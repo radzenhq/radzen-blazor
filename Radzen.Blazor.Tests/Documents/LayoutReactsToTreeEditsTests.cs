@@ -21,7 +21,7 @@ public class LayoutReactsToTreeEditsTests
         var section = document.Sections.Add();
         foreach (var text in texts)
         {
-            section.Blocks.AddParagraph(text);
+            section.Blocks.Add(new Paragraph(text));
         }
 
         return document;
@@ -36,7 +36,7 @@ public class LayoutReactsToTreeEditsTests
         document.Sections[0].Blocks.RemoveAt(0);
         Assert.Equal(["b"], LaidOutText(document));
 
-        document.Sections[0].Blocks.AddParagraph("c");
+        document.Sections[0].Blocks.Add(new Paragraph("c"));
         Assert.Equal(["b", "c"], LaidOutText(document));
 
         document.Sections[0].Blocks.Move(0, 1);
@@ -47,7 +47,7 @@ public class LayoutReactsToTreeEditsTests
     public void TableMutation_ChangesTheLaidOutTable()
     {
         var document = WithParagraphs();
-        var table = document.Sections[0].Blocks.AddTable();
+        var table = document.Sections[0].Blocks.Add(new Table());
         table.Columns.Add();
         table.Rows.Add().Cells[0].Text = "a";
         table.Rows.Add().Cells[0].Text = "b";

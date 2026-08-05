@@ -19,7 +19,7 @@ public class ShapedTextRunTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         section.Margins.SetAll(Unit.FromPoint(20));
-        section.Blocks.AddParagraph().Inlines.Add(text);
+        section.Blocks.Add(new Paragraph()).Inlines.Add(text);
         return document;
     }
 
@@ -87,7 +87,7 @@ public class ShapedTextRunTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         section.Margins.SetAll(Unit.FromPoint(20));
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("body");
         paragraph.Inlines.Add("one").Font.Bold = true;
 
@@ -104,7 +104,7 @@ public class ShapedTextRunTests
     public void FragmentsAreFlattenedOnceForMultipleShapedRuns()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("body");
         paragraph.Inlines.Add("one").Font.Bold = true;
         var line = FirstLine(document);

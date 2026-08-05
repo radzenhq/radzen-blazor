@@ -17,7 +17,7 @@ public class FieldAppearanceEmbeddingTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
 
-        paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         return document;
     }
@@ -186,7 +186,7 @@ public class FieldAppearanceEmbeddingTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
 

@@ -105,7 +105,7 @@ public class ContainerLayoutTests
             Background = Color.FromRgb(240, 240, 240),
         });
         container.Blocks.Add(Text("Band box"));
-        var table = section.Header.Blocks.AddTable();
+        var table = section.Header.Blocks.Add(new Table());
         table.Columns.Add();
         table.Rows.Add().Cells[0].Blocks.Add(Text("Band table"));
         section.Blocks.Add(Text("Body"));
@@ -179,7 +179,7 @@ public class ContainerLayoutTests
             Background = Color.FromRgb(255, 255, 0),
         });
         container.Borders.SetAll(width: 1);
-        var paragraph = container.Blocks.AddParagraph();
+        var paragraph = container.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Inside the box");
         run.Font.Family = BuildTestSupport.Latin;
 
@@ -197,7 +197,7 @@ public class ContainerLayoutTests
         var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container());
-        var paragraph = container.Blocks.AddParagraph();
+        var paragraph = container.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("styled");
 
         var resolution = StyleResolver.Resolve(document);
@@ -219,9 +219,9 @@ public class ContainerLayoutTests
         container.Borders.SetAll(width: 1);
         container.Blocks.Add(Text("First paragraph"));
         container.Blocks.Add(Text("Second paragraph"));
-        var nested = container.Blocks.AddTable();
+        var nested = container.Blocks.Add(new Table());
         nested.Columns.Add(Unit.FromPoint(120));
-        var cellParagraph = nested.Rows.Add().Cells[0].Blocks.AddParagraph();
+        var cellParagraph = nested.Rows.Add().Cells[0].Blocks.Add(new Paragraph());
         cellParagraph.Inlines.Add("nested cell").Font.Family = PaginationSupport.Family;
 
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
@@ -245,11 +245,11 @@ public class ContainerLayoutTests
             CornerRadius = Unit.FromPoint(4),
         });
         buildContainer.Borders.SetAll(width: 1);
-        var first = buildContainer.Blocks.AddParagraph();
+        var first = buildContainer.Blocks.Add(new Paragraph());
         first.Inlines.Add("First paragraph").Font.Family = BuildTestSupport.Latin;
-        var buildNested = buildContainer.Blocks.AddTable();
+        var buildNested = buildContainer.Blocks.Add(new Table());
         buildNested.Columns.Add(Unit.FromPoint(120));
-        buildNested.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("nested cell").Font.Family = BuildTestSupport.Latin;
+        buildNested.Rows.Add().Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("nested cell").Font.Family = BuildTestSupport.Latin;
 
         var pdf = new DocumentRenderer().Render(document);
 
@@ -278,9 +278,9 @@ public class ContainerLayoutTests
         };
         container.Borders.SetAll(width: 1);
         container.Blocks.Add(Text("inside box"));
-        var innerTable = container.Blocks.AddTable();
+        var innerTable = container.Blocks.Add(new Table());
         innerTable.Columns.Add(Unit.FromPoint(100));
-        var deep = innerTable.Rows.Add().Cells[0].Blocks.AddParagraph();
+        var deep = innerTable.Rows.Add().Cells[0].Blocks.Add(new Paragraph());
         deep.Inlines.Add("deep cell").Font.Family = PaginationSupport.Family;
         cell.Blocks.Add(container);
 
@@ -303,7 +303,7 @@ public class ContainerLayoutTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        var buildTable = section.Blocks.AddTable();
+        var buildTable = section.Blocks.Add(new Table());
         buildTable.Borders.SetAll(width: 0.5);
         buildTable.Columns.Add(Unit.FromPoint(300));
         var buildCell = buildTable.Rows.Add().Cells[0];
@@ -314,11 +314,11 @@ public class ContainerLayoutTests
             CornerRadius = Unit.FromPoint(4),
         };
         buildContainer.Borders.SetAll(width: 1);
-        var boxed = buildContainer.Blocks.AddParagraph();
+        var boxed = buildContainer.Blocks.Add(new Paragraph());
         boxed.Inlines.Add("inside box").Font.Family = BuildTestSupport.Latin;
-        var buildInner = buildContainer.Blocks.AddTable();
+        var buildInner = buildContainer.Blocks.Add(new Table());
         buildInner.Columns.Add(Unit.FromPoint(100));
-        buildInner.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("deep cell").Font.Family = BuildTestSupport.Latin;
+        buildInner.Rows.Add().Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("deep cell").Font.Family = BuildTestSupport.Latin;
         buildCell.Blocks.Add(buildContainer);
 
         var pdf = new DocumentRenderer().Render(document);
@@ -366,12 +366,12 @@ public class ContainerLayoutTests
             var document = new Document();
             BuildTestSupport.RegisterLatin(document);
             var section = document.Sections.Add();
-            var paragraph = section.Blocks.AddParagraph();
+            var paragraph = section.Blocks.Add(new Paragraph());
             paragraph.Inlines.Add("Plain body text").Font.Family = BuildTestSupport.Latin;
-            var table = section.Blocks.AddTable();
+            var table = section.Blocks.Add(new Table());
             table.Borders.SetAll(width: 0.5);
             table.Columns.Add(Unit.FromPoint(120));
-            table.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("cell").Font.Family = BuildTestSupport.Latin;
+            table.Rows.Add().Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("cell").Font.Family = BuildTestSupport.Latin;
             return new DocumentRenderer().ToArray(document);
         }
 

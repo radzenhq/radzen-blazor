@@ -7,13 +7,18 @@ namespace Radzen.Documents;
 
 /// <summary>
 /// A block that renders a 1D barcode as crisp vector bars - one filled black rectangle per bar.
-/// The block hierarchy is closed: create barcodes through
-/// <see cref="BlockCollection.AddBarcode(BarcodeType, string, Unit, Unit, bool)"/>.
 /// </summary>
 public sealed class Barcode : Block
 {
-    internal Barcode(BarcodeType type, string value, Unit width, Unit height)
+    /// <summary>Initializes a barcode.</summary>
+    /// <param name="type">The barcode symbology.</param>
+    /// <param name="value">The value to encode.</param>
+    /// <param name="width">The rendered width of the bars.</param>
+    /// <param name="height">The rendered height of the bars.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    public Barcode(BarcodeType type, string value, Unit width, Unit height)
     {
+        System.ArgumentNullException.ThrowIfNull(value);
         Type = type;
         Value = value;
         Width = AuthoredNumber.Absolute(width, "Barcode.Width");

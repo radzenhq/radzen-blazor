@@ -21,7 +21,7 @@ public class EditableDocumentTreeTests
         var section = document.Sections.Add();
         foreach (var text in texts)
         {
-            section.Blocks.AddParagraph(text);
+            section.Blocks.Add(new Paragraph(text));
         }
 
         return document;
@@ -147,7 +147,7 @@ public class EditableDocumentTreeTests
         blocks.Move(0, 0);
         Assert.False(blocks.StructureChanged);
 
-        blocks.AddParagraph("c");
+        blocks.Add(new Paragraph("c"));
         blocks.AcceptStructure();
         blocks.Move(0, 1);
         Assert.True(blocks.StructureChanged);
@@ -162,7 +162,7 @@ public class EditableDocumentTreeTests
     {
         var document = WithParagraphs();
         var other = document.Sections.Add();
-        var paragraph = document.Sections[0].Blocks.AddParagraph("a");
+        var paragraph = document.Sections[0].Blocks.Add(new Paragraph("a"));
 
         Assert.Throws<InvalidOperationException>(() => other.Blocks.Add(paragraph));
         Assert.Empty(other.Blocks);
@@ -174,7 +174,7 @@ public class EditableDocumentTreeTests
     {
         var document = WithParagraphs();
         var other = document.Sections.Add();
-        var paragraph = document.Sections[0].Blocks.AddParagraph("a");
+        var paragraph = document.Sections[0].Blocks.Add(new Paragraph("a"));
 
         Assert.Throws<InvalidOperationException>(() => other.Blocks.Insert(0, paragraph));
     }
@@ -185,7 +185,7 @@ public class EditableDocumentTreeTests
         var document = WithParagraphs();
         var other = document.Sections.Add();
         var first = document.Sections[0];
-        var paragraph = first.Blocks.AddParagraph("a");
+        var paragraph = first.Blocks.Add(new Paragraph("a"));
 
         first.Blocks.Remove(paragraph);
         other.Blocks.Add(paragraph);
@@ -200,7 +200,7 @@ public class EditableDocumentTreeTests
         var document = WithParagraphs();
         var other = document.Sections.Add();
         var first = document.Sections[0];
-        var paragraph = first.Blocks.AddParagraph("a");
+        var paragraph = first.Blocks.Add(new Paragraph("a"));
 
         first.Blocks.Clear();
         other.Blocks.Add(paragraph);
@@ -252,7 +252,7 @@ public class EditableDocumentTreeTests
         var list = new ListBlock();
         var first = list.Items.Add("a");
         var second = list.Items.Add("b");
-        var nested = first.AddList();
+        var nested = first.NestedList = new ListBlock();
 
         Assert.Throws<InvalidOperationException>(() => second.NestedList = nested);
     }
@@ -263,7 +263,7 @@ public class EditableDocumentTreeTests
         var list = new ListBlock();
         var first = list.Items.Add("a");
         var second = list.Items.Add("b");
-        var nested = first.AddList();
+        var nested = first.NestedList = new ListBlock();
 
         first.NestedList = null;
         second.NestedList = nested;
@@ -308,7 +308,7 @@ public class EditableDocumentTreeTests
     public void InlineMutation_ChangesTheAttachedParagraphText()
     {
         var document = WithParagraphs();
-        var paragraph = document.Sections[0].Blocks.AddParagraph("one");
+        var paragraph = document.Sections[0].Blocks.Add(new Paragraph("one"));
         paragraph.Inlines.Add("three");
         Assert.Equal("onethree", paragraph.Text);
 
@@ -323,9 +323,9 @@ public class EditableDocumentTreeTests
     public void SectionInsertRemoveAndMove_ReorderTheDocument()
     {
         var document = WithParagraphs();
-        document.Sections[0].Blocks.AddParagraph("a");
-        document.Sections.Add().Blocks.AddParagraph("c");
-        document.Sections.Insert(1).Blocks.AddParagraph("b");
+        document.Sections[0].Blocks.Add(new Paragraph("a"));
+        document.Sections.Add().Blocks.Add(new Paragraph("c"));
+        document.Sections.Insert(1).Blocks.Add(new Paragraph("b"));
         Assert.Equal(["a", "b", "c"], ParagraphTexts(document));
 
         document.Sections.Move(0, 2);
@@ -339,9 +339,9 @@ public class EditableDocumentTreeTests
     public void SectionRemovedThenReAdded_KeepsItsContent()
     {
         var document = WithParagraphs();
-        document.Sections[0].Blocks.AddParagraph("a");
+        document.Sections[0].Blocks.Add(new Paragraph("a"));
         var second = document.Sections.Add();
-        second.Blocks.AddParagraph("b");
+        second.Blocks.Add(new Paragraph("b"));
 
         document.Sections.Remove(second);
         Assert.Equal(["a"], ParagraphTexts(document));
@@ -400,7 +400,7 @@ public class EditableDocumentTreeTests
     public void ListMutation_ReordersTheAttachedItems()
     {
         var document = WithParagraphs();
-        var list = document.Sections[0].Blocks.AddList(ListStyle.Number);
+        var list = document.Sections[0].Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.AddItem("a");
         list.AddItem("c");
         list.Items.Insert(1, "b");

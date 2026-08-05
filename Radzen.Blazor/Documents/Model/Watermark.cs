@@ -66,7 +66,7 @@ public sealed class Watermark
     public Image SetImage(Stream image, Core.ResourceLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(image);
-        var buffered = Radzen.Documents.Image.FromStream(image, limits);
+        var buffered = new Radzen.Documents.Image(image, limits);
         Image = buffered;
         return buffered;
     }

@@ -27,7 +27,7 @@ public class SyntheticItalicTests
         }
 
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var lead = paragraph.Inlines.Add("Upright ");
         lead.Font.Family = Family;
         lead.Font.Size = Size;

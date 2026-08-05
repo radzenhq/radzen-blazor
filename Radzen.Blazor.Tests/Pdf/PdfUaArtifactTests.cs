@@ -44,7 +44,7 @@ public class PdfUaArtifactTests
 
         BuildTestSupport.AddText(section, "Body paragraph", BuildTestSupport.Latin);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         table.Borders.SetAll(width: 1, color: Color.FromRgb(0, 0, 0));
@@ -180,7 +180,7 @@ public class PdfUaArtifactTests
         var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
         document.Info.Title = "Figure";
         var section = document.Sections.Add();
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "";
 
         Lacks("emission", "/S /Figure", Emit(document, builderRenderer));
     }
@@ -202,16 +202,16 @@ public class PdfUaArtifactTests
         switch (kind)
         {
             case "Image":
-                blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+                blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
                 break;
             case "InlineImage":
-                blocks.AddParagraph().Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+                blocks.Add(new Paragraph()).Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
                 break;
             case "Barcode":
-                blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+                blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)));
                 break;
             case "QrCode":
-                blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+                blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80)));
                 break;
         }
 
@@ -231,7 +231,7 @@ public class PdfUaArtifactTests
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Figure";
-        var image = document.Sections.Add().Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = document.Sections.Add().Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.AlternateText = "";
 
         var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
@@ -247,7 +247,7 @@ public class PdfUaArtifactTests
         BuildTestSupport.RegisterLatin(document);
         document.Info.Title = "Figure";
         document.Styles.Add("Fig").Role = "Figure";
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.StyleName = "Fig";
         paragraph.Inlines.Add("Stands in for a picture.").Font.Family = BuildTestSupport.Latin;
 
@@ -264,7 +264,7 @@ public class PdfUaArtifactTests
         var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
         document.Info.Title = "Figure";
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.ReplacementText = "chart";
 
         Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
@@ -278,7 +278,7 @@ public class PdfUaArtifactTests
         BuildTestSupport.RegisterLatin(document);
         document.Info.Title = "List";
         var section = document.Sections.Add();
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
@@ -298,7 +298,7 @@ public class PdfUaArtifactTests
         BuildTestSupport.RegisterLatin(document);
         document.Info.Title = "List";
         var section = document.Sections.Add();
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
@@ -335,7 +335,7 @@ public class PdfUaArtifactTests
         run.Font.Family = BuildTestSupport.Latin;
         run.Link = "https://www.radzen.com";
         section.Header.Blocks.Add(paragraph);
-        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
 
         var error = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
 

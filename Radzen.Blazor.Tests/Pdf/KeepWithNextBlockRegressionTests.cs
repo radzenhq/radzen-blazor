@@ -64,10 +64,10 @@ public class KeepWithNextBlockRegressionTests
         heading.KeepWithNext = true;
         section.Blocks.Add(heading);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add().Width = Unit.FromPoint(200);
         var row = table.Rows.Add();
-        var cellParagraph = row.Cells[0].Blocks.AddParagraph();
+        var cellParagraph = row.Cells[0].Blocks.Add(new Paragraph());
         var run = cellParagraph.Inlines.Add("TallCellText");
         run.Font.Size = 30;
 
@@ -94,13 +94,13 @@ public class KeepWithNextBlockRegressionTests
         heading.KeepWithNext = true;
         section.Blocks.Add(heading);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add().Width = Unit.FromPoint(200);
         var headerRow = table.Rows.Add();
         headerRow.RepeatOnEveryPage = true;
-        headerRow.Cells[0].Blocks.AddParagraph().Inlines.Add("ColumnHead");
+        headerRow.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("ColumnHead");
         var bodyRow = table.Rows.Add();
-        bodyRow.Cells[0].Blocks.AddParagraph().Inlines.Add("FirstBodyRow");
+        bodyRow.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("FirstBodyRow");
 
         var page1 = PageContent(document, 0, out var pageCount);
         Assert.Equal(2, pageCount);
@@ -124,7 +124,7 @@ public class KeepWithNextBlockRegressionTests
         heading.KeepWithNext = true;
         section.Blocks.Add(heading);
 
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(60);
         image.Height = Unit.FromPoint(60);
 

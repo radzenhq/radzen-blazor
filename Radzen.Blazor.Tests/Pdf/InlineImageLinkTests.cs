@@ -24,8 +24,8 @@ public class InlineImageLinkTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
         section.Margins.SetAll(Unit.FromPoint(Margin));
-        var paragraph = section.Blocks.AddParagraph();
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var paragraph = section.Blocks.Add(new Paragraph());
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(ImageWidth);
         image.Height = Unit.FromPoint(ImageHeight);
         configure(image);
@@ -75,12 +75,12 @@ public class InlineImageLinkTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
         section.Margins.SetAll(Unit.FromPoint(Margin));
-        var paragraph = section.Blocks.AddParagraph();
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var paragraph = section.Blocks.Add(new Paragraph());
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(ImageWidth);
         image.Height = Unit.FromPoint(ImageHeight);
         image.LinkToAnchor = "target";
-        section.Blocks.AddParagraph().Inlines.Add("destination").Anchor = "target";
+        section.Blocks.Add(new Paragraph()).Inlines.Add("destination").Anchor = "target";
 
         var annotation = LinkAnnotation(Emit(document));
 
@@ -95,8 +95,8 @@ public class InlineImageLinkTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
         section.Margins.SetAll(Unit.FromPoint(Margin));
-        var paragraph = section.Blocks.AddParagraph();
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var paragraph = section.Blocks.Add(new Paragraph());
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Anchor = "picture";
 
         var page = Assert.Single(DocumentLayouter.Layout(document).Pages);

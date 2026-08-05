@@ -60,7 +60,7 @@ public class SemanticIntentCaptureTests
         BuildTestSupport.RegisterLatin(document);
 
         var front = document.Sections.Add();
-        toc = front.Blocks.AddTableOfContents();
+        toc = front.Blocks.Add(new TableOfContents());
         toc.Font.Family = BuildTestSupport.Latin;
         toc.AddEntry("Chapter One", "ch1");
         toc.AddEntry("Chapter Two", "ch2", level: 1);
@@ -68,7 +68,7 @@ public class SemanticIntentCaptureTests
         foreach (var (anchor, text) in new[] { ("ch1", "Chapter one body"), ("ch2", "Chapter two body") })
         {
             var section = document.Sections.Add();
-            var paragraph = section.Blocks.AddParagraph();
+            var paragraph = section.Blocks.Add(new Paragraph());
             var run = paragraph.Inlines.Add(text);
             run.Font.Family = BuildTestSupport.Latin;
             run.Anchor = anchor;
@@ -118,9 +118,9 @@ public class SemanticIntentCaptureTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        section.Header.Blocks.AddParagraph().Inlines.Add("Header").Font.Family = BuildTestSupport.Latin;
-        section.Footer.Blocks.AddParagraph().Inlines.Add("Footer").Font.Family = BuildTestSupport.Latin;
-        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+        section.Header.Blocks.Add(new Paragraph()).Inlines.Add("Header").Font.Family = BuildTestSupport.Latin;
+        section.Footer.Blocks.Add(new Paragraph()).Inlines.Add("Footer").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
 
         var artifacts = DocumentLayouter.Layout(document).Semantics.Structure.Artifacts;
 
@@ -132,7 +132,7 @@ public class SemanticIntentCaptureTests
     public void List_IsCapturedWithAListItemForEveryItem()
     {
         var document = new Document();
-        var list = document.Sections.Add().Blocks.AddList(ListStyle.Bullet);
+        var list = document.Sections.Add().Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.AddItem("Item");
 
         var nodes = DocumentLayouter.Layout(document).Semantics.Structure.Nodes;
@@ -207,7 +207,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "Scan for details";
+        document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80))).AlternateText = "Scan for details";
 
         var emission = Emit(Accessible().Render(document));
 
@@ -220,7 +220,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
+        document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80))).AlternateText = "";
 
         Lacks("tagged emission", StructureMarker("Figure"), Emit(Accessible().Render(document)));
     }
@@ -237,7 +237,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
+        document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80))).AlternateText = "";
 
         var figure = SingleFigure(document);
 
@@ -251,7 +251,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "Scan for details";
+        document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80))).AlternateText = "Scan for details";
 
         var figure = SingleFigure(document);
 
@@ -265,7 +265,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
+        document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(80))).AlternateText = "";
 
         var reader = BuildTestSupport.Read(document, Accessible());
 
@@ -304,9 +304,9 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Inline";
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "The Radzen logo";
+        paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "The Radzen logo";
 
         var emission = Emit(Accessible().Render(document));
 
@@ -320,7 +320,7 @@ public class SemanticIntentCaptureTests
         document.Info.Title = "Boxed";
         BuildTestSupport.RegisterLatin(document);
         var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
-        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+        container.Blocks.Add(new Paragraph()).Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
 
         var emission = Emit(Accessible().Render(document));
 
@@ -337,7 +337,7 @@ public class SemanticIntentCaptureTests
         document.Info.Title = "Boxed";
         BuildTestSupport.RegisterLatin(document);
         var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
-        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+        container.Blocks.Add(new Paragraph()).Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
 
         Lacks("untagged emission", StructureMarker("Div"), Emit(new DocumentRenderer().Render(document)));
     }
@@ -348,7 +348,7 @@ public class SemanticIntentCaptureTests
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(140));
         section.Margins.SetAll(Unit.FromPoint(20));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
         var first = table.Rows.Add();
         first.RepeatOnEveryPage = repeat;
@@ -427,9 +427,9 @@ public class SemanticIntentCaptureTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
+        paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "";
 
         var artifacts = DocumentLayouter.Layout(document).Semantics.Structure.Artifacts;
 
@@ -440,8 +440,8 @@ public class SemanticIntentCaptureTests
     public void InlineImageReplacementText_IsCaptured()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).ReplacementText = "Radzen";
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
+        paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg"))).ReplacementText = "Radzen";
 
         var figure = SingleFigure(document);
 
@@ -455,8 +455,8 @@ public class SemanticIntentCaptureTests
     public void MissingInlineImageText_IsNotSilentlyClassifiedAsDecorative()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
+        paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
 
         var laidOut = DocumentLayouter.Layout(document);
         var figure = Assert.Single(laidOut.Semantics.Structure.Nodes.Where(node => node.Intent == SemanticIntent.Figure));
@@ -475,7 +475,7 @@ public class SemanticIntentCaptureTests
         var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = "DRAFT" };
         section.Watermark.Font.Family = BuildTestSupport.Latin;
-        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
 
         var reader = BuildTestSupport.Read(document, Accessible());
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;

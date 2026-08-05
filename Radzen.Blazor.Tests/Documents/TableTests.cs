@@ -47,8 +47,8 @@ public class TableTests
         var t = new Table();
         t.Columns.Add();
         var cell = t.Rows.Add().Cells[0];
-        cell.Blocks.AddParagraph("old");
-        cell.Blocks.AddParagraph("more");
+        cell.Blocks.Add(new Paragraph("old"));
+        cell.Blocks.Add(new Paragraph("more"));
         cell.Text = "new";
         Assert.Single(cell.Blocks);
         var p = Assert.IsType<Paragraph>(cell.Blocks[0]);
@@ -64,8 +64,8 @@ public class TableTests
         var cell = t.Rows.Add().Cells[0];
         Assert.Null(cell.Text);
 
-        cell.Blocks.AddParagraph("a");
-        cell.Blocks.AddParagraph("b");
+        cell.Blocks.Add(new Paragraph("a"));
+        cell.Blocks.Add(new Paragraph("b"));
         Assert.Null(cell.Text);
     }
 
@@ -75,7 +75,7 @@ public class TableTests
         var t = new Table();
         t.Columns.Add();
         var cell = t.Rows.Add().Cells[0];
-        cell.Blocks.AddParagraph("solo");
+        cell.Blocks.Add(new Paragraph("solo"));
         Assert.Equal("solo", cell.Text);
     }
 

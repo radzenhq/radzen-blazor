@@ -115,7 +115,7 @@ public class FontPublicContractTests
     public void RunFontCascadesOverTheParagraphFont()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = "Times";
         paragraph.Font.Size = 20;
         var run = paragraph.Inlines.Add("run");

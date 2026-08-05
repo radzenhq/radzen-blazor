@@ -45,7 +45,7 @@ internal static class TablePaginationSupport
         cell.Blocks.Clear();
         for (var i = 0; i < lines; i++)
         {
-            var p = cell.Blocks.AddParagraph();
+            var p = cell.Blocks.Add(new Paragraph());
             var run = p.Inlines.Add($"{prefix}{i}");
             run.Font.Family = Family;
             run.Font.Size = 12;

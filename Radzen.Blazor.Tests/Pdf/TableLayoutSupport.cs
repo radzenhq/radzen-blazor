@@ -27,7 +27,7 @@ internal static class TableLayoutSupport
     public static Cell Fill(Cell cell, string text, double size = 12)
     {
         cell.Blocks.Clear();
-        var p = cell.Blocks.AddParagraph();
+        var p = cell.Blocks.Add(new Paragraph());
         var run = p.Inlines.Add(text);
         run.Font.Family = Family;
         run.Font.Size = size;

@@ -105,7 +105,7 @@ public class HyperlinkPageNumberRegressionTests
     public void LinkedRun_EmitsLinkAnnotation_WithUriOverTheTextRect()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Visit ");
         SetLink(paragraph.Inlines.Add("Radzen"), Url);
 
@@ -135,7 +135,7 @@ public class HyperlinkPageNumberRegressionTests
     public void LinkAnnotation_SetsPrintFlag_ForPdfAConformance()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         SetLink(paragraph.Inlines.Add("Radzen"), Url);
 
         var reader = BuildTestSupport.Read(document);
@@ -154,9 +154,9 @@ public class HyperlinkPageNumberRegressionTests
     public void LinkOnSecondPage_AnnotationLandsOnThatPage()
     {
         var (document, section) = Author();
-        section.Blocks.AddParagraph("page one body");
-        section.Blocks.AddPageBreak();
-        var paragraph = section.Blocks.AddParagraph();
+        section.Blocks.Add(new Paragraph("page one body"));
+        section.Blocks.Add(new PageBreak());
+        var paragraph = section.Blocks.Add(new Paragraph());
         SetLink(paragraph.Inlines.Add("second page link"), Url);
 
         var reader = BuildTestSupport.Read(document);
@@ -169,7 +169,7 @@ public class HyperlinkPageNumberRegressionTests
     public void WrappedLink_EmitsOneAnnotationPerLineFragment()
     {
         var (document, section) = Author(width: 200);
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         SetLink(paragraph.Inlines.Add(
             "an intentionally long hyperlink label that cannot possibly fit on a single narrow line"), Url);
 
@@ -195,17 +195,17 @@ public class HyperlinkPageNumberRegressionTests
     private static Document ThreePageDocumentWithNumberedFooter()
     {
         var (document, section) = Author();
-        var footer = section.Footer.Blocks.AddParagraph();
+        var footer = section.Footer.Blocks.Add(new Paragraph());
         footer.Inlines.Add("Page ");
         footer.Inlines.Add(Field("PageNumberField"));
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(Field("PageCountField"));
 
-        section.Blocks.AddParagraph("body one");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("body two");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("body three");
+        section.Blocks.Add(new Paragraph("body one"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("body two"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("body three"));
         return document;
     }
 
@@ -239,12 +239,12 @@ public class HyperlinkPageNumberRegressionTests
     public void SinglePageDocument_FooterShowsPageOneOfOne()
     {
         var (document, section) = Author();
-        var footer = section.Footer.Blocks.AddParagraph();
+        var footer = section.Footer.Blocks.Add(new Paragraph());
         footer.Inlines.Add("Page ");
         footer.Inlines.Add(Field("PageNumberField"));
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(Field("PageCountField"));
-        section.Blocks.AddParagraph("only page");
+        section.Blocks.Add(new Paragraph("only page"));
 
         var reader = BuildTestSupport.Read(document);
         Assert.Equal("Page 1 of 1", FooterLine(reader, 0));

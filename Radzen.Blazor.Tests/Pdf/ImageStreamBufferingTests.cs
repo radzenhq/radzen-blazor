@@ -18,13 +18,13 @@ public class ImageStreamBufferingTests
 
     [Fact]
     public void UnseekableStream_StillBuffersFully()
-        => Assert.Equal(PayloadBytes, Image.FromStream(new UnseekableStream(new byte[PayloadBytes])).Data.Length);
+        => Assert.Equal(PayloadBytes, new Image(new UnseekableStream(new byte[PayloadBytes])).Data.Length);
 
     [Fact]
     public void SeekableStream_BuffersFromCurrentPosition()
     {
         var stream = new MemoryStream([1, 2, 3, 4, 5]);
         stream.Position = 2;
-        Assert.Equal([3, 4, 5], Image.FromStream(stream).Data);
+        Assert.Equal([3, 4, 5], new Image(stream).Data);
     }
 }

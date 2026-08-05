@@ -51,7 +51,7 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document);
-        var run = section.Blocks.AddParagraph().Inlines.Add("Radzen");
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("Radzen");
         run.Opacity = 0.5;
         run.LetterSpacing = Unit.FromPoint(3);
         run.WordSpacing = Unit.FromPoint(2);
@@ -78,7 +78,7 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document);
-        var run = section.Blocks.AddParagraph().Inlines.Add("Radzen");
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("Radzen");
         run.Opacity = 0.5;
         run.Font.Color = Color.FromRgb(1, 2, 3);
         run.Link = "https://www.radzen.com/";
@@ -105,7 +105,7 @@ public class LaidOutContractTests
         BuildTestSupport.RegisterCjk(document);
         document.Fonts.SetFallback(BuildTestSupport.Cjk);
         var section = Page(document);
-        var run = section.Blocks.AddParagraph().Inlines.Add("A\u4E2DB");
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("A\u4E2DB");
         run.Font.Family = BuildTestSupport.Latin;
 
         var laidOut = DocumentLayouter.Layout(document);
@@ -165,7 +165,7 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddParagraph("A\u20AC\uFB01");
+        section.Blocks.Add(new Paragraph("A\u20AC\uFB01"));
 
         var fragment = FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages));
         var span = Assert.Single(fragment.GlyphRun.Spans);
@@ -193,7 +193,7 @@ public class LaidOutContractTests
         foreach (var (family, bold, italic, resolved, resolvedBold, resolvedItalic) in cases)
         {
             var document = new Document();
-            var run = (Run)Page(document).Blocks.AddParagraph("A").Inlines[0];
+            var run = (Run)Page(document).Blocks.Add(new Paragraph("A")).Inlines[0];
             run.Font.Family = family;
             run.Font.Bold = bold;
             run.Font.Italic = italic;
@@ -213,7 +213,7 @@ public class LaidOutContractTests
     public void LaidOutBuiltInFace_CarriesTheMetricsLayoutMeasuredWith()
     {
         var document = new Document();
-        Page(document).Blocks.AddParagraph("A");
+        Page(document).Blocks.Add(new Paragraph("A"));
 
         var face = Assert.Single(
             FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
@@ -243,7 +243,7 @@ public class LaidOutContractTests
     public void CapturedBuiltInAdjustment_IsInPointsUntilPdfEmission()
     {
         var document = new Document { Fonts = { EnableKerning = true } };
-        var run = (Run)Page(document).Blocks.AddParagraph("AV").Inlines[0];
+        var run = (Run)Page(document).Blocks.Add(new Paragraph("AV")).Inlines[0];
         run.Font.Family = "Helvetica";
         run.Font.Size = 11.3;
 
@@ -267,7 +267,7 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddParagraph("A\uFB01B");
+        section.Blocks.Add(new Paragraph("A\uFB01B"));
 
         var laidOut = DocumentLayouter.Layout(document);
         var glyph = Assert.Single(
@@ -298,7 +298,7 @@ public class LaidOutContractTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = Page(document);
-        var run = section.Blocks.AddParagraph().Inlines.Add("AVATAR");
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("AVATAR");
         run.Font.Family = BuildTestSupport.Latin;
 
         var laidOut = DocumentLayouter.Layout(document);
@@ -330,12 +330,12 @@ public class LaidOutContractTests
         header.Background = Color.FromRgb(200, 200, 200);
         header.Borders.Bottom.Width = 3;
         header.Borders.Bottom.Color = Color.FromRgb(2, 2, 2);
-        header.Cells[0].Blocks.AddParagraph("head");
+        header.Cells[0].Blocks.Add(new Paragraph("head"));
 
         var body = table.Rows.Add();
         body.Cells[0].Borders.Left.Width = 5;
         body.Cells[0].Borders.Left.Color = Color.FromRgb(3, 3, 3);
-        body.Cells[0].Blocks.AddParagraph("body");
+        body.Cells[0].Blocks.Add(new Paragraph("body"));
         return table;
     }
 
@@ -349,7 +349,7 @@ public class LaidOutContractTests
         table.Columns.Add(Unit.FromPoint(80));
         table.Columns.Add(Unit.FromPoint(80));
         var row = table.Rows.Add();
-        row.Cells[0].Blocks.AddParagraph("filled");
+        row.Cells[0].Blocks.Add(new Paragraph("filled"));
         row.Cells[1].Background = Color.FromRgb(9, 9, 9);
 
         var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
@@ -393,10 +393,10 @@ public class LaidOutContractTests
         table.Columns.Add(Unit.FromPoint(100));
         var header = table.Rows.Add();
         header.RepeatOnEveryPage = true;
-        header.Cells[0].Blocks.AddParagraph("head");
+        header.Cells[0].Blocks.Add(new Paragraph("head"));
         for (var i = 0; i < 12; i++)
         {
-            table.Rows.Add().Cells[0].Blocks.AddParagraph($"row {i}");
+            table.Rows.Add().Cells[0].Blocks.Add(new Paragraph($"row {i}"));
         }
 
         section.Blocks.Add(table);
@@ -426,7 +426,7 @@ public class LaidOutContractTests
         var document = new Document();
         var section = Page(document, 400, 300);
         section.Watermark = new Watermark { Text = "DRAFT", Rotation = 30, Opacity = 0.25 };
-        section.Blocks.AddParagraph("body");
+        section.Blocks.Add(new Paragraph("body"));
 
         var watermark = Assert.Single(DocumentLayouter.Layout(document).Pages).Watermark;
 
@@ -447,8 +447,8 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddQrCode("RADZEN", Unit.FromPoint(120));
-        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40));
+        section.Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(120)));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)));
 
         var codes = Assert.Single(DocumentLayouter.Layout(document).Pages).Body.CodeSymbols;
 
@@ -470,7 +470,7 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document, 400, 300);
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Radzen").Link = "https://www.radzen.com/";
         paragraph.Inlines.Add(" here").Anchor = "here";
 
@@ -570,21 +570,20 @@ public class LaidOutContractTests
             Font = { Family = BuildTestSupport.Latin, Size = 40 },
         };
 
-        section.Header.Blocks.AddParagraph("Header band");
+        section.Header.Blocks.Add(new Paragraph("Header band"));
         var headerBox = section.Header.Blocks.Add(new Container { Background = Color.FromRgb(220, 220, 220) });
-        headerBox.Blocks.AddParagraph("Header box");
-        section.Footer.Blocks.AddParagraph("Footer band");
+        headerBox.Blocks.Add(new Paragraph("Header box"));
+        section.Footer.Blocks.Add(new Paragraph("Footer band"));
 
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(" Radzen").Link = "https://www.radzen.com/";
         paragraph.Inlines.Add(" here").Anchor = "here";
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
-        section.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
-        section.Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(30), showText: true);
+        section.Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(60)));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(30)) { ShowText = true });
 
         var gradient = section.Blocks.Add(new Container
         {
@@ -604,16 +603,16 @@ public class LaidOutContractTests
             },
         });
         gradient.Borders.SetAll(width: 2);
-        gradient.Blocks.AddParagraph("Gradient box");
+        gradient.Blocks.Add(new Paragraph("Gradient box"));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
         for (var row = 0; row < 40; row++)
         {
             var cells = table.Rows.Add().Cells;
-            cells[0].Blocks.AddParagraph($"Cell {row}");
-            cells[1].Blocks.AddParagraph($"Value {row}");
+            cells[0].Blocks.Add(new Paragraph($"Cell {row}"));
+            cells[1].Blocks.Add(new Paragraph($"Value {row}"));
         }
 
         return document;
@@ -635,7 +634,7 @@ public class LaidOutContractTests
             flag.SetValue(document.Fonts, value);
         }
 
-        Page(document).Blocks.AddParagraph("Body");
+        Page(document).Blocks.Add(new Paragraph("Body"));
 
         return DocumentLayouter.Layout(document).Fonts;
     }
@@ -667,7 +666,7 @@ public class LaidOutContractTests
     {
         const string LateFamily = "LateRegistered";
         var document = new Document();
-        Page(document).Blocks.AddParagraph("Body");
+        Page(document).Blocks.Add(new Paragraph("Body"));
         var renderer = new DocumentRenderer();
         TextFieldDefinition Field() => new("name")
         {
@@ -726,9 +725,9 @@ public class LaidOutContractTests
     {
         var document = new Document();
         var section = Page(document, 500, 700);
-        var paragraph = section.Blocks.AddParagraph();
-        var inlineImage = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var paragraph = section.Blocks.Add(new Paragraph());
+        var inlineImage = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         var watermark = new Watermark { Text = "DRAFT" };
         var watermarkImage = watermark.SetImage(PdfTestResources.Open("Images/gray.jpg"));
         section.Watermark = watermark;

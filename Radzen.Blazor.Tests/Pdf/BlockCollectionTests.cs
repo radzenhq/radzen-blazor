@@ -26,8 +26,8 @@ public class BlockCollectionTests
     public void AddParagraph_WithAndWithoutText()
     {
         var blocks = NewBlocks();
-        var empty = blocks.AddParagraph();
-        var withText = blocks.AddParagraph("x");
+        var empty = blocks.Add(new Paragraph());
+        var withText = blocks.Add(new Paragraph("x"));
         Assert.Null(empty.Text);
         Assert.Equal("x", withText.Text);
         Assert.Equal(2, blocks.Count);
@@ -38,7 +38,7 @@ public class BlockCollectionTests
     {
         var blocks = NewBlocks();
 
-        var container = blocks.AddContainer();
+        var container = blocks.Add(new Container());
 
         Assert.Same(container, Assert.Single(blocks));
         Assert.True(blocks.StructureChanged);
@@ -62,7 +62,7 @@ public class BlockCollectionTests
         Image img;
         using (var stream = new MemoryStream(payload))
         {
-            img = blocks.AddImage(stream);
+            img = blocks.Add(new Image(stream));
         }
         Assert.Equal(payload, img.Data);
     }

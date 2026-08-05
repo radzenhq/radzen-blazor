@@ -136,7 +136,7 @@ public class PaginationTests
         var fonts = PaginationSupport.Fonts();
         var section = PaginationSupport.Section(500, 400);
         var a = section.Blocks.Add(PaginationSupport.Text("before"));
-        section.Blocks.AddPageBreak();
+        section.Blocks.Add(new PageBreak());
         var b = section.Blocks.Add(PaginationSupport.Text("after"));
 
         var capture = new LayoutCaptureContext(ImageProbes.None);

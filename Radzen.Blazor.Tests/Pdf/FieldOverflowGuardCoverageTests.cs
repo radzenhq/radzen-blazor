@@ -78,7 +78,7 @@ public class FieldOverflowGuardCoverageTests
     {
         for (var i = 0; i < 10; i++)
         {
-            section.Blocks.AddPageBreak();
+            section.Blocks.Add(new PageBreak());
         }
     }
 
@@ -97,7 +97,7 @@ public class FieldOverflowGuardCoverageTests
     public void TableCellFieldParagraph_MultiDigitCount_FitsTheReservedLines()
     {
         var document = Author(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         var cell = row.Cells[0];
@@ -127,7 +127,7 @@ public class FieldOverflowGuardCoverageTests
         section.Header.Blocks.Add(header);
         for (var i = 0; i < 120; i++)
         {
-            section.Blocks.AddPageBreak();
+            section.Blocks.Add(new PageBreak());
         }
 
         Assert.Null(Record.Exception(() => new DocumentRenderer().ToArray(document)));

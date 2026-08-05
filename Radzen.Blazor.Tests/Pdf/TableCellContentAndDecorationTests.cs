@@ -20,7 +20,7 @@ public class TableCellContentAndDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
 
         var row = table.Rows.Add();
@@ -212,7 +212,7 @@ public class TableCellContentAndDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
 
@@ -234,7 +234,7 @@ public class TableCellContentAndDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
 
@@ -296,14 +296,14 @@ public class TableCellContentAndDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
 
         var row = table.Rows.Add();
         TableLayoutSupport.Fill(row.Cells[0], "label");
-        var image = row.Cells[1].Blocks.AddImage(
-            new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png")));
+        var image = row.Cells[1].Blocks.Add(new Image(
+            new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png"))));
         image.Width = Unit.FromPoint(40);
         image.Height = Unit.FromPoint(20);
 
@@ -322,14 +322,14 @@ public class TableCellContentAndDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var outer = section.Blocks.AddTable();
+        var outer = section.Blocks.Add(new Table());
         outer.Columns.Add(Unit.FromPoint(300));
 
         var outerRow = outer.Rows.Add();
         var host = outerRow.Cells[0];
         TableLayoutSupport.Fill(host, "OUTER");
 
-        var inner = host.Blocks.AddTable();
+        var inner = host.Blocks.Add(new Table());
         inner.Columns.Add(Unit.FromPoint(120));
         var innerRow = inner.Rows.Add();
         TableLayoutSupport.Fill(innerRow.Cells[0], "NESTED");
@@ -346,8 +346,8 @@ public class TableCellContentAndDecorationTests
 
         var section = document.Sections.Add();
         var band = header ? section.Header : section.Footer;
-        var image = band.Blocks.AddImage(
-            new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png")));
+        var image = band.Blocks.Add(new Image(
+            new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png"))));
         image.Width = Unit.FromPoint(50);
         image.Height = Unit.FromPoint(25);
 

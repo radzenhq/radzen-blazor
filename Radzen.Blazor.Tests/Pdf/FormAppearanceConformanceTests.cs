@@ -20,7 +20,7 @@ public class FormAppearanceConformanceTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
 
-        paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
         return document;
@@ -170,7 +170,7 @@ public class FormAppearanceConformanceTests
     {
         var model = new Document();
         BuildTestSupport.RegisterLatin(model);
-        var paragraph = model.Sections.Add().Blocks.AddParagraph();
+        var paragraph = model.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add("base");
 

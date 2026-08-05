@@ -50,7 +50,7 @@ public class TaggedLinkStructureTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("See ").Font.Family = BuildTestSupport.Latin;
         var link = paragraph.Inlines.Add("Radzen");
         link.Font.Family = BuildTestSupport.Latin;
@@ -60,7 +60,7 @@ public class TaggedLinkStructureTests
 
         if (anchor is not null)
         {
-            var target = document.Sections.Add().Blocks.AddParagraph().Inlines.Add("Target");
+            var target = document.Sections.Add().Blocks.Add(new Paragraph()).Inlines.Add("Target");
             target.Font.Family = BuildTestSupport.Latin;
             target.Anchor = anchor;
         }
@@ -216,7 +216,7 @@ public class TaggedLinkStructureTests
         BuildTestSupport.RegisterLatin(document);
 
         var front = document.Sections.Add();
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         toc.Font.Family = BuildTestSupport.Latin;
         toc.AddEntry("Chapter One", "ch1");
         toc.AddEntry("Chapter Two", "ch2", level: 1);
@@ -224,7 +224,7 @@ public class TaggedLinkStructureTests
         foreach (var (anchor, text) in new[] { ("ch1", "Chapter one body"), ("ch2", "Chapter two body") })
         {
             var section = document.Sections.Add();
-            var run = section.Blocks.AddParagraph().Inlines.Add(text);
+            var run = section.Blocks.Add(new Paragraph()).Inlines.Add(text);
             run.Font.Family = BuildTestSupport.Latin;
             run.Anchor = anchor;
         }

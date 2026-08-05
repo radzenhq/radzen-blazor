@@ -79,9 +79,9 @@ public class PdfPaintOrderTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(40));
-        section.Header.Blocks.AddParagraph("HDR");
-        section.Footer.Blocks.AddParagraph("FTR");
-        section.Blocks.AddParagraph("BODY");
+        section.Header.Blocks.Add(new Paragraph("HDR"));
+        section.Footer.Blocks.Add(new Paragraph("FTR"));
+        section.Blocks.Add(new Paragraph("BODY"));
 
         var shown = ShownStrings(document);
 
@@ -125,7 +125,7 @@ public class PdfPaintOrderTests
         var run = caption.Inlines.Add("Overlapping");
         run.Font.Family = BuildTestSupport.Latin;
         container.Blocks.Add(caption);
-        container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        container.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
         return document;
     }

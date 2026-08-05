@@ -20,8 +20,8 @@ public class ListItemBlockContentTests
     public void Blocks_UseTheSharedEditableBlockCollectionRules()
     {
         var item = new ListItem();
-        var first = item.Blocks.AddParagraph("first");
-        var table = item.Blocks.AddTable();
+        var first = item.Blocks.Add(new Paragraph("first"));
+        var table = item.Blocks.Add(new Table());
         item.Blocks.Insert(1, new Paragraph { Text = "second" });
 
         item.Blocks.Move(2, 0);
@@ -54,7 +54,7 @@ public class ListItemBlockContentTests
         var list = new ListBlock();
         var item = list.AddItem("one");
         item.Inlines.Add(" two");
-        var nested = item.AddList(ListStyle.Number);
+        var nested = item.NestedList = new ListBlock { Style = ListStyle.Number };
 
         Assert.Equal("one two", item.Text);
         Assert.IsType<Paragraph>(item.Blocks[0]);
@@ -70,12 +70,12 @@ public class ListItemBlockContentTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var list = section.Blocks.AddList();
+        var list = section.Blocks.Add(new ListBlock());
         list.HangingIndent = Unit.FromPoint(20);
         var item = list.AddItem();
         item.Blocks.Add(PaginationSupport.Text("first"));
         item.Blocks.Add(PaginationSupport.Text("second"));
-        var nested = item.Blocks.AddList();
+        var nested = item.Blocks.Add(new ListBlock());
         nested.HangingIndent = Unit.FromPoint(15);
         nested.AddItem("inner").Font.Family = PaginationSupport.Family;
 
@@ -100,11 +100,11 @@ public class ListItemBlockContentTests
         var capture = new LayoutCaptureContext(ImageProbes.None);
 
         var narrow = new Container { Width = Unit.FromPoint(120) };
-        var narrowOuter = narrow.Blocks.AddList();
+        var narrowOuter = narrow.Blocks.Add(new ListBlock());
         narrowOuter.LeftIndent = Unit.FromPoint(5);
         narrowOuter.HangingIndent = Unit.FromPoint(10);
         var narrowItem = narrowOuter.AddItem("narrow");
-        var measuredList = narrowItem.Blocks.AddList();
+        var measuredList = narrowItem.Blocks.Add(new ListBlock());
         measuredList.LeftIndent = Unit.FromPoint(3);
         measuredList.HangingIndent = Unit.FromPoint(7);
         measuredList.AddItem("target").Font.Family = PaginationSupport.Family;
@@ -119,7 +119,7 @@ public class ListItemBlockContentTests
 
         Assert.True(narrowItem.Blocks.Remove(measuredList));
         var wide = new Container { Width = Unit.FromPoint(240) };
-        var wideOuter = wide.Blocks.AddList();
+        var wideOuter = wide.Blocks.Add(new ListBlock());
         wideOuter.LeftIndent = Unit.FromPoint(40);
         wideOuter.HangingIndent = Unit.FromPoint(20);
         var wideItem = wideOuter.AddItem("wide");
@@ -148,8 +148,8 @@ public class ListItemBlockContentTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var item = section.Blocks.AddList().AddItem("intro");
-        var table = item.Blocks.AddTable();
+        var item = section.Blocks.Add(new ListBlock()).AddItem("intro");
+        var table = item.Blocks.Add(new Table());
         table.Columns.Add();
         table.Rows.Add().Cells[0].Text = "cell";
 
@@ -166,8 +166,8 @@ public class ListItemBlockContentTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var item = section.Blocks.AddList().AddItem();
-        var image = item.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var item = section.Blocks.Add(new ListBlock()).AddItem();
+        var image = item.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(20);
         image.Height = Unit.FromPoint(20);
 
@@ -188,7 +188,7 @@ public class ListItemBlockContentTests
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineHeight, 3));
         section.Blocks.Add(PaginationSupport.Text("f0"));
         section.Blocks.Add(PaginationSupport.Text("f1"));
-        var item = section.Blocks.AddList().AddItem();
+        var item = section.Blocks.Add(new ListBlock()).AddItem();
         var blocks = Enumerable.Range(0, 4)
             .Select(i => item.Blocks.Add(PaginationSupport.Text($"i{i}")))
             .ToArray();
@@ -213,7 +213,7 @@ public class ListItemBlockContentTests
         var width = PaginationSupport.WidthForWordsPerLine(fonts, "Ha", 2, 12);
         var section = PaginationSupport.Section(width + 18, PaginationSupport.HeightForLines(lineHeight, 2));
         section.Blocks.Add(PaginationSupport.Text("filler"));
-        var item = section.Blocks.AddList().AddItem();
+        var item = section.Blocks.Add(new ListBlock()).AddItem();
         var paragraph = item.Blocks.Add(PaginationSupport.Repeated("Ha", 4));
 
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
@@ -244,7 +244,7 @@ public class ListItemBlockContentTests
         section.Blocks.Add(PaginationSupport.Text("f1"));
 
         document.Styles.Add("Keep list item").KeepTogether = true;
-        var item = section.Blocks.AddList().AddItem();
+        var item = section.Blocks.Add(new ListBlock()).AddItem();
         item.StyleName = "Keep list item";
         var first = item.Blocks.Add(PaginationSupport.Text("i0"));
         var second = item.Blocks.Add(PaginationSupport.Text("i1"));
@@ -266,10 +266,10 @@ public class ListItemBlockContentTests
     public void Semantics_KeepOneListBodyWithTheBlockStructure()
     {
         var document = new Document();
-        var item = document.Sections.Add().Blocks.AddList().AddItem();
-        item.Blocks.AddParagraph("first");
-        item.Blocks.AddParagraph("second");
-        item.Blocks.AddList(ListStyle.Number).AddItem("nested");
+        var item = document.Sections.Add().Blocks.Add(new ListBlock()).AddItem();
+        item.Blocks.Add(new Paragraph("first"));
+        item.Blocks.Add(new Paragraph("second"));
+        item.Blocks.Add(new ListBlock { Style = ListStyle.Number }).AddItem("nested");
 
         var structure = DocumentLayouter.Layout(document).Semantics.Structure;
         var body = Assert.Single(structure.Nodes.Where(node => node.Intent == SemanticIntent.ListBody)

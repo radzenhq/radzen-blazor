@@ -24,9 +24,9 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document);
         BuildTestSupport.RegisterLatin(document);
-        var first = section.Blocks.AddParagraph();
+        var first = section.Blocks.Add(new Paragraph());
         first.Inlines.Add("First paragraph").Font.Family = BuildTestSupport.Latin;
-        var second = section.Blocks.AddParagraph();
+        var second = section.Blocks.Add(new Paragraph());
         var target = second.Inlines.Add("Second paragraph");
         target.Font.Family = BuildTestSupport.Latin;
 
@@ -51,7 +51,7 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document);
         BuildTestSupport.RegisterLatin(document);
-        section.Blocks.AddParagraph().Inlines.Add("Only line").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Only line").Font.Family = BuildTestSupport.Latin;
 
         var laidOut = DocumentLayouter.LayoutWithSources(document);
         var page = Assert.Single(laidOut.Scene.Pages);
@@ -66,8 +66,8 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document);
         BuildTestSupport.RegisterLatin(document);
-        section.Blocks.AddParagraph().Inlines.Add("Above").Font.Family = BuildTestSupport.Latin;
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Above").Font.Family = BuildTestSupport.Latin;
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(80);
         image.Height = Unit.FromPoint(40);
 
@@ -98,7 +98,7 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document, height: 120);
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add(string.Join(' ', Enumerable.Repeat("flowing text", 40)));
         run.Font.Family = BuildTestSupport.Latin;
 
@@ -127,7 +127,7 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document);
         BuildTestSupport.RegisterLatin(document);
-        section.Blocks.AddParagraph().Inlines.Add("Text").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Text").Font.Family = BuildTestSupport.Latin;
 
         var sources = DocumentLayouter.LayoutWithSources(document).Sources;
 
@@ -141,7 +141,7 @@ public class DesignerHitTestTests
         var document = new Document();
         var section = Page(document);
         BuildTestSupport.RegisterLatin(document);
-        section.Blocks.AddParagraph().Inlines.Add("Text").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Text").Font.Family = BuildTestSupport.Latin;
 
         Assert.Equal(
             LayoutGeometry.Serialize(DocumentLayouter.Layout(document)),

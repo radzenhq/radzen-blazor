@@ -17,8 +17,24 @@ public sealed class InlineImage : Inline
 
     internal InlineImage(byte[] data) => Data = data;
 
-    internal static InlineImage FromStream(Stream stream, ResourceLimits? limits = null)
-        => new(StreamBytes.ReadFully(stream, (limits ?? ResourceLimits.Default).MaxFileBytes));
+    /// <summary>
+    /// Initializes an inline image, buffering the bytes from the specified stream. The caller may
+    /// dispose the stream immediately afterwards.
+    /// </summary>
+    /// <param name="stream">The source image stream.</param>
+    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="ResourceLimits.Default"/>.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidDataException">The stream holds more than <see cref="ResourceLimits.MaxFileBytes"/> bytes.</exception>
+    public InlineImage(Stream stream, ResourceLimits? limits = null)
+        : this(ReadFully(stream, limits))
+    {
+    }
+
+    private static byte[] ReadFully(Stream stream, ResourceLimits? limits)
+    {
+        System.ArgumentNullException.ThrowIfNull(stream);
+        return StreamBytes.ReadFully(stream, (limits ?? ResourceLimits.Default).MaxFileBytes);
+    }
 
     internal byte[] Data { get; }
 

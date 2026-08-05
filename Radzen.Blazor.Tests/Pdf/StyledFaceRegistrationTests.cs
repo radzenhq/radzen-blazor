@@ -33,7 +33,7 @@ public class StyledFaceRegistrationTests
         RegisterBoth(document.Fonts);
 
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var regular = paragraph.Inlines.Add("Regular ");
         regular.Font.Family = Family;
         var bold = paragraph.Inlines.Add("Bold");
@@ -68,7 +68,7 @@ public class StyledFaceRegistrationTests
         RegisterFace(document.Fonts, "Fonts/LiberationSans-Regular.ttf", bold: false, italic: false);
 
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Bold wanted");
         run.Font.Family = Family;
         run.Font.Bold = true;

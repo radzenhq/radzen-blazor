@@ -32,7 +32,7 @@ public class TaggedTableSemanticsTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -73,7 +73,7 @@ public class TaggedTableSemanticsTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var cell = table.Rows.Add().Cells[0];
         TableLayoutSupport.Fill(cell, "Summary");
@@ -110,7 +110,7 @@ public class TaggedTableSemanticsTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         table.Columns[0].IsHeaderColumn = headerColumn;
@@ -166,7 +166,7 @@ public class TaggedTableSemanticsTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -210,7 +210,7 @@ public class TaggedTableSemanticsTests
         document.Info.Title = "Combined spans";
         BuildTestSupport.RegisterLatin(document);
 
-        var table = document.Sections.Add().Blocks.AddTable();
+        var table = document.Sections.Add().Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         table.Columns.Add();
@@ -310,7 +310,7 @@ public class TaggedTableSemanticsTests
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(140));
         section.Margins.SetAll(Unit.FromPoint(20));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
         var header = table.Rows.Add();
         header.RepeatOnEveryPage = true;

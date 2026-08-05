@@ -23,7 +23,7 @@ public class AuthoredFormFieldTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
 
-        paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         return document;
     }
@@ -32,7 +32,7 @@ public class AuthoredFormFieldTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         return document;
     }

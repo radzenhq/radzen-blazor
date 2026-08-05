@@ -42,29 +42,29 @@ public class ModelReentrancyTests
 
         for (var i = 0; i < 10; i++)
         {
-            section.Blocks.AddParagraph("Centered heading number " + i).StyleName = Heading;
+            section.Blocks.Add(new Paragraph("Centered heading number " + i)).StyleName = Heading;
         }
 
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Size = 14;
         list.AddItem("first list item");
         var second = list.AddItem("second list item");
-        var nested = second.AddList(ListStyle.Number);
+        var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
         nested.AddItem("nested one");
         nested.AddItem("nested two");
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         for (var r = 0; r < 3; r++)
         {
             var row = table.Rows.Add();
-            var styled = row.Cells[0].Blocks.AddParagraph("row " + r + " left");
+            var styled = row.Cells[0].Blocks.Add(new Paragraph("row " + r + " left"));
             styled.StyleName = CellStyle;
-            row.Cells[1].Blocks.AddParagraph("row " + r + " right");
+            row.Cells[1].Blocks.Add(new Paragraph("row " + r + " right"));
         }
 
-        var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "REENTRANT-1", Unit.FromPoint(160), Unit.FromPoint(40), showText: true);
+        var barcode = section.Blocks.Add(new Barcode(BarcodeType.Code128, "REENTRANT-1", Unit.FromPoint(160), Unit.FromPoint(40)) { ShowText = true });
         barcode.Font.Size = 9;
 
         return document;
@@ -81,11 +81,11 @@ public class ModelReentrancyTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(800));
         section.Margins.SetAll(Unit.FromPoint(40));
 
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("first tagged item");
         var second = list.AddItem("second tagged item");
-        var nested = second.AddList(ListStyle.Number);
+        var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
         nested.Font.Family = BuildTestSupport.Latin;
         nested.AddItem("nested tagged one");
         nested.AddItem("nested tagged two");

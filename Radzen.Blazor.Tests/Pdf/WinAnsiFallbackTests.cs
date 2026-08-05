@@ -16,7 +16,7 @@ public class WinAnsiFallbackTests
         document.Fonts.SetFallback(BuildTestSupport.Latin);
 
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Total: 100 лв.");
+        section.Blocks.Add(new Paragraph("Total: 100 лв."));
 
         var text = BuildTestSupport.Reload(document).ExtractText();
 
@@ -29,7 +29,7 @@ public class WinAnsiFallbackTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("AﬁB");
+        section.Blocks.Add(new Paragraph("AﬁB"));
 
         var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
         var text = BuildTestSupport.Reload(document, renderer).ExtractText().Trim();
@@ -43,7 +43,7 @@ public class WinAnsiFallbackTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("ﬁﬁﬁﬁ");
+        section.Blocks.Add(new Paragraph("ﬁﬁﬁﬁ"));
 
         var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
         var text = BuildTestSupport.Reload(document, renderer).ExtractText();

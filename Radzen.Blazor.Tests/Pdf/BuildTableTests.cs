@@ -19,7 +19,7 @@ public class BuildTableTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -60,7 +60,7 @@ public class BuildTableTests
         section.PageSize = new PageSize(Unit.FromPoint(320), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(300));
 
         var header = table.Rows.Add();

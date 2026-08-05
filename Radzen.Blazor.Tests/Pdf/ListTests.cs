@@ -44,7 +44,7 @@ public class ListTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.HangingIndent = Unit.FromPoint(20);
         list.AddItem("Alpha");
         list.AddItem("Beta");
@@ -69,7 +69,7 @@ public class ListTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var list = section.Blocks.AddList(ListStyle.Number);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(24);
         list.AddItem("Alpha");
         list.AddItem("Beta");
@@ -96,7 +96,7 @@ public class ListTests
         section.PageSize = new PageSize(Unit.FromPoint(120), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var list = section.Blocks.AddList(ListStyle.Number);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(20);
         list.AddItem("Wrapping content that spills onto a second line");
 

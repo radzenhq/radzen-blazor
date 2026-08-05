@@ -75,11 +75,11 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     private static Document TwoParagraphCell(double spacingBefore)
     {
         var (document, section) = NewDocument();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
-        cell.Blocks.AddParagraph("P1");
-        var second = cell.Blocks.AddParagraph("P2");
+        cell.Blocks.Add(new Paragraph("P1"));
+        var second = cell.Blocks.Add(new Paragraph("P2"));
         second.SpacingBefore = Unit.FromPoint(spacingBefore);
         return document;
     }
@@ -99,11 +99,11 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     private static Document TwoRowTable(double spacingAfter)
     {
         var (document, section) = NewDocument();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
-        var first = table.Rows.Add().Cells[0].Blocks.AddParagraph("A");
+        var first = table.Rows.Add().Cells[0].Blocks.Add(new Paragraph("A"));
         first.SpacingAfter = Unit.FromPoint(spacingAfter);
-        table.Rows.Add().Cells[0].Blocks.AddParagraph("B");
+        table.Rows.Add().Cells[0].Blocks.Add(new Paragraph("B"));
         return document;
     }
 
@@ -125,7 +125,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         static Document Author(double spacingBefore)
         {
             var document = TwoParagraphCell(spacingBefore);
-            document.Sections[0].Blocks.AddParagraph("After");
+            document.Sections[0].Blocks.Add(new Paragraph("After"));
             return document;
         }
 
@@ -140,9 +140,9 @@ public class TableCellSpacingAlignmentIndentRegressionTests
 
     private static Table OneCellTable(Section section, string text)
     {
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
-        table.Rows.Add().Cells[0].Blocks.AddParagraph(text);
+        table.Rows.Add().Cells[0].Blocks.Add(new Paragraph(text));
         return table;
     }
 
@@ -228,11 +228,11 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     public void IndentedAutoWidthTable_InHeaderBand_StaysInsideRightContentEdge()
     {
         var (document, section) = NewDocument();
-        section.Blocks.AddParagraph("Body");
+        section.Blocks.Add(new Paragraph("Body"));
 
-        var table = section.Header.Blocks.AddTable();
+        var table = section.Header.Blocks.Add(new Table());
         table.Columns.Add();
-        table.Rows.Add().Cells[0].Blocks.AddParagraph("H");
+        table.Rows.Add().Cells[0].Blocks.Add(new Paragraph("H"));
         table.LeftIndent = Unit.FromPoint(100);
         table.Borders.SetAll(width: 1);
 
@@ -243,13 +243,13 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     public void IndentedAutoWidthNestedTable_StaysInsideOuterCell()
     {
         var (document, section) = NewDocument();
-        var outer = section.Blocks.AddTable();
+        var outer = section.Blocks.Add(new Table());
         outer.Columns.Add(Unit.FromPoint(200));
         var cell = outer.Rows.Add().Cells[0];
 
-        var nested = cell.Blocks.AddTable();
+        var nested = cell.Blocks.Add(new Table());
         nested.Columns.Add();
-        nested.Rows.Add().Cells[0].Blocks.AddParagraph("N");
+        nested.Rows.Add().Cells[0].Blocks.Add(new Paragraph("N"));
         nested.LeftIndent = Unit.FromPoint(80);
         nested.Borders.SetAll(width: 1);
 

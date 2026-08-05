@@ -46,12 +46,12 @@ public class NestedListTests
         var document = new Document();
         var section = AddSection(document);
 
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.HangingIndent = Unit.FromPoint(20);
         var first = list.AddItem("Outer one");
         list.AddItem("Outer two");
 
-        var nested = first.AddList(ListStyle.Bullet);
+        var nested = first.NestedList = new ListBlock { Style = ListStyle.Bullet };
         nested.HangingIndent = Unit.FromPoint(15);
         nested.AddItem("Inner one");
         nested.AddItem("Inner two");
@@ -81,13 +81,13 @@ public class NestedListTests
         var document = new Document();
         var section = AddSection(document);
 
-        var list = section.Blocks.AddList(ListStyle.Number);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(24);
         list.AddItem("Alpha");
         var second = list.AddItem("Beta");
         list.AddItem("Gamma");
 
-        var nested = second.AddList(ListStyle.Number);
+        var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
         nested.HangingIndent = Unit.FromPoint(18);
         nested.AddItem("Sub one");
         nested.AddItem("Sub two");
@@ -111,12 +111,12 @@ public class NestedListTests
         var document = new Document();
         var section = AddSection(document);
 
-        var bullets = section.Blocks.AddList(ListStyle.Bullet);
+        var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.HangingIndent = Unit.FromPoint(20);
         bullets.AddItem("Alpha");
         bullets.AddItem("Beta");
 
-        var numbers = section.Blocks.AddList(ListStyle.Number);
+        var numbers = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         numbers.LeftIndent = Unit.FromPoint(6);
         numbers.AddItem("One");
         numbers.AddItem("Two");

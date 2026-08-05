@@ -103,7 +103,7 @@ public class TextOpacityTests
         var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
-        container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        container.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
         var states = ExtGStates(document);
         Assert.NotNull(states);
@@ -121,7 +121,7 @@ public class TextOpacityTests
         var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
-        container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).Opacity = 0.5;
+        container.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg"))).Opacity = 0.5;
 
         var states = ExtGStates(document);
         Assert.NotNull(states);
@@ -173,7 +173,7 @@ public class TextOpacityTests
             section.Blocks.Add(paragraph);
             var container = section.Blocks.Add(new Container { Background = Color.FromRgb(200, 200, 200) });
             container.Blocks.Add(Text("Boxed"));
-            container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+            container.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
             if (set)
             {
                 run.Opacity = 1;

@@ -181,7 +181,7 @@ public class SceneWalkContractTests
         var anchored = section.Blocks.Add(Text("Top"));
         anchored.Inlines[0].Anchor = "top";
 
-        var linked = section.Blocks.AddParagraph();
+        var linked = section.Blocks.Add(new Paragraph());
         var link = linked.Inlines.Add("Radzen");
         link.Font.Family = BuildTestSupport.Latin;
         link.Font.Size = 10;
@@ -190,7 +190,7 @@ public class SceneWalkContractTests
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
         container.Blocks.Add(Text("Inside"));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(80));
         table.Columns.Add(Unit.FromPoint(80));
         for (var row = 0; row < 2; row++)
@@ -263,7 +263,7 @@ public class SceneWalkContractTests
         section.Margins.SetAll(Unit.FromPoint(20));
 
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
-        var table = container.Blocks.AddTable();
+        var table = container.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(60));
         table.Columns.Add(Unit.FromPoint(60));
         for (var row = 0; row < 3; row++)
@@ -351,7 +351,7 @@ public class SceneWalkContractTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(300));
         section.Margins.SetAll(Unit.FromPoint(20));
-        section.Blocks.AddImage(PdfTestResources.Open(resource)).Width = Unit.FromPoint(40);
+        section.Blocks.Add(new Image(PdfTestResources.Open(resource))).Width = Unit.FromPoint(40);
 
         var trace = SceneTrace.Of(DocumentLayouter.Layout(document));
 

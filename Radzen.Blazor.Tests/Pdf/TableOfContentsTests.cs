@@ -22,7 +22,7 @@ public class TableOfContentsTests
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         front.Margins.SetAll(Unit.FromPoint(40));
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         toc.AddEntry("Chapter One", "ch1");
         toc.AddEntry("Chapter Two", "ch2", level: 1);
 
@@ -36,8 +36,8 @@ public class TableOfContentsTests
         var two = document.Sections.Add();
         two.PageSize = front.PageSize;
         two.Margins.SetAll(Unit.FromPoint(40));
-        two.Blocks.AddParagraph("Filler before the break");
-        two.Blocks.AddPageBreak();
+        two.Blocks.Add(new Paragraph("Filler before the break"));
+        two.Blocks.Add(new PageBreak());
         var second = new Paragraph();
         second.Inlines.Add("Chapter Two body").Anchor = "ch2";
         two.Blocks.Add(second);
@@ -130,7 +130,7 @@ public class TableOfContentsTests
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(160));
         front.Margins.SetAll(Unit.FromPoint(40));
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         toc.AddEntry(
             "An exceedingly long heading that wraps across lines and runs into the page number column",
             "ch0");
@@ -169,7 +169,7 @@ public class TableOfContentsTests
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         front.Margins.SetAll(Unit.FromPoint(40));
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         foreach (var (text, anchor) in new[]
         {
             ("Chapter One", "ch1"),
@@ -237,11 +237,11 @@ public class TableOfContentsTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(120), Unit.FromPoint(60));
         section.Margins.SetAll(Unit.FromPoint(5));
-        section.Blocks.AddTableOfContents().AddEntry(new string('W', 24), "target");
+        section.Blocks.Add(new TableOfContents()).AddEntry(new string('W', 24), "target");
 
         for (var page = 0; page < pagesBeforeTheAnchor; page++)
         {
-            section.Blocks.AddPageBreak();
+            section.Blocks.Add(new PageBreak());
         }
 
         var heading = new Paragraph();

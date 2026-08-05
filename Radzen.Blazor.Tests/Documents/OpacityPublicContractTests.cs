@@ -18,8 +18,8 @@ public class OpacityPublicContractTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(new MemoryStream());
-        var run = section.Blocks.AddParagraph().Inlines.Add("text");
+        var image = section.Blocks.Add(new Image(new MemoryStream()));
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("text");
         var container = new Container();
         var watermark = new Watermark();
 
@@ -36,8 +36,8 @@ public class OpacityPublicContractTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(new MemoryStream());
-        var run = section.Blocks.AddParagraph().Inlines.Add("text");
+        var image = section.Blocks.Add(new Image(new MemoryStream()));
+        var run = section.Blocks.Add(new Paragraph()).Inlines.Add("text");
         var container = new Container();
         var watermark = new Watermark();
 

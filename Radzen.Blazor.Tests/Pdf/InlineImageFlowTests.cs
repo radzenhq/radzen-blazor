@@ -15,7 +15,7 @@ public class InlineImageFlowTests
 {
     private static InlineImage AddImage(Paragraph paragraph)
     {
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(40);
         image.Height = Unit.FromPoint(30);
         return image;
@@ -53,7 +53,7 @@ public class InlineImageFlowTests
         section.PageSize = new PageSize(Unit.FromPoint(500), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         AddImage(paragraph);
         AddImage(paragraph);
 
@@ -72,7 +72,7 @@ public class InlineImageFlowTests
         section.PageSize = new PageSize(Unit.FromPoint(60), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         AddImage(paragraph);
         AddImage(paragraph);
 

@@ -1,4 +1,5 @@
 Radzen.Documents.Barcode = public sealed class : Radzen.Documents.Block
+public Radzen.Documents.Barcode..ctor(Radzen.Documents.Codes.BarcodeType type, System.String value, Radzen.Documents.Core.Unit width, Radzen.Documents.Core.Unit height)
 public Radzen.Documents.Barcode.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.Barcode.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.Barcode.Font : Radzen.Documents.Fonts.Font { public get; }
@@ -29,16 +30,6 @@ Radzen.Documents.Block = public abstract class
 Radzen.Documents.BlockCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Block>
 public Radzen.Documents.BlockCollection.Add(System.String text) : Radzen.Documents.Paragraph
 public Radzen.Documents.BlockCollection.Add<T>(T block) : T where T : Radzen.Documents.Block
-public Radzen.Documents.BlockCollection.AddBarcode(Radzen.Documents.Codes.BarcodeType type, System.String value, Radzen.Documents.Core.Unit width, Radzen.Documents.Core.Unit height, System.Boolean showText = false) : Radzen.Documents.Barcode
-public Radzen.Documents.BlockCollection.AddContainer() : Radzen.Documents.Container
-public Radzen.Documents.BlockCollection.AddImage(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.Image
-public Radzen.Documents.BlockCollection.AddList(Radzen.Documents.ListStyle style = Radzen.Documents.ListStyle.Bullet) : Radzen.Documents.ListBlock
-public Radzen.Documents.BlockCollection.AddPageBreak() : Radzen.Documents.PageBreak
-public Radzen.Documents.BlockCollection.AddParagraph() : Radzen.Documents.Paragraph
-public Radzen.Documents.BlockCollection.AddParagraph(System.String text) : Radzen.Documents.Paragraph
-public Radzen.Documents.BlockCollection.AddQrCode(System.String value, Radzen.Documents.Core.Unit size, Radzen.Documents.Codes.QrErrorCorrection errorCorrection = Radzen.Documents.Codes.QrErrorCorrection.Medium) : Radzen.Documents.QrCode
-public Radzen.Documents.BlockCollection.AddTable() : Radzen.Documents.Table
-public Radzen.Documents.BlockCollection.AddTableOfContents() : Radzen.Documents.TableOfContents
 public Radzen.Documents.BlockCollection.Clear() : System.Void
 public Radzen.Documents.BlockCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.BlockCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Block>
@@ -468,6 +459,7 @@ public const Radzen.Documents.HorizontalAlignment.Left : Radzen.Documents.Horizo
 public const Radzen.Documents.HorizontalAlignment.Right : Radzen.Documents.HorizontalAlignment
 public const Radzen.Documents.HorizontalAlignment.Start : Radzen.Documents.HorizontalAlignment
 Radzen.Documents.Image = public sealed class : Radzen.Documents.Block
+public Radzen.Documents.Image..ctor(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null)
 public Radzen.Documents.Image.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.Image.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.Image.FitBox : System.ValueTuple<Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit>? { public get; public set; }
@@ -484,9 +476,8 @@ public Radzen.Documents.Inline.LinkToAnchor : System.String? { public get; publi
 public Radzen.Documents.Inline.Opacity : System.Double { public get; public set; }
 public Radzen.Documents.Inline.Role : System.String? { public get; public set; }
 Radzen.Documents.InlineCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Inline>
-public Radzen.Documents.InlineCollection.Add(Radzen.Documents.Inline inline) : Radzen.Documents.Inline
 public Radzen.Documents.InlineCollection.Add(System.String text) : Radzen.Documents.Run
-public Radzen.Documents.InlineCollection.AddImage(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.InlineImage
+public Radzen.Documents.InlineCollection.Add<T>(T inline) : T where T : Radzen.Documents.Inline
 public Radzen.Documents.InlineCollection.Clear() : System.Void
 public Radzen.Documents.InlineCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.InlineCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Inline>
@@ -497,6 +488,7 @@ public Radzen.Documents.InlineCollection.Move(System.Int32 fromIndex, System.Int
 public Radzen.Documents.InlineCollection.Remove(Radzen.Documents.Inline inline) : System.Boolean
 public Radzen.Documents.InlineCollection.RemoveAt(System.Int32 index) : System.Void
 Radzen.Documents.InlineImage = public sealed class : Radzen.Documents.Inline
+public Radzen.Documents.InlineImage..ctor(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null)
 public Radzen.Documents.InlineImage.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.InlineImage.Height : Radzen.Documents.Core.Unit? { public get; public set; }
 public Radzen.Documents.InlineImage.ReplacementText : System.String? { public get; public set; }
@@ -526,7 +518,6 @@ public Radzen.Documents.ListBlock.LeftIndent : Radzen.Documents.Core.Unit { publ
 public Radzen.Documents.ListBlock.Style : Radzen.Documents.ListStyle { public get; public set; }
 Radzen.Documents.ListItem = public sealed class
 public Radzen.Documents.ListItem..ctor()
-public Radzen.Documents.ListItem.AddList(Radzen.Documents.ListStyle style = Radzen.Documents.ListStyle.Bullet) : Radzen.Documents.ListBlock
 public Radzen.Documents.ListItem.Blocks : Radzen.Documents.BlockCollection { public get; }
 public Radzen.Documents.ListItem.Font : Radzen.Documents.Fonts.Font { public get; }
 public Radzen.Documents.ListItem.Inlines : Radzen.Documents.InlineCollection { public get; }
@@ -804,6 +795,7 @@ public static Radzen.Documents.PageSizes.Letter : Radzen.Documents.PageSize { pu
 public static Radzen.Documents.PageSizes.Tabloid : Radzen.Documents.PageSize { public get; }
 Radzen.Documents.Paragraph = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.Paragraph..ctor()
+public Radzen.Documents.Paragraph..ctor(System.String text)
 public Radzen.Documents.Paragraph.Alignment : Radzen.Documents.HorizontalAlignment? { public get; public set; }
 public Radzen.Documents.Paragraph.Font : Radzen.Documents.Fonts.Font { public get; }
 public Radzen.Documents.Paragraph.Inlines : Radzen.Documents.InlineCollection { public get; }
@@ -931,6 +923,11 @@ public Radzen.Documents.Pdf.DocumentParseException..ctor(System.String message)
 public Radzen.Documents.Pdf.DocumentParseException..ctor(System.String message, System.Exception innerException)
 public Radzen.Documents.Pdf.DocumentParseException..ctor(System.String message, System.Int64 offset)
 public Radzen.Documents.Pdf.DocumentParseException.Offset : System.Int64 { public get; }
+Radzen.Documents.Pdf.DocumentPdfExtensions = public static class
+public static Radzen.Documents.Pdf.DocumentPdfExtensions.SaveAsPdf(Radzen.Documents.Document document, System.IO.Stream stream, Radzen.Documents.Pdf.DocumentRenderer? renderer = null) : System.Void
+public static Radzen.Documents.Pdf.DocumentPdfExtensions.SaveAsPdfAsync(Radzen.Documents.Document document, System.IO.Stream stream, Radzen.Documents.Pdf.DocumentRenderer? renderer = null) : System.Threading.Tasks.ValueTask
+public static Radzen.Documents.Pdf.DocumentPdfExtensions.ToPdf(Radzen.Documents.Document document, Radzen.Documents.Pdf.DocumentRenderer? renderer = null) : System.Byte[]
+public static Radzen.Documents.Pdf.DocumentPdfExtensions.ToPdfAsync(Radzen.Documents.Document document, Radzen.Documents.Pdf.DocumentRenderer? renderer = null) : System.Threading.Tasks.ValueTask<System.Byte[]>
 Radzen.Documents.Pdf.DocumentRenderer = public sealed class
 public Radzen.Documents.Pdf.DocumentRenderer..ctor()
 public Radzen.Documents.Pdf.DocumentRenderer.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; public set; }
@@ -1355,6 +1352,7 @@ public Radzen.Documents.Pdf.ViewerPreferences.PageMode : Radzen.Documents.Pdf.Pd
 Radzen.Documents.Pdf.XObjectContent = public sealed class : Radzen.Documents.Pdf.ContentElement
 public Radzen.Documents.Pdf.XObjectContent.Name : System.String { public get; }
 Radzen.Documents.QrCode = public sealed class : Radzen.Documents.Block
+public Radzen.Documents.QrCode..ctor(System.String value, Radzen.Documents.Core.Unit size)
 public Radzen.Documents.QrCode.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.QrCode.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.QrCode.ErrorCorrection : Radzen.Documents.Codes.QrErrorCorrection { public get; public set; }

@@ -78,8 +78,8 @@ public class ContainerOverlayRotationTests
             Padding = Unit.FromPoint(6),
             Background = Color.FromRgb(200, 200, 200),
         });
-        container.Blocks.AddParagraph().Inlines.Add("UNDERLAY");
-        container.Blocks.AddParagraph().Inlines.Add("OVERLAY");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("UNDERLAY");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("OVERLAY");
 
         var pdf = new DocumentRenderer().Render(document);
         var page = Assert.Single(pdf.Pages);
@@ -242,7 +242,7 @@ public class ContainerOverlayRotationTests
                 OffsetY = Unit.FromPoint(3),
             },
         });
-        container.Blocks.AddParagraph().Inlines.Add("Tilted");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Tilted");
 
         Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
     }
@@ -258,7 +258,7 @@ public class ContainerOverlayRotationTests
             Rotation = 30,
             Background = Color.FromRgb(255, 255, 255),
         });
-        container.Blocks.AddParagraph().Inlines.Add("Tilted");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Tilted");
 
         var pdf = new DocumentRenderer().Render(document);
         var page = Assert.Single(pdf.Pages);
@@ -282,7 +282,7 @@ public class ContainerOverlayRotationTests
                 OffsetY = Unit.FromPoint(3),
             },
         });
-        container.Blocks.AddParagraph().Inlines.Add("Panel");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Panel");
 
         var pdf = new DocumentRenderer().Render(document);
         var page = Assert.Single(pdf.Pages);
@@ -298,16 +298,16 @@ public class ContainerOverlayRotationTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph().Inlines.Add("Before the box");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Before the box");
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(8),
             Background = Color.FromRgb(230, 230, 230),
         });
         container.Borders.SetAll(width: 1);
-        container.Blocks.AddParagraph().Inlines.Add("Inside the box");
-        container.Blocks.AddParagraph().Inlines.Add("Second line inside");
-        section.Blocks.AddParagraph().Inlines.Add("After the box");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Inside the box");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Second line inside");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("After the box");
 
         var bytes = new DocumentRenderer().Render(document).ToArray();
 
@@ -322,7 +322,7 @@ public class ContainerOverlayRotationTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph().Inlines.Add("Before the box");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("Before the box");
         var container = section.Blocks.Add(new Container
         {
             Layout = ContainerLayout.Overlay,
@@ -330,9 +330,9 @@ public class ContainerOverlayRotationTests
             Background = Color.FromRgb(230, 230, 230),
         });
         container.Borders.SetAll(width: 1);
-        container.Blocks.AddParagraph().Inlines.Add("Under");
-        container.Blocks.AddParagraph().Inlines.Add("Over");
-        section.Blocks.AddParagraph().Inlines.Add("After the box");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Under");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Over");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("After the box");
 
         var bytes = new DocumentRenderer().Render(document).ToArray();
 
@@ -355,7 +355,7 @@ public class ContainerOverlayRotationTests
             CornerRadius = Unit.FromPoint(6),
         });
         container.Borders.SetAll(width: 1);
-        container.Blocks.AddParagraph().Inlines.Add("Rounded overlay");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Rounded overlay");
 
         var pdf = new DocumentRenderer().Render(document);
         var page = Assert.Single(pdf.Pages);
@@ -510,11 +510,11 @@ public class ContainerOverlayRotationTests
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Rotation = 30 });
-        var table = container.Blocks.AddTable();
+        var table = container.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(150));
         table.Borders.Top.Width = 1;
         table.CornerRadius = Unit.FromPoint(8);
-        var run = table.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("NoFill");
+        var run = table.Rows.Add().Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("NoFill");
         run.Font.Family = BuildTestSupport.Latin;
 
         Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));

@@ -22,7 +22,7 @@ public class SemanticSpanTests
         document.Info.Title = "Span";
         BuildTestSupport.RegisterLatin(document);
 
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("The motto is ").Font.Family = BuildTestSupport.Latin;
         var run = paragraph.Inlines.Add("carpe diem");
         run.Font.Family = BuildTestSupport.Latin;
@@ -166,9 +166,9 @@ public class SemanticSpanTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Figure";
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Logo ").Font.Family = BuildTestSupport.Latin;
-        var picture = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var picture = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         picture.AlternateText = "Radzen";
         picture.Language = "bg";
 

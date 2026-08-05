@@ -81,7 +81,7 @@ public class ImageLayoutTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(500), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(0));
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(100);
         image.Height = Unit.FromPoint(100);
         image.Alignment = alignment;

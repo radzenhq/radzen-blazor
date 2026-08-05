@@ -15,7 +15,7 @@ public class EncryptionPublicApiTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Hello encrypted world");
+        section.Blocks.Add(new Paragraph("Hello encrypted world"));
         var rendered = new DocumentRenderer().Render(document);
         rendered.Encryption = options;
         return rendered.ToArray();
@@ -85,10 +85,10 @@ public class EncryptionPublicApiTests
     public void NoEncryption_ByteIdenticalToPlainBuild()
     {
         var plain = new Document();
-        plain.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
+        plain.Sections.Add().Blocks.Add(new Paragraph("Hello encrypted world"));
 
         var withNull = new Document();
-        withNull.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
+        withNull.Sections.Add().Blocks.Add(new Paragraph("Hello encrypted world"));
         var withNullRendered = new DocumentRenderer().Render(withNull);
         withNullRendered.Encryption = null;
 

@@ -33,7 +33,7 @@ public sealed class Cell
             Blocks.Clear();
             if (value != null)
             {
-                Blocks.AddParagraph().Text = value;
+                Blocks.Add(new Paragraph()).Text = value;
             }
         }
     }

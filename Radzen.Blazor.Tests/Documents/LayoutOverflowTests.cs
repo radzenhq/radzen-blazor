@@ -24,7 +24,7 @@ public class LayoutOverflowTests
     {
         var document = new Document();
         var section = Page(document, 200, 100);
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(150);
         image.Height = Unit.FromPoint(400);
 
@@ -55,7 +55,7 @@ public class LayoutOverflowTests
 
         for (var line = 0; line < 20; line++)
         {
-            container.Blocks.AddParagraph($"Line {line}");
+            container.Blocks.Add(new Paragraph($"Line {line}"));
         }
 
         var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
@@ -81,7 +81,7 @@ public class LayoutOverflowTests
         section.Margins.SetAll(Unit.FromPoint(10));
         section.Margins.Top = Unit.FromPoint(80);
         section.Margins.Bottom = Unit.FromPoint(80);
-        section.Blocks.AddParagraph("Body");
+        section.Blocks.Add(new Paragraph("Body"));
 
         var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
@@ -98,7 +98,7 @@ public class LayoutOverflowTests
         section.Margins.SetAll(Unit.FromPoint(10));
         section.Margins.Left = Unit.FromPoint(80);
         section.Margins.Right = Unit.FromPoint(80);
-        section.Blocks.AddParagraph("Body");
+        section.Blocks.Add(new Paragraph("Body"));
 
         var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
@@ -115,9 +115,9 @@ public class LayoutOverflowTests
         section.Margins.SetAll(Unit.FromPoint(10));
         section.HeaderDistance = Unit.FromPoint(60);
         section.FooterDistance = Unit.FromPoint(60);
-        section.Header.Blocks.AddParagraph("Header");
-        section.Footer.Blocks.AddParagraph("Footer");
-        section.Blocks.AddParagraph("Body");
+        section.Header.Blocks.Add(new Paragraph("Header"));
+        section.Footer.Blocks.Add(new Paragraph("Footer"));
+        section.Blocks.Add(new Paragraph("Body"));
 
         var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
@@ -134,7 +134,7 @@ public class LayoutOverflowTests
         section.Margins.SetAll(Unit.FromPoint(10));
         section.Margins.Top = Unit.FromPoint(50);
         section.Margins.Bottom = Unit.FromPoint(50);
-        section.Blocks.AddParagraph("Body");
+        section.Blocks.Add(new Paragraph("Body"));
 
         var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
@@ -146,7 +146,7 @@ public class LayoutOverflowTests
     {
         var document = new Document();
         var first = Page(document, 200, 100);
-        first.Blocks.AddParagraph("Body");
+        first.Blocks.Add(new Paragraph("Body"));
 
         var second = document.Sections.Add();
         second.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
@@ -171,7 +171,7 @@ public class LayoutOverflowTests
 
         for (var line = 0; line < 10; line++)
         {
-            section.Blocks.AddParagraph($"Line {line}");
+            section.Blocks.Add(new Paragraph($"Line {line}"));
         }
 
         var pages = DocumentLayouter.Layout(document).Pages;

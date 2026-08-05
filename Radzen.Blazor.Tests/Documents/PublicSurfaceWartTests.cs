@@ -12,7 +12,7 @@ public class PublicSurfaceWartTests
 {
     private static Table Table()
     {
-        var table = new Document().Sections.Add().Blocks.AddTable();
+        var table = new Document().Sections.Add().Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         table.Rows.Add();
@@ -82,7 +82,7 @@ public class PublicSurfaceWartTests
     public void HeadingLevelIsAbsentAsNullOnBothTheStyleAndTheResolvedFormat()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph("Body");
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph("Body"));
 
         Assert.Null(document.Styles["Normal"].HeadingLevel);
         Assert.Null(document.Resolve(paragraph).HeadingLevel);
@@ -95,8 +95,8 @@ public class PublicSurfaceWartTests
     [Fact]
     public void ImageFitBoxIsReadableAndClearable()
     {
-        var image = new Document().Sections.Add().Blocks.AddImage(
-            PdfTestResources.Open("Images/rgb.jpg"));
+        var image = new Document().Sections.Add().Blocks.Add(new Image(
+            PdfTestResources.Open("Images/rgb.jpg")));
 
         Assert.Null(image.FitBox);
 

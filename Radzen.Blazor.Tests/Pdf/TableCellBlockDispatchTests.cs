@@ -53,7 +53,7 @@ public class TableCellBlockDispatchTests
     public void ImageInCell_ProducesImageItem()
     {
         var (table, cell) = CellTable();
-        cell.Blocks.AddImage(new MemoryStream(Png()));
+        cell.Blocks.Add(new Image(new MemoryStream(Png())));
 
         var laid = LayOut(table);
 
@@ -65,7 +65,7 @@ public class TableCellBlockDispatchTests
     public void QrCodeInCell_ProducesCodeItem()
     {
         var (table, cell) = CellTable();
-        var qr = cell.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
+        var qr = cell.Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(60)));
         var capture = new LayoutCaptureContext(ImageProbes.None);
 
         var laid = LayOut(table, capture);
@@ -78,11 +78,7 @@ public class TableCellBlockDispatchTests
     public void BarcodeInCell_ProducesCodeItem()
     {
         var (table, cell) = CellTable();
-        var barcode = cell.Blocks.AddBarcode(
-            BarcodeType.Code128,
-            "RADZEN",
-            Unit.FromPoint(120),
-            Unit.FromPoint(40));
+        var barcode = cell.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(120), Unit.FromPoint(40)));
         var capture = new LayoutCaptureContext(ImageProbes.None);
 
         var laid = LayOut(table, capture);
@@ -95,7 +91,7 @@ public class TableCellBlockDispatchTests
     public void NestedTableInCell_ProducesTableItem()
     {
         var (table, cell) = CellTable();
-        var nested = cell.Blocks.AddTable();
+        var nested = cell.Blocks.Add(new Table());
         nested.Columns.Add(Unit.FromPoint(80));
         TableLayoutSupport.Fill(nested.Rows.Add().Cells[0], "Inner");
 
@@ -108,7 +104,7 @@ public class TableCellBlockDispatchTests
     public void ListInCell_ProducesOneLinePerItem()
     {
         var (table, cell) = CellTable();
-        var list = cell.Blocks.AddList(ListStyle.Number);
+        var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.Font.Family = TableLayoutSupport.Family;
         list.AddItem("Alpha");
         list.AddItem("Beta");
@@ -124,7 +120,7 @@ public class TableCellBlockDispatchTests
     {
         var (table, cell) = CellTable();
         var fonts = TableLayoutSupport.Fonts();
-        var list = cell.Blocks.AddList(ListStyle.Bullet);
+        var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = TableLayoutSupport.Family;
         list.Font.Size = 12;
         list.AddItem("Alpha");
@@ -143,10 +139,10 @@ public class TableCellBlockDispatchTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
-        var list = cell.Blocks.AddList(ListStyle.Number);
+        var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(20);
         list.AddItem("Alpha");
         list.AddItem("Beta");
@@ -168,7 +164,7 @@ public class TableCellBlockDispatchTests
         TableLayoutSupport.Fill(cell, "Alpha");
         var withoutBreakHeight = IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0];
 
-        cell.Blocks.AddPageBreak();
+        cell.Blocks.Add(new PageBreak());
         var laid = LayOut(table);
 
         Assert.Single(laid.Lines);
@@ -235,30 +231,30 @@ public class TableCellBlockDispatchTests
                 TableLayoutSupport.Fill(cell, "Alpha");
                 break;
             case nameof(Table):
-                var nested = cell.Blocks.AddTable();
+                var nested = cell.Blocks.Add(new Table());
                 nested.Columns.Add(Unit.FromPoint(80));
                 TableLayoutSupport.Fill(nested.Rows.Add().Cells[0], "Inner");
                 break;
             case nameof(Image):
-                cell.Blocks.AddImage(new MemoryStream(Png()));
+                cell.Blocks.Add(new Image(new MemoryStream(Png())));
                 break;
             case nameof(ListBlock):
-                var list = cell.Blocks.AddList();
+                var list = cell.Blocks.Add(new ListBlock());
                 list.Font.Family = TableLayoutSupport.Family;
                 list.AddItem("Alpha");
                 break;
             case nameof(QrCode):
-                cell.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
+                cell.Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(60)));
                 break;
             case nameof(Barcode):
-                cell.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(120), Unit.FromPoint(40));
+                cell.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(120), Unit.FromPoint(40)));
                 break;
             case nameof(PageBreak):
-                cell.Blocks.AddPageBreak();
+                cell.Blocks.Add(new PageBreak());
                 break;
             case nameof(Container):
                 var container = cell.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
-                var boxed = container.Blocks.AddParagraph();
+                var boxed = container.Blocks.Add(new Paragraph());
                 var run = boxed.Inlines.Add("Boxed");
                 run.Font.Family = TableLayoutSupport.Family;
                 break;
@@ -274,7 +270,7 @@ public class TableCellBlockDispatchTests
         var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "body", "Helvetica");
-        var list = section.Header.Blocks.AddList(ListStyle.Number);
+        var list = section.Header.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.AddItem("Alpha");
         list.AddItem("Beta");
 

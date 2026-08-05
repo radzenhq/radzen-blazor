@@ -95,7 +95,7 @@ public class LayoutCorrectnessRegressionTests
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
@@ -117,7 +117,7 @@ public class LayoutCorrectnessRegressionTests
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         var row = table.Rows.Add();
         Fill(row.Cells.AddCell(), "Orphan");
 
@@ -149,7 +149,7 @@ public class LayoutCorrectnessRegressionTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        MakeTable(section.Blocks.AddTable());
+        MakeTable(section.Blocks.Add(new Table()));
 
         var reader = BuildTestSupport.Read(document);
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));

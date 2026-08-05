@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
@@ -44,11 +43,13 @@ public sealed class InlineCollection : IReadOnlyList<Inline>
     /// <summary>
     /// Appends existing inline content.
     /// </summary>
+    /// <typeparam name="T">The inline type.</typeparam>
     /// <param name="inline">The inline to append.</param>
     /// <returns>The same <paramref name="inline"/> instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="inline"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException"><paramref name="inline"/> already belongs to another collection.</exception>
-    public Inline Add(Inline inline)
+    public T Add<T>(T inline)
+        where T : Inline
     {
         ContentTree.Attach(inline, this);
         items.Add(inline);
@@ -85,23 +86,6 @@ public sealed class InlineCollection : IReadOnlyList<Inline>
         ContentTree.Attach(inline, this);
         items.Insert(index, inline);
         return inline;
-    }
-
-    /// <summary>
-    /// Appends an inline image that flows within the paragraph line, buffering the bytes from
-    /// the specified stream.
-    /// </summary>
-    /// <param name="stream">The source image stream.</param>
-    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="ResourceLimits.Default"/>.</param>
-    /// <returns>The newly created inline image.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    /// <exception cref="System.IO.InvalidDataException">The stream holds more than <see cref="ResourceLimits.MaxFileBytes"/> bytes.</exception>
-    public InlineImage AddImage(Stream stream, ResourceLimits? limits = null)
-    {
-        ArgumentNullException.ThrowIfNull(stream);
-        var image = InlineImage.FromStream(stream, limits);
-        Add(image);
-        return image;
     }
 
     /// <summary>
