@@ -186,12 +186,13 @@ internal static class TableLayout
     private static BoxStyle CellDecoration(Table table, Cell cell, int row)
     {
         var cellBorders = cell.Borders;
-        var rowBorders = row < table.Rows.Count ? table.Rows[row].Borders : null;
+        var sourceRow = row < table.Rows.Count ? table.Rows[row] : null;
+        var rowBorders = sourceRow?.Borders;
         var tableBorders = table.Borders;
 
         return new BoxStyle
         {
-            Background = cell.Background,
+            Background = cell.Background ?? sourceRow?.Background,
             Top = GeometryCapture.Edge(CascadeEdge(cellBorders.Top, rowBorders?.Top, tableBorders.Top)),
             Right = GeometryCapture.Edge(CascadeEdge(cellBorders.Right, rowBorders?.Right, tableBorders.Right)),
             Bottom = GeometryCapture.Edge(CascadeEdge(cellBorders.Bottom, rowBorders?.Bottom, tableBorders.Bottom)),

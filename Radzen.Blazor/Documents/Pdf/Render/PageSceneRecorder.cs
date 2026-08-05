@@ -247,13 +247,6 @@ internal sealed class PageSceneRecorder(
     {
         var table = Table;
         table.CellArtifact = row.Artifact ?? table.Artifact;
-        PaintRowBackground(
-            row.Background,
-            frame.Left,
-            BottomUpSpace.FromTop(BottomUpSpace.FromTop(top, frame.Delta), row.Y + row.Height),
-            table.Width,
-            row.Height,
-            SemanticArtifacts.ForDecoration(table.CellArtifact));
     }
 
     void ISceneVisitor.LeaveFragment(in LaidOutTableFragment fragment, in SceneFrame frame)
@@ -373,28 +366,6 @@ internal sealed class PageSceneRecorder(
             BottomUpSpace.Bottom(top, bounds.Y, bounds.Height),
             bounds.Width,
             bounds.Height);
-
-    private void PaintRowBackground(
-        Color? rowBackground,
-        double x,
-        double bottom,
-        double width,
-        double rowHeight,
-        SemanticArtifactKind artifact)
-    {
-        if (rowBackground is { } background)
-        {
-            Plan.Fills.Add(new FillDraw
-            {
-                X = x,
-                Y = bottom,
-                Width = width,
-                Height = rowHeight,
-                Color = background,
-                Artifact = artifact,
-            });
-        }
-    }
 
     private void EmitTableFrame(
         in BoxStyle style,

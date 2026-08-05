@@ -413,7 +413,7 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
         => Enter(string.Create(
             CultureInfo.InvariantCulture,
             $"row {row.SourceRow} header={row.IsHeader} y={N(layerTop + frame.Delta + row.Y)} height={N(row.Height)}"
-                + $" background={(row.Background is { } background ? Rgba(background) : "-")} cells={row.Cells.Length}"));
+                + $" cells={row.Cells.Length}"));
 
     void ISceneVisitor.LeaveRow(in LaidOutRow row, in SceneFrame frame) => Leave("/row");
 

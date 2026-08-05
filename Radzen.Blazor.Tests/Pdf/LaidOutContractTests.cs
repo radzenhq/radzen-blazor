@@ -374,14 +374,14 @@ public class LaidOutContractTests
         Assert.Equal(new ResolvedEdge(Color.FromRgb(2, 2, 2), 3, BorderStyle.Solid), head.Decoration.Bottom);
         Assert.Equal(new ResolvedEdge(Color.FromRgb(1, 1, 1), 1, BorderStyle.Solid), head.Decoration.Top);
         Assert.Equal(new ResolvedEdge(Color.FromRgb(3, 3, 3), 5, BorderStyle.Solid), body.Decoration.Left);
-        Assert.Equal(Color.FromRgb(200, 200, 200), layout.Decoration.RowBackground(0));
-        Assert.Null(layout.Decoration.RowBackground(1));
+        Assert.Equal(Color.FromRgb(200, 200, 200), head.Decoration.Background);
+        Assert.Null(body.Decoration.Background);
 
         table.Borders.SetAll(width: 9);
         table.Rows[0].Background = Color.FromRgb(7, 7, 7);
 
         Assert.Equal(new ResolvedEdge(Color.FromRgb(1, 1, 1), 1, BorderStyle.Solid), head.Decoration.Top);
-        Assert.Equal(Color.FromRgb(200, 200, 200), layout.Decoration.RowBackground(0));
+        Assert.Equal(Color.FromRgb(200, 200, 200), head.Decoration.Background);
     }
 
     [Fact]

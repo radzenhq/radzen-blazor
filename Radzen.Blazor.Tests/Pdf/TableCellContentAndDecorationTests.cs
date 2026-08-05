@@ -228,6 +228,68 @@ public class TableCellContentAndDecorationTests
     }
 
     [Fact]
+    public void RowBackgroundWithRowSpan_FillsFollowCellGeometry()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+
+        var section = document.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(100));
+        table.Columns.Add(Unit.FromPoint(100));
+
+        var first = table.Rows.Add();
+        first.Background = Color.Red;
+        first.Cells[0].RowSpan = 2;
+        TableLayoutSupport.Fill(first.Cells[0], "span");
+        TableLayoutSupport.Fill(first.Cells[1], "top");
+
+        var second = table.Rows.Add();
+        second.Background = Color.Blue;
+        TableLayoutSupport.Fill(second.Cells[0], "bottom");
+
+        var ops = Ops(document);
+
+        var reds = FilledRects(ops, 1, 0, 0);
+        var blues = FilledRects(ops, 0, 0, 1);
+
+        Assert.Equal(2, reds.Count);
+        var spanned = reds.Find(r => r.Height > reds[0].Height + reds[1].Height - r.Height - 0.5);
+        var single = reds.Find(r => r != spanned);
+        Assert.True(spanned.Height > single.Height * 1.5,
+            "the spanned cell's background covers both rows");
+
+        var blue = Assert.Single(blues);
+        Assert.True(blue.X >= spanned.X + 100 - 0.5,
+            $"the second row's background must not cover the spanned column (x={blue.X}, spanned x={spanned.X})");
+        Assert.True(blue.Width <= 100.5,
+            $"the second row's background covers only its own cell, not the full table width (width={blue.Width})");
+    }
+
+    private readonly record struct FilledRect(double X, double Y, double Width, double Height);
+
+    private static List<FilledRect> FilledRects(List<ContentOperation> ops, double r, double g, double b)
+    {
+        var rects = new List<FilledRect>();
+        var matches = false;
+        foreach (var op in ops)
+        {
+            if (op.Operator == "rg")
+            {
+                matches = Math.Abs(op.Num(0) - r) < 0.001
+                    && Math.Abs(op.Num(1) - g) < 0.001
+                    && Math.Abs(op.Num(2) - b) < 0.001;
+            }
+            else if (op.Operator == "re" && matches)
+            {
+                rects.Add(new FilledRect(op.Num(0), op.Num(1), op.Num(2), op.Num(3)));
+            }
+        }
+
+        return rects;
+    }
+
+    [Fact]
     public void ImageInCell_EmitsImageXObjectAndDoOperator()
     {
         var document = new Document();

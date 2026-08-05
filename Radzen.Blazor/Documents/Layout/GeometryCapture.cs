@@ -126,12 +126,6 @@ internal static class GeometryCapture
 
     public static TableDecoration Table(Table table, double additionalLeftIndent = 0)
     {
-        var backgrounds = ImmutableArray.CreateBuilder<Color?>(table.Rows.Count);
-        for (var i = 0; i < table.Rows.Count; i++)
-        {
-            backgrounds.Add(table.Rows[i].Background);
-        }
-
         var borders = table.Borders;
         return new TableDecoration
         {
@@ -144,7 +138,6 @@ internal static class GeometryCapture
                 Bottom = Edge(borders.Bottom),
                 Left = Edge(borders.Left),
             },
-            RowBackgrounds = backgrounds.MoveToImmutable(),
         };
     }
 

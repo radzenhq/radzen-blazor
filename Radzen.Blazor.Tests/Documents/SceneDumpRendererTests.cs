@@ -1083,7 +1083,7 @@ public class SceneDumpRendererTests
               /item
               item 5 z=15
                 tableFragment at=24.00,186.48 size=260.00x80.49 rows=7
-                  row 0 header=True y=186.48 height=11.50 background=- cells=2
+                  row 0 header=True y=186.48 height=11.50 cells=2
                     cell 0,0 span=1x1 at=24.00,186.48 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 6 z=0
                         line at=24.00,186.48 size=34.46x11.50 baseline=9.05 role=Paragraph
@@ -1118,7 +1118,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 1 header=False y=197.98 height=11.50 background=- cells=2
+                  row 1 header=False y=197.98 height=11.50 cells=2
                     cell 1,0 span=1x1 at=24.00,197.98 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 8 z=0
                         line at=24.00,197.98 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1150,7 +1150,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 2 header=False y=209.47 height=11.50 background=- cells=2
+                  row 2 header=False y=209.47 height=11.50 cells=2
                     cell 2,0 span=1x1 at=24.00,209.47 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 10 z=0
                         line at=24.00,209.47 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1182,7 +1182,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 3 header=False y=220.97 height=11.50 background=- cells=2
+                  row 3 header=False y=220.97 height=11.50 cells=2
                     cell 3,0 span=1x1 at=24.00,220.97 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 12 z=0
                         line at=24.00,220.97 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1215,7 +1215,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 4 header=False y=232.47 height=11.50 background=- cells=2
+                  row 4 header=False y=232.47 height=11.50 cells=2
                     cell 4,0 span=1x1 at=24.00,232.47 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 14 z=0
                         line at=24.00,232.47 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1248,7 +1248,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 5 header=False y=243.97 height=11.50 background=- cells=2
+                  row 5 header=False y=243.97 height=11.50 cells=2
                     cell 5,0 span=1x1 at=24.00,243.97 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 16 z=0
                         line at=24.00,243.97 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1281,7 +1281,7 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 6 header=False y=255.47 height=11.50 background=- cells=2
+                  row 6 header=False y=255.47 height=11.50 cells=2
                     cell 6,0 span=1x1 at=24.00,255.47 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 18 z=0
                         line at=24.00,255.47 size=27.79x11.50 baseline=9.05 role=Paragraph
@@ -1387,7 +1387,7 @@ public class SceneDumpRendererTests
               /item
               item 1 z=15
                 tableFragment at=24.00,45.78 size=260.00x29.90 rows=2
-                  row 0 header=True y=45.78 height=11.50 background=- cells=2
+                  row 0 header=True y=45.78 height=11.50 cells=2
                     cell 0,0 span=1x1 at=24.00,45.78 size=150.00x11.50 opacity=1.00 role=TableCell
                       item 2 z=0
                         line at=24.00,45.78 size=34.46x11.50 baseline=9.05 role=Paragraph
@@ -1422,11 +1422,11 @@ public class SceneDumpRendererTests
                       /item
                     /cell
                   /row
-                  row 7 header=False y=57.28 height=18.40 background=- cells=2
+                  row 7 header=False y=57.28 height=18.40 cells=2
                     cell 7,0 span=1x1 at=24.00,57.28 size=150.00x18.40 opacity=1.00 role=TableCell
                       item 4 z=0
                         table at=24.00,57.28 width=120.00
-                          row 0 header=False y=57.28 height=9.20 background=- cells=2
+                          row 0 header=False y=57.28 height=9.20 cells=2
                             cell 0,0 span=1x1 at=24.00,57.28 size=60.00x9.20 opacity=1.00 role=TableCell
                               item 5 z=0
                                 line at=24.00,57.28 size=14.67x9.20 baseline=7.24 role=Paragraph
@@ -1455,7 +1455,7 @@ public class SceneDumpRendererTests
                               /item
                             /cell
                           /row
-                          row 1 header=False y=66.48 height=9.20 background=- cells=2
+                          row 1 header=False y=66.48 height=9.20 cells=2
                             cell 1,0 span=1x1 at=24.00,66.48 size=60.00x9.20 opacity=1.00 role=TableCell
                               item 7 z=0
                                 line at=24.00,66.48 size=13.79x9.20 baseline=7.24 role=Paragraph

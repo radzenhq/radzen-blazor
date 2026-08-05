@@ -279,7 +279,6 @@ internal static class SceneWalk
                 IsHeader = false,
                 Y = y,
                 Height = heights[index],
-                Background = layout.Decoration.RowBackground(index),
                 Cells = RowCells(layout, index, cells.Delta),
             };
 
