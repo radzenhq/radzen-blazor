@@ -509,8 +509,6 @@ public Radzen.Documents.LinearGradient.Y0 : Radzen.Documents.Core.Unit { public 
 public Radzen.Documents.LinearGradient.Y1 : Radzen.Documents.Core.Unit { public get; }
 Radzen.Documents.ListBlock = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.ListBlock..ctor()
-public Radzen.Documents.ListBlock.AddItem() : Radzen.Documents.ListItem
-public Radzen.Documents.ListBlock.AddItem(System.String text) : Radzen.Documents.ListItem
 public Radzen.Documents.ListBlock.Font : Radzen.Documents.Fonts.Font { public get; }
 public Radzen.Documents.ListBlock.HangingIndent : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.ListBlock.Items : Radzen.Documents.ListItemCollection { public get; }

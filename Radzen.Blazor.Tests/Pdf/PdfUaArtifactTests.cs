@@ -280,7 +280,7 @@ public class PdfUaArtifactTests
         var section = document.Sections.Add();
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
-        list.AddItem("First");
+        list.Items.Add("First");
 
         var emission = Emit(document, builderRenderer);
 
@@ -300,7 +300,7 @@ public class PdfUaArtifactTests
         var section = document.Sections.Add();
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
-        list.AddItem("First");
+        list.Items.Add("First");
 
         Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
     }

@@ -48,13 +48,13 @@ public class NestedListTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.HangingIndent = Unit.FromPoint(20);
-        var first = list.AddItem("Outer one");
-        list.AddItem("Outer two");
+        var first = list.Items.Add("Outer one");
+        list.Items.Add("Outer two");
 
         var nested = first.NestedList = new ListBlock { Style = ListStyle.Bullet };
         nested.HangingIndent = Unit.FromPoint(15);
-        nested.AddItem("Inner one");
-        nested.AddItem("Inner two");
+        nested.Items.Add("Inner one");
+        nested.Items.Add("Inner two");
 
         var draws = TextDraws(document);
         var texts = draws.ConvertAll(d => d.Text);
@@ -83,15 +83,15 @@ public class NestedListTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(24);
-        list.AddItem("Alpha");
-        var second = list.AddItem("Beta");
-        list.AddItem("Gamma");
+        list.Items.Add("Alpha");
+        var second = list.Items.Add("Beta");
+        list.Items.Add("Gamma");
 
         var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
         nested.HangingIndent = Unit.FromPoint(18);
-        nested.AddItem("Sub one");
-        nested.AddItem("Sub two");
-        nested.AddItem("Sub three");
+        nested.Items.Add("Sub one");
+        nested.Items.Add("Sub two");
+        nested.Items.Add("Sub three");
 
         var draws = TextDraws(document);
 
@@ -113,14 +113,14 @@ public class NestedListTests
 
         var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.HangingIndent = Unit.FromPoint(20);
-        bullets.AddItem("Alpha");
-        bullets.AddItem("Beta");
+        bullets.Items.Add("Alpha");
+        bullets.Items.Add("Beta");
 
         var numbers = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         numbers.LeftIndent = Unit.FromPoint(6);
-        numbers.AddItem("One");
-        numbers.AddItem("Two");
-        numbers.AddItem("Three");
+        numbers.Items.Add("One");
+        numbers.Items.Add("Two");
+        numbers.Items.Add("Three");
 
         var draws = TextDraws(document);
 

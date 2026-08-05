@@ -98,7 +98,7 @@ public class TextLayoutFindingTests
         section.Margins.SetAll(Unit.FromPoint(0));
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         var paragraph = LineLayoutSupport.SingleRun("\nSecond line");
-        list.AddItem().Blocks.Add(paragraph);
+        list.Items.Add().Blocks.Add(paragraph);
 
         var lines = DocumentLayouter.Layout(document).Pages[0].Body.Lines.Select(static line => line.Line).ToArray();
 

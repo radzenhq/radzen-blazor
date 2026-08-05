@@ -46,8 +46,8 @@ public class ListTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.HangingIndent = Unit.FromPoint(20);
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
 
         var draws = TextDraws(document);
 
@@ -71,9 +71,9 @@ public class ListTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(24);
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
-        list.AddItem("Gamma");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
+        list.Items.Add("Gamma");
 
         var draws = TextDraws(document);
 
@@ -98,7 +98,7 @@ public class ListTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(20);
-        list.AddItem("Wrapping content that spills onto a second line");
+        list.Items.Add("Wrapping content that spills onto a second line");
 
         var draws = TextDraws(document);
 

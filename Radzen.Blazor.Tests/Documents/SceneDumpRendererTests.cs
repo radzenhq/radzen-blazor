@@ -175,8 +175,8 @@ public class SceneDumpRendererTests
         barcode.AlternateText = "Barcode RZ7";
 
         var list = section.Blocks.Add(new ListBlock());
-        list.AddItem("First item");
-        list.AddItem("Second item");
+        list.Items.Add("First item");
+        list.Items.Add("Second item");
 
         var clipped = section.Blocks.Add(new Container
         {

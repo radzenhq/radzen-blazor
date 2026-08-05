@@ -36,8 +36,8 @@ public class ConcurrentSaveTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Size = 14;
-        list.AddItem("first list item");
-        list.AddItem("second list item");
+        list.Items.Add("first list item");
+        list.Items.Add("second list item");
 
         return document;
     }

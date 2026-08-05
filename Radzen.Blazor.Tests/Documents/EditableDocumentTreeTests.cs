@@ -401,8 +401,8 @@ public class EditableDocumentTreeTests
     {
         var document = WithParagraphs();
         var list = document.Sections[0].Blocks.Add(new ListBlock { Style = ListStyle.Number });
-        list.AddItem("a");
-        list.AddItem("c");
+        list.Items.Add("a");
+        list.Items.Add("c");
         list.Items.Insert(1, "b");
 
         Assert.Equal(["a", "b", "c"], list.Items.Select(item => item.Text));

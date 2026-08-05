@@ -39,12 +39,4 @@ public sealed class ListBlock : Block
     /// <summary>Gets the list items.</summary>
     public ListItemCollection Items { get; } = [];
 
-    /// <summary>Appends an empty item.</summary>
-    /// <returns>The newly created item.</returns>
-    public ListItem AddItem() => Items.Add();
-
-    /// <summary>Appends an item containing the specified text.</summary>
-    /// <param name="text">The item text.</param>
-    /// <returns>The newly created item.</returns>
-    public ListItem AddItem(string text) => Items.Add(text);
 }

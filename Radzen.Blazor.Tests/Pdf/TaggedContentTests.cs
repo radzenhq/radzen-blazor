@@ -41,8 +41,8 @@ public class TaggedContentTests
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
         list.Font.Size = 12;
-        list.AddItem("First");
-        list.AddItem("Second");
+        list.Items.Add("First");
+        list.Items.Add("Second");
 
         var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
@@ -58,8 +58,8 @@ public class TaggedContentTests
         var document = new Document();
         var section = document.Sections.Add();
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
-        list.AddItem("First");
-        list.AddItem("Second");
+        list.Items.Add("First");
+        list.Items.Add("Second");
 
         var emission = Emit(document, new DocumentRenderer());
 
