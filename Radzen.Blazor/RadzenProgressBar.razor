@@ -8,7 +8,7 @@
          aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
          aria-valuenow="@(Mode == ProgressBarMode.Indeterminate ? null : (double?)Value)" aria-label="@AriaLabel" id="@GetId()">
 
-        @if (Mode == ProgressBarMode.Determinate)
+        @if (Mode == ProgressBarMode.Determinate && HasBufferValue)
         {
             <div class="rz-progressbar-buffer-value" aria-hidden="true"></div>
         }

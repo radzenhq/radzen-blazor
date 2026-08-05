@@ -4345,7 +4345,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "ProgressBarCircular in determinate mode, Get and Set the value", Anchor = "#progressbarcircular-determinate" }, new () { Text = "ProgressBarCircular in indeterminate mode", Anchor = "#progressbarcircular-indeterminate" }, new () { Text = "ProgressBarCircular sizes", Anchor = "#progressbarcircular-sizes" }, new () { Text = "ProgressBarCircular Min and Max values", Anchor = "#progressbarcircular-min-max-values" } ],
+                    Toc = [ new () { Text = "ProgressBarCircular in determinate mode, Get and Set the value", Anchor = "#progressbarcircular-determinate" }, new () { Text = "ProgressBarCircular in indeterminate mode", Anchor = "#progressbarcircular-indeterminate" }, new () { Text = "ProgressBarCircular sizes", Anchor = "#progressbarcircular-sizes" }, new () { Text = "ProgressBarCircular Min and Max values", Anchor = "#progressbarcircular-min-max-values" }, new () { Text = "ProgressBarCircular Buffer Value", Anchor = "#progressbarcircular-buffer" } ],
                     Name = "ProgressBarCircular",
                     Description = "Demonstration and configuration of the Radzen Blazor circular progress bar component.",
                     Path = "progressbarcircular",

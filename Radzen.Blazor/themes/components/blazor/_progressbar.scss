@@ -72,7 +72,7 @@ $progressbar-circular-sizes: map.merge(
   background-color: var(--rz-progressbar-value-background-color);
   height: 100%;
   width: var(--rz-progressbar-buffer-value);
-  opacity: $progressbar-buffer-opacity;
+  opacity: var(--rz-progressbar-buffer-opacity);
   transition: var(--rz-progressbar-value-transition);
 }
 
@@ -137,14 +137,24 @@ $progressbar-circular-sizes: map.merge(
   stroke-width: var(--rz-progressbar-circular-stroke-width);
 }
 
+.rz-progressbar-circular-buffer-value,
 .rz-progressbar-circular-value {
   stroke-linecap: var(--rz-progressbar-circular-value-endpoint);
   stroke-width: var(--rz-progressbar-circular-value-stroke-width);
-  stroke: var(--rz-progressbar-value-background-color);
   transition: var(--rz-progressbar-value-transition);
 }
 
+.rz-progressbar-circular-buffer-value {
+  stroke: var(--rz-progressbar-value-background-color);
+  opacity: var(--rz-progressbar-buffer-opacity);
+}
+
+.rz-progressbar-circular-value {
+  stroke: var(--rz-progressbar-value-background-color);
+}
+
 .rz-progressbar-determinate {
+  .rz-progressbar-circular-buffer-value,
   .rz-progressbar-circular-value {
     stroke-dasharray: 100;
     transform: rotate(-.25turn);
@@ -277,6 +287,7 @@ $progressbar-circular-sizes: map.merge(
       background-color: map.get($progressbar, background-color);
     }
 
+    .rz-progressbar-circular-buffer-value,
     .rz-progressbar-circular-value {
       stroke: map.get($progressbar, background-color);
     }

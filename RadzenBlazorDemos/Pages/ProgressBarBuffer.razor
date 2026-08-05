@@ -4,16 +4,18 @@
     <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Base loading" />
     <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Light loading" />
     <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Dark loading" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="false" AriaLabel="Success loading" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="false" AriaLabel="Danger loading" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="false" AriaLabel="Warning loading" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="false" AriaLabel="Info loading" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Success loading" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Danger loading" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Warning loading" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Info loading" />
 </RadzenStack>
 
-<RadzenSlider @bind-Value="value" Min="0" Max="100" Step="1" ShowValue="true" class="rz-mt-8" AriaLabel="Set progress value" />
-<RadzenSlider @bind-Value="buffer" Min="0" Max="100" Step="1" ShowValue="true" class="rz-mt-4" AriaLabel="Set buffer value" />
+<RadzenLabel Text="Set progress value" class="rz-mt-8" Component="valueSlider"/>
+<RadzenSlider @bind-Value="value" Min="0" Max="100" Step="1" ShowValue="true" class="rz-w-100" AriaLabel="Set progress value" Name="valueSlider" />
+<RadzenLabel Text="Set buffer value" class="rz-mt-4" Component="bufferSlider"/>
+<RadzenSlider @bind-Value="buffer" Min="0" Max="100" Step="1" ShowValue="true" class="rz-w-100" AriaLabel="Set buffer value" Name="bufferSlider" />
 
 @code {
     double value = 50;
-    double buffer = 70;
+    double? buffer = 70;
 }

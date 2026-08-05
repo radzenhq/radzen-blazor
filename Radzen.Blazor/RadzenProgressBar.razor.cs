@@ -76,11 +76,13 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the buffered progress value.
         /// The buffer is displayed behind the current progress value in determinate mode.
-        /// Should be between <see cref="Min"/> and <see cref="Max"/>. Values outside this range are clamped.
+        /// Set to <c>null</c> to hide the buffer.
+        /// Values outside the range defined by <see cref="Min"/> and <see cref="Max"/>
+        /// are clamped.
         /// </summary>
-        /// <value>The buffered progress value. The default is 0.</value>
+        /// <value>The buffered progress value. The default is <c>null</c>.</value>
         [Parameter]
-        public double BufferValue { get; set; }
+        public double? BufferValue { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum value of the progress range.
@@ -119,7 +121,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The buffer value changed callback.</value>
         [Parameter]
-        public Action<double>? BufferValueChanged { get; set; }
+        public Action<double?>? BufferValueChanged { get; set; }
 
         /// <summary>
         /// Gets or sets the semantic color style of the progress bar.
@@ -138,6 +140,11 @@ namespace Radzen.Blazor
         public string? AriaLabel { get; set; }
 
         /// <summary>
+        /// Gets whether a buffered progress value has been supplied.
+        /// </summary>
+        protected bool HasBufferValue => BufferValue.HasValue;
+
+        /// <summary>
         /// Progress in range from 0 to 1.
         /// </summary>
         protected double NormalizedValue => Normalize(Value);
@@ -145,7 +152,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Buffered progress normalized to the range 0–1.
         /// </summary>
-        protected double NormalizedBufferValue => Normalize(BufferValue);
+        protected double NormalizedBufferValue =>  BufferValue.HasValue ? Normalize(BufferValue.Value) : 0;
 
         /// <summary>
         /// Normalizes a given value to a range between 0 and 1 based on the <see cref="Min"/> and <see cref="Max"/> properties.

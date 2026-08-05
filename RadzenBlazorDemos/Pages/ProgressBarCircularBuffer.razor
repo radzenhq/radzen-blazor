@@ -1,0 +1,21 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem" class="rz-m-12">
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Primary loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Secondary loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Base loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Light loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Dark loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Success loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Danger loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Warning loading" />
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="value" @bind-BufferValue="buffer" ShowValue="true" AriaLabel="Info loading" />
+</RadzenStack>
+
+<RadzenLabel Text="Set progress value" class="rz-mt-8" Component="valueSlider"/>
+<RadzenSlider @bind-Value="value" Min="0" Max="100" Step="1" ShowValue="true" class="rz-w-100" AriaLabel="Set progress value" Name="valueSlider" />
+<RadzenLabel Text="Set buffer value" class="rz-mt-4" Component="bufferSlider"/>
+<RadzenSlider @bind-Value="buffer" Min="0" Max="100" Step="1" ShowValue="true" class="rz-w-100" AriaLabel="Set buffer value" Name="bufferSlider" />
+
+@code {
+    double value = 50;
+    double? buffer = 70;
+}

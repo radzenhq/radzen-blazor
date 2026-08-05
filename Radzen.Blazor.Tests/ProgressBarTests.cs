@@ -281,6 +281,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void ProgressBar_DoesNotRenderBuffer_WhenBufferValueIsNotSet()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            {
+                parameters.Add(p => p.Value, -10);
+                parameters.Add(p => p.Min, -100);
+                parameters.Add(p => p.Max, 100);
+            });
+            Assert.DoesNotContain(@"class=""rz-progressbar-buffer-value""", component.Markup);
+        }
+
+        [Fact]
         public void ProgressBar_Renders_BufferBehindValue()
         {
             using var ctx = new TestContext();
@@ -301,5 +315,20 @@ namespace Radzen.Blazor.Tests
             Assert.True(valueIndex > bufferIndex);
         }
 
+        [Fact]
+        public void ProgressBar_RendersBuffer_WhenBufferIsZero()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            {
+                parameters.Add(p => p.Value, -20);
+                parameters.Add(p => p.BufferValue, 0);
+                parameters.Add(p => p.Min, -100);
+                parameters.Add(p => p.Max, 100);
+            });
+
+            Assert.Contains(@"--rz-progressbar-buffer-value: 50%;", component.Markup);
+        }
     }
 }
