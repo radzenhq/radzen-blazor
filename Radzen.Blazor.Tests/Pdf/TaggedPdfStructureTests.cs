@@ -35,7 +35,7 @@ public class TaggedPdfStructureTests
         BuildTestSupport.AddText(section, "Billed to Acme Corp", BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, "Payment due in 30 days", BuildTestSupport.Latin);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -52,7 +52,7 @@ public class TaggedPdfStructureTests
         TableLayoutSupport.Fill(bread.Cells[0], "Bread");
         TableLayoutSupport.Fill(bread.Cells[1], "222");
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A red square";
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "A red square";
 
         return document;
     }

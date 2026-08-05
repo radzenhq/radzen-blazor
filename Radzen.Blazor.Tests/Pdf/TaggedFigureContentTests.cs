@@ -74,9 +74,9 @@ public class TaggedFigureContentTests
         document.Info.Title = "Inline";
         BuildTestSupport.RegisterLatin(document);
 
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Before ").Font.Family = BuildTestSupport.Latin;
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(20);
         image.Height = Unit.FromPoint(20);
         image.AlternateText = alternateText;
@@ -142,8 +142,7 @@ public class TaggedFigureContentTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        var barcode = document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+        var barcode = document.Sections.Add().Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)));
         barcode.Font.Family = BuildTestSupport.Latin;
         barcode.ShowText = true;
         barcode.AlternateText = alternateText;
@@ -187,7 +186,7 @@ public class TaggedFigureContentTests
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Block";
-        var image = document.Sections.Add().Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = document.Sections.Add().Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.AlternateText = "A red square";
 
         var reader = BuildTestSupport.Read(document, Accessible());

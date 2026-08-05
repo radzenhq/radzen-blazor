@@ -17,7 +17,7 @@ public class AppendResourceTests
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Appended Content", BuildTestSupport.Latin);
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         return document;
     }
 

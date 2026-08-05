@@ -167,7 +167,7 @@ public class ObjectStreamRetentionTests
         var section = document.Sections.Add();
         for (var i = 0; i < 2000; i++)
         {
-            section.Blocks.AddParagraph($"Compressible line number {i} with repeated filler text.");
+            section.Blocks.Add(new Paragraph($"Compressible line number {i} with repeated filler text."));
         }
 
         var rendered = new DocumentRenderer().Render(document);

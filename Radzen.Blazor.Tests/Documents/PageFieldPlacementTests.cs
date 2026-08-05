@@ -35,10 +35,10 @@ public class PageFieldPlacementTests
         var document = new Document();
         var section = Page(document);
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
-        AddFields(container.Blocks.AddParagraph());
-        section.Blocks.AddPageBreak();
+        AddFields(container.Blocks.Add(new Paragraph()));
+        section.Blocks.Add(new PageBreak());
         var second = section.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
-        AddFields(second.Blocks.AddParagraph());
+        AddFields(second.Blocks.Add(new Paragraph()));
 
         var pages = DocumentLayouter.Layout(document).Pages;
 
@@ -57,14 +57,14 @@ public class PageFieldPlacementTests
         {
             if (page > 0)
             {
-                section.Blocks.AddPageBreak();
+                section.Blocks.Add(new PageBreak());
             }
 
-            var outer = section.Blocks.AddTable();
+            var outer = section.Blocks.Add(new Table());
             outer.Columns.Add(Unit.FromPoint(300));
-            var inner = outer.Rows.Add().Cells[0].Blocks.AddTable();
+            var inner = outer.Rows.Add().Cells[0].Blocks.Add(new Table());
             inner.Columns.Add(Unit.FromPoint(200));
-            AddFields(inner.Rows.Add().Cells[0].Blocks.AddParagraph());
+            AddFields(inner.Rows.Add().Cells[0].Blocks.Add(new Paragraph()));
         }
 
         var pages = DocumentLayouter.Layout(document).Pages;

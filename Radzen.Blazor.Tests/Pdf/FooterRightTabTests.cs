@@ -67,7 +67,7 @@ public class FooterRightTabTests
     public void RightTabStopAtTheContentEdge_TextAfterTab_IsFlushRight_OnTheSameBaseline()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         Sized(paragraph.Inlines.Add("Left\tRight"));
         RightTabAtContentEdge(paragraph);
 
@@ -89,7 +89,7 @@ public class FooterRightTabTests
     public void RightTabStopAtTheContentEdge_EarlierTabs_UseTheirOwnLeftStop()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         Sized(paragraph.Inlines.Add("ID:\tAAA\tRight"));
         paragraph.TabStops.Add(Unit.FromPoint(48), TabAlignment.Left);
         RightTabAtContentEdge(paragraph);
@@ -115,7 +115,7 @@ public class FooterRightTabTests
     public void Paragraph_WithoutTabStops_KeepsTheDefaultLeftTabGrid()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         Sized(paragraph.Inlines.Add("Left\tRight"));
 
         var runs = FirstPageRuns(document);
@@ -130,7 +130,7 @@ public class FooterRightTabTests
     private static Document TwoPagesWithRightTabFooter()
     {
         var (document, section) = Author();
-        var footer = section.Footer.Blocks.AddParagraph();
+        var footer = section.Footer.Blocks.Add(new Paragraph());
         Sized(footer.Inlines.Add("Confidential\t"));
         Sized(footer.Inlines.Add("Page "));
         Sized(footer.Inlines.Add(new PageNumberField()));
@@ -138,9 +138,9 @@ public class FooterRightTabTests
         Sized(footer.Inlines.Add(new PageCountField()));
         RightTabAtContentEdge(footer);
 
-        section.Blocks.AddParagraph("body one");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("body two");
+        section.Blocks.Add(new Paragraph("body one"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("body two"));
         return document;
     }
 

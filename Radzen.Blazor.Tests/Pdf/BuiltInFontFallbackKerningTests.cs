@@ -19,7 +19,7 @@ public class BuiltInFontFallbackKerningTests
         document.Fonts.SetFallback(BuildTestSupport.Latin);
 
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("АТ");
+        section.Blocks.Add(new Paragraph("АТ"));
 
         var reader = BuildTestSupport.Read(document);
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;

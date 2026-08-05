@@ -81,7 +81,7 @@ public class EmitFailLoudTests
 
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello conformance", BuildTestSupport.Latin);
-        section.Blocks.AddImage(PdfTestResources.Open("Images/cmyk.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/cmyk.jpg")));
         var builderRenderer = new DocumentRenderer();
         builderRenderer.Conformance = PdfAConformance.PdfA2B;
 
@@ -102,7 +102,7 @@ public class EmitFailLoudTests
 
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello conformance", BuildTestSupport.Latin);
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         builderRenderer.Conformance = PdfAConformance.PdfA2B;
 
         using var stream = new MemoryStream();
@@ -118,7 +118,7 @@ public class EmitFailLoudTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        section.Blocks.AddImage(PdfTestResources.Open("Images/cmyk.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/cmyk.jpg")));
 
         using var stream = new MemoryStream();
         builderRenderer.SaveToStream(document, stream);

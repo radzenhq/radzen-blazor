@@ -89,7 +89,7 @@ public class DeterminismManifestTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -114,7 +114,7 @@ public class DeterminismManifestTests
         var document = new Document();
         document.Info.Title = "Image";
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(120);
         image.Height = Unit.FromPoint(120);
         return new DocumentRenderer().ToArray(document);
@@ -156,7 +156,7 @@ public class DeterminismManifestTests
         section.Margins.SetAll(Unit.FromPoint(20));
         var overlay = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
         overlay.Blocks.Add(Text("TEXT BELOW IMAGE"));
-        var image = overlay.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = overlay.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(80);
         image.Height = Unit.FromPoint(40);
         return new DocumentRenderer().ToArray(document);
@@ -169,12 +169,12 @@ public class DeterminismManifestTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
 
-        var bullets = section.Blocks.AddList(ListStyle.Bullet);
+        var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.HangingIndent = Unit.FromPoint(20);
         bullets.AddItem("Alpha");
         bullets.AddItem("Beta");
 
-        var numbers = section.Blocks.AddList(ListStyle.Number);
+        var numbers = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         numbers.LeftIndent = Unit.FromPoint(6);
         numbers.AddItem("One");
         numbers.AddItem("Two");
@@ -195,17 +195,17 @@ public class DeterminismManifestTests
         heading.StyleName = "Heading1";
         section.Blocks.Add(Text("Billed to Acme Corp.", BuildTestSupport.Latin));
 
-        var linked = section.Blocks.AddParagraph();
+        var linked = section.Blocks.Add(new Paragraph());
         var link = linked.Inlines.Add("Radzen");
         link.Font.Family = BuildTestSupport.Latin;
         link.Link = "https://www.radzen.com";
 
-        var bullets = section.Blocks.AddList(ListStyle.Bullet);
+        var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.Font.Family = BuildTestSupport.Latin;
         bullets.AddItem("Alpha").Font.Family = BuildTestSupport.Latin;
         bullets.AddItem("Beta").Font.Family = BuildTestSupport.Latin;
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
 
@@ -221,7 +221,7 @@ public class DeterminismManifestTests
             TableLayoutSupport.Fill(row.Cells[1], price);
         }
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A red square";
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "A red square";
 
         return document;
     }

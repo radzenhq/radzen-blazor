@@ -48,12 +48,12 @@ public class TableCellOverflowClipTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(20));
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add().Width = Unit.FromPoint(40);
         table.Columns.Add().Width = Unit.FromPoint(200);
         var row = table.Rows.Add();
-        row.Cells[0].Blocks.AddQrCode("overflow", Unit.FromPoint(90));
-        row.Cells[1].Blocks.AddParagraph("neighbour");
+        row.Cells[0].Blocks.Add(new QrCode("overflow", Unit.FromPoint(90)));
+        row.Cells[1].Blocks.Add(new Paragraph("neighbour"));
 
         var ops = Ops(document);
         var moduleRight = FillRects(ops).Max(r => r.X + r.W);

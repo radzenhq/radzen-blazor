@@ -11,7 +11,7 @@ public class FlowUnificationTests
 {
     private static Table SmallTable(Section section, string text)
     {
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         var row = table.Rows.Add();
         TableLayoutSupport.Fill(row.Cells[0], text);
@@ -47,7 +47,7 @@ public class FlowUnificationTests
         section.Header.Blocks.Add(PaginationSupport.Text("HDRBAND"));
         section.Footer.Blocks.Add(PaginationSupport.Text("FTRBAND"));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(200));
         var head = table.Rows.Add();
         head.RepeatOnEveryPage = true;
@@ -82,7 +82,7 @@ public class FlowUnificationTests
         BuildTestSupport.AddText(section, "Fa", BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, "Fb", BuildTestSupport.Latin);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(300));
         var head = table.Rows.Add();
         head.RepeatOnEveryPage = true;

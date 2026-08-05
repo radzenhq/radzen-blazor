@@ -40,9 +40,9 @@ public class FieldResolutionTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
         section.Margins.SetAll(Unit.FromPoint(Margin));
-        section.Blocks.AddParagraph("body one");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("body two");
+        section.Blocks.Add(new Paragraph("body one"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("body two"));
         return (document, section);
     }
 
@@ -52,13 +52,13 @@ public class FieldResolutionTests
     public void FooterTableCell_PageNumberField_RendersActualPageNumberPerPage()
     {
         var (document, section) = Author();
-        var table = section.Footer.Blocks.AddTable();
+        var table = section.Footer.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         var row = table.Rows.Add();
-        Sized(row.Cells[0].Blocks.AddParagraph().Inlines.Add("Confidential"));
+        Sized(row.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("Confidential"));
 
-        var field = row.Cells[1].Blocks.AddParagraph();
+        var field = row.Cells[1].Blocks.Add(new Paragraph());
         Sized(field.Inlines.Add("Page "));
         Sized(field.Inlines.Add(new PageNumberField()));
         Sized(field.Inlines.Add(" of "));
@@ -84,7 +84,7 @@ public class FieldResolutionTests
     public void WrappingBandParagraphWithField_EmitsAllLines()
     {
         var (document, section) = Author();
-        var footer = section.Footer.Blocks.AddParagraph();
+        var footer = section.Footer.Blocks.Add(new Paragraph());
         Sized(footer.Inlines.Add(
             "This is a deliberately long footer sentence that has to wrap across several lines within the narrow content box, ending on page "));
         Sized(footer.Inlines.Add(new PageNumberField()));

@@ -52,7 +52,7 @@ public class CodeElementTests
         const string value = "https://radzen.com";
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddQrCode(value, Unit.FromPoint(120));
+        section.Blocks.Add(new QrCode(value, Unit.FromPoint(120)));
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
         var expectedModule = 120.0 / (matrix.GetLength(0) + 8);
@@ -80,7 +80,7 @@ public class CodeElementTests
         const string value = "error correction";
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddQrCode(value, Unit.FromPoint(100), QrErrorCorrection.High);
+        section.Blocks.Add(new QrCode(value, Unit.FromPoint(100)) { ErrorCorrection = QrErrorCorrection.High });
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.High);
         var reader = BuildTestSupport.Read(document);
@@ -95,7 +95,7 @@ public class CodeElementTests
         const string value = "RADZEN";
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40)));
 
         var widths = BarcodeEncoder.EncodeCode128B(value);
         var expectedBars = 0;
@@ -128,7 +128,7 @@ public class CodeElementTests
         const int quiet = 10;
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(width), Unit.FromPoint(40));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, value, Unit.FromPoint(width), Unit.FromPoint(40)));
 
         var (_, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Code128, value, 40, 0);
         var total = symbolModules + 2 * quiet;
@@ -150,7 +150,7 @@ public class CodeElementTests
         const string value = "RADZEN";
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
 
         var reader = BuildTestSupport.Read(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
@@ -191,8 +191,8 @@ public class CodeElementTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN CODE ONE TWO", Unit.FromPoint(50), Unit.FromPoint(40), showText: true);
-        section.Blocks.AddParagraph("after");
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN CODE ONE TWO", Unit.FromPoint(50), Unit.FromPoint(40)) { ShowText = true });
+        section.Blocks.Add(new Paragraph("after"));
 
         var shown = ShownText(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
         var after = shown.Single(s => s.Text == "after").Y;
@@ -211,7 +211,7 @@ public class CodeElementTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
 
         var emission = Emit(builderRenderer.Render(document));
 
@@ -225,7 +225,7 @@ public class CodeElementTests
         var document = new Document();
         document.Styles.Normal.Font.Size = 14;
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -239,7 +239,7 @@ public class CodeElementTests
         var document = new Document();
         document.Styles.Normal.Font.Size = 14;
         var section = document.Sections.Add();
-        var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        var barcode = section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
         barcode.Font.Family = "Courier";
         barcode.Font.Size = 8;
 
@@ -253,9 +253,9 @@ public class CodeElementTests
         const string value = "cell qr";
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
-        table.Rows.Add().Cells[0].Blocks.AddQrCode(value, Unit.FromPoint(90));
+        table.Rows.Add().Cells[0].Blocks.Add(new QrCode(value, Unit.FromPoint(90)));
         table.Rows.Add().Cells[0].Text = "below";
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
@@ -276,9 +276,9 @@ public class CodeElementTests
         const string value = "RADZEN";
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
-        table.Rows.Add().Cells[0].Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
+        table.Rows.Add().Cells[0].Blocks.Add(new Barcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40)));
 
         var widths = BarcodeEncoder.EncodeCode128B(value);
         var expectedBars = 0;
@@ -307,8 +307,8 @@ public class CodeElementTests
         var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
         document.Info.Title = "Codes";
         var section = document.Sections.Add();
-        section.Blocks.AddQrCode("PDF/A", Unit.FromPoint(80));
-        section.Blocks.AddBarcode(BarcodeType.Code128, "PDFA", Unit.FromPoint(160), Unit.FromPoint(30));
+        section.Blocks.Add(new QrCode("PDF/A", Unit.FromPoint(80)));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "PDFA", Unit.FromPoint(160), Unit.FromPoint(30)));
 
         var reader = BuildTestSupport.Read(document, builderRenderer);
         var emission = Emit(new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(document));
@@ -328,7 +328,7 @@ public class CodeElementTests
         const double width = 200.0;
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Ean13, value, Unit.FromPoint(width), Unit.FromPoint(50));
+        section.Blocks.Add(new Barcode(BarcodeType.Ean13, value, Unit.FromPoint(width), Unit.FromPoint(50)));
 
         var (bars, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Ean13, value, 50, 0);
         var reader = BuildTestSupport.Read(document);
@@ -348,7 +348,7 @@ public class CodeElementTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddBarcode(BarcodeType.Postnet, "123456789", Unit.FromPoint(200), Unit.FromPoint(30));
+        section.Blocks.Add(new Barcode(BarcodeType.Postnet, "123456789", Unit.FromPoint(200), Unit.FromPoint(30)));
 
         var reader = BuildTestSupport.Read(document);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
@@ -379,7 +379,7 @@ public class CodeElementTests
     private static Document QrDocument(Color? foreground)
     {
         var document = new Document();
-        var code = document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(120));
+        var code = document.Sections.Add().Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(120)));
         if (foreground is { } color)
         {
             code.Foreground = color;
@@ -391,8 +391,7 @@ public class CodeElementTests
     private static Document BarcodeDocument(Color? foreground)
     {
         var document = new Document();
-        var code = document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(50));
+        var code = document.Sections.Add().Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(50)));
         if (foreground is { } color)
         {
             code.Foreground = color;
@@ -429,8 +428,7 @@ public class CodeElementTests
         var document = new Document();
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
-        section.Blocks.AddBarcode(
-            BarcodeType.Ean13, "4006381333931", Unit.FromPoint(200), Unit.FromPoint(50), showText: true);
+        section.Blocks.Add(new Barcode(BarcodeType.Ean13, "4006381333931", Unit.FromPoint(200), Unit.FromPoint(50)) { ShowText = true });
 
         var page = Assert.Single(Radzen.Documents.Layout.DocumentLayouter.Layout(document).Pages);
         var symbol = Assert.Single(page.Body.CodeSymbols);

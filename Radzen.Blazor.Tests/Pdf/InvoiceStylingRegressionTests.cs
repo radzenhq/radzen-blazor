@@ -75,10 +75,10 @@ public class InvoiceStylingRegressionTests
 
     private static Table OneCellTable(Section section, string text, double columnWidth = 200)
     {
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(columnWidth));
         var row = table.Rows.Add();
-        row.Cells[0].Blocks.AddParagraph(text);
+        row.Cells[0].Blocks.Add(new Paragraph(text));
         return table;
     }
 
@@ -118,13 +118,13 @@ public class InvoiceStylingRegressionTests
         static double Gap(bool withSpacer)
         {
             var (document, section) = NewDocument();
-            section.Blocks.AddParagraph("First");
+            section.Blocks.Add(new Paragraph("First"));
             if (withSpacer)
             {
-                section.Blocks.AddParagraph();
+                section.Blocks.Add(new Paragraph());
             }
 
-            section.Blocks.AddParagraph("Second");
+            section.Blocks.Add(new Paragraph("Second"));
 
             var runs = TextRuns(document);
             var first = runs.Single(r => r.Text == "First");
@@ -141,8 +141,8 @@ public class InvoiceStylingRegressionTests
     public void Tab_AdvancesToNextDefaultTabStop()
     {
         var (document, section) = NewDocument();
-        section.Blocks.AddParagraph("ID:\tAAA");
-        section.Blocks.AddParagraph("No:\tBBB");
+        section.Blocks.Add(new Paragraph("ID:\tAAA"));
+        section.Blocks.Add(new Paragraph("No:\tBBB"));
 
         var runs = TextRuns(document);
         var label = runs.SingleOrDefault(r => r.Text == "ID:");
@@ -184,12 +184,12 @@ public class InvoiceStylingRegressionTests
     public void RowBorders_BottomRule_SpansAllRowCells()
     {
         var (document, section) = NewDocument();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
         var row = table.Rows.Add();
-        row.Cells[0].Blocks.AddParagraph("A");
-        row.Cells[1].Blocks.AddParagraph("B");
+        row.Cells[0].Blocks.Add(new Paragraph("A"));
+        row.Cells[1].Blocks.Add(new Paragraph("B"));
 
         var property = typeof(Row).GetProperty("Borders", BindingFlags.Public | BindingFlags.Instance);
         Assert.True(property is not null, "Row.Borders public property is missing");
@@ -212,7 +212,7 @@ public class InvoiceStylingRegressionTests
         static double TextX(double indent)
         {
             var (document, section) = NewDocument();
-            var paragraph = section.Blocks.AddParagraph("Bullet");
+            var paragraph = section.Blocks.Add(new Paragraph("Bullet"));
             if (indent > 0)
             {
                 SetUnitProperty(paragraph, "LeftIndent", indent);
@@ -230,7 +230,7 @@ public class InvoiceStylingRegressionTests
     public void ImageWithoutExplicitSize_FitsContentWidth()
     {
         var (document, section) = NewDocument();
-        section.Blocks.AddImage(new MemoryStream(GrayPng(2000, 400)));
+        section.Blocks.Add(new Image(new MemoryStream(GrayPng(2000, 400))));
 
         var contentWidth = section.PageSize.Width.Point - section.Margins.Left.Point - section.Margins.Right.Point;
         var (width, height) = ImagePlacement(Ops(document));
@@ -246,7 +246,7 @@ public class InvoiceStylingRegressionTests
     public void ImageWithExplicitSize_UsesGivenSize()
     {
         var (document, section) = NewDocument();
-        var image = section.Blocks.AddImage(new MemoryStream(GrayPng(2000, 400)));
+        var image = section.Blocks.Add(new Image(new MemoryStream(GrayPng(2000, 400))));
         image.Width = Unit.FromPoint(120);
         image.Height = Unit.FromPoint(48);
 

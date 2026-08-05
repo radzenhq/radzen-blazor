@@ -108,7 +108,7 @@ public class ImageDecoderHardeningTests
         Assert.Equal(decoded.Message, measured.Message);
 
         var document = new Document();
-        document.Sections.Add().Blocks.AddImage(new MemoryStream(png));
+        document.Sections.Add().Blocks.Add(new Image(new MemoryStream(png)));
 
         Assert.Throws<InvalidDataException>(
             () => new DocumentRenderer { ImageDecoders = decoders }.Render(document));
@@ -119,7 +119,7 @@ public class ImageDecoderHardeningTests
     public void LoadFromStream_CarriesMaxImagePixelsIntoLoadedImageDecoding()
     {
         var source = new Document();
-        source.Sections.Add().Blocks.AddParagraph("body");
+        source.Sections.Add().Blocks.Add(new Paragraph("body"));
         var bytes = new DocumentRenderer().ToArray(source);
         var watermark = new Watermark { Text = "DRAFT" };
         watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));

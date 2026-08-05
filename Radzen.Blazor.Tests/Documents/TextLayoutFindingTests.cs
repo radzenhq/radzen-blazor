@@ -31,7 +31,7 @@ public class TextLayoutFindingTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = new Paragraph { Alignment = HorizontalAlignment.Justify };
         Sized(paragraph.Inlines.Add("value"));
-        var image = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = paragraph.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(20);
         image.Height = Unit.FromPoint(12);
         Sized(paragraph.Inlines.Add("unit more words to force a wrap here"));
@@ -96,7 +96,7 @@ public class TextLayoutFindingTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
-        var list = section.Blocks.AddList(ListStyle.Number);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         var paragraph = LineLayoutSupport.SingleRun("\nSecond line");
         list.AddItem().Blocks.Add(paragraph);
 

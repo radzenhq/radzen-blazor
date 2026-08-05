@@ -51,12 +51,12 @@ public class NestedContainerDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var outer = section.Blocks.AddTable();
+        var outer = section.Blocks.Add(new Table());
         outer.Columns.Add(Unit.FromPoint(300));
         var host = outer.Rows.Add().Cells[0];
         TableLayoutSupport.Fill(host, "OUTER");
 
-        var inner = host.Blocks.AddTable();
+        var inner = host.Blocks.Add(new Table());
         inner.Columns.Add(Unit.FromPoint(120));
         var innerRow = inner.Rows.Add();
         innerRow.Background = Color.Green;
@@ -74,7 +74,7 @@ public class NestedContainerDecorationTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(300));
         var host = table.Rows.Add().Cells[0];
         TableLayoutSupport.Fill(host, "HOST");
@@ -88,7 +88,7 @@ public class NestedContainerDecorationTests
                 new GradientStop(0, Color.Red),
                 new GradientStop(1, Color.Blue)),
         });
-        var boxed = container.Blocks.AddParagraph().Inlines.Add("BOXED");
+        var boxed = container.Blocks.Add(new Paragraph()).Inlines.Add("BOXED");
         boxed.Font.Family = BuildTestSupport.Latin;
 
         var ops = Ops(document);
@@ -101,7 +101,7 @@ public class NestedContainerDecorationTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(300));
         var nested = table.Rows.Add().Cells[0].Blocks.Add(new Container
         {
@@ -114,7 +114,7 @@ public class NestedContainerDecorationTests
                 OffsetY = Unit.FromPoint(3),
             },
         });
-        nested.Blocks.AddParagraph("Nested");
+        nested.Blocks.Add(new Paragraph("Nested"));
 
         Assert.True(HasOperator(Ops(document), "gs"),
             "nested container shadow emits its transparency graphics state");
@@ -125,10 +125,10 @@ public class NestedContainerDecorationTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(300));
         var nested = table.Rows.Add().Cells[0].Blocks.Add(new Container { Rotation = 15 });
-        nested.Blocks.AddParagraph("Nested");
+        nested.Blocks.Add(new Paragraph("Nested"));
 
         var exception = Assert.Throws<System.NotSupportedException>(
             () => new DocumentRenderer().Render(document));

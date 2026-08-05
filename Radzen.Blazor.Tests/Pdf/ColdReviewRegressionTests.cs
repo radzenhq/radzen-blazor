@@ -71,7 +71,7 @@ public class ColdReviewRegressionTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
-        var list = section.Blocks.AddList(ListStyle.Number);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         var paragraph = new Paragraph();
         paragraph.Font.Family = BuildTestSupport.Latin;
         list.AddItem().Blocks.Add(paragraph);
@@ -108,7 +108,7 @@ public class ColdReviewRegressionTests
         document.Info.Title = "Form";
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
 
@@ -124,7 +124,7 @@ public class ColdReviewRegressionTests
         document.Info.Title = "Form";
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name", Link = "https://radzen.com" });
 
@@ -144,11 +144,11 @@ public class ColdReviewRegressionTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(0));
         var outer = section.Blocks.Add(new Container { Width = Unit.FromPoint(6), Padding = Unit.FromPoint(0) });
-        var wide = outer.Blocks.AddParagraph().Inlines.Add("Wide");
+        var wide = outer.Blocks.Add(new Paragraph()).Inlines.Add("Wide");
         wide.Font.Family = BuildTestSupport.Latin;
         wide.Font.Size = 24;
         var inner = new Container { Width = Unit.FromPoint(200) };
-        var run = inner.Blocks.AddParagraph().Inlines.Add("inner");
+        var run = inner.Blocks.Add(new Paragraph()).Inlines.Add("inner");
         run.Font.Family = BuildTestSupport.Latin;
         outer.Blocks.Add(inner);
 
@@ -169,7 +169,7 @@ public class ColdReviewRegressionTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add("Body");
         var bytes = new DocumentRenderer { Conformance = PdfAConformance.PdfA2B }.Render(document).ToArray();

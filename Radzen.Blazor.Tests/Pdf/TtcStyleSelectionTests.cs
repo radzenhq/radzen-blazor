@@ -65,7 +65,7 @@ public class TtcStyleSelectionTests
         document.Fonts.Register(Family, Ttc(), bold: true, italic: false);
 
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("AB");
         run.Font.Family = Family;
         run.Font.Size = 12;

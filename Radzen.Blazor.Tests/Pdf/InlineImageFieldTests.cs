@@ -18,10 +18,10 @@ public class InlineImageFieldTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(40));
-        section.Blocks.AddParagraph("body");
+        section.Blocks.Add(new Paragraph("body"));
 
-        var footer = section.Footer.Blocks.AddParagraph();
-        var image = footer.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var footer = section.Footer.Blocks.Add(new Paragraph());
+        var image = footer.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(40);
         image.Height = Unit.FromPoint(30);
         var number = new PageNumberField();

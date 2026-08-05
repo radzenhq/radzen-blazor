@@ -139,7 +139,7 @@ public class FlateWritePathTests
         var original = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
         var emission = Encoding.Latin1.GetString(new DocumentRenderer().ToArray(document));
         var images = Regex.Matches(emission, ImageObjectPattern);
@@ -176,7 +176,7 @@ public class FlateWritePathTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.png"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.png")));
         var reader = BuildTestSupport.Read(document);
 
         var image = Assert.Single(BuildTestSupport.ImageXObjects(reader));

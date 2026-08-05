@@ -31,7 +31,7 @@ public class DocumentLayoutFeatureTests
     public void LaidOutPage_CarriesLinkAndAnchorGeometry()
     {
         var (document, section) = Author();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Radzen").Link = Url;
         paragraph.Inlines.Add(" target").Anchor = "here";
 
@@ -48,9 +48,9 @@ public class DocumentLayoutFeatureTests
     public void DuplicateAnchorNames_AcrossPagesFailLayout()
     {
         var (document, section) = Author();
-        section.Blocks.AddParagraph().Inlines.Add("first").Anchor = "duplicate";
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph().Inlines.Add("second").Anchor = "duplicate";
+        section.Blocks.Add(new Paragraph()).Inlines.Add("first").Anchor = "duplicate";
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph()).Inlines.Add("second").Anchor = "duplicate";
 
         var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
@@ -61,16 +61,16 @@ public class DocumentLayoutFeatureTests
     private static Document NumberedFooter()
     {
         var (document, section) = Author();
-        var footer = section.Footer.Blocks.AddParagraph();
+        var footer = section.Footer.Blocks.Add(new Paragraph());
         footer.Inlines.Add("Page ");
         footer.Inlines.Add(new PageNumberField());
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(new PageCountField());
-        section.Blocks.AddParagraph("one");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("two");
-        section.Blocks.AddPageBreak();
-        section.Blocks.AddParagraph("three");
+        section.Blocks.Add(new Paragraph("one"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("two"));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("three"));
         return document;
     }
 
@@ -105,8 +105,7 @@ public class DocumentLayoutFeatureTests
     {
         var (document, section) = Author();
         BuildTestSupport.RegisterLatin(document);
-        var barcode = section.Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN-1234", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        var barcode = section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN-1234", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
         barcode.Font.Family = BuildTestSupport.Latin;
 
         var code = Assert.Single(Assert.Single(DocumentLayouter.Layout(document).Pages).Body.CodeSymbols);
@@ -122,7 +121,7 @@ public class DocumentLayoutFeatureTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Radzen");
         run.Font.Family = BuildTestSupport.Latin;
 
@@ -171,7 +170,7 @@ public class DocumentLayoutFeatureTests
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(150));
         front.Margins.SetAll(Unit.FromPoint(20));
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         toc.Font.Family = BuildTestSupport.Latin;
         toc.Font.Size = 12;
 
@@ -186,7 +185,7 @@ public class DocumentLayoutFeatureTests
             var chapter = document.Sections.Add();
             chapter.PageSize = front.PageSize;
             chapter.Margins.SetAll(Unit.FromPoint(20));
-            var paragraph = chapter.Blocks.AddParagraph();
+            var paragraph = chapter.Blocks.Add(new Paragraph());
             var run = paragraph.Inlines.Add($"Chapter {(char)('A' + i)} body");
             run.Font.Family = BuildTestSupport.Latin;
             run.Anchor = $"ch{i}";

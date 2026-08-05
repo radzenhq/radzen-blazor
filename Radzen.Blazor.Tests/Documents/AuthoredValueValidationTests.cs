@@ -51,7 +51,7 @@ public class AuthoredValueValidationTests
     [Fact]
     public void QrCodeQuietZoneModulesRejectsNegativeValues()
     {
-        var code = new Document().Sections.Add().Blocks.AddQrCode("payload", Unit.FromPoint(50));
+        var code = new Document().Sections.Add().Blocks.Add(new QrCode("payload", Unit.FromPoint(50)));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => code.QuietZoneModules = -1);
         code.QuietZoneModules = 0;
@@ -71,7 +71,7 @@ public class AuthoredValueValidationTests
     [Fact]
     public void ColumnRelativeWidthRejectsInfinity()
     {
-        var column = new Document().Sections.Add().Blocks.AddTable().Columns.Add();
+        var column = new Document().Sections.Add().Blocks.Add(new Table()).Columns.Add();
 
         Assert.Throws<ArgumentOutOfRangeException>(() => column.RelativeWidth = double.PositiveInfinity);
     }
@@ -234,7 +234,7 @@ public class AuthoredValueValidationTests
     [InlineData(-4)]
     public void ImageFitBoxRejectsNonPositiveBounds(double value)
     {
-        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+        var image = new Document().Sections.Add().Blocks.Add(new Image(new System.IO.MemoryStream()));
 
         var width = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPoint(value), Unit.FromPoint(10)));
         var height = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPoint(10), Unit.FromPoint(value)));
@@ -247,7 +247,7 @@ public class AuthoredValueValidationTests
     [Fact]
     public void ImageFitBoxRejectsRelativeBounds()
     {
-        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+        var image = new Document().Sections.Add().Blocks.Add(new Image(new System.IO.MemoryStream()));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPercent(50), Unit.FromPoint(10)));
     }
@@ -257,7 +257,7 @@ public class AuthoredValueValidationTests
     [InlineData(-3)]
     public void ImageDimensionsRejectNonPositiveValues(double value)
     {
-        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+        var image = new Document().Sections.Add().Blocks.Add(new Image(new System.IO.MemoryStream()));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => image.Width = Unit.FromPoint(value));
         Assert.Throws<ArgumentOutOfRangeException>(() => image.Height = Unit.FromPoint(value));
@@ -303,7 +303,7 @@ public class AuthoredValueValidationTests
     [Fact]
     public void InlineLanguageRejectsMalformedTags()
     {
-        var paragraph = new Document().Sections.Add().Blocks.AddParagraph();
+        var paragraph = new Document().Sections.Add().Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("text");
 
         Assert.Throws<ArgumentException>(() => run.Language = "not a tag");

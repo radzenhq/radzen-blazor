@@ -25,11 +25,11 @@ public class RoundedClipTests
             CornerRadius = Unit.FromPoint(radius),
         });
         configure?.Invoke(container);
-        var child = container.Blocks.AddTable();
+        var child = container.Blocks.Add(new Table());
         child.Columns.Add(Unit.FromPoint(150));
         var cell = child.Rows.Add().Cells[0];
         cell.Background = Color.FromRgb(200, 60, 60);
-        var run = cell.Blocks.AddParagraph().Inlines.Add("Child");
+        var run = cell.Blocks.Add(new Paragraph()).Inlines.Add("Child");
         run.Font.Family = BuildTestSupport.Latin;
         return document;
     }
@@ -39,7 +39,7 @@ public class RoundedClipTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(150));
         table.Columns.Add(Unit.FromPoint(150));
         if (borderWidth is { } width)
@@ -59,7 +59,7 @@ public class RoundedClipTests
             {
                 var cell = row.Cells[c];
                 cell.Background = Color.FromRgb(200, 220, 255);
-                var run = cell.Blocks.AddParagraph().Inlines.Add($"R{r}C{c}");
+                var run = cell.Blocks.Add(new Paragraph()).Inlines.Add($"R{r}C{c}");
                 run.Font.Family = BuildTestSupport.Latin;
             }
         }
@@ -211,13 +211,13 @@ public class RoundedClipTests
                 Background = Color.FromRgb(230, 230, 230),
             });
             container.Borders.SetAll(width: 1);
-            var table = container.Blocks.AddTable();
+            var table = container.Blocks.Add(new Table());
             table.Columns.Add(Unit.FromPoint(120));
             table.Columns.Add(Unit.FromPoint(120));
             table.Borders.SetAll(width: 1);
             var row = table.Rows.Add();
             row.Cells[0].Background = Color.FromRgb(200, 220, 255);
-            var run = row.Cells[0].Blocks.AddParagraph().Inlines.Add("Zero");
+            var run = row.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("Zero");
             run.Font.Family = BuildTestSupport.Latin;
             if (setZero)
             {

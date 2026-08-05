@@ -37,7 +37,7 @@ public class StructureTreeMapBlockFailLoudTests
         heading.StyleName = "Heading1";
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         row.IsHeaderRow = true;
@@ -49,7 +49,7 @@ public class StructureTreeMapBlockFailLoudTests
         item.Inlines.Add("One").Font.Family = BuildTestSupport.Latin;
         section.Blocks.Add(list);
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "An image";
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg"))).AlternateText = "An image";
 
         var bytes = builderRenderer.ToArray(document);
         Assert.NotEmpty(bytes);

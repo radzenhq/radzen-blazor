@@ -85,7 +85,7 @@ public class ForcedLineBreakTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Line one\nLine two");
+        section.Blocks.Add(new Paragraph("Line one\nLine two"));
 
         var content = CascadeTestSupport.FirstPageContent(document);
         var baselines = CascadeTestSupport.TdPositions(content)

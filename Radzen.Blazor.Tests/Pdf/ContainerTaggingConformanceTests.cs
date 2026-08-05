@@ -24,7 +24,7 @@ public class ContainerTaggingConformanceTests
 
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
-        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+        container.Blocks.Add(new Paragraph()).Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
         return (document, renderer);
     }
 

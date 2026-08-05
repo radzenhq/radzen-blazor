@@ -36,7 +36,7 @@ public class StrikethroughStyleBreakTests
     public void AdjacentStruckRunsOfDifferentColor_EachGetOwnColoredLine()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
 
         var red = paragraph.Inlines.Add("Red ");
         red.Font.Size = Size;
@@ -63,7 +63,7 @@ public class StrikethroughStyleBreakTests
     public void AdjacentStruckRunsOfSameStyle_MergeIntoOneLine()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         foreach (var word in new[] { "One ", "Two" })
         {
             var run = paragraph.Inlines.Add(word);

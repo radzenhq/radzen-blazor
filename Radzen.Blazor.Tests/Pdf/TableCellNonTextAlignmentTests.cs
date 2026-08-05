@@ -34,7 +34,7 @@ public class TableCellNonTextAlignmentTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(40));
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         var column = table.Columns.Add();
         return (document, table, column);
     }
@@ -49,10 +49,10 @@ public class TableCellNonTextAlignmentTests
     public void QrCode_RightAlignment_ShiftsRightVersusDefaultLeft()
     {
         var (left, leftTable, _) = WideSingleColumn();
-        leftTable.Rows.Add().Cells[0].Blocks.AddQrCode("qr", Unit.FromPoint(90));
+        leftTable.Rows.Add().Cells[0].Blocks.Add(new QrCode("qr", Unit.FromPoint(90)));
 
         var (rightBuilder, rightTable, _) = WideSingleColumn();
-        var qr = rightTable.Rows.Add().Cells[0].Blocks.AddQrCode("qr", Unit.FromPoint(90));
+        var qr = rightTable.Rows.Add().Cells[0].Blocks.Add(new QrCode("qr", Unit.FromPoint(90)));
         qr.Alignment = HorizontalAlignment.Right;
 
         Assert.True(QrMinX(rightBuilder) > QrMinX(left) + 100,
@@ -72,12 +72,12 @@ public class TableCellNonTextAlignmentTests
         }
 
         var (left, leftTable, _) = WideSingleColumn();
-        var leftImage = leftTable.Rows.Add().Cells[0].Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var leftImage = leftTable.Rows.Add().Cells[0].Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         leftImage.Width = Unit.FromPoint(50);
         leftImage.Height = Unit.FromPoint(40);
 
         var (rightBuilder, rightTable, _) = WideSingleColumn();
-        var rightImage = rightTable.Rows.Add().Cells[0].Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var rightImage = rightTable.Rows.Add().Cells[0].Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         rightImage.Width = Unit.FromPoint(50);
         rightImage.Height = Unit.FromPoint(40);
         rightImage.Alignment = HorizontalAlignment.Right;
@@ -91,8 +91,8 @@ public class TableCellNonTextAlignmentTests
     {
         var (document, table, column) = WideSingleColumn();
         column.Alignment = HorizontalAlignment.End;
-        table.Rows.Add().Cells[0].Blocks.AddParagraph("hi");
-        table.Rows.Add().Cells[0].Blocks.AddQrCode("qr", Unit.FromPoint(90));
+        table.Rows.Add().Cells[0].Blocks.Add(new Paragraph("hi"));
+        table.Rows.Add().Cells[0].Blocks.Add(new QrCode("qr", Unit.FromPoint(90)));
 
         var reader = BuildTestSupport.Read(document);
         var content = ContentTestHelpers.PageContent(reader, 0);

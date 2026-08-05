@@ -22,7 +22,7 @@ public class RoundedCornersTests
             Padding = Unit.FromPoint(10),
             Background = Color.FromRgb(230, 230, 230),
         });
-        var paragraph = container.Blocks.AddParagraph();
+        var paragraph = container.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Panel");
         run.Font.Family = BuildTestSupport.Latin;
         configure?.Invoke(container);

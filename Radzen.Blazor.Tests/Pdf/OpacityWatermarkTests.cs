@@ -86,7 +86,7 @@ public class OpacityWatermarkTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Opacity = 0.25;
 
         var states = ExtGStates(document);
@@ -129,7 +129,7 @@ public class OpacityWatermarkTests
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Background = Color.FromRgb(200, 200, 200) });
         container.Blocks.Add(Text("Plain"));
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
         Assert.Null(ExtGStates(document));
         Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(PageBytes(document)));

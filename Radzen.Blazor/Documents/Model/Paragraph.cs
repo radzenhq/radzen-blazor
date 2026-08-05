@@ -17,6 +17,15 @@ public sealed class Paragraph : Block
     private int widows = 2;
     private int orphans = 2;
 
+    /// <summary>Initializes an empty paragraph.</summary>
+    public Paragraph()
+    {
+    }
+
+    /// <summary>Initializes a paragraph containing the specified text as a single run.</summary>
+    /// <param name="text">The paragraph text.</param>
+    public Paragraph(string text) => Text = text;
+
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     /// <summary>Gets the inline text runs.</summary>

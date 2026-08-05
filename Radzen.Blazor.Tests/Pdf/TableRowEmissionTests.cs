@@ -19,14 +19,14 @@ public class TableRowEmissionTests
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(20));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         for (var r = 0; r < 4; r++)
         {
             var row = table.Rows.Add();
-            row.Cells[0].Blocks.AddParagraph($"r{r}c0");
-            row.Cells[1].Blocks.AddParagraph($"r{r}c1");
+            row.Cells[0].Blocks.Add(new Paragraph($"r{r}c0"));
+            row.Cells[1].Blocks.Add(new Paragraph($"r{r}c1"));
         }
 
         return document;

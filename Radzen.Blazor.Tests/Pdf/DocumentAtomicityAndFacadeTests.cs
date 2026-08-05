@@ -15,7 +15,7 @@ public class DocumentAtomicityAndFacadeTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("Name") { Value = "Ada" });
 

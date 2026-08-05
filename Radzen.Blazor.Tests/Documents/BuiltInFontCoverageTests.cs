@@ -17,7 +17,7 @@ public class BuiltInFontCoverageTests
     private static Document WithText(string text)
     {
         var document = new Document();
-        document.Sections.Add().Blocks.AddParagraph(text);
+        document.Sections.Add().Blocks.Add(new Paragraph(text));
         return document;
     }
 
@@ -116,7 +116,7 @@ public class BuiltInFontCoverageTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("body");
+        section.Blocks.Add(new Paragraph("body"));
         section.Watermark = new Watermark { Text = "中" };
 
         Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));

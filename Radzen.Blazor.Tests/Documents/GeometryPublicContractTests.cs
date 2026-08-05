@@ -159,7 +159,7 @@ public class GeometryPublicContractTests
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.Parse("300pt"), Unit.Parse("500pt"));
         section.Orientation = orientation;
-        section.Blocks.AddParagraph("page");
+        section.Blocks.Add(new Paragraph("page"));
         return document;
     }
 }

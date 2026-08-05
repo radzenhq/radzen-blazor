@@ -6,15 +6,18 @@ namespace Radzen.Documents;
 
 /// <summary>
 /// A block that renders a QR code as crisp vector squares - one filled black square per dark module.
-/// The block hierarchy is closed: create codes through
-/// <see cref="BlockCollection.AddQrCode(string, Unit, QrErrorCorrection)"/>.
 /// </summary>
 public sealed class QrCode : Block
 {
     private int quietZoneModules = 4;
 
-    internal QrCode(string value, Unit size)
+    /// <summary>Initializes a QR code.</summary>
+    /// <param name="value">The text to encode.</param>
+    /// <param name="size">The rendered width and height of the code, quiet zone included.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    public QrCode(string value, Unit size)
     {
+        System.ArgumentNullException.ThrowIfNull(value);
         Value = value;
         Size = AuthoredNumber.Absolute(size, "QrCode.Size");
     }

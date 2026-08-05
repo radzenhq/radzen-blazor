@@ -30,11 +30,11 @@ public class ConcurrentSaveTests
 
         for (var i = 0; i < 30; i++)
         {
-            var paragraph = section.Blocks.AddParagraph("Centered heading number " + i);
+            var paragraph = section.Blocks.Add(new Paragraph("Centered heading number " + i));
             paragraph.StyleName = Heading;
         }
 
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Size = 14;
         list.AddItem("first list item");
         list.AddItem("second list item");
@@ -78,7 +78,7 @@ public class ConcurrentSaveTests
         var referenceSection = referenceBuilder.Sections.Add();
         referenceSection.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(2000));
         referenceSection.Margins.SetAll(Unit.FromPoint(40));
-        var centered = referenceSection.Blocks.AddParagraph("Centered heading number 0");
+        var centered = referenceSection.Blocks.Add(new Paragraph("Centered heading number 0"));
         centered.Alignment = HorizontalAlignment.Center;
         centered.Font.Size = 18;
         centered.Font.Bold = true;

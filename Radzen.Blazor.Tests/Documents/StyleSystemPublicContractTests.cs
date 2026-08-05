@@ -50,9 +50,9 @@ public class StyleSystemPublicContractTests
         middle.Font.Size = 20;
         document.Styles.Add("Leaf", "Middle");
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Default");
-        section.Blocks.AddParagraph("Styled").StyleName = "Leaf";
-        var local = section.Blocks.AddParagraph("Local");
+        section.Blocks.Add(new Paragraph("Default"));
+        section.Blocks.Add(new Paragraph("Styled")).StyleName = "Leaf";
+        var local = section.Blocks.Add(new Paragraph("Local"));
         local.StyleName = "Leaf";
         local.Font.Size = 8;
         local.Font.Color = Color.Blue;
@@ -78,7 +78,7 @@ public class StyleSystemPublicContractTests
         var middle = document.Styles.Add("Middle", "Root");
         middle.HeadingLevel = 4;
         document.Styles.Add("Leaf", "Middle");
-        document.Sections.Add().Blocks.AddParagraph("Heading").StyleName = "Leaf";
+        document.Sections.Add().Blocks.Add(new Paragraph("Heading")).StyleName = "Leaf";
 
         var pdf = TaggedPdf(document);
 
@@ -90,7 +90,7 @@ public class StyleSystemPublicContractTests
     public void BuiltInHeadingStyleSuppliesItsHeadingLevel()
     {
         var document = new Document();
-        document.Sections.Add().Blocks.AddParagraph("Heading").StyleName = "Heading3";
+        document.Sections.Add().Blocks.Add(new Paragraph("Heading")).StyleName = "Heading3";
 
         Carries("tagged emission", "/S /H3", TaggedPdf(document));
     }
@@ -158,7 +158,7 @@ public class StyleSystemPublicContractTests
     public void UnsetParagraphValuesResolveToTheBuiltInDefaults()
     {
         var document = new Document();
-        var paragraph = document.Sections.Add().Blocks.AddParagraph("Default");
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph("Default"));
 
         var format = document.Resolve(paragraph);
 
@@ -181,7 +181,7 @@ public class StyleSystemPublicContractTests
         root.HeadingLevel = 3;
         var leaf = document.Styles.Add("Leaf", "Root");
         leaf.Alignment = HorizontalAlignment.Center;
-        var paragraph = document.Sections.Add().Blocks.AddParagraph("Styled");
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph("Styled"));
         paragraph.StyleName = "Leaf";
         paragraph.SpacingBefore = Unit.Parse("4pt");
 

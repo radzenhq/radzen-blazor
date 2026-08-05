@@ -173,7 +173,7 @@ public class DocumentLayoutGeometryTests
         container.Blocks.Add(Text("Panel heading"));
         container.Blocks.Add(Text("Panel body text that is long enough to wrap inside the padded container."));
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         section.Blocks.Add(Text("Caption under the image."));
         return document;
     }
@@ -186,8 +186,8 @@ public class DocumentLayoutGeometryTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
         section.Margins.SetAll(Unit.FromPoint(20));
         section.Blocks.Add(Text("Scan me"));
-        section.Blocks.AddQrCode("https://www.radzen.com", Unit.FromPoint(120));
-        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN-1234", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        section.Blocks.Add(new QrCode("https://www.radzen.com", Unit.FromPoint(120)));
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN-1234", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
         return document;
     }
 
@@ -198,7 +198,7 @@ public class DocumentLayoutGeometryTests
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(220));
         front.Margins.SetAll(Unit.FromPoint(30));
-        var toc = front.Blocks.AddTableOfContents();
+        var toc = front.Blocks.Add(new TableOfContents());
         toc.Font.Family = BuildTestSupport.Latin;
         toc.Font.Size = 12;
         toc.AddEntry("Chapter One", "ch1");
@@ -213,7 +213,7 @@ public class DocumentLayoutGeometryTests
         two.PageSize = front.PageSize;
         two.Margins.SetAll(Unit.FromPoint(30));
         two.Blocks.Add(Text("Filler before the break"));
-        two.Blocks.AddPageBreak();
+        two.Blocks.Add(new PageBreak());
         two.Blocks.Add(Anchored("Chapter Two body", "ch2"));
 
         return document;

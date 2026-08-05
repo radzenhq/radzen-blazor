@@ -17,10 +17,10 @@ public class ContentStreamCompactionTests
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
-        var heading = section.Blocks.AddParagraph("Invoice INV-42");
+        var heading = section.Blocks.Add(new Paragraph("Invoice INV-42"));
         heading.Alignment = HorizontalAlignment.Right;
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Borders.SetAll(width: 0.75);
         table.Columns.Add();
         table.Columns.Add();

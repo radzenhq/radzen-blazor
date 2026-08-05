@@ -139,7 +139,7 @@ public class GradientShadingTests
                 new GradientStop(0, Color.Red),
                 new GradientStop(1, Color.Blue)),
         });
-        container.Blocks.AddParagraph().Inlines.Add("Boxed");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("Boxed");
 
         var reader = BuildTestSupport.Read(document);
         var page = Assert.Single(BuildTestSupport.PageLeaves(reader));

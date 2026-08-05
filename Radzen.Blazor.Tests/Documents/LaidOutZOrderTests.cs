@@ -44,7 +44,7 @@ public class LaidOutZOrderTests
     private static Container Panel(BlockCollection blocks, string text)
     {
         var container = blocks.Add(new Container { Background = Color.FromRgb(200, 200, 200) });
-        container.Blocks.AddParagraph().Inlines.Add(text);
+        container.Blocks.Add(new Paragraph()).Inlines.Add(text);
         return container;
     }
 
@@ -53,8 +53,8 @@ public class LaidOutZOrderTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddParagraph().Inlines.Add("first");
-        section.Blocks.AddParagraph().Inlines.Add("second");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("first");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("second");
         Panel(section.Blocks, "inside");
 
         Assert.Equal(["first", "second", "fill", "inside"], PaintOrder(document));
@@ -65,9 +65,9 @@ public class LaidOutZOrderTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddParagraph().Inlines.Add("first");
-        section.Blocks.AddParagraph().Inlines.Add("second");
-        section.Blocks.AddParagraph().Inlines.Add("third");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("first");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("second");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("third");
 
         Assert.Equal(["first", "second", "third"], PaintOrder(document));
     }
@@ -77,7 +77,7 @@ public class LaidOutZOrderTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Blocks.AddParagraph().Inlines.Add("before");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("before");
         Panel(section.Blocks, "inside");
 
         var painted = PaintOrder(document);
@@ -91,7 +91,7 @@ public class LaidOutZOrderTests
         var document = new Document();
         var section = Page(document);
         var container = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
-        container.Blocks.AddParagraph().Inlines.Add("under");
+        container.Blocks.Add(new Paragraph()).Inlines.Add("under");
         Panel(container.Blocks, "over");
 
         var painted = PaintOrder(document);
@@ -105,9 +105,9 @@ public class LaidOutZOrderTests
     {
         var document = new Document();
         var section = Page(document);
-        section.Header.Blocks.AddParagraph().Inlines.Add("header first");
-        section.Header.Blocks.AddParagraph().Inlines.Add("header second");
-        section.Blocks.AddParagraph().Inlines.Add("body");
+        section.Header.Blocks.Add(new Paragraph()).Inlines.Add("header first");
+        section.Header.Blocks.Add(new Paragraph()).Inlines.Add("header second");
+        section.Blocks.Add(new Paragraph()).Inlines.Add("body");
 
         var painted = PaintOrder(document);
 

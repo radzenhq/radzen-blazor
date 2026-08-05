@@ -64,11 +64,6 @@ public sealed class ListItem
         }
     }
 
-    /// <summary>Creates a nested sub-list with the specified marker style and attaches it to this item.</summary>
-    /// <param name="style">The marker style of the nested list.</param>
-    /// <returns>The newly created nested list.</returns>
-    public ListBlock AddList(ListStyle style = ListStyle.Bullet) => NestedList = new ListBlock { Style = style };
-
     /// <summary>
     /// Gets or sets the text of the first paragraph. Getting returns <see langword="null"/> when
     /// there is no paragraph at the start of <see cref="Blocks"/>. Setting creates that paragraph

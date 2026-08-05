@@ -159,7 +159,7 @@ public class HeaderFooterBandRegressionTests
 
     private static Table BandTable(HeaderFooter band, string leftText, string rightText)
     {
-        var table = band.Blocks.AddTable();
+        var table = band.Blocks.Add(new Table());
         table.Columns.Add();
         table.Columns.Add();
         var row = table.Rows.Add();

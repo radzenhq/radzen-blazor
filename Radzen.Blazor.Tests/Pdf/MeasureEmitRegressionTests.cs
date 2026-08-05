@@ -44,7 +44,7 @@ public class MeasureEmitRegressionTests
 
     private static Paragraph RightAligned(Section section, string text, string? family)
     {
-        var paragraph = section.Blocks.AddParagraph(text);
+        var paragraph = section.Blocks.Add(new Paragraph(text));
         paragraph.Alignment = HorizontalAlignment.Right;
         if (family is not null)
         {

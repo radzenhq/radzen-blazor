@@ -25,7 +25,7 @@ public class StyleCascadeTests
     public void ParagraphFont_SizeAppliesToRunsWithDefaultFont()
     {
         var document = Builder(out var section);
-        var paragraph = section.Blocks.AddParagraph("Cascade");
+        var paragraph = section.Blocks.Add(new Paragraph("Cascade"));
         paragraph.Font.Size = 20;
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
@@ -39,7 +39,7 @@ public class StyleCascadeTests
     {
         var document = Builder(out var section);
         BuildTestSupport.RegisterLatin(document);
-        var paragraph = section.Blocks.AddParagraph("Hello");
+        var paragraph = section.Blocks.Add(new Paragraph("Hello"));
         paragraph.Font.Family = BuildTestSupport.Latin;
 
         var emission = Emit(new DocumentRenderer().Render(document));
@@ -54,7 +54,7 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Title");
         style.Font.Size = 30;
-        var paragraph = section.Blocks.AddParagraph("Styled");
+        var paragraph = section.Blocks.Add(new Paragraph("Styled"));
         paragraph.StyleName = "Title";
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
@@ -70,7 +70,7 @@ public class StyleCascadeTests
         var baseStyle = document.Styles.Add("Big");
         baseStyle.Font.Size = 24;
         document.Styles.Add("Derived", "Big");
-        var paragraph = section.Blocks.AddParagraph("Inherited");
+        var paragraph = section.Blocks.Add(new Paragraph("Inherited"));
         paragraph.StyleName = "Derived";
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
@@ -82,14 +82,14 @@ public class StyleCascadeTests
     public void NamedStyle_AlignmentApplies()
     {
         var reference = Builder(out var referenceSection);
-        var referenceParagraph = referenceSection.Blocks.AddParagraph("Centered text");
+        var referenceParagraph = referenceSection.Blocks.Add(new Paragraph("Centered text"));
         referenceParagraph.Alignment = HorizontalAlignment.Center;
         var expected = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(reference));
 
         var document = Builder(out var section);
         var style = document.Styles.Add("Middle");
         style.Alignment = HorizontalAlignment.Center;
-        var paragraph = section.Blocks.AddParagraph("Centered text");
+        var paragraph = section.Blocks.Add(new Paragraph("Centered text"));
         paragraph.StyleName = "Middle";
         var actual = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(document));
 
@@ -102,7 +102,7 @@ public class StyleCascadeTests
     public void CellFont_SizeAppliesToCellParagraphs()
     {
         var document = Builder(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         var cell = row.Cells[0];
@@ -119,7 +119,7 @@ public class StyleCascadeTests
     public void RowFont_SizeAppliesToRowCells()
     {
         var document = Builder(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Text = "Row";
@@ -135,7 +135,7 @@ public class StyleCascadeTests
     public void RowAlignment_AppliesToRowCells()
     {
         var reference = Builder(out var referenceSection);
-        var referenceTable = referenceSection.Blocks.AddTable();
+        var referenceTable = referenceSection.Blocks.Add(new Table());
         referenceTable.Columns.Add();
         var referenceRow = referenceTable.Rows.Add();
         referenceRow.Cells[0].Text = "Right";
@@ -143,7 +143,7 @@ public class StyleCascadeTests
         var expected = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(reference));
 
         var document = Builder(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Text = "Right";
@@ -159,7 +159,7 @@ public class StyleCascadeTests
     public void TableFont_SizeAppliesToCellWithNoExplicitFont()
     {
         var document = Builder(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Font.Size = 18;
         table.Rows.Add().Cells[0].Text = "Cell";
@@ -174,7 +174,7 @@ public class StyleCascadeTests
     public void TableFont_OverriddenByExplicitCellFont()
     {
         var document = Builder(out var section);
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Font.Size = 18;
         var cell = table.Rows.Add().Cells[0];
@@ -193,7 +193,7 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Number");
         style.Font.Size = 26;
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var cell = table.Rows.Add().Cells[0];
         cell.Text = "42";
@@ -211,7 +211,7 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Number");
         style.Font.Size = 26;
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var cell = table.Rows.Add().Cells[0];
         cell.Text = "42";
@@ -230,10 +230,10 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Title");
         style.Font.Size = 20;
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         table.Font.Size = 8;
-        var paragraph = table.Rows.Add().Cells[0].Blocks.AddParagraph("Heading");
+        var paragraph = table.Rows.Add().Cells[0].Blocks.Add(new Paragraph("Heading"));
         paragraph.StyleName = "Title";
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
@@ -246,7 +246,7 @@ public class StyleCascadeTests
     public void ExplicitRunFont_WinsOverParagraphAndCellFonts()
     {
         var document = Builder(out var section);
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Font.Size = 20;
         var run = paragraph.Inlines.Add("Precise");
         run.Font.Size = 9;
@@ -266,7 +266,7 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Quote");
         style.SpacingBefore = Unit.FromPoint(7);
-        var paragraph = section.Blocks.AddParagraph("Styled");
+        var paragraph = section.Blocks.Add(new Paragraph("Styled"));
         paragraph.StyleName = "Quote";
         paragraph.SpacingBefore = Unit.FromPoint(3);
 
@@ -285,7 +285,7 @@ public class StyleCascadeTests
         root.LeftIndent = Unit.FromPoint(30);
         var leaf = document.Styles.Add("Leaf", "Root");
         leaf.LeftIndent = Unit.FromPoint(12);
-        var paragraph = section.Blocks.AddParagraph("Chained");
+        var paragraph = section.Blocks.Add(new Paragraph("Chained"));
         paragraph.StyleName = "Leaf";
 
         Assert.Equal(12, Format(document, paragraph).LeftIndent.Point);
@@ -299,12 +299,12 @@ public class StyleCascadeTests
     public void NamedStyle_SpacingBeforeMovesTheRenderedBaseline()
     {
         var reference = Builder(out var referenceSection);
-        referenceSection.Blocks.AddParagraph("Spaced").SpacingBefore = Unit.FromPoint(40);
+        referenceSection.Blocks.Add(new Paragraph("Spaced")).SpacingBefore = Unit.FromPoint(40);
         var expected = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(reference));
 
         var document = Builder(out var section);
         document.Styles.Add("Spaced").SpacingBefore = Unit.FromPoint(40);
-        section.Blocks.AddParagraph("Spaced").StyleName = "Spaced";
+        section.Blocks.Add(new Paragraph("Spaced")).StyleName = "Spaced";
         var actual = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(document));
 
         Assert.NotEmpty(expected);
@@ -315,12 +315,12 @@ public class StyleCascadeTests
     public void NamedStyle_LeftIndentMovesTheRenderedText()
     {
         var reference = Builder(out var referenceSection);
-        referenceSection.Blocks.AddParagraph("Indented").LeftIndent = Unit.FromPoint(36);
+        referenceSection.Blocks.Add(new Paragraph("Indented")).LeftIndent = Unit.FromPoint(36);
         var expected = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(reference));
 
         var document = Builder(out var section);
         document.Styles.Add("Indented").LeftIndent = Unit.FromPoint(36);
-        section.Blocks.AddParagraph("Indented").StyleName = "Indented";
+        section.Blocks.Add(new Paragraph("Indented")).StyleName = "Indented";
         var actual = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(document));
 
         Assert.NotEmpty(expected);
@@ -330,7 +330,7 @@ public class StyleCascadeTests
     private static Cell SingleCell(Document document, out Table table)
     {
         var section = document.Sections.Add();
-        table = section.Blocks.AddTable();
+        table = section.Blocks.Add(new Table());
         table.Columns.Add();
         return table.Rows.Add().Cells[0];
     }
@@ -380,7 +380,7 @@ public class StyleCascadeTests
     public void MissingParagraphStyleName_FailsAtLayoutNamingTheStyle()
     {
         var document = Builder(out var section);
-        section.Blocks.AddParagraph("Body").StyleName = "Absent";
+        section.Blocks.Add(new Paragraph("Body")).StyleName = "Absent";
 
         var error = Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().ToArray(document));
 
@@ -406,7 +406,7 @@ public class StyleCascadeTests
     {
         var document = Builder(out var section);
         document.Styles.Add("Leaf").BaseStyle = "Gone";
-        section.Blocks.AddParagraph("Body").StyleName = "Leaf";
+        section.Blocks.Add(new Paragraph("Body")).StyleName = "Leaf";
 
         var error = Assert.Throws<InvalidOperationException>(() => StyleResolver.Resolve(document));
 
@@ -422,7 +422,7 @@ public class StyleCascadeTests
         var second = document.Styles.Add("Second", "First");
         first.BaseStyle = "Second";
         _ = second;
-        section.Blocks.AddParagraph("Body").StyleName = "First";
+        section.Blocks.Add(new Paragraph("Body")).StyleName = "First";
 
         var error = Assert.Throws<InvalidOperationException>(() => StyleResolver.Resolve(document));
 
@@ -450,7 +450,7 @@ public class StyleCascadeTests
         style.Font.Size = 27;
         style.LeftIndent = Unit.FromPoint(17);
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
-        var paragraph = container.Blocks.AddParagraph("Inside");
+        var paragraph = container.Blocks.Add(new Paragraph("Inside"));
         paragraph.StyleName = "Boxed";
 
         Assert.Equal(17, Format(document, paragraph).LeftIndent.Point, 9);
@@ -464,7 +464,7 @@ public class StyleCascadeTests
         document.Styles.Normal.Font.Size = 23;
         var outer = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
         var inner = outer.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
-        inner.Blocks.AddParagraph("Nested");
+        inner.Blocks.Add(new Paragraph("Nested"));
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -478,9 +478,9 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         var style = document.Styles.Add("Band");
         style.Font.Size = 21;
-        section.Header.Blocks.AddParagraph("Head").StyleName = "Band";
-        section.Footer.Blocks.AddParagraph("Foot").StyleName = "Band";
-        section.Blocks.AddParagraph("Body");
+        section.Header.Blocks.Add(new Paragraph("Head")).StyleName = "Band";
+        section.Footer.Blocks.Add(new Paragraph("Foot")).StyleName = "Band";
+        section.Blocks.Add(new Paragraph("Body"));
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -494,8 +494,7 @@ public class StyleCascadeTests
         var document = Builder(out var section);
         document.Styles.Normal.Font.Size = 19;
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
-        container.Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        container.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -507,8 +506,7 @@ public class StyleCascadeTests
     {
         var document = Builder(out var section);
         document.Styles.Normal.Font.Size = 19;
-        var barcode = section.Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        var barcode = section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40)) { ShowText = true });
         barcode.Font.Size = 8;
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));

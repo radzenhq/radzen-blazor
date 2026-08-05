@@ -96,7 +96,7 @@ public class WatermarkPublicContractTests
         var document = new Document();
         var section = document.Sections.Add();
         section.Watermark = watermark;
-        section.Blocks.AddParagraph("body");
+        section.Blocks.Add(new Paragraph("body"));
         return document;
     }
 }

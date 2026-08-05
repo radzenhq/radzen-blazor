@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Radzen.Documents.Codes;
 using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
 
 /// <summary>
-/// An ordered collection of block-level content with typed helpers for appending blocks.
+/// An ordered collection of block-level content.
 /// A block belongs to exactly one collection: adding a block that already has a parent throws,
 /// as does adding a block to itself or to anything it contains.
 /// </summary>
@@ -145,99 +143,7 @@ public sealed class BlockCollection : IReadOnlyList<Block>
     /// </summary>
     /// <param name="text">The paragraph text.</param>
     /// <returns>The newly created paragraph.</returns>
-    public Paragraph Add(string text) => AddParagraph(text);
-
-    /// <summary>
-    /// Appends an empty paragraph.
-    /// </summary>
-    /// <returns>The newly created paragraph.</returns>
-    public Paragraph AddParagraph() => Add(new Paragraph());
-
-    /// <summary>
-    /// Appends a paragraph containing the specified text.
-    /// </summary>
-    /// <param name="text">The paragraph text.</param>
-    /// <returns>The newly created paragraph.</returns>
-    public Paragraph AddParagraph(string text)
-    {
-        var paragraph = new Paragraph { Text = text };
-        return Add(paragraph);
-    }
-
-    /// <summary>
-    /// Appends an empty container.
-    /// </summary>
-    /// <returns>The newly created container.</returns>
-    public Container AddContainer() => Add(new Container());
-
-    /// <summary>
-    /// Appends an empty table.
-    /// </summary>
-    /// <returns>The newly created table.</returns>
-    public Table AddTable() => Add(new Table());
-
-    /// <summary>
-    /// Appends an empty table of contents.
-    /// </summary>
-    /// <returns>The newly created table of contents.</returns>
-    public TableOfContents AddTableOfContents() => Add(new TableOfContents());
-
-    /// <summary>
-    /// Appends a page break.
-    /// </summary>
-    /// <returns>The newly created page break.</returns>
-    public PageBreak AddPageBreak() => Add(new PageBreak());
-
-    /// <summary>
-    /// Appends an empty list.
-    /// </summary>
-    /// <param name="style">The marker style. Defaults to <see cref="ListStyle.Bullet"/>.</param>
-    /// <returns>The newly created list.</returns>
-    public ListBlock AddList(ListStyle style = ListStyle.Bullet) => Add(new ListBlock { Style = style });
-
-    /// <summary>
-    /// Appends an image, buffering the bytes from the specified stream.
-    /// </summary>
-    /// <param name="stream">The source image stream.</param>
-    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="ResourceLimits.Default"/>.</param>
-    /// <returns>The newly created image.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    /// <exception cref="System.IO.InvalidDataException">The stream holds more than <see cref="ResourceLimits.MaxFileBytes"/> bytes.</exception>
-    public Image AddImage(Stream stream, ResourceLimits? limits = null)
-    {
-        ArgumentNullException.ThrowIfNull(stream);
-        return Add(Image.FromStream(stream, limits));
-    }
-
-    /// <summary>
-    /// Appends a QR code rendered as vector squares.
-    /// </summary>
-    /// <param name="value">The text to encode.</param>
-    /// <param name="size">The rendered width and height of the code, quiet zone included.</param>
-    /// <param name="errorCorrection">The error-correction level. Defaults to <see cref="QrErrorCorrection.Medium"/>.</param>
-    /// <returns>The newly created QR code.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
-    public QrCode AddQrCode(string value, Unit size, QrErrorCorrection errorCorrection = QrErrorCorrection.Medium)
-    {
-        ArgumentNullException.ThrowIfNull(value);
-        return Add(new QrCode(value, size) { ErrorCorrection = errorCorrection });
-    }
-
-    /// <summary>
-    /// Appends a 1D barcode rendered as vector bars.
-    /// </summary>
-    /// <param name="type">The barcode symbology.</param>
-    /// <param name="value">The value to encode.</param>
-    /// <param name="width">The rendered width of the bars.</param>
-    /// <param name="height">The rendered height of the bars.</param>
-    /// <param name="showText">Whether the human-readable value is drawn centered below the bars.</param>
-    /// <returns>The newly created barcode.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
-    public Barcode AddBarcode(BarcodeType type, string value, Unit width, Unit height, bool showText = false)
-    {
-        ArgumentNullException.ThrowIfNull(value);
-        return Add(new Barcode(type, value, width, height) { ShowText = showText });
-    }
+    public Paragraph Add(string text) => Add(new Paragraph(text));
 
     /// <summary>
     /// Removes every block, detaching each one so it may be added elsewhere.

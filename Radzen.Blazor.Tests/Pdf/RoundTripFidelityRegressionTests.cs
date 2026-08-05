@@ -72,7 +72,7 @@ public class RoundTripFidelityRegressionTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Background = Color.Red;
@@ -97,7 +97,7 @@ public class RoundTripFidelityRegressionTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(100);
         BuildTestSupport.AddText(section, "Photo caption", "Helvetica");
 
@@ -163,13 +163,13 @@ public class RoundTripFidelityRegressionTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Background = Color.Red;
         row.Cells[0].Text = "Amount";
         row.Cells[0].Font.Family = "Helvetica";
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(80);
 
         var built = new DocumentRenderer().Render(document);

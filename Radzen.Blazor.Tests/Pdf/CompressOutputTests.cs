@@ -15,7 +15,7 @@ public class CompressOutputTests
         var section = document.Sections.Add();
         for (var i = 0; i < 40; i++)
         {
-            section.Blocks.AddParagraph($"Compressible line number {i} with repeated filler text.");
+            section.Blocks.Add(new Paragraph($"Compressible line number {i} with repeated filler text."));
         }
         return document;
     }

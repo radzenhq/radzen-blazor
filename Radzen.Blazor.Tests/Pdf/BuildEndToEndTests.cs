@@ -69,7 +69,7 @@ public class BuildEndToEndTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(200);
         image.Height = Unit.FromPoint(100);
 
@@ -97,7 +97,7 @@ public class BuildEndToEndTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(200);
         image.Height = Unit.FromPoint(100);
 

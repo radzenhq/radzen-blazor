@@ -17,7 +17,7 @@ public class StrikethroughRenderTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add(Text);
         run.Font.Size = Size;
         if (strikethrough)
@@ -63,7 +63,7 @@ public class StrikethroughRenderTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var plain = paragraph.Inlines.Add("Plain ");
         plain.Font.Size = Size;
         var marked = paragraph.Inlines.Add("Marked");
@@ -86,7 +86,7 @@ public class StrikethroughRenderTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var first = paragraph.Inlines.Add("Struck ");
         first.Font.Size = Size;
         first.Font.Strikethrough = true;

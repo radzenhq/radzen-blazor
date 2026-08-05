@@ -51,7 +51,7 @@ public class LinkAnnotationGeometryTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         section.Margins.SetAll(Unit.FromPoint(40));
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5), Rotation = rotation });
-        var paragraph = container.Blocks.AddParagraph();
+        var paragraph = container.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("Radzen").Link = Url;
         return document;
     }
@@ -63,7 +63,7 @@ public class LinkAnnotationGeometryTests
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Radzen");
         run.Link = Url;
         run.Font.Family = BuildTestSupport.Latin;
@@ -86,13 +86,13 @@ public class LinkAnnotationGeometryTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
         section.Margins.SetAll(Unit.FromPoint(40));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(120));
         table.Columns.Add(Unit.FromPoint(120));
         var row = table.Rows.Add();
-        row.Cells[0].Blocks.AddParagraph("First");
+        row.Cells[0].Blocks.Add(new Paragraph("First"));
         var container = row.Cells[1].Blocks.Add(new Container { Padding = Unit.FromPoint(7) });
-        var paragraph = container.Blocks.AddParagraph();
+        var paragraph = container.Blocks.Add(new Paragraph());
         var run = paragraph.Inlines.Add("Radzen");
         run.Link = Url;
         run.Font.Family = BuildTestSupport.Latin;

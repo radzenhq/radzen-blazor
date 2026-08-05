@@ -25,7 +25,7 @@ public class OverlayContainerTaggingConformanceTests
 
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(8), Layout = layout, Rotation = rotation });
-        container.Blocks.AddParagraph().Inlines.Add("OVERLAID").Font.Family = BuildTestSupport.Latin;
+        container.Blocks.Add(new Paragraph()).Inlines.Add("OVERLAID").Font.Family = BuildTestSupport.Latin;
         return (document, builderRenderer);
     }
 
@@ -43,8 +43,8 @@ public class OverlayContainerTaggingConformanceTests
         document.Info.Title = "Layered";
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
-        container.Blocks.AddParagraph().Inlines.Add("ABOVE IMAGE").Font.Family = BuildTestSupport.Latin;
-        var image = container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        container.Blocks.Add(new Paragraph()).Inlines.Add("ABOVE IMAGE").Font.Family = BuildTestSupport.Latin;
+        var image = container.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(80);
         image.Height = Unit.FromPoint(30);
         image.AlternateText = "Meaningful image";
@@ -64,20 +64,20 @@ public class OverlayContainerTaggingConformanceTests
         document.Info.Title = "TableAndFigure";
         var section = document.Sections.Add();
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(120));
         table.Columns.Add(Unit.FromPoint(120));
         var header = table.Rows.Add();
-        header.Cells[0].Blocks.AddParagraph().Inlines.Add("LEFT").Font.Family = BuildTestSupport.Latin;
-        header.Cells[1].Blocks.AddParagraph().Inlines.Add("RIGHT").Font.Family = BuildTestSupport.Latin;
+        header.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("LEFT").Font.Family = BuildTestSupport.Latin;
+        header.Cells[1].Blocks.Add(new Paragraph()).Inlines.Add("RIGHT").Font.Family = BuildTestSupport.Latin;
         var body = table.Rows.Add();
-        body.Cells[0].Blocks.AddParagraph().Inlines.Add("ONE").Font.Family = BuildTestSupport.Latin;
-        var cellImage = body.Cells[1].Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        body.Cells[0].Blocks.Add(new Paragraph()).Inlines.Add("ONE").Font.Family = BuildTestSupport.Latin;
+        var cellImage = body.Cells[1].Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         cellImage.Width = Unit.FromPoint(60);
         cellImage.Height = Unit.FromPoint(24);
         cellImage.AlternateText = "Cell figure";
 
-        var figure = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var figure = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         figure.Width = Unit.FromPoint(90);
         figure.Height = Unit.FromPoint(36);
         figure.AlternateText = "Standalone figure";

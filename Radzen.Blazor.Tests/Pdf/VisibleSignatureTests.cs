@@ -24,7 +24,7 @@ public class VisibleSignatureTests
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
         for (var i = 1; i < pages; i++)
         {
-            section.Blocks.AddPageBreak();
+            section.Blocks.Add(new PageBreak());
             BuildTestSupport.AddText(section, "Another page " + i, BuildTestSupport.Latin);
         }
 

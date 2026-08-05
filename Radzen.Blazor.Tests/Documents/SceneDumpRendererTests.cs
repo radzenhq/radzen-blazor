@@ -42,7 +42,7 @@ public class SceneDumpRendererTests
         section.PageSize = new PageSize(Unit.FromPoint(320), Unit.FromPoint(140));
         section.Margins.SetAll(Unit.FromPoint(20));
 
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         var tracked = paragraph.Inlines.Add("wide open text");
         tracked.Font.Family = Latin;
         tracked.Font.Size = 12;
@@ -82,7 +82,7 @@ public class SceneDumpRendererTests
         heading.Inlines[0].Anchor = "top";
         ((Run)heading.Inlines[0]).Font.Bold = true;
 
-        var styled = section.Blocks.AddParagraph();
+        var styled = section.Blocks.Add(new Paragraph());
         var plain = styled.Inlines.Add("Plain ");
         plain.Font.Family = Latin;
         var bold = styled.Inlines.Add("bold ");
@@ -96,20 +96,20 @@ public class SceneDumpRendererTests
         colored.Font.Color = Color.FromRgb(200, 30, 60);
         colored.Font.Underline = true;
 
-        var linked = section.Blocks.AddParagraph();
+        var linked = section.Blocks.Add(new Paragraph());
         var link = linked.Inlines.Add("Radzen site");
         link.Font.Family = Latin;
         link.Link = "https://www.radzen.com/";
 
-        var inline = section.Blocks.AddParagraph();
+        var inline = section.Blocks.Add(new Paragraph());
         inline.Inlines.Add("Inline ").Font.Family = Latin;
-        inline.Inlines.AddImage(PdfTestResources.Open("Images/rgb.png"));
+        inline.Inlines.Add(new InlineImage(PdfTestResources.Open("Images/rgb.png")));
 
-        var form = section.Blocks.AddParagraph();
+        var form = section.Blocks.Add(new Paragraph());
         form.Inlines.Add("Name: ").Font.Family = Latin;
         form.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Full name" });
 
-        var controls = section.Blocks.AddParagraph();
+        var controls = section.Blocks.Add(new Paragraph());
         controls.Inlines.Add("Agree ").Font.Family = Latin;
         controls.Inlines.Add(new CheckBox("agree") { Checked = true, Label = "Agree to terms" });
         controls.Inlines.Add(" S").Font.Family = Latin;
@@ -117,13 +117,13 @@ public class SceneDumpRendererTests
         controls.Inlines.Add(" M").Font.Family = Latin;
         controls.Inlines.Add(new RadioButton("size", "M"));
 
-        var picker = section.Blocks.AddParagraph();
+        var picker = section.Blocks.Add(new Paragraph());
         var country = new DropDown("country") { Value = "BG", Label = "Country" };
         country.Options.Add("BG");
         country.Options.Add("US");
         picker.Inlines.Add(country);
 
-        var spaced = section.Blocks.AddParagraph();
+        var spaced = section.Blocks.Add(new Paragraph());
         var tracked = spaced.Inlines.Add("Tracked out");
         tracked.Font.Family = Latin;
         tracked.LetterSpacing = Unit.FromPoint(1.5);
@@ -169,17 +169,12 @@ public class SceneDumpRendererTests
         });
         rotated.Blocks.Add(Text("Rotated", 9));
 
-        var barcode = section.Blocks.AddBarcode(
-            BarcodeType.Code39,
-            "RZ7",
-            Unit.FromPoint(90),
-            Unit.FromPoint(24),
-            showText: true);
+        var barcode = section.Blocks.Add(new Barcode(BarcodeType.Code39, "RZ7", Unit.FromPoint(90), Unit.FromPoint(24)) { ShowText = true });
         barcode.Font.Family = Latin;
         barcode.Font.Size = 8;
         barcode.AlternateText = "Barcode RZ7";
 
-        var list = section.Blocks.AddList();
+        var list = section.Blocks.Add(new ListBlock());
         list.AddItem("First item");
         list.AddItem("Second item");
 
@@ -191,11 +186,11 @@ public class SceneDumpRendererTests
             CornerRadius = Unit.FromPoint(4),
         });
         clipped.Blocks.Add(Text("WW", 24));
-        clipped.Blocks.AddImage(PdfTestResources.Open("Images/rgb.png"));
+        clipped.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.png")));
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
 
-        var table = section.Blocks.AddTable();
+        var table = section.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(150));
         table.Columns.Add(Unit.FromPoint(110));
         var header = table.Rows.Add();
@@ -210,7 +205,7 @@ public class SceneDumpRendererTests
         }
 
         var nesting = table.Rows.Add();
-        var nested = nesting.Cells[0].Blocks.AddTable();
+        var nested = nesting.Cells[0].Blocks.Add(new Table());
         nested.Columns.Add(Unit.FromPoint(60));
         nested.Columns.Add(Unit.FromPoint(60));
         var nestedHeader = nested.Rows.Add();
@@ -221,7 +216,7 @@ public class SceneDumpRendererTests
         nestedRow.Cells[1].Blocks.Add(Text("12", 8));
         nesting.Cells[1].Blocks.Add(Text("Nested", 10));
 
-        var back = section.Blocks.AddParagraph();
+        var back = section.Blocks.Add(new Paragraph());
         var jump = back.Inlines.Add("Back to top");
         jump.Font.Family = Latin;
         jump.LinkToAnchor = "top";

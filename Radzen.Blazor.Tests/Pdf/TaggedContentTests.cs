@@ -23,7 +23,7 @@ public class TaggedContentTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Alt test";
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.AlternateText = "A red square";
 
         var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
@@ -38,7 +38,7 @@ public class TaggedContentTests
         document.Info.Title = "List test";
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
         list.Font.Size = 12;
         list.AddItem("First");
@@ -57,7 +57,7 @@ public class TaggedContentTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        var list = section.Blocks.AddList(ListStyle.Bullet);
+        var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.AddItem("First");
         list.AddItem("Second");
 

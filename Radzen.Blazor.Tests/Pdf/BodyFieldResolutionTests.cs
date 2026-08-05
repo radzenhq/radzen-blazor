@@ -40,7 +40,7 @@ public class BodyFieldResolutionTests
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
         section.Margins.SetAll(Unit.FromPoint(40));
 
-        var paragraph = section.Blocks.AddParagraph();
+        var paragraph = section.Blocks.Add(new Paragraph());
         paragraph.Inlines.Add("page ").Font.Size = 12;
         AddField(paragraph, new PageNumberField());
         paragraph.Inlines.Add(" of ").Font.Size = 12;

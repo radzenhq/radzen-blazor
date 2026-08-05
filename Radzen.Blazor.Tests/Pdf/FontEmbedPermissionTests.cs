@@ -77,7 +77,7 @@ public class FontEmbedPermissionTests
         var document = new Document();
         document.Fonts.Register("Restricted", new System.IO.MemoryStream(font));
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Body").Font.Family = "Restricted";
+        section.Blocks.Add(new Paragraph("Body")).Font.Family = "Restricted";
         return document;
     }
 
@@ -107,7 +107,7 @@ public class FontEmbedPermissionTests
         var document = new Document();
         document.Fonts.Register("Restricted", new System.IO.MemoryStream(WithFsType(Liberation(), 0x0002)));
         var section = document.Sections.Add();
-        section.Blocks.AddParagraph("Body drawn with a base-14 face");
+        section.Blocks.Add(new Paragraph("Body drawn with a base-14 face"));
 
         Assert.NotEmpty(new Radzen.Documents.Pdf.DocumentRenderer().ToArray(document));
     }

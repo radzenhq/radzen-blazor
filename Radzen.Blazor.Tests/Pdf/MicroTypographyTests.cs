@@ -24,7 +24,7 @@ public class MicroTypographyTests
         var document = new Document();
         document.Fonts.Register(Family, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.Add(new Paragraph());
         var lead = paragraph.Inlines.Add("Base ");
         lead.Font.Family = Family;
         lead.Font.Size = Size;

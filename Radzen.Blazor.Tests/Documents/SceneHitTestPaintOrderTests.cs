@@ -47,9 +47,9 @@ public class SceneHitTestPaintOrderTests
         });
 
         var under = new Container { Width = Unit.FromPoint(160), Padding = Unit.FromPoint(24) };
-        under.Blocks.AddParagraph().Inlines.Add("under");
+        under.Blocks.Add(new Paragraph()).Inlines.Add("under");
         var over = new Container { Width = Unit.FromPoint(160), Padding = Unit.FromPoint(24) };
-        over.Blocks.AddParagraph().Inlines.Add("over");
+        over.Blocks.Add(new Paragraph()).Inlines.Add("over");
         overlay.Blocks.Add(under);
         overlay.Blocks.Add(over);
 
@@ -77,10 +77,10 @@ public class SceneHitTestPaintOrderTests
             Width = Unit.FromPoint(240),
         });
 
-        var image = overlay.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        var image = overlay.Blocks.Add(new Image(PdfTestResources.Open("Images/rgb.jpg")));
         image.Width = Unit.FromPoint(160);
         image.Height = Unit.FromPoint(80);
-        var text = overlay.Blocks.AddParagraph().Inlines.Add("over the image");
+        var text = overlay.Blocks.Add(new Paragraph()).Inlines.Add("over the image");
 
         var laidOut = DocumentLayouter.LayoutWithSources(document);
         var page = Assert.Single(laidOut.Scene.Pages);
@@ -109,7 +109,7 @@ public class SceneHitTestPaintOrderTests
             Width = Unit.FromPoint(160),
             Padding = Unit.FromPoint(8),
         });
-        var text = rotated.Blocks.AddParagraph().Inlines.Add("rotated run");
+        var text = rotated.Blocks.Add(new Paragraph()).Inlines.Add("rotated run");
 
         var laidOut = DocumentLayouter.LayoutWithSources(document);
         var page = Assert.Single(laidOut.Scene.Pages);
@@ -131,9 +131,9 @@ public class SceneHitTestPaintOrderTests
         var document = new Document();
         var section = Page(document);
         var outer = section.Blocks.Add(new Container { Width = Unit.FromPoint(40) });
-        outer.Blocks.AddParagraph().Inlines.Add("WW").Font.Size = 60;
+        outer.Blocks.Add(new Paragraph()).Inlines.Add("WW").Font.Size = 60;
         var inner = new Container { Width = Unit.FromPoint(200) };
-        var text = inner.Blocks.AddParagraph().Inlines.Add("inner text that is far wider than forty points");
+        var text = inner.Blocks.Add(new Paragraph()).Inlines.Add("inner text that is far wider than forty points");
         outer.Blocks.Add(inner);
 
         var laidOut = DocumentLayouter.LayoutWithSources(document);

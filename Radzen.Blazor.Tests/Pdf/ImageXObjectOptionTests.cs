@@ -13,7 +13,7 @@ public class ImageXObjectOptionTests
     private static Image AddImage(Document document, string resource)
     {
         var section = document.Sections.Add();
-        var image = section.Blocks.AddImage(PdfTestResources.Open(resource));
+        var image = section.Blocks.Add(new Image(PdfTestResources.Open(resource)));
         image.Width = Unit.FromPoint(48);
         image.Height = Unit.FromPoint(48);
         return image;
