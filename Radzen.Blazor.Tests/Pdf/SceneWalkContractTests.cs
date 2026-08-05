@@ -281,7 +281,9 @@ public class SceneWalkContractTests
         {
             Assert.Equal(row, trace.NestedRows[row].SourceRow);
             Assert.Equal(2, trace.NestedRows[row].Cells.Length);
-            Assert.Equal(Color.FromRgb((byte)(row * 10), 0, 0), trace.NestedRows[row].Background);
+            Assert.All(
+                trace.NestedRows[row].Cells,
+                placed => Assert.Equal(Color.FromRgb((byte)(placed.Cell.Row * 10), 0, 0), placed.Cell.Decoration.Background));
             Assert.True(trace.NestedRows[row].Height > 0);
         }
 

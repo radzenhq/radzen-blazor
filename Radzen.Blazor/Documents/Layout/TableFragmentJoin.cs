@@ -41,7 +41,6 @@ internal static class TableFragmentJoin
                 IsHeader = row.IsHeader,
                 Y = y + row.Y,
                 Height = row.Height,
-                Background = layout.Decoration.RowBackground(row.SourceRow),
                 Artifact = row.IsHeader && fragment.ContainsRepeatedHeaders
                     ? SemanticArtifactKind.RepeatedContent
                     : null,
