@@ -106,9 +106,9 @@ public class TableCellBlockDispatchTests
         var (table, cell) = CellTable();
         var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.Font.Family = TableLayoutSupport.Family;
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
-        list.AddItem("Gamma");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
+        list.Items.Add("Gamma");
 
         var laid = LayOut(table);
 
@@ -123,9 +123,9 @@ public class TableCellBlockDispatchTests
         var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = TableLayoutSupport.Family;
         list.Font.Size = 12;
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
-        list.AddItem("Gamma");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
+        list.Items.Add("Gamma");
 
         var layout = IsolatedTableLayout.LayoutIsolated(table, 400, fonts);
 
@@ -144,8 +144,8 @@ public class TableCellBlockDispatchTests
         var cell = table.Rows.Add().Cells[0];
         var list = cell.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         list.HangingIndent = Unit.FromPoint(20);
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
 
         var draws = TextDraws(document);
 
@@ -241,7 +241,7 @@ public class TableCellBlockDispatchTests
             case nameof(ListBlock):
                 var list = cell.Blocks.Add(new ListBlock());
                 list.Font.Family = TableLayoutSupport.Family;
-                list.AddItem("Alpha");
+                list.Items.Add("Alpha");
                 break;
             case nameof(QrCode):
                 cell.Blocks.Add(new QrCode("RADZEN", Unit.FromPoint(60)));
@@ -271,8 +271,8 @@ public class TableCellBlockDispatchTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "body", "Helvetica");
         var list = section.Header.Blocks.Add(new ListBlock { Style = ListStyle.Number });
-        list.AddItem("Alpha");
-        list.AddItem("Beta");
+        list.Items.Add("Alpha");
+        list.Items.Add("Beta");
 
         var draws = TextDraws(document);
 

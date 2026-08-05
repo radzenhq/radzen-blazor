@@ -74,7 +74,7 @@ public class ColdReviewRegressionTests
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         var paragraph = new Paragraph();
         paragraph.Font.Family = BuildTestSupport.Latin;
-        list.AddItem().Blocks.Add(paragraph);
+        list.Items.Add().Blocks.Add(paragraph);
 
         var lines = DocumentLayouter.Layout(document).Pages[0].Body.Lines;
 

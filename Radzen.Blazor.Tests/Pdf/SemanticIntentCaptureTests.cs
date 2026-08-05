@@ -133,7 +133,7 @@ public class SemanticIntentCaptureTests
     {
         var document = new Document();
         var list = document.Sections.Add().Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
-        list.AddItem("Item");
+        list.Items.Add("Item");
 
         var nodes = DocumentLayouter.Layout(document).Semantics.Structure.Nodes;
         var captured = Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.List));

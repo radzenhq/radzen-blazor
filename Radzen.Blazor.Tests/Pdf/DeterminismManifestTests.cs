@@ -171,14 +171,14 @@ public class DeterminismManifestTests
 
         var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.HangingIndent = Unit.FromPoint(20);
-        bullets.AddItem("Alpha");
-        bullets.AddItem("Beta");
+        bullets.Items.Add("Alpha");
+        bullets.Items.Add("Beta");
 
         var numbers = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
         numbers.LeftIndent = Unit.FromPoint(6);
-        numbers.AddItem("One");
-        numbers.AddItem("Two");
-        numbers.AddItem("Three");
+        numbers.Items.Add("One");
+        numbers.Items.Add("Two");
+        numbers.Items.Add("Three");
 
         return new DocumentRenderer().ToArray(document);
     }
@@ -202,8 +202,8 @@ public class DeterminismManifestTests
 
         var bullets = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         bullets.Font.Family = BuildTestSupport.Latin;
-        bullets.AddItem("Alpha").Font.Family = BuildTestSupport.Latin;
-        bullets.AddItem("Beta").Font.Family = BuildTestSupport.Latin;
+        bullets.Items.Add("Alpha").Font.Family = BuildTestSupport.Latin;
+        bullets.Items.Add("Beta").Font.Family = BuildTestSupport.Latin;
 
         var table = section.Blocks.Add(new Table());
         table.Columns.Add();

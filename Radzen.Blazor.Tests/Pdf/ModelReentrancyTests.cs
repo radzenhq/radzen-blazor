@@ -47,11 +47,11 @@ public class ModelReentrancyTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Size = 14;
-        list.AddItem("first list item");
-        var second = list.AddItem("second list item");
+        list.Items.Add("first list item");
+        var second = list.Items.Add("second list item");
         var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
-        nested.AddItem("nested one");
-        nested.AddItem("nested two");
+        nested.Items.Add("nested one");
+        nested.Items.Add("nested two");
 
         var table = section.Blocks.Add(new Table());
         table.Columns.Add();
@@ -83,12 +83,12 @@ public class ModelReentrancyTests
 
         var list = section.Blocks.Add(new ListBlock { Style = ListStyle.Bullet });
         list.Font.Family = BuildTestSupport.Latin;
-        list.AddItem("first tagged item");
-        var second = list.AddItem("second tagged item");
+        list.Items.Add("first tagged item");
+        var second = list.Items.Add("second tagged item");
         var nested = second.NestedList = new ListBlock { Style = ListStyle.Number };
         nested.Font.Family = BuildTestSupport.Latin;
-        nested.AddItem("nested tagged one");
-        nested.AddItem("nested tagged two");
+        nested.Items.Add("nested tagged one");
+        nested.Items.Add("nested tagged two");
 
         return (document, builderRenderer);
     }

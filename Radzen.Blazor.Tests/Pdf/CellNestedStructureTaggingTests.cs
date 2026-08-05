@@ -125,7 +125,7 @@ public class CellNestedStructureTaggingTests
         table.Columns.Add();
         var row = table.Rows.Add();
         var list = row.Cells[0].Blocks.Add(new ListBlock());
-        var item = list.AddItem();
+        var item = list.Items.Add();
         item.Font.Family = BuildTestSupport.Latin;
         item.Inlines.Add("One").Font.Family = BuildTestSupport.Latin;
 

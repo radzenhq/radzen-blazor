@@ -15,7 +15,7 @@ public class ListFontCascadeTests
         var document = new Document();
         document.Styles.Normal.Font.Size = 20;
         var section = document.Sections.Add();
-        section.Blocks.Add(new ListBlock()).AddItem("Item");
+        section.Blocks.Add(new ListBlock()).Items.Add("Item");
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -30,7 +30,7 @@ public class ListFontCascadeTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
         var section = document.Sections.Add();
-        section.Blocks.Add(new ListBlock()).AddItem("Hello");
+        section.Blocks.Add(new ListBlock()).Items.Add("Hello");
 
         var emission = Emit(new DocumentRenderer().Render(document));
         var composite = BuildTestSupport.CountOccurrences(emission, "/Subtype /Type0");
@@ -49,7 +49,7 @@ public class ListFontCascadeTests
         table.Columns.Add();
         var cell = table.Rows.Add().Cells[0];
         cell.Font.Size = 16;
-        cell.Blocks.Add(new ListBlock()).AddItem("Item");
+        cell.Blocks.Add(new ListBlock()).Items.Add("Item");
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -65,7 +65,7 @@ public class ListFontCascadeTests
         BuildTestSupport.RegisterLatin(document);
         document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
         var section = document.Sections.Add();
-        section.Blocks.Add(new ListBlock()).AddItem("Embedded item");
+        section.Blocks.Add(new ListBlock()).Items.Add("Embedded item");
 
         var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.Null(exception);
@@ -85,7 +85,7 @@ public class ListFontCascadeTests
         document.Styles.Normal.Font.Size = 20;
         var section = document.Sections.Add();
         var list = section.Blocks.Add(new ListBlock());
-        list.AddItem("Item").Font.Size = 8;
+        list.Items.Add("Item").Font.Size = 8;
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
@@ -102,7 +102,7 @@ public class ListFontCascadeTests
         var section = document.Sections.Add();
         var list = section.Blocks.Add(new ListBlock());
         list.Font.Size = 14;
-        list.AddItem("Item");
+        list.Items.Add("Item");
 
         var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
