@@ -31,8 +31,8 @@
 
         var web = section.Blocks.Add(new Paragraph());
         web.Inlines.Add("Any inline can link to the web: visit ");
-        var link = web.Inlines.Add("meridian-supply.example");
-        link.Link = "https://meridian-supply.example";
+        var link = web.Inlines.Add("www.fabrikam.com");
+        link.Link = "https://www.fabrikam.com";
         link.Font.Color = accent;
         link.Font.Underline = true;
         web.Inlines.Add(" for the full catalog.");

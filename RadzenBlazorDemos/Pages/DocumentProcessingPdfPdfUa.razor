@@ -41,7 +41,7 @@
         section.Blocks.Add(new Paragraph("Accessible report") { StyleName = "Heading" });
         var image = section.Blocks.Add(new Image(new MemoryStream(logo)));
         image.Width = 44;
-        image.AlternateText = "The Meridian Supply company logo";
+        image.AlternateText = "The Fabrikam company logo";
         section.Blocks.Add(new Paragraph("Every element is tagged: this paragraph, the heading above, the logo with its alternate text, and the list below.") { StyleName = "Body" });
 
         var list = section.Blocks.Add(new ListBlock { Font = { Family = "Liberation Sans" } });

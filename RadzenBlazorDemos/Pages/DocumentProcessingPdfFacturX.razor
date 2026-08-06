@@ -38,8 +38,8 @@
           </rsm:ExchangedDocument>
           <rsm:SupplyChainTradeTransaction>
             <ram:ApplicableHeaderTradeAgreement>
-              <ram:SellerTradeParty><ram:Name>Meridian Supply Co.</ram:Name></ram:SellerTradeParty>
-              <ram:BuyerTradeParty><ram:Name>Bluewave Logistics</ram:Name></ram:BuyerTradeParty>
+              <ram:SellerTradeParty><ram:Name>Fabrikam, Inc.</ram:Name></ram:SellerTradeParty>
+              <ram:BuyerTradeParty><ram:Name>Northwind Traders</ram:Name></ram:BuyerTradeParty>
             </ram:ApplicableHeaderTradeAgreement>
             <ram:ApplicableHeaderTradeDelivery />
             <ram:ApplicableHeaderTradeSettlement>
@@ -69,7 +69,7 @@
         title.Font.Family = "Liberation Sans";
         title.Font.Size = 16;
         title.Font.Color = Color.FromRgb(25, 118, 210);
-        section.Blocks.Add(new Paragraph("Meridian Supply Co. -> Bluewave Logistics")).Font.Family = "Liberation Sans";
+        section.Blocks.Add(new Paragraph("Fabrikam, Inc. -> Northwind Traders")).Font.Family = "Liberation Sans";
         section.Blocks.Add(new Paragraph("Total: 9,475.20 EUR (incl. 20% VAT), due within 14 days.")).Font.Family = "Liberation Sans";
 
         var portable = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(document);

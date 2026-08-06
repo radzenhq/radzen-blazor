@@ -21,7 +21,7 @@
         var section = document.Sections.Add();
         section.Margins.SetAll(48);
         section.Blocks.Add(new Paragraph("Invoice INV-2026-001")).Font.Size = 16;
-        section.Blocks.Add(new Paragraph("Customer: Bluewave Logistics"));
+        section.Blocks.Add(new Paragraph("Customer: Northwind Traders"));
         section.Blocks.Add(new Paragraph("Total: 9,475.20 EUR - due within 14 days."));
 
         using var source = new MemoryStream(document.ToPdf());
