@@ -5,35 +5,120 @@
 
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenCheckBox @bind-Value=@keepTogether Name="keep" aria-label="keep together" Change=@((bool _) => Generate()) />
-        <RadzenLabel Text="Keep the conclusion together" Component="keep" />
         <RadzenCheckBox @bind-Value=@keepWithNext Name="next" aria-label="keep with next" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Keep headings with their text" Component="next" />
+        <RadzenCheckBox @bind-Value=@keepTogether Name="keep" aria-label="keep together" Change=@((bool _) => Generate()) />
+        <RadzenLabel Text="Keep the conclusion together" Component="keep" />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />
 </RadzenStack>
 
 @code {
-    bool keepTogether = true;
     bool keepWithNext = true;
+    bool keepTogether = true;
     Document document;
     byte[] pdf;
 
-    static readonly string[] Chapters =
+    static readonly (string Title, string Body)[] Sections =
     {
-        "When movable type reached Europe, compositors discovered a problem the scribes never had: a page ends "
-            + "wherever the metal runs out, not where the thought does. The first rule they wrote down survives in "
-            + "every layout engine since - never leave the opening line of a paragraph stranded at the foot of a page.",
-        "The vocabulary is grim for a reason. A widow is a closing line abandoned at the top of a page, an orphan an "
-            + "opening line left behind at the bottom; both cost the reader a beat of confusion that good composition "
-            + "spends elsewhere. Printers fought them with tracking, rewriting, and when all else failed, a wider margin.",
-        "Headings raise the stakes. A chapter title at the very bottom of a page promises content the page cannot "
-            + "deliver, so the binding between a heading and its first paragraph became a rule of its own - keep with "
-            + "next - enforced here exactly as a hot-metal compositor would have.",
-        "Some content refuses to break at all. A signature block split across pages invites forgery disputes; a table "
-            + "of figures split mid-row invites misreading. Keep-together marks such blocks, and the engine moves them "
-            + "whole to the next page rather than divide them.",
+        ("A document model, not a canvas",
+         "You describe sections, paragraphs, tables, images and form fields; the layout engine decides where lines wrap "
+         + "and pages end. There are no coordinates to compute and no cursor to move - change the data and the document "
+         + "reflows, exactly like the components you already build with."),
+        ("No native dependencies",
+         "The entire engine - layout, fonts, compression, encryption, PDF serialization - is managed C#. There is no "
+         + "SkiaSharp, no wkhtmltopdf, no headless browser to install, which is why this very page can generate its PDF "
+         + "inside Blazor WebAssembly: the document you are reading was produced in your browser, and the same code runs "
+         + "unchanged on servers and in containers."),
+        ("Pagination a compositor would approve",
+         "Widow and orphan limits keep a minimum number of lines on each side of every break. KeepTogether moves an "
+         + "unbreakable block to the next page whole, and KeepWithNext binds a heading to the paragraph it announces. "
+         + "Toggle the two checkboxes above and watch the page breaks in this document obey."),
+        ("Tables that travel well",
+         "Long tables split across pages with their header rows repeated after every break; cells span rows and columns, "
+         + "and column widths mix fixed, relative and automatic sizing in one grid. The invoice on the Get Started page "
+         + "is one table, padded and banded."),
+        ("Fonts without folklore",
+         "Registered TrueType and OpenType fonts embed as subsets holding only the glyphs the document uses, with a "
+         + "ToUnicode map so copy and paste returns the original characters. A fallback chain covers scripts the primary "
+         + "font lacks, and a character no font can draw fails loudly with its code point and font named - never a "
+         + "silent tofu box."),
+        ("Deterministic to the byte",
+         "The same input produces byte-identical output, timestamps and identifiers included, so a generated document "
+         + "can be pinned by hash in a test suite. Regressions surface as a failing build instead of a customer noticing "
+         + "a shifted line."),
+        ("Conformance that fails loud",
+         "Ask for PDF/A or PDF/UA and the rules are enforced when the document is saved: encryption under PDF/A is "
+         + "refused with the clause named, a missing title under PDF/UA is refused with the fix suggested, and the files "
+         + "that do save validate cleanly in veraPDF."),
+        ("It reads as well as it writes",
+         "The same library loads existing files from any producer: merge and split them, fill and flatten their forms, "
+         + "search with exact hit rectangles, and redact so the text is removed from the bytes rather than hidden behind "
+         + "a rectangle - extract the result and the words are gone."),
+    };
+
+    static readonly (string Title, int Start, int Count)[] Groups =
+    {
+        ("Text and typography", 0, 10),
+        ("Tables and lists", 10, 6),
+        ("Images, graphics and codes", 16, 8),
+        ("Fonts", 24, 4),
+        ("Navigation and metadata", 28, 6),
+        ("Forms and annotations", 34, 4),
+        ("Reading and editing", 38, 5),
+        ("Security and standards", 43, 4),
+    };
+
+    static readonly string[] Features =
+    {
+        "Sections with per-section page size, orientation and margins",
+        "Paragraphs with alignment, spacing, indents and line spacing",
+        "Named styles that inherit from a base style",
+        "Bold, italic, underline, strikethrough, color and letter spacing",
+        "Superscript and subscript with adjustable scale",
+        "Widow and orphan limits on every paragraph",
+        "KeepTogether, KeepWithNext and explicit page breaks",
+        "Tab stops - left, center, right and decimal, with leaders",
+        "Page number and page count fields in headers and footers",
+        "Running headers and footers per section",
+        "Tables with fixed, relative and automatic column widths",
+        "Row and column spans that shift like an HTML table",
+        "Header rows repeated after every page break",
+        "Cell padding, borders, backgrounds and vertical alignment",
+        "Bulleted and numbered lists with nesting",
+        "List items holding arbitrary block content",
+        "Block and inline images - PNG with alpha, JPEG, JPEG 2000",
+        "Fit-box scaling, image opacity and alternate text",
+        "Containers with padding, borders, corner radius and shadows",
+        "Gradient backgrounds, sixteen blend modes and per-container opacity",
+        "Rotated containers and overlay stacking",
+        "Text and image watermarks at any rotation and opacity",
+        "Vector QR codes with error-correction levels",
+        "Code 128, Code 39, EAN and further one-dimensional symbologies",
+        "TrueType and OpenType embedding with automatic subsetting",
+        "TrueType collections with style-matched face selection",
+        "ToUnicode maps for faithful copy and paste",
+        "Fallback chains, with fail-loud reporting for uncovered characters",
+        "Bookmarks with nested items, styling and anchor targets",
+        "Internal links and web links on any inline",
+        "Table of contents with resolved page numbers and leaders",
+        "Page labels - roman, letters, decimal with prefixes",
+        "Viewer preferences for page mode, layout and window fitting",
+        "Document info and custom XMP metadata",
+        "AcroForm text, checkbox, radio and dropdown fields",
+        "Form filling, value reading and flattening",
+        "Sticky notes, free text, shapes, ink and text markup annotations",
+        "Generated appearance streams for identical rendering everywhere",
+        "Loading PDFs from any producer, with structural repair",
+        "Resource limits that contain hostile files",
+        "Merge, split, extract, reorder, rotate and crop pages",
+        "Text extraction, positioned runs and search with hit rectangles",
+        "Redaction that removes text from the content stream",
+        "AES-256, AES-128 and RC4 encryption, via Web Crypto in WebAssembly",
+        "PDF/A-2, PDF/A-3 and PDF/A-4 with save-time validation",
+        "PDF/UA tagged structure for screen readers",
+        "File attachments and Factur-X e-invoicing",
     };
 
     protected override void OnInitialized()
@@ -44,7 +129,7 @@
     void Generate()
     {
         document = new Document();
-        document.Info.Title = "Pagination control";
+        document.Info.Title = "Why this PDF library";
 
         var heading = document.Styles.Add("Heading");
         heading.Font.Size = 14;
@@ -61,24 +146,40 @@
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(new PageCountField());
 
-        var titles = new[]
+        section.Blocks.Add(new Paragraph("Why this PDF library") { StyleName = "Heading" });
+
+        foreach (var (title, body) in Sections)
         {
-            "1. Where pages end", "2. Widows and orphans", "3. Headings that keep their word",
-            "4. Blocks that will not break", "5. The compositor's ledger", "6. Rules become software",
-        };
-        for (var i = 0; i < titles.Length; i++)
-        {
-            var title = section.Blocks.Add(new Paragraph(titles[i]) { StyleName = "Heading" });
-            title.KeepWithNext = keepWithNext;
-            section.Blocks.Add(new Paragraph(Chapters[i % Chapters.Length] + " " + Chapters[(i + 1) % Chapters.Length])
-            {
-                Widows = 2,
-                Orphans = 2,
-            });
+            var sectionTitle = section.Blocks.Add(new Paragraph(title) { StyleName = "Heading" });
+            sectionTitle.KeepWithNext = keepWithNext;
+            section.Blocks.Add(new Paragraph(body) { Widows = 2, Orphans = 2, LineSpacing = 1.35, SpacingAfter = 4 });
         }
 
-        section.Blocks.Add(new Paragraph("In closing") { StyleName = "Heading" });
-        var conclusion = section.Blocks.Add(new Paragraph(string.Join(" ", Chapters)));
+        var listTitle = section.Blocks.Add(new Paragraph("The capability list") { StyleName = "Heading" });
+        listTitle.KeepWithNext = keepWithNext;
+        foreach (var (groupTitle, groupStart, groupCount) in Groups)
+        {
+            var groupHeading = section.Blocks.Add(new Paragraph(groupTitle) { StyleName = "Heading" });
+            groupHeading.Font.Size = 12;
+            groupHeading.KeepWithNext = keepWithNext;
+            var list = section.Blocks.Add(new ListBlock());
+            foreach (var feature in Features.Skip(groupStart).Take(groupCount))
+            {
+                list.Items.Add(feature);
+            }
+        }
+
+        var closing = section.Blocks.Add(new Paragraph("The short version") { StyleName = "Heading" });
+        closing.KeepWithNext = keepWithNext;
+        var conclusion = section.Blocks.Add(new Paragraph(
+            "One document model, laid out by a real pagination engine, rendered to standards-grade PDF by pure managed code. "
+            + "It runs in Blazor WebAssembly, on servers and in containers, with no native binaries to deploy. "
+            + "Output is deterministic, so a test suite can pin a generated file by hash and catch regressions as failing builds. "
+            + "Conformance to PDF/A and PDF/UA is validated when the file is saved, and violations are reported with the offending rule named. "
+            + "The same library reads files back: merge, split, fill, flatten, search, redact. "
+            + "This paragraph is marked KeepTogether, so when it does not fit at the bottom of a page it moves to the next page whole - "
+            + "and every claim it makes is a live demo in this catalog, generated in your browser."));
+        conclusion.LineSpacing = 1.35;
         conclusion.KeepTogether = keepTogether;
 
         pdf = document.ToPdf();
