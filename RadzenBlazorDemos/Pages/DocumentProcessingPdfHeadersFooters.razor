@@ -45,21 +45,42 @@
         rule.Borders.Bottom.Width = 0.5;
         rule.Borders.Bottom.Color = accent;
 
-        var footer = section.Footer.Blocks.Add(new Paragraph());
-        footer.Alignment = HorizontalAlignment.Center;
-        footer.Inlines.Add("Page ");
+        var footerRule = section.Footer.Blocks.Add(new Container());
+        footerRule.Borders.Top.Width = 0.5;
+        footerRule.Borders.Top.Color = accent;
+
+        var footer = section.Footer.Blocks.Add(new Paragraph { SpacingBefore = 4 });
+        footer.Font.Size = 9;
+        footer.Font.Color = Color.FromRgb(120, 120, 120);
+        footer.Inlines.Add("fabrikam.com");
+        footer.Inlines.Add("\tPage ");
         footer.Inlines.Add(new PageNumberField());
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(new PageCountField());
+        footer.Inlines.Add("\tFY 2026");
+        footer.TabStops.Add(Unit.FromPoint(249.5), TabAlignment.Center);
+        footer.TabStops.Add(Unit.FromPoint(499), TabAlignment.Right);
 
-        for (var i = 1; i <= 3; i++)
+        var chapters = new (string Title, string Body)[]
         {
-            section.Blocks.Add(new Paragraph($"Section {i}")).Font.Size = 16;
-            section.Blocks.Add(new Paragraph(
-                "The header and footer repeat on every page of the section. Fields resolve per page: "
-                + "PageNumberField renders the current page and PageCountField the total, so the footer "
-                + "reads correctly even when content moves during edits."));
-            if (i < 3)
+            ("Overview",
+             "Fabrikam closed the fiscal year with revenue growth across all three product lines. The furniture "
+             + "division led the expansion, driven by the modular office range introduced in the spring collection. "
+             + "Operating margin improved for the fourth consecutive year as the Hamburg plant reached full capacity."),
+            ("Operations",
+             "Manufacturing output rose while defect rates fell to a record low, a direct result of the automated "
+             + "inspection line commissioned in January. Logistics costs remained flat despite higher volumes, "
+             + "thanks to the consolidated distribution hub serving central Europe."),
+            ("Outlook",
+             "The board expects moderate growth next year, with investment focused on sustainable materials and "
+             + "the new e-commerce platform. Headcount will grow in engineering and customer service, while "
+             + "administrative functions remain unchanged."),
+        };
+        for (var i = 0; i < chapters.Length; i++)
+        {
+            section.Blocks.Add(new Paragraph(chapters[i].Title)).Font.Size = 16;
+            section.Blocks.Add(new Paragraph(chapters[i].Body) { LineSpacing = 1.35 });
+            if (i < chapters.Length - 1)
             {
                 section.Blocks.Add(new PageBreak());
             }
