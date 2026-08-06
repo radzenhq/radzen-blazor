@@ -17,6 +17,7 @@
 @code {
     byte[] regular;
     byte[] bold;
+    Document document;
     byte[] pdf;
     string status;
 
@@ -25,7 +26,7 @@
         regular = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
         bold = await Http.GetByteArrayAsync("fonts/LiberationSans-Bold.ttf");
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Font embedding and subsetting";
         document.Fonts.Register("Liberation Sans", new MemoryStream(regular));
         document.Fonts.Register("Liberation Sans", new MemoryStream(bold), bold: true, italic: false);
@@ -55,7 +56,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "font-embedding.pdf", streamRef, "application/pdf");
     }

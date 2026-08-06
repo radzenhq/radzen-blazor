@@ -21,6 +21,7 @@
     readonly PdfAConformance[] profiles = { PdfAConformance.PdfA2B, PdfAConformance.PdfA3B, PdfAConformance.PdfA4 };
     PdfAConformance conformance = PdfAConformance.PdfA3B;
     byte[] font;
+    Document document;
     byte[] pdf;
 
     protected override async Task OnInitializedAsync()
@@ -31,7 +32,7 @@
 
     void Generate()
     {
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Archival document";
         document.Fonts.Register("Liberation Sans", new MemoryStream(font));
 
@@ -50,7 +51,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream, new DocumentRenderer { Conformance = conformance });
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", $"{conformance}.pdf".ToLowerInvariant(), streamRef, "application/pdf");
     }

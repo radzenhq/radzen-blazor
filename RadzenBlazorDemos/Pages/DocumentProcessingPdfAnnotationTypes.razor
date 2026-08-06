@@ -12,6 +12,7 @@
 </RadzenStack>
 
 @code {
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -28,7 +29,7 @@
         section.Blocks.Add(new Paragraph("This sentence is struck out as removed."));
 
         using var source = new MemoryStream(document.ToPdf());
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
         var page = loaded.Pages[0];
 
         Markup(page, "highlighted for review", bounds => new HighlightAnnotation(bounds)
@@ -75,7 +76,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "annotations.pdf", streamRef, "application/pdf");
     }

@@ -24,6 +24,7 @@
 
 @code {
     byte[] filled;
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -45,7 +46,7 @@
         agree.Inlines.Add(" I agree to the terms");
 
         using var source = new MemoryStream(document.ToPdf());
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
         loaded.AcroForm.FillField("signer", "Maya Lindqvist");
         loaded.AcroForm.CheckField("agreed");
         filled = loaded.ToArray();
@@ -56,7 +57,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "flattened.pdf", streamRef, "application/pdf");
     }

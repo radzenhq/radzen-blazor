@@ -18,6 +18,7 @@
 @code {
     bool lastFirst = true;
     bool rotate;
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -53,7 +54,7 @@
         }
 
         using var source = new MemoryStream(document.ToPdf());
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
 
         if (lastFirst)
         {
@@ -70,7 +71,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "page-operations.pdf", streamRef, "application/pdf");
     }

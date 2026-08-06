@@ -17,6 +17,7 @@
 
 @code {
     string qrValue = "https://www.fabrikam.com";
+    Document document;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -26,7 +27,7 @@
 
     void Generate()
     {
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Barcodes and QR codes";
 
         var section = document.Sections.Add();
@@ -50,7 +51,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "barcodes.pdf", streamRef, "application/pdf");
     }

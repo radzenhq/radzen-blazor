@@ -19,6 +19,7 @@
 </RadzenStack>
 
 @code {
+    PortableDocument portable;
     byte[] pdf;
 
     const string InvoiceXml = """
@@ -72,7 +73,7 @@
         section.Blocks.Add(new Paragraph("Fabrikam, Inc. -> Northwind Traders")).Font.Family = "Liberation Sans";
         section.Blocks.Add(new Paragraph("Total: 9,475.20 EUR (incl. 20% VAT), due within 14 days.")).Font.Family = "Liberation Sans";
 
-        var portable = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(document);
+        portable = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(document);
         var attachment = portable.Attachments.Add(
             "factur-x.xml",
             Encoding.UTF8.GetBytes(InvoiceXml),
@@ -90,7 +91,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        portable.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "factur-x-invoice.pdf", streamRef, "application/pdf");
     }

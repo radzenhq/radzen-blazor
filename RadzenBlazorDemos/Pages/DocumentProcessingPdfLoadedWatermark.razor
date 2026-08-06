@@ -16,6 +16,7 @@
 @code {
     string text = "RECEIVED";
     byte[] blank;
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -36,7 +37,7 @@
     void Generate()
     {
         using var source = new MemoryStream(blank);
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
 
         loaded.AddWatermark(new Watermark
         {
@@ -50,7 +51,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "stamped.pdf", streamRef, "application/pdf");
     }

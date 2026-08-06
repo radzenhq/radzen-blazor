@@ -15,6 +15,7 @@
 </RadzenStack>
 
 @code {
+    Document document;
     byte[] pdf;
 
     protected override async Task OnInitializedAsync()
@@ -22,7 +23,7 @@
         var font = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
         var logo = await Http.GetByteArrayAsync("images/invoice-logo.png");
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Accessible report";
         document.Language = "en-US";
         document.Fonts.Register("Liberation Sans", new MemoryStream(font));
@@ -54,7 +55,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "accessible.pdf", streamRef, "application/pdf");
     }
