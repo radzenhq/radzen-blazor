@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
@@ -113,6 +115,57 @@ public class KeepWithNextBlockRegressionTests
             Shows(page1, "TableCaption"),
             "a KeepWithNext caption must not be stranded on page 1 when its table breaks to page 2");
         Assert.True(Shows(page2, "TableCaption"), "the caption must move to page 2 with the table");
+    }
+
+    [Fact]
+    public void KeepWithNext_BeforeKeepTogetherParagraph_MovesHeadingWithTheWholeParagraph()
+    {
+        var (document, section) = AuthorNearlyFullPage();
+
+        var heading = Text("ClosingHeading", BodyFontSize);
+        heading.KeepWithNext = true;
+        section.Blocks.Add(heading);
+
+        var closing = Text(string.Join(" ", Enumerable.Repeat("closing words that wrap across several lines", 6)), BodyFontSize);
+        closing.KeepTogether = true;
+        section.Blocks.Add(closing);
+
+        var page1 = PageContent(document, 0, out var pageCount);
+        Assert.Equal(2, pageCount);
+        var page2 = PageContent(document, 1, out _);
+
+        Assert.Contains("closing", page2, StringComparison.Ordinal);
+        Assert.DoesNotContain("closing", page1, StringComparison.Ordinal);
+        Assert.False(
+            Shows(page1, "ClosingHeading"),
+            "a KeepWithNext heading must not be stranded on page 1 when its KeepTogether paragraph moves whole to page 2");
+        Assert.True(Shows(page2, "ClosingHeading"), "the heading must move to page 2 with the paragraph");
+    }
+
+    [Fact]
+    public void KeepWithNext_BeforeParagraphMovedWholeByOrphanControl_MovesHeadingWithIt()
+    {
+        var (document, section) = AuthorNearlyFullPage();
+
+        var heading = Text("ClosingHeading", BodyFontSize);
+        heading.KeepWithNext = true;
+        section.Blocks.Add(heading);
+
+        var closing = Text(string.Join(" ", Enumerable.Repeat("closing words that wrap across several lines", 6)), BodyFontSize);
+        closing.Orphans = 4;
+        closing.Widows = 4;
+        section.Blocks.Add(closing);
+
+        var page1 = PageContent(document, 0, out var pageCount);
+        Assert.Equal(2, pageCount);
+        var page2 = PageContent(document, 1, out _);
+
+        Assert.Contains("closing", page2, StringComparison.Ordinal);
+        Assert.DoesNotContain("closing", page1, StringComparison.Ordinal);
+        Assert.False(
+            Shows(page1, "ClosingHeading"),
+            "a KeepWithNext heading must not be stranded on page 1 when orphan control moves its paragraph whole to page 2");
+        Assert.True(Shows(page2, "ClosingHeading"), "the heading must move to page 2 with the paragraph");
     }
 
     [Fact]
