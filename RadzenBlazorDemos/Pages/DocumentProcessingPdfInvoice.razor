@@ -181,7 +181,7 @@
         var payRow = pay.Rows.Add();
         payRow.Cells[0].Blocks.Add(new QrCode("https://pay.fabrikam.com/INV-2026-018", 68));
         payRow.Cells[1].Blocks.Add(new Paragraph("Scan to pay online, or transfer to:")).StyleName = "Muted";
-        payRow.Cells[1].Blocks.Add(new Paragraph("IBAN DE89 3704 0044 0532 0130 00 - BIC COBADEFF")).Font.Size = 10;
+        payRow.Cells[1].Blocks.Add(new Paragraph("IBAN DEXX XXXX 0044 0532 0130 00 - BIC FABRDEXX")).Font.Size = 10;
         payRow.Cells[1].Blocks.Add(new Paragraph("Reference INV-2026-018. Payment is due within 14 days.")).StyleName = "Muted";
 
         pdf = document.ToPdf();
