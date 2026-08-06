@@ -20,6 +20,7 @@
 @code {
     int headingSize = 20;
     string accent = "rgb(25, 118, 210)";
+    Document document;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -37,7 +38,7 @@
     {
         var color = Parse(accent);
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Named styles";
 
         var heading = document.Styles.Add("Heading");
@@ -89,7 +90,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "styles.pdf", streamRef, "application/pdf");
     }

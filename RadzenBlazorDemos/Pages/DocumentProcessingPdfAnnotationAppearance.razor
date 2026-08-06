@@ -16,6 +16,7 @@
 
 @code {
     decimal opacity = 0.6m;
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -35,7 +36,7 @@
             + "identically in every viewer instead of depending on viewer defaults."));
 
         using var source = new MemoryStream(document.ToPdf());
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
         var page = loaded.Pages[0];
 
         var x = 48.0;
@@ -59,7 +60,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "annotation-appearance.pdf", streamRef, "application/pdf");
     }

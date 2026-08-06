@@ -20,6 +20,7 @@
 @code {
     string text = "DRAFT";
     decimal opacity = 0.12m;
+    Document document;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -29,7 +30,7 @@
 
     void Generate()
     {
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Watermarks";
 
         var section = document.Sections.Add();
@@ -59,7 +60,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "watermarks.pdf", streamRef, "application/pdf");
     }

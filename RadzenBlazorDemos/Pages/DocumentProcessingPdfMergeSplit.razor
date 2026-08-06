@@ -19,6 +19,7 @@
 
 @code {
     string mode = "merged";
+    PortableDocument result;
     byte[] pdf;
 
     static byte[] Contract()
@@ -98,20 +99,15 @@
 
         contract.Append(appendix);
 
-        if (mode == "split")
-        {
-            var extracted = contract.Pages.ExtractPages(1..2);
-            pdf = extracted.ToArray();
-        }
-        else
-        {
-            pdf = contract.ToArray();
-        }
+        result = mode == "split" ? contract.Pages.ExtractPages(1..2) : contract;
+        pdf = result.ToArray();
     }
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        result.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", mode == "split" ? "appendix.pdf" : "agreement.pdf", streamRef, "application/pdf");
     }

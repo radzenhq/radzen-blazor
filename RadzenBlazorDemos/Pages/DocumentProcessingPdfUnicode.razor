@@ -12,6 +12,7 @@
 </RadzenStack>
 
 @code {
+    Document document;
     byte[] pdf;
 
     protected override async Task OnInitializedAsync()
@@ -19,7 +20,7 @@
         var latin = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
         var cjk = await Http.GetByteArrayAsync("fonts/NotoSansSC-Subset.otf");
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Unicode text";
         document.Fonts.Register("Liberation Sans", new MemoryStream(latin));
         document.Fonts.Register("Noto Sans SC", new MemoryStream(cjk));
@@ -59,7 +60,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "unicode.pdf", streamRef, "application/pdf");
     }

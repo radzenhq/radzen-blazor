@@ -13,6 +13,7 @@
 </RadzenStack>
 
 @code {
+    Document document;
     byte[] pdf;
 
     protected override async Task OnInitializedAsync()
@@ -20,7 +21,7 @@
         var logo = await Http.GetByteArrayAsync("images/invoice-logo.png");
         var photo = await Http.GetByteArrayAsync("images/blazor-template-repairshop.jpg");
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Images";
 
         var section = document.Sections.Add();
@@ -54,7 +55,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "images.pdf", streamRef, "application/pdf");
     }

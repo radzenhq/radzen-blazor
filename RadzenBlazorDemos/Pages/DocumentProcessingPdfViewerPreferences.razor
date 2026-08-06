@@ -22,6 +22,7 @@
     readonly PdfPageMode[] modes = { PdfPageMode.UseNone, PdfPageMode.UseOutlines, PdfPageMode.UseThumbs, PdfPageMode.FullScreen };
     PdfPageMode pageMode = PdfPageMode.UseThumbs;
     bool displayTitle = true;
+    PortableDocument portable;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -43,7 +44,7 @@
         section.Blocks.Add(new PageBreak());
         section.Blocks.Add(new Paragraph("A second page, so page layout and thumbnails have something to show."));
 
-        var portable = new DocumentRenderer().Render(document);
+        portable = new DocumentRenderer().Render(document);
         portable.ViewerPreferences = new ViewerPreferences
         {
             PageMode = pageMode,
@@ -56,7 +57,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        portable.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "viewer-preferences.pdf", streamRef, "application/pdf");
     }

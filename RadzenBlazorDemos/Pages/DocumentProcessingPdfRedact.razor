@@ -30,6 +30,7 @@
     string status;
     bool gone;
     byte[] original;
+    PortableDocument loaded;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -50,7 +51,7 @@
 
         original = document.ToPdf();
         using var source = new MemoryStream(original);
-        var loaded = PortableDocument.LoadFromStream(source);
+        loaded = PortableDocument.LoadFromStream(source);
 
         var removed = loaded.RedactText(secret);
         pdf = loaded.ToArray();
@@ -65,7 +66,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        loaded.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "redacted.pdf", streamRef, "application/pdf");
     }

@@ -17,6 +17,7 @@
 @code {
     bool keepTogether = true;
     bool keepWithNext = true;
+    Document document;
     byte[] pdf;
 
     static readonly string[] Chapters =
@@ -42,7 +43,7 @@
 
     void Generate()
     {
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Pagination control";
 
         var heading = document.Styles.Add("Heading");
@@ -85,7 +86,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "pagination.pdf", streamRef, "application/pdf");
     }

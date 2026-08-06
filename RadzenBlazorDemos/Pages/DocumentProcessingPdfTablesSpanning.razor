@@ -12,6 +12,7 @@
 </RadzenStack>
 
 @code {
+    Document document;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -19,7 +20,7 @@
         var accent = Color.FromRgb(25, 118, 210);
         var grid = Color.FromRgb(200, 200, 200);
 
-        var document = new Document();
+        document = new Document();
         document.Info.Title = "Spanning and cell styling";
 
         var section = document.Sections.Add();
@@ -92,7 +93,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "table-spanning.pdf", streamRef, "application/pdf");
     }

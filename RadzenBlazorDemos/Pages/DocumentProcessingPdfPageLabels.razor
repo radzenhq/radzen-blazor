@@ -11,6 +11,7 @@
 </RadzenStack>
 
 @code {
+    PortableDocument portable;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -35,7 +36,7 @@
             section.Blocks.Add(new Paragraph("Labeled with plain decimal numbers starting over at 1."));
         }
 
-        var portable = new DocumentRenderer().Render(document);
+        portable = new DocumentRenderer().Render(document);
         portable.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.LowercaseRoman });
         portable.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal, Start = 1 });
 
@@ -44,7 +45,9 @@
 
     async Task Download()
     {
-        using var stream = new MemoryStream(pdf);
+        using var stream = new MemoryStream();
+        portable.SaveToStream(stream);
+        stream.Position = 0;
         using var streamRef = new DotNetStreamReference(stream);
         await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "page-labels.pdf", streamRef, "application/pdf");
     }
