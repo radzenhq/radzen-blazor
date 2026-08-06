@@ -2305,6 +2305,7 @@ public Radzen.Documents.TabStopCollection.Remove(Radzen.Documents.TabStop stop) 
 public Radzen.Documents.TabStopCollection.RemoveAt(System.Int32 index) : System.Void
 Radzen.Documents.Table = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.Table..ctor()
+public Radzen.Documents.Table.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.Table.Borders : Radzen.Documents.Borders { public get; }
 public Radzen.Documents.Table.Columns : Radzen.Documents.ColumnCollection { public get; }
 public Radzen.Documents.Table.CornerRadius : Radzen.Documents.Core.Unit { public get; public set; }

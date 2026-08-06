@@ -43,6 +43,13 @@ public sealed class Table : Block
         set => width = AuthoredNumber.Absolute(value, "Table.Width");
     }
 
+    /// <summary>
+    /// Gets or sets the horizontal alignment of the table within the available width.
+    /// Only observable when the table is narrower than the available width.
+    /// Defaults to <see cref="HorizontalAlignment.Left"/>.
+    /// </summary>
+    public HorizontalAlignment Alignment { get; set; }
+
     /// <summary>Gets or sets the horizontal offset of the table from the left content edge.</summary>
     /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
     public Unit LeftIndent
