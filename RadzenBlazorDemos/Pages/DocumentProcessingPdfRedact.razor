@@ -6,21 +6,30 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Redact">
-            <RadzenTextBox @bind-Value=@secret aria-label="redact" />
+            <RadzenTextBox @bind-Value=@secret aria-label="redact" Change=@(_ => Generate()) />
         </RadzenFormField>
-        <RadzenButton Text="Redact" Icon="ink_eraser" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <RadzenAlert AlertStyle=@(gone ? AlertStyle.Success : AlertStyle.Warning) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
         @status
     </RadzenAlert>
-    <PdfPreview Data=@pdf />
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText TextStyle="TextStyle.Overline">Before</RadzenText>
+            <PdfPreview Data=@original Height="360px" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText TextStyle="TextStyle.Overline">After</RadzenText>
+            <PdfPreview Data=@pdf Height="360px" />
+        </RadzenColumn>
+    </RadzenRow>
 </RadzenStack>
 
 @code {
     string secret = "4485-7702-3311-9042";
     string status;
     bool gone;
+    byte[] original;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -39,7 +48,8 @@
         section.Blocks.Add(new Paragraph($"Card number: {secret}"));
         section.Blocks.Add(new Paragraph("Amount: 9,475.20 EUR"));
 
-        using var source = new MemoryStream(document.ToPdf());
+        original = document.ToPdf();
+        using var source = new MemoryStream(original);
         var loaded = PortableDocument.LoadFromStream(source);
 
         var removed = loaded.RedactText(secret);

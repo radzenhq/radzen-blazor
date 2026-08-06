@@ -8,9 +8,8 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="QR content">
-            <RadzenTextBox @bind-Value=@qrValue aria-label="qr content" />
+            <RadzenTextBox @bind-Value=@qrValue aria-label="qr content" Change=@(_ => Generate()) />
         </RadzenFormField>
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />

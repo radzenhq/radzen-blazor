@@ -7,12 +7,11 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Watermark text">
-            <RadzenTextBox @bind-Value=@text aria-label="watermark" />
+            <RadzenTextBox @bind-Value=@text aria-label="watermark" Change=@(_ => Generate()) />
         </RadzenFormField>
         <RadzenFormField Text="Opacity">
-            <RadzenNumeric @bind-Value=@opacity Min="0.05m" Max="1m" Step="0.05" aria-label="opacity" />
+            <RadzenNumeric @bind-Value=@opacity Min="0.05m" Max="1m" Step="0.05" aria-label="opacity" Change=@((decimal _) => Generate()) />
         </RadzenFormField>
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />

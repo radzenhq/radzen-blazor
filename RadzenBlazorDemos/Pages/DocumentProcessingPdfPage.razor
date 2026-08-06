@@ -7,11 +7,29 @@
     Create PDF documents in Blazor and C#. The document engine is pure managed code with no native dependencies, so every demo on these pages runs entirely in your browser - the PDF is generated, displayed, and downloaded without touching a server.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Body1" class="rz-pb-2">
+    You describe a document - sections, paragraphs, tables, images, form fields - and the layout engine paginates it: text wraps and breaks
+    with widow and orphan control, <RadzenLink Path="document-processing-pdf-tables" Text="tables" /> split across pages with repeating headers, and
+    <RadzenLink Path="document-processing-pdf-text" Text="headers and footers" /> resolve page numbers after layout. Registered
+    <RadzenLink Path="document-processing-pdf-fonts" Text="TrueType and OpenType fonts" /> embed as subsets with correct text extraction,
+    and <RadzenLink Path="document-processing-pdf-graphics" Text="images, gradients, watermarks, barcodes and QR codes" /> render as native PDF content.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-pb-2">
+    The same library loads existing files: <RadzenLink Path="document-processing-pdf-editing" Text="merge, split, reorder and rotate pages" />,
+    <RadzenLink Path="document-processing-pdf-forms" Text="fill and flatten forms" />,
+    <RadzenLink Path="document-processing-pdf-search" Text="extract, search and genuinely redact text" />, and
+    <RadzenLink Path="document-processing-pdf-annotations" Text="annotate" /> - against PDFs from any producer.
+    Output can be <RadzenLink Path="document-processing-pdf-security" Text="encrypted with AES-256" /> - in the browser, through Web Crypto -
+    and conformance is enforced at save time: <RadzenLink Path="document-processing-pdf-conformance" Text="archival PDF/A and accessible PDF/UA" />
+    documents validate cleanly in veraPDF, and <RadzenLink Path="document-processing-pdf-attachments" Text="Factur-X hybrid e-invoices" /> carry
+    their machine-readable XML inside the file.
+</RadzenText>
+
 <RadzenText Anchor="document-processing-pdf#hello-world" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Hello world
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Build a <code>Document</code>, add a section and a paragraph, and render it to PDF bytes with <code>DocumentRenderer</code>.
+    Build a <code>Document</code>, add a section and a paragraph, and render it to PDF bytes with <code>document.ToPdf()</code>. Edit the text - the PDF regenerates as you type.
 </RadzenText>
 <RadzenExample ComponentName="DocumentProcessingPdf" Example="DocumentProcessingPdfHelloWorld">
     <DocumentProcessingPdfHelloWorld />

@@ -9,7 +9,7 @@
         <RadzenSelectBar @bind-Value=@mode TValue="string" Change=@(_ => Generate())>
             <Items>
                 <RadzenSelectBarItem Text="Merged" Value=@("merged") />
-                <RadzenSelectBarItem Text="Only the letter" Value=@("split") />
+                <RadzenSelectBarItem Text="Only the appendix" Value=@("split") />
             </Items>
         </RadzenSelectBar>
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
@@ -21,22 +21,64 @@
     string mode = "merged";
     byte[] pdf;
 
-    static byte[] Sample(string title, Color accent, int pages)
+    static byte[] Contract()
     {
         var document = new Document();
-        document.Info.Title = title;
+        document.Info.Title = "Master Service Agreement";
         var section = document.Sections.Add();
         section.Margins.SetAll(48);
-        for (var i = 1; i <= pages; i++)
+        var title = section.Blocks.Add(new Paragraph("Master Service Agreement"));
+        title.Font.Size = 18;
+        title.Font.Color = Color.FromRgb(25, 118, 210);
+        section.Blocks.Add(new Paragraph("Between Fabrikam, Inc. (the Supplier) and Northwind Traders (the Customer)."))
+            .Font.Italic = true;
+        foreach (var (clause, text) in new[]
         {
-            var heading = section.Blocks.Add(new Paragraph($"{title} - page {i}"));
-            heading.Font.Size = 16;
-            heading.Font.Color = accent;
-            section.Blocks.Add(new Paragraph("Merged documents keep their fonts and resources, deduplicated."));
-            if (i < pages)
-            {
-                section.Blocks.Add(new PageBreak());
-            }
+            ("1. Scope", "The Supplier delivers office furnishings and related assembly services as itemized in the appendices to this agreement."),
+            ("2. Orders", "Orders reference this agreement by number. Each order confirms quantities, delivery windows, and the applicable appendix prices."),
+            ("3. Delivery", "Risk passes on delivery at the Customer's dock. The Supplier gives notice two business days before each delivery window."),
+            ("4. Payment", "Invoices are due within fourteen days. Late balances accrue interest at the statutory rate."),
+        })
+        {
+            var heading = section.Blocks.Add(new Paragraph(clause) { SpacingBefore = 12 });
+            heading.Font.Bold = true;
+            heading.KeepWithNext = true;
+            section.Blocks.Add(new Paragraph(text));
+        }
+
+        return document.ToPdf();
+    }
+
+    static byte[] Appendix()
+    {
+        var document = new Document();
+        document.Info.Title = "Appendix A - Price List";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        var title = section.Blocks.Add(new Paragraph("Appendix A - Price List"));
+        title.Font.Size = 18;
+        title.Font.Color = Color.FromRgb(211, 47, 47);
+
+        var table = section.Blocks.Add(new Table());
+        table.Columns.Add();
+        table.Columns.Add(90).Alignment = HorizontalAlignment.Right;
+        var header = table.Rows.Add();
+        header.IsHeaderRow = true;
+        header.Font.Bold = true;
+        header.Borders.Bottom.Width = 1;
+        header.Cells[0].Text = "Item";
+        header.Cells[1].Text = "Unit EUR";
+        foreach (var cell in header.Cells) cell.Padding = 5;
+        foreach (var (item, price) in new[]
+        {
+            ("Standing desk, oak", "649.00"), ("Task chair, mesh", "289.00"),
+            ("Monitor arm, dual", "119.00"), ("Meeting table, walnut", "1,890.00"),
+        })
+        {
+            var row = table.Rows.Add();
+            row.Cells[0].Text = item;
+            row.Cells[1].Text = price;
+            foreach (var cell in row.Cells) cell.Padding = 5;
         }
 
         return document.ToPdf();
@@ -49,21 +91,21 @@
 
     void Generate()
     {
-        using var reportSource = new MemoryStream(Sample("Report", Color.FromRgb(25, 118, 210), 2));
-        using var letterSource = new MemoryStream(Sample("Letter", Color.FromRgb(211, 47, 47), 1));
-        var report = PortableDocument.LoadFromStream(reportSource);
-        var letter = PortableDocument.LoadFromStream(letterSource);
+        using var contractSource = new MemoryStream(Contract());
+        using var appendixSource = new MemoryStream(Appendix());
+        var contract = PortableDocument.LoadFromStream(contractSource);
+        var appendix = PortableDocument.LoadFromStream(appendixSource);
 
-        report.Append(letter);
+        contract.Append(appendix);
 
         if (mode == "split")
         {
-            var extracted = report.Pages.ExtractPages(2..3);
+            var extracted = contract.Pages.ExtractPages(1..2);
             pdf = extracted.ToArray();
         }
         else
         {
-            pdf = report.ToArray();
+            pdf = contract.ToArray();
         }
     }
 
@@ -71,6 +113,6 @@
     {
         using var stream = new MemoryStream(pdf);
         using var streamRef = new DotNetStreamReference(stream);
-        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", mode == "split" ? "letter.pdf" : "merged.pdf", streamRef, "application/pdf");
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", mode == "split" ? "appendix.pdf" : "agreement.pdf", streamRef, "application/pdf");
     }
 }

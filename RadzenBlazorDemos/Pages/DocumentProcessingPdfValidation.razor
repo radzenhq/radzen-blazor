@@ -7,13 +7,12 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Conformance">
-            <RadzenDropDown @bind-Value=@conformance Data=@profiles aria-label="conformance" />
+            <RadzenDropDown @bind-Value=@conformance Data=@profiles aria-label="conformance" Change=@(_ => Generate()) />
         </RadzenFormField>
-        <RadzenCheckBox @bind-Value=@encrypt Name="encrypt" aria-label="encrypt" />
+        <RadzenCheckBox @bind-Value=@encrypt Name="encrypt" aria-label="encrypt" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Encrypt" Component="encrypt" />
-        <RadzenCheckBox @bind-Value=@attach Name="attach" aria-label="attachment" />
+        <RadzenCheckBox @bind-Value=@attach Name="attach" aria-label="attachment" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Attach a file" Component="attach" />
-        <RadzenButton Text="Try to save" Icon="rule" Click=@Generate />
     </RadzenStack>
     <RadzenAlert AlertStyle=@(failed ? AlertStyle.Danger : AlertStyle.Success) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
         <strong>@(failed ? "Refused at save time" : "Saved")</strong> - @status

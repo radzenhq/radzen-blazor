@@ -6,12 +6,11 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Name">
-            <RadzenTextBox @bind-Value=@attendee aria-label="name" />
+            <RadzenTextBox @bind-Value=@attendee aria-label="name" Change=@(_ => Generate()) />
         </RadzenFormField>
         <RadzenFormField Text="Rating">
-            <RadzenDropDown @bind-Value=@rating Data=@ratings aria-label="rating" />
+            <RadzenDropDown @bind-Value=@rating Data=@ratings aria-label="rating" Change=@(_ => Generate()) />
         </RadzenFormField>
-        <RadzenButton Text="Fill" Icon="edit_document" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />

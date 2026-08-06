@@ -7,9 +7,8 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Password to try">
-            <RadzenTextBox @bind-Value=@attempt aria-label="password" />
+            <RadzenTextBox @bind-Value=@attempt aria-label="password" Change=@(async _ => await OpenAsync()) />
         </RadzenFormField>
-        <RadzenButton Text="Open" Icon="lock_open" Click=@OpenAsync />
     </RadzenStack>
     <RadzenAlert AlertStyle=@(opened ? AlertStyle.Success : AlertStyle.Danger) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
         @status
