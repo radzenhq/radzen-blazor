@@ -7,6 +7,12 @@
          aria-valuenow="@(Mode == ProgressBarMode.Indeterminate ? null : (double?)Value)" aria-label="@AriaLabel" id="@GetId()">
         <svg class="rz-progressbar-circular-viewbox" viewBox="-19 -19 38 38">
             <circle class="rz-progressbar-circular-background" r="15.91549" fill="none" />
+            
+            @if (Mode == ProgressBarMode.Determinate && HasBufferValue)
+            {
+                <circle class="rz-progressbar-circular-buffer-value" r="15.91549" fill="none" aria-hidden="true" stroke-dashoffset="@(((1 - NormalizedBufferValue) * 100).ToInvariantString())" />
+            }
+
             <circle class="rz-progressbar-circular-value" r="15.91549" fill="none" stroke-dashoffset="@(((1 - NormalizedValue) * 100).ToInvariantString())" />
         </svg>
         @if (ShowValue)

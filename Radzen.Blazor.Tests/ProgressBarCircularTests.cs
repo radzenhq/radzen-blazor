@@ -18,11 +18,15 @@ namespace Radzen.Blazor.Tests
         public void ProgressBarCircular_Renders_SvgCirclesWithCorrectRadius()
         {
             using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>();
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            {
+                p.Add(x => x.BufferValue, 75);
+            });
 
-            // SVG contains viewBox, background circle, and value circle with correct radius
+            // SVG contains viewBox, background circle, and value, buffer circles with correct radius
             Assert.Contains(@"viewBox=""-19 -19 38 38""", component.Markup);
             Assert.Contains(@"class=""rz-progressbar-circular-background"" r=""15.91549""", component.Markup);
+            Assert.Contains(@"class=""rz-progressbar-circular-buffer-value"" r=""15.91549""", component.Markup);
             Assert.Contains(@"class=""rz-progressbar-circular-value"" r=""15.91549""", component.Markup);
         }
 
@@ -65,6 +69,56 @@ namespace Radzen.Blazor.Tests
 
             // At 100%, dashoffset = (1 - 1) * 100 = 0
             Assert.Contains(@"stroke-dashoffset=""0""", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBarCircular_BufferValue_Renders_CorrectDashoffset()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            {
+                p.Add(x => x.Value, 40);
+                p.Add(x => x.BufferValue, 75);
+            });
+
+            var bufferCircle = component.Find(".rz-progressbar-circular-buffer-value");
+            var valueCircle = component.Find(".rz-progressbar-circular-value");
+
+            Assert.Equal("25", bufferCircle.GetAttribute("stroke-dashoffset"));
+            Assert.Equal("60", valueCircle.GetAttribute("stroke-dashoffset"));
+        }
+
+        [Fact]
+        public void ProgressBarCircular_DoesNotRenderBuffer_WhenBufferValueIsNotSet()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            {
+                parameters.Add(p => p.Value, -10);
+                parameters.Add(p => p.Min, -100);
+                parameters.Add(p => p.Max, 100);
+            });
+
+            Assert.Empty(component.FindAll(".rz-progressbar-circular-buffer-value"));
+        }
+
+        [Fact]
+        public void ProgressBarCircular_RendersBuffer_WhenBufferIsZero()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            {
+                parameters.Add(p => p.Value, -20);
+                parameters.Add(p => p.BufferValue, 0);
+                parameters.Add(p => p.Min, -100);
+                parameters.Add(p => p.Max, 100);
+            });
+
+            var bufferCircle = component.Find(".rz-progressbar-circular-buffer-value");
+
+            Assert.Equal("50", bufferCircle.GetAttribute("stroke-dashoffset"));
         }
 
         [Fact]

@@ -10,6 +10,7 @@ $progressbar-value-transition: var(--rz-transition-all) !default;
 $progressbar-circular-stroke-width: 2px !default;
 $progressbar-circular-value-stroke-width: 3px !default;
 $progressbar-circular-value-endpoint: round !default;
+$progressbar-buffer-opacity: 0.35 !default;
 
 $progressbar-base-styles: () !default;
 $progressbar-base-styles: map.merge(
@@ -64,9 +65,21 @@ $progressbar-circular-sizes: map.merge(
   align-items: center;
 }
 
+.rz-progressbar-buffer-value {
+  border-radius: var(--rz-progressbar-border-radius);
+  position: absolute;
+  inset-inline-start: 0;
+  background-color: var(--rz-progressbar-value-background-color);
+  height: 100%;
+  width: var(--rz-progressbar-buffer-value);
+  opacity: var(--rz-progressbar-buffer-opacity);
+  transition: var(--rz-progressbar-value-transition);
+}
+
 .rz-progressbar-value {
   border-radius: var(--rz-progressbar-border-radius);
   position: absolute;
+  inset-inline-start: 0;
   background-color: var(--rz-progressbar-value-background-color);
   height: 100%;
   width: var(--rz-progressbar-value);
@@ -124,14 +137,24 @@ $progressbar-circular-sizes: map.merge(
   stroke-width: var(--rz-progressbar-circular-stroke-width);
 }
 
+.rz-progressbar-circular-buffer-value,
 .rz-progressbar-circular-value {
   stroke-linecap: var(--rz-progressbar-circular-value-endpoint);
   stroke-width: var(--rz-progressbar-circular-value-stroke-width);
-  stroke: var(--rz-progressbar-value-background-color);
   transition: var(--rz-progressbar-value-transition);
 }
 
+.rz-progressbar-circular-buffer-value {
+  stroke: var(--rz-progressbar-value-background-color);
+  opacity: var(--rz-progressbar-buffer-opacity);
+}
+
+.rz-progressbar-circular-value {
+  stroke: var(--rz-progressbar-value-background-color);
+}
+
 .rz-progressbar-determinate {
+  .rz-progressbar-circular-buffer-value,
   .rz-progressbar-circular-value {
     stroke-dasharray: 100;
     transform: rotate(-.25turn);
@@ -259,10 +282,12 @@ $progressbar-circular-sizes: map.merge(
   }
   
   .rz-progressbar-determinate.rz-progressbar-#{$style} {
+    .rz-progressbar-buffer-value,
     .rz-progressbar-value {
       background-color: map.get($progressbar, background-color);
     }
 
+    .rz-progressbar-circular-buffer-value,
     .rz-progressbar-circular-value {
       stroke: map.get($progressbar, background-color);
     }

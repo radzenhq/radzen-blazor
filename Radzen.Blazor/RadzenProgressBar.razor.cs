@@ -74,6 +74,17 @@ namespace Radzen.Blazor
         public double Value { get; set; }
 
         /// <summary>
+        /// Gets or sets the buffered progress value.
+        /// The buffer is displayed behind the current progress value in determinate mode.
+        /// Set to <c>null</c> to hide the buffer.
+        /// Values outside the range defined by <see cref="Min"/> and <see cref="Max"/>
+        /// are clamped.
+        /// </summary>
+        /// <value>The buffered progress value. The default is <c>null</c>.</value>
+        [Parameter]
+        public double? BufferValue { get; set; }
+
+        /// <summary>
         /// Gets or sets the minimum value of the progress range.
         /// Use non-zero values for custom progress scales (e.g., 0-1000 for byte counts).
         /// </summary>
@@ -105,6 +116,14 @@ namespace Radzen.Blazor
         public Action<double>? ValueChanged { get; set; }
 
         /// <summary>
+        /// Gets or sets a callback invoked when the buffer value changes.
+        /// Note: This is an Action, not EventCallback. For data binding, the BufferValue property is typically bound directly.
+        /// </summary>
+        /// <value>The buffer value changed callback.</value>
+        [Parameter]
+        public Action<double?>? BufferValueChanged { get; set; }
+
+        /// <summary>
         /// Gets or sets the semantic color style of the progress bar.
         /// Determines the progress bar color: Primary, Success, Info, Warning, Danger, etc.
         /// </summary>
@@ -121,8 +140,33 @@ namespace Radzen.Blazor
         public string? AriaLabel { get; set; }
 
         /// <summary>
+        /// Gets whether a buffered progress value has been supplied.
+        /// </summary>
+        protected bool HasBufferValue => BufferValue.HasValue;
+
+        /// <summary>
         /// Progress in range from 0 to 1.
         /// </summary>
-        protected double NormalizedValue => Math.Min(Math.Max((Value - Min) / (Max - Min), 0), 1);
+        protected double NormalizedValue => Normalize(Value);
+
+        /// <summary>
+        /// Buffered progress normalized to the range 0–1.
+        /// </summary>
+        protected double NormalizedBufferValue =>  BufferValue.HasValue ? Normalize(BufferValue.Value) : 0;
+
+        /// <summary>
+        /// Normalizes a given value to a range between 0 and 1 based on the <see cref="Min"/> and <see cref="Max"/> properties.
+        /// </summary>
+        /// <param name="value">Value to normalize.</param>
+        /// <returns>The normalized value.</returns>
+        private double Normalize(double value)
+        {
+            if (double.IsNaN(value) || double.IsNaN(Min) || double.IsNaN(Max) || Max <= Min)
+            {
+                return 0;
+            }
+
+            return Math.Min(Math.Max((value - Min) / (Max - Min), 0), 1);
+        }
     }
 }

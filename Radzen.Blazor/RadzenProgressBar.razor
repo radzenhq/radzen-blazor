@@ -3,8 +3,16 @@
 @using Radzen.Blazor.Rendering;
 @if (Visible)
 {
-    <div @ref="@Element" style="@($"--rz-progressbar-value: {(NormalizedValue * 100).ToInvariantString()}%;{Style}")" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
+    <div @ref="@Element" 
+         style="@($"--rz-progressbar-value: {(NormalizedValue * 100).ToInvariantString()}%;--rz-progressbar-buffer-value: {(NormalizedBufferValue * 100).ToInvariantString()}%;{Style}")"
+         aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
          aria-valuenow="@(Mode == ProgressBarMode.Indeterminate ? null : (double?)Value)" aria-label="@AriaLabel" id="@GetId()">
+
+        @if (Mode == ProgressBarMode.Determinate && HasBufferValue)
+        {
+            <div class="rz-progressbar-buffer-value" aria-hidden="true"></div>
+        }
+
         <div class="rz-progressbar-value"></div>
         @if (ShowValue)
         {
