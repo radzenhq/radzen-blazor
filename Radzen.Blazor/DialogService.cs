@@ -154,7 +154,7 @@ namespace Radzen
         /// Opens a dialog with the specified arguments.
         /// </summary>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
-        /// <param name="componentType">The type of the component to be displayed in the dialog. Must inherit from <see cref="IComponent"/>.</param>
+        /// <param name="componentType">The type of the component to be displayed in the dialog. Must implement <see cref="IComponent"/>.</param>
         /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
         [RequiresUnreferencedCode(TrimMessages.GenericMethodReflection)]
@@ -162,7 +162,7 @@ namespace Radzen
         {
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
-                throw new ArgumentException("The component type must be a subclass of IComponent.", nameof(componentType));
+                throw new ArgumentException("The component type must implement IComponent.", nameof(componentType));
             }
 
             OpenDialog(title, componentType, parameters, options);
@@ -205,17 +205,17 @@ namespace Radzen
         /// Opens a dialog with the specified arguments dynamically.
         /// </summary>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
-        /// <param name="componentType">The type of the Blazor component to be displayed in a dialog. Must inherit from <see cref="IComponent"/>.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in a dialog. Must implement <see cref="IComponent"/>.</param>
         /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
         /// <param name="options">The dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="Close"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="IComponent"/>.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not implement <see cref="IComponent"/>.</exception>
         [RequiresUnreferencedCode(TrimMessages.GenericMethodReflection)]
         public virtual Task<dynamic?> OpenAsync(string title, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type componentType, Dictionary<string, object?>? parameters = null, DialogOptions? options = null)
         {
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
-                throw new ArgumentException("The component type must be a subclass of IComponent.", nameof(componentType));
+                throw new ArgumentException("The component type must implement IComponent.", nameof(componentType));
             }
 
             var task = new TaskCompletionSource<dynamic?>();
@@ -255,16 +255,16 @@ namespace Radzen
         /// Opens a side dialog with the specified arguments dynamically.
         /// </summary>
         /// <param name="title">The text displayed in the title bar of the side dialog.</param>
-        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must inherit from <see cref="IComponent"/>.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must implement <see cref="IComponent"/>.</param>
         /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
         /// <param name="options">The side dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="CloseSide"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="IComponent"/>.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not implement <see cref="IComponent"/>.</exception>
         public Task<dynamic?> OpenSideAsync(string title, Type componentType, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
-                throw new ArgumentException("The component type must be a subclass of IComponent.", nameof(componentType));
+                throw new ArgumentException("The component type must implement IComponent.", nameof(componentType));
             }
 
             CloseSideSilently();
@@ -309,15 +309,15 @@ namespace Radzen
         /// Opens a side dialog with the specified arguments dynamically.
         /// </summary>
         /// <param name="title">The text displayed in the title bar of the side dialog.</param>
-        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must inherit from <see cref="IComponent"/>.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must implement <see cref="IComponent"/>.</param>
         /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
         /// <param name="options">The side dialog options.</param>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="IComponent"/>.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not implement <see cref="IComponent"/>.</exception>
         public void OpenSide(string title, Type componentType, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
-                throw new ArgumentException("The component type must be a subclass of IComponent.", nameof(componentType));
+                throw new ArgumentException("The component type must implement IComponent.", nameof(componentType));
             }
 
             CloseSideSilently();
