@@ -37,11 +37,11 @@
         section.Blocks.Add(new Paragraph(
             "A PNG with an alpha channel keeps its transparency, and images flow inline with text:") { SpacingBefore = 12 });
         var inline = section.Blocks.Add(new Paragraph());
-        inline.Inlines.Add("Send documents to ");
+        inline.Inlines.Add("Approved items carry the ");
         inline.Inlines.Add(new InlineImage(new MemoryStream(logo))).Width = 12;
-        inline.Inlines.Add(" Radzen and get ");
+        inline.Inlines.Add(" seal inline with text, and a second ");
         inline.Inlines.Add(new InlineImage(new MemoryStream(logo))).Width = 12;
-        inline.Inlines.Add(" answers on the same line.");
+        inline.Inlines.Add(" flows with the same baseline.");
 
         section.Blocks.Add(new Paragraph(
             "The same image at reduced opacity:") { SpacingBefore = 12 });

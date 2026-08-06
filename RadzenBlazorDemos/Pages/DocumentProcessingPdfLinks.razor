@@ -31,11 +31,11 @@
 
         var web = section.Blocks.Add(new Paragraph());
         web.Inlines.Add("Any inline can link to the web: visit ");
-        var link = web.Inlines.Add("radzen.com");
-        link.Link = "https://www.radzen.com";
+        var link = web.Inlines.Add("meridian-supply.example");
+        link.Link = "https://meridian-supply.example";
         link.Font.Color = accent;
         link.Font.Underline = true;
-        web.Inlines.Add(" for the component library.");
+        web.Inlines.Add(" for the full catalog.");
 
         section.Blocks.Add(new PageBreak());
         section.Blocks.Add(new Paragraph("Second page")).Font.Size = 16;

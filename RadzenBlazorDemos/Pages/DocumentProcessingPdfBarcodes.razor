@@ -17,7 +17,7 @@
 </RadzenStack>
 
 @code {
-    string qrValue = "https://www.radzen.com";
+    string qrValue = "https://meridian-supply.example";
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -41,7 +41,7 @@
         section.Blocks.Add(new QrCode(qrValue, 96) { ErrorCorrection = QrErrorCorrection.High });
 
         section.Blocks.Add(new Paragraph("Code 128 with the human-readable value:") { SpacingBefore = 10 });
-        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN-2026-001", 220, 48) { ShowText = true });
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "MER-2026-001", 220, 48) { ShowText = true });
 
         section.Blocks.Add(new Paragraph("EAN-13:") { SpacingBefore = 10 });
         section.Blocks.Add(new Barcode(BarcodeType.Ean13, "4006381333931", 180, 48) { ShowText = true });
