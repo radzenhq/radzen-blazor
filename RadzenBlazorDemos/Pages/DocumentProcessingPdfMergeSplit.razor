@@ -1,0 +1,76 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenSelectBar @bind-Value=@mode TValue="string" Change=@(_ => Generate())>
+            <Items>
+                <RadzenSelectBarItem Text="Merged" Value=@("merged") />
+                <RadzenSelectBarItem Text="Only the letter" Value=@("split") />
+            </Items>
+        </RadzenSelectBar>
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string mode = "merged";
+    byte[] pdf;
+
+    static byte[] Sample(string title, Color accent, int pages)
+    {
+        var document = new Document();
+        document.Info.Title = title;
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        for (var i = 1; i <= pages; i++)
+        {
+            var heading = section.Blocks.Add(new Paragraph($"{title} - page {i}"));
+            heading.Font.Size = 16;
+            heading.Font.Color = accent;
+            section.Blocks.Add(new Paragraph("Merged documents keep their fonts and resources, deduplicated."));
+            if (i < pages)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        return document.ToPdf();
+    }
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        using var reportSource = new MemoryStream(Sample("Report", Color.FromRgb(25, 118, 210), 2));
+        using var letterSource = new MemoryStream(Sample("Letter", Color.FromRgb(211, 47, 47), 1));
+        var report = PortableDocument.LoadFromStream(reportSource);
+        var letter = PortableDocument.LoadFromStream(letterSource);
+
+        report.Append(letter);
+
+        if (mode == "split")
+        {
+            var extracted = report.Pages.ExtractPages(2..3);
+            pdf = extracted.ToArray();
+        }
+        else
+        {
+            pdf = report.ToArray();
+        }
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", mode == "split" ? "letter.pdf" : "merged.pdf", streamRef, "application/pdf");
+    }
+}

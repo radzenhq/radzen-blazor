@@ -1,0 +1,60 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Table of contents";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Contents")).Font.Size = 18;
+        var toc = section.Blocks.Add(new TableOfContents());
+        toc.AddEntry("Introduction", "intro");
+        toc.AddEntry("Getting started", "start");
+        toc.AddEntry("Installation", "install", level: 1);
+        toc.AddEntry("First document", "first", level: 1);
+        toc.AddEntry("Reference", "reference");
+
+        foreach (var (anchor, title) in new[]
+        {
+            ("intro", "Introduction"),
+            ("start", "Getting started"),
+            ("install", "Installation"),
+            ("first", "First document"),
+            ("reference", "Reference"),
+        })
+        {
+            section.Blocks.Add(new PageBreak());
+            var heading = section.Blocks.Add(new Paragraph());
+            var run = heading.Inlines.Add(title);
+            run.Font.Size = 16;
+            run.Anchor = anchor;
+            section.Blocks.Add(new Paragraph(
+                "Each entry links to a named anchor and shows the page number the anchor lands on, "
+                + "resolved after layout - so the numbers stay correct when content moves."));
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "table-of-contents.pdf", streamRef, "application/pdf");
+    }
+}

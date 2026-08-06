@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Stamp">
+            <RadzenTextBox @bind-Value=@text aria-label="stamp" />
+        </RadzenFormField>
+        <RadzenButton Text="Apply" Icon="branding_watermark" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string text = "RECEIVED";
+    byte[] blank;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Incoming document";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Supplier contract")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "This document was produced elsewhere and loaded from its bytes - the watermark below is "
+            + "applied to the loaded pages, exactly as it would be to a third-party PDF."));
+        blank = document.ToPdf();
+
+        Generate();
+    }
+
+    void Generate()
+    {
+        using var source = new MemoryStream(blank);
+        var loaded = PortableDocument.LoadFromStream(source);
+
+        loaded.AddWatermark(new Watermark
+        {
+            Text = text,
+            Opacity = 0.15,
+            Rotation = -30,
+        });
+
+        pdf = loaded.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "stamped.pdf", streamRef, "application/pdf");
+    }
+}

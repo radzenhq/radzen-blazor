@@ -1,0 +1,59 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Caption">
+        The fields are interactive - download the file and fill it in any PDF viewer.
+    </RadzenText>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Feedback form";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Workshop feedback")).Font.Size = 16;
+
+        var name = section.Blocks.Add(new Paragraph("Name: "));
+        name.Inlines.Add(new TextInput("attendee") { Width = 220 });
+
+        var rating = section.Blocks.Add(new Paragraph("Rating: "));
+        foreach (var value in new[] { "Good", "Great", "Excellent" })
+        {
+            rating.Inlines.Add(new RadioButton("rating", value) { Label = value });
+            rating.Inlines.Add($" {value}   ");
+        }
+
+        var topics = section.Blocks.Add(new Paragraph("Next topic: "));
+        var dropdown = new DropDown("topic") { Width = 180 };
+        dropdown.Options.Add("Blazor components");
+        dropdown.Options.Add("PDF generation");
+        dropdown.Options.Add("Spreadsheets");
+        topics.Inlines.Add(dropdown);
+
+        var subscribe = section.Blocks.Add(new Paragraph());
+        subscribe.Inlines.Add(new CheckBox("newsletter") { Label = "Send me the newsletter", Checked = true });
+        subscribe.Inlines.Add(" Send me the newsletter");
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "feedback-form.pdf", streamRef, "application/pdf");
+    }
+}

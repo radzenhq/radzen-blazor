@@ -1,0 +1,163 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Company">
+            <RadzenTextBox @bind-Value=@company aria-label="company" />
+        </RadzenFormField>
+        <RadzenFormField Text="Customer">
+            <RadzenTextBox @bind-Value=@customer aria-label="customer" />
+        </RadzenFormField>
+        <RadzenFormField Text="VAT %">
+            <RadzenNumeric @bind-Value=@vatRate Min="0" Max="40" aria-label="vat" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string company = "Radzen Software";
+    string customer = "Northwind Traders";
+    decimal vatRate = 20;
+    byte[] logo;
+    byte[] pdf;
+
+    record Item(string Description, int Quantity, decimal Price);
+
+    readonly Item[] items =
+    {
+        new("Blazor component license", 3, 899m),
+        new("Priority support, 12 months", 1, 1499m),
+        new("Custom theme design", 1, 2400m),
+        new("Developer onboarding workshop", 2, 650m),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        logo = await Http.GetByteArrayAsync("images/invoice-logo.png");
+        Generate();
+    }
+
+    void Generate()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+
+        var document = new Document();
+        document.Info.Title = $"Invoice INV-2026-001 - {company}";
+
+        var title = document.Styles.Add("Title");
+        title.Font.Size = 26;
+        title.Font.Bold = true;
+        title.Font.Color = accent;
+
+        var muted = document.Styles.Add("Muted");
+        muted.Font.Size = 9;
+        muted.Font.Color = Color.FromRgb(128, 128, 128);
+
+        var label = document.Styles.Add("Label");
+        label.Font.Size = 9;
+        label.Font.Bold = true;
+        label.Font.Color = accent;
+        label.SpacingBefore = 16;
+
+        var section = document.Sections.Add();
+        section.PageSize = PageSizes.A4;
+        section.Margins.SetAll(40);
+
+        var footer = section.Footer.Blocks.Add(new Paragraph());
+        footer.StyleName = "Muted";
+        footer.Alignment = HorizontalAlignment.Center;
+        footer.Inlines.Add($"{company} - Page ");
+        footer.Inlines.Add(new PageNumberField());
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(new PageCountField());
+
+        var head = section.Blocks.Add(new Table());
+        head.Columns.Add(56);
+        head.Columns.Add();
+        head.Columns.Add(160);
+        var headRow = head.Rows.Add();
+        var image = headRow.Cells[0].Blocks.Add(new Image(new MemoryStream(logo)));
+        image.Width = 44;
+        headRow.Cells[1].Blocks.Add(new Paragraph(company)).Font.Size = 16;
+        headRow.Cells[1].Blocks.Add(new Paragraph("1 Main Street, Sofia 1000, Bulgaria")).StyleName = "Muted";
+        headRow.Cells[2].Alignment = HorizontalAlignment.Right;
+        headRow.Cells[2].Blocks.Add(new Paragraph("INVOICE")).StyleName = "Title";
+        headRow.Cells[2].Blocks.Add(new Paragraph("INV-2026-001")).StyleName = "Muted";
+
+        section.Blocks.Add(new Paragraph("BILL TO")).StyleName = "Label";
+        section.Blocks.Add(new Paragraph(customer));
+        section.Blocks.Add(new Paragraph("42 Market Square, Hamburg 20095, Germany")).StyleName = "Muted";
+
+        section.Blocks.Add(new Paragraph("ITEMS")).StyleName = "Label";
+        var table = section.Blocks.Add(new Table());
+        table.Columns.Add();
+        table.Columns.Add(60).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add(80).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add(90).Alignment = HorizontalAlignment.Right;
+
+        var header = table.Rows.Add();
+        header.IsHeaderRow = true;
+        header.RepeatOnEveryPage = true;
+        header.Background = accent;
+        header.Font.Color = Color.White;
+        header.Font.Bold = true;
+        header.Cells[0].Text = "Description";
+        header.Cells[1].Text = "Qty";
+        header.Cells[2].Text = "Price";
+        header.Cells[3].Text = "Amount";
+
+        for (var i = 0; i < items.Length; i++)
+        {
+            var item = items[i];
+            var row = table.Rows.Add();
+            if (i % 2 == 1)
+            {
+                row.Background = Color.FromRgb(245, 245, 245);
+            }
+            row.Cells[0].Text = item.Description;
+            row.Cells[1].Text = item.Quantity.ToString();
+            row.Cells[2].Text = item.Price.ToString("N2");
+            row.Cells[3].Text = (item.Quantity * item.Price).ToString("N2");
+        }
+
+        var subtotal = items.Sum(item => item.Quantity * item.Price);
+        var vat = subtotal * vatRate / 100;
+
+        var totals = section.Blocks.Add(new Table());
+        totals.LeftIndent = 285;
+        totals.Columns.Add(140);
+        totals.Columns.Add(90).Alignment = HorizontalAlignment.Right;
+        AddTotal(totals, "Subtotal", subtotal, false);
+        AddTotal(totals, $"VAT {vatRate}%", vat, false);
+        AddTotal(totals, "Total EUR", subtotal + vat, true);
+
+        section.Blocks.Add(new Paragraph("PAY ONLINE")).StyleName = "Label";
+        section.Blocks.Add(new QrCode("https://www.radzen.com/pay?invoice=INV-2026-001", 72));
+        section.Blocks.Add(new Paragraph("Payment is due within 14 days.")).StyleName = "Muted";
+
+        pdf = document.ToPdf();
+    }
+
+    static void AddTotal(Table totals, string text, decimal amount, bool bold)
+    {
+        var row = totals.Rows.Add();
+        row.Font.Bold = bold;
+        row.Cells[0].Text = text;
+        row.Cells[1].Text = amount.ToString("N2");
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "invoice.pdf", streamRef, "application/pdf");
+    }
+}

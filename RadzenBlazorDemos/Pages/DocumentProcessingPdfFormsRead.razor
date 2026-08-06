@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+
+<RadzenStack Gap="1rem">
+    <RadzenText TextStyle="TextStyle.Body2">
+        A form is generated, filled, and loaded back - the values below are read from the PDF bytes with <code>AcroForm.Fields</code>.
+    </RadzenText>
+    <RadzenTable>
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                <RadzenTableHeaderCell>Field</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell>Type</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell>Value</RadzenTableHeaderCell>
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
+            @foreach (var field in fields)
+            {
+                <RadzenTableRow>
+                    <RadzenTableCell>@field.Name</RadzenTableCell>
+                    <RadzenTableCell>@field.Type</RadzenTableCell>
+                    <RadzenTableCell>@(field.Value ?? "(empty)")</RadzenTableCell>
+                </RadzenTableRow>
+            }
+        </RadzenTableBody>
+    </RadzenTable>
+</RadzenStack>
+
+@code {
+    IReadOnlyList<FormField> fields = [];
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        var name = section.Blocks.Add(new Paragraph("Name: "));
+        name.Inlines.Add(new TextInput("attendee") { Width = 220 });
+        var rating = section.Blocks.Add(new Paragraph("Rating: "));
+        rating.Inlines.Add(new RadioButton("rating", "Good") { Label = "Good" });
+        rating.Inlines.Add(" Good   ");
+        rating.Inlines.Add(new RadioButton("rating", "Great") { Label = "Great" });
+        rating.Inlines.Add(" Great");
+        var subscribe = section.Blocks.Add(new Paragraph());
+        subscribe.Inlines.Add(new CheckBox("newsletter") { Label = "Newsletter" });
+        subscribe.Inlines.Add(" Newsletter");
+
+        using var source = new MemoryStream(document.ToPdf());
+        var loaded = PortableDocument.LoadFromStream(source);
+        loaded.AcroForm.FillField("attendee", "Ana Petrova");
+        loaded.AcroForm.SelectRadioOption("rating", "Great");
+        loaded.AcroForm.CheckField("newsletter");
+
+        using var filled = new MemoryStream(loaded.ToArray());
+        fields = PortableDocument.LoadFromStream(filled).AcroForm.Fields;
+    }
+}

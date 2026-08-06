@@ -1,0 +1,65 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@using Radzen.Blazor
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Password to try">
+            <RadzenTextBox @bind-Value=@attempt aria-label="password" />
+        </RadzenFormField>
+        <RadzenButton Text="Open" Icon="lock_open" Click=@OpenAsync />
+    </RadzenStack>
+    <RadzenAlert AlertStyle=@(opened ? AlertStyle.Success : AlertStyle.Danger) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+</RadzenStack>
+
+@code {
+    string attempt = "radzen";
+    string status;
+    bool opened;
+    byte[] encrypted;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var document = new Document();
+        document.Info.Title = "Locked";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("The secret is: the layout engine is pure managed code."));
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.Encryption = new EncryptionOptions
+        {
+            Algorithm = EncryptionAlgorithm.Aes256,
+            UserPassword = "radzen",
+            OwnerPassword = "radzen-owner",
+            AesProvider = new SubtleCryptoAesCbcProvider(JSRuntime),
+        };
+        encrypted = await portable.ToArrayAsync();
+
+        await OpenAsync();
+    }
+
+    async Task OpenAsync()
+    {
+        try
+        {
+            using var source = new MemoryStream(encrypted);
+            var loaded = await PortableDocument.LoadFromStreamAsync(source, new LoadOptions
+            {
+                Password = attempt,
+                AesProvider = new SubtleCryptoAesCbcProvider(JSRuntime),
+            });
+            opened = true;
+            status = $"Opened. Extracted text: \"{loaded.Pages[0].ExtractText().Trim()}\"";
+        }
+        catch (Exception error)
+        {
+            opened = false;
+            status = error.Message;
+        }
+    }
+}

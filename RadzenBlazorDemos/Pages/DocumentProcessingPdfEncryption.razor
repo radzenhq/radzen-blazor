@@ -1,0 +1,67 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@using Radzen.Blazor
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="User password">
+            <RadzenTextBox @bind-Value=@password aria-label="password" />
+        </RadzenFormField>
+        <RadzenCheckBox @bind-Value=@allowPrinting Name="printing" aria-label="allow printing" />
+        <RadzenLabel Text="Allow printing" Component="printing" />
+        <RadzenButton Text="Encrypt" Icon="lock" Click=@GenerateAsync />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Caption">
+        AES-256 runs in the browser through <code>SubtleCryptoAesCbcProvider</code> - the document never leaves this page.
+        The inline preview cannot prompt for the password, so download the file and open it with "@password".
+    </RadzenText>
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+</RadzenStack>
+
+@code {
+    string password = "radzen";
+    bool allowPrinting = true;
+    string status;
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GenerateAsync();
+    }
+
+    async Task GenerateAsync()
+    {
+        var document = new Document();
+        document.Info.Title = "Confidential";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Confidential report")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph("This document is encrypted with AES-256 and opens only with the user password."));
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.Encryption = new EncryptionOptions
+        {
+            Algorithm = EncryptionAlgorithm.Aes256,
+            UserPassword = password,
+            OwnerPassword = password + "-owner",
+            AllowPrinting = allowPrinting,
+            AllowContentCopy = false,
+            AesProvider = new SubtleCryptoAesCbcProvider(JSRuntime),
+        };
+
+        pdf = await portable.ToArrayAsync();
+        status = $"Encrypted: {pdf.Length:N0} bytes, AES-256, printing {(allowPrinting ? "allowed" : "denied")}, content copy denied.";
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "confidential.pdf", streamRef, "application/pdf");
+    }
+}

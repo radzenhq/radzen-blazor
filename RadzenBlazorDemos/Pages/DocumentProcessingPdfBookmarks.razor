@@ -1,0 +1,65 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Bookmarks";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        for (var i = 1; i <= 3; i++)
+        {
+            var heading = section.Blocks.Add(new Paragraph());
+            var run = heading.Inlines.Add($"Chapter {i}");
+            run.Font.Size = 16;
+            run.Anchor = $"chapter-{i}";
+            section.Blocks.Add(new Paragraph(
+                "Open the bookmarks panel in the viewer - the outline tree on the left navigates this document. "
+                + "Items target pages or anchors and carry bold, italic, and color styling."));
+            if (i < 3)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.ViewerPreferences = new ViewerPreferences { PageMode = PdfPageMode.UseOutlines };
+
+        for (var i = 1; i <= 3; i++)
+        {
+            var chapter = new OutlineItem($"Chapter {i}", OutlineTarget.ToAnchor($"chapter-{i}")) { Bold = i == 1 };
+            chapter.Children.Add(new OutlineItem("Top of the page", OutlineTarget.ToAnchor($"chapter-{i}")));
+            portable.Outline.Add(chapter);
+        }
+
+        portable.Outline.Add(new OutlineItem("radzen.com", null)
+        {
+            Italic = true,
+            Color = Color.FromRgb(25, 118, 210),
+        });
+
+        pdf = portable.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "bookmarks.pdf", streamRef, "application/pdf");
+    }
+}

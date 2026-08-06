@@ -1,0 +1,66 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var latin = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        var cjk = await Http.GetByteArrayAsync("fonts/NotoSansSC-Subset.otf");
+
+        var document = new Document();
+        document.Info.Title = "Unicode text";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(latin));
+        document.Fonts.Register("Noto Sans SC", new MemoryStream(cjk));
+        document.Fonts.SetFallback("Noto Sans SC");
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        var title = section.Blocks.Add(new Paragraph("Unicode across scripts"));
+        title.Font.Family = "Liberation Sans";
+        title.Font.Size = 16;
+        title.Font.Bold = true;
+
+        foreach (var (label, sample) in new[]
+        {
+            ("Latin", "The quick brown fox jumps over the lazy dog - naive, facade, Zurich"),
+            ("Greek", "Αλφα, Βήτα, Γάμμα - Ελληνικά κείμενα"),
+            ("Cyrillic", "Бързата кафява лисица прескача мързеливото куче"),
+            ("Chinese", "发票日期, 客户账单, 总金额"),
+            ("Japanese", "日本語 - 日付: 2026-08-05"),
+            ("Currency & symbols", "€ 1 234,56 - £42 - ¥9 800 - © ® ™ - 3½ × 2¾"),
+        })
+        {
+            var row = section.Blocks.Add(new Paragraph { SpacingBefore = 8 });
+            var name = row.Inlines.Add($"{label}: ");
+            name.Font.Family = "Liberation Sans";
+            name.Font.Bold = true;
+            row.Inlines.Add(sample).Font.Family = "Liberation Sans";
+        }
+
+        section.Blocks.Add(new Paragraph(
+            "Open the file and copy any line - the extracted text matches the original characters, "
+            + "because every embedded subset carries a ToUnicode mapping.") { SpacingBefore = 14 }).Font.Family = "Liberation Sans";
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "unicode.pdf", streamRef, "application/pdf");
+    }
+}

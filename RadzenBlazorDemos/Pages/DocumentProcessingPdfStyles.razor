@@ -1,0 +1,97 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Heading size">
+            <RadzenNumeric @bind-Value=@headingSize Min="12" Max="40" aria-label="heading size" />
+        </RadzenFormField>
+        <RadzenFormField Text="Accent">
+            <RadzenColorPicker @bind-Value=@accent ShowHSV="false" ShowRGBA="false" ShowColors="true" aria-label="accent" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    int headingSize = 20;
+    string accent = "rgb(25, 118, 210)";
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    static Color Parse(string value)
+    {
+        var parts = value.Replace("rgb(", "").Replace(")", "").Split(',');
+        return Color.FromRgb(byte.Parse(parts[0]), byte.Parse(parts[1]), byte.Parse(parts[2]));
+    }
+
+    void Generate()
+    {
+        var color = Parse(accent);
+
+        var document = new Document();
+        document.Info.Title = "Named styles";
+
+        var heading = document.Styles.Add("Heading");
+        heading.Font.Size = headingSize;
+        heading.Font.Bold = true;
+        heading.Font.Color = color;
+        heading.SpacingAfter = 6;
+
+        var subheading = document.Styles.Add("Subheading", baseStyle: "Heading");
+        subheading.Font.Size = headingSize * 0.6;
+        subheading.SpacingBefore = 10;
+
+        var quote = document.Styles.Add("Quote");
+        quote.Font.Italic = true;
+        quote.Font.Color = Color.FromRgb(96, 96, 96);
+        quote.LeftIndent = 24;
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(40);
+
+        section.Blocks.Add(new Paragraph("Named styles") { StyleName = "Heading" });
+        section.Blocks.Add(new Paragraph("A style bundles font, color, spacing, and alignment under a name. Assign it to any paragraph with StyleName."));
+
+        section.Blocks.Add(new Paragraph("Inheritance") { StyleName = "Subheading" });
+        section.Blocks.Add(new Paragraph("Subheading is based on Heading: it inherits the bold accent look and overrides only the size and spacing."));
+
+        section.Blocks.Add(new Paragraph("Direct formatting") { StyleName = "Subheading" });
+        var mixed = section.Blocks.Add(new Paragraph());
+        mixed.Inlines.Add("Inline formatting layers on top of styles: ");
+        mixed.Inlines.Add("bold").Font.Bold = true;
+        mixed.Inlines.Add(", ");
+        mixed.Inlines.Add("italic").Font.Italic = true;
+        mixed.Inlines.Add(", ");
+        mixed.Inlines.Add("underline").Font.Underline = true;
+        mixed.Inlines.Add(", ");
+        var colored = mixed.Inlines.Add("color");
+        colored.Font.Color = color;
+        mixed.Inlines.Add(", ");
+        mixed.Inlines.Add("strikethrough").Font.Strikethrough = true;
+        mixed.Inlines.Add(" and ");
+        var super = mixed.Inlines.Add("superscript");
+        super.VerticalAlignment = RunVerticalAlignment.Superscript;
+        mixed.Inlines.Add(".");
+
+        section.Blocks.Add(new Paragraph("\"Code and its names are the single source of truth.\"") { StyleName = "Quote" });
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "styles.pdf", streamRef, "application/pdf");
+    }
+}

@@ -1,0 +1,60 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+
+        var document = new Document();
+        document.Info.Title = "Links";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        var top = section.Blocks.Add(new Paragraph());
+        var anchor = top.Inlines.Add("Links");
+        anchor.Font.Size = 16;
+        anchor.Anchor = "top";
+
+        var web = section.Blocks.Add(new Paragraph());
+        web.Inlines.Add("Any inline can link to the web: visit ");
+        var link = web.Inlines.Add("radzen.com");
+        link.Link = "https://www.radzen.com";
+        link.Font.Color = accent;
+        link.Font.Underline = true;
+        web.Inlines.Add(" for the component library.");
+
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("Second page")).Font.Size = 16;
+
+        var back = section.Blocks.Add(new Paragraph());
+        back.Inlines.Add("Internal links jump to named anchors: ");
+        var jump = back.Inlines.Add("back to the top");
+        jump.LinkToAnchor = "top";
+        jump.Font.Color = accent;
+        jump.Font.Underline = true;
+        back.Inlines.Add(".");
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "links.pdf", streamRef, "application/pdf");
+    }
+}

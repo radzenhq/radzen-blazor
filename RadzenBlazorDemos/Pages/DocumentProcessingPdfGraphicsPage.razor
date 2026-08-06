@@ -1,0 +1,58 @@
+@page "/document-processing-pdf-graphics"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Images & Graphics</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Place images, decorate content with gradients, shadows, and blend modes, overlay elements, watermark pages, and render barcodes and QR codes directly into the document flow.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-graphics#images" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Images
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add PNG, JPEG, and JPEG 2000 images as blocks or inline with text. PNG transparency is preserved, and images scale to a fit box or to explicit dimensions.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfGraphics" Example="DocumentProcessingPdfImages">
+    <DocumentProcessingPdfImages />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-graphics#gradients-and-effects" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Gradients & effects
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Style containers with linear and radial gradients, rounded corners, box shadows, opacity, rotation, and sixteen blend modes.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfGraphics" Example="DocumentProcessingPdfGradients">
+    <DocumentProcessingPdfGradients />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-graphics#z-order" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Z-order
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Overlay containers stack content in a deterministic paint order - badges over images, text over shapes.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfGraphics" Example="DocumentProcessingPdfZOrder">
+    <DocumentProcessingPdfZOrder />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-graphics#watermarks" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Watermarks
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Stamp every page of a section with rotated text or an image at configurable opacity.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfGraphics" Example="DocumentProcessingPdfWatermarks">
+    <DocumentProcessingPdfWatermarks />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-graphics#barcodes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Barcodes & QR codes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Render barcodes and QR codes as vector content in the document flow, including QR error-correction levels and one-dimensional symbologies from Code 128 to EAN.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfGraphics" Example="DocumentProcessingPdfBarcodes">
+    <DocumentProcessingPdfBarcodes />
+</RadzenExample>

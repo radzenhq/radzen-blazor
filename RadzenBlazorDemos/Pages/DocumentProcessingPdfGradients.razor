@@ -1,0 +1,79 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Gradients and effects";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Gradients & effects")).Font.Size = 16;
+
+        var linear = section.Blocks.Add(new Container
+        {
+            Padding = 16,
+            CornerRadius = 8,
+            BackgroundGradient = new LinearGradient(0, 0, 500, 0,
+                new GradientStop(0, Color.FromRgb(25, 118, 210)),
+                new GradientStop(1, Color.FromRgb(0, 200, 190))),
+        });
+        var banner = linear.Blocks.Add(new Paragraph("A linear gradient background with rounded corners"));
+        banner.Font.Color = Color.White;
+        banner.Font.Bold = true;
+
+        var radial = section.Blocks.Add(new Container
+        {
+            Padding = 16,
+            CornerRadius = 8,
+            BackgroundGradient = new RadialGradient(250, 30, 0, 250, 30, 320,
+                new GradientStop(0, Color.FromRgb(255, 213, 79)),
+                new GradientStop(1, Color.FromRgb(230, 81, 0))),
+        });
+        radial.Blocks.Add(new Paragraph("A radial gradient radiating from the center")).Font.Bold = true;
+
+        var shadow = section.Blocks.Add(new Container
+        {
+            Padding = 16,
+            CornerRadius = 8,
+            Background = Color.White,
+            Shadow = new BoxShadow { OffsetX = 3, OffsetY = 3, BlurRadius = 6, Color = Color.FromRgb(120, 120, 120) },
+        });
+        shadow.Blocks.Add(new Paragraph("A card with a soft box shadow"));
+
+        var rotated = section.Blocks.Add(new Container
+        {
+            Padding = 12,
+            Width = 220,
+            Rotation = -4,
+            Background = Color.FromRgb(255, 249, 196),
+        });
+        rotated.Blocks.Add(new Paragraph("A rotated sticky note"));
+
+        var faded = section.Blocks.Add(new Container { Padding = 12, Opacity = 0.4 });
+        faded.Blocks.Add(new Paragraph("A container at 40% opacity - content and decoration fade together."));
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "gradients.pdf", streamRef, "application/pdf");
+    }
+}

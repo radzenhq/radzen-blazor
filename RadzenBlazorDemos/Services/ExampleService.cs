@@ -3226,44 +3226,175 @@ namespace RadzenBlazorDemos
         {
             Name = "Document Processing",
             Icon = "",
-            New = true,
             Title = "Blazor Document Processing | Free UI Components by Radzen",
-            Description = "Read and write Excel (XLSX) and CSV files in Blazor and C#. Generate downloads, parse uploads, and evaluate Excel formulas in code.",
+            Description = "Generate PDF documents and read and write Excel (XLSX) and CSV files in Blazor and C#. Create invoices and reports, parse uploads, and evaluate Excel formulas in code.",
             Children = new []
             {
                 new Example
                 {
-                    Name = "Spreadsheet API",
-                    Path = "document-processing-spreadsheet",
-                    Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
-                    Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
-                    Tags = new [] { "document", "processing", "spreadsheet", "api", "xlsx", "csv", "excel", "generate", "create", "download", "list", "objects", "workbook" }
+                    Name = "Spreadsheet",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Spreadsheet API",
+                            Path = "document-processing-spreadsheet",
+                            Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
+                            Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
+                            Tags = new [] { "document", "processing", "spreadsheet", "api", "xlsx", "csv", "excel", "generate", "create", "download", "list", "objects", "workbook" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "XLSX", Anchor = "#xlsx" }, new () { Text = "CSV", Anchor = "#csv" } ],
+                            Name = "Import & Export",
+                            Path = "document-processing-import-export",
+                            Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
+                            Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
+                            Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
+                        },
+                        new Example
+                        {
+                            Name = "Localization",
+                            Path = "document-processing-localization",
+                            Title = "Culture-Aware Excel Processing in Blazor and C# | Radzen",
+                            Description = "Parse, display, and localize spreadsheet values and formulas per culture in code while files stay canonical and host-independent.",
+                            Tags = new [] { "document", "processing", "localization", "culture", "globalization", "locale", "decimal", "separator", "formula", "invariant" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Formulas in code", Anchor = "#in-code" }, new () { Text = "Stateless evaluation", Anchor = "#stateless-engine" }, new () { Text = "Stateful evaluation", Anchor = "#stateful-engine" }, new () { Text = "Custom functions", Anchor = "#custom-functions" } ],
+                            Name = "Formulas",
+                            Path = "document-processing-formulas",
+                            Title = "Excel Formula Evaluator for Blazor and C# | Radzen",
+                            Description = "Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them in code, or add your own custom Excel functions.",
+                            Tags = new [] { "document", "processing", "formula", "formulas", "excel", "evaluate", "calculate", "engine", "evaluator", "custom", "function", "compound", "vlookup", "sum", "average", "if", "iferror", "edate", "sumif" }
+                        },
+                    }
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "XLSX", Anchor = "#xlsx" }, new () { Text = "CSV", Anchor = "#csv" } ],
-                    Name = "Import & Export",
-                    Path = "document-processing-import-export",
-                    Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
-                    Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
-                    Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
-                },
-                new Example
-                {
-                    Name = "Localization",
-                    Path = "document-processing-localization",
-                    Title = "Culture-Aware Excel Processing in Blazor and C# | Radzen",
-                    Description = "Parse, display, and localize spreadsheet values and formulas per culture in code while files stay canonical and host-independent.",
-                    Tags = new [] { "document", "processing", "localization", "culture", "globalization", "locale", "decimal", "separator", "formula", "invariant" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Formulas in code", Anchor = "#in-code" }, new () { Text = "Stateless evaluation", Anchor = "#stateless-engine" }, new () { Text = "Stateful evaluation", Anchor = "#stateful-engine" }, new () { Text = "Custom functions", Anchor = "#custom-functions" } ],
-                    Name = "Formulas",
-                    Path = "document-processing-formulas",
-                    Title = "Excel Formula Evaluator for Blazor and C# | Radzen",
-                    Description = "Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them in code, or add your own custom Excel functions.",
-                    Tags = new [] { "document", "processing", "formula", "formulas", "excel", "evaluate", "calculate", "engine", "evaluator", "custom", "function", "compound", "vlookup", "sum", "average", "if", "iferror", "edate", "sumif" }
+                    Name = "PDF",
+                    New = true,
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Hello world", Anchor = "#hello-world" }, new () { Text = "Invoice", Anchor = "#invoice" } ],
+                            Name = "Get Started",
+                            Path = "document-processing-pdf",
+                            Title = "Generate PDF Documents in Blazor and C# | Radzen",
+                            Description = "Create PDF documents in Blazor and C# - entirely in the browser, no server and no native dependencies. Build your first document and a complete invoice.",
+                            Tags = new [] { "document", "processing", "pdf", "generate", "create", "invoice", "report", "browser", "webassembly", "wasm" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Styles", Anchor = "#styles" }, new () { Text = "Pagination", Anchor = "#pagination" }, new () { Text = "Headers & footers", Anchor = "#headers-and-footers" }, new () { Text = "Lists", Anchor = "#lists" }, new () { Text = "Tab stops", Anchor = "#tab-stops" } ],
+                            Name = "Text & Layout",
+                            Path = "document-processing-pdf-text",
+                            Title = "PDF Text Formatting and Page Layout in Blazor | Radzen",
+                            Description = "Format PDF text with named styles, control pagination with widows, orphans, and keep-together, and add headers and footers with page numbers in Blazor and C#.",
+                            Tags = new [] { "document", "processing", "pdf", "text", "paragraph", "style", "pagination", "widow", "orphan", "keep", "header", "footer", "page", "number", "list", "bullet", "numbered", "tab", "leader" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Basics", Anchor = "#basics" }, new () { Text = "Spanning & cell styling", Anchor = "#spanning" }, new () { Text = "Tables across pages", Anchor = "#across-pages" } ],
+                            Name = "Tables",
+                            Path = "document-processing-pdf-tables",
+                            Title = "PDF Tables in Blazor and C# | Radzen",
+                            Description = "Create PDF tables in Blazor and C# with column and row spans, cell styling, relative column widths, and header rows that repeat on every page.",
+                            Tags = new [] { "document", "processing", "pdf", "table", "cell", "row", "column", "span", "colspan", "rowspan", "border", "repeat", "header", "width" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Built-in fonts", Anchor = "#built-in" }, new () { Text = "Embedding & subsetting", Anchor = "#embedding" }, new () { Text = "Fallback", Anchor = "#fallback" }, new () { Text = "Unicode", Anchor = "#unicode" } ],
+                            Name = "Fonts & Unicode",
+                            Path = "document-processing-pdf-fonts",
+                            Title = "PDF Fonts, Embedding and Unicode in Blazor | Radzen",
+                            Description = "Use the built-in PDF fonts or embed and subset TrueType fonts in Blazor and C#. Configure fallback chains and render Cyrillic, Greek, Chinese, Japanese, and Korean text.",
+                            Tags = new [] { "document", "processing", "pdf", "font", "truetype", "embed", "subset", "fallback", "kerning", "unicode", "cyrillic", "greek", "chinese", "japanese", "korean", "cjk" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Images", Anchor = "#images" }, new () { Text = "Gradients & effects", Anchor = "#gradients-and-effects" }, new () { Text = "Z-order", Anchor = "#z-order" }, new () { Text = "Watermarks", Anchor = "#watermarks" }, new () { Text = "Barcodes & QR codes", Anchor = "#barcodes" } ],
+                            Name = "Images & Graphics",
+                            Path = "document-processing-pdf-graphics",
+                            Title = "PDF Images, Graphics and Watermarks in Blazor | Radzen",
+                            Description = "Add images, gradients, shadows, opacity, and blend modes to PDF documents in Blazor and C#. Overlay content, apply watermarks, and render barcodes and QR codes.",
+                            Tags = new [] { "document", "processing", "pdf", "image", "png", "jpeg", "gradient", "shadow", "opacity", "blend", "overlay", "watermark", "barcode", "qr", "qrcode" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Table of contents", Anchor = "#table-of-contents" }, new () { Text = "Bookmarks", Anchor = "#bookmarks" }, new () { Text = "Links", Anchor = "#links" }, new () { Text = "Page labels", Anchor = "#page-labels" }, new () { Text = "Viewer preferences", Anchor = "#viewer-preferences" } ],
+                            Name = "Navigation",
+                            Path = "document-processing-pdf-navigation",
+                            Title = "PDF Table of Contents, Bookmarks and Links in Blazor | Radzen",
+                            Description = "Add a table of contents, bookmarks, hyperlinks, and internal anchors to PDF documents in Blazor and C#. Configure page labels and viewer preferences.",
+                            Tags = new [] { "document", "processing", "pdf", "toc", "table", "contents", "bookmark", "outline", "link", "hyperlink", "anchor", "page", "label", "viewer", "preferences" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Author fields", Anchor = "#author" }, new () { Text = "Fill", Anchor = "#fill" }, new () { Text = "Read values", Anchor = "#read" }, new () { Text = "Flatten", Anchor = "#flatten" } ],
+                            Name = "Forms",
+                            Path = "document-processing-pdf-forms",
+                            Title = "PDF Forms in Blazor and C# | Radzen",
+                            Description = "Create PDF forms with text, checkbox, radio, and dropdown fields in Blazor and C#. Fill existing forms, read the values back, and flatten fields into page content.",
+                            Tags = new [] { "document", "processing", "pdf", "form", "acroform", "field", "text", "checkbox", "radio", "dropdown", "fill", "read", "flatten" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Annotation types", Anchor = "#types" }, new () { Text = "Appearance", Anchor = "#appearance" } ],
+                            Name = "Annotations",
+                            Path = "document-processing-pdf-annotations",
+                            Title = "PDF Annotations in Blazor and C# | Radzen",
+                            Description = "Add sticky notes, free text, shapes, ink, stamps, and text markup annotations to PDF documents in Blazor and C#.",
+                            Tags = new [] { "document", "processing", "pdf", "annotation", "note", "comment", "highlight", "underline", "strikeout", "squiggly", "stamp", "ink", "shape" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Load", Anchor = "#load" }, new () { Text = "Merge & split", Anchor = "#merge-and-split" }, new () { Text = "Reorder & rotate", Anchor = "#reorder-and-rotate" }, new () { Text = "Watermark", Anchor = "#watermark" } ],
+                            Name = "Edit Existing PDFs",
+                            Path = "document-processing-pdf-editing",
+                            Title = "Merge, Split and Edit PDF Files in Blazor | Radzen",
+                            Description = "Load existing PDF files in Blazor and C#. Merge documents, split and extract pages, reorder and rotate them, and apply watermarks to loaded pages.",
+                            Tags = new [] { "document", "processing", "pdf", "load", "edit", "merge", "split", "extract", "append", "reorder", "rotate", "watermark", "pages" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Extract text", Anchor = "#extract" }, new () { Text = "Find & highlight", Anchor = "#find-and-highlight" }, new () { Text = "Redact", Anchor = "#redact" } ],
+                            Name = "Search & Redact",
+                            Path = "document-processing-pdf-search",
+                            Title = "PDF Text Extraction, Search and Redaction in Blazor | Radzen",
+                            Description = "Extract text from PDF files in Blazor and C#, search with hit geometry to highlight matches, and redact content so the removed text is gone from the file.",
+                            Tags = new [] { "document", "processing", "pdf", "extract", "text", "search", "find", "highlight", "redact", "redaction", "remove" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Encryption & permissions", Anchor = "#encryption" }, new () { Text = "Protected files", Anchor = "#protected-files" } ],
+                            Name = "Security",
+                            Path = "document-processing-pdf-security",
+                            Title = "PDF Encryption and Permissions in Blazor | Radzen",
+                            Description = "Encrypt PDF documents with AES-256 and set user and owner passwords and permissions in Blazor and C# - entirely in the browser. Open password-protected files.",
+                            Tags = new [] { "document", "processing", "pdf", "security", "encrypt", "encryption", "aes", "password", "permissions", "protect", "owner", "user" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "PDF/A", Anchor = "#pdf-a" }, new () { Text = "PDF/UA", Anchor = "#pdf-ua" }, new () { Text = "Validation", Anchor = "#validation" } ],
+                            Name = "Conformance & Accessibility",
+                            Path = "document-processing-pdf-conformance",
+                            Title = "PDF/A and PDF/UA Conformance in Blazor and C# | Radzen",
+                            Description = "Produce archival PDF/A and accessible, tagged PDF/UA documents in Blazor and C#. Conformance is validated at save time with actionable error messages.",
+                            Tags = new [] { "document", "processing", "pdf", "pdfa", "pdfua", "conformance", "archival", "accessibility", "accessible", "tagged", "structure", "validation" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Attachments", Anchor = "#attachments" }, new () { Text = "Factur-X", Anchor = "#factur-x" } ],
+                            Name = "Attachments & e-Invoicing",
+                            Path = "document-processing-pdf-attachments",
+                            Title = "PDF Attachments and Factur-X e-Invoices in Blazor | Radzen",
+                            Description = "Embed file attachments in PDF documents in Blazor and C# and produce Factur-X and ZUGFeRD hybrid e-invoices - a PDF/A-3 invoice with machine-readable XML inside.",
+                            Tags = new [] { "document", "processing", "pdf", "attachment", "embed", "file", "facturx", "factur-x", "zugferd", "einvoice", "e-invoicing", "en16931", "invoice", "xml" }
+                        },
+                    }
                 },
             }
         },

@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Conformance">
+            <RadzenDropDown @bind-Value=@conformance Data=@profiles aria-label="conformance" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Caption">
+        Fonts embed, an sRGB output intent is included, and the XMP metadata declares the profile - verify the downloaded file with veraPDF.
+    </RadzenText>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    readonly PdfAConformance[] profiles = { PdfAConformance.PdfA2B, PdfAConformance.PdfA3B, PdfAConformance.PdfA4 };
+    PdfAConformance conformance = PdfAConformance.PdfA3B;
+    byte[] font;
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        font = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Archival document";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(font));
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        var title = section.Blocks.Add(new Paragraph("Archival output"));
+        title.Font.Family = "Liberation Sans";
+        title.Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "PDF/A forbids anything a future reader could not reproduce: every font is embedded, "
+            + "colors carry an output intent, and encryption is rejected at save time."))
+            .Font.Family = "Liberation Sans";
+
+        pdf = document.ToPdf(new DocumentRenderer { Conformance = conformance });
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", $"{conformance}.pdf".ToLowerInvariant(), streamRef, "application/pdf");
+    }
+}

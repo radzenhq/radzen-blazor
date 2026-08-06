@@ -1,0 +1,68 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Search for">
+            <RadzenTextBox @bind-Value=@query aria-label="search" />
+        </RadzenFormField>
+        <RadzenButton Text="Find & highlight" Icon="search" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string query = "layout";
+    string status;
+    byte[] blank;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Search";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Search with geometry")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "The layout engine breaks paragraphs into lines, and the layout of every line is "
+            + "recoverable afterwards. FindText returns each hit with its exact rectangles, so "
+            + "search results can be turned into highlight annotations at the precise position "
+            + "of the matched words - even when a match wraps across lines of the layout."));
+        blank = document.ToPdf();
+
+        Generate();
+    }
+
+    void Generate()
+    {
+        using var source = new MemoryStream(blank);
+        var loaded = PortableDocument.LoadFromStream(source);
+
+        var hits = loaded.FindText(query);
+        foreach (var hit in hits)
+        {
+            loaded.Pages[hit.PageIndex].Annotations.Add(new HighlightAnnotation(hit.Bounds)
+            {
+                Color = Color.FromRgb(255, 213, 79),
+            });
+        }
+
+        status = $"{hits.Count} match(es) for \"{query}\".";
+        pdf = loaded.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "search-highlights.pdf", streamRef, "application/pdf");
+    }
+}

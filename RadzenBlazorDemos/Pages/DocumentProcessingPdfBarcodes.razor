@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Codes
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="QR content">
+            <RadzenTextBox @bind-Value=@qrValue aria-label="qr content" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string qrValue = "https://www.radzen.com";
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Barcodes and QR codes";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Barcodes & QR codes")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "Codes render as vector content directly in the document flow - no raster images, crisp at any zoom."));
+
+        section.Blocks.Add(new Paragraph("QR with configurable error correction:") { SpacingBefore = 10 });
+        section.Blocks.Add(new QrCode(qrValue, 96) { ErrorCorrection = QrErrorCorrection.High });
+
+        section.Blocks.Add(new Paragraph("Code 128 with the human-readable value:") { SpacingBefore = 10 });
+        section.Blocks.Add(new Barcode(BarcodeType.Code128, "RADZEN-2026-001", 220, 48) { ShowText = true });
+
+        section.Blocks.Add(new Paragraph("EAN-13:") { SpacingBefore = 10 });
+        section.Blocks.Add(new Barcode(BarcodeType.Ean13, "4006381333931", 180, 48) { ShowText = true });
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "barcodes.pdf", streamRef, "application/pdf");
+    }
+}

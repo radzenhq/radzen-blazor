@@ -1,0 +1,98 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Rows">
+            <RadzenNumeric @bind-Value=@rowCount Min="10" Max="200" aria-label="rows" />
+        </RadzenFormField>
+        <RadzenCheckBox @bind-Value=@repeatHeader Name="repeat" aria-label="repeat header" />
+        <RadzenLabel Text="Repeat header on every page" Component="repeat" />
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    int rowCount = 90;
+    bool repeatHeader = true;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+
+        var document = new Document();
+        document.Info.Title = "Tables across pages";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(40);
+
+        var footer = section.Footer.Blocks.Add(new Paragraph());
+        footer.Alignment = HorizontalAlignment.Center;
+        footer.Inlines.Add("Page ");
+        footer.Inlines.Add(new PageNumberField());
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(new PageCountField());
+
+        var table = section.Blocks.Add(new Table());
+        table.Columns.Add(50).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add().RelativeWidth = 2;
+        table.Columns.Add().RelativeWidth = 1;
+        table.Columns.Add(90).Alignment = HorizontalAlignment.Right;
+
+        var header = table.Rows.Add();
+        header.IsHeaderRow = true;
+        header.RepeatOnEveryPage = repeatHeader;
+        header.Background = accent;
+        header.Font.Color = Color.White;
+        header.Font.Bold = true;
+        header.Cells[0].Text = "#";
+        header.Cells[1].Text = "Transaction";
+        header.Cells[2].Text = "Status";
+        header.Cells[3].Text = "Amount";
+        Pad(header);
+
+        var statuses = new[] { "Completed", "Pending", "Refunded" };
+        for (var i = 1; i <= rowCount; i++)
+        {
+            var row = table.Rows.Add();
+            row.KeepTogether = true;
+            if (i % 2 == 0)
+            {
+                row.Background = Color.FromRgb(245, 245, 245);
+            }
+            row.Cells[0].Text = i.ToString();
+            row.Cells[1].Text = $"Order #{1000 + i} - online store";
+            row.Cells[2].Text = statuses[i % statuses.Length];
+            row.Cells[3].Text = (49.90m * (1 + i % 7)).ToString("N2");
+            Pad(row);
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    static void Pad(Row row)
+    {
+        foreach (var cell in row.Cells)
+        {
+            cell.Padding = 4;
+        }
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "table-across-pages.pdf", streamRef, "application/pdf");
+    }
+}

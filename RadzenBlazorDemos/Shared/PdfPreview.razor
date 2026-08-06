@@ -1,0 +1,44 @@
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@if (!string.IsNullOrEmpty(url))
+{
+    <iframe src="@url" title="PDF preview" style="width: 100%; height: 480px; border: var(--rz-border-base); border-radius: var(--rz-border-radius); background: var(--rz-base-100)"></iframe>
+}
+
+@code {
+    [Parameter]
+    public byte[] Data { get; set; }
+
+    string url;
+    byte[] shown;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Data != shown)
+        {
+            shown = Data;
+            var previous = url;
+            url = Data != null ? await JSRuntime.InvokeAsync<string>("Radzen.createObjectUrl", Data, "application/pdf") : null;
+            if (previous != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.revokeObjectUrl", previous);
+            }
+            StateHasChanged();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (url != null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.revokeObjectUrl", url);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

@@ -1,0 +1,48 @@
+@page "/document-processing-pdf-editing"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    <strong>Edit Existing PDFs</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Load PDF files - including ones produced by other tools - and reshape them: merge, split, extract, reorder, rotate, and watermark.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-editing#load" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Load
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Open a document with <code>PortableDocument.LoadFromStream</code>. The reader handles cross-reference tables and streams, object streams, and repairs common structural damage, with configurable limits that keep hostile files from exhausting resources.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfEditing" Example="DocumentProcessingPdfLoad">
+    <DocumentProcessingPdfLoad />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-editing#merge-and-split" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Merge & split
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Append whole documents, import selected pages, or split one document into several - fonts, images, and form fields carry over and deduplicate.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfEditing" Example="DocumentProcessingPdfMergeSplit">
+    <DocumentProcessingPdfMergeSplit />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-editing#reorder-and-rotate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Reorder & rotate
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Move, remove, and rotate pages through the <code>Pages</code> collection, and adjust page boxes to crop.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfEditing" Example="DocumentProcessingPdfReorderRotate">
+    <DocumentProcessingPdfReorderRotate />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-editing#watermark" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Watermark
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Apply a text or image watermark to the pages of a loaded document with <code>AddWatermark</code> - the same API that watermarks generated documents.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfEditing" Example="DocumentProcessingPdfLoadedWatermark">
+    <DocumentProcessingPdfLoadedWatermark />
+</RadzenExample>

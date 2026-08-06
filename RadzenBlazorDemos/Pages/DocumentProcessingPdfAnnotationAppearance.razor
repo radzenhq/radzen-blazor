@@ -1,0 +1,67 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Opacity">
+            <RadzenNumeric @bind-Value=@opacity Min="0.1m" Max="1m" Step="0.1" aria-label="opacity" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    decimal opacity = 0.6m;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Annotation appearance";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Appearance streams")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "Every annotation carries a generated appearance stream, so shapes and colors render "
+            + "identically in every viewer instead of depending on viewer defaults."));
+
+        using var source = new MemoryStream(document.ToPdf());
+        var loaded = PortableDocument.LoadFromStream(source);
+        var page = loaded.Pages[0];
+
+        var x = 48.0;
+        foreach (var color in new[] { Color.FromRgb(211, 47, 47), Color.FromRgb(25, 118, 210), Color.FromRgb(56, 142, 60) })
+        {
+            page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(x, 660, 80, 60))
+            {
+                Color = color,
+                Opacity = (double)opacity,
+            });
+            page.Annotations.Add(new CircleAnnotation(PdfRect.FromSize(x + 20, 580, 60, 60))
+            {
+                Color = color,
+                Opacity = (double)opacity,
+            });
+            x += 110;
+        }
+
+        pdf = loaded.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "annotation-appearance.pdf", streamRef, "application/pdf");
+    }
+}

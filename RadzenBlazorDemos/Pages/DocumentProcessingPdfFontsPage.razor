@@ -1,0 +1,48 @@
+@page "/document-processing-pdf-fonts"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Fonts & Unicode</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Use the built-in PDF fonts or embed your own TrueType fonts - subset automatically so documents stay small - and render international text that copies and pastes correctly.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-fonts#built-in" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Built-in fonts
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The fourteen standard PDF fonts - Helvetica, Times, Courier, Symbol, and ZapfDingbats families - work without embedding anything, with full metrics and kerning.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfFonts" Example="DocumentProcessingPdfBuiltInFonts">
+    <DocumentProcessingPdfBuiltInFonts />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-fonts#embedding" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Embedding & subsetting
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Register a TrueType or OpenType font with <code>Document.Fonts.Register</code>. Only the glyphs the document uses are embedded, and text still extracts and searches correctly in any viewer.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfFonts" Example="DocumentProcessingPdfFontEmbedding">
+    <DocumentProcessingPdfFontEmbedding />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-fonts#fallback" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Fallback
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Configure a fallback chain with <code>Document.Fonts.SetFallback</code> so characters missing from the primary font render from the next font that covers them. When no italic face is registered, an italic style is synthesized.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfFonts" Example="DocumentProcessingPdfFontFallback">
+    <DocumentProcessingPdfFontFallback />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-fonts#unicode" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Unicode
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Latin, Cyrillic, Greek, Chinese, Japanese, and Korean text renders with correct glyph mapping, so copying text out of the viewer produces the original characters. Complex scripts such as Arabic, Hebrew, Indic, and Thai are not yet supported.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfFonts" Example="DocumentProcessingPdfUnicode">
+    <DocumentProcessingPdfUnicode />
+</RadzenExample>

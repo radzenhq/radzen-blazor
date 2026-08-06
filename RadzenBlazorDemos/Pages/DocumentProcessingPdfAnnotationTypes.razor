@@ -1,0 +1,82 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+
+        var document = new Document();
+        document.Info.Title = "Annotations";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Review annotations")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph("This sentence is highlighted for review."));
+        section.Blocks.Add(new Paragraph("This sentence is underlined by a reviewer."));
+        section.Blocks.Add(new Paragraph("This sentence is struck out as removed."));
+
+        using var source = new MemoryStream(document.ToPdf());
+        var loaded = PortableDocument.LoadFromStream(source);
+        var page = loaded.Pages[0];
+
+        Markup(page, "highlighted for review", bounds => new HighlightAnnotation(bounds)
+        {
+            Color = Color.FromRgb(255, 213, 79),
+            Contents = "Please double-check this.",
+            Title = "Reviewer",
+        });
+        Markup(page, "underlined by a reviewer", bounds => new UnderlineAnnotation(bounds) { Color = accent });
+        Markup(page, "struck out as removed", bounds => new StrikeOutAnnotation(bounds) { Color = Color.FromRgb(211, 47, 47) });
+
+        page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(500, 770, 22, 22))
+        {
+            Contents = "A sticky note - open it in the viewer.",
+            Title = "Reviewer",
+        });
+
+        page.Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(48, 640, 220, 40))
+        {
+            Contents = "Free text draws directly on the page.",
+            TextColor = accent,
+        });
+
+        var ink = new InkAnnotation(PdfRect.FromSize(300, 620, 180, 70)) { Color = accent };
+        var stroke = new InkStroke();
+        foreach (var (x, y) in new[] { (310.0, 640.0), (340.0, 680.0), (370.0, 640.0), (400.0, 680.0), (430.0, 640.0) })
+        {
+            stroke.Add(new AnnotationPoint(x, y));
+        }
+
+        ink.Strokes.Add(stroke);
+        page.Annotations.Add(ink);
+
+        pdf = loaded.ToArray();
+    }
+
+    static void Markup(Page page, string text, Func<PdfRect, Annotation> create)
+    {
+        foreach (var hit in page.FindText(text))
+        {
+            page.Annotations.Add(create(hit.Bounds));
+        }
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "annotations.pdf", streamRef, "application/pdf");
+    }
+}

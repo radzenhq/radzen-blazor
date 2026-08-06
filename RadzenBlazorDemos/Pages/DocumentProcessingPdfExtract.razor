@@ -1,0 +1,30 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+
+<RadzenStack Gap="1rem">
+    <RadzenText TextStyle="TextStyle.Body2">
+        The text below is not the document model - it is extracted back from the generated PDF bytes with <code>ExtractText</code>.
+    </RadzenText>
+    <RadzenCard>
+        <pre style="margin: 0; white-space: pre-wrap; font-family: var(--rz-text-font-family)">@extracted</pre>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    string extracted;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Extraction";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Invoice INV-2026-001")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph("Customer: Northwind Traders"));
+        section.Blocks.Add(new Paragraph("Total: 9,475.20 EUR - due within 14 days."));
+
+        using var source = new MemoryStream(document.ToPdf());
+        extracted = PortableDocument.LoadFromStream(source).ExtractText();
+    }
+}

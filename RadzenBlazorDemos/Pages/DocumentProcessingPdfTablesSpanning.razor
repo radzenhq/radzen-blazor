@@ -1,0 +1,99 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+        var grid = Color.FromRgb(200, 200, 200);
+
+        var document = new Document();
+        document.Info.Title = "Spanning and cell styling";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(40);
+
+        section.Blocks.Add(new Paragraph("Quarterly sales by region")).Font.Size = 16;
+
+        var table = section.Blocks.Add(new Table());
+        table.Columns.Add(100);
+        for (var i = 0; i < 4; i++)
+        {
+            table.Columns.Add().Alignment = HorizontalAlignment.Right;
+        }
+
+        var top = table.Rows.Add();
+        top.IsHeaderRow = true;
+        top.Background = accent;
+        top.Font.Color = Color.White;
+        top.Font.Bold = true;
+        Style(top.Cells[0], grid).Text = "Region";
+        top.Cells[0].RowSpan = 2;
+        top.Cells[0].VerticalAlignment = VerticalAlignment.Middle;
+        Style(top.Cells[1], grid).Text = "First half";
+        top.Cells[1].ColumnSpan = 2;
+        top.Cells[1].Alignment = HorizontalAlignment.Center;
+        Style(top.Cells[2], grid).Text = "Second half";
+        top.Cells[2].ColumnSpan = 2;
+        top.Cells[2].Alignment = HorizontalAlignment.Center;
+
+        var quarters = table.Rows.Add();
+        quarters.IsHeaderRow = true;
+        quarters.Background = Color.FromRgb(227, 240, 252);
+        quarters.Font.Bold = true;
+        for (var i = 0; i < 4; i++)
+        {
+            Style(quarters.Cells[i], grid).Text = $"Q{i + 1}";
+        }
+
+        var data = new (string Region, double[] Sales)[]
+        {
+            ("EMEA", new[] { 71.2, 78.9, 74.1, 90.3 }),
+            ("Americas", new[] { 55.4, 61.0, 66.7, 72.8 }),
+            ("APAC", new[] { 38.1, 41.5, 47.2, 52.9 }),
+        };
+
+        foreach (var (region, sales) in data)
+        {
+            var row = table.Rows.Add();
+            Style(row.Cells[0], grid).Text = region;
+            row.Cells[0].Font.Bold = true;
+            for (var i = 0; i < sales.Length; i++)
+            {
+                Style(row.Cells[i + 1], grid).Text = sales[i].ToString("N1");
+            }
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    static Cell Style(Cell cell, Color grid)
+    {
+        cell.Padding = 6;
+        foreach (var border in new[] { cell.Borders.Top, cell.Borders.Right, cell.Borders.Bottom, cell.Borders.Left })
+        {
+            border.Width = 0.5;
+            border.Color = grid;
+        }
+        return cell;
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "table-spanning.pdf", streamRef, "application/pdf");
+    }
+}

@@ -1,0 +1,38 @@
+@page "/document-processing-pdf-tables"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Tables</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Create tables with spanning cells, styled borders and backgrounds, relative column widths, and header rows that repeat when the table crosses a page.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-tables#basics" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basics
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Build a table from columns, rows, and cells, and fill it from a list of objects.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfTables" Example="DocumentProcessingPdfTablesBasics">
+    <DocumentProcessingPdfTablesBasics />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-tables#spanning" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Spanning & cell styling
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Merge cells with <code>ColumnSpan</code> and <code>RowSpan</code> and style them with borders, padding, background color, and vertical alignment.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfTables" Example="DocumentProcessingPdfTablesSpanning">
+    <DocumentProcessingPdfTablesSpanning />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-tables#across-pages" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tables across pages
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Long tables paginate automatically. Mark rows with <code>IsHeaderRow</code> and <code>RepeatOnEveryPage</code> to repeat them after each break, keep rows together, and size columns with fixed or relative widths.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfTables" Example="DocumentProcessingPdfTablesAcrossPages">
+    <DocumentProcessingPdfTablesAcrossPages />
+</RadzenExample>

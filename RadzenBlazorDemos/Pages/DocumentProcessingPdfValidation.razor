@@ -1,0 +1,70 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Conformance">
+            <RadzenDropDown @bind-Value=@conformance Data=@profiles aria-label="conformance" />
+        </RadzenFormField>
+        <RadzenCheckBox @bind-Value=@encrypt Name="encrypt" aria-label="encrypt" />
+        <RadzenLabel Text="Encrypt" Component="encrypt" />
+        <RadzenCheckBox @bind-Value=@attach Name="attach" aria-label="attachment" />
+        <RadzenLabel Text="Attach a file" Component="attach" />
+        <RadzenButton Text="Try to save" Icon="rule" Click=@Generate />
+    </RadzenStack>
+    <RadzenAlert AlertStyle=@(failed ? AlertStyle.Danger : AlertStyle.Success) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        <strong>@(failed ? "Refused at save time" : "Saved")</strong> - @status
+    </RadzenAlert>
+</RadzenStack>
+
+@code {
+    readonly PdfAConformance[] profiles = { PdfAConformance.PdfA2B, PdfAConformance.PdfA3B, PdfAConformance.PdfA4, PdfAConformance.PdfA4F };
+    PdfAConformance conformance = PdfAConformance.PdfA4F;
+    bool encrypt;
+    bool attach;
+    bool failed;
+    string status;
+    byte[] font;
+
+    protected override async Task OnInitializedAsync()
+    {
+        font = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Conformance validation";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(font));
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Validation happens when the document is saved.")).Font.Family = "Liberation Sans";
+
+        try
+        {
+            var portable = new DocumentRenderer { Conformance = conformance }.Render(document);
+            if (encrypt)
+            {
+                portable.Encryption = new EncryptionOptions { Algorithm = EncryptionAlgorithm.Aes256, UserPassword = "x" };
+            }
+
+            if (attach)
+            {
+                portable.Attachments.Add("data.csv", "id,total\n1,9475.20"u8.ToArray(), AttachmentRelationship.Data, "text/csv");
+            }
+
+            var bytes = portable.ToArray();
+            failed = false;
+            status = $"{conformance} produced {bytes.Length:N0} conformant bytes.";
+        }
+        catch (InvalidOperationException error)
+        {
+            failed = true;
+            status = error.Message;
+        }
+    }
+}
