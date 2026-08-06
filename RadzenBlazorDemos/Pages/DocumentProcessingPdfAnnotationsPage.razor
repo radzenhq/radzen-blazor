@@ -1,0 +1,28 @@
+@page "/document-processing-pdf-annotations"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Annotations</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Add review and markup annotations to pages - sticky notes, free text, shapes, ink strokes, stamps, and text markup - with appearances every viewer renders the same way.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-annotations#types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Annotation types
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Sticky notes, free text, squares, circles, ink, stamps, and the text markup family - highlight, underline, strikeout, and squiggly - added with <code>Page.Annotations.Add</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfAnnotations" Example="DocumentProcessingPdfAnnotationTypes">
+    <DocumentProcessingPdfAnnotationTypes />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-annotations#appearance" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Appearance
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set color, opacity, title, and flags. Appearance streams are generated for every annotation, so they render identically across viewers instead of depending on viewer defaults.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfAnnotations" Example="DocumentProcessingPdfAnnotationAppearance">
+    <DocumentProcessingPdfAnnotationAppearance />
+</RadzenExample>

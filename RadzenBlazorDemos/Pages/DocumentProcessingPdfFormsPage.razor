@@ -1,0 +1,48 @@
+@page "/document-processing-pdf-forms"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Forms</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The full form round-trip: author fields, fill them, read the values back, and flatten the result into permanent page content.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-forms#author" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Author fields
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Place text inputs, checkboxes, radio groups, and dropdowns inline in the document flow, or position them absolutely with field definitions.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfForms" Example="DocumentProcessingPdfFormsAuthor">
+    <DocumentProcessingPdfFormsAuthor />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-forms#fill" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Fill
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Load a PDF with a form and fill it from code: <code>FillField</code>, <code>CheckField</code>, <code>SelectOption</code>, and <code>SelectRadioOption</code> on <code>PortableDocument.AcroForm</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfForms" Example="DocumentProcessingPdfFormsFill">
+    <DocumentProcessingPdfFormsFill />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-forms#read" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Read values
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Enumerate <code>AcroForm.Fields</code> to read names, types, and values from a filled form - the other half of the round-trip.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfForms" Example="DocumentProcessingPdfFormsRead">
+    <DocumentProcessingPdfFormsRead />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-forms#flatten" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Flatten
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>Flatten()</code> bakes fields and annotations into page content so the values become permanent and no longer editable.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfForms" Example="DocumentProcessingPdfFormsFlatten">
+    <DocumentProcessingPdfFormsFlatten />
+</RadzenExample>

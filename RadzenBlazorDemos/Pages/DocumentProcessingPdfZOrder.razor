@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var photo = await Http.GetByteArrayAsync("images/blazor-template-repairshop.jpg");
+
+        var document = new Document();
+        document.Info.Title = "Z-order";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Overlay containers")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "An overlay container stacks its children at the same origin - document order is paint order, "
+            + "so later children draw on top:"));
+
+        var overlay = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
+        var image = overlay.Blocks.Add(new Image(new MemoryStream(photo)));
+        image.FitBox = (Unit.FromPoint(360), Unit.FromPoint(216));
+
+        var badge = overlay.Blocks.Add(new Container
+        {
+            Padding = 6,
+            Width = 90,
+            CornerRadius = 6,
+            Background = Color.FromRgb(211, 47, 47),
+        });
+        var text = badge.Blocks.Add(new Paragraph("FEATURED"));
+        text.Alignment = HorizontalAlignment.Center;
+        text.Font.Color = Color.White;
+        text.Font.Bold = true;
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "z-order.pdf", streamRef, "application/pdf");
+    }
+}

@@ -1,0 +1,38 @@
+@page "/document-processing-pdf-conformance"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Conformance & Accessibility</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Produce archival PDF/A and accessible, tagged PDF/UA documents. Conformance is enforced when the document is saved - an invalid combination fails immediately with a message that names the rule and the fix.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-conformance#pdf-a" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    PDF/A
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Target PDF/A-2, PDF/A-3, or PDF/A-4 in their B, A, E, and F variants by setting <code>Conformance</code>. Fonts embed, an sRGB output intent is included, and level-specific rules are applied automatically.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfConformance" Example="DocumentProcessingPdfPdfA">
+    <DocumentProcessingPdfPdfA />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-conformance#pdf-ua" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    PDF/UA
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Accessibility</code> to PDF/UA-1 to emit a full logical structure tree from headings, lists, tables, and links, with document language, title, and alternate text for images.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfConformance" Example="DocumentProcessingPdfPdfUa">
+    <DocumentProcessingPdfPdfUa />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-conformance#validation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Validation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Try to save an invalid combination - encryption under PDF/A, a missing title under PDF/UA, attachments where the level forbids them - and the save fails with the exact rule and the suggested fix instead of producing a non-conformant file.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfConformance" Example="DocumentProcessingPdfValidation">
+    <DocumentProcessingPdfValidation />
+</RadzenExample>

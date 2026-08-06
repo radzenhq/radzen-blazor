@@ -1,0 +1,58 @@
+@page "/document-processing-pdf-text"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Text & Layout</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Format text with named styles, control how paragraphs break across pages, and add running headers and footers with page numbers.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-text#styles" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Styles
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Define named styles with inheritance and apply them to paragraphs and runs. Character formatting covers font family, size, bold, italic, underline, strikethrough, color, letter spacing, and superscript and subscript.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfText" Example="DocumentProcessingPdfStyles">
+    <DocumentProcessingPdfStyles />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-text#pagination" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Pagination
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Control page breaking with widow and orphan limits, <code>KeepTogether</code>, <code>KeepWithNext</code>, and explicit page breaks. Adjust the settings and watch content move between pages.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfText" Example="DocumentProcessingPdfPagination">
+    <DocumentProcessingPdfPagination />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-text#headers-and-footers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Headers & footers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add running headers and footers to a section, including page numbers and page counts rendered with <code>PageNumberField</code> and <code>PageCountField</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfText" Example="DocumentProcessingPdfHeadersFooters">
+    <DocumentProcessingPdfHeadersFooters />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-text#lists" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Lists
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Bulleted and numbered lists with nesting, hanging indents, and items that hold arbitrary block content.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfText" Example="DocumentProcessingPdfLists">
+    <DocumentProcessingPdfLists />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-text#tab-stops" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tab stops
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Align content with left, center, right, and decimal tab stops, with optional dot leaders.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfText" Example="DocumentProcessingPdfTabStops">
+    <DocumentProcessingPdfTabStops />
+</RadzenExample>

@@ -1,0 +1,57 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Built-in fonts";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("The fourteen standard fonts")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "Every PDF viewer ships these faces, so nothing is embedded and the file stays small. "
+            + "Metrics and kerning are built in."));
+
+        foreach (var family in new[] { "Helvetica", "Times", "Courier" })
+        {
+            var sample = section.Blocks.Add(new Paragraph { SpacingBefore = 10 });
+            var name = sample.Inlines.Add($"{family}: ");
+            name.Font.Family = family;
+            name.Font.Bold = true;
+            sample.Inlines.Add("regular, ").Font.Family = family;
+            var bold = sample.Inlines.Add("bold, ");
+            bold.Font.Family = family;
+            bold.Font.Bold = true;
+            var italic = sample.Inlines.Add("italic, ");
+            italic.Font.Family = family;
+            italic.Font.Italic = true;
+            var both = sample.Inlines.Add("bold italic - AVAST kerning, 0123456789");
+            both.Font.Family = family;
+            both.Font.Bold = true;
+            both.Font.Italic = true;
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "built-in-fonts.pdf", streamRef, "application/pdf");
+    }
+}

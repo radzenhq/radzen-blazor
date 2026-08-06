@@ -1,0 +1,57 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var latin = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        var cjk = await Http.GetByteArrayAsync("fonts/NotoSansSC-Subset.otf");
+
+        var document = new Document();
+        document.Info.Title = "Font fallback";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(latin));
+        document.Fonts.Register("Noto Sans SC", new MemoryStream(cjk));
+        document.Fonts.SetFallback("Noto Sans SC");
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        var title = section.Blocks.Add(new Paragraph("Fallback chain"));
+        title.Font.Family = "Liberation Sans";
+        title.Font.Size = 16;
+        title.Font.Bold = true;
+
+        section.Blocks.Add(new Paragraph(
+            "The primary font here is Liberation Sans, which has no Chinese glyphs. Characters it "
+            + "cannot render fall through to Noto Sans SC - per character, inside a single run:")).Font.Family = "Liberation Sans";
+
+        var mixed = section.Blocks.Add(new Paragraph("Invoice 发票 - total 总金额 128.00, tax 税额 21.33. 谢谢!") { SpacingBefore = 8 });
+        mixed.Font.Family = "Liberation Sans";
+        mixed.Font.Size = 13;
+
+        section.Blocks.Add(new Paragraph(
+            "Without a fallback, an uncovered character fails the render with an error naming the "
+            + "character and the font, instead of printing a placeholder box.") { SpacingBefore = 8 }).Font.Family = "Liberation Sans";
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "font-fallback.pdf", streamRef, "application/pdf");
+    }
+}

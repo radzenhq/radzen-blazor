@@ -1,0 +1,62 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Redact">
+            <RadzenTextBox @bind-Value=@secret aria-label="redact" />
+        </RadzenFormField>
+        <RadzenButton Text="Redact" Icon="ink_eraser" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenAlert AlertStyle=@(gone ? AlertStyle.Success : AlertStyle.Warning) Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string secret = "4485-7702-3311-9042";
+    string status;
+    bool gone;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Redaction";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Payment record")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph("Customer: Northwind Traders"));
+        section.Blocks.Add(new Paragraph($"Card number: {secret}"));
+        section.Blocks.Add(new Paragraph("Amount: 9,475.20 EUR"));
+
+        using var source = new MemoryStream(document.ToPdf());
+        var loaded = PortableDocument.LoadFromStream(source);
+
+        var removed = loaded.RedactText(secret);
+        pdf = loaded.ToArray();
+
+        using var check = new MemoryStream(pdf);
+        var extracted = PortableDocument.LoadFromStream(check).ExtractText();
+        gone = !extracted.Contains(secret, StringComparison.Ordinal);
+        status = gone
+            ? $"Redacted {removed} occurrence(s). Re-extracting the text of the produced file proves the digits are gone from the bytes - not hidden behind a box."
+            : "The text is still present.";
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "redacted.pdf", streamRef, "application/pdf");
+    }
+}

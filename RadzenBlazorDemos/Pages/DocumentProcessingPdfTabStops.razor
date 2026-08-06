@@ -1,0 +1,58 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Tab stops";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Tab stops")).Font.Size = 16;
+
+        section.Blocks.Add(new Paragraph("A menu aligned with a right tab stop and a dot leader:"));
+        foreach (var (dish, price) in new[] { ("Shopska salad", "6.90"), ("Kavarma", "12.50"), ("Baklava", "5.20") })
+        {
+            var line = section.Blocks.Add(new Paragraph($"{dish}\t{price}"));
+            line.TabStops.Add(Unit.FromPoint(360), TabAlignment.Right, leader: '.');
+        }
+
+        section.Blocks.Add(new Paragraph("Decimal alignment lines numbers up on the decimal separator:") { SpacingBefore = 12 });
+        foreach (var amount in new[] { "7.5", "142.25", "1,318.4", "0.875" })
+        {
+            var line = section.Blocks.Add(new Paragraph($"\t{amount}"));
+            line.TabStops.Add(Unit.FromPoint(200), TabAlignment.Decimal);
+        }
+
+        section.Blocks.Add(new Paragraph("Center and left stops position columns without a table:") { SpacingBefore = 12 });
+        foreach (var (code, city, zone) in new[] { ("SOF", "Sofia", "EET"), ("HAM", "Hamburg", "CET"), ("NYC", "New York", "EST") })
+        {
+            var line = section.Blocks.Add(new Paragraph($"{code}\t{city}\t{zone}"));
+            line.TabStops.Add(Unit.FromPoint(160), TabAlignment.Center);
+            line.TabStops.Add(Unit.FromPoint(300));
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "tab-stops.pdf", streamRef, "application/pdf");
+    }
+}

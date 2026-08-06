@@ -1,0 +1,61 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Caption">
+        The file carries a full structure tree - headings, paragraphs, list, link, and image alt text - so screen readers announce it in reading order. Verify with veraPDF or PAC.
+    </RadzenText>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var font = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        var logo = await Http.GetByteArrayAsync("images/invoice-logo.png");
+
+        var document = new Document();
+        document.Info.Title = "Accessible report";
+        document.Language = "en-US";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(font));
+
+        var heading = document.Styles.Add("Heading");
+        heading.Font.Family = "Liberation Sans";
+        heading.Font.Size = 16;
+        heading.HeadingLevel = 1;
+
+        var body = document.Styles.Add("Body");
+        body.Font.Family = "Liberation Sans";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Accessible report") { StyleName = "Heading" });
+        var image = section.Blocks.Add(new Image(new MemoryStream(logo)));
+        image.Width = 44;
+        image.AlternateText = "The Radzen document logo";
+        section.Blocks.Add(new Paragraph("Every element is tagged: this paragraph, the heading above, the logo with its alternate text, and the list below.") { StyleName = "Body" });
+
+        var list = section.Blocks.Add(new ListBlock { Font = { Family = "Liberation Sans" } });
+        list.Items.Add("Logical structure tree");
+        list.Items.Add("Document language and title");
+        list.Items.Add("Alternate text for images");
+
+        pdf = document.ToPdf(new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "accessible.pdf", streamRef, "application/pdf");
+    }
+}

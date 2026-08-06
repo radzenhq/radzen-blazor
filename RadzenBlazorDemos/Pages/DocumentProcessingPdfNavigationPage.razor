@@ -1,0 +1,58 @@
+@page "/document-processing-pdf-navigation"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Navigation</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Help readers find their way: a table of contents with page numbers, a bookmark tree in the viewer sidebar, links within and out of the document, and page labels.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-navigation#table-of-contents" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Table of contents
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add a table of contents whose entries link to anchors and show the resolved page number with a dot leader.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfNavigation" Example="DocumentProcessingPdfToc">
+    <DocumentProcessingPdfToc />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-navigation#bookmarks" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Bookmarks
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Build the outline tree shown in the viewer sidebar - nested items with bold, italic, and colored titles targeting pages or anchors.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfNavigation" Example="DocumentProcessingPdfBookmarks">
+    <DocumentProcessingPdfBookmarks />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-navigation#links" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Links
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Turn any inline content into a web link with <code>Inline.Link</code> or an internal jump with <code>Inline.LinkToAnchor</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfNavigation" Example="DocumentProcessingPdfLinks">
+    <DocumentProcessingPdfLinks />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-navigation#page-labels" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Page labels
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Number front matter i, ii, iii and the body 1, 2, 3 - the viewer's page indicator follows the labels.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfNavigation" Example="DocumentProcessingPdfPageLabels">
+    <DocumentProcessingPdfPageLabels />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-navigation#viewer-preferences" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Viewer preferences
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Control how the document opens: initial page mode and layout, window fitting, and whether the viewer shows the document title.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfNavigation" Example="DocumentProcessingPdfViewerPreferences">
+    <DocumentProcessingPdfViewerPreferences />
+</RadzenExample>

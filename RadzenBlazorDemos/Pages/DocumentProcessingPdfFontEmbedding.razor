@@ -1,0 +1,62 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+            @status
+        </RadzenAlert>
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] regular;
+    byte[] bold;
+    byte[] pdf;
+    string status;
+
+    protected override async Task OnInitializedAsync()
+    {
+        regular = await Http.GetByteArrayAsync("fonts/LiberationSans-Regular.ttf");
+        bold = await Http.GetByteArrayAsync("fonts/LiberationSans-Bold.ttf");
+
+        var document = new Document();
+        document.Info.Title = "Font embedding and subsetting";
+        document.Fonts.Register("Liberation Sans", new MemoryStream(regular));
+        document.Fonts.Register("Liberation Sans", new MemoryStream(bold), bold: true, italic: false);
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        var title = section.Blocks.Add(new Paragraph("Liberation Sans, embedded"));
+        title.Font.Family = "Liberation Sans";
+        title.Font.Size = 16;
+        title.Font.Bold = true;
+
+        var body = section.Blocks.Add(new Paragraph(
+            "This paragraph uses a registered TrueType font. Only the glyphs the document actually uses "
+            + "are embedded - the subset is rebuilt on every render, so the file stays small no matter "
+            + "how large the font is. Text still selects, searches, and copies correctly."));
+        body.Font.Family = "Liberation Sans";
+
+        var synthetic = section.Blocks.Add(new Paragraph(
+            "No italic face is registered, so this italic text is synthesized by slanting the regular face."));
+        synthetic.Font.Family = "Liberation Sans";
+        synthetic.Font.Italic = true;
+
+        pdf = document.ToPdf();
+        status = $"Font files: {(regular.Length + bold.Length) / 1024} KB. Generated PDF with both subsets: {pdf.Length / 1024} KB.";
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "font-embedding.pdf", streamRef, "application/pdf");
+    }
+}

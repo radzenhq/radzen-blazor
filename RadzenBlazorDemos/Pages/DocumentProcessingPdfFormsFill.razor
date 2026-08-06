@@ -1,0 +1,69 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Name">
+            <RadzenTextBox @bind-Value=@attendee aria-label="name" />
+        </RadzenFormField>
+        <RadzenFormField Text="Rating">
+            <RadzenDropDown @bind-Value=@rating Data=@ratings aria-label="rating" />
+        </RadzenFormField>
+        <RadzenButton Text="Fill" Icon="edit_document" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    readonly string[] ratings = { "Good", "Great", "Excellent" };
+    string attendee = "Ana Petrova";
+    string rating = "Excellent";
+    byte[] blank;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Feedback form";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Workshop feedback")).Font.Size = 16;
+        var name = section.Blocks.Add(new Paragraph("Name: "));
+        name.Inlines.Add(new TextInput("attendee") { Width = 220 });
+        var choices = section.Blocks.Add(new Paragraph("Rating: "));
+        foreach (var value in ratings)
+        {
+            choices.Inlines.Add(new RadioButton("rating", value) { Label = value });
+            choices.Inlines.Add($" {value}   ");
+        }
+
+        var subscribe = section.Blocks.Add(new Paragraph());
+        subscribe.Inlines.Add(new CheckBox("newsletter") { Label = "Send me the newsletter" });
+        subscribe.Inlines.Add(" Send me the newsletter");
+        blank = document.ToPdf();
+
+        Generate();
+    }
+
+    void Generate()
+    {
+        using var source = new MemoryStream(blank);
+        var loaded = PortableDocument.LoadFromStream(source);
+
+        loaded.AcroForm.FillField("attendee", attendee);
+        loaded.AcroForm.SelectRadioOption("rating", rating);
+        loaded.AcroForm.CheckField("newsletter");
+
+        pdf = loaded.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "filled-form.pdf", streamRef, "application/pdf");
+    }
+}

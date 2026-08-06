@@ -1,0 +1,67 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Watermark text">
+            <RadzenTextBox @bind-Value=@text aria-label="watermark" />
+        </RadzenFormField>
+        <RadzenFormField Text="Opacity">
+            <RadzenNumeric @bind-Value=@opacity Min="0.05m" Max="1m" Step="0.05" aria-label="opacity" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string text = "DRAFT";
+    decimal opacity = 0.12m;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Watermarks";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Watermark = new Watermark
+        {
+            Text = text,
+            Opacity = (double)opacity,
+            Rotation = -45,
+        };
+
+        for (var i = 1; i <= 2; i++)
+        {
+            section.Blocks.Add(new Paragraph($"Page {i}")).Font.Size = 16;
+            section.Blocks.Add(new Paragraph(
+                "The watermark paints behind the content of every page in the section. "
+                + "Rotation and opacity are configurable, and an image can be used instead of text "
+                + "with Watermark.SetImage."));
+            if (i == 1)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "watermarks.pdf", streamRef, "application/pdf");
+    }
+}

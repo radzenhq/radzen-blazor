@@ -1,0 +1,65 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenCheckBox @bind-Value=@lastFirst Name="move" aria-label="move last first" />
+        <RadzenLabel Text="Move the last page first" Component="move" />
+        <RadzenCheckBox @bind-Value=@rotate Name="rotate" aria-label="rotate" />
+        <RadzenLabel Text="Rotate the first page 90°" Component="rotate" />
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    bool lastFirst = true;
+    bool rotate;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Page operations";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        for (var i = 1; i <= 3; i++)
+        {
+            section.Blocks.Add(new Paragraph($"Page {i}")).Font.Size = 40;
+            if (i < 3)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        using var source = new MemoryStream(document.ToPdf());
+        var loaded = PortableDocument.LoadFromStream(source);
+
+        if (lastFirst)
+        {
+            loaded.Pages.Move(from: 2, to: 0);
+        }
+
+        if (rotate)
+        {
+            loaded.Pages[0].Rotate = 90;
+        }
+
+        pdf = loaded.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "page-operations.pdf", streamRef, "application/pdf");
+    }
+}

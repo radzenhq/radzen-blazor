@@ -1,0 +1,64 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Page mode">
+            <RadzenDropDown @bind-Value=@pageMode Data=@modes aria-label="page mode" />
+        </RadzenFormField>
+        <RadzenCheckBox @bind-Value=@displayTitle Name="doctitle" aria-label="display title" />
+        <RadzenLabel Text="Show document title in the title bar" Component="doctitle" />
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Caption">
+        The inline preview ignores most viewer preferences - download the file and open it in a desktop viewer to see them applied.
+    </RadzenText>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    readonly PdfPageMode[] modes = { PdfPageMode.UseNone, PdfPageMode.UseOutlines, PdfPageMode.UseThumbs, PdfPageMode.FullScreen };
+    PdfPageMode pageMode = PdfPageMode.UseThumbs;
+    bool displayTitle = true;
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Viewer preferences";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Viewer preferences")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "The document asks the viewer how to present itself: which panel opens, the page layout, "
+            + "window fitting, and whether the title bar shows the document title instead of the file name."));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("A second page, so page layout and thumbnails have something to show."));
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.ViewerPreferences = new ViewerPreferences
+        {
+            PageMode = pageMode,
+            DisplayDocTitle = displayTitle,
+            FitWindow = true,
+        };
+
+        pdf = portable.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "viewer-preferences.pdf", streamRef, "application/pdf");
+    }
+}

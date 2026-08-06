@@ -1,0 +1,56 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Lists";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Lists")).Font.Size = 16;
+
+        section.Blocks.Add(new Paragraph("Bulleted, with a nested sub-list:"));
+        var bullets = section.Blocks.Add(new ListBlock());
+        bullets.Items.Add("Document model");
+        var renderers = bullets.Items.Add("Renderers");
+        renderers.NestedList = new ListBlock();
+        renderers.NestedList.Items.Add("PDF");
+        renderers.NestedList.Items.Add("More to come");
+        bullets.Items.Add("Layout engine");
+
+        section.Blocks.Add(new Paragraph("Numbered:") { SpacingBefore = 12 });
+        var numbers = section.Blocks.Add(new ListBlock { Style = ListStyle.Number });
+        numbers.Items.Add("Build the document");
+        numbers.Items.Add("Render it to PDF");
+        numbers.Items.Add("Ship it");
+
+        section.Blocks.Add(new Paragraph("Items can hold full blocks, not just a line of text:") { SpacingBefore = 12 });
+        var rich = section.Blocks.Add(new ListBlock());
+        var item = rich.Items.Add();
+        item.Blocks.Add(new Paragraph("A paragraph inside a list item,"));
+        item.Blocks.Add(new Paragraph("followed by another one in the same item."));
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "lists.pdf", streamRef, "application/pdf");
+    }
+}

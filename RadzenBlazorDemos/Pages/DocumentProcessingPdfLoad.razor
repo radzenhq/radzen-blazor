@@ -1,0 +1,40 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+
+<RadzenStack Gap="1rem">
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+    string status;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Quarterly report";
+        document.Info.Author = "Radzen";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        for (var i = 1; i <= 3; i++)
+        {
+            section.Blocks.Add(new Paragraph($"Chapter {i}")).Font.Size = 16;
+            section.Blocks.Add(new Paragraph("A sample chapter used to demonstrate loading."));
+            if (i < 3)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        pdf = document.ToPdf();
+
+        using var source = new MemoryStream(pdf);
+        var loaded = PortableDocument.LoadFromStream(source);
+        status = $"Loaded '{loaded.Info.Title}' by {loaded.Info.Author}: {loaded.Pages.Count} pages, "
+            + $"first page {loaded.Pages[0].MediaBox.Width:F0}x{loaded.Pages[0].MediaBox.Height:F0}pt.";
+    }
+}

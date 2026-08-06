@@ -1,0 +1,73 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenCheckBox @bind-Value=@keepTogether Name="keep" aria-label="keep together" />
+        <RadzenLabel Text="Keep the conclusion together" Component="keep" />
+        <RadzenCheckBox @bind-Value=@keepWithNext Name="next" aria-label="keep with next" />
+        <RadzenLabel Text="Keep headings with their text" Component="next" />
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    bool keepTogether = true;
+    bool keepWithNext = true;
+    byte[] pdf;
+
+    const string Filler = "The layout engine breaks paragraphs across pages while honoring the rules each paragraph declares. "
+        + "Widow and orphan limits keep a minimum number of lines on each side of a break, KeepTogether refuses to split a block, "
+        + "and KeepWithNext binds a heading to the paragraph that follows it. ";
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var document = new Document();
+        document.Info.Title = "Pagination control";
+
+        var heading = document.Styles.Add("Heading");
+        heading.Font.Size = 14;
+        heading.Font.Bold = true;
+        heading.SpacingBefore = 12;
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(40);
+
+        var footer = section.Footer.Blocks.Add(new Paragraph());
+        footer.Alignment = HorizontalAlignment.Center;
+        footer.Inlines.Add("Page ");
+        footer.Inlines.Add(new PageNumberField());
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(new PageCountField());
+
+        for (var i = 1; i <= 8; i++)
+        {
+            var title = section.Blocks.Add(new Paragraph($"Chapter {i}") { StyleName = "Heading" });
+            title.KeepWithNext = keepWithNext;
+            section.Blocks.Add(new Paragraph(string.Concat(Enumerable.Repeat(Filler, 3))) { Widows = 2, Orphans = 2 });
+        }
+
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("Conclusion") { StyleName = "Heading" });
+        var conclusion = section.Blocks.Add(new Paragraph(string.Concat(Enumerable.Repeat(Filler, 6))));
+        conclusion.KeepTogether = keepTogether;
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "pagination.pdf", streamRef, "application/pdf");
+    }
+}

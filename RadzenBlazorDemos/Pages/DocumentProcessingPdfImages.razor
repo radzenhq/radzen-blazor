@@ -1,0 +1,61 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var logo = await Http.GetByteArrayAsync("images/invoice-logo.png");
+        var photo = await Http.GetByteArrayAsync("images/blazor-template-repairshop.jpg");
+
+        var document = new Document();
+        document.Info.Title = "Images";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Images")).Font.Size = 16;
+
+        section.Blocks.Add(new Paragraph(
+            "A JPEG placed as a block, scaled into a fit box that preserves its aspect ratio:"));
+        var block = section.Blocks.Add(new Image(new MemoryStream(photo)));
+        block.FitBox = (Unit.FromPoint(300), Unit.FromPoint(180));
+        block.AlternateText = "Screenshot of a repair shop application";
+
+        section.Blocks.Add(new Paragraph(
+            "A PNG with an alpha channel keeps its transparency, and images flow inline with text:") { SpacingBefore = 12 });
+        var inline = section.Blocks.Add(new Paragraph());
+        inline.Inlines.Add("Send documents to ");
+        inline.Inlines.Add(new InlineImage(new MemoryStream(logo))).Width = 12;
+        inline.Inlines.Add(" Radzen and get ");
+        inline.Inlines.Add(new InlineImage(new MemoryStream(logo))).Width = 12;
+        inline.Inlines.Add(" answers on the same line.");
+
+        section.Blocks.Add(new Paragraph(
+            "The same image at reduced opacity:") { SpacingBefore = 12 });
+        var faded = section.Blocks.Add(new Image(new MemoryStream(photo)));
+        faded.FitBox = (Unit.FromPoint(300), Unit.FromPoint(180));
+        faded.Opacity = 0.35;
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "images.pdf", streamRef, "application/pdf");
+    }
+}

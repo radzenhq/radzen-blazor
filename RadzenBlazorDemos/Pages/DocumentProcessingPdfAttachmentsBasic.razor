@@ -1,0 +1,54 @@
+@using System.IO
+@using System.Text
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false" class="rz-m-0" Size="AlertSize.Small">
+        @status
+    </RadzenAlert>
+    <RadzenText TextStyle="TextStyle.Caption">
+        Open the downloaded file's attachment panel to see the embedded CSV. The status line above reads it back with <code>GetBytes()</code>.
+    </RadzenText>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+    string status;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Report with data";
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.Blocks.Add(new Paragraph("Sales report")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph("The numbers behind this report travel inside the file as a CSV attachment."));
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.Attachments.Add(
+            "sales.csv",
+            Encoding.UTF8.GetBytes("region,total\nEMEA,314.5\nAMER,270.8\nAPAC,189.9"),
+            AttachmentRelationship.Data,
+            "text/csv");
+
+        pdf = portable.ToArray();
+
+        using var buffer = new MemoryStream(pdf);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
+        var attachment = reloaded.Attachments[0];
+        status = $"Reloaded '{attachment.Name}' ({attachment.MimeType}, {attachment.GetBytes().Length} bytes, {attachment.Relationship}).";
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "report-with-data.pdf", streamRef, "application/pdf");
+    }
+}

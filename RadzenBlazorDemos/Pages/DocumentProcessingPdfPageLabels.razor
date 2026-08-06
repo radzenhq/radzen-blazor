@@ -1,0 +1,51 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Page labels";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+
+        section.Blocks.Add(new Paragraph("Preface")).Font.Size = 16;
+        section.Blocks.Add(new Paragraph(
+            "Watch the page indicator in the viewer toolbar: this front matter is numbered i, ii - "
+            + "the body restarts at 1. Page labels change what the viewer displays without touching the content."));
+        section.Blocks.Add(new PageBreak());
+        section.Blocks.Add(new Paragraph("Second preface page, labeled ii."));
+
+        for (var i = 1; i <= 2; i++)
+        {
+            section.Blocks.Add(new PageBreak());
+            section.Blocks.Add(new Paragraph($"Body page {i}")).Font.Size = 16;
+            section.Blocks.Add(new Paragraph("Labeled with plain decimal numbers starting over at 1."));
+        }
+
+        var portable = new DocumentRenderer().Render(document);
+        portable.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.LowercaseRoman });
+        portable.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal, Start = 1 });
+
+        pdf = portable.ToArray();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "page-labels.pdf", streamRef, "application/pdf");
+    }
+}

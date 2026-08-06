@@ -1,0 +1,28 @@
+@page "/document-processing-pdf-security"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Security</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Encrypt documents with AES-256, set user and owner passwords with granular permissions, and open password-protected files - all in the browser, using its own Web Crypto implementation.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-security#encryption" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Encryption & permissions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Assign <code>EncryptionOptions</code> to a document: AES-256, AES-128, or RC4, user and owner passwords, and permission flags for printing, copying, modification, form filling, and annotation.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfSecurity" Example="DocumentProcessingPdfEncryption">
+    <DocumentProcessingPdfEncryption />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-security#protected-files" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Protected files
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Open an encrypted document by passing the password in <code>LoadOptions</code>, then read or edit it like any other file.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfSecurity" Example="DocumentProcessingPdfProtectedFiles">
+    <DocumentProcessingPdfProtectedFiles />
+</RadzenExample>

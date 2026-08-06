@@ -1,0 +1,38 @@
+@page "/document-processing-pdf-search"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PDF <strong>Search & Redact</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Extract text from PDF files, find matches with their exact position on the page, and redact content so it is removed from the file - not hidden behind a black box.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf-search#extract" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Extract text
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Read the text of a document or a single page with <code>ExtractText</code>, or get each run with its bounds using <code>ExtractPositionedText</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfSearch" Example="DocumentProcessingPdfExtract">
+    <DocumentProcessingPdfExtract />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-search#find-and-highlight" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Find & highlight
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>FindText</code> returns every match with its page and quadrilaterals - draw highlight annotations over the hits to build search-and-mark tooling.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfSearch" Example="DocumentProcessingPdfFindHighlight">
+    <DocumentProcessingPdfFindHighlight />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf-search#redact" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Redact
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>RedactText</code> removes the matched content from the page itself. Extracting the text again afterwards proves the removed words are gone from the file.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdfSearch" Example="DocumentProcessingPdfRedact">
+    <DocumentProcessingPdfRedact />
+</RadzenExample>

@@ -1,0 +1,77 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenFormField Text="Report title">
+            <RadzenTextBox @bind-Value=@title aria-label="title" />
+        </RadzenFormField>
+        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    string title = "Annual Report 2026";
+    byte[] pdf;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    void Generate()
+    {
+        var accent = Color.FromRgb(25, 118, 210);
+
+        var document = new Document();
+        document.Info.Title = title;
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(48);
+        section.HeaderDistance = 24;
+        section.FooterDistance = 24;
+
+        var header = section.Header.Blocks.Add(new Paragraph());
+        header.Inlines.Add(title).Font.Color = accent;
+        header.Inlines.Add("\tCONFIDENTIAL").Font.Color = Color.FromRgb(160, 160, 160);
+        header.TabStops.Add(Unit.FromPoint(499), TabAlignment.Right);
+
+        var rule = section.Header.Blocks.Add(new Container());
+        rule.Borders.Bottom.Width = 0.5;
+        rule.Borders.Bottom.Color = accent;
+
+        var footer = section.Footer.Blocks.Add(new Paragraph());
+        footer.Alignment = HorizontalAlignment.Center;
+        footer.Inlines.Add("Page ");
+        footer.Inlines.Add(new PageNumberField());
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(new PageCountField());
+
+        for (var i = 1; i <= 3; i++)
+        {
+            section.Blocks.Add(new Paragraph($"Section {i}")).Font.Size = 16;
+            section.Blocks.Add(new Paragraph(
+                "The header and footer repeat on every page of the section. Fields resolve per page: "
+                + "PageNumberField renders the current page and PageCountField the total, so the footer "
+                + "reads correctly even when content moves during edits."));
+            if (i < 3)
+            {
+                section.Blocks.Add(new PageBreak());
+            }
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "headers-footers.pdf", streamRef, "application/pdf");
+    }
+}

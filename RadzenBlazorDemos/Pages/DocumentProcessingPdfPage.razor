@@ -1,0 +1,28 @@
+@page "/document-processing-pdf"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor <strong>PDF</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Create PDF documents in Blazor and C#. The document engine is pure managed code with no native dependencies, so every demo on these pages runs entirely in your browser - the PDF is generated, displayed, and downloaded without touching a server.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-pdf#hello-world" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Hello world
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Build a <code>Document</code>, add a section and a paragraph, and render it to PDF bytes with <code>DocumentRenderer</code>.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdf" Example="DocumentProcessingPdfHelloWorld">
+    <DocumentProcessingPdfHelloWorld />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-pdf#invoice" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Invoice
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A complete invoice: named styles, a logo, seller and buyer address blocks, a line-item table with a repeating header row, totals, a payment QR code, and a footer with page numbers. Change the data and regenerate.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingPdf" Example="DocumentProcessingPdfInvoice">
+    <DocumentProcessingPdfInvoice />
+</RadzenExample>

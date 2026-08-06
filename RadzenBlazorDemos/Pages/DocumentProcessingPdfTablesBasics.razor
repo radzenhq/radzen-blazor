@@ -1,0 +1,78 @@
+@using System.IO
+@using Radzen.Documents
+@using Radzen.Documents.Core
+@using Radzen.Documents.Pdf
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+    </RadzenStack>
+    <PdfPreview Data=@pdf />
+</RadzenStack>
+
+@code {
+    byte[] pdf;
+
+    record Product(string Name, string Category, decimal Price);
+
+    readonly Product[] products =
+    {
+        new("Wireless Mouse", "Accessories", 24.90m),
+        new("Mechanical Keyboard", "Accessories", 89.00m),
+        new("27\" Monitor", "Displays", 219.00m),
+        new("USB-C Dock", "Accessories", 129.50m),
+        new("Noise-Cancelling Headset", "Audio", 179.00m),
+    };
+
+    protected override void OnInitialized()
+    {
+        var document = new Document();
+        document.Info.Title = "Table basics";
+
+        var section = document.Sections.Add();
+        section.Margins.SetAll(40);
+
+        section.Blocks.Add(new Paragraph("Products")).Font.Size = 16;
+
+        var table = section.Blocks.Add(new Table());
+        table.Columns.Add();
+        table.Columns.Add(120);
+        table.Columns.Add(80).Alignment = HorizontalAlignment.Right;
+
+        var header = table.Rows.Add();
+        header.IsHeaderRow = true;
+        header.Font.Bold = true;
+        header.Borders.Bottom.Width = 1;
+        header.Cells[0].Text = "Product";
+        header.Cells[1].Text = "Category";
+        header.Cells[2].Text = "Price";
+        Pad(header);
+
+        foreach (var product in products)
+        {
+            var row = table.Rows.Add();
+            row.Cells[0].Text = product.Name;
+            row.Cells[1].Text = product.Category;
+            row.Cells[2].Text = product.Price.ToString("N2");
+            Pad(row);
+        }
+
+        pdf = document.ToPdf();
+    }
+
+    static void Pad(Row row)
+    {
+        foreach (var cell in row.Cells)
+        {
+            cell.Padding = 4;
+        }
+    }
+
+    async Task Download()
+    {
+        using var stream = new MemoryStream(pdf);
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "table-basics.pdf", streamRef, "application/pdf");
+    }
+}
