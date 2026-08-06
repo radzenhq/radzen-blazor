@@ -61,6 +61,13 @@ window.Radzen = {
 
         URL.revokeObjectURL(url);
     },
+    createObjectUrl: async function (data, mimeType) {
+        const part = typeof data.arrayBuffer === 'function' ? await data.arrayBuffer() : data;
+        return URL.createObjectURL(new Blob([part], { type: mimeType }));
+    },
+    revokeObjectUrl: function (url) {
+        URL.revokeObjectURL(url);
+    },
     mask: function (id, mask, pattern, characterPattern) {
       var el = document.getElementById(id);
       if (el) {
