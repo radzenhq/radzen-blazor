@@ -88,9 +88,26 @@ internal static class NextBlockHeightResolver
         : ILoweredBlockHandler<int, NextBlockHeight>
     {
         public NextBlockHeight Paragraph(Paragraph paragraph, int next)
-            => broken[next] is { Count: > 0 } lines
-                ? new NextBlockHeight { Found = true, SpacingBefore = resolution.Format(paragraph).SpacingBefore.Point, Height = lines[0].Height }
-                : default;
+        {
+            if (broken[next] is not { Count: > 0 } lines)
+            {
+                return default;
+            }
+
+            var format = resolution.Format(paragraph);
+            var required = format.KeepTogether ? lines.Count : Math.Max(1, paragraph.Orphans);
+            if (lines.Count - required < paragraph.Widows)
+            {
+                required = lines.Count;
+            }
+
+            return new NextBlockHeight
+            {
+                Found = true,
+                SpacingBefore = format.SpacingBefore.Point,
+                Height = SumHeights(lines, 0, required),
+            };
+        }
 
         public NextBlockHeight Table(Table table, int next)
             => new() { Found = true, Height = TableFirstFragmentHeight(table, layouts.Table(next, table)) };
