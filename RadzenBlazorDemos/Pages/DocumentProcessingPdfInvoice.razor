@@ -103,7 +103,7 @@
         word.Font.Bold = true;
         word.Font.Color = accent;
 
-        var meta = section.Blocks.Add(new Table { LeftIndent = 309 });
+        var meta = section.Blocks.Add(new Table { Alignment = HorizontalAlignment.Right });
         meta.Columns.Add(90);
         meta.Columns.Add(100).Alignment = HorizontalAlignment.Right;
         foreach (var (name, value) in new[]
@@ -167,7 +167,7 @@
         var subtotal = items.Sum(item => item.Quantity * item.Price);
         var vat = subtotal * vatRate / 100;
 
-        var totals = section.Blocks.Add(new Table { LeftIndent = 269 });
+        var totals = section.Blocks.Add(new Table { Alignment = HorizontalAlignment.Right });
         totals.Columns.Add(140);
         totals.Columns.Add(90).Alignment = HorizontalAlignment.Right;
         AddTotal(totals, "Subtotal", subtotal.ToString("N2"), false, muted, line);
