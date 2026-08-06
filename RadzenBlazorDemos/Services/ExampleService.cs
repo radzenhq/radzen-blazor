@@ -3279,11 +3279,10 @@ namespace RadzenBlazorDemos
                     {
                         new Example
                         {
-                            Toc = [ new () { Text = "Hello world", Anchor = "#hello-world" }, new () { Text = "Invoice", Anchor = "#invoice" } ],
                             Name = "Get Started",
                             Path = "document-processing-pdf",
-                            Title = "Generate PDF Documents in Blazor and C# | Radzen",
-                            Description = "Create PDF documents in Blazor and C# - entirely in the browser, no server and no native dependencies. Build your first document and a complete invoice.",
+                            Title = "Generate PDF Files in Blazor and C# | Radzen",
+                            Description = "Generate a PDF invoice in Blazor and C# and download it - built from your data, rendered in the browser, with no server and no native dependencies.",
                             Tags = new [] { "document", "processing", "pdf", "generate", "create", "invoice", "report", "browser", "webassembly", "wasm" },
                             Related = new [] { "document-processing-pdf-tables", "document-processing-pdf-text", "document-processing-pdf-fonts" },
                             Faq = new []
