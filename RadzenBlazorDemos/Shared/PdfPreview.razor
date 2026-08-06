@@ -3,12 +3,15 @@
 
 @if (!string.IsNullOrEmpty(url))
 {
-    <iframe src="@url" title="PDF preview" style="width: 100%; height: 480px; border: var(--rz-border-base); border-radius: var(--rz-border-radius); background: var(--rz-base-100)"></iframe>
+    <iframe src="@url" title="PDF preview" style="width: 100%; height: @Height; border: var(--rz-border-base); border-radius: var(--rz-border-radius); background: var(--rz-base-100)"></iframe>
 }
 
 @code {
     [Parameter]
     public byte[] Data { get; set; }
+
+    [Parameter]
+    public string Height { get; set; } = "480px";
 
     string url;
     byte[] shown;

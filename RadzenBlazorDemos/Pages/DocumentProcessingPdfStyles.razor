@@ -7,12 +7,11 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Heading size">
-            <RadzenNumeric @bind-Value=@headingSize Min="12" Max="40" aria-label="heading size" />
+            <RadzenNumeric @bind-Value=@headingSize Min="12" Max="40" aria-label="heading size" Change=@((int _) => Generate()) />
         </RadzenFormField>
         <RadzenFormField Text="Accent">
-            <RadzenColorPicker @bind-Value=@accent ShowHSV="false" ShowRGBA="false" ShowColors="true" aria-label="accent" />
+            <RadzenColorPicker @bind-Value=@accent ShowHSV="false" ShowRGBA="false" ShowColors="true" aria-label="accent" Change=@(_ => Generate()) />
         </RadzenFormField>
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />

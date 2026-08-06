@@ -7,11 +7,10 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="Rows">
-            <RadzenNumeric @bind-Value=@rowCount Min="10" Max="200" aria-label="rows" />
+            <RadzenNumeric @bind-Value=@rowCount Min="10" Max="200" aria-label="rows" Change=@((int _) => Generate()) />
         </RadzenFormField>
-        <RadzenCheckBox @bind-Value=@repeatHeader Name="repeat" aria-label="repeat header" />
+        <RadzenCheckBox @bind-Value=@repeatHeader Name="repeat" aria-label="repeat header" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Repeat header on every page" Component="repeat" />
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />

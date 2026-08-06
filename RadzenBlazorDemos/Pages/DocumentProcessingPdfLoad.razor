@@ -16,15 +16,20 @@
     protected override void OnInitialized()
     {
         var document = new Document();
-        document.Info.Title = "Quarterly report";
-        document.Info.Author = "Radzen";
+        document.Info.Title = "Fabrikam Quarterly Report";
+        document.Info.Author = "Fabrikam, Inc.";
         var section = document.Sections.Add();
         section.Margins.SetAll(48);
-        for (var i = 1; i <= 3; i++)
+        foreach (var (quarter, revenue, note) in new[]
         {
-            section.Blocks.Add(new Paragraph($"Chapter {i}")).Font.Size = 16;
-            section.Blocks.Add(new Paragraph("A sample chapter used to demonstrate loading."));
-            if (i < 3)
+            ("Q1", "1.24M EUR", "Desk revenue carried the quarter; the Hamburg showroom opened in March."),
+            ("Q2", "1.41M EUR", "Seating overtook desks for the first time on the strength of the conference line."),
+            ("Q3", "1.58M EUR", "Acoustic panels doubled quarter over quarter after the open-office study."),
+        })
+        {
+            section.Blocks.Add(new Paragraph($"{quarter} - {revenue}")).Font.Size = 16;
+            section.Blocks.Add(new Paragraph(note));
+            if (quarter != "Q3")
             {
                 section.Blocks.Add(new PageBreak());
             }

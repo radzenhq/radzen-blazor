@@ -1,15 +1,15 @@
 @using System.IO
 @using Radzen.Documents
+@using Radzen.Documents.Core
 @using Radzen.Documents.Pdf
 @inject IJSRuntime JSRuntime
 
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenCheckBox @bind-Value=@lastFirst Name="move" aria-label="move last first" />
+        <RadzenCheckBox @bind-Value=@lastFirst Name="move" aria-label="move last first" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Move the last page first" Component="move" />
-        <RadzenCheckBox @bind-Value=@rotate Name="rotate" aria-label="rotate" />
+        <RadzenCheckBox @bind-Value=@rotate Name="rotate" aria-label="rotate" Change=@((bool _) => Generate()) />
         <RadzenLabel Text="Rotate the first page 90°" Component="rotate" />
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
         <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <PdfPreview Data=@pdf />
@@ -28,13 +28,25 @@
     void Generate()
     {
         var document = new Document();
-        document.Info.Title = "Page operations";
+        document.Info.Title = "Fabrikam catalog";
         var section = document.Sections.Add();
         section.Margins.SetAll(48);
-        for (var i = 1; i <= 3; i++)
+        var chapters = new[]
         {
-            section.Blocks.Add(new Paragraph($"Page {i}")).Font.Size = 40;
-            if (i < 3)
+            ("Desks", Color.FromRgb(25, 118, 210), "Height-adjustable frames, solid oak tops, cable management built in."),
+            ("Seating", Color.FromRgb(56, 142, 60), "Mesh-back task chairs and conference seating, tested to 150,000 cycles."),
+            ("Acoustics", Color.FromRgb(230, 81, 0), "Wall panels and ceiling baffles that bring open offices below 45 dB."),
+        };
+        for (var i = 0; i < chapters.Length; i++)
+        {
+            var (name, tint, blurb) = chapters[i];
+            var banner = section.Blocks.Add(new Container { Padding = 14, CornerRadius = 6, Background = tint });
+            var heading = banner.Blocks.Add(new Paragraph($"{i + 1}. {name}"));
+            heading.Font.Size = 22;
+            heading.Font.Bold = true;
+            heading.Font.Color = Color.White;
+            section.Blocks.Add(new Paragraph(blurb) { SpacingBefore = 10 });
+            if (i < chapters.Length - 1)
             {
                 section.Blocks.Add(new PageBreak());
             }

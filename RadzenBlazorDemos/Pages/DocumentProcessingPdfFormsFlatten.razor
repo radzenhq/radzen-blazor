@@ -5,19 +5,25 @@
 
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-        <RadzenCheckBox @bind-Value=@flatten Name="flatten" aria-label="flatten" />
-        <RadzenLabel Text="Flatten the filled form" Component="flatten" />
-        <RadzenButton Text="Generate" Icon="picture_as_pdf" Click=@Generate />
-        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+        <RadzenButton Text="Download flattened PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.Caption">
-        Download both variants and try editing the name: the flattened copy is permanent page content, not a field.
+        Download both variants and try editing the name in a viewer: the interactive copy still has fields, the flattened copy is permanent page content.
     </RadzenText>
-    <PdfPreview Data=@pdf />
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText TextStyle="TextStyle.Overline">Interactive form</RadzenText>
+            <PdfPreview Data=@filled Height="360px" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText TextStyle="TextStyle.Overline">Flattened</RadzenText>
+            <PdfPreview Data=@pdf Height="360px" />
+        </RadzenColumn>
+    </RadzenRow>
 </RadzenStack>
 
 @code {
-    bool flatten = true;
+    byte[] filled;
     byte[] pdf;
 
     protected override void OnInitialized()
@@ -42,11 +48,9 @@
         var loaded = PortableDocument.LoadFromStream(source);
         loaded.AcroForm.FillField("signer", "Maya Lindqvist");
         loaded.AcroForm.CheckField("agreed");
-        if (flatten)
-        {
-            loaded.Flatten();
-        }
+        filled = loaded.ToArray();
 
+        loaded.Flatten();
         pdf = loaded.ToArray();
     }
 
@@ -54,6 +58,6 @@
     {
         using var stream = new MemoryStream(pdf);
         using var streamRef = new DotNetStreamReference(stream);
-        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", flatten ? "flattened.pdf" : "fillable.pdf", streamRef, "application/pdf");
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "flattened.pdf", streamRef, "application/pdf");
     }
 }

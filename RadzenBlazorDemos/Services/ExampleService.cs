@@ -3284,7 +3284,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf",
                             Title = "Generate PDF Documents in Blazor and C# | Radzen",
                             Description = "Create PDF documents in Blazor and C# - entirely in the browser, no server and no native dependencies. Build your first document and a complete invoice.",
-                            Tags = new [] { "document", "processing", "pdf", "generate", "create", "invoice", "report", "browser", "webassembly", "wasm" }
+                            Tags = new [] { "document", "processing", "pdf", "generate", "create", "invoice", "report", "browser", "webassembly", "wasm" },
+                            Related = new [] { "document-processing-pdf-tables", "document-processing-pdf-text", "document-processing-pdf-fonts" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a PDF in Blazor?", Answer = "Build a Document with sections, paragraphs, and tables, then call document.ToPdf() - the whole engine is managed code, so it runs on the server, on desktop, and in Blazor WebAssembly alike." },
+                                new FaqItem { Question = "Does PDF generation work in Blazor WebAssembly?", Answer = "Yes. The library has no native dependencies, so documents render entirely in the browser - every demo on these pages generates its PDF client-side." },
+                                new FaqItem { Question = "Do I need wkhtmltopdf, SkiaSharp, or another native dependency?", Answer = "No. Layout, fonts, and PDF serialization are implemented in pure C#, so deployment is just your app - nothing to install in the container or on the machine." },
+                            }
                         },
                         new Example
                         {
@@ -3293,7 +3300,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-text",
                             Title = "PDF Text Formatting and Page Layout in Blazor | Radzen",
                             Description = "Format PDF text with named styles, control pagination with widows, orphans, and keep-together, and add headers and footers with page numbers in Blazor and C#.",
-                            Tags = new [] { "document", "processing", "pdf", "text", "paragraph", "style", "pagination", "widow", "orphan", "keep", "header", "footer", "page", "number", "list", "bullet", "numbered", "tab", "leader" }
+                            Tags = new [] { "document", "processing", "pdf", "text", "paragraph", "style", "pagination", "widow", "orphan", "keep", "header", "footer", "page", "number", "list", "bullet", "numbered", "tab", "leader" },
+                            Related = new [] { "document-processing-pdf-tables", "document-processing-pdf-fonts", "document-processing-pdf" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I control page breaks in a generated PDF?", Answer = "Set Widows and Orphans limits per paragraph, KeepTogether to move a whole block to the next page, KeepWithNext to bind a heading to its text, or insert an explicit PageBreak." },
+                                new FaqItem { Question = "How do I add page numbers to a PDF in C#?", Answer = "Add PageNumberField and PageCountField inlines to a section's header or footer - they resolve per page after layout, so 'Page 3 of 12' stays correct as content moves." },
+                                new FaqItem { Question = "Can I align text with tab stops and dot leaders?", Answer = "Yes - paragraphs carry left, center, right, and decimal tab stops with optional leader characters, so menus and figure columns line up without a table." },
+                            }
                         },
                         new Example
                         {
@@ -3302,7 +3316,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-tables",
                             Title = "PDF Tables in Blazor and C# | Radzen",
                             Description = "Create PDF tables in Blazor and C# with column and row spans, cell styling, relative column widths, and header rows that repeat on every page.",
-                            Tags = new [] { "document", "processing", "pdf", "table", "cell", "row", "column", "span", "colspan", "rowspan", "border", "repeat", "header", "width" }
+                            Tags = new [] { "document", "processing", "pdf", "table", "cell", "row", "column", "span", "colspan", "rowspan", "border", "repeat", "header", "width" },
+                            Related = new [] { "document-processing-pdf", "document-processing-pdf-text" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I repeat a table header on every PDF page?", Answer = "Mark the row with IsHeaderRow and RepeatOnEveryPage - when the table breaks across pages, the header is painted again after each break." },
+                                new FaqItem { Question = "How do I merge table cells in a PDF?", Answer = "Set ColumnSpan and RowSpan on a cell; following cells shift around the spanned area exactly as they do in an HTML table." },
+                                new FaqItem { Question = "How are column widths determined?", Answer = "Columns take a fixed width, a relative weight via RelativeWidth, or size to content when neither is set - mix all three in one table." },
+                            }
                         },
                         new Example
                         {
@@ -3311,7 +3332,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-fonts",
                             Title = "PDF Fonts, Embedding and Unicode in Blazor | Radzen",
                             Description = "Use the built-in PDF fonts or embed and subset TrueType fonts in Blazor and C#. Configure fallback chains and render Cyrillic, Greek, Chinese, Japanese, and Korean text.",
-                            Tags = new [] { "document", "processing", "pdf", "font", "truetype", "embed", "subset", "fallback", "kerning", "unicode", "cyrillic", "greek", "chinese", "japanese", "korean", "cjk" }
+                            Tags = new [] { "document", "processing", "pdf", "font", "truetype", "embed", "subset", "fallback", "kerning", "unicode", "cyrillic", "greek", "chinese", "japanese", "korean", "cjk" },
+                            Related = new [] { "document-processing-pdf-text", "document-processing-pdf-conformance" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I embed a custom font in a PDF in C#?", Answer = "Register a TrueType or OpenType file with Document.Fonts.Register and use its family name - the font is embedded automatically, subset to the glyphs the document uses." },
+                                new FaqItem { Question = "Can the PDF library render Chinese, Japanese, or Cyrillic text?", Answer = "Yes - register a font that covers the script and text renders with correct glyph mapping, so copy and paste from the viewer returns the original characters. Complex scripts such as Arabic and Hebrew are not supported yet." },
+                                new FaqItem { Question = "What happens when a character is missing from every font?", Answer = "By default rendering throws an exception naming each uncovered character and its font; set UnsupportedCharacters to Substitute to draw the font's missing-glyph shape and report through a callback instead." },
+                            }
                         },
                         new Example
                         {
@@ -3320,7 +3348,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-graphics",
                             Title = "PDF Images, Graphics and Watermarks in Blazor | Radzen",
                             Description = "Add images, gradients, shadows, opacity, and blend modes to PDF documents in Blazor and C#. Overlay content, apply watermarks, and render barcodes and QR codes.",
-                            Tags = new [] { "document", "processing", "pdf", "image", "png", "jpeg", "gradient", "shadow", "opacity", "blend", "overlay", "watermark", "barcode", "qr", "qrcode" }
+                            Tags = new [] { "document", "processing", "pdf", "image", "png", "jpeg", "gradient", "shadow", "opacity", "blend", "overlay", "watermark", "barcode", "qr", "qrcode" },
+                            Related = new [] { "document-processing-pdf-tables", "document-processing-pdf" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add an image to a PDF in C#?", Answer = "Add an Image block or an InlineImage from a stream - PNG (with transparency), JPEG, and JPEG 2000 are embedded directly, scaled by explicit size or a fit box." },
+                                new FaqItem { Question = "How do I add a watermark to a PDF?", Answer = "Set Section.Watermark with text or an image, rotation, and opacity - it paints behind the content of every page, and AddWatermark applies the same to loaded documents." },
+                                new FaqItem { Question = "Can I generate barcodes and QR codes inside the PDF?", Answer = "Yes - QR codes and one-dimensional symbologies like Code 128 and EAN render as crisp vector content directly in the document flow, no raster images involved." },
+                            }
                         },
                         new Example
                         {
@@ -3329,7 +3364,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-navigation",
                             Title = "PDF Table of Contents, Bookmarks and Links in Blazor | Radzen",
                             Description = "Add a table of contents, bookmarks, hyperlinks, and internal anchors to PDF documents in Blazor and C#. Configure page labels and viewer preferences.",
-                            Tags = new [] { "document", "processing", "pdf", "toc", "table", "contents", "bookmark", "outline", "link", "hyperlink", "anchor", "page", "label", "viewer", "preferences" }
+                            Tags = new [] { "document", "processing", "pdf", "toc", "table", "contents", "bookmark", "outline", "link", "hyperlink", "anchor", "page", "label", "viewer", "preferences" },
+                            Related = new [] { "document-processing-pdf-text", "document-processing-pdf" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add bookmarks to a PDF in C#?", Answer = "Populate PortableDocument.Outline with OutlineItem entries targeting pages or named anchors - nested children build the tree shown in the viewer sidebar." },
+                                new FaqItem { Question = "How do I create a clickable table of contents with page numbers?", Answer = "Add a TableOfContents block whose entries reference anchors; each entry links to its target and shows the page number resolved after layout." },
+                                new FaqItem { Question = "Can the viewer show roman numerals for front matter?", Answer = "Yes - PageLabels map page ranges to numbering styles, so the viewer displays i, ii, iii for the preface and restarts at 1 for the body." },
+                            }
                         },
                         new Example
                         {
@@ -3338,7 +3380,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-forms",
                             Title = "PDF Forms in Blazor and C# | Radzen",
                             Description = "Create PDF forms with text, checkbox, radio, and dropdown fields in Blazor and C#. Fill existing forms, read the values back, and flatten fields into page content.",
-                            Tags = new [] { "document", "processing", "pdf", "form", "acroform", "field", "text", "checkbox", "radio", "dropdown", "fill", "read", "flatten" }
+                            Tags = new [] { "document", "processing", "pdf", "form", "acroform", "field", "text", "checkbox", "radio", "dropdown", "fill", "read", "flatten" },
+                            Related = new [] { "document-processing-pdf-annotations", "document-processing-pdf-editing" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I fill a PDF form programmatically in C#?", Answer = "Load the file and use AcroForm.FillField, CheckField, SelectOption, and SelectRadioOption - appearances regenerate so the values render in any viewer." },
+                                new FaqItem { Question = "How do I flatten a PDF form?", Answer = "Call Flatten() on the loaded document - fields and annotations bake into permanent page content that can no longer be edited." },
+                                new FaqItem { Question = "How do I read submitted form values from a PDF?", Answer = "Enumerate AcroForm.Fields - each field exposes its name, type, and current value, straight from the file's bytes." },
+                            }
                         },
                         new Example
                         {
@@ -3347,7 +3396,13 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-annotations",
                             Title = "PDF Annotations in Blazor and C# | Radzen",
                             Description = "Add sticky notes, free text, shapes, ink, stamps, and text markup annotations to PDF documents in Blazor and C#.",
-                            Tags = new [] { "document", "processing", "pdf", "annotation", "note", "comment", "highlight", "underline", "strikeout", "squiggly", "stamp", "ink", "shape" }
+                            Tags = new [] { "document", "processing", "pdf", "annotation", "note", "comment", "highlight", "underline", "strikeout", "squiggly", "stamp", "ink", "shape" },
+                            Related = new [] { "document-processing-pdf-forms", "document-processing-pdf-search" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I highlight text in a PDF in C#?", Answer = "Find the text with FindText to get its exact rectangles, then add a HighlightAnnotation over each hit - the highlight blends with the text so it stays legible." },
+                                new FaqItem { Question = "Do annotations render the same in every PDF viewer?", Answer = "Yes - the library generates an appearance stream for every annotation, so shapes and colors do not depend on viewer defaults." },
+                            }
                         },
                         new Example
                         {
@@ -3356,7 +3411,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-editing",
                             Title = "Merge, Split and Edit PDF Files in Blazor | Radzen",
                             Description = "Load existing PDF files in Blazor and C#. Merge documents, split and extract pages, reorder and rotate them, and apply watermarks to loaded pages.",
-                            Tags = new [] { "document", "processing", "pdf", "load", "edit", "merge", "split", "extract", "append", "reorder", "rotate", "watermark", "pages" }
+                            Tags = new [] { "document", "processing", "pdf", "load", "edit", "merge", "split", "extract", "append", "reorder", "rotate", "watermark", "pages" },
+                            Related = new [] { "document-processing-pdf-search", "document-processing-pdf-forms" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I merge two PDF files in C#?", Answer = "Load both documents and call Append, or import selected pages with ImportPages - fonts, images, and form fields carry over and deduplicate." },
+                                new FaqItem { Question = "How do I split a PDF into separate files?", Answer = "Pages.Split produces one document per boundary, and Pages.ExtractPages copies a range into a new document." },
+                                new FaqItem { Question = "Can I edit PDFs produced by other tools?", Answer = "Yes - the reader handles cross-reference tables and streams, object streams, and repairs common structural damage, with resource limits that keep hostile files in check." },
+                            }
                         },
                         new Example
                         {
@@ -3365,7 +3427,13 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-search",
                             Title = "PDF Text Extraction, Search and Redaction in Blazor | Radzen",
                             Description = "Extract text from PDF files in Blazor and C#, search with hit geometry to highlight matches, and redact content so the removed text is gone from the file.",
-                            Tags = new [] { "document", "processing", "pdf", "extract", "text", "search", "find", "highlight", "redact", "redaction", "remove" }
+                            Tags = new [] { "document", "processing", "pdf", "extract", "text", "search", "find", "highlight", "redact", "redaction", "remove" },
+                            Related = new [] { "document-processing-pdf-editing", "document-processing-pdf-annotations" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I extract text from a PDF in C#?", Answer = "Call ExtractText on a document or page, or ExtractPositionedText to get every run with its bounds on the page." },
+                                new FaqItem { Question = "How do I redact text so it is really removed?", Answer = "RedactText removes the matched content from the page itself rather than covering it - extracting the text of the produced file proves the words are gone from the bytes." },
+                            }
                         },
                         new Example
                         {
@@ -3374,7 +3442,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-security",
                             Title = "PDF Encryption and Permissions in Blazor | Radzen",
                             Description = "Encrypt PDF documents with AES-256 and set user and owner passwords and permissions in Blazor and C# - entirely in the browser. Open password-protected files.",
-                            Tags = new [] { "document", "processing", "pdf", "security", "encrypt", "encryption", "aes", "password", "permissions", "protect", "owner", "user" }
+                            Tags = new [] { "document", "processing", "pdf", "security", "encrypt", "encryption", "aes", "password", "permissions", "protect", "owner", "user" },
+                            Related = new [] { "document-processing-pdf-conformance", "document-processing-pdf-editing" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I password-protect a PDF in C#?", Answer = "Assign EncryptionOptions with AES-256, AES-128, or RC4, user and owner passwords, and permission flags for printing, copying, and editing." },
+                                new FaqItem { Question = "Does AES-256 encryption work in Blazor WebAssembly?", Answer = "Yes - SubtleCryptoAesCbcProvider bridges encryption to the browser's own Web Crypto, so protected documents are produced and opened entirely client-side." },
+                                new FaqItem { Question = "How do I open a password-protected PDF?", Answer = "Pass the password (and, on WebAssembly, the AES provider) in LoadOptions to LoadFromStream - a wrong password fails with a clear error." },
+                            }
                         },
                         new Example
                         {
@@ -3383,7 +3458,14 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-conformance",
                             Title = "PDF/A and PDF/UA Conformance in Blazor and C# | Radzen",
                             Description = "Produce archival PDF/A and accessible, tagged PDF/UA documents in Blazor and C#. Conformance is validated at save time with actionable error messages.",
-                            Tags = new [] { "document", "processing", "pdf", "pdfa", "pdfua", "conformance", "archival", "accessibility", "accessible", "tagged", "structure", "validation" }
+                            Tags = new [] { "document", "processing", "pdf", "pdfa", "pdfua", "conformance", "archival", "accessibility", "accessible", "tagged", "structure", "validation" },
+                            Related = new [] { "document-processing-pdf-attachments", "document-processing-pdf-fonts" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a PDF/A file in C#?", Answer = "Set DocumentRenderer.Conformance to a PDF/A-2, PDF/A-3, or PDF/A-4 profile - fonts embed, an sRGB output intent is included, and the XMP metadata declares the level." },
+                                new FaqItem { Question = "How do I make an accessible, tagged PDF (PDF/UA)?", Answer = "Set Accessibility to PdfUa1 and give the document a language, a title, heading levels, and alternate text - a full structure tree is emitted for screen readers." },
+                                new FaqItem { Question = "What happens if my document violates PDF/A?", Answer = "Saving fails immediately with a message naming the exact rule and the fix - encryption under PDF/A, missing attachments for PDF/A-4F - instead of writing a non-conformant file." },
+                            }
                         },
                         new Example
                         {
@@ -3392,7 +3474,13 @@ namespace RadzenBlazorDemos
                             Path = "document-processing-pdf-attachments",
                             Title = "PDF Attachments and Factur-X e-Invoices in Blazor | Radzen",
                             Description = "Embed file attachments in PDF documents in Blazor and C# and produce Factur-X and ZUGFeRD hybrid e-invoices - a PDF/A-3 invoice with machine-readable XML inside.",
-                            Tags = new [] { "document", "processing", "pdf", "attachment", "embed", "file", "facturx", "factur-x", "zugferd", "einvoice", "e-invoicing", "en16931", "invoice", "xml" }
+                            Tags = new [] { "document", "processing", "pdf", "attachment", "embed", "file", "facturx", "factur-x", "zugferd", "einvoice", "e-invoicing", "en16931", "invoice", "xml" },
+                            Related = new [] { "document-processing-pdf-conformance", "document-processing-pdf" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I embed a file inside a PDF?", Answer = "Attachments.Add takes the name, bytes, relationship, and MIME type - and loaded documents expose their attachments for reading back." },
+                                new FaqItem { Question = "How do I create a ZUGFeRD or Factur-X invoice in C#?", Answer = "Render the human-readable invoice as PDF/A-3, attach the invoice XML as an Alternative relationship named factur-x.xml, and set Attachment.FacturX - the profile declaration lands in the XMP metadata." },
+                            }
                         },
                     }
                 },
