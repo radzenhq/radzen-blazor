@@ -23,8 +23,8 @@
 </RadzenStack>
 
 @code {
-    string company = "Radzen Software";
-    string customer = "Northwind Traders";
+    string company = "Meridian Supply Co.";
+    string customer = "Bluewave Logistics";
     decimal vatRate = 20;
     byte[] logo;
     byte[] pdf;
@@ -33,10 +33,18 @@
 
     readonly Item[] items =
     {
-        new("Blazor component license", 3, 899m),
-        new("Priority support, 12 months", 1, 1499m),
-        new("Custom theme design", 1, 2400m),
-        new("Developer onboarding workshop", 2, 650m),
+        new("Standing desk, oak, 140x70", 4, 649m),
+        new("Task chair, mesh back", 8, 289m),
+        new("Monitor arm, dual", 8, 119m),
+        new("Cable tray, powder-coated", 12, 24.5m),
+        new("Desk lamp, warm LED", 8, 59m),
+        new("Acoustic panel, 60x60", 24, 42m),
+        new("Whiteboard, glass, 180x90", 2, 379m),
+        new("Meeting table, walnut", 1, 1890m),
+        new("Conference chair", 10, 175m),
+        new("Floor protection mat", 8, 31m),
+        new("Cabinet, lockable", 4, 259m),
+        new("Delivery & assembly", 1, 480m),
     };
 
     protected override async Task OnInitializedAsync()
@@ -48,60 +56,82 @@
     void Generate()
     {
         var accent = Color.FromRgb(25, 118, 210);
+        var ink = Color.FromRgb(33, 37, 41);
+        var muted = Color.FromRgb(120, 128, 138);
+        var faint = Color.FromRgb(244, 247, 250);
+        var line = Color.FromRgb(222, 228, 234);
 
         var document = new Document();
-        document.Info.Title = $"Invoice INV-2026-001 - {company}";
-
-        var title = document.Styles.Add("Title");
-        title.Font.Size = 26;
-        title.Font.Bold = true;
-        title.Font.Color = accent;
-
-        var muted = document.Styles.Add("Muted");
-        muted.Font.Size = 9;
-        muted.Font.Color = Color.FromRgb(128, 128, 128);
+        document.Info.Title = $"Invoice INV-2026-018 - {company}";
 
         var label = document.Styles.Add("Label");
-        label.Font.Size = 9;
+        label.Font.Size = 8;
         label.Font.Bold = true;
         label.Font.Color = accent;
-        label.SpacingBefore = 16;
+        label.SpacingBefore = 18;
+        label.SpacingAfter = 4;
+
+        var mutedStyle = document.Styles.Add("Muted");
+        mutedStyle.Font.Size = 9;
+        mutedStyle.Font.Color = muted;
 
         var section = document.Sections.Add();
         section.PageSize = PageSizes.A4;
-        section.Margins.SetAll(40);
+        section.Margins.SetAll(48);
 
-        var footer = section.Footer.Blocks.Add(new Paragraph());
-        footer.StyleName = "Muted";
-        footer.Alignment = HorizontalAlignment.Center;
-        footer.Inlines.Add($"{company} - Page ");
+        var footer = section.Footer.Blocks.Add(new Paragraph { StyleName = "Muted" });
+        footer.TabStops.Add(Unit.FromPoint(499), TabAlignment.Right);
+        footer.Inlines.Add($"{company} - hello@meridian-supply.example\tPage ");
         footer.Inlines.Add(new PageNumberField());
         footer.Inlines.Add(" of ");
         footer.Inlines.Add(new PageCountField());
 
         var head = section.Blocks.Add(new Table());
-        head.Columns.Add(56);
+        head.Columns.Add(52);
         head.Columns.Add();
-        head.Columns.Add(160);
+        head.Columns.Add(190);
         var headRow = head.Rows.Add();
         var image = headRow.Cells[0].Blocks.Add(new Image(new MemoryStream(logo)));
-        image.Width = 44;
-        headRow.Cells[1].Blocks.Add(new Paragraph(company)).Font.Size = 16;
-        headRow.Cells[1].Blocks.Add(new Paragraph("1 Main Street, Sofia 1000, Bulgaria")).StyleName = "Muted";
+        image.Width = 40;
+        var brand = headRow.Cells[1].Blocks.Add(new Paragraph(company));
+        brand.Font.Size = 15;
+        brand.Font.Bold = true;
+        brand.Font.Color = ink;
+        headRow.Cells[1].Blocks.Add(new Paragraph("Harbor Quarter 12, 21079 Hamburg")).StyleName = "Muted";
         headRow.Cells[2].Alignment = HorizontalAlignment.Right;
-        headRow.Cells[2].Blocks.Add(new Paragraph("INVOICE")).StyleName = "Title";
-        headRow.Cells[2].Blocks.Add(new Paragraph("INV-2026-001")).StyleName = "Muted";
+        var word = headRow.Cells[2].Blocks.Add(new Paragraph("INVOICE"));
+        word.Font.Size = 24;
+        word.Font.Bold = true;
+        word.Font.Color = accent;
 
-        section.Blocks.Add(new Paragraph("BILL TO")).StyleName = "Label";
-        section.Blocks.Add(new Paragraph(customer));
-        section.Blocks.Add(new Paragraph("42 Market Square, Hamburg 20095, Germany")).StyleName = "Muted";
+        var meta = section.Blocks.Add(new Table { LeftIndent = 325 });
+        meta.Columns.Add(90);
+        meta.Columns.Add(100).Alignment = HorizontalAlignment.Right;
+        foreach (var (name, value) in new[]
+        {
+            ("Invoice no.", "INV-2026-018"),
+            ("Issued", "05 Aug 2026"),
+            ("Due", "19 Aug 2026"),
+        })
+        {
+            var row = meta.Rows.Add();
+            row.Cells[0].Text = name;
+            row.Cells[0].Font.Color = muted;
+            row.Cells[1].Text = value;
+            row.Cells[1].Font.Bold = true;
+            Pad(row, 3);
+        }
 
-        section.Blocks.Add(new Paragraph("ITEMS")).StyleName = "Label";
+        section.Blocks.Add(new Paragraph("BILLED TO") { StyleName = "Label" });
+        section.Blocks.Add(new Paragraph(customer)).Font.Bold = true;
+        section.Blocks.Add(new Paragraph("Pier 4, Waterfront Business Park, Rotterdam")).StyleName = "Muted";
+
+        section.Blocks.Add(new Paragraph("ITEMS") { StyleName = "Label" });
         var table = section.Blocks.Add(new Table());
         table.Columns.Add();
-        table.Columns.Add(60).Alignment = HorizontalAlignment.Right;
-        table.Columns.Add(80).Alignment = HorizontalAlignment.Right;
-        table.Columns.Add(90).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add(46).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add(76).Alignment = HorizontalAlignment.Right;
+        table.Columns.Add(86).Alignment = HorizontalAlignment.Right;
 
         var header = table.Rows.Add();
         header.IsHeaderRow = true;
@@ -109,10 +139,12 @@
         header.Background = accent;
         header.Font.Color = Color.White;
         header.Font.Bold = true;
-        header.Cells[0].Text = "Description";
-        header.Cells[1].Text = "Qty";
-        header.Cells[2].Text = "Price";
-        header.Cells[3].Text = "Amount";
+        header.Font.Size = 9;
+        header.Cells[0].Text = "DESCRIPTION";
+        header.Cells[1].Text = "QTY";
+        header.Cells[2].Text = "UNIT";
+        header.Cells[3].Text = "AMOUNT";
+        Pad(header, 7);
 
         for (var i = 0; i < items.Length; i++)
         {
@@ -120,38 +152,70 @@
             var row = table.Rows.Add();
             if (i % 2 == 1)
             {
-                row.Background = Color.FromRgb(245, 245, 245);
+                row.Background = faint;
             }
+
+            row.Borders.Bottom.Width = 0.5;
+            row.Borders.Bottom.Color = line;
             row.Cells[0].Text = item.Description;
             row.Cells[1].Text = item.Quantity.ToString();
             row.Cells[2].Text = item.Price.ToString("N2");
             row.Cells[3].Text = (item.Quantity * item.Price).ToString("N2");
+            row.Cells[3].Font.Bold = true;
+            Pad(row, 6);
         }
 
         var subtotal = items.Sum(item => item.Quantity * item.Price);
         var vat = subtotal * vatRate / 100;
 
-        var totals = section.Blocks.Add(new Table());
-        totals.LeftIndent = 285;
+        var totals = section.Blocks.Add(new Table { LeftIndent = 285 });
         totals.Columns.Add(140);
         totals.Columns.Add(90).Alignment = HorizontalAlignment.Right;
-        AddTotal(totals, "Subtotal", subtotal, false);
-        AddTotal(totals, $"VAT {vatRate}%", vat, false);
-        AddTotal(totals, "Total EUR", subtotal + vat, true);
+        AddTotal(totals, "Subtotal", subtotal.ToString("N2"), false, muted, line);
+        AddTotal(totals, $"VAT {vatRate}%", vat.ToString("N2"), false, muted, line);
+        AddTotal(totals, "Total EUR", (subtotal + vat).ToString("N2"), true, ink, accent);
 
-        section.Blocks.Add(new Paragraph("PAY ONLINE")).StyleName = "Label";
-        section.Blocks.Add(new QrCode("https://www.radzen.com/pay?invoice=INV-2026-001", 72));
-        section.Blocks.Add(new Paragraph("Payment is due within 14 days.")).StyleName = "Muted";
+        section.Blocks.Add(new Paragraph("PAYMENT") { StyleName = "Label" });
+        var pay = section.Blocks.Add(new Table());
+        pay.Columns.Add(84);
+        pay.Columns.Add();
+        var payRow = pay.Rows.Add();
+        payRow.Cells[0].Blocks.Add(new QrCode("https://pay.meridian-supply.example/INV-2026-018", 68));
+        payRow.Cells[1].Blocks.Add(new Paragraph("Scan to pay online, or transfer to:")).StyleName = "Muted";
+        payRow.Cells[1].Blocks.Add(new Paragraph("IBAN DE89 3704 0044 0532 0130 00 - BIC COBADEFF")).Font.Size = 10;
+        payRow.Cells[1].Blocks.Add(new Paragraph("Reference INV-2026-018. Payment is due within 14 days.")).StyleName = "Muted";
 
         pdf = document.ToPdf();
     }
 
-    static void AddTotal(Table totals, string text, decimal amount, bool bold)
+    static void Pad(Row row, double padding)
+    {
+        foreach (var cell in row.Cells)
+        {
+            cell.Padding = padding;
+        }
+    }
+
+    static void AddTotal(Table totals, string text, string amount, bool grand, Color labelColor, Color ruleColor)
     {
         var row = totals.Rows.Add();
-        row.Font.Bold = bold;
         row.Cells[0].Text = text;
-        row.Cells[1].Text = amount.ToString("N2");
+        row.Cells[0].Font.Color = labelColor;
+        row.Cells[1].Text = amount;
+        row.Cells[1].Font.Bold = true;
+        if (grand)
+        {
+            row.Font.Size = 12;
+            row.Borders.Top.Width = 1.5;
+            row.Borders.Top.Color = ruleColor;
+        }
+        else
+        {
+            row.Borders.Bottom.Width = 0.5;
+            row.Borders.Bottom.Color = ruleColor;
+        }
+
+        Pad(row, 5);
     }
 
     async Task Download()

@@ -40,7 +40,7 @@
 
         using var source = new MemoryStream(document.ToPdf());
         var loaded = PortableDocument.LoadFromStream(source);
-        loaded.AcroForm.FillField("signer", "Ana Petrova");
+        loaded.AcroForm.FillField("signer", "Maya Lindqvist");
         loaded.AcroForm.CheckField("agreed");
         if (flatten)
         {
