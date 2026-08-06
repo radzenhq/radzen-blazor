@@ -171,10 +171,12 @@ internal static class TableLayout
             totalHeight += h;
         }
 
+        var alignmentOffset = HorizontalAlignmentOffset.Of(table.Alignment, availableWidth, totalWidth);
+
         return new LaidOutTable
         {
             Source = capture.Source(table),
-            Decoration = GeometryCapture.Table(table, additionalLeftIndent),
+            Decoration = GeometryCapture.Table(table, additionalLeftIndent + alignmentOffset),
             ColumnWidths = [.. columnWidths],
             RowHeights = [.. rowHeights],
             Width = totalWidth,

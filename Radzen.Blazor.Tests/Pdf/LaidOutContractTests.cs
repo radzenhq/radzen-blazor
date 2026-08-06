@@ -360,6 +360,26 @@ public class LaidOutContractTests
     }
 
     [Fact]
+    public void TableAlignment_PositionsAFixedWidthTableInTheAvailableWidth()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = Page(document);
+        var table = section.Blocks.Add(new Table { Alignment = HorizontalAlignment.Right });
+        table.Columns.Add(Unit.FromPoint(100));
+        TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
+
+        var centered = section.Blocks.Add(new Table { Alignment = HorizontalAlignment.Center });
+        centered.Columns.Add(Unit.FromPoint(100));
+        TableLayoutSupport.Fill(centered.Rows.Add().Cells[0], "x");
+
+        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
+
+        Assert.Equal(260, page.Body.Tables[0].Layout.Decoration.LeftIndent, 6);
+        Assert.Equal(130, page.Body.Tables[1].Layout.Decoration.LeftIndent, 6);
+    }
+
+    [Fact]
     public void LaidOutCell_CarriesPerEdgeBordersResolvedByPrecedence()
     {
         var document = new Document();
