@@ -887,36 +887,37 @@ window.Radzen = {
 
       var hidden = el.querySelector('input[type="hidden"]');
 
-      Radzen[id] = {};
+      var state = {};
+      Radzen[id] = state;
 
-      Radzen[id].inputs = [...el.querySelectorAll('.rz-security-code-input')];
+      state.inputs = [...el.querySelectorAll('.rz-security-code-input')];
 
       var isAndroid = navigator.userAgent.match(/Android/i);
 
-      Radzen[id].paste = function (e) {
+      state.paste = function (e) {
           if (e.clipboardData) {
               var value = e.clipboardData.getData('text');
 
               if (value) {
-                  for (var i = 0; i < Math.min(value.length, Radzen[id].inputs.length); i++) {
+                  for (var i = 0; i < Math.min(value.length, state.inputs.length); i++) {
                       if (isNumber && isNaN(+value[i])) {
                           continue;
                       }
-                      Radzen[id].inputs[i].value = value[i];
+                      state.inputs[i].value = value[i];
                   }
 
-                  var code = Radzen[id].inputs.map(i => i.value).join('').trim();
+                  var code = state.inputs.map(i => i.value).join('').trim();
                   hidden.value = code;
 
                   try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code)); } catch { }
 
-                  Radzen[id].inputs[Radzen[id].inputs.length - 1].focus();
+                  state.inputs[state.inputs.length - 1].focus();
               }
 
               e.preventDefault();
           }
       }
-      Radzen[id].keyPress = function (e) {
+      state.keyPress = function (e) {
           var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
           var ch = e.data || String.fromCharCode(e.which);
 
@@ -945,58 +946,51 @@ window.Radzen = {
 
           e.currentTarget.value = ch;
 
-          var value = Radzen[id].inputs.map(i => i.value).join('').trim();
+          var value = state.inputs.map(i => i.value).join('').trim();
           hidden.value = value;
 
           try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
 
-          var index = Radzen[id].inputs.indexOf(e.currentTarget);
-          if (index < Radzen[id].inputs.length - 1) {
-              Radzen[id].inputs[index + 1].focus();
+          var index = state.inputs.indexOf(e.currentTarget);
+          if (index < state.inputs.length - 1) {
+              state.inputs[index + 1].focus();
           }
       }
 
-      Radzen[id].keyDown = function (e) {
+      state.keyDown = function (e) {
           var keyCode = e.which || e.keyCode;
           if (keyCode == 8) {
               e.currentTarget.value = '';
 
-              var value = Radzen[id].inputs.map(i => i.value).join('').trim();
+              var value = state.inputs.map(i => i.value).join('').trim();
               hidden.value = value;
 
               try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
 
-              var index = Radzen[id].inputs.indexOf(e.currentTarget);
+              var index = state.inputs.indexOf(e.currentTarget);
               if (index > 0) {
-                  Radzen[id].inputs[index - 1].focus();
+                  state.inputs[index - 1].focus();
               }
           }
       }
 
-      for (var i = 0; i < Radzen[id].inputs.length; i++) {
-          Radzen[id].inputs[i].addEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
-          Radzen[id].inputs[i].addEventListener('keydown', Radzen[id].keyDown);
-          Radzen[id].inputs[i].addEventListener('paste', Radzen[id].paste);
+      for (var i = 0; i < state.inputs.length; i++) {
+          state.inputs[i].addEventListener(isAndroid ? 'textInput' : 'keypress', state.keyPress);
+          state.inputs[i].addEventListener('keydown', state.keyDown);
+          state.inputs[i].addEventListener('paste', state.paste);
       }
 
       return {
           dispose: function () {
-              if (!Radzen[id]) return;
-
-              var inputs = el.getElementsByTagName('input');
-
-              if (Radzen[id].keyPress && Radzen[id].keyDown && Radzen[id].paste) {
-                  for (var i = 0; i < inputs.length; i++) {
-                      inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
-                      inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
-                      inputs[i].removeEventListener('paste', Radzen[id].paste);
-                  }
-                  delete Radzen[id].keyPress;
-                  delete Radzen[id].keyDown;
-                  delete Radzen[id].paste;
+              for (var i = 0; i < state.inputs.length; i++) {
+                  state.inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', state.keyPress);
+                  state.inputs[i].removeEventListener('keydown', state.keyDown);
+                  state.inputs[i].removeEventListener('paste', state.paste);
               }
 
-              Radzen[id] = null;
+              if (Radzen[id] === state) {
+                  Radzen[id] = null;
+              }
           }
       };
   },
@@ -1013,8 +1007,9 @@ window.Radzen = {
     step,
     isVertical
   ) {
-    Radzen[id] = {};
-    Radzen[id].mouseMoveHandler = function (e) {
+    var state = {};
+    Radzen[id] = state;
+    state.mouseMoveHandler = function (e) {
       e.preventDefault();
 
       var handle = slider.isMin ? minHandle : maxHandle;
@@ -1055,16 +1050,16 @@ window.Radzen = {
       }
     };
 
-    Radzen[id].mouseDownHandler = function (e) {
+    state.mouseDownHandler = function (e) {
       if (parent.classList.contains('rz-state-disabled')) return;
 
-      document.addEventListener('mousemove', Radzen[id].mouseMoveHandler);
-      document.addEventListener('touchmove', Radzen[id].mouseMoveHandler, {
+      document.addEventListener('mousemove', state.mouseMoveHandler);
+      document.addEventListener('touchmove', state.mouseMoveHandler, {
         passive: false, capture: true
       });
 
-      document.addEventListener('mouseup', Radzen[id].mouseUpHandler);
-      document.addEventListener('touchend', Radzen[id].mouseUpHandler, {
+      document.addEventListener('mouseup', state.mouseUpHandler);
+      document.addEventListener('touchend', state.mouseUpHandler, {
         passive: true
       });
 
@@ -1092,43 +1087,40 @@ window.Radzen = {
       }
     };
 
-    Radzen[id].mouseUpHandler = function (e) {
+    state.mouseUpHandler = function (e) {
       slider.canChange = false;
-      document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
-      document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler, {
+      document.removeEventListener('mousemove', state.mouseMoveHandler);
+      document.removeEventListener('touchmove', state.mouseMoveHandler, {
         passive: false, capture: true
       });
-      document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
-      document.removeEventListener('touchend', Radzen[id].mouseUpHandler, {
+      document.removeEventListener('mouseup', state.mouseUpHandler);
+      document.removeEventListener('touchend', state.mouseUpHandler, {
         passive: true
       });
     };
 
-    parent.addEventListener('mousedown', Radzen[id].mouseDownHandler);
-    parent.addEventListener('touchstart', Radzen[id].mouseDownHandler, {
+    parent.addEventListener('mousedown', state.mouseDownHandler);
+    parent.addEventListener('touchstart', state.mouseDownHandler, {
       passive: true
     });
 
     return { dispose: function() {
-      if (!Radzen[id]) return;
+      document.removeEventListener('mousemove', state.mouseMoveHandler);
+      document.removeEventListener('touchmove', state.mouseMoveHandler, {
+        passive: false, capture: true
+      });
+      document.removeEventListener('mouseup', state.mouseUpHandler);
+      document.removeEventListener('touchend', state.mouseUpHandler, {
+        passive: true
+      });
+      parent.removeEventListener('mousedown', state.mouseDownHandler);
+      parent.removeEventListener('touchstart', state.mouseDownHandler, {
+        passive: true
+      });
 
-      if (Radzen[id].mouseMoveHandler) {
-        document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
-        document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler);
-        delete Radzen[id].mouseMoveHandler;
+      if (Radzen[id] === state) {
+        Radzen[id] = null;
       }
-      if (Radzen[id].mouseUpHandler) {
-        document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
-        document.removeEventListener('touchend', Radzen[id].mouseUpHandler);
-        delete Radzen[id].mouseUpHandler;
-      }
-      if (Radzen[id].mouseDownHandler) {
-        parent.removeEventListener('mousedown', Radzen[id].mouseDownHandler);
-        parent.removeEventListener('touchstart', Radzen[id].mouseDownHandler);
-        delete Radzen[id].mouseDownHandler;
-      }
-
-      Radzen[id] = null;
     }};
   },
   prepareDrag: function (el) {
@@ -2007,24 +1999,29 @@ window.Radzen = {
 
       var input = el.querySelector('.rz-inputtext');
       var button = el.querySelector('.rz-datepicker-trigger');
+
+      var buttonHandler = function (e) {
+          handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
+      };
+
+      var inputHandler = function (e) {
+          handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
+      };
+
       if (button) {
-          button.onclick = function (e) {
-              handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
-          };
+          button.onclick = buttonHandler;
       }
 
       if (input) {
-          input.onclick = function (e) {
-              handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
-          };
+          input.onclick = inputHandler;
       }
 
       return {
           dispose: function () {
-              if (button) {
+              if (button && button.onclick === buttonHandler) {
                   button.onclick = null;
               }
-              if (input) {
+              if (input && input.onclick === inputHandler) {
                   input.onclick = null;
               }
           }
