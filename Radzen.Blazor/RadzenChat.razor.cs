@@ -142,6 +142,7 @@ namespace Radzen.Blazor
         private bool hasMoreMentionUsers;
         private bool appendMentionUsersOnNextUpdate;
         private bool mentionSearchRequested;
+        private bool ignoreIncomingMentionUsers;
         private readonly List<MentionInputSegment> mentionInputSegments = new();
 
         private sealed class MentionInputSegment
@@ -845,6 +846,23 @@ namespace Radzen.Blazor
                 }
             }
 
+            // While a mention is active keep filtering with the text after the original mention
+            // character even when it contains spaces, so multi-word names like "John Doe" can
+            // be matched. The mention stays anchored at mentionStartPosition, which is set
+            // synchronously when the mention is first detected, so this works even when the
+            // initial search has not resolved yet. The mention state is reset when such a
+            // search yields no results (see ApplyMentionUsersFromParameters).
+            if (mentionStartPosition >= 0 &&
+                mentionStartPosition < trimmedInput.Length &&
+                trimmedInput[mentionStartPosition] == char_code &&
+                (mentionStartPosition == 0 || char.IsWhiteSpace(trimmedInput[mentionStartPosition - 1])))
+            {
+                var continuedSearchText = trimmedInput.Substring(mentionStartPosition + 1);
+                mentionSearchText = continuedSearchText;
+                await PerformMentionSearch(continuedSearchText);
+                return;
+            }
+
             await CloseMentionPopup();
         }
 
@@ -869,6 +887,7 @@ namespace Radzen.Blazor
                 mentionSearchRequested = true;
                 appendMentionUsersOnNextUpdate = append;
                 isLoadingMentionUsers = true;
+                ignoreIncomingMentionUsers = false;
 
                 var searchArgs = new MentionSearchArgs
                 {
@@ -889,7 +908,7 @@ namespace Radzen.Blazor
 
         private async Task InsertMention(MentionUserContext user)
         {
-            if (user?.UserId == null)
+            if (user?.UserId == null || mentionStartPosition < 0)
             {
                 return;
             }
@@ -927,6 +946,7 @@ namespace Radzen.Blazor
             hasMoreMentionUsers = false;
             mentionSearchRequested = false;
             appendMentionUsersOnNextUpdate = false;
+            ignoreIncomingMentionUsers = true;
 
             mentionSearchCts?.Cancel();
             mentionSearchCts?.Dispose();
@@ -974,7 +994,9 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (!mentionSearchRequested && !isMentionPopupOpen && !appendMentionUsersOnNextUpdate && !(MentionUsers?.Any() == true))
+            // Once the popup has been closed, incoming users from a stale in-flight search must
+            // not reopen it; only a new search (or an already open popup) may apply results.
+            if (!mentionSearchRequested && !isMentionPopupOpen && !appendMentionUsersOnNextUpdate && (ignoreIncomingMentionUsers || !(MentionUsers?.Any() == true)))
             {
                 return;
             }
@@ -1008,6 +1030,22 @@ namespace Radzen.Blazor
             if (selectedMentionIndex >= mentionSearchResults.Count)
             {
                 selectedMentionIndex = mentionSearchResults.Count - 1;
+            }
+
+            // A multi-word search without results means the user is typing regular text after
+            // the mention character, so reset the mention state to stop searching until a new
+            // mention is started.
+            if (!isMentionPopupOpen && mentionSearchResults.Count == 0 && mentionSearchText.Contains(' ', StringComparison.Ordinal))
+            {
+                mentionSearchText = string.Empty;
+                selectedMentionIndex = -1;
+                mentionStartPosition = -1;
+                hasMoreMentionUsers = false;
+                ignoreIncomingMentionUsers = true;
+
+                mentionSearchCts?.Cancel();
+                mentionSearchCts?.Dispose();
+                mentionSearchCts = null;
             }
         }
 
