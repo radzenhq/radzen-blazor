@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -13,8 +14,10 @@ namespace Radzen;
 /// </summary>
 public static class PropertyAccess
 {
+    private static readonly ConcurrentDictionary<(Type ItemType, Type ValueType, string PropertyName, Type? TargetType), Delegate> getterCache = new();
+
     /// <summary>
-    /// Creates a function that will return the specified property.
+    /// Creates a function that will return the specified property. The compiled function is cached so repeated calls with the same arguments do not recompile it.
     /// </summary>
     /// <typeparam name="TItem">The owner type.</typeparam>
     /// <typeparam name="TValue">The value type.</typeparam>
@@ -26,6 +29,13 @@ public static class PropertyAccess
     {
         ArgumentNullException.ThrowIfNull(propertyName);
 
+        return (Func<TItem, TValue>)getterCache.GetOrAdd((typeof(TItem), typeof(TValue), propertyName, type),
+            _ => CreateGetter<TItem, TValue>(propertyName, type));
+    }
+
+    [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
+    private static Func<TItem, TValue> CreateGetter<TItem, TValue>(string propertyName, Type? type)
+    {
         if (propertyName.Contains('[', StringComparison.Ordinal))
         {
             var arg0 = Expression.Parameter(typeof(TItem), "x");
