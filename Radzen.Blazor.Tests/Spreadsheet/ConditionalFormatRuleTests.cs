@@ -104,7 +104,7 @@ public class ConditionalFormatRuleTests
     }
 
     [Fact]
-    public void Top10Rule_TiesAtThreshold_IncludeAllTiedValues()
+    public void Top10Rule_DuplicatesConsumeRanksAndTiesAtThresholdAreIncluded()
     {
         var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 5;
@@ -119,7 +119,7 @@ public class ConditionalFormatRuleTests
         Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]));
         Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[1, 0]));
         Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[2, 0]));
-        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
     }
 
     [Fact]

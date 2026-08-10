@@ -226,6 +226,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         public XElement FillsElement { get; set; } = null!;
         public XElement CellXfsElement { get; set; } = null!;
         public XElement BordersElement { get; set; } = null!;
+        public XElement DxfsElement { get; set; } = null!;
         public XElement? NumFmtsElement { get; set; }
     }
 
@@ -795,6 +796,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         styleTracker.FillsElement = stylesDoc.Root!.Element(ns + "fills")!;
         styleTracker.CellXfsElement = stylesDoc.Root!.Element(ns + "cellXfs")!;
         styleTracker.BordersElement = stylesDoc.Root!.Element(ns + "borders")!;
+        styleTracker.DxfsElement = stylesDoc.Root!.Element(ns + "dxfs")!;
 
         return styleTracker;
     }
@@ -934,6 +936,8 @@ class XlsxWriter(Workbook sourceWorkbook)
         AddMergedCells(sheet, sheetDoc);
 
         AddAutoFilter(sheet, sheetDoc);
+
+        AddConditionalFormatting(sheet, sheetDoc, styleTracker);
 
         AddDataValidations(sheet, sheetDoc);
 
@@ -1901,6 +1905,191 @@ class XlsxWriter(Workbook sourceWorkbook)
 
             sheetDoc.Root!.Add(autoFilter);
         }
+    }
+
+    private static void AddConditionalFormatting(Worksheet sheet, XDocument sheetDoc, StyleTracker styleTracker)
+    {
+        var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+
+        var entries = new List<(RangeRef Range, ConditionalFormatBase Rule)>();
+        foreach (var range in sheet.ConditionalFormats.Ranges)
+        {
+            foreach (var rule in sheet.ConditionalFormats.GetRules(range))
+            {
+                if (GetConditionalFormat(rule) is not null)
+                {
+                    entries.Add((range, rule));
+                }
+            }
+        }
+
+        if (entries.Count == 0)
+        {
+            return;
+        }
+
+        // ConditionalFormatStore.Calculate lets later rules override earlier ones, while ECMA-376
+        // §18.3.1.10 gives precedence to the lowest priority number, so priorities are assigned in
+        // reverse add order and stopIfTrue is omitted.
+        XElement? currentElement = null;
+        RangeRef? currentRange = null;
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var (range, rule) = entries[i];
+            var priority = entries.Count - i;
+            var dxfId = AddDxf(styleTracker, GetConditionalFormat(rule)!);
+
+            if (currentRange is null || !currentRange.Value.Equals(range))
+            {
+                currentElement = new XElement(XName.Get("conditionalFormatting", ns),
+                    new XAttribute("sqref", range.ToString()));
+                sheetDoc.Root!.Add(currentElement);
+                currentRange = range;
+            }
+
+            currentElement!.Add(CreateCfRule(rule, range, priority, dxfId, ns));
+        }
+    }
+
+    private static Format? GetConditionalFormat(ConditionalFormatBase rule) => rule switch
+    {
+        GreaterThanRule r => r.Format,
+        LessThanRule r => r.Format,
+        BetweenRule r => r.Format,
+        EqualToRule r => r.Format,
+        TextContainsRule r => r.Format,
+        Top10Rule r => r.Format,
+        _ => null
+    };
+
+    private static XElement CreateCfRule(ConditionalFormatBase rule, RangeRef range, int priority, int dxfId, string ns)
+    {
+        var element = new XElement(XName.Get("cfRule", ns),
+            new XAttribute("type", rule switch
+            {
+                TextContainsRule => "containsText",
+                Top10Rule => "top10",
+                _ => "cellIs"
+            }),
+            new XAttribute("dxfId", dxfId.ToString(CultureInfo.InvariantCulture)),
+            new XAttribute("priority", priority.ToString(CultureInfo.InvariantCulture)));
+
+        switch (rule)
+        {
+            case GreaterThanRule gt:
+                element.Add(new XAttribute("operator", "greaterThan"));
+                element.Add(new XElement(XName.Get("formula", ns), gt.Value.ToString(CultureInfo.InvariantCulture)));
+                break;
+            case LessThanRule lt:
+                element.Add(new XAttribute("operator", "lessThan"));
+                element.Add(new XElement(XName.Get("formula", ns), lt.Value.ToString(CultureInfo.InvariantCulture)));
+                break;
+            case BetweenRule bw:
+                element.Add(new XAttribute("operator", "between"));
+                element.Add(new XElement(XName.Get("formula", ns), bw.Minimum.ToString(CultureInfo.InvariantCulture)));
+                element.Add(new XElement(XName.Get("formula", ns), bw.Maximum.ToString(CultureInfo.InvariantCulture)));
+                break;
+            case EqualToRule eq:
+                element.Add(new XAttribute("operator", "equal"));
+                element.Add(new XElement(XName.Get("formula", ns),
+                    NumericCoercion.TryCoerceToDouble(eq.Value, out var number)
+                        ? number.ToString(CultureInfo.InvariantCulture)
+                        : $"\"{(eq.Value?.ToString() ?? string.Empty).Replace("\"", "\"\"", StringComparison.Ordinal)}\""));
+                break;
+            case TextContainsRule tc:
+                var escaped = tc.Text.Replace("\"", "\"\"", StringComparison.Ordinal);
+                element.Add(new XAttribute("operator", "containsText"));
+                element.Add(new XAttribute("text", tc.Text));
+                element.Add(new XElement(XName.Get("formula", ns),
+                    $"NOT(ISERROR(SEARCH(\"{escaped}\",{range.Start})))"));
+                break;
+            case Top10Rule top:
+                if (top.Bottom)
+                {
+                    element.Add(new XAttribute("bottom", "1"));
+                }
+                element.Add(new XAttribute("rank", top.Count.ToString(CultureInfo.InvariantCulture)));
+                break;
+        }
+
+        return element;
+    }
+
+    private static int AddDxf(StyleTracker styleTracker, Format format)
+    {
+        var ns = XNamespace.Get("http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+        var dxf = new XElement(ns + "dxf");
+
+        var font = new XElement(ns + "font");
+        if (format.Bold)
+        {
+            font.Add(new XElement(ns + "b"));
+        }
+        if (format.Italic)
+        {
+            font.Add(new XElement(ns + "i"));
+        }
+        if (format.Underline)
+        {
+            font.Add(new XElement(ns + "u"));
+        }
+        if (format.Strikethrough)
+        {
+            font.Add(new XElement(ns + "strike"));
+        }
+        if (format.Color is not null)
+        {
+            font.Add(new XElement(ns + "color", new XAttribute("rgb", format.Color.ToXLSXColor())));
+        }
+        if (format.FontFamily is not null)
+        {
+            font.Add(new XElement(ns + "name", new XAttribute("val", format.FontFamily)));
+        }
+        if (format.FontSize is not null)
+        {
+            font.Add(new XElement(ns + "sz", new XAttribute("val", format.FontSize.Value.ToString(CultureInfo.InvariantCulture))));
+        }
+        if (font.HasElements)
+        {
+            dxf.Add(font);
+        }
+
+        if (format.BackgroundColor is not null)
+        {
+            // ECMA-376 §18.8.14: in a dxf a solid fill is expressed via patternFill/bgColor,
+            // unlike a full xf fill which uses patternType="solid" with fgColor.
+            dxf.Add(new XElement(ns + "fill",
+                new XElement(ns + "patternFill",
+                    new XElement(ns + "bgColor", new XAttribute("rgb", format.BackgroundColor.ToXLSXColor())))));
+        }
+
+        var border = new XElement(ns + "border");
+        AddDxfBorderSide(border, ns, "left", format.BorderLeft);
+        AddDxfBorderSide(border, ns, "right", format.BorderRight);
+        AddDxfBorderSide(border, ns, "top", format.BorderTop);
+        AddDxfBorderSide(border, ns, "bottom", format.BorderBottom);
+        if (border.HasElements)
+        {
+            dxf.Add(border);
+        }
+
+        styleTracker.DxfsElement.Add(dxf);
+        var dxfId = styleTracker.DxfsElement.Elements().Count() - 1;
+        styleTracker.DxfsElement.SetAttributeValue("count", (dxfId + 1).ToString(CultureInfo.InvariantCulture));
+        return dxfId;
+    }
+
+    private static void AddDxfBorderSide(XElement border, XNamespace ns, string side, BorderStyle? style)
+    {
+        if (style is null || style.LineStyle == BorderLineStyle.None)
+        {
+            return;
+        }
+
+        border.Add(new XElement(ns + side,
+            new XAttribute("style", style.ToXlsxStyle()),
+            new XElement(ns + "color", new XAttribute("rgb", style.Color.ToXLSXColor()))));
     }
 
     private static void AddDataValidations(Worksheet sheet, XDocument sheetDoc)

@@ -133,11 +133,11 @@ public class TextContainsRule : ConditionalFormatBase
 /// Conditional format rule that applies when the cell value is in the top (or bottom) N distinct values of its range.
 /// </summary>
 /// <remarks>
-/// Selection follows Excel semantics: it ranks the DISTINCT numeric values within the range and matches any cell
-/// whose value is at or beyond the resulting threshold (so ties at the threshold are all included). Because the
-/// rule needs the full range to compute the threshold, evaluation is performed by
-/// <see cref="ConditionalFormatStore.Calculate(Cell)"/>; calling <see cref="GetFormat(Cell)"/> directly returns
-/// <see langword="null"/>.
+/// Selection follows Excel semantics: the threshold is the Nth largest (or smallest) numeric value in the range
+/// counting duplicates, like the LARGE and SMALL functions, and any cell at or beyond the threshold matches
+/// (so ties at the threshold are all included). Because the rule needs the full range to compute the threshold,
+/// evaluation is performed by <see cref="ConditionalFormatStore.Calculate(Cell)"/>; calling
+/// <see cref="GetFormat(Cell)"/> directly returns <see langword="null"/>.
 /// </remarks>
 public class Top10Rule : ConditionalFormatBase
 {
@@ -172,24 +172,24 @@ public class Top10Rule : ConditionalFormatBase
         }
 
         var sheet = cell.Worksheet;
-        var distinct = new HashSet<double>();
+        var values = new List<double>();
         foreach (var address in range.GetCells())
         {
             var other = sheet.Cells[address];
             if (NumericCoercion.TryCoerceToDouble(other.Value, out var v))
             {
-                distinct.Add(v);
+                values.Add(v);
             }
         }
 
-        if (distinct.Count == 0)
+        if (values.Count == 0)
         {
             return null;
         }
 
         var ordered = Bottom
-            ? distinct.OrderBy(v => v).ToList()
-            : distinct.OrderByDescending(v => v).ToList();
+            ? values.OrderBy(v => v).ToList()
+            : values.OrderByDescending(v => v).ToList();
 
         var index = Math.Min(Count, ordered.Count) - 1;
         var threshold = ordered[index];
