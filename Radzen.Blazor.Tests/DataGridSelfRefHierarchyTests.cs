@@ -175,6 +175,120 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new[] { "Root 1", "Root 0", "Child 0.2", "Child 0.1", "Child 0.0" }, view.Select(e => e.Name));
         }
 
+        static IEnumerable<Employee> ServerFilter(List<Employee> data, string filter)
+        {
+            var roots = data.Where(e => e.ParentId == null);
+            if (string.IsNullOrEmpty(filter))
+            {
+                return roots.ToList();
+            }
+
+            return roots.Where(r => r.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                || data.Any(c => c.ParentId == r.Id && c.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))).ToList();
+        }
+
+        static IRenderedComponent<RadzenDataGrid<Employee>> CreateLoadDataGrid(TestContext ctx, List<Employee> data, Func<IEnumerable<Employee>> getData, Action<LoadDataArgs> onLoadData)
+        {
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            return ctx.RenderComponent<RadzenDataGrid<Employee>>(pb =>
+            {
+                pb.Add(p => p.Data, getData());
+                pb.Add(p => p.AllowFiltering, true);
+                pb.Add(p => p.LoadData, EventCallback.Factory.Create<LoadDataArgs>(data, onLoadData));
+                pb.Add(p => p.LoadChildData, EventCallback.Factory.Create<DataGridLoadChildDataEventArgs<Employee>>(data,
+                    args => args.Data = data.Where(e => e.ParentId == args.Item.Id).ToList()));
+                pb.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<Employee>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.CloseComponent();
+                });
+            });
+        }
+
+        [Fact]
+        public async Task DataGrid_SelfRefHierarchy_LoadData_NoExpandedRows_ServerResultShownAsIs()
+        {
+            var data = CreateData(3, 2);
+            IEnumerable<Employee> gridData = ServerFilter(data, null);
+            using var ctx = new TestContext();
+
+            var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
+            {
+                gridData = ServerFilter(data, args.Filters?.FirstOrDefault()?.FilterValue as string);
+            });
+
+            var grid = component.Instance;
+            var column = grid.ColumnsCollection.First();
+
+            await component.InvokeAsync(() => column.SetFilterValue("Child 1.0"));
+            await component.InvokeAsync(() => grid.Reload());
+            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+
+            List<Employee> view = null;
+            await component.InvokeAsync(() => view = grid.View.ToList());
+
+            Assert.Equal(new[] { "Root 1" }, view.Select(e => e.Name));
+        }
+
+        [Fact]
+        public async Task DataGrid_SelfRefHierarchy_LoadData_ExpandedRow_ServerResultShownAsIs()
+        {
+            var data = CreateData(3, 2);
+            IEnumerable<Employee> gridData = ServerFilter(data, null);
+            using var ctx = new TestContext();
+
+            var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
+            {
+                gridData = ServerFilter(data, args.Filters?.FirstOrDefault()?.FilterValue as string);
+            });
+
+            var grid = component.Instance;
+            var roots = data.Where(e => e.ParentId == null).ToList();
+
+            await component.InvokeAsync(() => grid.ExpandRow(roots[0]));
+
+            var column = grid.ColumnsCollection.First();
+            await component.InvokeAsync(() => column.SetFilterValue("Child 1.0"));
+            await component.InvokeAsync(() => grid.Reload());
+            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+
+            List<Employee> view = null;
+            await component.InvokeAsync(() => view = grid.View.ToList());
+
+            Assert.Equal(new[] { "Root 1" }, view.Select(e => e.Name));
+        }
+
+        [Fact]
+        public async Task DataGrid_SelfRefHierarchy_LoadData_ExpandedRow_CaseInsensitiveServerFilter_ShownWithChildren()
+        {
+            var data = CreateData(3, 2);
+            IEnumerable<Employee> gridData = ServerFilter(data, null);
+            using var ctx = new TestContext();
+
+            var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
+            {
+                gridData = ServerFilter(data, args.Filters?.FirstOrDefault()?.FilterValue as string);
+            });
+
+            var grid = component.Instance;
+            var roots = data.Where(e => e.ParentId == null).ToList();
+
+            await component.InvokeAsync(() => grid.ExpandRow(roots[2]));
+
+            var column = grid.ColumnsCollection.First();
+            await component.InvokeAsync(() => column.SetFilterValue("root 2"));
+            await component.InvokeAsync(() => grid.Reload());
+            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+
+            List<Employee> view = null;
+            await component.InvokeAsync(() => view = grid.View.ToList());
+
+            Assert.Equal(new[] { "Root 2", "Child 2.0", "Child 2.1" }, view.Select(e => e.Name));
+        }
+
         [Fact]
         public async Task DataGrid_SelfRefHierarchy_ViewCount_ScalesLinearly()
         {

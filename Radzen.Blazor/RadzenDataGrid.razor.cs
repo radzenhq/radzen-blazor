@@ -2156,6 +2156,11 @@ namespace Radzen.Blazor
 
             var viewListQueryable = viewList.AsQueryable();
 
+            if (LoadData.HasDelegate)
+            {
+                return viewListQueryable;
+            }
+
             var filteredItems = new HashSet<TItem>(viewListQueryable.Where<TItem>(allColumns));
 
             var parentsWithMatchingChildren = new HashSet<TItem>(childData
