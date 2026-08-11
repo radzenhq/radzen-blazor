@@ -2521,6 +2521,10 @@ namespace Radzen.Blazor
                 selectedItems.Clear();
                 expandedItems.Clear();
                 collapsedGroupItems.Clear();
+                childData.Clear();
+                editedItems.Clear();
+                editContexts.Clear();
+                allRowsExpanded = false;
             }
 
             if (resetColumnState)
