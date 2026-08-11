@@ -299,52 +299,63 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SplitButton_RecreatesClickHandler_WhenVisibleToggled()
+        public void SplitButton_OpensPopup_OnToggleClick()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
 
-            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+            component.Find("button.rz-splitbutton-menubutton").Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Contains(@"aria-expanded=""true""", component.Markup);
+        }
+
+        [Fact]
+        public void SplitButton_ClosesPopup_OnSecondToggleClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderWithItems(ctx);
+
+            component.Find("button.rz-splitbutton-menubutton").Click();
+            component.Find("button.rz-splitbutton-menubutton").Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closePopup"));
+            Assert.Contains(@"aria-expanded=""false""", component.Markup);
+        }
+
+        [Fact]
+        public void SplitButton_DestroysPopup_WhenVisibleToggled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderWithItems(ctx);
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
 
             Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.destroyPopup"));
-
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
-
-            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
         }
 
         [Fact]
-        public void SplitButton_CreatesClickHandler_WhenInitiallyHiddenBecomesVisible()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters => parameters
-                .Add(p => p.Text, "Save")
-                .Add(p => p.Visible, false));
-
-            Assert.Equal(0, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
-
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
-
-            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
-        }
-
-        [Fact]
-        public void SplitButton_DoesNotRecreateClickHandler_OnUnrelatedRender()
+        public void SplitButton_UpdatesState_WhenPopupClosedFromClient()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, "Updated"));
+            component.Find("button.rz-splitbutton-menubutton").Click();
 
-            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+            Assert.Contains(@"aria-expanded=""true""", component.Markup);
+
+            component.InvokeAsync(() => component.Instance.OnPopupClose());
+
+            Assert.Contains(@"aria-expanded=""false""", component.Markup);
         }
 
         [Fact]

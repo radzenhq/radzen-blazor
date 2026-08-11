@@ -1927,8 +1927,6 @@ namespace Radzen.Blazor
         }
 
         bool firstRender;
-        IJSObjectReference? _jsRef;
-        int _jsRefVersion;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -1936,34 +1934,6 @@ namespace Radzen.Blazor
             await base.OnAfterRenderAsync(firstRender);
 
             this.firstRender = firstRender;
-
-            if (Visible && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
-            {
-                var version = ++_jsRefVersion;
-                var jsRef = _jsRef;
-                _jsRef = null;
-
-                if (jsRef != null)
-                {
-                    await jsRef.InvokeVoidAsync("dispose");
-                    await jsRef.DisposeAsync();
-                }
-
-                if (version == _jsRefVersion)
-                {
-                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnPopupClose));
-
-                    if (version == _jsRefVersion)
-                    {
-                        _jsRef = created;
-                    }
-                    else if (created != null)
-                    {
-                        await created.InvokeVoidAsync("dispose");
-                        await created.DisposeAsync();
-                    }
-                }
-            }
 
             if (shouldFocusDay && JSRuntime != null)
             {
@@ -1993,19 +1963,9 @@ namespace Radzen.Blazor
 
             Form?.RemoveComponent(this);
 
-            _jsRefVersion++;
-            var jsRef = _jsRef;
-            _jsRef = null;
-
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
-
-                if (jsRef != null)
-                {
-                    jsRef.InvokeVoid("dispose");
-                    jsRef.DisposeFireAndForget();
-                }
             }
 
             GC.SuppressFinalize(this);
@@ -2039,13 +1999,33 @@ namespace Radzen.Blazor
 
         async Task OnToggle()
         {
-            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            if (Disabled || ReadOnly || Inline)
+            {
+                return;
+            }
+
+            if (PopupRenderMode == PopupRenderMode.Initial)
+            {
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, Reference, nameof(OnPopupClose), true, false);
+                }
+            }
+            else
             {
                 if (popup != null)
                 {
                     await popup.ToggleAsync(Element);
                 }
                 await FocusAsync();
+            }
+        }
+
+        async Task OnInputClick()
+        {
+            if (!ShowButton && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, Reference, nameof(OnPopupClose), true, false);
             }
         }
         DateTime FocusedDate { get; set; } = DateTime.Now;

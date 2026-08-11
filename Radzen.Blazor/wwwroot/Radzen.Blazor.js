@@ -1989,44 +1989,6 @@ window.Radzen = {
         clearTimeout(Radzen[id + 'duration']);
     }
   },
-  createDatePicker(el, popupId, instance, callback) {
-      if(!el) return { dispose: function() {} };
-      var handler = function (e, condition) {
-          if (condition) {
-              Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, instance, callback, true, false);
-          }
-      };
-
-      var input = el.querySelector('.rz-inputtext');
-      var button = el.querySelector('.rz-datepicker-trigger');
-
-      var buttonHandler = function (e) {
-          handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
-      };
-
-      var inputHandler = function (e) {
-          handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
-      };
-
-      if (button) {
-          button.onclick = buttonHandler;
-      }
-
-      if (input) {
-          input.onclick = inputHandler;
-      }
-
-      return {
-          dispose: function () {
-              if (button && button.onclick === buttonHandler) {
-                  button.onclick = null;
-              }
-              if (input && input.onclick === inputHandler) {
-                  input.onclick = null;
-              }
-          }
-      };
-  },
   findPopup: function (id) {
     var popups = [];
     for (var i = 0; i < document.body.children.length; i++) {
@@ -6114,28 +6076,23 @@ Radzen.createProfileMenu = function(el) {
   toggle.addEventListener('click', onClick);
   return { dispose: function() { toggle.removeEventListener('click', onClick); }};
 };
-Radzen.createSplitButton = function(el, popupId) {
-  if (!el) return { dispose: function() {} };
-  var btn = el.querySelector('.rz-splitbutton-menubutton');
-  if (!btn) return { dispose: function() {} };
-  function onClick() { if (popupId) Radzen.togglePopup(btn.parentNode, popupId); }
-  btn.addEventListener('click', onClick);
-  return { dispose: function() { btn.removeEventListener('click', onClick); }};
+Radzen.menuClick = function (e) {
+  var item = e.target.closest('.rz-navigation-item-wrapper');
+  if (!item) return;
+  var menu = item.closest('[data-click-to-open]');
+  if (!menu) return;
+  var clickToOpen = menu.getAttribute('data-click-to-open') === 'true';
+  var navItem = item.closest('.rz-navigation-item');
+  var hasChildren = navItem && navItem.querySelector('.rz-navigation-menu');
+  if (clickToOpen || hasChildren) {
+    Radzen.toggleMenuItem(item);
+  } else {
+    Radzen.toggleMenuItem(item, e, false);
+  }
 };
+document.addEventListener('click', Radzen.menuClick);
 Radzen.createMenu = function(el, clickToOpen) {
   if (!el) return { dispose: function() {} };
-  function onClick(e) {
-    var item = e.target.closest('.rz-navigation-item-wrapper');
-    if (!item || !el.contains(item)) return;
-    var navItem = item.closest('.rz-navigation-item');
-    var hasChildren = navItem && navItem.querySelector('.rz-navigation-menu');
-    if (clickToOpen || hasChildren) {
-      Radzen.toggleMenuItem(item);
-    } else {
-      Radzen.toggleMenuItem(item, e, false);
-    }
-  }
-  el.addEventListener('click', onClick);
   var hoverItems = [];
   if (!clickToOpen) {
     el.querySelectorAll('.rz-navigation-item').forEach(function(navItem) {
@@ -6149,7 +6106,6 @@ Radzen.createMenu = function(el, clickToOpen) {
     });
   }
   return { dispose: function() {
-    el.removeEventListener('click', onClick);
     hoverItems.forEach(function(h) {
       h.el.removeEventListener('mouseenter', h.onEnter);
       h.el.removeEventListener('mouseleave', h.onLeave);
@@ -6967,3 +6923,22 @@ Radzen.itemListKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.itemListKeydown);
+Radzen.popupTriggerKeydown = function (e) {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  var el = e.target;
+  if (!el || !el.classList) return;
+  var key = e.code ? e.code : e.key;
+  var vertical = key === 'ArrowUp' || key === 'ArrowDown';
+  if (el.classList.contains('rz-splitbutton-menubutton')) {
+    if (vertical) e.preventDefault();
+  } else if (el.classList.contains('rz-menu-list') || el.classList.contains('rz-navigation-menu')) {
+    if (vertical || key === 'Home' || key === 'End' || key === 'Space') e.preventDefault();
+  } else if (el.classList.contains('rz-navigation-item-wrapper') && el.getAttribute('aria-haspopup')) {
+    if (vertical || key === 'Home' || key === 'End' || key === 'Space') e.preventDefault();
+  } else if (el.classList.contains('rz-dropdown') || el.classList.contains('rz-listbox')) {
+    if (vertical || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Space') e.preventDefault();
+  } else if (el.classList.contains('rz-colorpicker')) {
+    if (key === 'Space') e.preventDefault();
+  }
+};
+document.addEventListener('keydown', Radzen.popupTriggerKeydown);
