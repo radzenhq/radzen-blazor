@@ -6068,14 +6068,6 @@ Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) 
     input.removeEventListener('paste', onPaste);
   }};
 };
-Radzen.createProfileMenu = function(el) {
-  if (!el) return { dispose: function() {} };
-  var toggle = el.querySelector('.rz-navigation-item-wrapper');
-  if (!toggle) return { dispose: function() {} };
-  function onClick() { Radzen.toggleMenuItem(toggle); }
-  toggle.addEventListener('click', onClick);
-  return { dispose: function() { toggle.removeEventListener('click', onClick); }};
-};
 Radzen.menuClick = function (e) {
   var item = e.target.closest('.rz-navigation-item-wrapper');
   if (!item) return;

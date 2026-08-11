@@ -4,10 +4,11 @@
 {
     <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
         role="presentation" tabindex="-1">
-        <li class="rz-navigation-item" role="presentation">
-            <div @ref="@toggleElement" class="rz-navigation-item-wrapper" role="button" tabindex="0" aria-haspopup="menu"
+        <li class="@(Collapsed ? "rz-navigation-item" : "rz-navigation-item rz-navigation-item-active")" role="presentation">
+            <div @ref="@toggleElement" class="@(Collapsed ? "rz-navigation-item-wrapper" : "rz-navigation-item-wrapper rz-navigation-item-wrapper-active")" role="button" tabindex="0" aria-haspopup="menu"
                  aria-label="@ToggleAriaLabel"
                  aria-expanded="@((!Collapsed).ToString().ToLowerInvariant())" aria-controls="@($"{GetId()}-menu")"
+                 @onclick="@Toggle"
                  @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
                 <div class="rz-navigation-item-link">
                     <div class="item-text" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">

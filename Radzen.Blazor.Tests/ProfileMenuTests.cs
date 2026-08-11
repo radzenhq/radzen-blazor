@@ -20,6 +20,36 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void ProfileMenu_Opens_OnToggleClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>();
+
+            component.Find(".rz-navigation-item-wrapper").Click();
+
+            Assert.Contains(@"aria-expanded=""true""", component.Markup);
+            Assert.Contains("rz-navigation-item-active", component.Markup);
+            Assert.Contains("rz-navigation-item-wrapper-active", component.Markup);
+        }
+
+        [Fact]
+        public void ProfileMenu_Closes_OnSecondToggleClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>();
+
+            component.Find(".rz-navigation-item-wrapper").Click();
+            component.Find(".rz-navigation-item-wrapper").Click();
+
+            Assert.Contains(@"aria-expanded=""false""", component.Markup);
+            Assert.DoesNotContain("rz-navigation-item-active", component.Markup);
+        }
+
+        [Fact]
         public void ProfileMenu_Renders_RoleMenu()
         {
             using var ctx = new TestContext();

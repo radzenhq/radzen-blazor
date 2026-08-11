@@ -29,56 +29,10 @@ namespace Radzen.Blazor
             return "rz-menu rz-profile-menu";
         }
 
-        IJSObjectReference? _jsRef;
-        int _jsRefVersion;
-        bool _visibleChanged;
-
-        /// <inheritdoc />
-        public override async Task SetParametersAsync(ParameterView parameters)
-        {
-            if (parameters.DidParameterChange(nameof(Visible), Visible))
-            {
-                _visibleChanged = true;
-            }
-
-            await base.SetParametersAsync(parameters);
-        }
-
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-
-            if ((firstRender || _visibleChanged) && JSRuntime != null)
-            {
-                _visibleChanged = false;
-
-                var version = ++_jsRefVersion;
-                var jsRef = _jsRef;
-                _jsRef = null;
-
-                if (jsRef != null)
-                {
-                    await jsRef.InvokeVoidAsync("dispose");
-                    await jsRef.DisposeAsync();
-                }
-
-                if (version == _jsRefVersion && Visible)
-                {
-                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                        "Radzen.createProfileMenu", Element);
-
-                    if (version == _jsRefVersion)
-                    {
-                        _jsRef = created;
-                    }
-                    else if (created != null)
-                    {
-                        await created.InvokeVoidAsync("dispose");
-                        await created.DisposeAsync();
-                    }
-                }
-            }
 
             if (shouldFocusMenu)
             {
@@ -98,18 +52,6 @@ namespace Radzen.Blazor
                 {
                 }
             }
-        }
-
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            base.Dispose();
-            _jsRefVersion++;
-            var jsRef = _jsRef;
-            _jsRef = null;
-            jsRef?.InvokeVoidAsync("dispose");
-            jsRef?.DisposeAsync();
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>

@@ -34,12 +34,6 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ProfileMenu_RecreatesJsHandler_WhenVisibleToggled()
-        {
-            AssertRecreatedOnVisibleToggle<RadzenProfileMenu>("Radzen.createProfileMenu");
-        }
-
-        [Fact]
         public void Menu_RecreatesJsHandler_WhenVisibleToggled()
         {
             AssertRecreatedOnVisibleToggle<RadzenMenu>("Radzen.createMenu");
@@ -97,21 +91,6 @@ namespace Radzen.Blazor.Tests
         public void GoogleMap_RecreatesJsHandler_WhenVisibleToggled()
         {
             AssertRecreatedOnVisibleToggle<RadzenGoogleMap>("Radzen.createMap");
-        }
-
-        [Fact]
-        public void ProfileMenu_CreatesJsHandler_WhenInitiallyHiddenBecomesVisible()
-        {
-            using var ctx = CreateContext();
-
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters => parameters
-                .Add(p => p.Visible, false));
-
-            Assert.Equal(0, Count(ctx, "Radzen.createProfileMenu"));
-
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
-
-            Assert.Equal(1, Count(ctx, "Radzen.createProfileMenu"));
         }
 
         [Fact]
