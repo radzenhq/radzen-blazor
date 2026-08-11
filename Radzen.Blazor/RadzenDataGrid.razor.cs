@@ -2058,14 +2058,60 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenGrid.OnColumnResized")]
         public async Task OnColumnResized(int columnIndex, double value)
         {
-            var column = columns.Where(c => c.GetVisible()).ToList()[columnIndex];
-            column.SetWidth($"{Math.Round(value)}px");
+            await OnColumnsResized(columnIndex, value, null);
+        }
+
+        private static string ToPixels(double width) => $"{width.ToString("0.####", CultureInfo.InvariantCulture)}px";
+
+        /// <summary>
+        /// Called when a column is resized and the widths of all visible columns are known.
+        /// </summary>
+        /// <param name="columnIndex">Index of the resized column.</param>
+        /// <param name="value">The resized column width.</param>
+        /// <param name="values">The widths of all visible columns.</param>
+        [JSInvokable("RadzenGrid.OnColumnsResized")]
+        public async Task OnColumnsResized(int columnIndex, double value, double[]? values)
+        {
+            var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
+            var column = visibleColumns.ElementAtOrDefault(columnIndex);
+
+            if (column == null)
+            {
+                return;
+            }
+
+            var widths = new Dictionary<RadzenDataGridColumn<TItem>, double>();
+
+            if (values?.Length == visibleColumns.Count)
+            {
+                for (var index = 0; index < visibleColumns.Count; index++)
+                {
+                    var width = values[index];
+
+                    if (width < 1)
+                    {
+                        visibleColumns[index].SetWidth(null);
+                        continue;
+                    }
+
+                    visibleColumns[index].SetWidth(ToPixels(width));
+                    widths.Add(visibleColumns[index], width);
+                }
+            }
+            else
+            {
+                column.SetWidth(ToPixels(value));
+                widths.Add(column, value);
+            }
+
             await ColumnResized.InvokeAsync(new DataGridColumnResizedEventArgs<TItem>
             {
                 Column = column,
                 Width = value,
+                Widths = widths,
             });
             SaveSettings();
+            StateHasChanged();
         }
 
         internal string GetOrderBy()

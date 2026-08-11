@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -46,6 +47,151 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-grid-table", component.Markup);
             Assert.Contains(@$"rz-grid-table-fixed", component.Markup);
             Assert.Contains(@$"rz-grid-table-striped", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_RendersWidthOnColOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Width", "80px");
+                    builder.CloseComponent();
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Name");
+                    builder.AddAttribute(5, "MinWidth", "150px");
+                    builder.CloseComponent();
+                });
+            });
+
+            var columns = component.FindAll("colgroup col");
+
+            Assert.Contains("width:80px", columns[0].GetAttribute("style"));
+
+            Assert.DoesNotMatch(@"(?:^|;)\s*width:", columns[1].GetAttribute("style"));
+            Assert.Contains("min-width:150px", columns[1].GetAttribute("style"));
+
+            foreach (var cell in component.FindAll("th, td"))
+            {
+                Assert.DoesNotMatch(@"(?:^|;)\s*width:", cell.GetAttribute("style") ?? string.Empty);
+            }
+
+            Assert.Contains("min-width:150px", component.FindAll("thead th")[1].GetAttribute("style"));
+        }
+
+        [Fact]
+        public void DataGrid_CompositeColumns_RenderWidthOnCells()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Title", "Group");
+                    builder.AddAttribute(2, "Columns", (RenderFragment)(child =>
+                    {
+                        child.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                        child.AddAttribute(1, "Property", "Id");
+                        child.AddAttribute(2, "Width", "80px");
+                        child.CloseComponent();
+                        child.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                        child.AddAttribute(4, "Property", "Name");
+                        child.CloseComponent();
+                    }));
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Empty(component.FindAll("colgroup col"));
+            Assert.Contains(component.FindAll("th"), cell => (cell.GetAttribute("style") ?? string.Empty).Contains("width:80px"));
+        }
+
+        private static IRenderedComponent<RadzenDataGrid<dynamic>> RenderTwoColumnGrid(TestContext ctx,
+            out RadzenDataGridColumn<dynamic> first, out RadzenDataGridColumn<dynamic> second,
+            Action<DataGridColumnResizedEventArgs<dynamic>>? columnResized = null)
+        {
+            RadzenDataGridColumn<dynamic> idColumn = null!;
+            RadzenDataGridColumn<dynamic> nameColumn = null!;
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
+
+                if (columnResized != null)
+                {
+                    parameterBuilder.Add(p => p.ColumnResized, columnResized);
+                }
+
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddComponentReferenceCapture(2, value => idColumn = (RadzenDataGridColumn<dynamic>)value);
+                    builder.CloseComponent();
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Name");
+                    builder.AddComponentReferenceCapture(5, value => nameColumn = (RadzenDataGridColumn<dynamic>)value);
+                    builder.CloseComponent();
+                });
+            });
+
+            first = idColumn;
+            second = nameColumn;
+
+            return component;
+        }
+
+        [Fact]
+        public async Task DataGrid_Resize_PreservesAllVisibleColumnWidths()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            DataGridColumnResizedEventArgs<dynamic> args = null!;
+
+            var component = RenderTwoColumnGrid(ctx, out var idColumn, out var nameColumn, e => args = e);
+
+            await component.InvokeAsync(() => component.Instance.OnColumnsResized(1, 240, [90, 240]));
+
+            Assert.Equal("90px", idColumn.GetWidth());
+            Assert.Equal("240px", nameColumn.GetWidth());
+
+            Assert.Equal(nameColumn, args.Column);
+            Assert.Equal(90, args.Widths[idColumn]);
+            Assert.Equal(240, args.Widths[nameColumn]);
+        }
+
+        [Fact]
+        public async Task DataGrid_Resize_LeavesColumnWithoutWidth()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = RenderTwoColumnGrid(ctx, out var idColumn, out var nameColumn);
+
+            await component.InvokeAsync(() => component.Instance.OnColumnsResized(1, 150, [100, 150]));
+
+            Assert.Equal("150px", nameColumn.GetWidth());
+
+            await component.InvokeAsync(() => component.Instance.OnColumnsResized(0, 400, [400, 0]));
+
+            Assert.Equal("400px", idColumn.GetWidth());
+
+            Assert.True(string.IsNullOrEmpty(nameColumn.GetWidth()));
         }
 
         [Fact]

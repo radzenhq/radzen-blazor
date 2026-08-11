@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Radzen.Blazor;
 
 namespace Radzen;
@@ -17,5 +18,13 @@ public class DataGridColumnResizedEventArgs<T> where T : notnull
     /// Gets the new width of the resized column.
     /// </summary>
     public double Width { get; internal set; }
+
+    /// <summary>
+    /// Gets the new width in pixels of every column the resize pinned a width on. Resizing one
+    /// column fixes the width of its neighbours as well, so handlers which persist column widths
+    /// themselves need all of them. Columns left without a width of their own are absent here.
+    /// </summary>
+    public IReadOnlyDictionary<RadzenDataGridColumn<T>, double> Widths { get; internal set; }
+        = new Dictionary<RadzenDataGridColumn<T>, double>();
 }
 

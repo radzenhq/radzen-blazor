@@ -823,7 +823,9 @@ namespace Radzen.Blazor
 
             var width = GetWidthOrGridSetting()?.Trim();
 
-            if (!string.IsNullOrEmpty(width))
+            var hasColGroup = Grid.allColumns.All(c => c.Parent == null);
+
+            if (!string.IsNullOrEmpty(width) && (isForCol || !hasColGroup))
             {
                 style.Add($"width:{width}");
             }
