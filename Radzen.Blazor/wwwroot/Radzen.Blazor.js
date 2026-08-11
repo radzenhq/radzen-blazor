@@ -6923,6 +6923,40 @@ Radzen.itemListKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.itemListKeydown);
+Radzen.chatKeydown = function (e) {
+  var el = e.target;
+  if (!el || !el.classList || !el.classList.contains('rz-chat-textarea')) return;
+  var container = el.closest('.rz-chat-input');
+  var popupOpen = container && container.querySelector('.rz-chat-mention-popup');
+  if (e.key === 'Enter') {
+    if (!e.shiftKey || popupOpen) {
+      e.preventDefault();
+    }
+  } else if (popupOpen && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+    e.preventDefault();
+  } else if ((e.key === 'Backspace' || e.key === 'Delete') && el.dataset.mentionSegments) {
+    var start = el.selectionStart;
+    var end = el.selectionEnd;
+    var segments = el.dataset.mentionSegments.split(',');
+    for (var i = 0; i < segments.length; i++) {
+      var parts = segments[i].split(':');
+      var segmentStart = parseInt(parts[0], 10);
+      var segmentEnd = segmentStart + parseInt(parts[1], 10);
+      var hit;
+      if (start !== end) {
+        hit = segmentStart < end && segmentEnd > start;
+      } else {
+        var target = e.key === 'Backspace' ? start - 1 : start;
+        hit = target >= 0 && segmentStart <= target && segmentEnd > target;
+      }
+      if (hit) {
+        e.preventDefault();
+        break;
+      }
+    }
+  }
+};
+document.addEventListener('keydown', Radzen.chatKeydown);
 Radzen.popupTriggerKeydown = function (e) {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   var el = e.target;

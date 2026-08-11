@@ -120,7 +120,6 @@ namespace Radzen.Blazor
         private List<ChatMessage> internalMessages { get; set; } = new();
         private string CurrentInput { get; set; } = string.Empty;
         private bool IsLoading { get; set; }
-        private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
         private ElementReference mentionPopupElement;
@@ -143,6 +142,8 @@ namespace Radzen.Blazor
         private bool appendMentionUsersOnNextUpdate;
         private bool mentionSearchRequested;
         private bool ignoreIncomingMentionUsers;
+        private int dismissedMentionPosition = -1;
+        private string dismissedMentionText = string.Empty;
         private readonly List<MentionInputSegment> mentionInputSegments = new();
 
         private sealed class MentionInputSegment
@@ -154,6 +155,10 @@ namespace Radzen.Blazor
 
             public int End => Start + Length;
         }
+
+        private string? MentionSegmentsAttribute => mentionInputSegments.Count > 0
+            ? string.Join(",", mentionInputSegments.Select(segment => $"{segment.Start}:{segment.Length}"))
+            : null;
 
         /// <summary>
         /// Gets or sets the message template.
@@ -736,7 +741,6 @@ namespace Radzen.Blazor
                 if (e.Key == "ArrowDown")
                 {
                     selectedMentionIndex = Math.Min(selectedMentionIndex + 1, mentionSearchResults.Count - 1);
-                    preventDefault = true;
                     if (selectedMentionIndex == mentionSearchResults.Count - 1)
                     {
                         await LoadMoreMentionUsersIfNeeded();
@@ -747,7 +751,6 @@ namespace Radzen.Blazor
                 else if (e.Key == "ArrowUp")
                 {
                     selectedMentionIndex = Math.Max(selectedMentionIndex - 1, 0);
-                    preventDefault = true;
                     await InvokeAsync(StateHasChanged);
                     return;
                 }
@@ -756,14 +759,14 @@ namespace Radzen.Blazor
                     if (selectedMentionIndex >= 0 && selectedMentionIndex < mentionSearchResults.Count)
                     {
                         await InsertMention(mentionSearchResults[selectedMentionIndex]);
-                        preventDefault = true;
                         return;
                     }
                 }
                 else if (e.Key == "Escape")
                 {
+                    dismissedMentionPosition = mentionStartPosition;
+                    dismissedMentionText = $"{MentionCharacter}{mentionSearchText}";
                     await CloseMentionPopup();
-                    preventDefault = true;
                     return;
                 }
             }
@@ -772,7 +775,6 @@ namespace Radzen.Blazor
             {
                 if (await HandleMentionDeletion(e.Key))
                 {
-                    preventDefault = true;
                     return;
                 }
             }
@@ -781,11 +783,8 @@ namespace Radzen.Blazor
             if (e.Key == "Enter" && !e.ShiftKey && JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", inputElement, "");
-                preventDefault = true;
                 await OnSendMessage();
             }
-
-            preventDefault = false;
         }
 
         private async Task OnSendMessage()
@@ -839,6 +838,13 @@ namespace Radzen.Blazor
                 // Check if this is a continuous mention (no spaces in search text)
                 if (!searchText.Contains(' ', StringComparison.Ordinal))
                 {
+                    if (dismissedMentionPosition == mentionPos && trimmedInput.Substring(mentionPos).StartsWith(dismissedMentionText, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+
+                    dismissedMentionPosition = -1;
+                    dismissedMentionText = string.Empty;
                     mentionSearchText = searchText;
                     mentionStartPosition = mentionPos;
                     await PerformMentionSearch(searchText);
@@ -846,12 +852,6 @@ namespace Radzen.Blazor
                 }
             }
 
-            // While a mention is active keep filtering with the text after the original mention
-            // character even when it contains spaces, so multi-word names like "John Doe" can
-            // be matched. The mention stays anchored at mentionStartPosition, which is set
-            // synchronously when the mention is first detected, so this works even when the
-            // initial search has not resolved yet. The mention state is reset when such a
-            // search yields no results (see ApplyMentionUsersFromParameters).
             if (mentionStartPosition >= 0 &&
                 mentionStartPosition < trimmedInput.Length &&
                 trimmedInput[mentionStartPosition] == char_code &&
@@ -994,8 +994,6 @@ namespace Radzen.Blazor
                 return;
             }
 
-            // Once the popup has been closed, incoming users from a stale in-flight search must
-            // not reopen it; only a new search (or an already open popup) may apply results.
             if (!mentionSearchRequested && !isMentionPopupOpen && !appendMentionUsersOnNextUpdate && (ignoreIncomingMentionUsers || !(MentionUsers?.Any() == true)))
             {
                 return;
@@ -1017,8 +1015,13 @@ namespace Radzen.Blazor
             }
             else
             {
+                var sameUsers = incomingUsers.Count == mentionSearchResults.Count &&
+                    incomingUsers.Select(user => user.UserId).SequenceEqual(mentionSearchResults.Select(user => user.UserId), StringComparer.Ordinal);
                 mentionSearchResults = incomingUsers;
-                selectedMentionIndex = mentionSearchResults.Count > 0 ? 0 : -1;
+                if (!sameUsers || selectedMentionIndex < 0)
+                {
+                    selectedMentionIndex = mentionSearchResults.Count > 0 ? 0 : -1;
+                }
             }
 
             hasMoreMentionUsers = MentionUsersCount.HasValue && MentionUsersCount.Value > mentionSearchResults.Count;
@@ -1032,9 +1035,6 @@ namespace Radzen.Blazor
                 selectedMentionIndex = mentionSearchResults.Count - 1;
             }
 
-            // A multi-word search without results means the user is typing regular text after
-            // the mention character, so reset the mention state to stop searching until a new
-            // mention is started.
             if (!isMentionPopupOpen && mentionSearchResults.Count == 0 && mentionSearchText.Contains(' ', StringComparison.Ordinal))
             {
                 mentionSearchText = string.Empty;
