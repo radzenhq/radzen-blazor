@@ -162,7 +162,7 @@
                                     else
                                     {
                                         <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@isLoading" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                                        <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
+                                        <RadzenListBox @ref=filterListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
                                         TValue="IEnumerable" Value=@(hasPendingCheckBoxFilter ? pendingCheckBoxFilterValue as IEnumerable : Column.GetFilterValue() as IEnumerable) Change="@ListBoxChange"
                                         Data=@(Column.FilterLookupData ?? filterValues)
                                         TextProperty="@(Column.FilterLookupData != null ? Column.FilterLookupTextProperty : null)"
@@ -223,6 +223,7 @@ else
 }
 @code {
     RadzenPopup? popup;
+    RadzenListBox<IEnumerable>? filterListBox;
     ElementReference filterButton;
 
     int filterValuesCount;
@@ -413,6 +414,11 @@ else
             hasPendingCheckBoxFilter = false;
             pendingCheckBoxFilterValue = null;
             await Grid.ApplyFilter(Column, false);
+
+            if (Column.FilterLookupData == null)
+            {
+                await LoadFilterValues(new LoadDataArgs() { Filter = filterListBox?.SearchText });
+            }
         }
     }
 

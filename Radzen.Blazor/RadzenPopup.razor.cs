@@ -132,6 +132,8 @@ namespace Radzen.Blazor
             open = false;
 
             await Close.InvokeAsync(null);
+
+            await InvokeAsync(StateHasChanged);
         }
 
         /// <summary>
