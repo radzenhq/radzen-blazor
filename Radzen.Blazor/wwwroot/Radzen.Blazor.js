@@ -261,6 +261,9 @@ window.Radzen = {
     // Forward vertical mouse-wheel events to the timeline so the user
     // can still scroll vertically while hovering over the grid.
     var onGridWheel = function (e) {
+      if (e.shiftKey || e.deltaX) {
+        return;
+      }
       if (e.deltaY) {
         timeline.scrollTop += e.deltaY;
         e.preventDefault();
