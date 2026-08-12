@@ -902,6 +902,8 @@ namespace Radzen.Blazor
                 allColumns.Add(column);
             }
 
+            ApplyGroupedColumnVisibility(column);
+
             if (AllowColumnPicking)
             {
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
@@ -960,6 +962,8 @@ namespace Radzen.Blazor
             childColumns.Remove(column);
 
             allColumns.Remove(column);
+
+            groupedColumns.Remove(column);
 
             UpdateColumnsOrder();
 
@@ -2587,6 +2591,7 @@ namespace Radzen.Blazor
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
                 columns = allColumns.Where(c => c.Parent == null).ToList();
+                ApplyGroupedColumnVisibility();
            }
         }
 
@@ -2911,7 +2916,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            bool emptyTextChanged = false, allowColumnPickingChanged = false, valueChanged = false, allGroupsExpandedChanged = false;
+            bool emptyTextChanged = false, allowColumnPickingChanged = false, valueChanged = false, allGroupsExpandedChanged = false,
+                groupsChanged = false, hideGroupedColumnChanged = false;
 
             foreach (var parameter in parameters) {
                 switch (parameter.Name) {
@@ -2927,6 +2933,12 @@ namespace Radzen.Blazor
                     case nameof(Settings):
                         settingsChanged = HasChanged(parameter.Value, Settings); break;
 
+                    case nameof(Groups):
+                        groupsChanged = !ReferenceEquals(parameter.Value, groups); break;
+
+                    case nameof(HideGroupedColumn):
+                        hideGroupedColumnChanged = HasChanged(parameter.Value, HideGroupedColumn); break;
+
                     case nameof(AllGroupsExpanded):
                         allGroupsExpandedChanged = HasChanged(parameter.Value, AllGroupsExpanded);
                         if (allGroupsExpandedChanged)
@@ -2941,6 +2953,16 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (groupsChanged || hideGroupedColumnChanged)
+            {
+                SynchronizeGroupedColumnVisibility();
+
+                if (groupsChanged && !firstRender)
+                {
+                    await InvokeAsync(Reload);
+                }
+            }
 
             if (valueChanged)
             {
@@ -3752,78 +3774,102 @@ namespace Radzen.Blazor
             descriptor.SortOrder = sortOrder;
         }
 
+        void RestoreGroupedColumnVisibility()
+        {
+            foreach (var column in groupedColumns)
+            {
+                column.SetVisible(true);
+            }
+
+            groupedColumns.Clear();
+        }
+
+        void ApplyGroupedColumnVisibility(RadzenDataGridColumn<TItem> column)
+        {
+            if (HideGroupedColumn && groups != null && groups.Any(g => g.Property == column.GetGroupProperty()))
+            {
+                column.SetVisible(false);
+
+                if (!groupedColumns.Contains(column))
+                {
+                    groupedColumns.Add(column);
+                }
+            }
+        }
+
+        void ApplyGroupedColumnVisibility()
+        {
+            foreach (var column in allColumns)
+            {
+                ApplyGroupedColumnVisibility(column);
+            }
+        }
+
+        void SynchronizeGroupedColumnVisibility()
+        {
+            RestoreGroupedColumnVisibility();
+            ApplyGroupedColumnVisibility();
+        }
+
+        void SetGroupsCollection(ObservableCollection<GroupDescriptor>? value)
+        {
+            if (ReferenceEquals(groups, value))
+            {
+                return;
+            }
+
+            if (groups != null)
+            {
+                groups.CollectionChanged -= GroupsCollectionChanged;
+            }
+
+            groups = value;
+
+            if (groups != null)
+            {
+                groups.CollectionChanged += GroupsCollectionChanged;
+            }
+
+            _groupedPagedView = null;
+            SynchronizeGroupedColumnVisibility();
+        }
+
+        bool suppressGroupsCollectionChanged;
+
         void GroupsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
         {
-            if (args.Action == NotifyCollectionChangedAction.Add)
+            _groupedPagedView = null;
+
+            if (suppressGroupsCollectionChanged)
             {
-                RadzenDataGridColumn<TItem>? column;
-                column = columns.FirstOrDefault(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems![0]!).Property);
-
-                if(column == null && args.NewItems != null && args.NewItems.Count > 0 && args.NewItems[0] is GroupDescriptor newGroup)
-                {
-                   column = allColumns.FirstOrDefault(c => c.GetGroupProperty() == newGroup.Property);
-                }
-
-                if (column != null && HideGroupedColumn)
-                {
-                    column.SetVisible(false);
-                    if (!groupedColumns.Contains(column))
-                    {
-                        groupedColumns.Add(column);
-                    }
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                RadzenDataGridColumn<TItem>? column;
-                column = columns.FirstOrDefault(c => c.GetGroupProperty() == ((GroupDescriptor)args.OldItems![0]!).Property);
-
-                if (column == null && args.OldItems != null && args.OldItems.Count > 0 && args.OldItems[0] is GroupDescriptor oldGroup)
-                {
-                    column = allColumns.FirstOrDefault(c => c.GetGroupProperty() == oldGroup.Property);
-                }
-
-                if (column != null && HideGroupedColumn)
-                {
-                    column.SetVisible(true);
-                    groupedColumns.Remove(column);
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Reset)
-            {
-                foreach (var column in groupedColumns)
-                {
-                    if (HideGroupedColumn)
-                    {
-                        column.SetVisible(true);
-                    }
-                }
+                return;
             }
 
+            SynchronizeGroupedColumnVisibility();
             SaveSettings();
+            InvokeAsync(StateHasChanged);
         }
 
         List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
         /// <summary>
         /// Gets or sets the group descriptors.
         /// </summary>
-        /// <value>The groups.</value>
+        /// <value>The groups. Use a stable collection instance when grouping can be changed interactively.</value>
+        [Parameter]
         public ObservableCollection<GroupDescriptor> Groups
         {
             get
             {
                 if (groups == null)
                 {
-                    groups = new ObservableCollection<GroupDescriptor>();
-                    groups.CollectionChanged -= GroupsCollectionChanged;
-                    groups.CollectionChanged += GroupsCollectionChanged;
+                    SetGroupsCollection(new ObservableCollection<GroupDescriptor>());
                 }
 
-                return groups;
+                return groups!;
             }
             set
             {
-                groups = value;
+                SetGroupsCollection(value);
             }
         }
 
@@ -4222,6 +4268,8 @@ namespace Radzen.Blazor
                     c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
                     c.SecondFilterOperator == FilterOperator.IsEmpty || c.SecondFilterOperator == FilterOperator.IsNotEmpty);
 
+                RestoreGroupedColumnVisibility();
+
                 if (settings.Columns != null)
                 {
                     var allColumns = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection));
@@ -4317,18 +4365,23 @@ namespace Radzen.Blazor
 
                 if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
                 {
-                    if (groups != null)
+                    var settingsGroups = settings.Groups.ToList();
+                    suppressGroupsCollectionChanged = true;
+
+                    try
                     {
-                        groups.CollectionChanged -= GroupsCollectionChanged;
+                        Groups.Clear();
+                        settingsGroups.ForEach(Groups.Add);
                     }
-                    Groups.Clear();
-                    settings.Groups.ToList().ForEach(Groups.Add);
+                    finally
+                    {
+                        suppressGroupsCollectionChanged = false;
+                    }
+
                     shouldUpdateState = true;
-                    if (groups != null)
-                    {
-                        groups.CollectionChanged += GroupsCollectionChanged;
-                    }
                 }
+
+                ApplyGroupedColumnVisibility();
 
                 if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
                 {
