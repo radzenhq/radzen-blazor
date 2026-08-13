@@ -1260,6 +1260,67 @@ namespace Radzen.Blazor.Tests
             Assert.True(changeRaised);
             Assert.False(okClickRaised);
         }
+
+        [Fact]
+        public void DatePicker_OkClick_AppliesPendingHourAndMinutesTogether()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            DateTime? lastValueChanged = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.ShowTimeOkButton, true);
+                parameters.Add(p => p.Value, new DateTime(2024, 6, 15, 0, 0, 0));
+                parameters.Add(p => p.ValueChanged, args => { lastValueChanged = args; });
+            });
+
+            component.Find(".rz-hour-picker input").Input("5");
+            component.Find(".rz-minute-picker input").Input("45");
+            component.FindAll(".rz-button-text").First(x => x.TextContent == "Ok").Click();
+
+            Assert.NotNull(lastValueChanged);
+            Assert.Equal(5, lastValueChanged.Value.Hour);
+            Assert.Equal(45, lastValueChanged.Value.Minute);
+        }
+
+        [Fact]
+        public void DatePicker_DaySelection_AfterClear_DoesNotRestoreStaleTime()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            DateTime? lastValueChanged = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.ShowTimeOkButton, true);
+                parameters.Add(p => p.Value, new DateTime(2024, 6, 15, 10, 30, 0));
+                parameters.Add(p => p.ValueChanged, args => { lastValueChanged = args; });
+            });
+
+            component.Find(".rz-hour-picker .rz-numeric-up").Click();
+            component.FindAll(".rz-button-text").First(x => x.TextContent == "Ok").Click();
+
+            Assert.NotNull(lastValueChanged);
+            Assert.Equal(11, lastValueChanged.Value.Hour);
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, null));
+
+            component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "20").ParentElement.Click();
+
+            Assert.NotNull(lastValueChanged);
+            Assert.Equal(20, lastValueChanged.Value.Day);
+            Assert.Equal(0, lastValueChanged.Value.Hour);
+            Assert.Equal(0, lastValueChanged.Value.Minute);
+            Assert.Equal(0, lastValueChanged.Value.Second);
+        }
+
         [Fact]
         public void DatePicker_Renders_ImmediateParameter()
         {

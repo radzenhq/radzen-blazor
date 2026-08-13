@@ -495,17 +495,17 @@ namespace Radzen.Blazor
 
                 if (CurrentDate.Hour != hour && hour != null)
                 {
-                    date = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, hour.Value, CurrentDate.Minute, CurrentDate.Second);
+                    date = new DateTime(date.Year, date.Month, date.Day, hour.Value, date.Minute, date.Second);
                 }
 
                 if (CurrentDate.Minute != minutes && minutes != null)
                 {
-                    date = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, minutes.Value, CurrentDate.Second);
+                    date = new DateTime(date.Year, date.Month, date.Day, date.Hour, minutes.Value, date.Second);
                 }
 
                 if (CurrentDate.Second != seconds && seconds != null)
                 {
-                    date = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, CurrentDate.Minute, seconds.Value);
+                    date = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, seconds.Value);
                 }
 
                 Value = date;
@@ -855,6 +855,9 @@ namespace Radzen.Blazor
                 if (!EqualityComparer<object>.Default.Equals(value, _value))
                 {
                     _currentDate = default(DateTime);
+                    hour = null;
+                    minutes = null;
+                    seconds = null;
 
                     if (Multiple)
                     {
