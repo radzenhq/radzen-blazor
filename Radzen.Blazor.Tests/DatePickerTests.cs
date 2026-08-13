@@ -998,6 +998,40 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_DrillDown_Cells_DoNotRenderPreventDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DrillDown);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 5, 1));
+            });
+
+            component.InvokeAsync(() => component.Find(".rz-calendar-title-button").Click());
+
+            var monthCell = component.FindAll(".rz-calendar-month-cell")[4];
+            Assert.DoesNotContain(monthCell.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            component.InvokeAsync(() => component.FindAll(".rz-calendar-month-cell")[4].KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" }));
+            monthCell = component.FindAll(".rz-calendar-month-cell")[5];
+            Assert.Equal("0", monthCell.GetAttribute("tabindex"));
+            Assert.DoesNotContain(monthCell.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            component.InvokeAsync(() => component.Find(".rz-calendar-title-button").Click());
+
+            var yearCell = component.FindAll(".rz-calendar-year-cell").Single(c => c.GetAttribute("tabindex") == "0");
+            Assert.DoesNotContain(yearCell.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            component.InvokeAsync(() => component.FindAll(".rz-calendar-year-cell").Single(c => c.GetAttribute("tabindex") == "0").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" }));
+            yearCell = component.FindAll(".rz-calendar-year-cell").Single(c => c.GetAttribute("tabindex") == "0");
+            Assert.Equal("2025", yearCell.TextContent);
+            Assert.DoesNotContain(yearCell.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
         public void DatePicker_DrillDown_Disables_Months_Outside_MinMax()
         {
             using var ctx = new TestContext();
