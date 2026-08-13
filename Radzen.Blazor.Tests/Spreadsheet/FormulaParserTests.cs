@@ -642,4 +642,24 @@ public class FormulaParserTests
         var syntaxTree = FormulaParser.Parse(formula);
         Assert.NotEmpty(syntaxTree.Errors);
     }
+
+    [Theory]
+    [InlineData("Item #")]
+    [InlineData("=A #")]
+    [InlineData("=SUM #")]
+    [InlineData("=SUM(A1 #")]
+    [InlineData("#")]
+    public void FormulaParser_ShouldReportErrors_ForUnsupportedErrorLiteral(string formula)
+    {
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+    }
+
+    [Fact]
+    public void FunctionStore_CreateFunctionHint_ShouldNotCrash_ForUnsupportedErrorLiteral()
+    {
+        var store = new FunctionStore();
+
+        Assert.Null(store.CreateFunctionHint("Item #", 3));
+    }
 }

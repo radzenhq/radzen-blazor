@@ -166,4 +166,15 @@ public class FormulaLexerTests
         Assert.Equal(FormulaTokenType.CellIdentifier, tokens[5].Type);
         Assert.Equal("D1", tokens[5].Address.ToString());
     }
+
+    [Theory]
+    [InlineData("Item #")]
+    [InlineData("=A #")]
+    [InlineData("#")]
+    public void FormulaLexer_ShouldEmitEndToken_WhenScanStopsAtUnsupportedCharacter(string expression)
+    {
+        var tokens = FormulaLexer.Scan(expression, strict: false);
+
+        Assert.Equal(FormulaTokenType.None, tokens[^1].Type);
+    }
 }

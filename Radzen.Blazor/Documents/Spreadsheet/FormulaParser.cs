@@ -554,7 +554,11 @@ internal class FormulaParser
     {
         if (position + offset >= tokens.Count)
         {
-            return tokens[^1];
+            var last = tokens[^1];
+
+            return last.Type == FormulaTokenType.None
+                ? last
+                : new FormulaToken(FormulaTokenType.None, string.Empty) { Start = last.End, End = last.End };
         }
 
         return tokens[position + offset];

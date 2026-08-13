@@ -145,7 +145,7 @@ internal class FormulaLexer(string expression, bool strict = true)
                     whitespaceToken.End = position;
                     yield return whitespaceToken;
                 }
-                yield break;
+                break;
             }
 
             token.LeadingTrivia.AddRange(leadingTrivia);
