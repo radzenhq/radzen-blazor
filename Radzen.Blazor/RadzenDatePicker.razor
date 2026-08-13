@@ -81,7 +81,7 @@
                                     var isActiveMonth = month.Value == GetCalendarMonth(CurrentDate);
                                     var monthDisabled = Disabled || IsMonthDisabled(month.Value);
                                     <button type="button" id="@($"{GetId()}-month-{month.Value}")" class="@($"rz-calendar-month-cell{(isActiveMonth ? " rz-state-active" : "")}")" disabled="@monthDisabled" aria-disabled="@(monthDisabled ? "true" : "false")" aria-label="@($"{month.Name} {GetViewTitle()}")" aria-current="@(isActiveMonth ? "true" : null)" tabindex="@(isActiveMonth && !monthDisabled ? TabIndex : -1)"
-                                            @onclick="@(() => SelectViewMonth(month.Value))" @onkeydown="@OnMonthCellKeyDown" @onkeydown:preventDefault="preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation">@month.Name</button>
+                                            @onclick="@(() => SelectViewMonth(month.Value))" @onkeydown="@OnMonthCellKeyDown" @onkeydown:stopPropagation="stopKeydownPropagation">@month.Name</button>
                                 }
                             </div>
                         </div>
@@ -94,7 +94,7 @@
                                 {
                                     var isActiveYear = year.Value == GetCalendarYear(CurrentDate);
                                     <button type="button" id="@($"{GetId()}-year-{year.Value}")" class="@($"rz-calendar-year-cell{(isActiveYear ? " rz-state-active" : "")}")" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")" aria-current="@(isActiveYear ? "true" : null)" tabindex="@(isActiveYear ? TabIndex : -1)"
-                                            @onclick="@(() => SelectViewYear(year.Value))" @onkeydown="@OnYearCellKeyDown" @onkeydown:preventDefault="preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation">@year.Name</button>
+                                            @onclick="@(() => SelectViewYear(year.Value))" @onkeydown="@OnYearCellKeyDown" @onkeydown:stopPropagation="stopKeydownPropagation">@year.Name</button>
                                 }
                             </div>
                         </div>
