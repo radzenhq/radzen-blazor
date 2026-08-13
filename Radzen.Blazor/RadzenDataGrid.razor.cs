@@ -3776,9 +3776,9 @@ namespace Radzen.Blazor
 
         void RestoreGroupedColumnVisibility()
         {
-            foreach (var column in groupedColumns)
+            foreach (var entry in groupedColumns)
             {
-                column.SetVisible(true);
+                entry.Key.SetVisible(entry.Value);
             }
 
             groupedColumns.Clear();
@@ -3788,12 +3788,12 @@ namespace Radzen.Blazor
         {
             if (HideGroupedColumn && groups != null && groups.Any(g => g.Property == column.GetGroupProperty()))
             {
-                column.SetVisible(false);
-
-                if (!groupedColumns.Contains(column))
+                if (!groupedColumns.ContainsKey(column))
                 {
-                    groupedColumns.Add(column);
+                    groupedColumns.Add(column, column.GetVisible());
                 }
+
+                column.SetVisible(false);
             }
         }
 
@@ -3850,7 +3850,7 @@ namespace Radzen.Blazor
             InvokeAsync(StateHasChanged);
         }
 
-        List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
+        Dictionary<RadzenDataGridColumn<TItem>, bool> groupedColumns = new Dictionary<RadzenDataGridColumn<TItem>, bool>();
         /// <summary>
         /// Gets or sets the group descriptors.
         /// </summary>
@@ -4196,7 +4196,7 @@ namespace Radzen.Blazor
                         UniqueID = c.UniqueID,
                         Property = c.Property,
                         Width = c.GetWidth(),
-                        Visible = c.GetVisible(),
+                        Visible = groupedColumns.TryGetValue(c, out var visibleBeforeGrouping) ? visibleBeforeGrouping : c.GetVisible(),
                         OrderIndex = c.GetOrderIndex(),
                         SortOrder = c.GetSortOrder(),
                         SortIndex = c.GetSortIndex(),

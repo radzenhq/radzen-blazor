@@ -3542,7 +3542,8 @@ namespace Radzen.Blazor.Tests
                 bool allowGrouping = false,
                 DataGridSettings settings = null,
                 Action<DataGridSettings> settingsChanged = null,
-                Action<DataGridRenderEventArgs<GroupTestItem>> render = null)
+                Action<DataGridRenderEventArgs<GroupTestItem>> render = null,
+                bool countryColumnVisible = true)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
@@ -3576,7 +3577,8 @@ namespace Radzen.Blazor.Tests
 
                         builder.OpenComponent<RadzenDataGridColumn<GroupTestItem>>(6);
                         builder.AddAttribute(7, nameof(RadzenDataGridColumn<GroupTestItem>.Property), nameof(GroupTestItem.Country));
-                        builder.AddComponentReferenceCapture(8, value => countryColumn = (RadzenDataGridColumn<GroupTestItem>)value);
+                        builder.AddAttribute(8, nameof(RadzenDataGridColumn<GroupTestItem>.Visible), countryColumnVisible);
+                        builder.AddComponentReferenceCapture(9, value => countryColumn = (RadzenDataGridColumn<GroupTestItem>)value);
                         builder.CloseComponent();
                     });
 
@@ -3760,6 +3762,48 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Columns, component.Instance.Columns));
 
             Assert.Empty(groups);
+            Assert.True(nameColumn.GetVisible());
+        }
+
+        [Fact]
+        public void DataGrid_HideGroupedColumn_RestoresDeclaredVisibilityOnUngroup()
+        {
+            using var ctx = new TestContext();
+            var groups = new ObservableCollection<GroupDescriptor>
+            {
+                new GroupDescriptor { Property = nameof(GroupTestItem.Country) }
+            };
+            var (component, _, _, countryColumn) = RenderGroupsDataGrid(ctx, groups, countryColumnVisible: false);
+
+            Assert.False(countryColumn.GetVisible());
+
+            component.InvokeAsync(groups.Clear);
+
+            Assert.False(countryColumn.GetVisible());
+        }
+
+        [Fact]
+        public void DataGrid_HideGroupedColumn_SavesVisibilityBeforeGrouping()
+        {
+            using var ctx = new TestContext();
+            var groups = new ObservableCollection<GroupDescriptor>
+            {
+                new GroupDescriptor { Property = nameof(GroupTestItem.City) }
+            };
+            DataGridSettings capturedSettings = null;
+            var (component, cityColumn, nameColumn, _) = RenderGroupsDataGrid(ctx, groups, settingsChanged: s => capturedSettings = s);
+
+            component.InvokeAsync(() => groups.Add(new GroupDescriptor { Property = nameof(GroupTestItem.Name) }));
+
+            Assert.False(cityColumn.GetVisible());
+            Assert.False(nameColumn.GetVisible());
+            Assert.NotNull(capturedSettings);
+            Assert.True(capturedSettings.Columns.Single(c => c.Property == nameof(GroupTestItem.City)).Visible);
+            Assert.True(capturedSettings.Columns.Single(c => c.Property == nameof(GroupTestItem.Name)).Visible);
+
+            component.InvokeAsync(groups.Clear);
+
+            Assert.True(cityColumn.GetVisible());
             Assert.True(nameColumn.GetVisible());
         }
 
