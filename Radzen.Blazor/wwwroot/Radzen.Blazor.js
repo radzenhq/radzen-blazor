@@ -7575,10 +7575,17 @@ document.addEventListener('keydown', Radzen.popupTriggerKeydown);
 Radzen.datePickerKeydown = function (e) {
   if (e.isComposing) return;
   var el = e.target;
-  if (!el || el.tagName !== 'INPUT' || !el.classList || !el.classList.contains('rz-inputtext') || !el.closest('.rz-datepicker')) return;
+  if (!el || !el.classList) return;
   var key = e.code ? e.code : e.key;
-  if (key === 'Enter' || (e.altKey && key === 'ArrowDown')) {
-    e.preventDefault();
+  if (el.tagName === 'INPUT' && el.classList.contains('rz-inputtext') && el.closest('.rz-datepicker')) {
+    if (key === 'Enter' || (e.altKey && key === 'ArrowDown')) {
+      e.preventDefault();
+    }
+  } else if (el.classList.contains('rz-calendar-month-cell') || el.classList.contains('rz-calendar-year-cell')) {
+    if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown'
+      || key === 'Home' || key === 'End' || key === 'PageUp' || key === 'PageDown') {
+      e.preventDefault();
+    }
   }
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
