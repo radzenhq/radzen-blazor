@@ -1262,6 +1262,28 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_InputKeydown_DoesNotRenderPreventDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.Value, new DateTime(2024, 6, 15, 10, 30, 0));
+            });
+
+            var input = component.Find(".rz-inputtext");
+            Assert.DoesNotContain(input.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            component.Find(".rz-inputtext").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" });
+
+            input = component.Find(".rz-inputtext");
+            Assert.DoesNotContain(input.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
         public void DatePicker_OkClick_AppliesPendingHourAndMinutesTogether()
         {
             using var ctx = new TestContext();

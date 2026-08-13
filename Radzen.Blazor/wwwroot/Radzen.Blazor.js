@@ -7008,3 +7008,13 @@ Radzen.popupTriggerKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.popupTriggerKeydown);
+Radzen.datePickerKeydown = function (e) {
+  if (e.isComposing) return;
+  var el = e.target;
+  if (!el || el.tagName !== 'INPUT' || !el.classList || !el.classList.contains('rz-inputtext') || !el.closest('.rz-datepicker')) return;
+  var key = e.code ? e.code : e.key;
+  if (key === 'Enter' || (e.altKey && key === 'ArrowDown')) {
+    e.preventDefault();
+  }
+};
+document.addEventListener('keydown', Radzen.datePickerKeydown);
