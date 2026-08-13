@@ -132,7 +132,7 @@ public class SheetView
         // Find start index - include items that start before the viewport end
         int startIndex = includeFrozen ? 0 : axis.Frozen;
 
-        for (; startIndex < axis.Count - 1; startIndex++)
+        for (; startIndex < axis.Count; startIndex++)
         {
             if (axis.IsHidden(startIndex))
             {
@@ -148,6 +148,12 @@ public class SheetView
             }
 
             currentPosition += segmentSize;
+        }
+
+        if (startIndex >= axis.Count)
+        {
+            startIndex = axis.Count - 1;
+            startOffset = start - currentPosition;
         }
 
         // Find end index - include items that end after the viewport start

@@ -74,4 +74,63 @@ public class SheetViewIndexRangeTests
         Assert.Equal(4, range.Start);
         Assert.Equal(4, range.End);
     }
+
+    [Fact]
+    public void GetColumnRange_OffsetPlacesLastColumnAfterFrozenPane_WhenAllOtherColumnsAreFrozen()
+    {
+        var sheet = new Worksheet(100, 10);
+        sheet.Columns.Frozen = 9;
+        var view = new SheetView(sheet);
+
+        var frozenWidth = 0d;
+        for (var i = 0; i < 9; i++)
+        {
+            frozenWidth += sheet.Columns[i];
+        }
+
+        var range = view.GetColumnRange(0, 1200);
+
+        Assert.Equal(9, range.Start);
+        Assert.Equal(9, range.End);
+        Assert.Equal(-(view.ColumnHeaderOffset + frozenWidth), range.Offset);
+    }
+
+    [Fact]
+    public void GetRowRange_OffsetPlacesLastRowAfterFrozenPane_WhenAllOtherRowsAreFrozen()
+    {
+        var sheet = new Worksheet(10, 5);
+        sheet.Rows.Frozen = 9;
+        var view = new SheetView(sheet);
+
+        var frozenHeight = 0d;
+        for (var i = 0; i < 9; i++)
+        {
+            frozenHeight += sheet.Rows[i];
+        }
+
+        var range = view.GetRowRange(0, 500);
+
+        Assert.Equal(9, range.Start);
+        Assert.Equal(9, range.End);
+        Assert.Equal(-(view.RowHeaderOffset + frozenHeight), range.Offset);
+    }
+
+    [Fact]
+    public void GetColumnRange_OffsetMatchesFrozenPane_WhenLastColumnIsNotTheOnlyUnfrozenOne()
+    {
+        var sheet = new Worksheet(100, 10);
+        sheet.Columns.Frozen = 8;
+        var view = new SheetView(sheet);
+
+        var frozenWidth = 0d;
+        for (var i = 0; i < 8; i++)
+        {
+            frozenWidth += sheet.Columns[i];
+        }
+
+        var range = view.GetColumnRange(0, 1200);
+
+        Assert.Equal(8, range.Start);
+        Assert.Equal(-(view.ColumnHeaderOffset + frozenWidth), range.Offset);
+    }
 }
