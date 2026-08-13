@@ -110,6 +110,26 @@ public class Axis(double size, int count)
         }
     }
 
+    internal int NextVisible(int index, int direction, int fallback)
+    {
+        if (direction == 0)
+        {
+            return index;
+        }
+
+        direction = Math.Sign(direction);
+
+        for (var i = Math.Max(0, Math.Min(Count - 1, index)); i >= 0 && i < Count; i += direction)
+        {
+            if (!IsHidden(i))
+            {
+                return i;
+            }
+        }
+
+        return fallback;
+    }
+
     /// <summary>
     /// Shows all hidden indices in the axis.
     /// </summary>

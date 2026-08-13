@@ -67,8 +67,8 @@ public class Selection(Worksheet sheet)
 
     internal CellRef Move(int rowOffset, int columnOffset)
     {
-        var column = OffsetColumn(columnOffset);
-        var row = OffsetRow(rowOffset);
+        var column = sheet.Columns.NextVisible(OffsetColumn(columnOffset), columnOffset, Cell.Column);
+        var row = sheet.Rows.NextVisible(OffsetRow(rowOffset), rowOffset, Cell.Row);
 
         var cell = sheet.Clamp(new CellRef(row, column));
 
@@ -99,7 +99,7 @@ public class Selection(Worksheet sheet)
     {
         if (Cell == CellRef.Invalid)
         {
-            var address = new CellRef(0, 0);
+            var address = sheet.FirstVisibleCell();
 
             Select(address);
 
@@ -115,35 +115,19 @@ public class Selection(Worksheet sheet)
             var column = OffsetColumn(columnOffset);
             var row = OffsetRow(rowOffset);
 
-            if (row < Range.Start.Row)
-            {
-                row = Range.End.Row;
-                column += Math.Sign(rowOffset);
-            }
-            else if (row > Range.End.Row)
-            {
-                row = Range.Start.Row;
-                column += Math.Sign(rowOffset);
-            }
+            var attempts = (Range.End.Row - Range.Start.Row + 1) * (Range.End.Column - Range.Start.Column + 1);
 
-            if (column < Range.Start.Column)
+            while (true)
             {
-                column = Range.End.Column;
-                row += Math.Sign(columnOffset);
-            }
-            else if (column > Range.End.Column)
-            {
-                column = Range.Start.Column;
-                row += Math.Sign(columnOffset);
-            }
+                (row, column) = WrapIntoRange(row, column, rowOffset, columnOffset);
 
-            if (row < Range.Start.Row)
-            {
-                row = Range.End.Row;
-            }
-            else if (row > Range.End.Row)
-            {
-                row = Range.Start.Row;
+                if ((!sheet.Rows.IsHidden(row) && !sheet.Columns.IsHidden(column)) || --attempts <= 0)
+                {
+                    break;
+                }
+
+                row += rowOffset;
+                column += columnOffset;
             }
 
             var address = MergeStart(new CellRef(row, column));
@@ -152,6 +136,42 @@ public class Selection(Worksheet sheet)
 
             return address;
         }
+    }
+
+    private (int Row, int Column) WrapIntoRange(int row, int column, int rowOffset, int columnOffset)
+    {
+        if (row < Range.Start.Row)
+        {
+            row = Range.End.Row;
+            column += Math.Sign(rowOffset);
+        }
+        else if (row > Range.End.Row)
+        {
+            row = Range.Start.Row;
+            column += Math.Sign(rowOffset);
+        }
+
+        if (column < Range.Start.Column)
+        {
+            column = Range.End.Column;
+            row += Math.Sign(columnOffset);
+        }
+        else if (column > Range.End.Column)
+        {
+            column = Range.Start.Column;
+            row += Math.Sign(columnOffset);
+        }
+
+        if (row < Range.Start.Row)
+        {
+            row = Range.End.Row;
+        }
+        else if (row > Range.End.Row)
+        {
+            row = Range.Start.Row;
+        }
+
+        return (row, column);
     }
 
     /// <summary>
@@ -326,13 +346,17 @@ public class Selection(Worksheet sheet)
 
         if (useStart)
         {
-            cell = sheet.Clamp(new CellRef(start.Row + rowOffset, start.Column + columnOffset));
+            cell = sheet.Clamp(new CellRef(
+                sheet.Rows.NextVisible(start.Row + rowOffset, rowOffset, start.Row),
+                sheet.Columns.NextVisible(start.Column + columnOffset, columnOffset, start.Column)));
 
             start = cell;
         }
         else
         {
-            cell = sheet.Clamp(new CellRef(end.Row + rowOffset, end.Column + columnOffset));
+            cell = sheet.Clamp(new CellRef(
+                sheet.Rows.NextVisible(end.Row + rowOffset, rowOffset, end.Row),
+                sheet.Columns.NextVisible(end.Column + columnOffset, columnOffset, end.Column)));
 
             end = cell;
         }

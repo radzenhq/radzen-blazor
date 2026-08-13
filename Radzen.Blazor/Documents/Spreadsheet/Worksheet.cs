@@ -339,6 +339,11 @@ public partial class Worksheet
         return new CellRef(row, column);
     }
 
+    internal CellRef FirstVisibleCell()
+    {
+        return new CellRef(Rows.NextVisible(0, 1, 0), Columns.NextVisible(0, 1, 0));
+    }
+
     private void EvaluateFormula(Cell cell)
     {
         var tree = cell.FormulaSyntaxTree;
