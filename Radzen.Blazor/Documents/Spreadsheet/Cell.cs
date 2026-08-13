@@ -247,7 +247,7 @@ public class Cell
         else
         {
             Formula = null;
-            Value = value;
+            Value = string.IsNullOrEmpty(value) ? null : value;
         }
     }
 

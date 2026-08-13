@@ -6659,7 +6659,9 @@ class SheetEditor {
   };
 
   onInput = () => {
-    this.dotNetRef.invokeMethodAsync('OnInputAsync', this.element.innerText);
+    // Browsers keep a placeholder <br> in an emptied contenteditable which makes innerText report "\n" for empty content
+    const text = this.element.innerText;
+    this.dotNetRef.invokeMethodAsync('OnInputAsync', text == '\n' ? '' : text);
   };
 
   setValue = (value, moveCaretTo) => {
