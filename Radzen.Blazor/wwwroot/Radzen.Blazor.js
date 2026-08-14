@@ -6056,6 +6056,30 @@ Radzen.createDropDown = function(el) {
     el.removeEventListener('click', onFilterClick, true);
   }};
 };
+Radzen.registerProfileMenuClickAway = function (el, ref) {
+  if (!el) return;
+  Radzen.unregisterProfileMenuClickAway(el);
+  el.profileMenuClickAway = function (e) {
+    if (!document.contains(el)) {
+      Radzen.unregisterProfileMenuClickAway(el);
+      return;
+    }
+    if (el.contains(e.target)) {
+      var item = e.target.closest('.rz-navigation-item');
+      if (item && item.querySelector('.rz-navigation-menu')) {
+        return;
+      }
+    }
+    try { suppressDisposed(ref.invokeMethodAsync('CloseOnClickAway')); } catch { }
+  };
+  document.addEventListener('click', el.profileMenuClickAway);
+};
+Radzen.unregisterProfileMenuClickAway = function (el) {
+  if (el && el.profileMenuClickAway) {
+    document.removeEventListener('click', el.profileMenuClickAway);
+    delete el.profileMenuClickAway;
+  }
+};
 Radzen.createFileInput = function(el) {
   if (!el) return { dispose: function() {} };
   var choose = el.querySelector('.rz-fileupload-choose');

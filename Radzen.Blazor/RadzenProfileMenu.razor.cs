@@ -29,10 +29,37 @@ namespace Radzen.Blazor
             return "rz-menu rz-profile-menu";
         }
 
+        bool clickAwayRegistered;
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
+
+            var shouldRegisterClickAway = Visible && !Collapsed;
+
+            if (shouldRegisterClickAway != clickAwayRegistered && JSRuntime != null)
+            {
+                clickAwayRegistered = shouldRegisterClickAway;
+
+                try
+                {
+                    if (shouldRegisterClickAway)
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.registerProfileMenuClickAway", Element, Reference);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.unregisterProfileMenuClickAway", Element);
+                    }
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+                catch (JSException)
+                {
+                }
+            }
 
             if (shouldFocusMenu)
             {
@@ -111,6 +138,40 @@ namespace Radzen.Blazor
             contentStyle = "display:none;";
             focusedIndex = -1;
             StateHasChanged();
+        }
+
+        /// <summary>
+        /// Invoked from client-side when the user clicks outside the expanded menu or activates a menu item.
+        /// </summary>
+        [JSInvokable("CloseOnClickAway")]
+        public async Task CloseOnClickAway()
+        {
+            if (!Collapsed)
+            {
+                await InvokeAsync(Close);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            if (clickAwayRegistered)
+            {
+                clickAwayRegistered = false;
+
+                try
+                {
+                    JSRuntime?.InvokeVoidAsync("Radzen.unregisterProfileMenuClickAway", Element);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+                catch (JSException)
+                {
+                }
+            }
+
+            base.Dispose();
         }
 
         ElementReference toggleElement;

@@ -34,6 +34,7 @@
     <type fullname="Radzen.Blazor.RadzenHeatmap" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenHtmlEditor" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenMediaQuery" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenProfileMenu" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenRangeNavigator" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSankeyDiagram`1" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenScheduler`1" preserve="methods" />
@@ -41,6 +42,7 @@
     <type fullname="Radzen.Blazor.RadzenSlider`1" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSpeechToTextButton" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSpiderChart" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenSplitButton" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSplitter" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenToc" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenTreemap" preserve="methods" />
