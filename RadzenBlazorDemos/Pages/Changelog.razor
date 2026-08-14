@@ -1,6 +1,62 @@
 @page "/changelog"
 
 <div class="changelog">
+<RadzenText Anchor="changelog#v12" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v12 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v12
+</RadzenText>
+<RadzenText Anchor="changelog#v12-breaking" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Breaking changes
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> RadzenDatePicker calendar navigation now defaults to the new drill-down mode - the calendar title drills up to a month grid and a year grid instead of showing month and year drop-downs. Set <code>NavigationMode="DatePickerNavigationMode.DropDown"</code> to restore the previous behavior.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Enum filter values in DataGrid settings are now serialized as numbers instead of <code>FullName</code> casts. Settings saved by previous versions are still loaded.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> The dynamic LINQ API (<code>QueryableExtension</code> and related methods) is now marked with <code>[RequiresUnreferencedCode]</code>. Applications published with trimming enabled will see analyzer warnings when calling it directly.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-new-components" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    New Components
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenDateRangePicker" Path="/daterangepicker" /> - a date range picker component with a two-month calendar, min/max support and drill-down navigation.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenVirtualKeyboard" Path="/virtual-keyboard" /> - an on-screen virtual keyboard that attaches to inputs or renders inline, with custom layouts, numpad mode and locale support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code>RadzenSchedulerResource</code> - declares a resource type (rooms, people, equipment) of <RadzenLink Text="RadzenScheduler" Path="/scheduler" /> for grouping appointments by resource.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenScheduler
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Group appointments by resource in all views (day, week, month, multi-day, planner, timeline and year) by declaring <code>RadzenSchedulerResource</code> types and setting <code>GroupByResource="true"</code> on a view. Supports hierarchical grouping by multiple resource types and horizontal or vertical orientation via <code>GroupOrientation</code>.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Appointments can belong to multiple resources when the resource property is a collection.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Resize appointments by dragging their edges in day, week and multi-day views. Handle the <code>AppointmentResize</code> event to apply the new duration.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> New <code>AllDayProperty</code> renders all-day appointments in a dedicated row of the week view. Configure it with the <code>ShowAllDay</code> and <code>AllDayText</code> properties of RadzenWeekView.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-gantt" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenGantt
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <RadzenLink Text="Resource view" Path="/gantt-resource-view" /> - display tasks in resource lanes with stacking, hierarchical resources via <code>ResourceParentIdProperty</code>, an unassigned tasks lane and a workload histogram. Enabled with <code>ResourceData</code>, <code>ResourceIdProperty</code>, <code>ResourceTextProperty</code> and <code>TaskResourceIdProperty</code>.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <RadzenLink Text="Multi-year timescale" Path="/gantt-multi-year" /> - new quarter-based Years view for multi-year projects and a rescaled Year view.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-datepicker" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenDatePicker
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> New <code>NavigationMode</code> property with drill-down calendar navigation - the calendar title drills up to a month grid and a year grid. Drill-down is the default; <code>DatePickerNavigationMode.DropDown</code> restores the month and year drop-downs.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-trimming" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Trimming
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> The library is now compatible with .NET trimming (<code>PublishTrimmed</code>) and Blazor WebAssembly trimmed publish. Data-bound components preserve the members they access via reflection through <code>DynamicallyAccessedMembers</code> annotations. See <RadzenLink Text="TRIMMING.md" Path="https://github.com/radzenhq/radzen-blazor/blob/master/TRIMMING.md" /> for consumer-facing guidance.</li>
+</ul>
+
 <RadzenText Anchor="changelog#v11" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v11 Changelog
 </RadzenText>
