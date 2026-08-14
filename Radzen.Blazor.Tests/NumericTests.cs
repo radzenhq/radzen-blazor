@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json.Linq;
@@ -308,7 +309,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double?>>(parameters =>
@@ -317,60 +317,106 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             object newValue = 1;
 
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("");
-
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
 
-            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "Backspace", Code = "Backspace" });
+            component.Find("input").Input("");
 
             Assert.True(raised);
             Assert.Null(newValue);
         }
 
         [Fact]
-        public void Numeric_Raises_ChangeEvent_OnDelete_When_Immediate()
+        public void Numeric_Raises_ChangeEvent_OnEveryKeystroke_When_Immediate()
         {
             using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double?>>(parameters =>
-                parameters.Add(p => p.Immediate, true).Add(p => p.Value, 5));
+                parameters.Add(p => p.Immediate, true));
 
-            var raised = false;
-            object newValue = 1;
+            var values = new List<double?>();
 
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("");
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, values.Add));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+            component.Find("input").Input("5");
+            component.Find("input").Input("57");
 
-            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "Delete", Code = "Delete" });
-
-            Assert.True(raised);
-            Assert.Null(newValue);
+            Assert.Equal(new double?[] { 5, 57 }, values);
         }
 
         [Fact]
-        public void Numeric_Restores_Cursor_After_Immediate_KeyDown()
+        public void Numeric_Does_Not_Raise_ChangeEvent_OnInput_When_Not_Immediate()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            ctx.JSInterop.Setup<int[]>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 3, 3 });
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("21345.00");
+            var component = ctx.RenderComponent<RadzenNumeric<double?>>();
 
-            var component = ctx.RenderComponent<RadzenNumeric<decimal?>>(parameters =>
-                parameters.Add(p => p.Immediate, true).Add(p => p.Format, "#.00").Add(p => p.Value, 2345m));
+            Assert.Throws<MissingEventHandlerException>(() => component.Find("input").Input("5"));
+        }
 
-            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "1", Code = "Digit1" });
+        [Fact]
+        public void Numeric_Immediate_Keeps_Typed_Text_Until_Change()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var invocations = ctx.JSInterop.Invocations["Radzen.setSelectionRange"];
-            Assert.NotEmpty(invocations);
-            var invocation = invocations[invocations.Count - 1];
-            Assert.Equal(3, invocation.Arguments[1]);
-            Assert.Equal(3, invocation.Arguments[2]);
+            double value = 527;
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(parameters =>
+                parameters.Add(p => p.Immediate, true).Add(p => p.Format, "###.## m2").Add(p => p.Value, value)
+                    .Add(p => p.ValueChanged, v => value = v));
+
+            Assert.Equal("527 m2", component.Find("input").GetAttribute("value"));
+
+            component.Find("input").Input("527 m27");
+
+            Assert.Equal(5277, value);
+            Assert.Equal("527 m27", component.Find("input").GetAttribute("value"));
+
+            component.Find("input").Change("527 m27");
+
+            Assert.Equal(5277, value);
+            Assert.Equal("5277 m2", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void Numeric_Immediate_Does_Not_Register_Format_Literal_Digits()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            double value = 0;
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(parameters =>
+                parameters.Add(p => p.Immediate, true).Add(p => p.Format, "###.## m2").Add(p => p.Value, value)
+                    .Add(p => p.ValueChanged, v => value = v));
+
+            component.Find("input").Input(" m25");
+
+            Assert.Equal(5, value);
+        }
+
+        [Fact]
+        public void Numeric_Change_Does_Not_Leak_Format_Literal_Digits_Into_Value()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            double value = 0;
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(parameters =>
+                parameters.Add(p => p.Format, "###.## m2").Add(p => p.Value, value)
+                    .Add(p => p.ValueChanged, v => value = v));
+
+            component.Find("input").Change("527 m2");
+
+            Assert.Equal(527, value);
         }
 
         [Fact]

@@ -136,15 +136,6 @@ namespace Radzen.Blazor
                     }
                 }
             }
-
-            if (pendingSelectionStart.HasValue && JSRuntime != null)
-            {
-                var start = pendingSelectionStart.Value;
-                var end = pendingSelectionEnd ?? start;
-                pendingSelectionStart = null;
-                pendingSelectionEnd = null;
-                await JSRuntime.InvokeVoidAsync("Radzen.setSelectionRange", input, start, end);
-            }
         }
 
         /// <inheritdoc />
@@ -369,7 +360,10 @@ namespace Radzen.Blazor
                     _value = value;
                 }
 
-                stringValue = $"{value}";
+                if (!isTyping)
+                {
+                    stringValue = $"{value}";
+                }
             }
         }
 
@@ -381,6 +375,11 @@ namespace Radzen.Blazor
         {
             get
             {
+                if (isTyping)
+                {
+                    return stringValue;
+                }
+
                 if (_value != null)
                 {
                     if (Format != null)
@@ -557,15 +556,30 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
+            isTyping = false;
             stringValue = $"{args.Value}";
             await InternalValueChanged(args.Value);
         }
 
         string? stringValue;
+        bool isTyping;
+
         async Task SetValue(string? value)
         {
+            isTyping = false;
             stringValue = value;
             await InternalValueChanged(value);
+        }
+
+        async Task OnInput(ChangeEventArgs args)
+        {
+            if (!Immediate)
+            {
+                return;
+            }
+
+            isTyping = true;
+            await InternalValueChanged(args.Value, updateText: false);
         }
 
         private string RemoveNonNumericCharacters(object value)
@@ -583,9 +597,63 @@ namespace Radzen.Blazor
                 {
                     valueStr = valueStr.Replace(Culture.NumberFormat.CurrencyGroupSeparator, "", StringComparison.Ordinal);
                 }
+
+                foreach (var literal in GetFormatLiterals(Format))
+                {
+                    valueStr = valueStr.Replace(literal, "", StringComparison.Ordinal);
+                }
             }
 
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "", StringComparison.Ordinal);
+        }
+
+        private static readonly char[] customFormatActiveChars = { '#', '0', '.', ',', '%', '‰', 'E', 'e', '+', '-', ';' };
+
+        private static IEnumerable<string> GetFormatLiterals(string format)
+        {
+            if (format.Length <= 3 && char.IsLetter(format[0]) && format.Skip(1).All(char.IsDigit))
+            {
+                yield break;
+            }
+
+            var literal = new System.Text.StringBuilder();
+
+            for (var i = 0; i < format.Length; i++)
+            {
+                var ch = format[i];
+
+                if (ch == '\'' || ch == '"')
+                {
+                    var close = format.IndexOf(ch, i + 1);
+                    if (close < 0)
+                    {
+                        close = format.Length;
+                    }
+                    literal.Append(format, i + 1, close - i - 1);
+                    i = close;
+                }
+                else if (ch == '\\' && i + 1 < format.Length)
+                {
+                    literal.Append(format[++i]);
+                }
+                else if (Array.IndexOf(customFormatActiveChars, ch) >= 0)
+                {
+                    if (literal.Length > 0)
+                    {
+                        yield return literal.ToString();
+                        literal.Clear();
+                    }
+                }
+                else
+                {
+                    literal.Append(ch);
+                }
+            }
+
+            if (literal.Length > 0)
+            {
+                yield return literal.ToString();
+            }
         }
 
         private static string NormalizeDigits(string input)
@@ -619,7 +687,7 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<string, TValue>? ConvertValue { get; set; }
 
-        private async Task InternalValueChanged(object? value)
+        private async Task InternalValueChanged(object? value, bool updateText = true)
         {
             TValue? newValue = default(TValue);
             try
@@ -648,11 +716,12 @@ namespace Radzen.Blazor
                 newValue = ApplyMinMax(newValue);
             }
 
-            stringValue = $"{newValue}";
+            var rawText = $"{value}";
+            stringValue = updateText ? $"{newValue}" : rawText;
 
             if (EqualityComparer<TValue>.Default.Equals(Value, newValue))
             {
-                if (JSRuntime != null)
+                if (updateText && JSRuntime != null)
                 {
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
                 }
@@ -660,7 +729,8 @@ namespace Radzen.Blazor
             }
 
             Value = newValue;
-            if (!ValueChanged.HasDelegate && JSRuntime != null)
+
+            if (updateText && !ValueChanged.HasDelegate && JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
             }
@@ -805,8 +875,6 @@ namespace Radzen.Blazor
 
         bool preventKeyPress;
         bool stopKeydownPropagation;
-        int? pendingSelectionStart;
-        int? pendingSelectionEnd;
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
@@ -841,26 +909,6 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
 
                 await SetValueToBound(key == "Home");
-
-                preventKeyPress = false;
-            }
-            else if (Immediate && (key == "Backspace" || key == "Delete" || (args.Key.Length == 1 && char.IsDigit(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.ShiftKey)))
-            {
-                stopKeydownPropagation = true;
-                preventKeyPress = true;
-
-                if (JSRuntime != null)
-                {
-                    var selection = await JSRuntime.InvokeAsync<int[]>("Radzen.getSelectionRange", input);
-                    if (selection != null && selection.Length >= 2)
-                    {
-                        pendingSelectionStart = selection[0];
-                        pendingSelectionEnd = selection[1];
-                    }
-
-                    var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
-                    await SetValue(value);
-                }
 
                 preventKeyPress = false;
             }
