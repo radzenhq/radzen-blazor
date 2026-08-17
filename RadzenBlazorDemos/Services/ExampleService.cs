@@ -2156,18 +2156,20 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Basic", Anchor = "#basic" }, new () { Text = "Large", Anchor = "#large" }, new () { Text = "Styled", Anchor = "#styled" } ],
                     Name = "QRCode",
-                    Description = "Generate and display QR codes as SVG using RadzenQRCode.",
+                    Updated = true,
+                    Description = "Generate and display QR codes as SVG using RadzenQRCode, and export them to PDF.",
                     Path = "qrcode",
                     Icon = "\uef6b",
-                    Tags = new [] { "qr", "qrcode", "barcode", "svg" }
+                    Tags = new [] { "qr", "qrcode", "barcode", "svg", "pdf" }
                 },
                 new Example
                 {
                     Name = "Barcode",
-                    Description = "Generate and display 1D barcodes as SVG using RadzenBarcode.",
+                    Updated = true,
+                    Description = "Generate and display 1D barcodes as SVG using RadzenBarcode, and export them to PDF.",
                     Path = "barcode",
                     Icon = "\ue70b",
-                    Tags = new [] { "barcode", "svg" }
+                    Tags = new [] { "barcode", "svg", "pdf" }
                 },
                 new Example
                 {
