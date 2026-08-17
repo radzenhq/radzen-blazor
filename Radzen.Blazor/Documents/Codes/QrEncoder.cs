@@ -168,10 +168,6 @@ public static class QrEncoder
         string imageBackground = "#FFF")
     {
         ArgumentNullException.ThrowIfNull(modules);
-        ArgumentNullException.ThrowIfNull(foreground);
-        ArgumentNullException.ThrowIfNull(background);
-        ArgumentNullException.ThrowIfNull(imageBackground);
-
         var moduleFill = SvgAttributes.Color(foreground, nameof(foreground));
         var imageBackgroundFill = SvgAttributes.Color(imageBackground, nameof(imageBackground));
         var imageHref = image is null ? null : SvgAttributes.Href(image, nameof(image));

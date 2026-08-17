@@ -206,6 +206,15 @@ public class QrEncoderTests
         Assert.True(MatricesEqual(legacy, neutral));
     }
 
+    [Fact]
+    public void LegacyEncoder_NullValue_MatchesEmptyValue()
+    {
+        var fromNull = RadzenQREncoder.EncodeUtf8(null!, RadzenQREcc.Medium);
+        var fromEmpty = RadzenQREncoder.EncodeUtf8(string.Empty, RadzenQREcc.Medium);
+
+        Assert.True(MatricesEqual(fromNull, fromEmpty));
+    }
+
     static bool MatricesEqual(bool[,] a, bool[,] b)
     {
         if (a.GetLength(0) != b.GetLength(0) || a.GetLength(1) != b.GetLength(1))
@@ -290,5 +299,29 @@ public class QrEncoderTests
         var svg = QrEncoder.ToSvg(modules, image: "data:image/png;base64,iVBORw0KGgo=");
 
         Assert.Contains("href=\"data:image/png;base64,iVBORw0KGgo=\"", svg, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("hsl(120 100% 25%)")]
+    [InlineData("var(--qr-foreground)")]
+    [InlineData("rgb(10 20 30 / 50%)")]
+    [InlineData("")]
+    public void ToSvg_AcceptsToleratedCssColorForms(string color)
+    {
+        var modules = QrEncoder.EncodeUtf8("AB", QrErrorCorrection.Quartile);
+
+        var svg = QrEncoder.ToSvg(modules, foreground: color, background: color, imageBackground: color);
+
+        Assert.Contains("<svg", svg, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToSvg_AcceptsNullColors()
+    {
+        var modules = QrEncoder.EncodeUtf8("AB", QrErrorCorrection.Quartile);
+
+        var svg = QrEncoder.ToSvg(modules, foreground: null!, background: null!, imageBackground: null!);
+
+        Assert.Contains("fill=\"none\"", svg, StringComparison.Ordinal);
     }
 }
