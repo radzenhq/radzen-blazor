@@ -69,6 +69,26 @@ public class AnnotationFlattenValidationTests
         Assert.Throws<InvalidOperationException>(document.Flatten);
     }
 
+    [Fact]
+    public void LoadedSquigglyWithNonFiniteQuadPoint_FlattensAndSaves()
+    {
+        var huge = new string('9', 330) + ".0";
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [4 0 R] >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Type /Annot /Subtype /Squiggly /Rect [10 10 110 30] /QuadPoints ["
+            + huge + " 30 110 30 10 10 110 10] /C [1 0 0] >>\nendobj\n");
+        var bytes = FixturePdf.Wrap(pdf, 5);
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
+
+        document.Flatten();
+        var saved = document.ToArray();
+
+        Assert.NotEmpty(saved);
+        Assert.Empty(document.Pages[0].Annotations);
+    }
+
     private static string FlattenedContent(PortableDocument document)
     {
         document.Flatten();
