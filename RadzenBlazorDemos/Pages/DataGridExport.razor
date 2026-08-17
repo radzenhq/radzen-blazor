@@ -57,7 +57,7 @@
 
     Task ExportExcel()
     {
-        return grid.ExportToExcelAsync("orders.xlsx", new DataGridExportOptions { Scope = scope, UseTheme = useTheme });
+        return grid.ExportToExcelAsync("orders.xlsx", new DataGridExcelExportOptions { Scope = scope, UseTheme = useTheme });
     }
 
     Task ExportCsv()

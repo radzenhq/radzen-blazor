@@ -10,7 +10,7 @@
 
 <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" class="rz-mb-4">
     <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Click="@(() => grid.ExportToPdfAsync("order-totals.pdf", new DataGridPdfExportOptions { Scope = DataGridExportScope.All, Title = "Order totals" }))" />
-    <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="@(() => grid.ExportToExcelAsync("order-totals.xlsx", new DataGridExportOptions { Scope = DataGridExportScope.All }))" />
+    <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="@(() => grid.ExportToExcelAsync("order-totals.xlsx", new DataGridExcelExportOptions { Scope = DataGridExportScope.All }))" />
     <RadzenButton Text="Download customized PDF" Icon="edit_document" ButtonStyle="ButtonStyle.Secondary" Click="ExportCustomPdf" />
 </RadzenStack>
 

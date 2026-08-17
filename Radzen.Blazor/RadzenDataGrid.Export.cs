@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         /// <param name="fileName">The downloaded file name.</param>
         /// <param name="options">The export options.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public async Task ExportToExcelAsync(string fileName = "export.xlsx", DataGridExportOptions? options = null)
+        public async Task ExportToExcelAsync(string fileName = "export.xlsx", DataGridExcelExportOptions? options = null)
         {
             var workbook = await ToWorkbookAsync(options);
             using var stream = new MemoryStream();
@@ -185,9 +185,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="options">The export options.</param>
         /// <returns>The workbook.</returns>
-        public Task<Workbook> ToWorkbookAsync(DataGridExportOptions? options = null)
+        public Task<Workbook> ToWorkbookAsync(DataGridExcelExportOptions? options = null)
         {
-            return CreateWorkbookAsync(options ?? new DataGridExportOptions(), false);
+            return CreateWorkbookAsync(options ?? new DataGridExcelExportOptions(), false);
         }
 
         internal Task<Workbook> ToCsvWorkbookAsync(DataGridCsvExportOptions options)

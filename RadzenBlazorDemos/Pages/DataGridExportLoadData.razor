@@ -86,7 +86,7 @@
             }
             else
             {
-                await grid.ExportToExcelAsync($"{fileName}.xlsx", new DataGridExportOptions
+                await grid.ExportToExcelAsync($"{fileName}.xlsx", new DataGridExcelExportOptions
                 {
                     Scope = scope,
                     ChunkSize = 25,
