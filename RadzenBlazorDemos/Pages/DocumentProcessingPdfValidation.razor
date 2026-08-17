@@ -36,6 +36,11 @@
 
     void Generate()
     {
+        if (font == null)
+        {
+            return;
+        }
+
         var document = new Document();
         document.Info.Title = "Conformance validation";
         document.Fonts.Register("Liberation Sans", new MemoryStream(font));

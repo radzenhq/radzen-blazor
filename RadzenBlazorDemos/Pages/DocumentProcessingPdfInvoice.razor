@@ -55,6 +55,11 @@
 
     void Generate()
     {
+        if (logo == null)
+        {
+            return;
+        }
+
         var accent = Color.FromRgb(25, 118, 210);
         var ink = Color.FromRgb(33, 37, 41);
         var muted = Color.FromRgb(120, 128, 138);
@@ -220,6 +225,11 @@
 
     async Task Download()
     {
+        if (document == null)
+        {
+            return;
+        }
+
         using var stream = new MemoryStream();
         document.SaveAsPdf(stream);
         stream.Position = 0;
