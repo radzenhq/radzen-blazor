@@ -779,8 +779,7 @@ namespace Radzen.Blazor
         /// <returns>System.Object.</returns>
         public virtual object? GetValue(TItem item)
         {
-            var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.', StringComparison.Ordinal) ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
-
+            var value = GetRawValue(item);
 
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || PropertyAccess.IsNullableEnum(FilterPropertyType) ||
                 ((FilterMode ?? Grid.FilterMode) == Radzen.FilterMode.CheckBoxList && (value as Enum) != null)) && value != null)
@@ -793,6 +792,22 @@ namespace Radzen.Blazor
             }
 
             return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatProvider ?? Grid?.Culture ?? CultureInfo.CurrentCulture, FormatString, value) : Convert.ToString(value, FormatProvider ?? Grid?.Culture ?? CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Gets or sets the function that provides the value exported for this column. Enables exporting columns without a Property, such as template columns. FormatString is applied to the returned value.
+        /// </summary>
+        [Parameter]
+        public Func<TItem, object?>? ExportValue { get; set; }
+
+        internal object? GetRawValue(TItem item)
+        {
+            if (ExportValue != null)
+            {
+                return ExportValue(item);
+            }
+
+            return propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.', StringComparison.Ordinal) ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
         }
 
         internal object GetHeader()

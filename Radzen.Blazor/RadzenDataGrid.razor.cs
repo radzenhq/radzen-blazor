@@ -21,7 +21,7 @@ namespace Radzen.Blazor
     /// A powerful data grid component for displaying and manipulating tabular data with support for sorting, filtering, paging, grouping, editing, and selection.
     /// RadzenDataGrid provides a full-featured table with inline editing, master-detail views, virtualization, export capabilities, and extensive customization options.
     /// Supports single/multiple column sorting, simple/advanced filtering, grouping with aggregation, inline/cell editing with validation, and single/multiple row selection with checkbox columns.
-    /// Features on-demand data loading via LoadData event for server-side operations, export to Excel and CSV formats, column/row templates, group headers/footers, and density modes (Default/Compact) for responsive layouts.
+    /// Features on-demand data loading via LoadData event for server-side operations, export to PDF, Excel and CSV formats, column/row templates, group headers/footers, and density modes (Default/Compact) for responsive layouts.
     /// The grid can work with in-memory collections or load data on-demand from APIs.
     /// Columns are defined using RadzenDataGridColumn components within the Columns template.
     /// </summary>
@@ -208,6 +208,8 @@ namespace Radzen.Blazor
         }
 
         string? lastLoadDataArgs;
+        int lastLoadDataStart;
+        int lastLoadDataTop;
         Task lastLoadDataTask = Task.CompletedTask;
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
@@ -2539,6 +2541,13 @@ namespace Radzen.Blazor
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         protected override void OnDataChanged()
         {
+            if (exporting)
+            {
+                _view = null;
+                _groupedPagedView = null;
+                return;
+            }
+
             if (!string.IsNullOrEmpty(KeyProperty) && keyPropertyGetter == null)
             {
                 keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
@@ -2682,8 +2691,19 @@ namespace Radzen.Blazor
         IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
 
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-        internal async Task InvokeLoadData(int start, int top)
+        internal async Task InvokeLoadData(int start, int top, bool fromExport = false)
         {
+            if (exporting && !fromExport)
+            {
+                return;
+            }
+
+            if (!exporting)
+            {
+                lastLoadDataStart = start;
+                lastLoadDataTop = top;
+            }
+
             var orderBy = GetOrderBy();
 
             Query.Skip = skip;
