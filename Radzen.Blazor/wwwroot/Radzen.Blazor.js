@@ -68,6 +68,14 @@ window.Radzen = {
     revokeObjectUrl: function (url) {
         URL.revokeObjectURL(url);
     },
+    cssVariables: function (element, names) {
+        if (!(element instanceof Element) || !Array.isArray(names)) {
+            return null;
+        }
+
+        const style = getComputedStyle(element);
+        return names.map(name => style.getPropertyValue(name).trim() || null);
+    },
     mask: function (id, mask, pattern, characterPattern) {
       var el = document.getElementById(id);
       if (el) {
