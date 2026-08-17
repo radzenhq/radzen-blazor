@@ -52,9 +52,9 @@ public class DataGridExportOptions
     public string? Title { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the export reads the current theme from the rendered grid and applies its header background and foreground colors and row and alternating row background colors. Applies to PDF and Excel.
+    /// Gets or sets whether the export reads the current theme from the rendered grid and applies its header and row colors, gridlines, font size, and cell padding. Applies to PDF and Excel.
     /// </summary>
-    public bool UseThemeColors { get; set; } = true;
+    public bool UseTheme { get; set; } = true;
 }
 
 /// <summary>
@@ -136,7 +136,7 @@ public class DataGridPdfExportOptions : DataGridExportOptions
     public string? FontFamily { get; set; }
 
     /// <summary>
-    /// Gets or sets the table font size in points.
+    /// Gets or sets the table font size in points. A null value uses the theme font size when <see cref="DataGridExportOptions.UseTheme"/> is enabled, or 9.
     /// </summary>
-    public double FontSize { get; set; } = 9;
+    public double? FontSize { get; set; }
 }
