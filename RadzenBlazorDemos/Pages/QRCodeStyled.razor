@@ -111,10 +111,17 @@
                 </RadzenStack>
             </RadzenFieldset>
 
-            <RadzenButton Text="Save SVG"
-                          Icon="download"
-                          ButtonStyle="ButtonStyle.Primary"
-                          Click="@(_ => SaveSvg())" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem">
+                <RadzenButton Text="Save SVG"
+                              Icon="download"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@(_ => SaveSvg())" />
+
+                <RadzenButton Text="Save PDF"
+                              Icon="picture_as_pdf"
+                              ButtonStyle="ButtonStyle.Secondary"
+                              Click="@(_ => qrCode.ExportToPdfAsync())" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenColumn>
 </RadzenRow>

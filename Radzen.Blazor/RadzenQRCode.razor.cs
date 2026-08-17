@@ -253,6 +253,46 @@ namespace Radzen.Blazor
 
             return Array.Empty<byte>();
         }
+
+        /// <summary>
+        /// Creates a PDF document containing the QR code as vector graphics on a page sized to the code.
+        /// Customize the returned document with the document API before saving it with SaveAsPdf.
+        /// </summary>
+        /// <returns>The PDF authoring document.</returns>
+        public Radzen.Documents.Document ToPdfDocument()
+        {
+            var size = CodePdfExport.PointsOrDefault(Size, 144);
+            var margin = 12d;
+            var document = new Radzen.Documents.Document();
+            var section = document.Sections.Add();
+            section.PageSize = new Radzen.Documents.PageSize(size + 2 * margin, size + 2 * margin);
+            section.Margins.SetAll(margin);
+            var code = section.Blocks.Add(new Radzen.Documents.QrCode(Value ?? string.Empty, size));
+            code.ErrorCorrection = (Radzen.Documents.Codes.QrErrorCorrection)(int)Ecc;
+            code.Foreground = CodePdfExport.ParseColor(Foreground, Radzen.Documents.Core.Color.Black);
+            code.AlternateText = Value;
+            return document;
+        }
+
+        /// <summary>
+        /// Exports the QR code to a PDF file and downloads it in the browser.
+        /// </summary>
+        /// <param name="fileName">The downloaded file name.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task ExportToPdfAsync(string fileName = "qrcode.pdf")
+        {
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
+            var document = ToPdfDocument();
+            using var stream = new MemoryStream();
+            await Radzen.Documents.Pdf.DocumentPdfExtensions.SaveAsPdfAsync(document, stream);
+            stream.Position = 0;
+            using var streamReference = new DotNetStreamReference(stream);
+            await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", fileName, streamReference, "application/pdf");
+        }
     }
 }
 
