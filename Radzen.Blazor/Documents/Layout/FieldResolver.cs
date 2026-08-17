@@ -69,7 +69,8 @@ internal sealed class FieldResolver(
         int pageNumber,
         int pageCount,
         HorizontalAlignment? inheritedAlignment,
-        int reservedLines)
+        int reservedLines,
+        int firstLine = -1)
     {
         var pieces = new List<(Inline Run, StringBuilder? Text, int TabsBefore)>();
         var pendingTabs = 0;
@@ -177,13 +178,30 @@ internal sealed class FieldResolver(
             inheritedAlignment,
             resolution);
 
-        if (lines.Count > reservedLines)
+        if (firstLine < 0)
         {
-            throw new InvalidOperationException(
-                $"A field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
-                $"but only {reservedLines} were reserved; widen the available width or shorten the text.");
+            if (lines.Count > reservedLines)
+            {
+                throw new InvalidOperationException(
+                    $"A field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
+                    $"but only {reservedLines} were reserved; widen the available width or shorten the text.");
+            }
+
+            return lines;
         }
 
-        return lines;
+        var available = Math.Max(0, Math.Min(reservedLines, lines.Count - firstLine));
+        if (available == lines.Count && firstLine == 0)
+        {
+            return lines;
+        }
+
+        var pageLines = new List<LineBox>(available);
+        for (var i = 0; i < available; i++)
+        {
+            pageLines.Add(lines[firstLine + i]);
+        }
+
+        return pageLines;
     }
 }
