@@ -44,6 +44,11 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
 
     private DictionaryObject ReadXrefSectionAt(long offset, IndirectObjectStore store)
     {
+        if (offset < 0 || offset >= data.LongLength || offset > int.MaxValue)
+        {
+            throw new DocumentParseException("Cross-reference offset is outside the file.", offset);
+        }
+
         var index = (int)offset;
         SkipWhitespace(ref index);
         return Matches(index, "xref")
@@ -60,7 +65,10 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
             if (Matches(index, "trailer"))
             {
                 index += 7;
-                var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index, limits);
+                if (ObjectParser.Parse(data, index, limits) is not DictionaryObject trailerDict)
+                {
+                    throw new DocumentParseException("Expected trailer dictionary.", index);
+                }
 
                 foreach (var pair in section)
                 {
@@ -140,10 +148,17 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         var dict = stream.Dictionary;
         var decoded = decoder.Decode(dict, stream.Data);
 
-        var widths = (ArrayObject)dict["W"];
-        var w0 = ((NumberObject)widths[0]).IntValue;
-        var w1 = ((NumberObject)widths[1]).IntValue;
-        var w2 = ((NumberObject)widths[2]).IntValue;
+        if (!dict.TryGetValue("W", out var widthsValue) || widthsValue is not ArrayObject { Count: >= 3 } widths
+            || widths[0] is not NumberObject width0
+            || widths[1] is not NumberObject width1
+            || widths[2] is not NumberObject width2)
+        {
+            throw new DocumentParseException("Cross-reference stream /W must be an array of three integers.", -1);
+        }
+
+        var w0 = width0.IntValue;
+        var w1 = width1.IntValue;
+        var w2 = width2.IntValue;
         var entryLength = w0 + w1 + w2;
 
         if (w0 < 0 || w1 < 0 || w2 < 0 || entryLength <= 0)
@@ -151,7 +166,17 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
             throw new DocumentParseException("Invalid cross-reference stream entry width.", -1);
         }
 
-        var size = ((NumberObject)dict["Size"]).IntValue;
+        if (!dict.TryGetValue("Size", out var sizeValue) || sizeValue is not NumberObject sizeNumber)
+        {
+            throw new DocumentParseException("Cross-reference stream /Size must be an integer.", -1);
+        }
+
+        var size = sizeNumber.IntValue;
+        if (size < 0)
+        {
+            throw new DocumentParseException("Cross-reference stream /Size must not be negative.", -1);
+        }
+
         var index = BuildIndex(dict, size);
 
         var pos = 0;
@@ -199,7 +224,17 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         {
             foreach (var item in array)
             {
-                result.Add(((NumberObject)item).IntValue);
+                if (item is not NumberObject number)
+                {
+                    throw new DocumentParseException("Cross-reference stream /Index must contain integers.", -1);
+                }
+
+                result.Add(number.IntValue);
+            }
+
+            if (result.Count % 2 != 0)
+            {
+                throw new DocumentParseException("Cross-reference stream /Index must contain pairs.", -1);
             }
         }
         else

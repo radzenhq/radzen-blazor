@@ -19,7 +19,7 @@ internal static class DocumentLoader
 
         var bytes = PdfSourceBytes.ReadFully(stream, limits.MaxFileBytes);
         var reader = DocumentReader.Parse(bytes, options?.Password, options?.AesProvider, limits);
-        return Build(reader, bytes, limits);
+        return BuildSafely(reader, bytes, limits);
     }
 
     public static async ValueTask<PortableDocument> LoadAsync(Stream stream, ReaderLimits limits, LoadOptions? options)
@@ -31,8 +31,31 @@ internal static class DocumentLoader
         var bytes = PdfSourceBytes.ReadFully(stream, limits.MaxFileBytes);
         var reader = await DocumentReader
             .ParseAsync(bytes, options?.Password, options?.AesProvider, limits).ConfigureAwait(false);
-        return Build(reader, bytes, limits);
+        return BuildSafely(reader, bytes, limits);
     }
+
+    private static PortableDocument BuildSafely(DocumentReader reader, byte[] bytes, ReaderLimits limits)
+    {
+        try
+        {
+            return Build(reader, bytes, limits);
+        }
+        catch (Exception exception) when (IsRecoverableBuildFailure(exception))
+        {
+            throw new DocumentParseException("The PDF document could not be materialized.", exception);
+        }
+    }
+
+    private static bool IsRecoverableBuildFailure(Exception exception)
+        => exception is not DocumentParseException
+            && (exception is KeyNotFoundException
+                or ArgumentException
+                or OverflowException
+                or FormatException
+                or EndOfStreamException
+                or InvalidDataException
+                or InvalidCastException
+                or IndexOutOfRangeException);
 
     private static PortableDocument Build(DocumentReader reader, byte[] bytes, ReaderLimits limits)
     {
