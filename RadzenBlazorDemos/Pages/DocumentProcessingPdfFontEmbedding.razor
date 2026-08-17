@@ -56,6 +56,11 @@
 
     async Task Download()
     {
+        if (document == null)
+        {
+            return;
+        }
+
         using var stream = new MemoryStream();
         document.SaveAsPdf(stream);
         stream.Position = 0;

@@ -53,6 +53,14 @@
         using var source = new MemoryStream(original);
         loaded = PortableDocument.LoadFromStream(source);
 
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            pdf = original;
+            gone = false;
+            status = "Type the text to redact.";
+            return;
+        }
+
         var removed = loaded.RedactText(secret);
         pdf = loaded.ToArray();
 

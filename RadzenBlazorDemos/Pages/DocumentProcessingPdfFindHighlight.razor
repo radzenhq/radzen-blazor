@@ -46,6 +46,13 @@
         using var source = new MemoryStream(blank);
         loaded = PortableDocument.LoadFromStream(source);
 
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            status = "Type a word to search for.";
+            pdf = loaded.ToArray();
+            return;
+        }
+
         var hits = loaded.FindText(query);
         foreach (var hit in hits)
         {
