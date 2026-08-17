@@ -85,6 +85,13 @@ public class DataGridExportProgress
 }
 
 /// <summary>
+/// Configures a DataGrid Excel export.
+/// </summary>
+public class DataGridExcelExportOptions : DataGridExportOptions
+{
+}
+
+/// <summary>
 /// Configures a DataGrid CSV export.
 /// </summary>
 public class DataGridCsvExportOptions : DataGridExportOptions

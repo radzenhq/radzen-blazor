@@ -32,7 +32,7 @@ public class DataGridExportTests
         };
         var component = RenderGrid(context, rows, culture: culture);
 
-        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions { Title = "Orders" }));
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions { Title = "Orders" }));
         var sheet = workbook.Sheets.Single();
 
         Assert.Same(culture, workbook.Culture);
@@ -57,7 +57,7 @@ public class DataGridExportTests
         await component.InvokeAsync(() => component.Instance.GoToPage(1));
 
         var current = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync());
-        var all = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions { Scope = DataGridExportScope.All }));
+        var all = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions { Scope = DataGridExportScope.All }));
 
         Assert.Equal(3, current.Sheets[0].RowCount);
         Assert.Equal(6, all.Sheets[0].RowCount);
@@ -127,7 +127,7 @@ public class DataGridExportTests
         calls.Clear();
         var progress = new List<int>();
 
-        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions
         {
             Scope = DataGridExportScope.All,
             ChunkSize = 2,
@@ -161,7 +161,7 @@ public class DataGridExportTests
         calls.Clear();
         using var cancellation = new CancellationTokenSource();
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() => component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions
+        await Assert.ThrowsAsync<OperationCanceledException>(() => component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions
         {
             Scope = DataGridExportScope.All,
             ChunkSize = 2,
@@ -261,7 +261,7 @@ public class DataGridExportTests
         });
         calls.Clear();
 
-        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions
         {
             Scope = DataGridExportScope.All,
             ChunkSize = 4
@@ -283,11 +283,11 @@ public class DataGridExportTests
         });
         Task<Workbook> second = null;
 
-        await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExportOptions
+        await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions
         {
             Scope = DataGridExportScope.All,
             ChunkSize = 2,
-            Progress = _ => second ??= component.Instance.ToWorkbookAsync(new DataGridExportOptions { Scope = DataGridExportScope.All })
+            Progress = _ => second ??= component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions { Scope = DataGridExportScope.All })
         }));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => second);
