@@ -37,6 +37,32 @@ public class CodePdfExportTests
     }
 
     [Fact]
+    public void RadzenQRCode_ToPdfDocument_ComposesCenterImageOverlay()
+    {
+        using var context = new TestContext();
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var component = context.RenderComponent<RadzenQRCode>(parameters => parameters
+            .Add(code => code.Value, "https://radzen.com")
+            .Add(code => code.Size, "160px")
+            .Add(code => code.Image, "images/logo.png")
+            .Add(code => code.ImageSizePercent, 25)
+            .Add(code => code.ImageBackgroundOpacity, 0.5));
+
+        using var image = new System.IO.MemoryStream(Radzen.Blazor.Pdf.Tests.PdfTestResources.ReadAllBytes("Images/rgb.png"));
+        var document = component.Instance.ToPdfDocument(image);
+        var overlay = document.Sections[0].Blocks.OfType<Radzen.Documents.Container>().Single();
+        var code = overlay.Blocks.OfType<Radzen.Documents.QrCode>().Single();
+        var patch = overlay.Blocks.OfType<Radzen.Documents.Container>().Single().Blocks.OfType<Radzen.Documents.Container>().Single();
+        var logo = patch.Blocks.OfType<Radzen.Documents.Image>().Single();
+
+        Assert.Equal(Radzen.Documents.ContainerLayout.Overlay, overlay.Layout);
+        Assert.Equal(Unit.FromPoint(120), code.Size);
+        Assert.Equal(Unit.FromPoint(30), logo.Width);
+        Assert.Equal((byte?)128, patch.Background?.A);
+        Assert.Equal("%PDF-", Encoding.ASCII.GetString(document.ToPdf(), 0, 5));
+    }
+
+    [Fact]
     public void RadzenQRCode_ToPdfDocument_MapsComponentState()
     {
         using var context = new TestContext();
@@ -48,7 +74,7 @@ public class CodePdfExportTests
             .Add(code => code.Foreground, "#123456"));
 
         var document = component.Instance.ToPdfDocument();
-        var code = document.Sections[0].Blocks.OfType<Radzen.Documents.QrCode>().Single();
+        var code = document.Sections[0].Blocks.OfType<Radzen.Documents.Container>().Single().Blocks.OfType<Radzen.Documents.QrCode>().Single();
 
         Assert.Equal("https://radzen.com", code.Value);
         Assert.Equal(Unit.FromPoint(120), code.Size);
