@@ -1,7 +1,10 @@
 #nullable enable
 
 using System;
+using System.Linq;
+using System.Text;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Core;
 using Xunit;
 using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
@@ -89,5 +92,19 @@ public class PathContentClipTests
         Lacks("page content", "\nf*\n", content);
         Lacks("page content", "\nW\n", content);
         Lacks("page content", "\nW*\n", content);
+    }
+
+    [Fact]
+    public void LoadedClippingPath_ModificationIsRejected()
+    {
+        var document = new PortableDocument();
+        document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("0 0 20 20 re W n 0 0 100 100 re f"));
+        var loaded = InterpreterTestSupport.SaveAndLoad(document);
+        var clip = loaded.Pages[0].Content.OfType<PathContent>().First();
+
+        clip.FillColor = Color.Red;
+
+        var exception = Assert.Throws<NotSupportedException>(() => loaded.ToArray());
+        Assert.Contains("clipping path", exception.Message, StringComparison.Ordinal);
     }
 }

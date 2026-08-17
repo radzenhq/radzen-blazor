@@ -28,7 +28,7 @@ public class PathStateRoundTripTests
         page.SetContent(InterpreterTestSupport.Ascii(Source));
 
         var loaded = InterpreterTestSupport.Load(document.ToArray());
-        loaded.Pages[0].Content[0].Transform = Matrix.Translate(5, 5);
+        loaded.Pages[0].Content[1].Transform = Matrix.Translate(5, 5);
 
         var emission = Emit(loaded);
         return IndirectObject(
@@ -42,8 +42,7 @@ public class PathStateRoundTripTests
         var content = ReencodeAfterMutation();
 
         Carries("page content", " d\n", content);
-        Carries("page content", "\nW\n", content);
-        Carries("page content", "\nf*\n", content);
+        Carries("page content", "\nW f*\n", content);
         Carries("page content", " k\n", content);
         Carries("page content", " cs\n", content);
         Carries("page content", " scn\n", content);

@@ -131,6 +131,11 @@ internal static class ContentEditor
 
     private static void ValidateModification(ContentElement element)
     {
+        if (element is PathContent { Clip: not PathClipMode.None })
+        {
+            throw new NotSupportedException("Modifying a clipping path would change surrounding graphics state and is not supported.");
+        }
+
         if (element is RawContent or XObjectContent or InlineImageContent)
         {
             throw new NotSupportedException($"Modifying loaded {element.GetType().Name} is not supported.");
