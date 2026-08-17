@@ -84,6 +84,10 @@ namespace Radzen.Blazor
             ValidateOptions(options);
 
             var columns = GetExportColumns();
+            var theme = await GetExportThemeAsync(options);
+            var gridLines = ResolveGridLines(theme);
+            var fontSize = options.FontSize ?? ParseCssLength(theme?.FontSize) ?? 9;
+            var (paddingVertical, paddingHorizontal) = ParseCssPadding(theme?.CellPadding) ?? (4, 4);
             var document = new Document();
             var section = document.Sections.Add();
             section.PageSize = options.PageSize;
@@ -95,8 +99,8 @@ namespace Radzen.Blazor
                 document.Info.Title = options.Title;
                 var title = section.Blocks.Add(new Paragraph(options.Title));
                 title.Font.Bold = true;
-                title.Font.Size = Unit.FromPoint(options.FontSize * 1.5);
-                title.SpacingAfter = Unit.FromPoint(options.FontSize);
+                title.Font.Size = Unit.FromPoint(fontSize * 1.5);
+                title.SpacingAfter = Unit.FromPoint(fontSize);
                 if (!string.IsNullOrEmpty(options.FontFamily))
                 {
                     title.Font.Family = options.FontFamily;
@@ -107,7 +111,7 @@ namespace Radzen.Blazor
             {
                 var footer = section.Footer.Blocks.Add(new Paragraph());
                 footer.Alignment = DocumentHorizontalAlignment.Right;
-                footer.Font.Size = Unit.FromPoint(Math.Max(6, options.FontSize - 1));
+                footer.Font.Size = Unit.FromPoint(Math.Max(6, fontSize - 1));
                 if (!string.IsNullOrEmpty(options.FontFamily))
                 {
                     footer.Font.Family = options.FontFamily;
@@ -119,7 +123,7 @@ namespace Radzen.Blazor
             }
 
             var table = section.Blocks.Add(new DocumentTable());
-            table.Font.Size = Unit.FromPoint(options.FontSize);
+            table.Font.Size = Unit.FromPoint(fontSize);
             if (!string.IsNullOrEmpty(options.FontFamily))
             {
                 table.Font.Family = options.FontFamily;
@@ -139,9 +143,6 @@ namespace Radzen.Blazor
                 column.Alignment = GetDocumentAlignment(gridColumn);
             }
 
-            var theme = await GetExportThemeAsync(options);
-            var gridLines = ResolveGridLines(theme);
-
             var header = table.Rows.Add();
             header.IsHeaderRow = true;
             header.RepeatOnEveryPage = options.RepeatHeader;
@@ -152,7 +153,7 @@ namespace Radzen.Blazor
             for (var columnIndex = 0; columnIndex < columns.Count; columnIndex++)
             {
                 header.Cells[columnIndex].Text = columns[columnIndex].GetTitle();
-                header.Cells[columnIndex].Padding = Unit.FromPoint(4);
+                SetPadding(header.Cells[columnIndex], paddingVertical, paddingHorizontal);
                 ApplyGridLines(header.Cells[columnIndex], true, gridLines);
             }
 
@@ -170,7 +171,7 @@ namespace Radzen.Blazor
                 {
                     var cell = row.Cells[columnIndex];
                     cell.Text = Convert.ToString(columns[columnIndex].GetValue(item), Culture) ?? string.Empty;
-                    cell.Padding = Unit.FromPoint(4);
+                    SetPadding(cell, paddingVertical, paddingHorizontal);
                     ApplyGridLines(cell, false, gridLines);
                 }
                 rowIndex++;
@@ -214,6 +215,7 @@ namespace Radzen.Blazor
             var gridLines = ResolveGridLines(theme);
             var horizontalBorder = theme != null && gridLines.Horizontal ? new SpreadsheetBorder { Color = ToHexColor(theme.HorizontalBorder) ?? "#D3D7DC" } : null;
             var verticalBorder = theme != null && gridLines.Vertical ? new SpreadsheetBorder { Color = ToHexColor(theme.VerticalBorder) ?? "#D3D7DC" } : null;
+            var fontSize = ParseCssLength(theme?.FontSize);
             var workbook = new Workbook { Culture = Culture };
             var sheet = workbook.AddSheet(GetSheetName(options.Title), 1, columns.Count);
             sheet.BeginUpdate();
@@ -223,7 +225,7 @@ namespace Radzen.Blazor
                 {
                     var cell = sheet.Cells[0, columnIndex];
                     SetStringValue(cell, columns[columnIndex].GetTitle());
-                    cell.Format = new SpreadsheetFormat { Bold = true, BackgroundColor = headerBackground, Color = headerColor };
+                    cell.Format = new SpreadsheetFormat { Bold = true, BackgroundColor = headerBackground, Color = headerColor, FontSize = fontSize };
                     ApplyExcelBorders(cell, horizontalBorder, verticalBorder);
                 }
 
@@ -246,6 +248,7 @@ namespace Radzen.Blazor
                             SetWorkbookValue(cell, column, item);
                             cell.Format.BackgroundColor = background;
                             cell.Format.Color = rowColor;
+                            cell.Format.FontSize = fontSize;
                             ApplyExcelBorders(cell, horizontalBorder, verticalBorder);
                         }
                     }
@@ -474,7 +477,7 @@ namespace Radzen.Blazor
 
         private async Task<DataGridExportTheme?> GetExportThemeAsync(DataGridExportOptions options)
         {
-            if (!options.UseThemeColors || JSRuntime == null)
+            if (!options.UseTheme || JSRuntime == null)
             {
                 return null;
             }
@@ -491,10 +494,12 @@ namespace Radzen.Blazor
                     "--rz-grid-cell-color",
                     alternatingRowBackgroundVariable,
                     "--rz-grid-bottom-cell-border",
-                    "--rz-grid-right-cell-border"
+                    "--rz-grid-right-cell-border",
+                    "--rz-grid-cell-font-size",
+                    "--rz-grid-cell-padding"
                 });
 
-                if (values == null || values.Length < 7)
+                if (values == null || values.Length < 9)
                 {
                     return null;
                 }
@@ -507,13 +512,62 @@ namespace Radzen.Blazor
                     RowColor = values[3],
                     AlternatingRowBackground = values[4],
                     HorizontalBorder = values[5],
-                    VerticalBorder = values[6]
+                    VerticalBorder = values[6],
+                    FontSize = values[7],
+                    CellPadding = values[8]
                 };
             }
             catch (Exception exception) when (exception is JSException or InvalidOperationException or ArgumentException or JSDisconnectedException or TaskCanceledException)
             {
                 return null;
             }
+        }
+
+        private static double? ParseCssLength(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            var trimmed = value.Trim();
+            var (suffix, factor) = trimmed switch
+            {
+                _ when trimmed.EndsWith("rem", StringComparison.OrdinalIgnoreCase) => ("rem", 12d),
+                _ when trimmed.EndsWith("px", StringComparison.OrdinalIgnoreCase) => ("px", 0.75),
+                _ when trimmed.EndsWith("pt", StringComparison.OrdinalIgnoreCase) => ("pt", 1d),
+                _ => (null, 0d)
+            };
+            if (suffix == null)
+            {
+                return null;
+            }
+
+            return double.TryParse(trimmed[..^suffix.Length], NumberStyles.Float, CultureInfo.InvariantCulture, out var number) ? number * factor : null;
+        }
+
+        private static (double Vertical, double Horizontal)? ParseCssPadding(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            var lengths = value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseCssLength).ToArray();
+            if (lengths.Length == 0 || lengths.Any(length => length == null))
+            {
+                return null;
+            }
+
+            return (lengths[0]!.Value, lengths[Math.Min(1, lengths.Length - 1)]!.Value);
+        }
+
+        private static void SetPadding(Radzen.Documents.Cell cell, double vertical, double horizontal)
+        {
+            cell.PaddingTop = Unit.FromPoint(vertical);
+            cell.PaddingBottom = Unit.FromPoint(vertical);
+            cell.PaddingLeft = Unit.FromPoint(horizontal);
+            cell.PaddingRight = Unit.FromPoint(horizontal);
         }
 
         private static DocumentColor? ParseCssColor(string? value)
@@ -655,5 +709,9 @@ namespace Radzen.Blazor
         public string? HorizontalBorder { get; set; }
 
         public string? VerticalBorder { get; set; }
+
+        public string? FontSize { get; set; }
+
+        public string? CellPadding { get; set; }
     }
 }

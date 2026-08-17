@@ -14,7 +14,7 @@
         </Items>
     </RadzenSelectBar>
     <RadzenCheckBox @bind-Value="useThemeColors" Name="loadDataUseThemeColors" />
-    <RadzenLabel Text="Theme colors" Component="loadDataUseThemeColors" />
+    <RadzenLabel Text="Use theme" Component="loadDataUseThemeColors" />
     <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Disabled="exporting" Click="@(() => Export("pdf"))" />
     <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Disabled="exporting" Click="@(() => Export("excel"))" />
     @if (exporting)
@@ -80,7 +80,7 @@
                     Scope = scope,
                     ChunkSize = 25,
                     Title = "Northwind order details",
-                    UseThemeColors = useThemeColors,
+                    UseTheme = useThemeColors,
                     Progress = OnProgress
                 });
             }
@@ -90,7 +90,7 @@
                 {
                     Scope = scope,
                     ChunkSize = 25,
-                    UseThemeColors = useThemeColors,
+                    UseTheme = useThemeColors,
                     Progress = OnProgress
                 });
             }

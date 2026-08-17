@@ -10,6 +10,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Spreadsheet;
 using Xunit;
@@ -342,7 +343,9 @@ public class DataGridExportTests
             "rgb(16, 24, 32)",
             "rgb(242, 244, 247)",
             "1px solid rgb(200, 205, 210)",
-            "none"
+            "none",
+            "0.875rem",
+            "0.5rem 0.75rem"
         });
         var rows = Enumerable.Range(1, 2).Select(index => new ExportRow(index, $"Row {index}", index, new DateTime(2024, 1, index), $"X{index}")).ToArray();
         var component = RenderGrid(context, rows);
@@ -365,16 +368,33 @@ public class DataGridExportTests
         Assert.Equal("#F2F4F7", sheet.Cells[2, 0].Format.BackgroundColor);
         Assert.Equal("#C8CDD2", sheet.Cells[1, 0].Format.BorderBottom?.Color);
         Assert.Null(sheet.Cells[1, 0].Format.BorderLeft);
+        Assert.Equal(Unit.FromPoint(10.5), table.Font.Size);
+        Assert.Equal(Unit.FromPoint(6), table.Rows[1].Cells[0].PaddingTop);
+        Assert.Equal(Unit.FromPoint(9), table.Rows[1].Cells[0].PaddingLeft);
+        Assert.Equal(10.5, sheet.Cells[1, 0].Format.FontSize);
+    }
+
+    [Fact]
+    public async Task ToPdfDocumentAsync_ExplicitFontSizeOverridesTheme()
+    {
+        using var context = CreateContext();
+        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { null, null, null, null, null, null, null, "0.875rem", (string)null });
+        var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
+
+        var document = await component.InvokeAsync(() => component.Instance.ToPdfDocumentAsync(new DataGridPdfExportOptions { FontSize = 8 }));
+        var table = document.Sections[0].Blocks.OfType<DocumentTable>().Single();
+
+        Assert.Equal(Unit.FromPoint(8), table.Font.Size);
     }
 
     [Fact]
     public async Task Export_KeepsDefaultColorsWhenThemeDisabled()
     {
         using var context = CreateContext();
-        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { "rgb(1, 2, 3)", null, null, null, null, null, null });
+        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { "rgb(1, 2, 3)", null, null, null, null, null, null, null, null });
         var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
 
-        var document = await component.InvokeAsync(() => component.Instance.ToPdfDocumentAsync(new DataGridPdfExportOptions { UseThemeColors = false }));
+        var document = await component.InvokeAsync(() => component.Instance.ToPdfDocumentAsync(new DataGridPdfExportOptions { UseTheme = false }));
         var table = document.Sections[0].Blocks.OfType<DocumentTable>().Single();
 
         Assert.Equal(Radzen.Documents.Core.Color.FromRgb(242, 244, 247), table.Rows[0].Background);
