@@ -281,8 +281,14 @@ internal sealed class IndirectObjectStore(
         }
 
         var decoded = decoder.Decode(stream.Dictionary, stream.Data);
-        var count = ((NumberObject)stream.Dictionary["N"]).IntValue;
-        var first = ((NumberObject)stream.Dictionary["First"]).IntValue;
+        if (!stream.Dictionary.TryGetValue("N", out var countValue) || countValue is not NumberObject countNumber
+            || !stream.Dictionary.TryGetValue("First", out var firstValue) || firstValue is not NumberObject firstNumber)
+        {
+            throw new DocumentParseException("Object stream /N and /First must be direct integers.", -1);
+        }
+
+        var count = countNumber.IntValue;
+        var first = firstNumber.IntValue;
 
         if (count < 0)
         {

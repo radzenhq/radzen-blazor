@@ -18,6 +18,8 @@ internal sealed class ArrayObject : DocumentObject, IEnumerable<DocumentObject>
         items.Add(item);
     }
 
+    internal void Set(int index, DocumentObject item) => items[index] = item;
+
     internal override void Write(Stream stream, WriteContext context)
     {
         stream.WriteByte((byte)'[');

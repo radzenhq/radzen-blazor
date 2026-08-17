@@ -16,6 +16,79 @@ public class DocumentHardeningTests
 {
 
     [Fact]
+    public void NegativeStartXref_IsRepairedOrThrowsDocumentParseException()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 0 /Kids [] >>\nendobj\n");
+        pdf.Append("startxref\n-3\n%%EOF\n");
+
+        AssertRepairOrDocumentParse(pdf.ToArray());
+    }
+
+    [Theory]
+    [InlineData("/Bogus")]
+    [InlineData("[5 0 R 1 1]")]
+    public void InvalidXrefStreamWidths_AreRepairedOrThrowDocumentParseException(string widths)
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 0 /Kids [] >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Object(3, "3 0 obj\n<< /Type /XRef /Size 4 /W " + widths
+            + " /Root 1 0 R /Length 0 >>\nstream\n\nendstream\nendobj\n");
+        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
+
+        AssertRepairOrDocumentParse(pdf.ToArray());
+    }
+
+    [Fact]
+    public void ObjectStreamMissingCount_ThrowsDocumentParseException()
+    {
+        var catalog = "<< /Type /Catalog /Pages 2 0 R >>";
+        var pages = "<< /Type /Pages /Count 0 /Kids [] >>";
+        var header = "1 0 2 " + (catalog.Length + 1).ToString(CultureInfo.InvariantCulture) + " ";
+        var data = header + catalog + " " + pages;
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        var objectStream = pdf.Position;
+        pdf.Object(3, "3 0 obj\n<< /Type /ObjStm /First " + header.Length.ToString(CultureInfo.InvariantCulture)
+            + " /Length " + data.Length.ToString(CultureInfo.InvariantCulture) + " >>\nstream\n" + data + "\nendstream\nendobj\n");
+        var xref = pdf.Position;
+        var payload = new byte[16];
+        Copy(payload, 0, FixturePdf.XrefStreamEntry(2, 3, 0));
+        Copy(payload, 4, FixturePdf.XrefStreamEntry(2, 3, 1));
+        Copy(payload, 8, FixturePdf.XrefStreamEntry(1, (int)objectStream, 0));
+        Copy(payload, 12, FixturePdf.XrefStreamEntry(1, (int)xref, 0));
+        pdf.Object(4, "4 0 obj\n<< /Type /XRef /Size 5 /Index [1 4] /W [1 2 1] /Root 1 0 R /Length 16 >>\nstream\n")
+            .Append(payload)
+            .Append("\nendstream\nendobj\nstartxref\n" + xref + "\n%%EOF\n");
+
+        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(pdf.ToArray())));
+    }
+
+    [Fact]
+    public void CorruptFlatePageStream_ThrowsDocumentParseException()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Contents 4 0 R >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Length 7 /Filter /FlateDecode >>\nstream\ngarbage\nendstream\nendobj\n");
+
+        Assert.Throws<DocumentParseException>(
+            () => PortableDocument.LoadFromStream(new MemoryStream(FixturePdf.Wrap(pdf, 5))));
+    }
+
+    private static void AssertRepairOrDocumentParse(byte[] bytes)
+    {
+        var exception = Record.Exception(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
+        if (exception is not null)
+        {
+            Assert.IsType<DocumentParseException>(exception);
+        }
+    }
+
+    [Fact]
     public void CyclicPageTree_Throws()
     {
         var bytes = ClassicXref(
