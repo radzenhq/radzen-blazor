@@ -33,7 +33,7 @@ public static class RadzenQREncoder
 {
     /// <summary>Encode a UTF-8 string into a QR module matrix.</summary>
     public static bool[,] EncodeUtf8(string value, RadzenQREcc ecc, int minVersion = 1, int maxVersion = 40)
-        => QrEncoder.EncodeUtf8(value, (QrErrorCorrection)(int)ecc, minVersion, maxVersion);
+        => QrEncoder.EncodeUtf8(value ?? string.Empty, (QrErrorCorrection)(int)ecc, minVersion, maxVersion);
 
     /// <summary>Encode raw bytes into a QR module matrix.</summary>
     public static bool[,] EncodeBytes(byte[] data, RadzenQREcc ecc = RadzenQREcc.Medium, int minVersion = 1, int maxVersion = 40)

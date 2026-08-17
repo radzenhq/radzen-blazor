@@ -9,7 +9,7 @@ namespace Radzen.Documents.Codes;
 internal static class SvgAttributes
 {
     private static readonly Regex ColorSyntax = new(
-        @"^(?:#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*\d*\.?\d+\s*)?\)|[A-Za-z]+)$",
+        @"^(?:#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|(?:rgba?|hsla?)\([^<>&""']+\)|var\(--[A-Za-z0-9_-]+(?:,\s*[^<>&""']+)?\)|[A-Za-z]+)$",
         RegexOptions.CultureInvariant);
 
     // https://www.w3.org/TR/xml/#NT-AttValue - an attribute value may not contain '<', '&' or its delimiter.
@@ -38,8 +38,10 @@ internal static class SvgAttributes
         return escaped.ToString();
     }
 
-    internal static string Color(string value, string parameterName)
-        => IsColor(value)
+    internal static string Color(string? value, string parameterName)
+        => string.IsNullOrWhiteSpace(value)
+            ? "none"
+            : IsColor(value)
             ? Escape(value)
             : throw new ArgumentException($"'{value}' is not a valid CSS color.", parameterName);
 
@@ -52,6 +54,8 @@ internal static class SvgAttributes
 
         return value[0] == '#'
             || value.StartsWith("rgb", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("hsl", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("var(", StringComparison.OrdinalIgnoreCase)
             || IsKeyword(value)
             || ColorValue.Parse(value) is not null;
     }
