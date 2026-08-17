@@ -2662,6 +2662,94 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(result, r => r.Id == 1);
             Assert.Contains(result, r => r.Id == 3);
         }
+
+        [Fact]
+        public void Where_FiltersNullableScalarProperty_WithIn()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, ClientNr = (long?)100 },
+                new { Id = 2, ClientNr = (long?)200 },
+                new { Id = 3, ClientNr = (long?)300 },
+                new { Id = 4, ClientNr = default(long?) }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "ClientNr",
+                    FilterValue = new long[] { 100, 300 },
+                    FilterOperator = FilterOperator.In
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersNullableScalarProperty_WithNotIn()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, ClientNr = (long?)100 },
+                new { Id = 2, ClientNr = (long?)200 },
+                new { Id = 3, ClientNr = (long?)300 },
+                new { Id = 4, ClientNr = default(long?) }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "ClientNr",
+                    FilterValue = new long[] { 100, 300 },
+                    FilterOperator = FilterOperator.NotIn
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 4);
+        }
+
+        [Fact]
+        public void Where_FiltersNullableScalarProperty_WithSecondFilterValue_In()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, ClientNr = (long?)100 },
+                new { Id = 2, ClientNr = (long?)200 },
+                new { Id = 3, ClientNr = (long?)300 },
+                new { Id = 4, ClientNr = default(long?) }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "ClientNr",
+                    FilterValue = 100L,
+                    FilterOperator = FilterOperator.Equals,
+                    SecondFilterValue = new long[] { 200, 300 },
+                    SecondFilterOperator = FilterOperator.In,
+                    LogicalFilterOperator = LogicalFilterOperator.Or
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(3, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
     }
 }
 
