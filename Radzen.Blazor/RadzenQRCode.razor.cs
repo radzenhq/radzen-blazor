@@ -258,8 +258,9 @@ namespace Radzen.Blazor
         /// Creates a PDF document containing the QR code as vector graphics on a page sized to the code.
         /// Customize the returned document with the document API before saving it with SaveAsPdf.
         /// </summary>
+        /// <param name="image">The center image content. When null the code is rendered without a center image; use <see cref="ToPdfDocumentAsync"/> to download the <see cref="Image"/> URL automatically.</param>
         /// <returns>The PDF authoring document.</returns>
-        public Radzen.Documents.Document ToPdfDocument()
+        public Radzen.Documents.Document ToPdfDocument(Stream? image = null)
         {
             var size = CodePdfExport.PointsOrDefault(Size, 144);
             var margin = 12d;
@@ -267,11 +268,52 @@ namespace Radzen.Blazor
             var section = document.Sections.Add();
             section.PageSize = new Radzen.Documents.PageSize(size + 2 * margin, size + 2 * margin);
             section.Margins.SetAll(margin);
-            var code = section.Blocks.Add(new Radzen.Documents.QrCode(Value ?? string.Empty, size));
+            var container = section.Blocks.Add(new Radzen.Documents.Container { Layout = Radzen.Documents.ContainerLayout.Overlay });
+            var code = container.Blocks.Add(new Radzen.Documents.QrCode(Value ?? string.Empty, size));
             code.ErrorCorrection = (Radzen.Documents.Codes.QrErrorCorrection)(int)Ecc;
             code.Foreground = CodePdfExport.ParseColor(Foreground, Radzen.Documents.Core.Color.Black);
             code.AlternateText = Value;
+
+            if (image != null)
+            {
+                var moduleCount = RadzenQREncoder.EncodeUtf8(Value ?? string.Empty, Ecc).GetLength(0) + 2 * code.QuietZoneModules;
+                var moduleSize = size / moduleCount;
+                var imageSize = size * ImageSizePercent / 100;
+                var padding = ImagePaddingModules * moduleSize;
+                var patchSize = imageSize + 2 * padding;
+                var background = CodePdfExport.ParseColor(ImageBackground, Radzen.Documents.Core.Color.White);
+                var opacity = Math.Clamp(ImageBackgroundOpacity, 0, 1);
+                if (opacity < 1)
+                {
+                    background = Radzen.Documents.Core.Color.FromArgb((byte)Math.Round(opacity * 255), background.R, background.G, background.B);
+                }
+
+                var holder = container.Blocks.Add(new Radzen.Documents.Container());
+                holder.PaddingTop = (size - patchSize) / 2;
+                var patch = holder.Blocks.Add(new Radzen.Documents.Container
+                {
+                    Alignment = Radzen.Documents.HorizontalAlignment.Center,
+                    Width = patchSize,
+                    Background = background
+                });
+                patch.Padding = padding;
+                patch.CornerRadius = ImageCornerRadius * moduleSize;
+                var logo = patch.Blocks.Add(new Radzen.Documents.Image(image));
+                logo.Width = imageSize;
+                logo.Height = imageSize;
+                logo.AlternateText = string.Empty;
+            }
+
             return document;
+        }
+
+        /// <summary>
+        /// Creates a PDF document containing the QR code as vector graphics, downloading the center <see cref="Image"/> when one is set.
+        /// </summary>
+        /// <returns>The PDF authoring document.</returns>
+        public async Task<Radzen.Documents.Document> ToPdfDocumentAsync()
+        {
+            return ToPdfDocument(await LoadImageAsync());
         }
 
         /// <summary>
@@ -286,12 +328,49 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var document = ToPdfDocument();
+            var document = await ToPdfDocumentAsync();
             using var stream = new MemoryStream();
             await Radzen.Documents.Pdf.DocumentPdfExtensions.SaveAsPdfAsync(document, stream);
             stream.Position = 0;
             using var streamReference = new DotNetStreamReference(stream);
             await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", fileName, streamReference, "application/pdf");
+        }
+
+        [Inject]
+        NavigationManager? NavigationManager { get; set; }
+
+        [Inject]
+        IServiceProvider? ServiceProvider { get; set; }
+
+        private async Task<Stream?> LoadImageAsync()
+        {
+            if (string.IsNullOrEmpty(Image))
+            {
+                return null;
+            }
+
+            try
+            {
+                if (Image.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var comma = Image.IndexOf(',', StringComparison.Ordinal);
+                    return comma > 0 ? new MemoryStream(Convert.FromBase64String(Image[(comma + 1)..])) : null;
+                }
+
+                var uri = NavigationManager != null ? NavigationManager.ToAbsoluteUri(Image) : new Uri(Image, UriKind.Absolute);
+                var shared = ServiceProvider?.GetService(typeof(System.Net.Http.HttpClient)) as System.Net.Http.HttpClient;
+                using var owned = shared == null ? new System.Net.Http.HttpClient() : null;
+                var client = shared ?? owned!;
+                using var source = await client.GetStreamAsync(uri);
+                var buffer = new MemoryStream();
+                await source.CopyToAsync(buffer);
+                buffer.Position = 0;
+                return buffer;
+            }
+            catch (Exception exception) when (exception is System.Net.Http.HttpRequestException or UriFormatException or FormatException or TaskCanceledException)
+            {
+                return null;
+            }
         }
     }
 }
