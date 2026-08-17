@@ -7,11 +7,11 @@
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenFormField Text="User password">
-            <RadzenTextBox @bind-Value=@password aria-label="password" Change=@(async _ => await GenerateAsync()) />
+            <RadzenTextBox @bind-Value=@password aria-label="password" Disabled=@(!ready) Change=@(async _ => await GenerateAsync()) />
         </RadzenFormField>
-        <RadzenCheckBox @bind-Value=@allowPrinting Name="printing" aria-label="allow printing" Change=@(async (bool _) => await GenerateAsync()) />
+        <RadzenCheckBox @bind-Value=@allowPrinting Name="printing" aria-label="allow printing" Disabled=@(!ready) Change=@(async (bool _) => await GenerateAsync()) />
         <RadzenLabel Text="Allow printing" Component="printing" />
-        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Click=@Download />
+        <RadzenButton Text="Download PDF" Icon="download" ButtonStyle="ButtonStyle.Secondary" Disabled=@(!ready) Click=@Download />
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.Caption">
         AES-256 runs in the browser through <code>SubtleCryptoAesCbcProvider</code> - the document never leaves this page.
@@ -25,13 +25,19 @@
 @code {
     string password = "radzen";
     bool allowPrinting = true;
-    string status;
+    string status = "Generating encrypted PDF...";
+    bool ready;
     PortableDocument portable;
     byte[] pdf;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await GenerateAsync();
+        if (firstRender)
+        {
+            await GenerateAsync();
+            ready = true;
+            StateHasChanged();
+        }
     }
 
     async Task GenerateAsync()
