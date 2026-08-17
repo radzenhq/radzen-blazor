@@ -1,0 +1,41 @@
+﻿@page "/datagrid-export"
+@page "/export-excel-csv"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Export to PDF, Excel and CSV
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Export a Blazor DataGrid to PDF, Excel, and CSV directly in the browser - no server required.
+    Choose between the current page and all rows; exports respect the current sort, filter, column order, format strings, and theme colors.
+</RadzenText>
+
+<RadzenText Anchor="datagrid-export#export" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Export
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Call <code>ExportToPdfAsync</code>, <code>ExportToExcelAsync</code>, or <code>ExportToCsvAsync</code> and pick a scope - the current page or all filtered and sorted rows.
+</RadzenText>
+<RadzenExample ComponentName="DataGrid" Example="DataGridExport">
+    <DataGridExport />
+</RadzenExample>
+
+<RadzenText Anchor="datagrid-export#loaddata" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    LoadData export
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    This grid loads one page at a time. Exporting all rows requests the filtered and sorted data in chunks, reports progress, and restores the visible page when done.
+</RadzenText>
+<RadzenExample ComponentName="DataGrid" Example="DataGridExportLoadData">
+    <DataGridExportLoadData />
+</RadzenExample>
+
+<RadzenText Anchor="datagrid-export#customization" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Customization
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The Total column has no Property; it renders a template on screen and exports through <code>ExportValue</code>, with <code>FormatString</code> applied to the returned value.
+    <code>ToPdfDocumentAsync</code> returns the PDF document before it is saved so you can customize it with the full document API - the customized download adds a watermark and document metadata.
+</RadzenText>
+<RadzenExample ComponentName="DataGrid" Example="DataGridExportCustomization">
+    <DataGridExportCustomization />
+</RadzenExample>

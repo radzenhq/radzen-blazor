@@ -1,0 +1,64 @@
+@using Microsoft.EntityFrameworkCore
+@using System.IO
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Radzen.Documents
+@using Radzen.Documents.Pdf
+
+@inherits DbContextPage
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" class="rz-mb-4">
+    <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Click="@(() => grid.ExportToPdfAsync("order-totals.pdf", new DataGridPdfExportOptions { Scope = DataGridExportScope.All, Title = "Order totals" }))" />
+    <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="@(() => grid.ExportToExcelAsync("order-totals.xlsx", new DataGridExportOptions { Scope = DataGridExportScope.All }))" />
+    <RadzenButton Text="Download customized PDF" Icon="edit_document" ButtonStyle="ButtonStyle.Secondary" Click="ExportCustomPdf" />
+</RadzenStack>
+
+<RadzenDataGrid @ref="grid" Data="orderDetails" TItem="OrderDetail" AllowPaging="true" PageSize="5">
+    <Columns>
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price" FormatString="{0:C2}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn Title="Total" TextAlign="TextAlign.Right" FormatString="{0:C2}" ExportValue="@(detail => Total(detail))">
+            <Template Context="detail">@string.Format("{0:C2}", Total(detail))</Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<OrderDetail> grid;
+    List<OrderDetail> orderDetails = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        orderDetails = await dbContext.OrderDetails.Include(detail => detail.Product).ToListAsync();
+    }
+
+    static double Total(OrderDetail detail) => (detail.UnitPrice ?? 0) * (detail.Quantity ?? 0) * (1 - (detail.Discount ?? 0));
+
+    async Task ExportCustomPdf()
+    {
+        var document = await grid.ToPdfDocumentAsync(new DataGridPdfExportOptions
+        {
+            Scope = DataGridExportScope.All,
+            Title = "Order totals"
+        });
+
+        document.Info.Author = "Northwind Traders";
+
+        var section = document.Sections[0];
+        section.Watermark = new Watermark
+        {
+            Text = "CONFIDENTIAL",
+            Opacity = 0.08,
+            Rotation = -45
+        };
+
+        using var stream = new MemoryStream();
+        document.SaveAsPdf(stream);
+        stream.Position = 0;
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "order-totals.pdf", streamRef, "application/pdf");
+    }
+}
