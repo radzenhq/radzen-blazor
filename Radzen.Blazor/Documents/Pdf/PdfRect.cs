@@ -73,6 +73,11 @@ internal struct PdfRectBounds
 
     public void Include(double x, double y)
     {
+        if (!double.IsFinite(x) || !double.IsFinite(y))
+        {
+            return;
+        }
+
         if (!HasPoint)
         {
             left = right = x;

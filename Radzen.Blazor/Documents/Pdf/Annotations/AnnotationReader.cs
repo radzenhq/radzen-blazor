@@ -111,10 +111,27 @@ internal static class AnnotationReader
             var bounds = new PdfRectBounds();
             for (var point = 0; point < 8; point += 2)
             {
-                bounds.Include(Number(reader, quadPoints[i + point]), Number(reader, quadPoints[i + point + 1]));
+                var xIndex = i + point;
+                var yIndex = xIndex + 1;
+                var x = Number(reader, quadPoints[xIndex]);
+                var y = Number(reader, quadPoints[yIndex]);
+                if (!double.IsFinite(x))
+                {
+                    quadPoints.Set(xIndex, new NumberObject(0));
+                }
+
+                if (!double.IsFinite(y))
+                {
+                    quadPoints.Set(yIndex, new NumberObject(0));
+                }
+
+                bounds.Include(x, y);
             }
 
-            annotation.Areas.Add(bounds.ToRect());
+            if (bounds.ToRectOrNull() is { } area)
+            {
+                annotation.Areas.Add(area);
+            }
         }
 
         return annotation;
