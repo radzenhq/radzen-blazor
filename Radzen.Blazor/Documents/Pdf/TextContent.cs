@@ -154,6 +154,8 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref insideTextObject, value);
     }
 
+    internal string? SourceShowOperator { get; set; }
+
     private protected override void EmitBody(ContentWriter writer)
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);

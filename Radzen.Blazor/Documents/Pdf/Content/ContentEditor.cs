@@ -136,6 +136,11 @@ internal static class ContentEditor
             throw new NotSupportedException("Modifying a clipping path would change surrounding graphics state and is not supported.");
         }
 
+        if (element is TextContent { SourceShowOperator: "'" or "\"" } text)
+        {
+            throw new NotSupportedException($"Modifying text from the '{text.SourceShowOperator}' show operator is not supported safely.");
+        }
+
         if (element is RawContent or XObjectContent or InlineImageContent)
         {
             throw new NotSupportedException($"Modifying loaded {element.GetType().Name} is not supported.");

@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -60,6 +61,21 @@ public class ContentEditorNestedTextObjectTests
 
         Assert.Equal(Color.Red, actual[0].Color);
         Assert.Equal(Color.Black, actual[1].Color);
+    }
+
+    [Theory]
+    [InlineData("BT /F1 12 Tf 14 TL 10 100 Td (First) Tj (Second) ' ET", "'")]
+    [InlineData("BT /F1 12 Tf 14 TL 10 100 Td (First) Tj 2 1 (Second) \" ET", "\"")]
+    public void ModifiedTextFromLineAdvancingShowOperator_IsRejected(string source, string showOperator)
+    {
+        var document = new PortableDocument();
+        document.Pages.Add().SetContent(TestBytes.Ascii(source));
+        var loaded = InterpreterTestSupport.SaveAndLoad(document);
+        loaded.Pages[0].Content.OfType<TextContent>().Last().Color = Color.Red;
+
+        var exception = Assert.Throws<NotSupportedException>(() => loaded.ToArray());
+
+        Assert.Contains($"'{showOperator}' show operator", exception.Message, System.StringComparison.Ordinal);
     }
 
     private static int Count(string content, string op)
