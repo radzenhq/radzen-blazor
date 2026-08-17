@@ -14,6 +14,7 @@ using Radzen.Documents.Spreadsheet;
 using DocumentColor = Radzen.Documents.Core.Color;
 using DocumentHorizontalAlignment = Radzen.Documents.HorizontalAlignment;
 using DocumentTable = Radzen.Documents.Table;
+using SpreadsheetBorder = Radzen.Documents.Spreadsheet.BorderStyle;
 using SpreadsheetFormat = Radzen.Documents.Spreadsheet.Format;
 
 namespace Radzen.Blazor
@@ -139,6 +140,7 @@ namespace Radzen.Blazor
             }
 
             var theme = await GetExportThemeAsync(options);
+            var gridLines = ResolveGridLines(theme);
 
             var header = table.Rows.Add();
             header.IsHeaderRow = true;
@@ -151,7 +153,7 @@ namespace Radzen.Blazor
             {
                 header.Cells[columnIndex].Text = columns[columnIndex].GetTitle();
                 header.Cells[columnIndex].Padding = Unit.FromPoint(4);
-                ApplyGridLines(header.Cells[columnIndex], true);
+                ApplyGridLines(header.Cells[columnIndex], true, gridLines);
             }
 
             var rowBackground = ParseCssColor(theme?.RowBackground);
@@ -169,7 +171,7 @@ namespace Radzen.Blazor
                     var cell = row.Cells[columnIndex];
                     cell.Text = Convert.ToString(columns[columnIndex].GetValue(item), Culture) ?? string.Empty;
                     cell.Padding = Unit.FromPoint(4);
-                    ApplyGridLines(cell, false);
+                    ApplyGridLines(cell, false, gridLines);
                 }
                 rowIndex++;
             }
@@ -209,6 +211,9 @@ namespace Radzen.Blazor
             var rowBackground = ToHexColor(theme?.RowBackground);
             var alternatingRowBackground = ToHexColor(theme?.AlternatingRowBackground);
             var rowColor = ToHexColor(theme?.RowColor);
+            var gridLines = ResolveGridLines(theme);
+            var horizontalBorder = theme != null && gridLines.Horizontal ? new SpreadsheetBorder { Color = ToHexColor(theme.HorizontalBorder) ?? "#D3D7DC" } : null;
+            var verticalBorder = theme != null && gridLines.Vertical ? new SpreadsheetBorder { Color = ToHexColor(theme.VerticalBorder) ?? "#D3D7DC" } : null;
             var workbook = new Workbook { Culture = Culture };
             var sheet = workbook.AddSheet(GetSheetName(options.Title), 1, columns.Count);
             sheet.BeginUpdate();
@@ -219,6 +224,7 @@ namespace Radzen.Blazor
                     var cell = sheet.Cells[0, columnIndex];
                     SetStringValue(cell, columns[columnIndex].GetTitle());
                     cell.Format = new SpreadsheetFormat { Bold = true, BackgroundColor = headerBackground, Color = headerColor };
+                    ApplyExcelBorders(cell, horizontalBorder, verticalBorder);
                 }
 
                 var rowIndex = 1;
@@ -240,6 +246,7 @@ namespace Radzen.Blazor
                             SetWorkbookValue(cell, column, item);
                             cell.Format.BackgroundColor = background;
                             cell.Format.Color = rowColor;
+                            ApplyExcelBorders(cell, horizontalBorder, verticalBorder);
                         }
                     }
                     rowIndex++;
@@ -374,6 +381,20 @@ namespace Radzen.Blazor
             SetStringValue(cell, Convert.ToString(column.GetValue(item), Culture) ?? string.Empty);
         }
 
+        private static void ApplyExcelBorders(Radzen.Documents.Spreadsheet.Cell cell, SpreadsheetBorder? horizontal, SpreadsheetBorder? vertical)
+        {
+            if (horizontal != null)
+            {
+                cell.Format.BorderTop = horizontal.Clone();
+                cell.Format.BorderBottom = horizontal.Clone();
+            }
+            if (vertical != null)
+            {
+                cell.Format.BorderLeft = vertical.Clone();
+                cell.Format.BorderRight = vertical.Clone();
+            }
+        }
+
         private static void SetNativeValue(Radzen.Documents.Spreadsheet.Cell cell, object? value)
         {
             if (value is string text)
@@ -468,10 +489,12 @@ namespace Radzen.Blazor
                     "--rz-grid-header-color",
                     rowBackgroundVariable,
                     "--rz-grid-cell-color",
-                    alternatingRowBackgroundVariable
+                    alternatingRowBackgroundVariable,
+                    "--rz-grid-bottom-cell-border",
+                    "--rz-grid-right-cell-border"
                 });
 
-                if (values == null || values.Length < 5)
+                if (values == null || values.Length < 7)
                 {
                     return null;
                 }
@@ -482,7 +505,9 @@ namespace Radzen.Blazor
                     HeaderColor = values[1],
                     RowBackground = values[2],
                     RowColor = values[3],
-                    AlternatingRowBackground = values[4]
+                    AlternatingRowBackground = values[4],
+                    HorizontalBorder = values[5],
+                    VerticalBorder = values[6]
                 };
             }
             catch (Exception exception) when (exception is JSException or InvalidOperationException or ArgumentException or JSDisconnectedException or TaskCanceledException)
@@ -550,21 +575,52 @@ namespace Radzen.Blazor
             };
         }
 
-        private void ApplyGridLines(Radzen.Documents.Cell cell, bool header)
+        private readonly record struct ExportGridLines(bool Horizontal, bool Vertical, DocumentColor HorizontalColor, DocumentColor VerticalColor);
+
+        private ExportGridLines ResolveGridLines(DataGridExportTheme? theme)
         {
-            var color = DocumentColor.FromRgb(211, 215, 220);
-            if (GridLines is DataGridGridLines.Default or DataGridGridLines.Both or DataGridGridLines.Horizontal)
+            var fallback = DocumentColor.FromRgb(211, 215, 220);
+            var (horizontal, vertical) = GridLines switch
             {
-                SetBorder(cell.Borders.Bottom, 0.4, color);
+                DataGridGridLines.Both => (true, true),
+                DataGridGridLines.Horizontal => (true, false),
+                DataGridGridLines.Vertical => (false, true),
+                DataGridGridLines.None => (false, false),
+                _ => theme != null ? (HasBorder(theme.HorizontalBorder), HasBorder(theme.VerticalBorder)) : (true, false)
+            };
+            return new ExportGridLines(horizontal, vertical, ParseCssColor(theme?.HorizontalBorder) ?? fallback, ParseCssColor(theme?.VerticalBorder) ?? fallback);
+        }
+
+        private static bool HasBorder(string? value)
+        {
+            if (string.IsNullOrEmpty(value) || value.Contains("none", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var width = value.Split(' ')[0];
+            if (width.EndsWith("px", StringComparison.OrdinalIgnoreCase) && double.TryParse(width[..^2], NumberStyles.Float, CultureInfo.InvariantCulture, out var pixels))
+            {
+                return pixels > 0;
+            }
+
+            return true;
+        }
+
+        private static void ApplyGridLines(Radzen.Documents.Cell cell, bool header, ExportGridLines gridLines)
+        {
+            if (gridLines.Horizontal)
+            {
+                SetBorder(cell.Borders.Bottom, 0.4, gridLines.HorizontalColor);
                 if (!header)
                 {
-                    SetBorder(cell.Borders.Top, 0.4, color);
+                    SetBorder(cell.Borders.Top, 0.4, gridLines.HorizontalColor);
                 }
             }
-            if (GridLines is DataGridGridLines.Default or DataGridGridLines.Both or DataGridGridLines.Vertical)
+            if (gridLines.Vertical)
             {
-                SetBorder(cell.Borders.Left, 0.4, color);
-                SetBorder(cell.Borders.Right, 0.4, color);
+                SetBorder(cell.Borders.Left, 0.4, gridLines.VerticalColor);
+                SetBorder(cell.Borders.Right, 0.4, gridLines.VerticalColor);
             }
         }
 
@@ -595,5 +651,9 @@ namespace Radzen.Blazor
         public string? RowColor { get; set; }
 
         public string? AlternatingRowBackground { get; set; }
+
+        public string? HorizontalBorder { get; set; }
+
+        public string? VerticalBorder { get; set; }
     }
 }
