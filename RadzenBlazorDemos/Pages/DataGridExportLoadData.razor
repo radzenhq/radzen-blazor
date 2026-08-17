@@ -13,7 +13,7 @@
             <RadzenSelectBarItem Text="All" Value="DataGridExportScope.All" />
         </Items>
     </RadzenSelectBar>
-    <RadzenCheckBox @bind-Value="useThemeColors" Name="loadDataUseThemeColors" />
+    <RadzenCheckBox @bind-Value="useTheme" Name="loadDataUseThemeColors" />
     <RadzenLabel Text="Use theme" Component="loadDataUseThemeColors" />
     <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Disabled="exporting" Click="@(() => Export("pdf"))" />
     <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Disabled="exporting" Click="@(() => Export("excel"))" />
@@ -43,7 +43,7 @@
     bool isLoading;
     bool exporting;
     DataGridExportScope scope = DataGridExportScope.All;
-    bool useThemeColors = true;
+    bool useTheme = true;
 
     double progressValue => total > 0 ? Math.Round(loaded * 100d / total) : 0;
 
@@ -80,7 +80,7 @@
                     Scope = scope,
                     ChunkSize = 25,
                     Title = "Northwind order details",
-                    UseTheme = useThemeColors,
+                    UseTheme = useTheme,
                     Progress = OnProgress
                 });
             }
@@ -90,7 +90,7 @@
                 {
                     Scope = scope,
                     ChunkSize = 25,
-                    UseTheme = useThemeColors,
+                    UseTheme = useTheme,
                     Progress = OnProgress
                 });
             }

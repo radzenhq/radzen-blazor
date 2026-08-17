@@ -13,8 +13,8 @@
                 <RadzenSelectBarItem Text="All" Value="DataGridExportScope.All" />
             </Items>
         </RadzenSelectBar>
-        <RadzenCheckBox @bind-Value="useThemeColors" Name="useThemeColors" />
-        <RadzenLabel Text="Use theme" Component="useThemeColors" />
+        <RadzenCheckBox @bind-Value="useTheme" Name="useTheme" />
+        <RadzenLabel Text="Use theme" Component="useTheme" />
         <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Click="ExportPdf" />
         <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="ExportExcel" />
         <RadzenButton Text="Export CSV" Icon="description" ButtonStyle="ButtonStyle.Secondary" Click="ExportCsv" />
@@ -37,7 +37,7 @@
     RadzenDataGrid<OrderDetail> grid;
     List<OrderDetail> orderDetails = new();
     DataGridExportScope scope = DataGridExportScope.CurrentPage;
-    bool useThemeColors = true;
+    bool useTheme = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,13 +51,13 @@
         {
             Scope = scope,
             Title = "Northwind order details",
-            UseTheme = useThemeColors
+            UseTheme = useTheme
         });
     }
 
     Task ExportExcel()
     {
-        return grid.ExportToExcelAsync("orders.xlsx", new DataGridExportOptions { Scope = scope, UseTheme = useThemeColors });
+        return grid.ExportToExcelAsync("orders.xlsx", new DataGridExportOptions { Scope = scope, UseTheme = useTheme });
     }
 
     Task ExportCsv()
