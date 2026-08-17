@@ -1,4 +1,5 @@
 @using System.IO
+@using Radzen.Blazor.Rendering
 @using Radzen.Documents
 @using Radzen.Documents.Core
 @using Radzen.Documents.Pdf
@@ -28,15 +29,9 @@
         Generate();
     }
 
-    static Color Parse(string value)
-    {
-        var parts = value.Replace("rgb(", "").Replace(")", "").Split(',');
-        return Color.FromRgb(byte.Parse(parts[0]), byte.Parse(parts[1]), byte.Parse(parts[2]));
-    }
-
     void Generate()
     {
-        var color = Parse(accent);
+        var color = RGB.Parse(accent) is { } rgb ? Color.FromHex(rgb.ToHex()) : Color.FromRgb(25, 118, 210);
 
         document = new Document();
         document.Info.Title = "Named styles";
