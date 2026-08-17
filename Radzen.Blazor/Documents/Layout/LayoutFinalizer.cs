@@ -18,16 +18,17 @@ internal static class LayoutFinalizer
         var count = document.Pages.Length;
         var pages = ImmutableArray.CreateBuilder<LaidOutPage>(count);
         var anchors = new Dictionary<string, SourceId>(StringComparer.Ordinal);
+        var bodyFieldLineOffsets = new Dictionary<SourceId, int>();
         var fields = new FormFieldRules();
         for (var index = 0; index < count; index++)
         {
             var page = document.Pages[index];
-            var state = new PageState(resolver, resolution, capture, index + 1, count);
+            var state = new PageState(resolver, resolution, capture, bodyFieldLineOffsets, index + 1, count);
             var width = page.ContentBox.Width;
 
-            var body = state.Layer(page.Body, width);
-            var header = state.Layer(page.HeaderLayer, width);
-            var footer = state.Layer(page.FooterLayer, width);
+            var body = state.Layer(page.Body, width, trackFieldLines: true);
+            var header = state.Layer(page.HeaderLayer, width, trackFieldLines: false);
+            var footer = state.Layer(page.FooterLayer, width, trackFieldLines: false);
 
             if (body is not null || header is not null || footer is not null)
             {
@@ -56,11 +57,15 @@ internal static class LayoutFinalizer
         FieldResolver resolver,
         LoweringResult resolution,
         LayoutCaptureContext capture,
+        Dictionary<SourceId, int> bodyFieldLineOffsets,
         int pageNumber,
         int pageCount)
     {
-        public LaidOutLayer? Layer(LaidOutLayer layer, double width)
+        private bool trackFieldLines;
+
+        public LaidOutLayer? Layer(LaidOutLayer layer, double width, bool trackFieldLines)
         {
+            this.trackFieldLines = trackFieldLines;
             if (ResolveContent(layer, width, Tables) is not { } resolved)
             {
                 return null;
@@ -225,11 +230,19 @@ internal static class LayoutFinalizer
                 if (FieldParagraph(current) is { } paragraph)
                 {
                     var reserved = Reserved(lines, i);
+                    var firstLine = trackFieldLines && bodyFieldLineOffsets.TryGetValue(current.Source, out var offset)
+                        ? offset
+                        : 0;
                     var y = current.Y;
-                    foreach (var box in Break(paragraph, width, reserved))
+                    foreach (var box in Break(paragraph, width, firstLine, reserved))
                     {
                         result.Add(current with { Line = box, Y = y });
                         y += box.Height;
+                    }
+
+                    if (trackFieldLines)
+                    {
+                        bodyFieldLineOffsets[current.Source] = firstLine + reserved;
                     }
 
                     i += reserved;
@@ -244,8 +257,15 @@ internal static class LayoutFinalizer
             return result.ToImmutable();
         }
 
-        private IReadOnlyList<LineBox> Break(Paragraph paragraph, double width, int reserved)
-            => resolver.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph), reserved);
+        private IReadOnlyList<LineBox> Break(Paragraph paragraph, double width, int firstLine, int reserved)
+            => resolver.ResolveFields(
+                paragraph,
+                width,
+                pageNumber,
+                pageCount,
+                resolution.Alignment(paragraph),
+                reserved,
+                trackFieldLines ? firstLine : -1);
 
         private static int Reserved(ImmutableArray<LaidOutLine> lines, int start)
         {
