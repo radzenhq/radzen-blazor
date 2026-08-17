@@ -205,7 +205,7 @@ internal static class ContentInterpreter
             return false;
         }
 
-        EmitText(target, interpreter, interpreter.Graphics);
+        EmitText(target, interpreter, interpreter.Graphics, op);
         return true;
     }
 
@@ -441,7 +441,7 @@ internal static class ContentInterpreter
     }
 
 
-    private static void EmitText(ContentCollection target, InterpreterState interpreter, GraphicsState state)
+    private static void EmitText(ContentCollection target, InterpreterState interpreter, GraphicsState state, string? showOperator)
     {
         ref var text = ref interpreter.Machine.Text;
         var textMatrix = interpreter.Machine.TextMatrix;
@@ -504,6 +504,7 @@ internal static class ContentInterpreter
             FillPaint = state.FillPaint,
             WordSpacing = text.Spacing.WordSpacing,
             CharSpacing = text.Spacing.CharSpacing,
+            SourceShowOperator = showOperator,
             Transform = transform,
             IsArtifact = artifactDepth > 0,
         };
