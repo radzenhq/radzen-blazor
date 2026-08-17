@@ -1,0 +1,67 @@
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+        <RadzenText Text="Rows:" />
+        <RadzenSelectBar @bind-Value="scope" TValue="DataGridExportScope" Size="ButtonSize.Small">
+            <Items>
+                <RadzenSelectBarItem Text="Current page" Value="DataGridExportScope.CurrentPage" />
+                <RadzenSelectBarItem Text="All" Value="DataGridExportScope.All" />
+            </Items>
+        </RadzenSelectBar>
+        <RadzenCheckBox @bind-Value="useThemeColors" Name="useThemeColors" />
+        <RadzenLabel Text="Theme colors" Component="useThemeColors" />
+        <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Click="ExportPdf" />
+        <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="ExportExcel" />
+        <RadzenButton Text="Export CSV" Icon="description" ButtonStyle="ButtonStyle.Secondary" Click="ExportCsv" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="grid" Data="orderDetails" TItem="OrderDetail" AllowPaging="true" PageSize="10"
+                AllowSorting="true" AllowFiltering="true" GridLines="Radzen.DataGridGridLines.Both">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="100px" />
+        <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" FormatString="{0:d}" Width="130px" />
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" Width="240px" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price" FormatString="{0:C2}" TextAlign="TextAlign.Right" Width="130px" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" TextAlign="TextAlign.Right" Width="110px" />
+        <RadzenDataGridColumn Property="Discount" Title="Discount" FormatString="{0:P0}" TextAlign="TextAlign.Right" Width="110px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<OrderDetail> grid;
+    List<OrderDetail> orderDetails = new();
+    DataGridExportScope scope = DataGridExportScope.CurrentPage;
+    bool useThemeColors = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        orderDetails = await dbContext.OrderDetails.Include(detail => detail.Order).Include(detail => detail.Product).ToListAsync();
+    }
+
+    Task ExportPdf()
+    {
+        return grid.ExportToPdfAsync("orders.pdf", new DataGridPdfExportOptions
+        {
+            Scope = scope,
+            Title = "Northwind order details",
+            UseThemeColors = useThemeColors
+        });
+    }
+
+    Task ExportExcel()
+    {
+        return grid.ExportToExcelAsync("orders.xlsx", new DataGridExportOptions { Scope = scope, UseThemeColors = useThemeColors });
+    }
+
+    Task ExportCsv()
+    {
+        return grid.ExportToCsvAsync("orders.csv", new DataGridCsvExportOptions { Scope = scope });
+    }
+}

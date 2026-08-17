@@ -1,0 +1,110 @@
+@using Microsoft.EntityFrameworkCore
+@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" class="rz-mb-4">
+    <RadzenText Text="Rows:" />
+    <RadzenSelectBar @bind-Value="scope" TValue="DataGridExportScope" Size="ButtonSize.Small">
+        <Items>
+            <RadzenSelectBarItem Text="Current page" Value="DataGridExportScope.CurrentPage" />
+            <RadzenSelectBarItem Text="All" Value="DataGridExportScope.All" />
+        </Items>
+    </RadzenSelectBar>
+    <RadzenCheckBox @bind-Value="useThemeColors" Name="loadDataUseThemeColors" />
+    <RadzenLabel Text="Theme colors" Component="loadDataUseThemeColors" />
+    <RadzenButton Text="Export PDF" Icon="picture_as_pdf" Disabled="exporting" Click="@(() => Export("pdf"))" />
+    <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Disabled="exporting" Click="@(() => Export("excel"))" />
+    @if (exporting)
+    {
+        <RadzenProgressBar Value="progressValue" ShowValue="true" Style="width: 260px" AriaLabel="Export progress" />
+        <RadzenText Text="@($"{loaded} of {total} rows")" />
+    }
+</RadzenStack>
+
+<RadzenDataGrid @ref="grid" Data="orderDetails" TItem="OrderDetail" Count="count" LoadData="LoadData"
+                IsLoading="isLoading" AllowPaging="true" PageSize="10" AllowSorting="true" AllowFiltering="true">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="100px" />
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" Width="260px" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price" FormatString="{0:C2}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" TextAlign="TextAlign.Right" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<OrderDetail> grid;
+    IEnumerable<OrderDetail> orderDetails;
+    int count;
+    int loaded;
+    int total;
+    bool isLoading;
+    bool exporting;
+    DataGridExportScope scope = DataGridExportScope.All;
+    bool useThemeColors = true;
+
+    double progressValue => total > 0 ? Math.Round(loaded * 100d / total) : 0;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        await Task.Yield();
+        var query = dbContext.OrderDetails.Include(detail => detail.Order).Include(detail => detail.Product).AsQueryable();
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(grid.ColumnsCollection);
+        }
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        count = query.Count();
+        orderDetails = query.Skip(args.Skip ?? 0).Take(args.Top ?? 10).ToList();
+        isLoading = false;
+    }
+
+    async Task Export(string format)
+    {
+        exporting = true;
+        loaded = 0;
+        total = count;
+        try
+        {
+            var fileName = scope == DataGridExportScope.All ? "all-orders" : "orders";
+            if (format == "pdf")
+            {
+                await grid.ExportToPdfAsync($"{fileName}.pdf", new DataGridPdfExportOptions
+                {
+                    Scope = scope,
+                    ChunkSize = 25,
+                    Title = "Northwind order details",
+                    UseThemeColors = useThemeColors,
+                    Progress = OnProgress
+                });
+            }
+            else
+            {
+                await grid.ExportToExcelAsync($"{fileName}.xlsx", new DataGridExportOptions
+                {
+                    Scope = scope,
+                    ChunkSize = 25,
+                    UseThemeColors = useThemeColors,
+                    Progress = OnProgress
+                });
+            }
+        }
+        finally
+        {
+            exporting = false;
+        }
+    }
+
+    void OnProgress(DataGridExportProgress value)
+    {
+        loaded = value.Loaded;
+        total = value.Total;
+        _ = InvokeAsync(StateHasChanged);
+    }
+}
