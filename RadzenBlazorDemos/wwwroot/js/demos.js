@@ -60,3 +60,13 @@ function showMapInfoWindow(mapId, markerTitle, message) {
     window.infoWindow = new google.maps.InfoWindow({ content: message });
     setTimeout(function() { window.infoWindow.open(map, marker); }, 200);
 }
+
+window.addEventListener('message', function (e) {
+    if (e.origin === 'https://blocks.radzen.com' && e.data && e.data.type === 'radzen-block-resize') {
+        document.querySelectorAll('iframe').forEach(function (frame) {
+            if (frame.contentWindow === e.source) {
+                frame.style.height = e.data.height + 'px';
+            }
+        });
+    }
+});

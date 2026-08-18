@@ -1,0 +1,49 @@
+@inject ThemeService ThemeService
+@implements IDisposable
+
+<iframe src="@Src" title="@Title" loading="lazy" style="width: 100%; border: 0; display: block; min-height: 200px"></iframe>
+
+@code {
+    const string BaseUrl = "https://blocks.radzen.com";
+
+    [Parameter]
+    public string Path { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    string Src
+    {
+        get
+        {
+            var query = $"?theme={Uri.EscapeDataString(ThemeService.Theme ?? "material3")}";
+
+            if (ThemeService.RightToLeft == true)
+            {
+                query += "&rtl=1";
+            }
+
+            if (ThemeService.Wcag == true)
+            {
+                query += "&wcag=1";
+            }
+
+            return $"{BaseUrl}{Path}{query}";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    void OnThemeChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+    }
+}

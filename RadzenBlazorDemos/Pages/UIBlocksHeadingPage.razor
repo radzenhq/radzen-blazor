@@ -15,18 +15,7 @@
     <RadzenTabs class="example-tabs">
         <Tabs>
             <RadzenTabsItem Text="Example">
-                <RadzenRow class="rz-w-100 rz-mx-auto" RowGap="0" >
-                    <RadzenColumn Size="12" SizeMD="5" class="rz-p-6 rz-p-sm-12">
-                        <RadzenText Text="Page Title" TextStyle="Radzen.Blazor.TextStyle.H2" TextAlign="Radzen.TextAlign.Left" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H1" class="rz-m-0" />
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="7" class="rz-px-6 rz-p-sm-12 rz-text-align-start rz-text-align-md-end">
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap" Gap="1rem" class="rz-display-inline-flex rz-h-100">
-                            <RadzenLink Text="Primary action" class="rz-order-1 rz-order-md-3 rz-button rz-button-md rz-primary rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                            <RadzenLink Text="Secondary action" class="rz-order-2 rz-button rz-button-md rz-base rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                            <RadzenLink Text="Tertiary action" class="rz-order-3 rz-order-md-1 rz-button rz-button-md rz-base rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                        </RadzenStack>
-                    </RadzenColumn>
-                </RadzenRow>
+                <UIBlock Path="/heading/title-with-actions" Title="Title with actions" />
             </RadzenTabsItem>
             <UIBlocks />
         </Tabs>
@@ -40,15 +29,7 @@
     <RadzenTabs class="example-tabs">
         <Tabs>
             <RadzenTabsItem Text="Example">
-                <RadzenRow class="rz-w-100 rz-mx-auto" RowGap="0" >
-                    <RadzenColumn Size="12" class="rz-px-6 rz-pt-3 rz-pb-6 rz-px-sm-12 rz-pb-sm-12">
-                        <RadzenBreadCrumb class="rz-pb-1 rz-pt-sm-6">
-                        <RadzenBreadCrumbItem Text="Item 1" />
-                        <RadzenBreadCrumbItem Text="Item 2" />
-                        </RadzenBreadCrumb>
-                        <RadzenText Text="Page Title" TextStyle="Radzen.Blazor.TextStyle.H2" TextAlign="Radzen.TextAlign.Left" TagName="Radzen.Blazor.TagName.H1" class="rz-m-0" />
-                    </RadzenColumn>
-                </RadzenRow>
+                <UIBlock Path="/heading/title-with-breadcrumbs" Title="Title with breadcrumbs" />
             </RadzenTabsItem>
             <UIBlocks />
         </Tabs>
@@ -63,24 +44,7 @@
     <RadzenTabs class="example-tabs">
         <Tabs>
             <RadzenTabsItem Text="Example">
-                <RadzenRow class="rz-w-100 rz-mx-auto" RowGap="0" >
-                    <RadzenColumn Size="12" class="rz-px-6 rz-pt-3 rz-pb-1 rz-px-sm-12 rz-pt-sm-6">
-                        <RadzenBreadCrumb>
-                        <RadzenBreadCrumbItem Text="Item 1" />
-                        <RadzenBreadCrumbItem Text="Item 2" />
-                        </RadzenBreadCrumb>
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="5" class="rz-px-6 rz-pb-6 rz-px-sm-12 rz-pb-sm-12">
-                        <RadzenText Text="Page Title" TextStyle="Radzen.Blazor.TextStyle.H2" TextAlign="Radzen.TextAlign.Left" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H1" class="rz-m-0" />
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="7" class="rz-px-6 rz-pb-6 rz-px-sm-12 rz-pb-sm-12 rz-text-align-start rz-text-align-md-end">
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap" Gap="1rem" class="rz-display-inline-flex rz-h-100">
-                            <RadzenLink Text="Primary action" class="rz-order-1 rz-order-md-3 rz-button rz-button-md rz-primary rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                            <RadzenLink Text="Secondary action" class="rz-order-2 rz-button rz-button-md rz-base rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                            <RadzenLink Text="Tertiary action" class="rz-order-3 rz-order-md-1 rz-button rz-button-md rz-base rz-variant-flat rz-shade-default rz-text-align-center" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-page-headings" />
-                        </RadzenStack>
-                    </RadzenColumn>
-                </RadzenRow>
+                <UIBlock Path="/heading/title-with-breadcrumbs-and-actions" Title="Title with breadcrumbs and actions" />
             </RadzenTabsItem>
             <UIBlocks />
         </Tabs>
