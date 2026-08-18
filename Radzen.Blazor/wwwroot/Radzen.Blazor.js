@@ -3345,20 +3345,35 @@ window.Radzen = {
     ref.navLabelInputEnd = 0;
 
     function formatLabel(fraction) {
-      var inputStart = ref.navLabelInputStart;
-      var inputEnd = ref.navLabelInputEnd;
-      if (inputStart === inputEnd) return '';
-      var value = inputStart + fraction * (inputEnd - inputStart);
-      if (ref.navLabelIsDate) {
-        // .NET ticks to JS Date: ticks are 100ns intervals from 0001-01-01
-        var ticksToMs = value / 10000 - 62135596800000;
-        var d = new Date(ticksToMs);
-        var m = d.getMonth() + 1;
-        var day = d.getDate();
-        var y = d.getFullYear();
-        return (m < 10 ? '0' : '') + m + '/' + (day < 10 ? '0' : '') + day + '/' + y;
-      }
-      return Math.round(value).toString();
+        var inputStart = ref.navLabelInputStart;
+        var inputEnd = ref.navLabelInputEnd;
+
+        if (inputStart === inputEnd) return '';
+
+        var value = inputStart + fraction * (inputEnd - inputStart);
+
+        if (ref.navLabelIsDate) {
+            // .NET ticks -> JavaScript Date
+            var ticksToMs = value / 10000 - 62135596800000;
+            var d = new Date(ticksToMs);
+
+            var format = ref.handleLabelFormatString || "{0:MM/dd/yyyy}";
+
+            // Extract "MM/dd/yyyy" from "{0:MM/dd/yyyy}"
+            format = format.replace(/^\{0:/, '').replace(/\}$/, '');
+
+            return format
+                .replace(/yyyy/g, d.getFullYear().toString())
+                .replace(/MM/g, String(d.getMonth() + 1).padStart(2, '0'))
+                .replace(/dd/g, String(d.getDate()).padStart(2, '0'))
+                .replace(/HH/g, String(d.getHours()).padStart(2, '0'))
+                .replace(/mm/g, String(d.getMinutes()).padStart(2, '0'))
+                .replace(/ss/g, String(d.getSeconds()).padStart(2, '0'))
+                .replace(/M/g, String(d.getMonth() + 1))
+                .replace(/d/g, String(d.getDate()));
+        }
+
+        return Math.round(value).toString();
     }
 
     function setLabelText(el, text) {
@@ -3528,12 +3543,13 @@ window.Radzen = {
     return [width, height];
   },
 
-  updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd) {
-    if (!ref) return;
-    ref.navLabelIsDate = isDate;
-    ref.navLabelInputStart = inputStart;
-    ref.navLabelInputEnd = inputEnd;
-  },
+    updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd, handleLabelFormatString) {
+        if (!ref) return;
+        ref.navLabelIsDate = isDate;
+        ref.navLabelInputStart = inputStart;
+        ref.navLabelInputEnd = inputEnd;
+        ref.handleLabelFormatString = handleLabelFormatString;
+    },
 
   destroyGauge: function (ref) {
     if (ref._gaugeRTLObserver) {
