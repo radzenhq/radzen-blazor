@@ -1,5 +1,6 @@
 using Bunit;
 using System;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -152,6 +153,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 1, 20)));
             });
 
@@ -169,6 +171,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
                 parameters.Add(p => p.Separator, " → ");
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 1, 20)));
             });
@@ -187,6 +190,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 20), new DateTime(2024, 1, 10)));
             });
 
