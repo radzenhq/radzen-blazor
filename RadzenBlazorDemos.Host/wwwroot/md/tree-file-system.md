@@ -1,0 +1,67 @@
+﻿# Tree: Files and directories
+
+This example demonstrates how to populate Blazor RadzenTree from the file system.
+
+Keywords: tree, treeview, nodes, file, directory
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## File and directory browser
+
+Populate RadzenTree from the file system.
+
+```razor
+<RadzenRow class="rz-p-0 rz-p-lg-12">
+    <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
+        <RadzenCard>
+            <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    IEnumerable<string> entries;
+    protected override void OnInitialized()
+    {
+        entries = Directory.GetDirectories(Directory.GetCurrentDirectory())
+                           .Where(entry =>
+                           {
+                               var name = Path.GetFileName(entry);
+
+                               return !name.StartsWith(".") && name != "bin" && name != "obj";
+                           });
+
+    }
+
+    void LoadFiles(TreeExpandEventArgs args)
+    {
+        var directory = args.Value as string;
+
+        args.Children.Data = Directory.EnumerateFileSystemEntries(directory);
+        args.Children.Text = GetTextForNode;
+        args.Children.HasChildren = (path) => Directory.Exists((string)path);
+        args.Children.Template = FileOrFolderTemplate;
+        args.Children.Checkable = o => false;
+    }
+
+    string GetTextForNode(object data)
+    {
+        return Path.GetFileName((string)data);
+    }
+
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
+    {
+        string path = context.Value as string;
+        bool isDirectory = Directory.Exists(path);
+
+        builder.OpenComponent<RadzenIcon>(0);
+        builder.AddAttribute(1, nameof(RadzenIcon.Icon), isDirectory ? "folder" : "insert_drive_file");
+        builder.CloseComponent();
+        builder.AddContent(3, context.Text);
+    };
+}
+```

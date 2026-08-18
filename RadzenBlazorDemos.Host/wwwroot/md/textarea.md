@@ -1,0 +1,77 @@
+﻿# TextArea
+
+The Blazor TextArea is a multi-line text input with auto-resize, value binding, and placeholder support.
+
+Keywords: input, form, edit
+
+> API reference: [RadzenTextArea API](https://blazor.radzen.com/api/textarea.md)
+
+## Examples
+
+## Blazor TextArea
+
+The Blazor TextArea is a multi-line text input with auto-resize, value binding, and placeholder support.
+
+```razor
+<RadzenRow Gap="2rem" RowGap="2rem" class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea</RadzenText>
+            <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) Style="width: 100%" aria-label="TextArea" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with placeholder</RadzenText>
+            <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) Style="width: 100%" aria-label="TextArea with placeholder" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with @maxLength maximum characters</RadzenText>
+            <RadzenTextArea @bind-Value=@maxLengthValue @oninput="@(args => maxLengthValue = $"{args.Value}")" MaxLength="@maxLength" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) Style="width: 100%" aria-label="TextArea with 5 maximum characters" />
+            <span style="font-style: italic;">@($"{maxLengthValue.Length}/{maxLength}")</span>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Style="overflow: scroll">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with 3 rows and 30 columns</RadzenText>
+            <RadzenTextArea @bind-Value=@value Cols="30" Rows="3" Change=@(args => OnChange(args, "TextArea with 3 rows and 30 columns")) aria-label="TextArea with 3 rows and 30 columns" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Style="overflow: scroll">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled TextArea with 3 rows and 30 columns</RadzenText>
+            <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" aria-label="Disabled TextArea with 3 rows and 30 columns" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+	    <RadzenCard>
+		    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Auto-resize TextArea</RadzenText>
+		    <RadzenTextArea oninput="event.target.style.height = Math.max(event.target.clientHeight, event.target.scrollHeight) + 'px';" Change=@(args => OnChange(args, "Auto-resize")) Style="width: 100%" aria-label="Auto-resize" />
+	    </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+	    <RadzenCard>
+		    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Change on every input</RadzenText>
+            <RadzenTextArea Immediate="true" Change=@(args => OnChange(args, "TextBox with change on every input")) @bind-Value=@value aria-label="TextArea with change on every input" />
+	    </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+<EventConsole @ref=@console />
+
+@code {
+    string maxLengthValue = "";
+    int maxLength = 5;
+
+    string value;
+
+    EventConsole console;
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}
+```

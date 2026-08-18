@@ -1,0 +1,78 @@
+﻿# CustomValidator
+
+Demonstration and configuration of the Radzen Blazor Custom Validator component.
+
+Keywords: validator, validation, custom, unique
+
+> API reference: [RadzenCustomValidator API](https://blazor.radzen.com/api/customvalidator.md)
+
+## Examples
+
+## Blazor CustomValidator
+
+Implement custom validation logic with flexible validation rules.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Personal information">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Email" Component="Email" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Name="Email" @bind-Value=@model.Email Placeholder="Try with mail@example.com" Style="display: block; width: 100%;" />
+                        <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup />
+                        <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup />
+                        <RadzenCustomValidator Component="Email" Validator="@(() => ValidateNewEmail(model.Email))" Text="Email already exists" Popup=@popup />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    class Model
+    {
+        public string Email { get; set; }
+    }
+
+    string[] emails = new string[] { "mail@example.com" };
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    bool ValidateNewEmail(string email)
+    {
+        return !emails.Any(e => e.ToUpper().Equals(email?.ToUpper()));
+    }
+
+    void OnSubmit(Model model)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}
+```

@@ -1,0 +1,204 @@
+﻿# Area Chart
+
+Show how a value's volume changes over time with a Blazor area chart - a filled line chart. Free and open source.
+
+Keywords: chart, graph, area
+
+## Examples
+
+## Radzen Blazor Chart with area series
+
+An area chart is a line chart with the space beneath the line filled in, which emphasizes volume or magnitude as it changes over time.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                <RadzenLabel Text="Smooth" Component="smooth" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick Placement" Component="tickPlacement" />
+                <RadzenSelectBar @bind-Value="@tickPlacement" TValue="TickPlacement" Size="ButtonSize.Small" Name="tickPlacement">
+                    <Items>
+                        <RadzenSelectBarItem Value="TickPlacement.Between" Text="Between" />
+                        <RadzenSelectBarItem Value="TickPlacement.On" Text="On" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart Animate="true">
+        <RadzenAreaSeries Smooth="@smooth" FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenAreaSeries Smooth="@smooth" FillMode="@fillMode" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenCategoryAxis LabelAutoRotation="-45" TickPlacement="@tickPlacement" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    bool smooth = true;
+    bool showDataLabels = false;
+    FillMode fillMode = FillMode.Gradient;
+    TickPlacement tickPlacement = TickPlacement.Between;
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 294000
+        }
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 334000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 369000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 333000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 344000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 314000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 353000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 374000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 384000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 373000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 382000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 389000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 394000
+        }
+    };
+}
+```

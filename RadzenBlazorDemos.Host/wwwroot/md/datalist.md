@@ -1,0 +1,84 @@
+﻿# DataList: IQueryable
+
+Demonstration and configuration of the Radzen Blazor DataList component.
+
+Keywords: dataview, grid, table, list
+
+> API reference: [RadzenDataList API](https://blazor.radzen.com/api/datalist.md)
+
+## Examples
+
+## Blazor DataList
+
+Display collections with paging and templates.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2">
+        <RadzenCheckBox @bind-Value="@allowVirtualization" Name="allowVirtualization"  />
+        <RadzenLabel Text="Allow virtualization" Component="allowVirtualization" />
+    </RadzenStack>
+
+    <RadzenDataList AllowVirtualization=@allowVirtualization Style="@(allowVirtualization ? "height:400px;overflow:auto;" : "")" 
+                    WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)"
+                    Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+        <Template Context="product">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0" Style="width: 100%; overflow: hidden;">
+                <RadzenRow Gap="0">
+                    <RadzenColumn Size="12" SizeLG="3" class="rz-p-4 product-title">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-on-secondary-lighter">@(product.ProductName)</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeLG="7" class="rz-p-4">
+                        <RadzenRow Gap="0">
+                            <RadzenColumn Size="12" SizeMD="6" SizeLG="2">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">In Stock</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(product.UnitsInStock)</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="6" SizeLG="2">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">Origin</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(product.Supplier?.Country)</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="6" SizeLG="5">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">Sold by</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(product.Supplier?.CompanyName)</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="6" SizeLG="3" class="rz-text-align-start rz-text-align-lg-end">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", product.UnitPrice)}") />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeLG="2" class="rz-p-4">
+                        <RadzenButton Text="Order now" Style="width: 100%" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+
+<style>
+.product-title {
+    min-height: 72px;
+    background-color: var(--rz-secondary-lighter);
+}
+.price-badge {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+    padding: 8px;
+}
+</style>
+
+@code {
+    bool allowVirtualization;
+
+    IQueryable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products.Include("Category").Include("Supplier");
+    }
+}
+```

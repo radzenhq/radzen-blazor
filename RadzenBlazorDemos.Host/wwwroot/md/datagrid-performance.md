@@ -1,0 +1,101 @@
+﻿# DataGrid: Performance
+
+Blazor Data Grid bound to a large collection of data
+
+Keywords: datagrid, bind, performance, data, large
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## Blazor DataGrid
+
+See how the Blazor DataGrid stays fast with large datasets - tens of thousands of rows - using virtualization and server-side paging so only the rows in view are rendered and fetched.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
+    AllowGrouping="true" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+    Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true"
+    IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="OrderID" Title="OrderID" Width="160px" />
+        <RadzenDataGridColumn Property="ProductID" Title="ProductID" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="UnitPrice" Width="160px" FormatString="{0:C}" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" Width="160px" FormatString="{0:P}" />
+        <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="OrderDate" Width="160px" FormatString="{0:d}" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IQueryable<OrderAndDetail> data;
+
+    bool isLoading = false;
+
+    async Task ShowLoading()
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        isLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await ShowLoading();
+
+        data = from o in dbContext.Orders.Take(20)
+               from od in dbContext.OrderDetails
+               from e in dbContext.Employees
+               select new OrderAndDetail()
+               {
+                    OrderID = od.OrderID,
+                    ProductID = od.ProductID,
+                    UnitPrice = od.UnitPrice,
+                    Quantity = od.Quantity,
+                    Discount = od.Discount,
+                    CustomerID = o.CustomerID,
+                    OrderDate = o.OrderDate,
+                    EmployeeID = e.EmployeeID,
+                    Photo = e.Photo,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Title = e.Title,
+                    TitleOfCourtesy = e.TitleOfCourtesy
+               };
+    }
+
+    public class OrderAndDetail
+    {
+        public int OrderID { get; set; }
+        public int ProductID { get; set; }
+        public double? UnitPrice { get; set; }
+        public short? Quantity { get; set; }
+        public float? Discount { get; set; }
+        public string CustomerID { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public int? EmployeeID { get; set; }
+        public string Photo { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Title { get; set; }
+        public string TitleOfCourtesy { get; set; }
+    }
+}
+```

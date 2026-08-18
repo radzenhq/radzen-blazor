@@ -1,0 +1,98 @@
+﻿# DataGrid: Group Footer Template
+
+The GroupFooterTemplate column property allows you to display aggregated data (totals) in the column footer for each group.
+
+Keywords: group, grouping, footer, template, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Group Footer Totals
+
+Show per-group totals in a Blazor DataGrid with GroupFooterTemplate - display sums, averages, and counts in the footer of each group.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+            <RadzenSwitch @bind-Value="@alwaysShowGroupFooter" Name="alwaysShowGroupFooter" Change="@(args => allGroupsExpanded = !alwaysShowGroupFooter)" />
+            <RadzenLabel Text="Always show group footers" Component="alwaysShowGroupFooter" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="false" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+                ShowPagingSummary="true" Data="@orders" Render="@OnRender" GroupFootersAlwaysVisible="@alwaysShowGroupFooter" @bind-AllGroupsExpanded="@allGroupsExpanded">
+    <GroupHeaderTemplate>
+        @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
+    </GroupHeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template>
+                @(orders.IndexOf(context) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID">
+            <FooterTemplate>
+                Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+            </FooterTemplate>
+            <GroupFooterTemplate>
+                Group amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", context.Data.Items.Cast<Order>().Sum(o => o.Freight))</b>
+            </GroupFooterTemplate>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+                    <Template Context="order">
+                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                    </Template>
+                    <FooterTemplate>
+                        Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+                    </FooterTemplate>
+                    <GroupFooterTemplate>
+                        Max Freight: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", context.Data.Items.Cast<Order>().Max(o => o.Freight))</b>
+                    </GroupFooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
+                    <FooterTemplate>
+                        Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
+                    </FooterTemplate>
+                    <GroupFooterTemplate>
+                        Last order date: <b>@String.Format("{0:d}", context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
+                    </GroupFooterTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Width="160px" Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Width="160px" Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool? allGroupsExpanded;
+    bool alwaysShowGroupFooter = false;
+    IList<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void OnRender(DataGridRenderEventArgs<Order> args)
+    {
+        if(args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Employee.LastName", Title = "Employee" });
+            StateHasChanged();
+        }
+    }
+}
+```

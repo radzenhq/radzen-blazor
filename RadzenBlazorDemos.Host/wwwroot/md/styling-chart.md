@@ -1,0 +1,108 @@
+﻿# Styling Chart
+
+Restyle a Blazor chart with color schemes, custom series colors, fills, and fonts to match your theme.
+
+Keywords: chart, graph, styling
+
+## Examples
+
+## Radzen Blazor Chart Styling
+
+This example shows how to restyle a chart - color schemes, custom series colors, fills, and fonts - to match your brand or theme.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+                <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
+                    <Template>
+                        @Enum.GetName(typeof(ColorScheme), context)
+                    </Template>
+                </RadzenDropDown>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeLG="8">
+            <RadzenChart ColorScheme="@colorScheme">
+                @for (var year = 2017; year <= 2024; year++)
+                {
+                    var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
+                    <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
+                }
+                <RadzenColumnOptions Margin="0" />
+                <RadzenValueAxis Formatter="@FormatAsUSD" />
+            </RadzenChart>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="4">
+            <RadzenChart ColorScheme="@colorScheme">
+                <RadzenPieSeries FillMode="FillMode.Gradient" Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Custom colors and styling</RadzenText>
+            <RadzenChart>
+                <RadzenAreaSeries FillMode="FillMode.Gradient" Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
+                    <ChildContent>
+                        <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />
+                    </ChildContent>
+                    <TooltipTemplate Context="data">
+                        Revenue for <span>@data.Quarter</span> 2020: <strong>@data.Revenue.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</strong>
+                    </TooltipTemplate>
+                </RadzenAreaSeries>
+                <RadzenCategoryAxis>
+                    <RadzenGridLines Visible="true" Stroke="#ccc" LineType="LineType.Dashed" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+                <RadzenChartTooltipOptions Style="border: 1px solid rgb(236,72,127); background: #eee; color: #000;" />
+                <RadzenLegend Visible="false" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
+    ColorScheme colorScheme = ColorScheme.Palette;
+
+    class DataItem
+    {
+        public int Year { get; set; }
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    IList<DataItem> revenue = new List<DataItem>();
+
+    protected override void OnInitialized()
+    {
+        var random = new Random();
+
+        for (var year = 2017; year <= 2024; year++)
+        {
+            for (var quarter = 1; quarter <= 4; quarter++)
+            {
+                revenue.Add(new DataItem
+                {
+                    Year = year,
+                    Quarter = $"Q{quarter}",
+                    Revenue = random.NextDouble() * 200000
+                });
+            }
+        }
+    }
+}
+```

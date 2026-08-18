@@ -1,0 +1,73 @@
+﻿# Stack
+
+The Blazor Stack arranges children horizontally or vertically with consistent spacing.
+
+Keywords: stack, layout
+
+> API reference: [RadzenStack API](https://blazor.radzen.com/api/stack.md)
+
+## Examples
+
+## Blazor Stack
+
+The Blazor Stack arranges children horizontally or vertically with consistent spacing.
+
+```razor
+<RadzenCard class="rz-my-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Orientation
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "orientation" }})"
+                        Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            AlignItems
+            <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "align items" }})"
+                        Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            JustifyContent
+            <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "justify content" }})"
+                        Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Wrap
+            <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "wrap" }})"
+                        Data="@(Enum.GetValues(typeof(FlexWrap)).Cast<FlexWrap>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Gap
+            <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Reverse
+            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "reverse" }})" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+<RadzenCard class="rz-p-0">
+    <RadzenStack Orientation="@orientation" Gap="@gap" Reverse="@reverse" JustifyContent="@justifyContent" AlignItems="@alignItems" Wrap="@wrap" Style="height: 400px">
+        <RadzenCard class="rz-p-1 rz-background-color-info rz-color-on-info rz-text-align-center">
+            A
+        </RadzenCard>
+        <RadzenCard class="rz-p-1 rz-background-color-success rz-color-on-success rz-text-align-center" style="height: 40px; width: 40px;">
+            B
+        </RadzenCard>
+        <RadzenCard class="rz-p-1 rz-background-color-warning rz-color-on-warning rz-text-align-center" style="height: 60px; width: 60px;">
+            C
+        </RadzenCard>
+        <RadzenCard class="rz-p-1 rz-background-color-danger rz-color-on-danger rz-text-align-center" style="height: 80px; width: 80px;">
+            D
+        </RadzenCard>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    Orientation orientation = Orientation.Horizontal;
+    AlignItems alignItems = AlignItems.Normal;
+    JustifyContent justifyContent = JustifyContent.Normal;
+    FlexWrap wrap = FlexWrap.NoWrap;
+    string gap = "10px";
+    bool reverse;
+}
+```

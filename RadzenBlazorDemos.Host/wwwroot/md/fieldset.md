@@ -1,0 +1,82 @@
+﻿# Fieldset
+
+The Blazor Fieldset groups related form fields under a titled, collapsible container.
+
+Keywords: form, container
+
+> API reference: [RadzenFieldset API](https://blazor.radzen.com/api/fieldset.md)
+
+## Examples
+
+## Blazor Fieldset
+
+The Blazor Fieldset groups related form fields under a titled, collapsible container with a legend.
+
+```razor
+@inherits DbContextPage
+
+<RadzenFieldset AllowCollapse="true" Style="width: 700px; margin: 40px auto;" ExpandTitle="Expand orders." CollapseTitle="Collapse orders."
+                ExpandAriaLabel="Expand the list of orders." CollapseAriaLabel="Collapse the list of orders."
+                Expand=@(() => Change("Fieldset expanded")) Collapse=@(() => Change("Fieldset collapsed"))>
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem">
+            <RadzenIcon Icon="account_box" /><b>Orders</b>
+        </RadzenStack>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
+                        Data="@orders" TItem="Order">
+            <Template Context="order">
+                <RadzenCard Style="width: 250px">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="8" class="rz-text-truncate">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
+                                <b>@(order.ShipName)</b>
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" class="rz-text-align-end">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
+
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                            <RadzenStack Gap="0.25rem">
+                                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.P" class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                                <div>@order.ShipAddress</div>
+                                <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </Template>
+        </RadzenDataList>
+    </ChildContent>
+    <SummaryTemplate>
+        <RadzenCard class="rz-mt-4">
+            <b>@orders.Count() Orders</b>
+        </RadzenCard>
+    </SummaryTemplate>
+</RadzenFieldset>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void Change(string text)
+    {
+        console.Log($"{text}");
+    }
+}
+```

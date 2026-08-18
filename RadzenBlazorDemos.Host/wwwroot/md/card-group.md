@@ -1,0 +1,72 @@
+﻿# CardGroup
+
+The Blazor CardGroup lays out a set of cards as a connected, responsive group.
+
+Keywords: card, group, deck, container
+
+> API reference: [RadzenCardGroup API](https://blazor.radzen.com/api/cardgroup.md)
+
+## Examples
+
+## Blazor CardGroup
+
+The Blazor CardGroup lays out a set of cards as a connected, responsive group.
+By default the CardGroup is responsive and Cards wrap one below the other on screen sizes smaller than 576px. Use `Responsive="false"` to disable responsiveness.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                <RadzenLabel Text="Card Variant:" />
+                <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+                <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-inline-flex rz-display-xl-none" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                <RadzenLabel Text="Responsive:" />
+                <RadzenSwitch @bind-Value="responsive" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenCardGroup Responsive="@responsive">
+        <RadzenCard Variant="@variant">
+            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Team 1</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H2" TagName="TagName.P" class="rz-m-0">@($"{Math.Round(teamOneProgress)}%")</RadzenText>
+                </RadzenStack>
+                <RadzenProgressBar @bind-Value=@teamOneProgress ShowValue="false" Style="--rz-progressbar-height: 1rem;"/>
+            </RadzenStack>
+        </RadzenCard>
+        <RadzenCard Variant="@variant">
+            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Team 2</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H2" TagName="TagName.P" class="rz-m-0">@($"{Math.Round(teamTwoProgress)}%")</RadzenText>
+                </RadzenStack>
+                <RadzenProgressBar @bind-Value=@teamTwoProgress ShowValue="false" Style="--rz-progressbar-height: 1rem;"/>
+            </RadzenStack>
+        </RadzenCard>
+        <RadzenCard Variant="@variant">
+            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Team 3</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H2" TagName="TagName.P" class="rz-m-0">@($"{Math.Round(teamThreeProgress)}%")</RadzenText>
+                </RadzenStack>
+                <RadzenProgressBar @bind-Value=@teamThreeProgress ShowValue="false" Style="--rz-progressbar-height: 1rem;"/>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenCardGroup>
+</RadzenStack>
+
+@code {
+    bool responsive = true;
+
+    Variant variant = Variant.Filled;
+
+    double teamOneProgress = 55;
+    double teamTwoProgress = 32;
+    double teamThreeProgress = 76;
+}
+```

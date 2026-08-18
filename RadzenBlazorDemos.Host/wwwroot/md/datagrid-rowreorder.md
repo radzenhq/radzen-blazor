@@ -1,0 +1,86 @@
+﻿# DataGrid: Rows reorder
+
+This example demonstrates custom DataGrid rows reoder.
+
+Keywords: datagrid, reorder, row
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid row reorder
+
+Let users reorder Blazor DataGrid rows by dragging - drag a row to a new position and update the underlying data order.
+
+```razor
+@inherits DbContextPage
+
+<style>
+    .my-class td {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+</style>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single"
+                @bind-Value=@selectedEmployees RowRender="@RowRender">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="55px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" Width="300px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    ObservableCollection<Employee> employees;
+    IList<Employee> selectedEmployees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = new ObservableCollection<Employee>(dbContext.Employees);
+
+        selectedEmployees = new List<Employee>(){ employees.FirstOrDefault() };
+    }
+
+    Employee draggedItem;
+
+    void RowRender(RowRenderEventArgs<Employee> args)
+    {
+        args.Attributes.Add("title", "Drag row to reorder");
+        args.Attributes.Add("style", "cursor:grab");
+        args.Attributes.Add("draggable", "true");
+        args.Attributes.Add("ondragover", "event.preventDefault();event.target.closest('.rz-data-row').classList.add('my-class')");
+        args.Attributes.Add("ondragleave", "event.target.closest('.rz-data-row').classList.remove('my-class')");
+        args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => draggedItem = args.Data));
+        args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
+        {
+            var draggedIndex = employees.IndexOf(draggedItem);
+            var droppedIndex = employees.IndexOf(args.Data);
+            employees.Remove(draggedItem);
+            employees.Insert(draggedIndex <= droppedIndex ? droppedIndex++ : droppedIndex, draggedItem);
+
+            JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('.my-class').classList.remove('my-class')");
+        }));
+    }
+}
+```

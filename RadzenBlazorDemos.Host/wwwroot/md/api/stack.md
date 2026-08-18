@@ -1,0 +1,27 @@
+﻿# RadzenStack API Reference
+
+## Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| AlignItems | `AlignItems` | Gets or sets the items alignment. |
+| Attributes | `IReadOnlyDictionary<string, object>?` | Gets or sets a dictionary of additional HTML attributes that will be applied to the component's root element. Any attributes not explicitly defined as parameters will be captured here and rendered on the element. Use this to add data-* attributes, ARIA attributes, or any custom HTML attributes. |
+| ChildContent | `RenderFragment?` | Gets or sets the child content |
+| Culture | `CultureInfo` | Gets or sets the culture used for formatting and parsing localizable data (numbers, dates, currency). If not set, uses the from a parent component or falls back to . |
+| Gap | `string?` | Gets or sets the spacing between child elements in the stack. Accepts CSS length values (e.g., "1rem", "16px", "2em") or unitless numbers (interpreted as pixels). The gap applies uniformly between all adjacent children. |
+| JustifyContent | `JustifyContent` | Gets or sets the content justify. |
+| Orientation | `Orientation` | Gets or sets the stack direction: Vertical arranges children top-to-bottom, Horizontal arranges left-to-right. This determines the main axis direction for the flexbox layout. |
+| Reverse | `bool` | Gets or sets whether to reverse the display order of child elements. When true, children are displayed in reverse order (bottom-to-top for vertical, right-to-left for horizontal). Useful for visual reordering without changing markup order. |
+| Style | `string?` | Gets or sets the inline CSS style. |
+| UICulture | `CultureInfo` | Gets or sets the culture used for localized UI strings. If not set, uses the from a parent component or falls back to . |
+| Visible | `bool` | Gets or sets a value indicating whether this is visible. Invisible components are not rendered. |
+| Wrap | `FlexWrap` | Gets or sets the flex wrap behavior controlling whether child elements wrap to new lines when they don't fit. NoWrap keeps all children on one line (may cause overflow), Wrap allows wrapping to multiple lines. |
+
+## Events
+
+| Event | Type | Description |
+|-------|------|-------------|
+| ContextMenu | `EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs>` | Gets or sets the callback invoked when the user right-clicks the component. Commonly used with to display context menus. Receives mouse event arguments containing click position. |
+| MouseEnter | `EventCallback<ElementReference>` | Gets or sets the callback invoked when the mouse pointer enters the component's bounds. Commonly used with to display tooltips on hover. Receives the component's ElementReference as a parameter. |
+| MouseLeave | `EventCallback<ElementReference>` | Gets or sets the callback invoked when the mouse pointer leaves the component's bounds. Commonly used with to hide tooltips when hover ends. Receives the component's ElementReference as a parameter. |
+

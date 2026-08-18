@@ -1,0 +1,54 @@
+﻿# Row
+
+The Blazor Row arranges columns in a responsive 12-column grid row, with gap and alignment control.
+
+Keywords: row, layout, responsive, grid
+
+> API reference: [RadzenRow API](https://blazor.radzen.com/api/row.md)
+
+## Examples
+
+## Blazor Row
+
+The Blazor Row arranges columns in a responsive 12-column grid row, with gap and alignment control.
+
+```razor
+<RadzenCard class="rz-my-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start"  Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            AlignItems
+            <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "align items" }})"
+                        Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            JustifyContent
+            <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "justify content" }})"
+                        Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Gap
+            <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+<RadzenRow JustifyContent="@justifyContent" AlignItems="@alignItems" Gap="@gap" class="rz-border-info-light">
+    <RadzenColumn Size="2" class="rz-background-color-info-lighter rz-color-on-info-lighter rz-text-align-center rz-p-2">
+        Column 1
+    </RadzenColumn>
+    <RadzenColumn Size="2" class="rz-background-color-success-lighter rz-color-on-success-lighter rz-text-align-center rz-p-2" style="height: 60px;">
+        Column 2
+    </RadzenColumn>
+    <RadzenColumn Size="2" class="rz-background-color-warning-lighter rz-color-on-warning-lighter rz-text-align-center rz-p-2" style="height: 120px;">
+        Column 3
+    </RadzenColumn>
+    <RadzenColumn Size="2" class="rz-background-color-danger-lighter rz-color-on-danger-lighter rz-text-align-center rz-p-2" style="height: 180px;">
+        Column 4
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    AlignItems alignItems = AlignItems.Normal;
+    JustifyContent justifyContent = JustifyContent.Normal;
+    string gap = "1rem";
+}
+```

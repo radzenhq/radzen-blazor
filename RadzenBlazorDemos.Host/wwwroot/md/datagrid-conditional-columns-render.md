@@ -1,0 +1,87 @@
+﻿# DataGrid: Conditional Columns
+
+Use RadzenDataGridColumn Columns property to define child columns conditionally.
+
+Keywords: datagrid, column, conditional, render, complex
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## Blazor DataGrid
+
+Show, hide, or change Blazor DataGrid columns conditionally - render columns based on data, user role, or screen size, and keep the column order as declared.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="white-space:nowrap; margin-right: 16px">Show employee photo:</div>
+    <RadzenSwitch @bind-Value=@showPhoto Change="@(args => refresh = true)" />
+</RadzenCard>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+    <Columns>
+        @RenderColumns()
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+
+    bool showPhoto;
+    bool refresh;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+ 
+        employees = dbContext.Employees;
+
+        selectedEmployees = new List<Employee>(){ employees.FirstOrDefault() };
+    }
+
+    RenderFragment RenderColumns()
+    {
+        return __builder =>
+        {
+            if (refresh)
+            {
+                refresh = false;
+                <text>
+                </text>
+            }
+            else
+            {
+                <text>
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                    @if (showPhoto)
+                    {
+                        <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                            <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    }
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Address)" Title="Address" Width="200px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.City)" Title="City" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Region)" Title="Region" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Country)" Title="Country" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.HomePhone)" Title="Home Phone" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Extension)" Title="Extension" Width="160px" />
+                    <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Notes)" Title="Notes" Width="300px" />
+                </text>
+            }
+        };
+    }
+}
+```

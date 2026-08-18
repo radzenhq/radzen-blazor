@@ -1,0 +1,152 @@
+﻿# Notification
+
+Demonstration and configuration of the Radzen Blazor Notification component.
+
+Keywords: message, notification
+
+## Examples
+
+## Blazor Notification
+
+Severity levels, positions, and custom content.
+
+### Notification severity
+
+Use NotificationMessage Severity to set the notification severity.
+
+```razor
+<RadzenRow Gap="1rem" RowGap="1rem" class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-info-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Info</RadzenText>
+            <RadzenButton Text="Show info notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Info"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-warning-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Warning</RadzenText>
+            <RadzenButton Text="Show warning notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Warning"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-danger-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Error</RadzenText>
+            <RadzenButton Text="Show error notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Danger"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-success-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Success</RadzenText>
+            <RadzenButton Text="Show success notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Success"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}
+```
+
+
+### Custom Notification position
+
+Use NotificationMessage Style to set custom position.
+
+```razor
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification at custom position" 
+                  Click=@(args => ShowNotification(new NotificationMessage { Style = "position: absolute; inset-inline-start: -1000px;", Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
+</div>
+
+@code {
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}
+```
+
+
+### Custom click handler
+
+Use NotificationMessage Click action to set custom click handler.
+
+```razor
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with custom click handler" 
+                  Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+
+        console.Log($"{message.Severity} notification");
+    }
+
+    void NotificationClick(NotificationMessage message)
+    {
+        console.Log($"{message.Summary} clicked, Payload = {message.Payload}");
+    }
+}
+```
+
+
+### Custom content
+
+Use NotificationMessage SummaryContent and DetailContent to set custom content.
+
+```razor
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with custom content" 
+                  Click="@(args => ShowNotificationWithCustomContent())" />
+</div>
+
+@code {
+    void ShowNotificationWithCustomContent()
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+                Severity = NotificationSeverity.Warning,
+                Duration = 40000,
+                SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Custom summary: <br /> @DateTime.Now</RadzenText>,
+                DetailContent = ns => @<RadzenButton Text="Clear" Click="@(args => ns.Messages.Clear())" />
+        });
+    }
+}
+```
+
+
+### Duration progress
+
+Use NotificationMessage ShowProgress to show duration progress.
+
+```razor
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with duration progress" 
+                  Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, ShowProgress = true, CloseOnClick = true, Payload = DateTime.Now }))" />
+</div>
+
+@code {
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}
+```

@@ -1,0 +1,83 @@
+﻿# LengthValidator
+
+Demonstration and configuration of the Radzen Blazor Length Validator component.
+
+Keywords: validator, validation, required, length
+
+> API reference: [RadzenLengthValidator API](https://blazor.radzen.com/api/lengthvalidator.md)
+
+## Examples
+
+## Blazor LengthValidator
+
+Enforce minimum and maximum text length on form inputs.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Personal information">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="First Name" Component="FirstName" />
+                        <small style="display: block">(3-10 characters)</small>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Name="FirstName" @bind-Value=@model.FirstName Style="display: block; width: 100%;" />
+                        <RadzenLengthValidator Component="FirstName" Min="3" Text="First name should be at least 3 characters" Popup=@popup Style="position: absolute" />
+                        <RadzenLengthValidator Component="FirstName"  Max="10" Text="First name should be at most 10 characters" Popup=@popup Style="position: absolute" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Last Name" Component="LastName" />
+                        <small style="display: block">(3-10 characters)</small>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Name="LastName" @bind-Value=@model.LastName Style="display: block; width: 100%;" />
+                        <RadzenLengthValidator Component="LastName" Min="3" Text="Last name should be at least 3 characters" Popup=@popup Style="position: absolute" />
+                        <RadzenLengthValidator Component="LastName"  Max="10" Text="Last name should be at most 10 characters" Popup=@popup Style="position: absolute" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    class Model
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void OnSubmit(Model model)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}
+```

@@ -1,0 +1,96 @@
+﻿# DataGrid: IQueryable
+
+Save and load DataGrid state including page index, page size, column filters, sort order, width, and visibility.
+
+Keywords: save, load, settings
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid save settings
+
+Save and restore Blazor DataGrid state - persist page, sort, filter, column width, order, and visibility so users return to the grid as they left it.
+
+```razor
+@inherits DbContextPage
+
+<RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
+<RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings", true))" Text="Reload" Style="margin-bottom: 16px" />
+<RadzenDataGrid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+                AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees">
+    <Columns>
+        <RadzenDataGridColumn Title="Employee" Sortable="false" Filterable="false" UniqueID="Employee">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    DataGridSettings _settings;
+    public DataGridSettings Settings 
+    { 
+        get
+        {
+            return _settings;
+        }
+        set
+        {
+            if (_settings != value)
+            {
+                _settings = value;
+                InvokeAsync(SaveStateAsync);
+            }
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        await Task.CompletedTask;
+
+        var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "Settings");
+        if (!string.IsNullOrEmpty(result))
+        {
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+        }
+    }
+
+    private async Task SaveStateAsync()
+    {
+        await Task.CompletedTask;
+
+        await JSRuntime.InvokeVoidAsync("window.localStorage.setItem", "Settings", JsonSerializer.Serialize<DataGridSettings>(Settings));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadStateAsync();
+            StateHasChanged();
+        }
+    }
+}
+```

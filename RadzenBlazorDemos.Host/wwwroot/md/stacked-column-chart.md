@@ -1,0 +1,117 @@
+﻿# Stacked Column Chart
+
+Show a total and its parts per category with a Blazor stacked column chart.
+
+Keywords: chart, stack, graph, column, bar
+
+## Examples
+
+## Radzen Blazor Chart stacked column series
+
+A stacked column chart stacks each category's parts into a single column, showing the total height and the contribution of each part at once.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Auto-size stacked column series</RadzenText>
+            <RadzenChart Animate="true">
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenColumnOptions Radius="5" />
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Custom size stacked column series</RadzenText>
+            <RadzenChart Animate="true">
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
+                <RadzenColumnOptions Radius="5" Width="20" />
+                <RadzenCategoryAxis Padding="20" />
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    bool showDataLabels = false;
+
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[] {
+        new DataItem
+        {
+            Quarter = "Q1",
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Quarter = "Q2",
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Quarter = "Q3",
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Quarter = "Q4",
+            Revenue = 294000
+        },
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+        new DataItem
+        {
+            Quarter = "Q1",
+            Revenue = 254000
+        },
+        new DataItem
+        {
+            Quarter = "Q2",
+            Revenue = 324000
+        },
+        new DataItem
+        {
+            Quarter = "Q3",
+            Revenue = 354000
+        },
+        new DataItem
+        {
+            Quarter = "Q4",
+            Revenue = 394000
+        },
+
+    };
+}
+```

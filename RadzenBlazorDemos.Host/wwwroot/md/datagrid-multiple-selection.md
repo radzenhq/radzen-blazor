@@ -1,0 +1,68 @@
+﻿# DataGrid: Multiple selection
+
+This example demonstrates how to enable multiple selection in Blazor RadzenDataGrid component.
+
+Keywords: multiple, selection, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Multiple Selection
+
+Enable multiple row selection in a Blazor DataGrid - users check rows or Ctrl/Shift-click to select many, with an optional select-all header checkbox.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+        <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
+        <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
+        <RadzenButton Text="Clear selected rows" Click="@(args => selectedEmployees = null)" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@employees" ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees >
+    <Columns>
+        <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TabIndex="-1" TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
+                   Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Contains(i)) ? null : employees.Any(i => selectedEmployees.Contains(i)))"
+                   Change="@(args => selectedEmployees = args == true ? employees.ToList() : null)" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TabIndex="-1" TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Contains(data))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
+                    TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectRow(data); }}) />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool allowRowSelectOnRowClick = true;
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+    RadzenDataGrid<Employee> grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+}
+```

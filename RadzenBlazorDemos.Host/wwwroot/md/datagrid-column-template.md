@@ -1,0 +1,70 @@
+﻿# DataGrid: Template
+
+Blazor Data Grid custom appearance via column templates. The Template allows you to customize the way data is displayed.
+
+Keywords: column, template, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Column Template
+
+Customize Blazor DataGrid cell content with column templates - render images, badges, buttons, links, or any markup in a column instead of plain text.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="5" AllowSorting="true" 
+            Data="@orders" TItem="Order">
+    <Columns>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @(orders.IndexOf(data) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenImage Path="@order.Employee?.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-0">@order.Employee?.FirstName @order.Employee?.LastName</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-mb-0">@order.Customer?.CompanyName</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+            <Template Context="order">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="ShipCountry" />
+        <RadzenDataGridColumn Width="160px" Property="OrderID" Title="Order Details">
+            <Template Context="data">
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="rz-m-1" Click=@(() => OpenOrder(data.OrderID)) Text="@data.OrderID.ToString()" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Order> ordersGrid;
+    IList<Order> orders;
+
+    async Task OpenOrder(int orderId)
+    {
+         await DialogService.OpenAsync<DialogCardPage>($"Order {orderId}",
+               new Dictionary<string, object>() { { "OrderID", orderId } },
+               new DialogOptions() { Width = "700px", Height = "520px" });
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+}
+```

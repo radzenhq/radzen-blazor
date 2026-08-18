@@ -1,0 +1,98 @@
+﻿# DataGrid: Mixed Mode
+
+RadzenDataGrid Excel like and advanced mixed mode filtering.
+
+Keywords: filter, advanced, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid mixed Advanced or Simple Filter modes
+
+Use a different filter UI per column in a Blazor DataGrid - a full filter menu on some columns, a quick inline box on others. Advanced filter modes cannot be mixed with simple filter modes.
+
+```razor
+@inherits DbContextPage
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <div>Filter Mode:</div>
+        <RadzenSelectBar Size="ButtonSize.Small" @bind-Value="@filterMode" Change=@((int args) => refresh = true)>
+            <Items>
+                <RadzenSelectBarItem Value="0" Text="Advanced and CheckBoxList Mixed Filter" />
+                <RadzenSelectBarItem Value="1" Text="Simple and SimpleWithMenu Mixed Filter" />
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
+    FilterMode="@(filterMode == 0 ? FilterMode.CheckBoxList : FilterMode.Simple)" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
+    <Columns>
+        @RenderColumns()
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool refresh;
+    int filterMode = 1;
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = await Task.FromResult(dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList().Select(o =>
+            {
+                o.ProductDiscontinued = o.OrderDetails.FirstOrDefault()?.Product?.Discontinued;
+                return o;
+            }).AsQueryable());
+    }
+
+    RenderFragment RenderColumns()
+    {
+        return __builder =>
+        {
+            if (refresh)
+            {
+                refresh = false;
+                <text>
+                </text>
+            }
+            else
+            {
+                <text>
+                <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" FilterMode="@(filterMode == 0 ? FilterMode.Advanced : null)" />
+                <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" FilterMode="@(filterMode == 1 ? FilterMode.SimpleWithMenu : null)" />
+                <RadzenDataGridColumn TItem="Order" Property="ProductDiscontinued" Title="Discontinued" />
+                <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+                    <Template Context="order">
+                        <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                        @order.Employee?.FirstName @order.Employee?.LastName
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.OrderDetails)" FilterProperty="Product.ProductName" Title="Product Name"
+                    Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.In" Sortable="false">
+                    <Template>
+                        @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" />
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" />
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipName)" Title="Ship Name" />
+                <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+                </text>
+            }
+        };
+    }
+}
+```

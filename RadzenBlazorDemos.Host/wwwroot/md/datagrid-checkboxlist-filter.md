@@ -1,0 +1,84 @@
+﻿# DataGrid: CheckBoxList (Excel like)
+
+RadzenDataGrid Excel like filtering.
+
+Keywords: filter, excel, grid, datagrid, table, menu, checkbox, list
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid CheckBox list (Excel like) Filter
+
+Add Excel-style checkbox filtering to a Blazor DataGrid - a checkbox list of distinct column values for multi-value filtering.
+
+```razor
+@inherits DbContextPage
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
+    FilterMode="FilterMode.CheckBoxList" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" AllowCheckBoxListVirtualization="false" />
+        <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" FormatString="{0}" FormatProvider="@myBooleanProvider" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDetails)" FilterProperty="Product.ProductName" Title="Product Name"
+            Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.In" Sortable="false">
+            <Template>
+                @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> grid;
+    MyBooleanProvider myBooleanProvider = new MyBooleanProvider();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = await Task.FromResult(dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList().Select(o =>
+            {
+                o.ProductDiscontinued = o.OrderDetails.FirstOrDefault()?.Product?.Discontinued;
+                return o;
+            }).AsQueryable());
+    }
+
+    public class MyBooleanProvider : IFormatProvider, ICustomFormatter
+    {
+        public string Format(string format, object arg, IFormatProvider formatProvider)
+        {
+            return object.Equals(arg, true) ? "Yes" : object.Equals(arg, false) ? "No" : "No value";
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            if (formatType == typeof(ICustomFormatter))
+            {
+                return this;
+            }
+
+            return null;
+        }
+    }
+}
+```

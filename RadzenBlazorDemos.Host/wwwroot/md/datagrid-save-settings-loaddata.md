@@ -1,0 +1,153 @@
+﻿# DataGrid: LoadData binding
+
+This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.
+
+Keywords: save, load, settings, async, loaddata
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid save settings using LoadData binding
+
+Save and load Blazor DataGrid state with LoadData binding - persist sort, filter, and paging when the grid fetches data via the LoadData event.
+
+```razor
+@inherits DbContextPage
+
+<RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
+<RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings-loaddata", true))" Text="Reload" Style="margin-bottom: 16px" />
+<RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" TItem="Employee" PickedColumnsChanged="@OnPickedColumnsChanged" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" 
+                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
+                AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData
+                PageSize="@pageSize" PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" PageSizeChanged="@(args => pageSize = args)">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+
+        <RadzenDataGridColumn Property="Orders" FilterProperty="ShipCity" Title="Order ship city" Type="typeof(ICollection<Order>)" Sortable="false">
+            <Template>
+                @(string.Join(',', context.Orders.Select(od => od.ShipCity)))
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Orders" FilterProperty="ShipPostalCode" Title="Order ShipPostalCode" Type="typeof(ICollection<Order>)" Sortable="false">
+            <Template>
+                @(string.Join(',', context.Orders.Select(od => od.ShipPostalCode)))
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<int> pageSizeOptions = new int[] { 4, 6, 8 };
+    int pageSize = 4;
+
+    RadzenDataGrid<Employee> grid;
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    int count;
+    bool isLoading = false;
+    async Task LoadData(LoadDataArgs args)
+    {
+        console.Log("LoadData");
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = dbContext.Employees.Include("Orders").AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(grid.ColumnsCollection);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        // Simulate async data loading
+        await Task.Delay(2000);
+
+        employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+
+        isLoading = false;
+    }
+
+    DataGridSettings _settings;
+    public DataGridSettings Settings
+    {
+        get
+        {
+            return _settings;
+        }
+        set
+        {
+            if (_settings != value)
+            {
+                _settings = value;
+                console.Log("Set");
+                InvokeAsync(SaveStateAsync);
+            }
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        console.Log("LoadStateAsync");
+        var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
+        if (!string.IsNullOrEmpty(result) && result != "null")
+        {
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+            if (_settings.PageSize.HasValue)
+            {
+                pageSize = _settings.PageSize.Value;
+                await Task.Yield();
+            }
+        }
+    }
+
+    private async Task SaveStateAsync()
+    {
+        console.Log("SaveStateAsync");
+        await JSRuntime.InvokeVoidAsync("window.localStorage.setItem", "SettingsLoadData", JsonSerializer.Serialize<DataGridSettings>(Settings));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadStateAsync();
+        }
+    }
+
+    void LoadSettings(DataGridLoadSettingsEventArgs args)
+    {
+        if (Settings != null)
+        {
+            args.Settings = Settings;
+        }
+    }
+
+    async Task OnPickedColumnsChanged(DataGridPickedColumnsChangedEventArgs<Employee> args)
+    {
+        await SaveStateAsync();
+    }
+}
+```

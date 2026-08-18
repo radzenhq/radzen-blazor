@@ -1,0 +1,49 @@
+﻿# Alert: Alert Configuration
+
+Demonstration and configuration of the Radzen Blazor Alert component.
+
+Keywords: message, alert
+
+> API reference: [RadzenAlert API](https://blazor.radzen.com/api/alert.md)
+
+## Examples
+
+## Blazor Alert
+
+Configurable severity levels, styles, shades, and variants for displaying important messages.
+
+```razor
+<RadzenStack Gap="0" class="rz-py-8 rz-px-12">
+    <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+        Alert with close button
+    </RadzenAlert>
+    <RadzenAlert  AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+        Alert without close button
+    </RadzenAlert>
+    <RadzenAlert Title="Alert with Title" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+        Alert with title
+    </RadzenAlert>
+    <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+        Alert without message icon
+    </RadzenAlert>
+    <RadzenAlert @bind-Visible="visible" Close=@OnClose>
+        Toggle alert visibility and handle the <code>Close</code> event.
+    </RadzenAlert>
+    <RadzenButton Text="@ToggleButtonText" Click="@OnToggle" />
+</RadzenStack>
+@code {
+    bool visible = true;
+
+    string ToggleButtonText => visible ? "Hide alert" : "Show alert";
+
+    void OnToggle()
+    {
+        visible = !visible;
+    }
+
+    void OnClose()
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Closed", Detail = "Info" });
+    }
+}
+```

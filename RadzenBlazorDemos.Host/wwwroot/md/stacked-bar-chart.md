@@ -1,0 +1,129 @@
+﻿# Stacked Bar Chart
+
+Show a total and its parts per category with a Blazor stacked bar chart.
+
+Keywords: chart, stack, graph, column, bar
+
+## Examples
+
+## Radzen Blazor Stacked Chart bar series
+
+A stacked bar chart stacks each category's segments end to end along a horizontal bar, showing both the total and how the parts contribute to it.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Auto-size stacked bar series</RadzenText>
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedBarSeries>
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedBarSeries>
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+                <RadzenBarOptions Radius="5" />
+            </RadzenChart>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Custom size stacked bar series</RadzenText>
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+                <RadzenBarOptions Radius="5" Height="20" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    bool showDataLabels;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        double num = (double)value / 1000;
+
+        return num.ToString("$0K");
+    }
+
+    DataItem[] revenue2023 = new DataItem[]
+    {
+    new DataItem
+    {
+        Quarter = "Q1",
+        Revenue = 234000
+    },
+    new DataItem
+    {
+        Quarter = "Q2",
+        Revenue = 284000
+    },
+    new DataItem
+    {
+        Quarter = "Q3",
+        Revenue = 274000
+    },
+    new DataItem
+    {
+        Quarter = "Q4",
+        Revenue = 294000
+    },
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+    new DataItem
+    {
+    Quarter = "Q1",
+    Revenue = 254000
+    },
+    new DataItem
+    {
+    Quarter = "Q2",
+    Revenue = 324000
+    },
+    new DataItem
+    {
+    Quarter = "Q3",
+    Revenue = 354000
+    },
+    new DataItem
+    {
+    Quarter = "Q4",
+    Revenue = 394000
+    },
+
+    };
+}
+```

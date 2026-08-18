@@ -1,0 +1,97 @@
+﻿# Tree: Checkboxes
+
+This example demonstrates tri-state checkboxes in RadzenTree.
+
+Keywords: tree, treeview, nodes, check
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## Tree checkboxes
+
+Get or set the selected items of RadzenTree.
+
+```razor
+@inherits DbContextPage
+
+<RadzenRow class="rz-p-0 rz-p-lg-12">
+    <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
+        <RadzenCard>
+            <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories
+                ItemRender="@TreeItemRender" Expand="@OnExpand">
+                <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" />
+                <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Category> categories;
+    IEnumerable<object> checkedValues;
+
+    IEnumerable<object> CheckedValues
+    {
+        get => checkedValues;
+        set
+        {
+            checkedValues = value;
+            if (checkedValues != null)
+            {
+                console.Log($"CheckedValues Changed {string.Join(Environment.NewLine, value.Select(GetText))}");
+            }
+        }
+    }
+
+    string GetText(object data)
+    {
+        if (data is Category category)
+        {
+            return category.CategoryName;
+        }
+
+        if (data is Product product)
+        {
+            return product.ProductName;
+        }
+
+        return string.Empty;
+    }
+
+    EventConsole console;
+
+    Category firstCategory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = await Task.FromResult(dbContext.Categories.Include(c => c.Products));
+
+        firstCategory = await Task.FromResult(categories.FirstOrDefault());
+
+        checkedValues = await Task.FromResult(firstCategory.Products.Where(p => p.ProductName.StartsWith("C")));
+    }
+
+    bool firstCategoryExpanded;
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        if (args.Value == firstCategory)
+        {
+            firstCategoryExpanded = true;
+        }
+    }
+
+    void TreeItemRender(TreeItemRenderEventArgs args)
+    {
+        if (args.Value == firstCategory && !firstCategoryExpanded && !args.Data.Cast<object>().Any())
+        {
+            args.Checked = null;
+        }
+    }
+}
+```

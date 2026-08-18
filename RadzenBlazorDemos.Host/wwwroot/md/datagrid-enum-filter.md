@@ -1,0 +1,78 @@
+﻿# DataGrid: Enum filtering
+
+This example demonstrates how to use enums in the RadzenDataGrid column filter.
+
+Keywords: filter, enum, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Enum Column Filter
+
+Filter Blazor DataGrid columns by enum values - the grid lists the enum members as filter options so users pick from a friendly list.
+
+```razor
+<RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.ID)" Title="ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Gender)" Title="Gender" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Status)" Title="Nullable Status" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Color)" Title="Favorite Color (Display Attribute in Filter)" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Employee> employees;
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public GenderType Gender { get; set; }
+        public StatusType? Status { get; set; }
+        public ColorType Color { get; set; }
+    }
+
+    public enum GenderType
+    {
+        Ms,
+        Mr,
+        Unknown,
+    }
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
+        [Display(Description = "Azure")]
+        AzureBlue,
+
+    }
+
+    public enum StatusType
+    {
+        Inactive,
+        Active,
+    }
+
+    protected override void OnInitialized()
+    {
+        employees = Enumerable.Range(0, 10).Select(i =>
+            new Employee
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red: i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
+            });
+    }
+}
+```

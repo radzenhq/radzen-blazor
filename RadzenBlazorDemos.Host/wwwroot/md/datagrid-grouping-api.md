@@ -1,0 +1,118 @@
+﻿# DataGrid: Grouping API
+
+Enable DataGrid grouping with AllowGrouping. Localize group panel text and disable grouping per column.
+
+Keywords: group, grouping, datagrid, table, dataview, api
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Grouping API
+
+Group Blazor DataGrid rows by one or more columns - turn on grouping so users drag columns into a group panel, or set groups in code.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox TValue="bool" @bind-Value="@showGroupExpandColumn" Name="showGroupExpandColumn" />
+                <RadzenLabel Text="Show group expand column" Component="showGroupExpandColumn" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox TriState="true" TValue="bool?" @bind-Value="@allGroupsExpanded" Name="allGroupsExpanded" Change="@ToggleGroups" />
+                <RadzenLabel Text="All groups expanded by default" Component="allGroupsExpanded" />
+            </RadzenStack>
+            <RadzenButton Text="Expand all groups" Click="@(args => ToggleGroups(true))" Disabled=@(allGroupsExpanded == true) />
+            <RadzenButton Text="Collapse all groups" Click="@(args => ToggleGroups(false))" Disabled=@(allGroupsExpanded == false) />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid @ref=grid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
+            Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender"  TItem="Employee"
+            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
+            @bind-AllGroupsExpanded="@allGroupsExpanded" ShowGroupExpandColumn=@showGroupExpandColumn>
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="FirstName" Title="First Name" />
+            <RadzenDataGridColumn Property="LastName" Title="Last Name"/>
+            <RadzenDataGridColumn Property="Title" Title="Title" Width="200px" />
+            <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn Property="Address" Title="Address" Width="200px" />
+            <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+            <RadzenDataGridColumn Property="Region" Title="Region" />
+            <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
+            <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+            <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" />
+            <RadzenDataGridColumn Property="Extension" Title="Extension" />
+            <RadzenDataGridColumn Property="Notes" Title="Notes" Width="400px" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    bool showGroupExpandColumn = true;
+    bool? allGroupsExpanded;
+    RadzenDataGrid<Employee> grid;
+
+    EventConsole console;
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    void OnRender(DataGridRenderEventArgs<Employee> args)
+    {
+        if(args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Title", SortOrder = SortOrder.Descending });
+            StateHasChanged();
+        }
+    }
+
+    void ToggleGroups(bool? value)
+    {
+        allGroupsExpanded = value;
+    }
+
+    void OnGroupRowRender(GroupRowRenderEventArgs args)
+    {
+        if (args.FirstRender && args.Group.Data.Key == "Vice President, Sales" || allGroupsExpanded != null)
+        {
+            args.Expanded = allGroupsExpanded != null ? allGroupsExpanded : false;
+        }
+
+        args.Expandable = args.Group.Data.Key != "Vice President, Sales";
+    }
+
+    void OnGroupRowExpand(Group group)
+    {
+        console.Log($"Group row with key: {group.Data.Key} expanded");
+    }
+
+    void OnGroupRowCollapse(Group group)
+    {
+        console.Log($"Group row with key: {group.Data.Key} collapsed");
+    }
+
+    void OnGroup(DataGridColumnGroupEventArgs<Employee> args)
+    {
+        console.Log($"DataGrid {(args.GroupDescriptor != null ? "grouped" : "ungrouped")} by {args.Column.GetGroupProperty()}");
+    }
+}
+```

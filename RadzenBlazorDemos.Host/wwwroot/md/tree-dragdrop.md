@@ -1,0 +1,71 @@
+﻿# Tree: Drag & Drop
+
+This example demonstrates custom drag & drop logic in RadzenTree.
+
+Keywords: tree, treeview, nodes, drag, drop
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## Tree Drag & Drop
+
+Custom Tree items drag & drop logic.
+
+```razor
+@inherits DbContextPage
+
+<RadzenTree Data=@employees Style="height: 300px" ItemRender="ItemRender">
+    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"
+                     Expanded=@(i => true)
+                     HasChildren=@(i => ((Employee)i).Employees1?.Any() == true) />
+</RadzenTree>
+
+@code {
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
+    }
+
+    Employee draggedItem;
+
+    void ItemRender(TreeItemRenderEventArgs args)
+    { 
+        var employee = (Employee)args.Value;
+
+        // Allow drag of all items except the root item.
+        if (employee.ReportsTo != null)
+        {
+            args.Attributes.Add("title", "Drag item to reorder");
+            args.Attributes.Add("style", "cursor:grab");
+            args.Attributes.Add("draggable", "true");
+            args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => 
+            {
+                if (draggedItem == null)
+                {
+                    draggedItem = employee;
+                }
+            }));
+        }
+
+        // Allow drop over any item including the root item.
+        args.Attributes.Add("ondragover", "event.preventDefault()");
+        args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
+        {
+            if (draggedItem != null && draggedItem != employee &&
+                    draggedItem.ReportsTo != employee.EmployeeID && 
+                    draggedItem.EmployeeID != employee.ReportsTo)
+            {
+                draggedItem.ReportsTo = employee.EmployeeID;
+                dbContext.SaveChanges();
+                draggedItem = null;
+            }
+        }));
+    }
+}
+```

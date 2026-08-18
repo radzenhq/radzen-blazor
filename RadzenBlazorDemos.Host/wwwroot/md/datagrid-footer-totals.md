@@ -1,0 +1,80 @@
+﻿# DataGrid: Footer Totals
+
+The FooterTemplate column property allows you to display aggregated data in the column footer.
+
+Keywords: summary, total, aggregate, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Footer Totals
+
+Show totals and aggregates in the Blazor DataGrid footer - sum, average, count, min, and max across the current data, including filtered and paged results.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" ColumnWidth="220px" AllowColumnResize=true
+                Data="@orders" TItem="Order" Sort="@(args => ResetIndex(true))" Page="@(args => ResetIndex(true))" Filter="@(args => ResetIndex(true))">
+    <Columns>
+        <RadzenDataGridColumn Width="60px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template>
+                @{
+                    var pageSize = Math.Min(ordersGrid.PageSize, orders.AsQueryable().Where(ordersGrid.ColumnsCollection).Count());
+                }
+                <RenderOnceComponent CanRender=@(!(index >= pageSize))>
+                @{
+                    ResetIndex(index >= pageSize);
+                }
+                @((ordersGrid.CurrentPage * pageSize) + index++ + 1)
+                </RenderOnceComponent>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID">
+            <FooterTemplate>
+                Displayed orders: <b>@orders.AsQueryable().Where(ordersGrid.ColumnsCollection).Count()</b> of <b>@orders.Count()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn  Width="160px" Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
+            <FooterTemplate>
+                Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+            <Template Context="order">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+            </Template>
+            <FooterTemplate>
+                Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Order> ordersGrid;
+    IList<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    int index;
+    void ResetIndex(bool shouldReset)
+    {
+        if (shouldReset)
+        {
+            index = 0;
+        }
+    }
+}
+```
