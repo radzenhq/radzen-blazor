@@ -3242,7 +3242,7 @@ namespace RadzenBlazorDemos
                     {
                         new Example
                         {
-                            Name = "Spreadsheet API",
+                            Name = "Get Started",
                             Path = "document-processing-spreadsheet",
                             Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
                             Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
