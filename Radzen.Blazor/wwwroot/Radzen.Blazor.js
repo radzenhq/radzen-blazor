@@ -3347,11 +3347,8 @@ window.Radzen = {
     function formatLabel(fraction) {
         var inputStart = ref.navLabelInputStart;
         var inputEnd = ref.navLabelInputEnd;
-
         if (inputStart === inputEnd) return '';
-
         var value = inputStart + fraction * (inputEnd - inputStart);
-
         if (ref.navLabelIsDate) {
             // .NET ticks -> JavaScript Date
             var ticksToMs = value / 10000 - 62135596800000;

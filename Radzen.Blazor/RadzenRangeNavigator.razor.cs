@@ -290,15 +290,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Returns the formatted label text for a range navigator handle.
-        /// Invoked from JavaScript while dragging the handle to ensure the same
-        /// formatting logic is used as during normal rendering.
-        /// </summary>
-        /// <param name="fraction">The normalized handle position (0.0 to 1.0).</param>
-        /// <returns>The formatted handle label.</returns>
-        [JSInvokable]
-        public string GetHandleLabel(double fraction)
+        internal string GetHandleLabel(double fraction)
         {
             if (CategoryScale?.Input == null)
             {
