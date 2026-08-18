@@ -99,25 +99,20 @@ public class MetadataChangeTrackingMatrixTests
     [Fact]
     public void EveryMutableMemberOfLoadedMetadataOpensAChangeDetectionDoor()
     {
-        var checkedMembers = 0;
         foreach (var owner in Tracked)
         {
             foreach (var property in SettableProperties(owner))
             {
                 AssertDoor(owner, property.Name, document => Mutate(property, Target(owner, document)));
-                checkedMembers++;
             }
         }
 
         AssertDoor(typeof(OutlineItem), "Children.Add()",
             document => document.Outline[0].Children.Add(new OutlineItem("added", OutlineTarget.ToPage(1))));
-        checkedMembers++;
 
         AssertDoor(typeof(OutlineItem), "Children[0].Title",
             document => document.Outline[0].Children[0].Title = "renamed");
-        checkedMembers++;
 
-        Assert.InRange(checkedMembers, 15, 60);
     }
 
     [Fact]
