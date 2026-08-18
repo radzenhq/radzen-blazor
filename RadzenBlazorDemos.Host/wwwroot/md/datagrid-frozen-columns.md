@@ -1,0 +1,65 @@
+﻿# DataGrid: Frozen Columns
+
+Lock columns in RadzenDataGrid to prevent them from scrolling out of view via the Frozen property.
+
+Keywords: datagrid, column, frozen, locked
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Frozen Columns
+
+Freeze (pin) Blazor DataGrid columns so key columns stay visible while users scroll horizontally through the rest - pin to the left or right edge.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" 
+    ColumnWidth="140px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:300px">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="5rem" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Frozen="@frozen" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Pin/Unpin Photo column" }})" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true">
+            <FooterTemplate>
+                Total employees: <b>@employees.Count()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name">
+                <FooterTemplate>
+                Footer
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Frozen="true" FrozenPosition="FrozenColumnPosition.Left"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Employee> employees;
+    bool frozen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+}
+```

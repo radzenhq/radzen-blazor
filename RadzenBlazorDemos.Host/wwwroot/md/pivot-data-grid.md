@@ -1,0 +1,135 @@
+﻿# PivotDataGrid: IQueryable
+
+The Blazor Pivot DataGrid (RadzenPivotDataGrid) creates cross-tabulation reports - rows, columns, and aggregated values - from an IQueryable data source.
+
+Keywords: pivot, pivot table, crosstab, analysis, aggregation, drill-down, datagrid, table, query, IQueryable
+
+> API reference: [RadzenPivotDataGrid API](https://blazor.radzen.com/api/pivotdatagrid.md)
+
+## Examples
+
+## Blazor PivotDataGrid
+
+The Blazor Pivot DataGrid builds cross-tabulation reports - rows, columns, and aggregated values - from your data, with drill-down and grouping.
+This example demonstrates full pivot table functionality with columns, rows, and aggregates.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
+        <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" />
+        <RadzenLabel Text="Show columns totals" Component="ShowColumnsTotals" />
+        <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" />
+        <RadzenLabel Text="Show rows totals" Component="ShowRowsTotals" />
+        <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" />
+        <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
+        <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" />
+        <RadzenLabel Text="AllowPaging" Component="AllowPaging" />
+        <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
+        <RadzenSwitch @bind-Value=@allowFieldsPicking Name="AllowFieldsPicking" />
+        <RadzenLabel Text="Allow fields picking" Component="AllowFieldsPicking" />
+        <RadzenSwitch @bind-Value=@allowSorting Name="AllowSorting" Visible=@allowFieldsPicking />
+        <RadzenLabel Text="Allow sorting" Component="AllowSorting" Visible=@allowFieldsPicking />
+        <RadzenSwitch @bind-Value=@allowFiltering Name="AllowFiltering" Visible=@allowFieldsPicking />
+        <RadzenLabel Text="Allow filtering" Component="AllowFiltering" Visible=@allowFieldsPicking />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenPivotDataGrid Data=@salesData TItem="SalesData" Style="height:700px"
+        AllowPaging="@allowPaging" PagerPosition="@pagerPosition" PageSize="20" AllowFieldsPicking="@allowFieldsPicking" 
+        ShowColumnsTotals="@showColumnsTotals" ShowRowsTotals="@showRowsTotals" AllowDrillDown="@allowDrillDown"
+        AllowSorting="@allowSorting" AllowFiltering="@allowFiltering"
+        GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
+    <Columns>
+        <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px">
+            <HeaderTemplate>
+                Year: @context.Key
+            </HeaderTemplate>
+        </RadzenPivotColumn>
+        <RadzenPivotColumn TItem="SalesData" Property="ShipCountry" Title="Ship Country" Width="150px">
+            <HeaderTemplate>
+                Country: @context.Key
+            </HeaderTemplate>
+        </RadzenPivotColumn>
+    </Columns>
+    <Rows>
+        <RadzenPivotRow TItem="SalesData" Property="CategoryName" Title="Product Category" />
+        <RadzenPivotRow TItem="SalesData" Property="ProductName" Title="Product" />
+    </Rows>
+    <Aggregates>
+        <RadzenPivotAggregate TItem="SalesData" Property="TotalAmount" Title="Total Sales"
+                            Aggregate="AggregateFunction.Sum" FormatString="{0:C}" />
+        <RadzenPivotAggregate TItem="SalesData" Property="Quantity" Title="Quantity Sold"
+                            Aggregate="AggregateFunction.Sum">
+            <HeaderTemplate>
+                Total Quantity
+            </HeaderTemplate>
+            <Template>
+                Qty: @(context ?? "N/A")
+            </Template>
+            <ColumnTotalTemplate>
+                Total: @(context ?? "N/A")
+            </ColumnTotalTemplate>
+            <RowTotalTemplate>
+                Total: @(context.Value ?? "N/A")
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="UnitPrice" Title="Average Unit Price"
+                            Aggregate="AggregateFunction.Average" FormatString="{0:C}" />
+        <RadzenPivotAggregate TItem="SalesData" Property="Discount" Title="Average Discount"
+                            Aggregate="AggregateFunction.Average" FormatString="{0:P}" />
+    </Aggregates>
+</RadzenPivotDataGrid>
+
+@code {
+    bool allowDrillDown;
+    bool showColumnsTotals;
+    bool showRowsTotals;
+    bool allowFieldsPicking;
+    bool allowSorting = true;
+    bool allowFiltering = true;
+    bool allowPaging = true;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    private IEnumerable<SalesData> salesData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        salesData = (from od in dbContext.OrderDetails
+                     join o in dbContext.Orders on od.OrderID equals o.OrderID
+                     join p in dbContext.Products on od.ProductID equals p.ProductID
+                     join c in dbContext.Categories on p.CategoryID equals c.CategoryID
+                     select new SalesData
+                         {
+                             CategoryName = c.CategoryName,
+                             ProductName = p.ProductName,
+                             OrderYear = o.OrderDate.HasValue ? o.OrderDate.Value.Year : 0,
+                             OrderMonth = o.OrderDate.HasValue ? o.OrderDate.Value.Month : 0,
+                             ShipCountry = o.ShipCountry,
+                             UnitPrice = od.UnitPrice ?? 0,
+                             Quantity = od.Quantity ?? 0,
+                             Discount = od.Discount ?? 0,
+                             TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (1 - (od.Discount ?? 0))
+                         });
+    }
+
+    public class SalesData
+    {
+        public string CategoryName { get; set; }
+        public string ProductName { get; set; }
+        public int OrderYear { get; set; }
+        public int OrderMonth { get; set; }
+        public string ShipCountry { get; set; }
+        public double UnitPrice { get; set; }
+        public short Quantity { get; set; }
+        public float Discount { get; set; }
+        public double TotalAmount { get; set; }
+    }
+}
+```

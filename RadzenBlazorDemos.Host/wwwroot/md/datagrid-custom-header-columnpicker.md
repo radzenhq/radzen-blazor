@@ -1,0 +1,59 @@
+﻿# DataGrid: Header with column picker
+
+See how to add a column picker to your Blazor RadzenDataGrid.
+
+Keywords: grid header, header
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Custom Header with a button
+
+Add a column picker to the Blazor DataGrid header - let users show and hide columns from a custom header toolbar.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid Data="@employees" AllowFiltering=true ColumnWidth="300px" AllowColumnPicking=@WithColumnPicker>
+    <HeaderTemplate>
+        <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible)  />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Visible="@EmployeeIDVisible" Property="@nameof(Employee.EmployeeID)" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Width="200px" Pickable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool EmployeeIDVisible = false;
+    IEnumerable<Employee> employees;
+
+    [Parameter]
+    public bool WithColumnPicker { get; set; } = false;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }   
+}
+```

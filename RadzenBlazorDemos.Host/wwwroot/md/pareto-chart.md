@@ -1,0 +1,68 @@
+﻿# Pareto Chart
+
+Find the vital few with a Blazor pareto chart - sorted bars plus a cumulative line. Free and open source.
+
+Keywords: chart, graph, pareto, cumulative, quality
+
+## Examples
+
+## Radzen Blazor Pareto Chart
+
+A pareto chart pairs sorted bars with a cumulative line, making it easy to see which few categories account for most of the total - the 80/20 view used in quality and prioritization.
+
+```razor
+<RadzenChart Style="width: 100%; height: 400px;">
+    <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@defects" CategoryProperty="Category" ValueProperty="Count" Title="Defect Count" />
+    <RadzenLineSeries Data="@defects" CategoryProperty="Category" ValueProperty="CumulativePercent" Title="Cumulative %" Smooth="true">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+        <RadzenSeriesDataLabels Visible="true" />
+    </RadzenLineSeries>
+    <RadzenCategoryAxis>
+        <RadzenAxisTitle Text="Defect Type" />
+    </RadzenCategoryAxis>
+    <RadzenValueAxis>
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="Count" />
+    </RadzenValueAxis>
+    <RadzenLegend Position="LegendPosition.Bottom" />
+</RadzenChart>
+
+@code {
+    class DefectData
+    {
+        public string Category { get; set; }
+        public int Count { get; set; }
+        public double CumulativePercent { get; set; }
+    }
+
+    DefectData[] defects;
+
+    protected override void OnInitialized()
+    {
+        var raw = new (string Category, int Count)[]
+        {
+            ("Scratches", 42),
+            ("Dents", 35),
+            ("Cracks", 25),
+            ("Discoloration", 18),
+            ("Misalignment", 12),
+            ("Missing Parts", 8),
+            ("Other", 5),
+        };
+
+        var total = raw.Sum(x => x.Count);
+        var cumulative = 0;
+
+        defects = raw.Select(x =>
+        {
+            cumulative += x.Count;
+            return new DefectData
+            {
+                Category = x.Category,
+                Count = x.Count,
+                CumulativePercent = Math.Round(cumulative * 100.0 / total, 1)
+            };
+        }).ToArray();
+    }
+}
+```

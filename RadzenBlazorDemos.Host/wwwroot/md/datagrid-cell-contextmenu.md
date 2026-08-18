@@ -1,0 +1,90 @@
+﻿# DataGrid: Cell Context Menu
+
+Right click on a table cell to open the context menu.
+
+Keywords: cell, row, contextmenu, menu, rightclick
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Cell context menu
+
+Add a right-click context menu to Blazor DataGrid cells - show custom actions for the clicked row and cell.
+
+```razor
+@inherits DbContextPage
+
+<p>Right click on a table cell to open the <strong>cell-specific</strong> context menu. Right click on the grid header, pager, or empty space to open the <strong>grid-level</strong> context menu.</p>
+<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@employees" ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees  TItem="Employee" 
+            CellContextMenu="@OnCellContextMenu" ContextMenu="@OnGridContextMenu">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+    EventConsole console;
+
+    void ClearSelection()
+    {
+        selectedEmployees = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+        selectedEmployees = employees.Take(1).ToList();
+    }
+
+    void OnCellContextMenu(DataGridCellMouseEventArgs<Employee> args)
+    {
+        selectedEmployees = new List<Employee>() { args.Data };
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Cell Menu - Edit", Value = 1, Icon = "edit" },
+                new ContextMenuItem(){ Text = "Cell Menu - Delete", Value = 2, Icon = "delete" },
+                new ContextMenuItem(){ Text = "Cell Menu - Copy", Value = 3, Icon = "content_copy" },
+            }, 
+            (e) => { 
+             console.Log($"Cell context menu item clicked. Value={e.Value}, Column: {args.Column.Property}, EmployeeID: {args.Data.EmployeeID}"); 
+            }
+         );
+    }
+
+    void OnGridContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+    {
+        selectedEmployees = null;
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Grid Menu - Refresh", Value = 1, Icon = "refresh" },
+                new ContextMenuItem(){ Text = "Grid Menu - Export", Value = 2, Icon = "save_alt" },
+                new ContextMenuItem(){ Text = "Grid Menu - Settings", Value = 3, Icon = "settings" },
+            }, 
+            (e) => { 
+             console.Log($"Grid context menu item clicked. Value={e.Value} (clicked on grid, not on a cell)"); 
+            }
+         );
+    }
+}
+```

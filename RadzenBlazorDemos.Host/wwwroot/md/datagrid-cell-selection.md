@@ -1,0 +1,111 @@
+﻿# DataGrid: Cell selection
+
+This example demonstrates how to enable cell selection in Blazor RadzenDataGrid component.
+
+Keywords: cell, selection, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Cell selection
+
+Enable cell selection in a Blazor DataGrid - users select individual cells or ranges, useful for copy and spreadsheet-style interaction.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="1rem">
+    <p>Click on a table cell to select or deselect.</p>
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox @bind-Value="@multiple" Name="multiple" Change="@((bool args) => selectedCellData.Clear())" />
+                <RadzenLabel Text="Enable multiple cells selection" Component="multiple" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Event type:" Component="type" />
+                <RadzenDropDown @bind-Value="@type" Data="@(new string[]{ "Click", "DoubleClick" })" Name="type" />
+            </RadzenStack>
+            <RadzenButton Text="Clear selected cells" Click="@(args => selectedCellData.Clear())" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@employees" ColumnWidth="200px" TItem="Employee"
+                CellClick="@OnCellClick" CellDoubleClick="OnCellDoubleClick" CellRender="OnCellRender">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                    @data.FirstName @data.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+            <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+            <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+            <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    string type = "Click";
+    bool multiple = true;
+    IEnumerable<Employee> employees;
+    IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    void Select(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (!multiple)
+        {
+            selectedCellData.Clear();
+        }
+
+        var cellData = selectedCellData.FirstOrDefault(i => i.Item1 == args.Data && i.Item2 == args.Column);
+        if (cellData != null)
+        {
+            selectedCellData.Remove(cellData);
+        }
+        else
+        {
+            selectedCellData.Add(new Tuple<Employee, RadzenDataGridColumn<Employee>>(args.Data, args.Column));
+        }
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type == "Click")
+        {
+            Select(args);
+        }
+    }
+
+    void OnCellDoubleClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type != "Click")
+        {
+            Select(args);
+        }
+    }
+
+    void OnCellRender(DataGridCellRenderEventArgs<Employee> args)
+    {
+        if (selectedCellData.Any(i => i.Item1 == args.Data && i.Item2 == args.Column))
+        {
+            args.Attributes.Add("style", $"background-color: var(--rz-secondary-lighter);");
+        }
+    }
+}
+```

@@ -1,0 +1,83 @@
+﻿# DataGrid: Empty Data Grid
+
+This example demonstrates Blazor DataGrid without data.
+
+Keywords: datagrid, databinding
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## Empty DataGrid
+
+Show an empty Blazor DataGrid state - render a friendly message or custom template when there are no rows.
+
+```razor
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3">Default Empty Text</RadzenText>
+<RadzenDataGrid Data="@data">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+    </Columns>
+</RadzenDataGrid>    
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Custom Empty Text</RadzenText>
+<div class="rz-mb-6">
+    Custom text: <RadzenTextBox @bind-Value="emptyText" class="rz-ms-2" Style="width: 300px;" aria-label="custom text" />
+</div>
+<RadzenDataGrid Data="@data" EmptyText="@emptyText">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Render Fragment as Empty Text</RadzenText>
+<RadzenDataGrid Data="@data">
+    <EmptyTemplate>
+        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+    </Columns>
+</RadzenDataGrid>
+
+@code { 
+    string emptyText = "No Items to display!";
+    List<Employee> data = new List<Employee>();
+}
+```

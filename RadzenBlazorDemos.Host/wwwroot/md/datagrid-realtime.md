@@ -1,0 +1,90 @@
+﻿# DataGrid: Real-time data
+
+Blazor Data Grid with real-time data sources.
+
+Keywords: datagrid, bind, load, data, loaddata, real-time
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid real-time data support
+
+Update a Blazor DataGrid in real time as data changes - refresh rows from a timer, SignalR, or any live feed and call Reload so the grid reflects the latest values.
+
+```razor
+<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+    <Columns>
+        @foreach (var column in columns)
+        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<IDictionary<string, object>> grid;
+    System.Timers.Timer timer;
+    ElapsedEventHandler timerElapsedHandler;
+
+    public IEnumerable<IDictionary<string, object>> data 
+    { 
+        get
+        {
+            return Enumerable.Range(0, 20).Select(i =>
+            {
+                var row = new Dictionary<string, object>();
+
+                foreach (var column in columns)
+                {
+                    row.Add(
+                        column.Key,
+                        column.Value == typeof(Guid) ? Guid.NewGuid()
+                            : column.Value == typeof(DateTime) ? DateTime.Now.AddMonths(i)
+                                : $"{column.Key}{i}"
+                    );
+                }
+
+                return row;
+            });
+        }
+    }
+
+    public IDictionary<string, Type> columns { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        columns = new Dictionary<string, Type>()
+        {
+            { "ID", typeof(Guid) },
+            { "Date", typeof(DateTime) },
+        };
+
+        timer = new System.Timers.Timer(1000);
+        timerElapsedHandler = (s, e) => InvokeAsync(grid.Reload);
+        timer.Elapsed += timerElapsedHandler;
+
+        timer.Start();
+    }
+
+    public void Dispose()
+    {
+        if (timer != null && timerElapsedHandler != null)
+        {
+            timer.Elapsed -= timerElapsedHandler;
+            timerElapsedHandler = null;
+        }
+
+        timer?.Stop();
+        timer?.Dispose();
+        timer = null;
+    }
+}
+```

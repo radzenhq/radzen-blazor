@@ -1,0 +1,76 @@
+﻿# RegexValidator
+
+Demonstration and configuration of the Radzen Blazor Regex Validator component.
+
+Keywords: validator, validation, pattern, regex, regular, expression
+
+> API reference: [RadzenRegexValidator API](https://blazor.radzen.com/api/regexvalidator.md)
+
+## Examples
+
+## Blazor RegexValidator
+
+Pattern-based input validation using regular expressions.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Personal information">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="ZIP" Component="ZIP" />
+                        <small style="display: block">(5 digit ZIP code)</small>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Name="ZIP" @bind-Value=@model.Zip Style="display: block; width: 100%;" />
+                        <RadzenRequiredValidator Component="ZIP" Text="ZIP code is required" Popup=@popup Style="position: absolute"/>
+                        <RadzenRegexValidator Component="ZIP" Text="ZIP code must be 5 digits" Pattern="\d{5}" Popup=@popup Style="position: absolute" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    class Model
+    {
+        public string Zip { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void Log(string eventName, string value)
+    {
+        console.Log($"{eventName}: {value}");
+    }
+
+    void OnSubmit(Model model)
+    {
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true }));
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true }));
+    }
+}
+```

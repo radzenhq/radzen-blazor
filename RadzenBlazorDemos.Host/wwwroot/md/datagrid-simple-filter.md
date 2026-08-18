@@ -1,0 +1,68 @@
+﻿# DataGrid: Simple Mode
+
+RadzenDataGrid simple mode filtering.
+
+Keywords: filter, simple, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Simple Filter Mode
+
+Add an inline column filter to a Blazor DataGrid - a filter box in each column header that filters the grid as the user types. The lightest-weight way to make a grid searchable.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Logical filter operator:" Component="operator" />
+                <RadzenDropDown @bind-Value="@logicalFilterOperator" TextProperty="Text" ValueProperty="Value" Name="operator" Change=@(args => grid.Reload())
+                                Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Filter case sensitivity:" Component="caseSensitivity" />
+                <RadzenDropDown @bind-Value="@filterCaseSensitivity" TextProperty="Text" ValueProperty="Value" Name="caseSensitivity" Change=@(args => grid.Reload())
+                                Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)).Cast<FilterCaseSensitivity>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid @ref=grid AllowFiltering="true" AllowColumnResize="true" 
+        FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
+        FilterCaseSensitivity="@filterCaseSensitivity" LogicalFilterOperator="@logicalFilterOperator">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="FirstName" Title="First Name" />
+            <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px"/>
+            <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+            <RadzenDataGridColumn Property="Notes" Title="Notes" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    RadzenDataGrid<Employee> grid;
+
+    LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And;
+    FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
+
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+}
+```

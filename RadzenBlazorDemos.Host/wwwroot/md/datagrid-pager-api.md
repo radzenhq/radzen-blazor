@@ -1,0 +1,87 @@
+﻿# DataGrid: Pager API
+
+Blazor RadzenDataGrid Pager API.
+
+Keywords: pager, paging, api, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Pager API
+
+Control Blazor DataGrid paging from code - set the page size, page-size options, and the current page, and respond to page changes.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem;" Wrap="FlexWrap.Wrap">
+            <RadzenButton Click="@FirstPage" Text="First page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click="@TenthPage" Text="10th page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click="@LastPage" Text="Last page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" />
+                <RadzenLabel Text="Show pager summary" Component="CheckBox1" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
+    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" Page="@OnPage">
+        <PagingSummaryTemplate>
+            <RadzenIcon Icon="database" Style="color: var(--rz-primary); font-size: var(--rz-pager-summary-font-size);" />
+            Displaying page @context.CurrentPage of @context.NumberOfPages <b>(total @context.TotalCount records)</b>
+        </PagingSummaryTemplate>
+        <Columns>
+            <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
+            <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
+            <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+                <Template Context="detail">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
+                <Template Context="detail">
+                    @String.Format("{0}%", detail.Discount * 100)
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+
+    RadzenDataGrid<OrderDetail> dataGrid;
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30 };
+    IEnumerable<OrderDetail> orderDetails;
+    bool showPagerSummary = true;
+
+    async Task FirstPage()
+    {
+        await dataGrid.FirstPage();
+    }
+    async Task TenthPage()
+    {
+        await dataGrid.GoToPage(9);
+    }
+    async Task LastPage()
+    {
+        await dataGrid.LastPage();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+ 
+        orderDetails = dbContext.OrderDetails;
+    }
+
+    void OnPage(PagerEventArgs args)
+    {
+        //
+    }
+}
+```

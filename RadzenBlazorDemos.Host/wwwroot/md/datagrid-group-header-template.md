@@ -1,0 +1,89 @@
+﻿# DataGrid: Group Header Template
+
+Use GroupHeaderTemplate to customize DataGrid group header rows.
+
+Keywords: group, grouping, template, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Group Header Template
+
+Customize Blazor DataGrid group headers with GroupHeaderTemplate - show the group key, a count, or any markup on each group row.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
+        <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
+        Data="@orders" Render="@OnRender" GroupRowRender="OnGroupRowRender">
+    <GroupHeaderTemplate>
+        @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items?.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
+    </GroupHeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Width="80px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template>
+                @(orders.IndexOf(context) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID">
+            <FooterTemplate>
+                Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+            <Template Context="order">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+            </Template>
+            <FooterTemplate>
+                Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
+            <FooterTemplate>
+                Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool? groupsExpanded;
+    IList<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void OnRender(DataGridRenderEventArgs<Order> args)
+    {
+        if(args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor(){ Title = "Customer", Property = "Customer.CompanyName", SortOrder = SortOrder.Descending });
+            StateHasChanged();
+        }
+    }
+
+    void OnGroupRowRender(GroupRowRenderEventArgs args)
+    {
+       args.Expanded = groupsExpanded;
+    }
+}
+```

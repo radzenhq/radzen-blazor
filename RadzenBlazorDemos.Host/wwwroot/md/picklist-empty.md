@@ -1,0 +1,91 @@
+﻿# Empty PickList
+
+This example demonstrates Blazor PickList with empty text and empty template.
+
+Keywords: picklist, empty, list, listbox
+
+## Examples
+
+## Empty PickList
+
+Showcase empty state when there is no data. Customize with placeholders or messages.
+
+```razor
+@inherits DbContextPage
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3">Default Empty Text</RadzenText>
+<RadzenPickList @bind-Source="@emptySource" @bind-Target="@emptyTarget" Style="height:300px; width:100%;"
+    TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)">
+    <SourceHeader>
+        Source:
+    </SourceHeader>
+    <TargetHeader>
+        Target:
+    </TargetHeader>
+</RadzenPickList>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Custom Empty Text</RadzenText>
+<RadzenPickList @bind-Source="@emptySource2" @bind-Target="@emptyTarget2" Style="height:300px; width:100%;"
+    TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+    SourceEmptyText="No available customers" TargetEmptyText="No selected customers">
+    <SourceHeader>
+        Source:
+    </SourceHeader>
+    <TargetHeader>
+        Target:
+    </TargetHeader>
+</RadzenPickList>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Custom Empty Template</RadzenText>
+<RadzenPickList @bind-Source="@emptySource3" @bind-Target="@emptyTarget3" Style="height:300px; width:100%;"
+    TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)">
+    <SourceHeader>
+        Source:
+    </SourceHeader>
+    <TargetHeader>
+        Target:
+    </TargetHeader>
+    <SourceEmptyTemplate>
+        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No source items.</p>
+    </SourceEmptyTemplate>
+    <TargetEmptyTemplate>
+        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No target items.</p>
+    </TargetEmptyTemplate>
+</RadzenPickList>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Empty Text with Data</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Move all items to see the empty message appear.
+</RadzenText>
+<RadzenPickList @bind-Source="@source" @bind-Target="@target" Style="height:300px; width:100%;"
+    TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+    SourceEmptyText="All customers moved to target" TargetEmptyText="No customers selected yet">
+    <SourceHeader>
+        Customers:
+    </SourceHeader>
+    <TargetHeader>
+        Selected Customers:
+    </TargetHeader>
+</RadzenPickList>
+
+@code {
+    IEnumerable<Customer> emptySource;
+    IEnumerable<Customer> emptyTarget;
+
+    IEnumerable<Customer> emptySource2;
+    IEnumerable<Customer> emptyTarget2;
+
+    IEnumerable<Customer> emptySource3;
+    IEnumerable<Customer> emptyTarget3;
+
+    IEnumerable<Customer> source;
+    IEnumerable<Customer> target;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        source = dbContext.Customers.Take(5);
+    }
+}
+```

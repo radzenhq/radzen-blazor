@@ -1,0 +1,52 @@
+﻿# Arc Gauge
+
+Show a value on a curved arc with a Blazor arc gauge - a compact dial for cards and tiles.
+
+Keywords: gauge, graph, arc, progress
+
+## Examples
+
+## Radzen Blazor Arc Gauge
+
+An arc gauge shows a value along a curved segment - a lighter, flatter take on the radial dial that fits neatly into cards and tight dashboard tiles.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick position" Component="tickPositionDropDown" />
+                <RadzenDropDown Name="tickPositionDropDown" @bind-Value=@tickPosition Data=@tickPositions Style="width: 200px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Value" Component="valueSlider" />
+                <RadzenSlider Name="valueSlider" Min="0" Max="260" @bind-Value=@value Style="width: 200px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value=@showValue Name="showPointerValue"/>
+                <RadzenLabel Text="Show the pointer value" Component="showPointerValue" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenArcGauge Style="width: 100%; height: 250px;">
+        <RadzenArcGaugeScale Step="20" Min="0" Max="260" MinorStep="2" Radius="1.5" TickPosition=@tickPosition Y="0.9" Margin="0">
+            <RadzenArcGaugeScaleValue Value=@value ShowValue=@showValue>
+                <Template Context="pointer">
+                    <RadzenStack AlignItems="AlignItems.Center" Gap="0" Style="margin-top: -50%;">
+                        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.P" class="rz-m-0"><strong>@pointer.Value</strong></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption">km/h</RadzenText>
+                    </RadzenStack>
+                </Template>
+            </RadzenArcGaugeScaleValue>
+        </RadzenArcGaugeScale>
+    </RadzenArcGauge>
+</RadzenStack>
+
+@code {
+    bool showValue = true;
+    double value = 100;
+    IEnumerable<GaugeTickPosition> tickPositions = Enum.GetValues(typeof(GaugeTickPosition)).Cast<GaugeTickPosition>();
+    GaugeTickPosition tickPosition = GaugeTickPosition.Outside;
+}
+```

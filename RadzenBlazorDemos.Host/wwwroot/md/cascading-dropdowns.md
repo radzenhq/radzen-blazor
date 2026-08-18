@@ -1,0 +1,84 @@
+﻿# DataGrid: Cascading DropDowns
+
+This example demonstrates cascading Radzen Blazor DropDown components.
+
+Keywords: related, parent, child
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## Cascading DropDowns
+
+Build cascading dropdowns in a Blazor DataGrid - filter one dropdown's options by another's selection, such as country then city, while editing.
+
+```razor
+@inherits DbContextPage
+
+<RadzenRow Gap="2rem" RowGap="2rem" class="rz-p-0 rz-p-md-12">
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard Variant="Variant.Flat">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Customers</RadzenText>
+            <RadzenDropDown Style="width: 100%; max-width: 300px;" TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true"
+                            Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})"
+                            Change="@(args => { orders = dbContext.Orders.Where(o => o.CustomerID == CustomerID); })" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard Variant="Variant.Flat">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Orders</RadzenText>
+            <RadzenDropDown Style="width: 100%; max-width: 300px;" TValue="int" @bind-Value="OrderID" Placeholder="Select order"
+                            Data="@(orders)" ValueProperty="OrderID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order" }})"
+                            Change="@(args => { orderDetails = dbContext.OrderDetails.Where(o => o.OrderID == OrderID).Include("Product"); })">
+                <Template>
+                    Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
+                </Template>
+            </RadzenDropDown>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Flat">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Order Details</RadzenText>
+            <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            Data="@orderDetails" ColumnWidth="200px" TItem="OrderDetail"
+                            RowSelect="@(args => { products = dbContext.Products.Where(o => o.ProductID == args.ProductID); })">
+                <Columns>
+                    <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Flat">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Products</RadzenText>
+            <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            Data="@products" ColumnWidth="200px">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(Product.ProductName)" Title="ProductName" />
+                    <RadzenDataGridColumn Property="@nameof(Product.UnitPrice)" Title="UnitPrice" FormatString="{0:C}" />
+                    <RadzenDataGridColumn Property="@nameof(Product.UnitsInStock)" Title="UnitsInStock" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    IEnumerable<Customer> customers;
+    IEnumerable<Order> orders;
+    IEnumerable<OrderDetail> orderDetails;
+    IEnumerable<Product> products;
+
+    string CustomerID;
+    int OrderID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers.ToList();
+    }
+}
+```

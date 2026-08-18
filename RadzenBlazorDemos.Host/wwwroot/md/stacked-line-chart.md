@@ -1,0 +1,59 @@
+﻿# Stacked Line Chart
+
+Stack series to show a cumulative total over time with a Blazor stacked line chart.
+
+Keywords: chart, graph, line, stack, cumulative
+
+## Examples
+
+## Radzen Blazor Chart with stacked line series
+
+A stacked line chart adds each series on top of the ones below it, so the top line shows the cumulative total while the gaps show each series' contribution.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Animate="true">
+                <RadzenChartTooltipOptions Shared="true" />
+                <RadzenStackedLineSeries Data="@revenue2025" CategoryProperty="Quarter" Title="2025" ValueProperty="Revenue" />
+                <RadzenStackedLineSeries Data="@revenue2026" CategoryProperty="Quarter" Title="2026" ValueProperty="Revenue" LineType="LineType.Dashed" />
+                <RadzenCategoryAxis Padding="20">
+                    <RadzenAxisCrosshair Visible="true" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2025 = new DataItem[] {
+        new DataItem { Quarter = "Q1", Revenue = 234000 },
+        new DataItem { Quarter = "Q2", Revenue = 284000 },
+        new DataItem { Quarter = "Q3", Revenue = 274000 },
+        new DataItem { Quarter = "Q4", Revenue = 294000 },
+    };
+
+    DataItem[] revenue2026 = new DataItem[] {
+        new DataItem { Quarter = "Q1", Revenue = 254000 },
+        new DataItem { Quarter = "Q2", Revenue = 324000 },
+        new DataItem { Quarter = "Q3", Revenue = 354000 },
+        new DataItem { Quarter = "Q4", Revenue = 394000 },
+    };
+}
+```

@@ -1,0 +1,162 @@
+﻿# Barcode
+
+Generate and display 1D barcodes as SVG using RadzenBarcode.
+
+Keywords: barcode, svg
+
+> API reference: [RadzenBarcode API](https://blazor.radzen.com/api/barcode.md)
+
+## Examples
+
+## Blazor Barcode
+
+Generate and display 1D barcodes as SVG images.
+Pick a `Type`, enter a `Value`, and customize styling and layout.
+
+```razor
+<RadzenRow Gap="2rem">
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
+            <RadzenBarcode @ref="barCode" Value="@value"
+                          Type="@type"
+                          Foreground="@foreground"
+                          Background="@background"
+                          BarHeight="@barHeight"
+                          QuietZoneModules="@quietZone"
+                          ShowValue="@showValue"
+                          ShowChecksum="@showChecksum"
+                          ValueStyle="@valueStyle"
+                          Height="140px"
+                          Width="100%" />
+        </RadzenStack>
+    </RadzenColumn>
+
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack Gap="1rem">
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Type" class="rz-w-100">
+                        <RadzenDropDown @bind-Value="@type" Data="@types" class="rz-w-100" Change="@OnTypeChanged" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Value" class="rz-w-100">
+                        <RadzenTextBox @bind-Value="@value" class="rz-w-100" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Foreground" class="rz-w-100">
+                        <RadzenColorPicker @bind-Value="@foreground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Background" class="rz-w-100">
+                        <RadzenColorPicker @bind-Value="@background" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="BarHeight" class="rz-w-100">
+                        <RadzenNumeric @bind-Value="@barHeight" class="rz-w-100" Min="10" Max="120" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Quiet zone (modules)" class="rz-w-100">
+                        <RadzenNumeric @bind-Value="@quietZone" class="rz-w-100" Min="0" Max="30" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField class="rz-w-100">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-3">
+                            <RadzenLabel Text="Show value" Component="showValue" />
+                            <RadzenSwitch @bind-Value="@showValue" Name="showValue" />
+                        </RadzenStack>
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField class="rz-w-100">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-3">
+                            <RadzenLabel Text="Show checksum" Component="showChecksum" />
+                            <RadzenSwitch @bind-Value="@showChecksum" Name="showChecksum" Disabled="@(!showValue || !RadzenBarcode.HasChecksum(type))" />
+                        </RadzenStack>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenFormField Text="ValueStyle">
+                <RadzenTextArea @bind-Value="@valueStyle" class="rz-w-100" Rows="3" />
+            </RadzenFormField>
+
+            <RadzenButton Text="Save SVG"
+                          Icon="download"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Click="@(_ => SaveSvg())" />
+
+            <RadzenText TextStyle="TextStyle.Caption">
+                Tip: some types require numeric-only input (EAN/UPC/ITF/MSI/POSTNET/Pharmacode). Changing the type auto-fills a valid sample value.
+            </RadzenText>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    RadzenBarcode barCode;
+    RadzenBarcodeType type = RadzenBarcodeType.Code128;
+    IEnumerable<RadzenBarcodeType> types = Enum.GetValues<RadzenBarcodeType>();
+
+    string value = "Radzen-123";
+    string foreground = "#111827";
+    string background = "#F9FAFB";
+
+    double barHeight = 60;
+    int quietZone = 10;
+
+    bool showValue = true;
+    bool showChecksum = true;
+
+    string valueStyle = "font: 600 12px/1.2 Inter, system-ui, sans-serif;";
+
+    void OnTypeChanged(object _)
+    {
+        value = type switch
+        {
+            RadzenBarcodeType.Code128 => "Radzen-123",
+            RadzenBarcodeType.Code39 => "RADZEN 123",
+            RadzenBarcodeType.Ean13 => "5901234123457",
+            RadzenBarcodeType.Ean8 => "96385074",
+            RadzenBarcodeType.UpcA => "036000291452",
+            RadzenBarcodeType.Itf => "12345670",
+            RadzenBarcodeType.Codabar => "123456",
+            RadzenBarcodeType.Postnet => "555551237",
+            RadzenBarcodeType.Pharmacode => "1234",
+            RadzenBarcodeType.Rm4scc => "SW1A1AA1A",
+            RadzenBarcodeType.Isbn => "0306406152",
+            RadzenBarcodeType.Issn => "03178471",
+            RadzenBarcodeType.Msi => "1234567",
+            RadzenBarcodeType.Telepen => "Wikipedia",
+            _ => value
+        };
+    }
+
+    async Task SaveSvg(bool custom = false)
+    {
+        var svg = custom ? RadzenBarcodeEncoder.ToSvg(
+            type,
+            value,
+            barHeight: barHeight,
+            quietZoneModules: quietZone,
+            foreground: foreground,
+            background: background) : await barCode.ToSvg();
+
+        await JS.InvokeVoidAsync("Radzen.downloadFile", "barcode.svg", svg, "image/svg+xml;charset=utf-8");
+    }
+}
+```

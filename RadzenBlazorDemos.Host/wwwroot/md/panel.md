@@ -1,0 +1,98 @@
+﻿# Panel
+
+The Blazor Panel is a titled, collapsible container for grouping content.
+
+Keywords: container
+
+> API reference: [RadzenPanel API](https://blazor.radzen.com/api/panel.md)
+
+## Examples
+
+## Blazor Panel
+
+The Blazor Panel is a titled, collapsible container for grouping content.
+Use `&lt;HeaderTemplate &gt;`, `&lt;ChildContent &gt;` and `&lt;SummaryTemplate &gt;` to define custom content for Panel component parts. Use `AllowCollapse` property to allow expand/collapse and `Expand` and `Collapse` callbacks to catch if Panel component is expanded or collapsed.
+
+```razor
+@inherits DbContextPage
+
+@if(position == 0)
+{
+    <style>
+        .rz-panel-titlebar {
+            flex-direction: row-reverse;
+            justify-content:left;
+        }
+    </style>
+}
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenText TextStyle="TextStyle.Body1">Expand/Collapse position:</RadzenText>
+    <RadzenSelectBar @bind-Value="@position" TextProperty="Text" ValueProperty="Value"
+                     Data="@(new []{ new { Text = "Left", Value = 0 }, new { Text = "Right", Value = 1 } })" Size="ButtonSize.Small" />
+</RadzenStack>
+
+<RadzenPanel AllowCollapse="true" class="rz-my-10 rz-mx-auto" Style="width: 700px;"
+                Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
+    <HeaderTemplate>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-display-flex rz-align-items-center rz-m-0">
+            <RadzenIcon Icon="account_box" class="rz-me-1" /><b>Orders</b>
+        </RadzenText>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
+            <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
+                            Data="@orders" TItem="Order">
+                <Template Context="order">
+                    <RadzenCard Style="width: 250px">
+                        <RadzenRow>
+                            <RadzenColumn Size="8" class="rz-text-truncate">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
+                                <b>@(order.ShipName)</b>
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" class="rz-text-align-end">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+        </RadzenCard>
+    </ChildContent>
+    <SummaryTemplate>
+        <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
+            <b>@orders.Count() Orders</b>
+        </RadzenCard>
+    </SummaryTemplate>
+</RadzenPanel>
+
+<EventConsole @ref=@console />
+
+@code {
+    int position = 1;
+    EventConsole console;
+
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void Change(string text)
+    {
+        console.Log($"{text}");
+    }
+}
+```

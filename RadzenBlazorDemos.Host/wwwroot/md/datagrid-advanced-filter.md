@@ -1,0 +1,100 @@
+﻿# DataGrid: Advanced Mode
+
+RadzenDataGrid advanced mode filtering.
+
+Keywords: filter, advanced, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Advanced Filter Mode
+
+Add multi-condition column filtering to a Blazor DataGrid - a per-column filter menu where users combine several conditions with operators and AND/OR logic to narrow large datasets precisely.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true"
+FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
+FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" TItem="Employee" FilterCleared=@FilterCleared
+LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" FilterValue="@employeeID" Filterable="true" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
+            <FilterValueTemplate>
+                <RadzenNumeric @bind-Value=@employeeID />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" 
+        Type="typeof(IEnumerable<string>)" LogicalFilterOperator=LogicalFilterOperator.Or
+                              FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains" 
+                              FilterOperators="new FilterOperator[] { FilterOperator.Contains, FilterOperator.DoesNotContain }"
+        SecondFilterValue="@selectedSecondTitles" SecondFilterOperator="FilterOperator.Contains"
+        Width="200px">
+            <FilterValueTemplate>
+                <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%"
+                Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+            </FilterValueTemplate>
+            <SecondFilterValueTemplate>
+                <RadzenDropDown @bind-Value=@selectedSecondTitles Style="width:100%"
+                Change=@OnSelectedSecondTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+            </SecondFilterValueTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+@code {
+    int? employeeID;
+    RadzenDataGrid<Employee> grid;
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees.ToList();
+    }
+
+    List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;
+        }
+
+        await grid.FirstPage();
+    }
+
+    IEnumerable<string> selectedSecondTitles;
+
+    async Task OnSelectedSecondTitlesChange(object value)
+    {
+        if (selectedSecondTitles != null && !selectedSecondTitles.Any())
+        {
+            selectedSecondTitles = null;
+        }
+
+        await grid.FirstPage();
+    }
+
+    async Task FilterCleared()
+    {
+        selectedTitles = null;
+        selectedSecondTitles = null;
+        employeeID = null;
+        await grid.FirstPage();
+    }
+}
+```

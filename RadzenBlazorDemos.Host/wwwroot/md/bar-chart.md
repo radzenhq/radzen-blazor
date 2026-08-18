@@ -1,0 +1,166 @@
+﻿# Bar Chart
+
+Rank categories with a Blazor bar chart - horizontal bars sized by value, with room for long labels. Free and open source.
+
+Keywords: chart, graph, column, bar
+
+## Examples
+
+## Radzen Blazor Chart bar series
+
+A bar chart plots categories as horizontal bars, with length showing the value. The horizontal layout gives long category names room to breathe and makes rankings easy to scan top to bottom.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+            @if (showDataLabels)
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Label Position" Component="labelPosition" />
+                    <RadzenSelectBar @bind-Value="@labelPosition" TValue="DataLabelPosition" Size="ButtonSize.Small" Name="labelPosition">
+                        <Items>
+                            <RadzenSelectBarItem Value="DataLabelPosition.Auto" Text="Auto" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Top" Text="Top" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Inside" Text="Inside" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Center" Text="Center" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            }
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Max Height" Component="maxHeight" />
+                <RadzenNumeric @bind-Value="@maxHeight" Min="0" Max="200" Step="10" Style="width: 90px" Name="maxHeight" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Category Gap" Component="categoryGap" />
+                <RadzenNumeric @bind-Value="@categoryGap" Min="0" Max="0.9m" Step="0.1" Style="width: 90px" Name="categoryGap" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeLG="6">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Auto-size bar series</RadzenText>
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenBarSeries FillMode="@fillMode" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
+                </RadzenBarSeries>
+                <RadzenBarSeries FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
+                </RadzenBarSeries>
+                <RadzenCategoryAxis />
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+                <RadzenBarOptions Radius="5" MaxHeight="@(maxHeight > 0 ? maxHeight : null)" CategoryGap="@(categoryGap > 0 ? categoryGap : null)" />
+            </RadzenChart>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="6">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Custom size bar series</RadzenText>
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
+                </RadzenBarSeries>
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
+                </RadzenBarSeries>
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+                <RadzenBarOptions Radius="5" Height="20" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    bool showDataLabels = false;
+    DataLabelPosition labelPosition = DataLabelPosition.Auto;
+    FillMode fillMode = FillMode.Gradient;
+    double maxHeight = 0;
+    double categoryGap = 0;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[]
+    {
+    new DataItem
+    {
+        Quarter = "Q1",
+        Revenue = 234000
+    },
+    new DataItem
+    {
+        Quarter = "Q2",
+        Revenue = 284000
+    },
+    new DataItem
+    {
+        Quarter = "Q3",
+        Revenue = 274000
+    },
+    new DataItem
+    {
+        Quarter = "Q4",
+        Revenue = 294000
+    },
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+    new DataItem
+    {
+    Quarter = "Q1",
+    Revenue = 254000
+    },
+    new DataItem
+    {
+    Quarter = "Q2",
+    Revenue = 324000
+    },
+    new DataItem
+    {
+    Quarter = "Q3",
+    Revenue = 354000
+    },
+    new DataItem
+    {
+    Quarter = "Q4",
+    Revenue = 394000
+    },
+
+    };
+}
+```

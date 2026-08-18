@@ -1,0 +1,240 @@
+﻿# DataGrid: InLine Editing
+
+This example demonstrates how to configure the Razden Blazor DataGrid for inline editing.
+
+Keywords: inline, editor, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid InLine Editing
+
+Edit Blazor DataGrid rows inline - switch a row into edit mode with editors in each cell, then save or cancel, with built-in validation.
+
+```razor
+@inherits DbContextPage
+
+<style>
+    .rz-grid-table {
+    width: unset;
+    }
+</style>
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <div>Edit Mode:</div>
+        <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value"
+        Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small"
+        Disabled="@(editMode == DataGridEditMode.Multiple && ordersToInsert.Count() > 1)" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
+Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+    <HeaderTemplate>
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Add New Order" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="280px">
+            <EditTemplate Context="order">
+                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="220px">
+            <Template Context="order">
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                    <Template>
+                        <RadzenImage Path="@context.Photo" Style="width: 20px; height: 20px;" class="rz-border-radius-4 rz-me-2" />
+                        @context.FirstName @context.LastName
+                    </Template>
+                </RadzenDropDown>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" Width="200px">
+            <Template Context="order">
+                @String.Format("{0:d}", order.OrderDate)
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+            <Template Context="order">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name">
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
+                <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="ShipCountry">
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
+                <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCity)" Title="ShipCity">
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
+                <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="order">
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" Click="@(() => InsertAfterRow(order))" title="Add new row after this row" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(order))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))" aria-label="Save"/>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(order))" aria-label="Cancel"/>
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" aria-label="Delete" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Order> ordersGrid;
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    DataGridEditMode editMode = DataGridEditMode.Single;
+
+    List<Order> ordersToInsert = new List<Order>();
+    List<Order> ordersToUpdate = new List<Order>();
+
+    void Reset()
+    {
+        ordersToInsert.Clear();
+        ordersToUpdate.Clear();
+    }
+
+    void Reset(Order order)
+    {
+        ordersToInsert.Remove(order);
+        ordersToUpdate.Remove(order);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
+    async Task EditRow(Order order)
+    {
+        if (!ordersGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        ordersToUpdate.Add(order);
+        await ordersGrid.EditRow(order);
+    }
+
+    void OnUpdateRow(Order order)
+    {
+        Reset(order);
+
+        dbContext.Update(order);
+
+        dbContext.SaveChanges();
+    }
+
+    async Task SaveRow(Order order)
+    {
+        await ordersGrid.UpdateRow(order);
+    }
+
+    void CancelEdit(Order order)
+    {
+        Reset(order);
+
+        ordersGrid.CancelEditRow(order);
+
+        var orderEntry = dbContext.Entry(order);
+        if (orderEntry.State == EntityState.Modified)
+        {
+            orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+            orderEntry.State = EntityState.Unchanged;
+        }
+    }
+
+    async Task DeleteRow(Order order)
+    {
+        Reset(order);
+
+        if (orders.Contains(order))
+        {
+            dbContext.Remove<Order>(order);
+
+            dbContext.SaveChanges();
+
+            await ordersGrid.Reload();
+        }
+        else
+        {
+            ordersGrid.CancelEditRow(order);
+            await ordersGrid.Reload();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        if (!ordersGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var order = new Order();
+        ordersToInsert.Add(order);
+        await ordersGrid.InsertRow(order);
+    }
+
+    async Task InsertAfterRow(Order row)
+    {
+        if (!ordersGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var order = new Order();
+        ordersToInsert.Add(order);
+        await ordersGrid.InsertAfterRow(order, row);
+    }
+
+    void OnCreateRow(Order order)
+    {
+        dbContext.Add(order);
+
+        dbContext.SaveChanges();
+
+        ordersToInsert.Remove(order);
+    }
+}
+```

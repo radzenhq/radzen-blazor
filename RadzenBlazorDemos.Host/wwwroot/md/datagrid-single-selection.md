@@ -1,0 +1,67 @@
+﻿# DataGrid: Single selection
+
+This example demonstrates how to enable single selection in Blazor RadzenDataGrid component.
+
+Keywords: single, selection, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Single Selection
+
+Enable single row selection in a Blazor DataGrid - users click a row to select it, and you bind the selected item to your code.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
+            @if (selectedEmployees?.Any() == true)
+            {
+            <div>
+                Selected Employee: @selectedEmployees[0].FirstName @selectedEmployees[0].LastName
+            </div>
+            }
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@employees" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                    @data.FirstName @data.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Title" Title="Title" />
+            <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+            <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+            <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+
+    void ClearSelection()
+    {
+        selectedEmployees = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+        selectedEmployees = employees.Take(1).ToList();
+    }
+}
+```

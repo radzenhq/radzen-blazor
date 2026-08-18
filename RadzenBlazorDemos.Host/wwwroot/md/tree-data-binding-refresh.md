@@ -1,0 +1,93 @@
+﻿# Tree: Refreshing tree data-binding
+
+This example demonstrates how to refresh a lazily loaded RadzenTree.
+
+Keywords: tree, treeview, nodes
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## Refreshing tree data-binding
+
+Lazily populate a RadzenTree and refresh it programmatically. Use the context menu of a node to open a dialog for adding new child items in the data model.
+
+```razor
+<RadzenRow class="rz-p-0 rz-p-lg-12">
+    <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
+        <RadzenCard>
+            <RadzenTree @ref="this.tree" Data=@entries Expand=@LoadSubsidiaries ItemContextMenu="@this.GetContextMenuForNode" Style="width: 100%; height: 300px">
+                <RadzenTreeLevel Text="@this.GetTextForNode" HasChildren="@this.NodeHasChildren" />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private static readonly Dictionary<string, IEnumerable<string>> Data = new() {
+        { "Volkswagen Group", ["Audi AG", "Dr. Ing. h.c. F. Porsche Aktiengesellschaft", "Seat S.A.", "Škoda Auto a.s.", "Volkswagen"] },
+        { "Audi AG", ["Audi Sport GmbH", "Automobili Lamborghini S.p.A.", "Bentley Motors Ltd."] },
+        { "Seat S.A.", ["Seat Cupra S.A.U."] },
+        { "Volkswagen", ["Volkswagen Nutzfahrzeuge"] },
+        { "Automobili Lamborghini S.p.A.", ["Ducati Motor Holding S.p.A.", "Italdesign Giugiaro S.p.A."]}
+    };
+
+    IEnumerable<string> entries;
+    string subsidiary;
+    RadzenTree tree = new();
+
+    protected override void OnInitialized() {
+        entries = ["Volkswagen Group"];
+    }
+
+    private async Task AddSubsidiary(string parent) {
+        var result = await DialogService.OpenAsync("Add a subsidiary", d =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenTextBox @bind-Value="this.subsidiary" Placeholder="Name the subsidiary." />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => d.Close(this.subsidiary)" Style="width: 80px;" />
+                <RadzenButton Text="Cancel" Click="() => d.Close(null)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+
+        if ((result is string s) && !string.IsNullOrWhiteSpace(s)) {
+            if (Data.TryGetValue(parent, out var subsidiaries)) {
+                Data[parent] = subsidiaries.Append(s);
+            } else {
+                Data[parent] = [s];
+            }
+        }
+    }
+
+    private void GetContextMenuForNode(TreeItemContextMenuEventArgs args) {
+        this.ContextMenuService.Open(args, [new ContextMenuItem() { Text = "Add" }], async (e) => {
+            this.subsidiary = null;
+            await this.AddSubsidiary(args.Text);
+            // Force the tree to re-evaluate LoadSubsidiaries to make the change visible.
+            await this.tree.Reload();
+        });
+    }
+
+    private string GetTextForNode(object data) => (string)data;
+
+    private void LoadSubsidiaries(TreeExpandEventArgs args) {
+        var company = args.Value as string;
+
+        if (Data.TryGetValue(company, out var subsidiaries)) {
+            args.Children.Data = subsidiaries;
+            // Ensure child items render their labels (otherwise they'll be empty).
+            args.Children.Text = this.GetTextForNode;
+            args.Children.HasChildren = c => Data.TryGetValue((string) c, out var _);
+            args.Children.Checkable = o => false;
+        }
+    }
+
+    private bool NodeHasChildren(object data)
+    {
+        return data is string s && Data.ContainsKey(s);
+    }
+}
+```

@@ -1,0 +1,93 @@
+﻿# DataGrid: Dynamic data
+
+Blazor Data Grid supports dynamic data sources.
+
+Keywords: datagrid, bind, load, data, loaddata, dynamic
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid dynamic data support
+
+Bind a Blazor DataGrid to dynamic data with no compile-time model - dictionaries, ExpandoObject, or values from an external API - and define columns at runtime by property name.
+
+```razor
+<RadzenDataGrid @bind-Value=@selectedItems Data="@data" TItem="IDictionary<string, object>" ColumnWidth="200px"
+                AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true">
+    <Columns>
+        @foreach (var column in columns)
+        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IList<IDictionary<string, object>> selectedItems;
+
+    public IEnumerable<IDictionary<string, object>> data { get; set; }
+
+    public IDictionary<string, Type> columns { get; set; }
+
+    public enum EnumTest
+    {
+        EnumValue1,
+        EnumValue2
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        columns = new Dictionary<string, Type>()
+        {
+            { "Employee ID", typeof(int?) },
+            { "MyColumn", typeof(EnumTest?) },
+            { "FirstName", typeof(string) },
+            { "LastName", typeof(string) },
+            { "HireDate", typeof(DateTime?) },
+            { "DateOnly", typeof(DateOnly?) },
+            { "TimeOnly", typeof(TimeOnly?) },
+            { "UID", typeof(Guid?) },
+        };
+
+        foreach (var i in Enumerable.Range(0, 50))
+        {
+            columns.Add($"Column{i}", typeof(string));
+        }
+
+        data = Enumerable.Range(0, 100).Select(i =>
+        {
+            var row = new Dictionary<string, object>();
+
+            foreach (var column in columns)
+            {
+                row.Add(
+                    column.Key,
+                    column.Value == typeof(EnumTest?)
+                        ? i == 0 ? null : (i % 2 == 0 ? EnumTest.EnumValue1 : EnumTest.EnumValue2)
+                        : column.Value == typeof(int?)
+                            ? i == 0 ? null : i
+                            : column.Value == typeof(DateTime?)
+                                ? i == 0 ? null : DateTime.Now.AddMonths(i)
+                                : column.Value == typeof(Guid?)
+                                ? i == 0 ? null : Guid.NewGuid()
+                                : column.Value == typeof(DateOnly?)
+                                ? i == 0 ? null : DateOnly.FromDateTime(DateTime.Now.AddMonths(i))
+                                : column.Value == typeof(TimeOnly?)
+                                ? i == 0 ? null : TimeOnly.FromDateTime(DateTime.Now.AddMonths(i))
+                                : $"{column.Key}{i}" 
+                );
+            }
+
+            return row;
+        }).ToList();
+    }
+}
+```

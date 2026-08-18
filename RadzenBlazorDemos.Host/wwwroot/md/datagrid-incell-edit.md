@@ -1,0 +1,274 @@
+﻿# DataGrid: InCell Editing
+
+This example demonstrates how to configure the Razden Blazor DataGrid for in-cell editing.
+
+Keywords: in-cell, editor, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid InCell Editing
+
+Edit Blazor DataGrid cells in place - click a cell to edit directly and commit on blur or Enter, for fast spreadsheet-style data entry.
+
+```razor
+@inherits DbContextPage
+
+@*
+    Pay attention to the following event handlers below: Sort, Page, and Filter. They are required to help maintain state on the Item and Property being edited.
+    The 'CellClick' event handler is used to trigger the column edit mode.
+*@
+
+<RadzenDataGrid @ref=grid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())"
+ColumnWidth="200px" CellClick="@OnCellClick">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+
+        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.Customer?.CompanyName)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="220px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </RadzenStack>
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                    <Template>
+                        <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
+                        @context.FirstName @context.LastName
+                    </Template>
+                </RadzenDropDown>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.OrderDate)" Title="Order Date" Width="200px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format("{0:d}", order.OrderDate))" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDatePicker @ref="editor" Change="@(args => Update())" @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.Freight)" Title="Freight" IsInEditMode="@IsEditing" CalculatedCssClass="@IsEdited">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenNumeric @ref="editor" Change="@((decimal? args) => Update())" @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipName)" Title="Ship Name" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipName)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
+                <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipCountry)" Title="ShipCountry" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCountry)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
+                <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipCity)" Title="ShipCity" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCity)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
+                <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<style>
+    .table-cell-edited {
+    position: relative;
+    }
+
+    .table-cell-edited::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 10px solid red;
+    border-left: 10px solid transparent;
+    }
+</style>
+
+@code {
+    RadzenDataGrid<Order> grid;
+    string columnEditing;
+
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    List<KeyValuePair<int, string>> editedFields = new List<KeyValuePair<int, string>>();
+    List<Order> ordersToUpdate = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+
+        orders.First().ShipName = null;
+    }
+
+    /// <summary>
+    /// Determines if the specified column is in edit mode for the specified order.
+    /// </summary>
+    /// <param name="columnName">The RadzenDataGridColumn.Property currently being rendered by the RadzenDataGrid.</param>
+    /// <param name="order">The Order currently being rendered by the RadzenDataGrid.</param>
+    /// <returns>True if the column should render the EditTemplate for the specified Order, otherwise false.</returns>
+    bool IsEditing(string columnName, Order order)
+    {
+        // Comparing strings is quicker than checking the contents of a List, so let the property check fail first.
+        return columnEditing == columnName && ordersToUpdate.Contains(order);
+    }
+
+    /// <summary>
+    /// Determines if the specified column needs a custom CSS class based on the <typeparamref name="TItem">TItem's</typeparamref> state.
+    /// </summary>
+    /// <param name="column">The RadzenDataGridColumn.Property currently being rendered by the RadzenDataGrid.</param>
+    /// <param name="order">The Order currently being rendered by the RadzenDataGrid.</param>
+    /// <returns>A string containing the CssClass to add, or <see cref="String.Empty">.</returns>
+    string IsEdited(RadzenDataGridColumn<Order> column, Order order)
+    {
+        // In a real scenario, you might use IRevertibleChangeTracking to check the current column
+        //  against a list of the object's edited fields.
+        return editedFields.Where(c => c.Key == order.OrderID && c.Value == column.Property).Any() ?
+            "table-cell-edited" :
+            string.Empty;
+    }
+
+    /// <summary>
+    /// Handles the CellClick event of the RadzenDataGrid.
+    /// </summary>
+    /// <param name="args"></param>
+    async Task OnCellClick(DataGridCellMouseEventArgs<Order> args)
+    {
+        if (!grid.IsValid ||
+            (ordersToUpdate.Contains(args.Data) && columnEditing == args.Column.Property)) return;
+
+        // Commit any pending edit before switching to the new cell.
+        if (ordersToUpdate.Any())
+        {
+            await Update();
+        }
+
+        // This sets which column is currently being edited.
+        columnEditing = args.Column.Property;
+
+        // This sets the Item to be edited.
+        await EditRow(args.Data);
+    }
+
+    void Reset(Order order = null)
+    {
+        editorFocused = false;
+
+        if (order != null)
+        {
+            ordersToUpdate.Remove(order);
+        }
+        else
+        {
+            ordersToUpdate.Clear();
+        }
+    }
+
+    async Task Update()
+    {
+        editorFocused = false;
+
+        if (ordersToUpdate.Any())
+        {
+            // Record the edited field so the cell gets the "edited" indicator.
+            editedFields.Add(new(ordersToUpdate.First().OrderID, columnEditing));
+            await grid.UpdateRow(ordersToUpdate.First());
+        }
+    }
+
+    async Task EditRow(Order order)
+    {
+        Reset();
+
+        ordersToUpdate.Add(order);
+
+        await grid.EditRow(order);
+    }
+
+    /// <summary>
+    /// Saves the changes from the Order to the database.
+    /// </summary>
+    /// <param name="order">The <see cref="Order" /> to save.</param>
+    /// <remarks>
+    /// Currently, this is called every time the Cell is changed. In a real in-cell edit scenario, you would likely either update
+    /// on RowDeselect, or batch the changes using a "Save Changes" button in the header.
+    /// </remarks>
+    void OnUpdateRow(Order order)
+    {
+        Reset(order);
+
+        dbContext.Update(order);
+
+        dbContext.SaveChanges();
+
+        // If you were doing row-level edits and handling RowDeselect, you could use the line below to
+        // clear edits for the current record.
+
+        //editedFields = editedFields.Where(c => c.Key != order.OrderID).ToList();
+    }
+
+    IRadzenFormComponent editor;
+    bool editorFocused;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (!editorFocused && editor != null)
+        {
+            editorFocused = true;
+
+            try
+            {
+                await editor.FocusAsync();
+            }
+            catch
+            {
+                //
+            }
+        }
+    }
+}
+```

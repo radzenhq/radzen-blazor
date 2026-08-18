@@ -1,0 +1,197 @@
+﻿# Interpolation
+
+Choose how a Blazor line or area chart connects its points - straight, smooth spline, or flat steps.
+
+Keywords: chart, interpolation, spline, step
+
+## Examples
+
+## Radzen Blazor Chart interpolation mode
+
+Interpolation controls how a line or area connects its points - straight segments, a smooth spline, or flat steps. The choice changes how the trend reads between points.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Interpolation" Component="interpolation" />
+            <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
+                            TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
+                            Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+        <RadzenAreaSeries FillMode="FillMode.Gradient" Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" />
+        <RadzenLineSeries Interpolation="@interpolation" Data="@revenueWithGaps" CategoryProperty="Date" Title="2022 (with gaps)" ValueProperty="Revenue" />
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true"/>
+            <RadzenAxisTitle Text="Revenue in USD"/>
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    Interpolation interpolation = Interpolation.Line;
+
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    class NullableDataItem
+    {
+        public string Date { get; set; }
+        public double? Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 294000
+        }
+    };
+
+    NullableDataItem[] revenueWithGaps = new NullableDataItem[] {
+        new NullableDataItem { Date = "Jan", Revenue = 194000 },
+        new NullableDataItem { Date = "Feb", Revenue = 209000 },
+        new NullableDataItem { Date = "Mar", Revenue = null },
+        new NullableDataItem { Date = "Apr", Revenue = null },
+        new NullableDataItem { Date = "May", Revenue = 184000 },
+        new NullableDataItem { Date = "Jun", Revenue = 213000 },
+        new NullableDataItem { Date = "Jul", Revenue = 234000 },
+        new NullableDataItem { Date = "Aug", Revenue = null },
+        new NullableDataItem { Date = "Sept", Revenue = 233000 },
+        new NullableDataItem { Date = "Oct", Revenue = 242000 },
+        new NullableDataItem { Date = "Nov", Revenue = 249000 },
+        new NullableDataItem { Date = "Dec", Revenue = 254000 }
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 334000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 369000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 333000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 344000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 314000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 353000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 374000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 384000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 373000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 382000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 389000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 394000
+        }
+    };
+}
+```

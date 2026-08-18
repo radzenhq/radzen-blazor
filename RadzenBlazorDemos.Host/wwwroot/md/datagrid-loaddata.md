@@ -1,0 +1,144 @@
+﻿# DataGrid: LoadData event
+
+Blazor Data Grid custom data-binding via the LoadData event.
+
+Keywords: datagrid, bind, load, data, loaddata, custom
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid LoadData
+
+Load Blazor DataGrid data on demand with the LoadData event - the grid passes you the current page, sort, and filter so you can fetch rows from a web API, stored procedure, or any custom data source and return just that page.
+
+```razor
+@inherits DbContextPage
+
+<RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
+<RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" 
+            Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains" Width="200px">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
+                    Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" Width="300px" />
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenCard class="rz-mt-6">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-4">Perform custom data-binding</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1">
+        1. Set the Data and Count properties.
+    </RadzenText>
+        <pre class="rz-mt-4 rz-p-4">
+            <code>&lt;RadzenDataGrid Count="@@count" Data="@@employees"</code>
+        </pre>
+    <RadzenText TextStyle="TextStyle.Body1">
+        2. Handle the LoadData event and update the Data and Count backing fields (<code>employees</code> and <code>count</code> in this case).
+    </RadzenText>
+        <pre class="rz-mt-4 rz-p-4">
+            <code>
+void LoadData(LoadDataArgs args)
+{
+    var query = dbContext.Employees.AsQueryable();
+
+    if (!string.IsNullOrEmpty(args.Filter))
+    {
+        query = query.Where(grid.ColumnsCollection);
+    }
+
+    if (!string.IsNullOrEmpty(args.OrderBy))
+    {
+        query = query.OrderBy(args.OrderBy);
+    }
+
+    count = query.Count();
+
+    employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+} 
+            </code>
+        </pre>
+</RadzenCard>
+@code {
+    RadzenDataGrid<Employee> grid;
+    int count;
+    IEnumerable<Employee> employees;
+    bool isLoading = false;
+
+    List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;  
+        }
+        
+        await grid.FirstPage();
+    }
+
+    async Task Reset()
+    {
+        grid.Reset(true); 
+        await grid.FirstPage(true);
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = dbContext.Employees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            // Query cannot be translated to SQL and filtering will be performed in-memory.
+            if (selectedTitles?.Any() == true)
+            {
+                query = query.ToList().AsQueryable();
+            }
+            // Filter via the Where method
+            query = query.Where(grid.ColumnsCollection);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            // Sort via the OrderBy method
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
+        // Perform paging via Skip and Take.
+        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+}
+```

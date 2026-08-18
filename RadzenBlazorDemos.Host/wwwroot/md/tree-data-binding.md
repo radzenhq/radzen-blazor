@@ -1,0 +1,88 @@
+﻿# Tree: Data-binding
+
+This example demonstrates how to populate RadzenTree from a database via Entity Framework.
+
+Keywords: tree, treeview, nodes, data, table
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## Tree data-binding
+
+Populate RadzenTree from a database via Entity Framework.
+
+```razor
+@inherits DbContextPage
+
+<RadzenRow class="rz-p-0 rz-p-lg-12">
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-mb-0">Data-binding to Categories &#8250; Products</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Data from different tables.</RadzenText>
+            <RadzenTree Style="height: 300px" Data=@categories>
+                <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" />
+                <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-mb-0">Data-binding to Employees</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Data from a single self-referencing table.</RadzenText>
+            <RadzenTree Data=@employees Style="height: 300px">
+                <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
+                    Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
+                />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-mb-0">Load children on demand</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Populate children on parent expand.</RadzenText>
+            <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
+                <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)"/>
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    IEnumerable<Category> categories;
+    IEnumerable<Employee> employees;
+    
+    bool ShouldExpand(object data)
+    {
+        var employee = data as Employee;
+
+        return employee.LastName == "Fuller";
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        var category = args.Value as Category;
+
+        args.Children.Data = category.Products;
+        args.Children.TextProperty = "ProductName";
+        args.Children.HasChildren = (product) => false;
+
+        /* Optional template
+        args.Children.Template = context => builder => {
+            builder.OpenElement(1, "strong");
+            builder.AddContent(2, (context.Value as Product).ProductName);
+            builder.CloseElement();
+        };
+        */
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
+    }
+}
+```

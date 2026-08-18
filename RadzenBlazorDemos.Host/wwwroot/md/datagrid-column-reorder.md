@@ -1,0 +1,72 @@
+﻿# DataGrid: Reorder
+
+Enable column reorder in RadzenDataGrid by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.
+
+Keywords: column, reorder, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Column Reorder
+
+Let users reorder Blazor DataGrid columns by dragging headers, so they can arrange the grid to match how they work.
+
+```razor
+@inherits DbContextPage
+
+<RadzenButton Text="Reset" Click="@((args) => { grid.Reset(); })" class="rz-my-4" />
+
+<RadzenDataGrid @ref=grid AllowColumnReorder="true" ColumnReordering="@OnColumnReordering" ColumnReordered="@OnColumnReordered" TItem="Employee"
+    AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" OrderIndex="2" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" OrderIndex="1" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    RadzenDataGrid<Employee> grid;
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    void OnColumnReordering(DataGridColumnReorderingEventArgs<Employee> args)
+    {
+        if (args.ToColumn.Property == nameof(Employee.EmployeeID))
+        {
+            args.Cancel = true;   
+        }
+    }
+
+    void OnColumnReordered(DataGridColumnReorderedEventArgs<Employee> args)
+    {
+        console.Log($"Reordered {args.Column.Title}. Old index: {args.OldIndex}, New index: {args.NewIndex}");
+    }
+}
+```

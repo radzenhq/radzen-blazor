@@ -1,0 +1,69 @@
+﻿# DataGrid: Filter API
+
+Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.
+
+Keywords: filter, api, grid, datagrid, table
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Filter API
+
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
+    FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px" 
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"  TItem="Employee"
+    LogicalFilterOperator="LogicalFilterOperator.Or" Filter="@OnFilter">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <MyCustomDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Employee> employees;
+    RadzenDataGrid<Employee> grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var column = grid.ColumnsCollection.Where(c => c.Property == "FirstName").FirstOrDefault();
+
+            if(column != null)
+            {
+                column.SetFilterValue("Nan");
+                column.SetFilterOperator(FilterOperator.StartsWith);
+                grid.Reload();
+            }
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    void OnFilter(DataGridColumnFilterEventArgs<Employee> args)
+    {
+    //
+    }
+}
+```

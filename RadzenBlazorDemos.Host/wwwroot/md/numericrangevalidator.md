@@ -1,0 +1,81 @@
+﻿# NumericRangeValidator
+
+Demonstration and configuration of the Radzen Blazor Numeric Range Validator component.
+
+Keywords: validator, validation, required, range
+
+> API reference: [RadzenNumericRangeValidator API](https://blazor.radzen.com/api/numericrangevalidator.md)
+
+## Examples
+
+## Blazor NumericRangeValidator
+
+Enforce minimum and maximum numeric values on form inputs.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Bid info">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Quantity" Component="Quantity" />
+                        <small style="display: block">(1-10 items)</small>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenNumeric Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput Style="display: block; width: 100%;" />
+                        <!-- Use 'm' (decimal), 'f' (float) or 'd' (double) as numeric literal suffix when setting Min and Max -->
+                        <RadzenNumericRangeValidator Component="Quantity" Min="1m" Max="10m" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    class Model
+    {
+        public decimal Quantity { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void OnInput(ChangeEventArgs args)
+    {
+        Log("oninput", args.Value.ToString());
+    }
+
+    void Log(string eventName, string value)
+    {
+        console.Log($"{eventName}: {value}");
+    }
+
+    void OnSubmit(Model model)
+    {
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+}
+```

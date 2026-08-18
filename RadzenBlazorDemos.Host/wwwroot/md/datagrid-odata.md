@@ -1,0 +1,160 @@
+﻿# DataGrid: OData service
+
+Blazor Data Grid supports data-binding to OData.
+
+Keywords: datagrid, bind, load, data, loaddata, odata, service, rest
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid OData
+
+Bind a Blazor DataGrid to an OData service and get server-side paging, sorting, and filtering for free - the grid translates its operations into OData query options ($skip, $top, $orderby, $filter) so only the rows in view are returned.
+
+```razor
+<RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees SelectionMode="DataGridSelectionMode.Multiple" KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" 
+    LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+    FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" 
+    PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
+                                Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)) ? null : employees.Any(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)))"
+                                Change="@(args => selectedEmployees = args == true ? (selectedEmployees ?? Enumerable.Empty<Employee>()).Union(employees.Where(i => !(selectedEmployees ?? Enumerable.Empty<Employee>()).Select(e => e.EmployeeID).Contains(i.EmployeeID))).ToList() : null)" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Select(e => e.EmployeeID).Contains(data.EmployeeID))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
+                                TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name">
+                <EditTemplate Context="employee">
+                    <RadzenTextBox @bind-Value="employee.FirstName" />
+                </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" 
+            Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
+                    Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Customers" Property="NorthwindOrders" FilterProperty="Customer/CustomerID" Sortable=false
+                                  Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select company" }})"
+                    Change=@OnSelectedCustomersChange Data="@(customers)" AllowSelectAll="false" Multiple="true" MaxSelectedLabels="2" />
+            </FilterTemplate>
+            <Template>
+                @(string.Join(',', context.NorthwindOrders != null ? context.NorthwindOrders.Select(i => i.Customer?.CompanyName) : Enumerable.Empty<string>()))
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
+            <RadzenDataGridColumn Context="employee" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+                <Template Context="employee">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" 
+                        Click="@(args => grid.EditRow(employee))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+            </RadzenDataGridColumn>
+    </Columns>
+    <LoadingTemplate>
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+    </LoadingTemplate>
+</RadzenDataGrid>
+
+<RadzenCard class="rz-mt-6">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-4">Data-bind to a service</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">
+            1. Set the Data and Count properties.
+        </RadzenText>
+        <pre class="rz-mt-4 rz-p-4">
+            <code>&lt;RadzenDataGrid Count="@@count" Data="@@employees"</code>
+        </pre>
+        <RadzenText TextStyle="TextStyle.Body1">
+            2. Handle the LoadData event and update the Data and Count backing fields (<code>employees</code> and <code>count</code> in this case).
+        </RadzenText>
+            
+        <pre class="rz-mt-4 rz-p-4">
+            <code>
+async Task LoadData(LoadDataArgs args)
+{
+    var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+    employees = result.Value.AsODataEnumerable();
+    count = result.Count;
+}
+            </code>
+        </pre>
+</RadzenCard>
+@code {
+    bool isLoading;
+    int count;
+    ODataEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+    RadzenDataGrid<Employee> grid;
+
+    List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;  
+        }
+
+        await grid.FirstPage();
+    }
+
+    IEnumerable<string> selectedCustomers;
+
+    async Task OnSelectedCustomersChange(object value)
+    {
+        if (selectedCustomers != null && !selectedCustomers.Any())
+        {
+            selectedCustomers = null;
+        }
+
+        await grid.FirstPage();
+    }
+
+    NorthwindODataService service = new NorthwindODataService("https://services.radzen.com/odata/Northwind/");
+
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var result = await service.GetCustomers();
+        customers = result.Value;
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "NorthwindOrders($expand=Customer)");
+        // Update the Data property
+        employees = result.Value.AsODataEnumerable();
+        // Update the count
+        count = result.Count;
+
+        isLoading = false;
+    }
+}
+```

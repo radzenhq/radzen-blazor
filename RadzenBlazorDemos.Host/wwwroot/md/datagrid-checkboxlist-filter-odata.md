@@ -1,0 +1,96 @@
+﻿# DataGrid: CheckBoxList with OData
+
+RadzenDataGrid Excel like filtering with OData.
+
+Keywords: filter, excel, grid, datagrid, table, menu, checkbox, list, odata
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid CheckBox list (Excel like) Filter
+
+Use Excel-style checkbox filtering with an OData-bound Blazor DataGrid - distinct filter values fetched from the service for server-side filtering.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" IsLoading="@isLoading" TItem="Order"
+        FilterMode="FilterMode.CheckBoxList" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" AllowPaging="true" AllowSorting="true" 
+        Data="@orders" Count="@count" LoadData="@LoadData" LoadColumnFilterData="@LoadColumnFilterData" ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    NorthwindODataService service = new NorthwindODataService("https://services.radzen.com/odata/Northwind/");
+
+    IEnumerable<Order> orders;
+    int count;
+    bool isLoading;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await service.GetOrders(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "Customer,Employee");
+        
+        orders = result.Value.AsODataEnumerable();
+        count = result.Count;
+
+        isLoading = false;
+    }
+
+    async Task LoadColumnFilterData(DataGridLoadColumnFilterDataEventArgs<Order> args)
+    {
+        // Get the property name in OData format. Sub-properties are separated by /.
+        var property = args.Column.GetFilterProperty().Replace(".","/");
+
+        // Get the distinct values for the property in OData format for the current column.
+        var result = await service.GetOrders(
+            count: true, 
+            filter: !string.IsNullOrEmpty(args.Filter) ? $"contains(tolower({property}), tolower('{args.Filter}'))" : null, 
+            apply: $"groupby(({property}))", 
+            expand: GetODataExpand(property));
+
+        args.Count = result.Count;
+        args.Data = result.Value;
+    }
+
+    string GetODataExpand(string property)
+    {
+        var parts = property.Split('.');
+        if (parts.Length <= 1)
+            return null;
+
+        parts = parts.Take(parts.Length - 1).ToArray();
+
+        string result = "";
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (i == 0)
+                result += $"$expand={parts[i]}";
+            else
+                result += $"($expand={parts[i]}";
+        }
+
+        for (int i = 1; i < parts.Length; i++)
+            result += ")";
+
+        return result;
+    }
+}
+```

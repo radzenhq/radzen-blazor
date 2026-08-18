@@ -1,0 +1,200 @@
+﻿# DataFilter: IQueryable
+
+Filter Entity Framework IQueryable without extra code.
+
+Keywords: dataview, grid, table, filter
+
+> API reference: [RadzenDataFilter API](https://blazor.radzen.com/api/datafilter.md)
+
+## Examples
+
+## Blazor DataFilter
+
+Filter Entity Framework data sources without writing extra code.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="2rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenCheckBox @bind-Value="@auto" Name="auto" />
+        <RadzenLabel Text="Auto filter" Component="auto" class="rz-me-6" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@ViewChanged FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+        <Properties>
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" FilterValue="@finalSelectedIds" 
+                Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
+                <FilterTemplate>
+                        <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
+                        Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="@nameof(Order.ProductIds)" Title="ProductIds" FilterValue="@finalSelectedProductIds"
+                                      Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.In">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedProductIds Style="width:100%;"
+                                    Change=@OnSelectedProductIdsChange Data="@(productIds)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products"
+                                      Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.Contains"/>
+            <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date">
+                <FilterTemplate>
+                    <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d"
+                                      Change="@ApplyOrderDateFilter" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="@nameof(Order.Freight)" Title="Freight" />
+        </Properties>
+    </RadzenDataFilter>
+
+    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" Data="@(filteredOrders ?? orders)"
+        ColumnWidth="200px" PageSize="20" Style="height: 500px">
+        <Columns>
+            <RadzenDataGridColumn Width="200px" Property="@nameof(Order.OrderID)" Title="Order ID">
+                <FooterTemplate>
+                    Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products" Type="typeof(IEnumerable<OrderDetail>)" Sortable="false">
+                <Template>
+                    @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
+                <FooterTemplate>
+                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+                <FooterTemplate>
+                    Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    bool auto = true;
+    RadzenDataFilter<Order> dataFilter;
+
+    IQueryable<Order> filteredOrders;
+    IQueryable<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    IEnumerable<int> finalSelectedIds;
+    IEnumerable<int> selectedIds;
+    IEnumerable<int> orderIds;
+
+    IEnumerable<int> finalSelectedProductIds;
+    IEnumerable<int> selectedProductIds;
+    IEnumerable<int> productIds;
+
+    void ViewChanged(IQueryable<Order> view)
+    {
+        if (selectedIds?.Any() == true && !dataFilter.Filters.Any(f => f.Property == "OrderID"))
+        {
+            selectedIds = null;
+            finalSelectedIds = null;
+        }
+
+        if (selectedProductIds?.Any() == true && !dataFilter.Filters.Any(f => f.Property == "ProductIds"))
+        {
+            selectedProductIds = null;
+            finalSelectedProductIds = null;
+        }
+
+        filteredOrders = view;
+    }
+
+    void OnSelectedIdsChange(object value)
+    {
+        orders = orders.ToList().AsQueryable();
+
+        if (selectedIds != null && !selectedIds.Any())
+        {
+            selectedIds = null;
+        }
+
+        if (auto)
+        {
+            finalSelectedIds = selectedIds;
+        }
+    }
+
+    void OnSelectedProductIdsChange(object value)
+    {
+        orders = orders.ToList().AsQueryable();
+
+        if (selectedProductIds != null && !selectedProductIds.Any())
+        {
+            selectedProductIds = null;
+        }
+
+        if (auto)
+        {
+            finalSelectedProductIds = selectedProductIds;
+        }
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedIds = selectedIds;
+        finalSelectedProductIds = selectedProductIds;
+        await dataFilter.Filter();
+    }
+
+    async Task ApplyOrderDateFilter()
+    { 
+        if (auto) 
+        { 
+            await dataFilter.Filter();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList()
+            .Select(o =>
+            {
+                o.ProductIds = o.OrderDetails.Select(od => od.ProductID);
+                return o;
+            }).AsQueryable();
+
+        orderIds = orders.Select(o => o.OrderID).Distinct();
+
+        productIds = orders.SelectMany(o => o.OrderDetails).Select(od => od.ProductID).Distinct();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await dataFilter.AddFilter(new CompositeFilterDescriptor() 
+            { 
+                Property = "Employee.LastName", 
+                FilterValue = "Buchanan", 
+                FilterOperator = FilterOperator.Contains 
+            });
+        }
+    }
+}
+```

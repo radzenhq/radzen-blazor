@@ -1,0 +1,93 @@
+﻿# DataGrid: Drag row between two DataGrids
+
+This example demonstrates drag and drop rows between two DataGrid components.
+
+Keywords: datagrid, drag, row, between
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## Drag and drop rows between two DataGrids
+
+Drag rows between two Blazor DataGrids - move items from one grid to another with drag and drop.
+
+```razor
+@inherits DbContextPage
+<RadzenStack Orientation="Orientation.Horizontal">
+    <RadzenDataGrid Data="@sourceEmployees" AllowFiltering="true" AllowSorting="true" PageSize="5" AllowPaging="true"
+                    RowRender="@RowRender" ondragover="event.preventDefault()" @ondrop=@(args => Move(targetEmployees, sourceEmployees))>
+        <Columns>
+            @RenderColumns()
+        </Columns>
+    </RadzenDataGrid>
+    <RadzenDataGrid Data="@targetEmployees" AllowFiltering="true" AllowSorting="true" PageSize="5" AllowPaging="true"
+                    RowRender="@RowRender" ondragover="event.preventDefault()" @ondrop=@(args => Move(sourceEmployees, targetEmployees))>
+        <Columns>
+            @RenderColumns()
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    ObservableCollection<Employee> sourceEmployees;
+    ObservableCollection<Employee> targetEmployees = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        sourceEmployees = new ObservableCollection<Employee>(dbContext.Employees);
+    }
+
+    Employee draggedItem;
+
+    void RowRender(RowRenderEventArgs<Employee> args)
+    {
+        args.Attributes.Add("title", "Drag row to move it to the other DataGrid");
+        args.Attributes.Add("style", "cursor:grab");
+        args.Attributes.Add("draggable", "true");
+        args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => draggedItem = args.Data));
+    }
+
+    void Move(ObservableCollection<Employee> source, ObservableCollection<Employee> target)
+    {
+        if (source.Contains(draggedItem))
+        {
+            source.Remove(draggedItem);
+        }
+        if (!target.Contains(draggedItem))
+        {
+            target.Add(draggedItem);
+        }
+    }
+
+    RenderFragment RenderColumns()
+    {
+        return __builder => {
+            <text>
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="55px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="Employee" Title=" Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template>
+                        <RadzenImage Path="@context.Photo" class="rz-gravatar" AlternateText="@(context.FirstName + " " + context.LastName)" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Address)" Title="Address" Width="200px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.City)" Title="City" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Region)" Title="Region" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Country)" Title="Country" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.HomePhone)" Title="Home Phone" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Extension)" Title="Extension" Width="160px" />
+                <RadzenDataGridColumn TItem="Employee" Property="@nameof(Employee.Notes)" Title="Notes" Width="300px" />
+            </text>
+        };
+    }
+}
+```

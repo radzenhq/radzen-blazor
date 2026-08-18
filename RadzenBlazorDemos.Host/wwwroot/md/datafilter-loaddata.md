@@ -1,0 +1,155 @@
+﻿# DataFilter: LoadData
+
+This example demonstrates DataFilter with DataGrid LoadData event.
+
+Keywords: dataview, grid, table, filter, loaddata
+
+> API reference: [RadzenDataFilter API](https://blazor.radzen.com/api/datafilter.md)
+
+## Examples
+
+## DataFilter with DataGrid LoadData event.
+
+Combine DataFilter with the DataGrid LoadData event for server-side filtering.
+
+```razor
+@inherits DbContextPage
+
+<RadzenStack Gap="2rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenCheckBox @bind-Value="@auto" Name="auto" />
+        <RadzenLabel Text="Auto filter" Component="auto" class="rz-me-6" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => ordersGrid.Reload())>
+        <Properties>
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" />
+            <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
+            <RadzenDataFilterProperty Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
+                Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains" FilterOperators="@(new [] { FilterOperator.Contains, FilterOperator.DoesNotContain})">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
+                                    Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date" />
+            <RadzenDataFilterProperty Property="@nameof(Order.Freight)" Title="Freight" />
+        </Properties>
+    </RadzenDataFilter>
+
+    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" IsLoading="@isLoading"
+                    Data="@(filteredOrders)" Count="@count" LoadData="@LoadData"
+                    ColumnWidth="200px" PageSize="20" Style="height: 500px">
+        <Columns>
+            <RadzenDataGridColumn Width="200px" Property="@nameof(Order.OrderID)" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Employee.Title" Title="Employee Title" />
+            <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    bool auto = true;
+    RadzenDataFilter<Order> dataFilter;
+
+    IEnumerable<Order> filteredOrders;
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = Enumerable.Empty<Order>();
+    }
+
+    List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+    IEnumerable<string> finalSelectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;
+        }
+
+        if (auto)
+        {
+            finalSelectedTitles = selectedTitles;
+        }
+
+        await ordersGrid.FirstPage();
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedTitles = selectedTitles;
+        await dataFilter.Filter();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await dataFilter.AddFilter(new CompositeFilterDescriptor() 
+            { 
+                Property = "Employee.LastName", 
+                FilterValue = "Buchanan", 
+                FilterOperator = FilterOperator.Contains 
+            });
+        }
+    }
+
+    bool isLoading;
+    int count;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = dbContext.Orders.Include("Customer").Include("Employee").AsQueryable();
+
+        // Use in-memory LINQ to Objects since complex expressions with collections cannot be translated to SQL.
+        if (dataFilter.Filters.Any(f => f.Property == "Employee.Title"))
+        {
+            query = query.ToList().AsQueryable();
+        }
+
+        // Filter via the Where method
+        query = query.Where(dataFilter);
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            // Sort via the OrderBy method
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
+        // Perform paging via Skip and Take.
+        filteredOrders = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+}
+```

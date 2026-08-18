@@ -1,0 +1,108 @@
+﻿# Trendlines & Statistical Overlays
+
+Add regression, moving-average, and mean/median/mode overlays to any Blazor chart with trendlines and statistical overlays.
+
+Keywords: chart, graph, trendline, trend, trends, regression, polynomial, moving average, forecast, mean, median, mode, statistics
+
+## Examples
+
+## Radzen Blazor Chart trendlines and statistical overlays
+
+Trendlines and statistical overlays sit on top of any series to summarize it - a regression or moving-average line to show direction, or mean, median, and mode markers to anchor the distribution.
+
+```razor
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-mb-0">Regression overlays</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@trend" Name="trend" />
+                    <RadzenLabel Text="Linear trend" Component="trend" class="rz-color-danger-dark" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@polynomial" Name="polynomial" />
+                    <RadzenLabel Text="Polynomial" Component="polynomial" class="rz-color-success-dark" />
+                    <RadzenNumeric @bind-Value="@polyOrder" Min="2" Max="6" Style="width: 70px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@movingAverage" Name="movingAverage" />
+                    <RadzenLabel Text="Moving average" Component="movingAverage" class="rz-color-warning-darker" />
+                    <RadzenNumeric @bind-Value="@maPeriod" Min="2" Max="6" Style="width: 70px;" />
+                </RadzenStack>
+            </RadzenStack>
+
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-mb-0 rz-mt-2">Statistical overlays</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@mean" Name="mean" />
+                    <RadzenLabel Text="Mean" Component="mean" class="rz-color-info-dark" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@median" Name="median" />
+                    <RadzenLabel Text="Median" Component="median" class="rz-color-primary" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@mode" Name="mode" />
+                    <RadzenLabel Text="Mode" Component="mode" class="rz-color-secondary" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Smooth="true" Data="@revenue" CategoryProperty="Date" Title="Monthly revenue" ValueProperty="Revenue" Stroke="rgba(97,142,247,0.9)" StrokeWidth="2">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+            <RadzenSeriesTrendLine Visible="@trend" Stroke="var(--rz-danger-dark)" StrokeWidth="2" LineType="LineType.Dashed" />
+            <RadzenSeriesPolynomialTrendLine Visible="@polynomial" Order="@polyOrder" Stroke="var(--rz-success-dark)" StrokeWidth="2" LineType="LineType.Dashed" />
+            <RadzenSeriesMovingAverageLine Visible="@movingAverage" Period="@maPeriod" Stroke="var(--rz-warning-darker)" StrokeWidth="2" LineType="LineType.Dotted" />
+            <RadzenSeriesMeanLine Visible="@mean" Stroke="var(--rz-info-dark)" LineType="LineType.Dotted" />
+            <RadzenSeriesMedianLine Visible="@median" Stroke="var(--rz-primary)" LineType="LineType.Dotted" />
+            <RadzenSeriesModeLine Visible="@mode" Stroke="var(--rz-secondary)" LineType="LineType.Dotted" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue (USD)" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    bool trend = true;
+    bool polynomial = false;
+    bool movingAverage = false;
+    bool mean = false;
+    bool median = false;
+    bool mode = false;
+    int polyOrder = 3;
+    int maPeriod = 3;
+
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue = new[]
+    {
+        new DataItem { Date = "Jan",  Revenue = 234000 },
+        new DataItem { Date = "Feb",  Revenue = 269000 },
+        new DataItem { Date = "Mar",  Revenue = 233000 },
+        new DataItem { Date = "Apr",  Revenue = 244000 },
+        new DataItem { Date = "May",  Revenue = 214000 },
+        new DataItem { Date = "Jun",  Revenue = 253000 },
+        new DataItem { Date = "Jul",  Revenue = 274000 },
+        new DataItem { Date = "Aug",  Revenue = 284000 },
+        new DataItem { Date = "Sept", Revenue = 273000 },
+        new DataItem { Date = "Oct",  Revenue = 282000 },
+        new DataItem { Date = "Nov",  Revenue = 289000 },
+        new DataItem { Date = "Dec",  Revenue = 294000 },
+    };
+}
+```

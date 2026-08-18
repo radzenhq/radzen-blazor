@@ -1,0 +1,80 @@
+﻿# DataGrid: LoadData support
+
+RadzenDataGrid supports virtualization with custom data-binding scenarios. Handle the LoadData event as usual.
+
+Keywords: datagrid, bind, load, data, loaddata, virtualization, ondemand
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Custom Virtualization
+
+RadzenDataGrid supports virtualization with custom data-binding scenarios. Handle the `LoadData` event as usual.
+
+```razor
+@inherits DbContextPage
+
+<RadzenButton Text="Refresh" Click="@(args => grid.Reload())" class="rz-my-4" />
+
+<RadzenDataGrid @ref=grid Data="@orderDetails" Count="@count" LoadData="@LoadData" AllowVirtualization="true" Style="height:400px"
+                AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
+                AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.OrderID)" Title="OrderID" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.ProductID)" Title="ProductID" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
+            <Template Context="detail">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
+            <Template Context="detail">
+                @String.Format("{0}%", detail.Discount * 100)
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+@code {
+    EventConsole console;
+    RadzenDataGrid<OrderDetail> grid;
+    int count;
+    IEnumerable<OrderDetail> orderDetails;
+
+    string lastfilter;
+    async Task LoadData(LoadDataArgs args)
+    {
+        await Task.Yield();
+
+        if(!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
+        {
+            args.Skip = 0;
+        }
+
+        console.Log($"Skip: {args.Skip}, Top: {args.Top}");
+
+        var query = dbContext.OrderDetails.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            lastfilter = args.Filter;
+            query = query.Where(grid.ColumnsCollection);
+            count = await Task.FromResult(query.Count());
+        }
+        else
+        {
+            count = await Task.FromResult(dbContext.OrderDetails.Count());
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        orderDetails = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+    }
+}
+```

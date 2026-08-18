@@ -1,0 +1,61 @@
+﻿# Tree: Selection
+
+This example demonstrates how to get or set the selected items of RadzenTree.
+
+Keywords: tree, treeview, nodes, selection
+
+> API reference: [RadzenTree API](https://blazor.radzen.com/api/tree.md)
+
+## Examples
+
+## Tree selection
+
+Get or set the selected items of RadzenTree.
+
+```razor
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-m-0 rz-m-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenButton Click=@(() => selection = categories.Skip(1).FirstOrDefault()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click=@(() => selection = null) Text="Clear selection" ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenCard  class="rz-m-0 rz-my-4 rz-m-md-12">
+    <RadzenTree Style="width: 100%; height: 300px" Change=@OnChange Data=@categories @bind-Value=@selection>
+        <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" />
+        <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
+    </RadzenTree>
+</RadzenCard>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Category> categories;
+    object selection;
+
+    EventConsole console;
+
+    void OnChange()
+    {
+        if (selection is Category category)
+        {
+            console.Log($"Selection changed to: {category.CategoryName}");
+        }
+
+        if (selection is Product product)
+        {
+            console.Log($"Selection changed to: {product.ProductName}");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        selection = categories.FirstOrDefault();
+    }
+}
+```

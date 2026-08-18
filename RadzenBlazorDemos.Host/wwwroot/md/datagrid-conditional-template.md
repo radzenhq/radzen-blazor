@@ -1,0 +1,109 @@
+﻿# DataGrid: Conditional formatting
+
+This example demonstrates RadzenDataGrid with conditional rows and cells template and styles.
+
+Keywords: conditional, template, style, datagrid, table, dataview
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid conditional styles and templates
+
+Apply conditional formatting to a Blazor DataGrid - style rows and cells by value to highlight status, thresholds, or alerts.
+
+```razor
+@inherits DbContextPage
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Order Details</RadzenText>
+<RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            Data="@orderDetails" ColumnWidth="200px" 
+            RowRender="@RowRender" CellRender="@CellRender" HeaderCellRender="@HeaderFooterCellRender" FooterCellRender="@HeaderFooterCellRender">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.OrderID)" Title="OrderID">
+            <FooterTemplate>
+                Total records: <b>@orderDetails.Count()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.ProductID)" Title="ProductID/ProductName" 
+            SortProperty="Product.ProductName" FilterProperty="Product.ProductName">
+            <FooterTemplate>
+                Most ordered product: <b>@orderDetails.GroupBy(o => o.Product.ProductName).OrderBy(g => g.Count()).Select(g => g.Key).FirstOrDefault()</b>,
+                Least ordered product: <b>@orderDetails.GroupBy(o => o.Product.ProductName).OrderByDescending(g => g.Count()).Select(g => g.Key).FirstOrDefault()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity">
+            <Template Context="data">
+                @if (data.Quantity > 20)
+                {
+                    <span style='color: var(--rz-text-contrast-color)'>@data.Quantity</span>
+                }
+                else
+                {
+                    <span style='color: var(--rz-text-color)'>@data.Quantity</span>
+                }
+            </Template>
+            <FooterTemplate>
+                Total quantity: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orderDetails.Sum(o => o.Quantity))</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}">
+            <FooterTemplate>
+                Average discount: <b>@String.Format("{0:P}", orderDetails.Average(o => o.Discount))</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<OrderDetail> orderDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
+    }
+
+    void RowRender(RowRenderEventArgs<OrderDetail> args)
+    {
+        args.Attributes.Add("style", $"font-weight: {(args.Data.Quantity > 20 ? "bold" : "normal")};");
+    }
+
+    void CellRender(DataGridCellRenderEventArgs<OrderDetail> args)
+    {
+        if (args.Column.Property == "Quantity")
+        {
+            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "var(--rz-success)" : "var(--rz-base-background-color)")};");
+            args.Attributes.Add("class", args.Data.Quantity > 20 ? "my-class" : "my-other-class");
+
+            if (args.Data.Discount == 0)
+            {
+                args.Attributes.Add("colspan", 2);
+            }
+        }
+
+        if (args.Column.Property == "OrderID")
+        {
+            if (args.Data.OrderID == 10248 && args.Data.ProductID == 11 || args.Data.OrderID == 10250 && args.Data.ProductID == 41)
+            {
+                args.Attributes.Add("rowspan", 3);
+            }
+
+            if (args.Data.OrderID == 10249 && args.Data.ProductID == 14 || args.Data.OrderID == 10251 && args.Data.ProductID == 22)
+            {
+                args.Attributes.Add("rowspan", 2);
+            }
+        }
+    }
+
+    void HeaderFooterCellRender(DataGridCellRenderEventArgs<OrderDetail> args)
+    {
+        if (args.Column.Property == "ProductID")
+        {
+            args.Attributes.Add("colspan", 2);
+        }
+    }
+}
+```

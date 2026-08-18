@@ -1,0 +1,216 @@
+﻿# DataGrid: Filter Value Template
+
+This example demonstrates how to define custom RadzenDataGrid column filter value template.
+
+Keywords: datagrid, column, filter, template, value
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+```razor
+<RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.SimpleWithMenu" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Employee">
+    <Columns>
+        <RadzenDataGridColumn Property="ID" Title="ID" FilterValue="@idValue">
+            <FilterValueTemplate>
+                <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by ID" }})" />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" FilterValue="@selectedCompanyNames" LogicalFilterOperator="LogicalFilterOperator.Or"
+                              FilterOperator="FilterOperator.Contains" FilterOperators="@(new FilterOperator[]{ FilterOperator.Contains, FilterOperator.DoesNotContain})">
+            <FilterValueTemplate>
+                <RadzenDropDown @ref=scdd @bind-Value=@selectedCompanyNames Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Company" }})"
+                                Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Awards" Property="Awards" Type="typeof(IEnumerable<string>)" FilterValue="@selectedAwards" LogicalFilterOperator="LogicalFilterOperator.Or"
+                              FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})" CollectionFilterMode="@collectionFilterMode">
+            <FilterValueTemplate>
+                <RadzenDropDown @ref=sadd @bind-Value=@selectedAwards Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Awards" } })"
+                                Change=@OnSelectedAwardsChange Data="@(awards)" AllowClear="true" Multiple="true">
+                    <HeaderTemplate>
+                        <RadzenSelectBar @bind-Value=@collectionFilterMode Style="width:100%;margin-top:1rem;"
+                            TValue="CollectionFilterMode">
+                            <Items>
+                                <RadzenSelectBarItem Text="Any" Value="@(CollectionFilterMode.Any)" />
+                                <RadzenSelectBarItem Text="All" Value="@(CollectionFilterMode.All)" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </HeaderTemplate>
+                </RadzenDropDown>
+            </FilterValueTemplate>
+            <Template>
+                @(string.Join(',', context.Awards))
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
+        FilterValue="@hireDate?.Date">
+            <FilterValueTemplate>
+                <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Hire Date" }})" />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
+        FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})" LogicalFilterOperator="LogicalFilterOperator.Or">
+            <FilterValueTemplate>
+                <RadzenDropDown @ref=swdd @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by WorkStatus" }})"
+                Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses TextProperty="Text" ValueProperty="Value" />
+            </FilterValueTemplate>
+            <Template>
+                @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" 
+        FilterValue="@currentTOC">
+            <FilterValueTemplate>
+                <RadzenDataGridFilterMenu Grid="@grid" Column="@context" />
+                <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"
+                Change=@OnSelectedTOCChange
+                Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDropDown<IEnumerable<string>> scdd;
+    RadzenDropDown<IEnumerable<string>> sadd;
+    RadzenDropDown<IEnumerable<WorkStatus>> swdd;
+    RadzenDataGrid<Employee> grid;
+    CollectionFilterMode collectionFilterMode;
+    int? idValue;
+    DateTime? hireDate;
+    TitleOfCourtesy? currentTOC;
+    IEnumerable<string> selectedCompanyNames;
+    IEnumerable<string> selectedAwards;
+    IEnumerable<WorkStatus> selectedWorkStatus;
+    IEnumerable<object> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new { Text = $"{t}", Value = t });
+
+    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro commercial Moctezuma" };
+    List<string> awards = new List<string> { "award 1", "award 2", "award 3", "award 4", "award 5" };
+
+    public enum TitleOfCourtesy
+    {
+        Ms,
+        Mr,
+        All = -1
+    }
+
+    public enum WorkStatus
+    {
+        Office,
+        Remote,
+    }
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public string CompanyName { get; set; }
+        public IEnumerable<string> Awards { get; set; }
+        public DateTime HireDate { get; set; }
+        public TitleOfCourtesy TitleOfCourtesy { get; set; }
+        public IEnumerable<WorkStatus> WorkStatus { get; set; }
+    }
+
+    void OnSelectedCompanyNamesChange(object value)
+    {
+        if (selectedCompanyNames != null && !selectedCompanyNames.Any())
+        {
+            selectedCompanyNames = null;  
+        }
+    }
+
+    void OnSelectedAwardsChange(object value)
+    {
+        if (selectedAwards != null && !selectedAwards.Any())
+        {
+            selectedAwards = null;
+        }
+    }
+
+    void OnSelectedWorkStatusChange(object value)
+    {
+        if (selectedWorkStatus != null && !selectedWorkStatus.Any())
+        {
+            selectedWorkStatus = null;
+        }
+    }
+
+    void OnSelectedTOCChange(object value)
+    {
+        if (currentTOC == TitleOfCourtesy.All)
+        {
+            currentTOC = null;
+        }
+    }
+
+    bool IsNullOrEmpty(FilterOperator? value)
+    {
+        return value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty || value == FilterOperator.IsNull || value == FilterOperator.IsNotNull;
+    }
+
+    void ClearCustomFilters(DataGridColumnFilterEventArgs<Employee> args)
+    {
+        if (args.Column.Property == "ID")
+        {
+            idValue = null;
+        }
+        else if (args.Column.Property == "CompanyName")
+        {
+            selectedCompanyNames = null;
+            scdd.Reset();
+        }
+        else if (args.Column.Property == "Awards")
+        {
+            selectedAwards = null;
+            sadd.Reset();
+        }
+        else if (args.Column.Property == "HireDate.Date")
+        {
+            hireDate = null;
+        }
+        else if (args.Column.Property == "WorkStatus")
+        {
+            selectedWorkStatus = null;
+            swdd.Reset();
+        }
+        else if (args.Column.Property == "TitleOfCourtesy")
+        {
+            currentTOC = null;
+        }
+    }
+
+    void OnFilter(DataGridColumnFilterEventArgs<Employee> args)
+    {
+        if (IsNullOrEmpty(args.Column.GetFilterOperator()))
+        {
+            ClearCustomFilters(args);
+        }
+    }
+
+    void OnFilterCleared(DataGridColumnFilterEventArgs<Employee> args)
+    {
+        ClearCustomFilters(args);
+    }
+
+    IEnumerable<Employee> employees; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Task.FromResult(Enumerable.Range(0, 10).Select(i =>
+            new Employee
+            {
+                ID = i,
+                CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
+                Awards = awards[..^(i % 5)],
+                HireDate = DateTime.Now.AddMonths(-i),
+                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
+                    WorkStatus = i < 3 ?
+                            new WorkStatus[] { WorkStatus.Office } :
+                                            i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote },
+            }).AsQueryable());
+    }
+}
+```

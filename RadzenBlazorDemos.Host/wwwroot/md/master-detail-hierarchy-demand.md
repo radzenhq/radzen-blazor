@@ -1,0 +1,90 @@
+﻿# DataGrid: Hierarchy on demand
+
+This example demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy and load data on demand.
+
+Keywords: master, detail, datagrid, table, dataview, on-demand
+
+> API reference: [RadzenDataGrid API](https://blazor.radzen.com/api/datagrid.md)
+
+## Examples
+
+## DataGrid Master Detail Hierarchy on demand
+
+Load Blazor DataGrid hierarchy data on demand - fetch each row's children only when the user expands it, so large hierarchies stay fast.
+
+```razor
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
+            Data="@orders" TItem="Order" RowExpand="RowExpand">
+    <Template Context="order">
+        <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails">
+            <Columns>
+                <RadzenDataGridColumn Property="Order.CustomerID" Title="Order" />
+                <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+                <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
+                    <Template Context="detail">
+                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+                <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
+                    <Template Context="detail">
+                        @String.Format("{0}%", detail.Discount * 100)
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Template>
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px" >
+            <Template Context="order">
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void RowRender(RowRenderEventArgs<Order> args)
+    {
+        args.Expandable = args.Data.ShipCountry == "France" || args.Data.ShipCountry == "Brazil";
+    }
+
+    void RowExpand(Order order)
+    {
+        if (order.OrderDetails == null)
+        {
+            order.OrderDetails = dbContext.OrderDetails.Include("Product").Where(o => o.OrderID == order.OrderID).ToList();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            await grid.ExpandRow(orders.FirstOrDefault());
+        }
+    }
+}
+```
