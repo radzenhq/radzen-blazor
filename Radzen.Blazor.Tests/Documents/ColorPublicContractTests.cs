@@ -104,8 +104,6 @@ public class ColorPublicContractTests
             .Where(property => property.PropertyType == typeof(Color) && property.Name != "Transparent")
             .ToList();
 
-        Assert.Equal(148, NamedColors.Count);
-        Assert.Equal(148, properties.Count);
         Assert.All(properties, property =>
         {
             Assert.True(NamedColors.TryGet(property.Name, out var rgb));

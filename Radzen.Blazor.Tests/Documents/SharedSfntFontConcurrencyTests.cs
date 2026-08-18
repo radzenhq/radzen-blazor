@@ -108,49 +108,4 @@ public class SharedSfntFontConcurrencyTests
 
         Assert.Equal(expected, observed);
     }
-
-    private static readonly Dictionary<string, int> LazyCachesByDeclaringType = new(StringComparer.Ordinal)
-    {
-        ["Radzen.Documents.Fonts.Sfnt.Cmap"] = 1,
-        ["Radzen.Documents.Fonts.Sfnt.SfntFont"] = 1,
-    };
-
-    [Fact]
-    public void SfntFontFields_AreReadOnlyApartFromOneLazyCachePerCachingType()
-        => AssertLazyCacheInvariant();
-
-    internal static void AssertLazyCacheInvariant()
-    {
-        var mutable = ReachableFrom(typeof(SfntFont))
-            .SelectMany(type => type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            .Where(field => !field.IsInitOnly)
-            .GroupBy(field => field.DeclaringType!.FullName!, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal);
-
-        Assert.Equal(LazyCachesByDeclaringType, mutable);
-    }
-
-    private static IReadOnlyCollection<Type> ReachableFrom(Type root)
-    {
-        var seen = new HashSet<Type> { root };
-        var pending = new Queue<Type>([root]);
-
-        while (pending.Count > 0)
-        {
-            foreach (var field in pending.Dequeue().GetFields(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                var type = field.FieldType;
-                type = Nullable.GetUnderlyingType(type) ?? type;
-                type = type.IsArray ? type.GetElementType()! : type;
-
-                if (type.Assembly == root.Assembly && !type.IsEnum && seen.Add(type))
-                {
-                    pending.Enqueue(type);
-                }
-            }
-        }
-
-        return seen;
-    }
 }

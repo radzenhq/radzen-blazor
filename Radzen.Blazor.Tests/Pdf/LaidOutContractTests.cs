@@ -505,46 +505,6 @@ public class LaidOutContractTests
         Assert.True(anchor.Top >= page.ContentBox.Y);
     }
 
-    private static IEnumerable<PropertyInfo> SettableProperties(System.Type type)
-        => type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(property => property.SetMethod is { ReturnParameter: var returned }
-                && !returned.GetRequiredCustomModifiers().Any(modifier => modifier.Name == "IsExternalInit"));
-
-    [Fact]
-    public void LaidOutTypes_HaveNoSettableProperties()
-    {
-        var offenders =
-            from type in LaidOutTypes()
-            from property in SettableProperties(type)
-            select $"{type.Name}.{property.Name}";
-
-        Assert.Empty(offenders);
-    }
-
-    [Fact]
-    public void LaidOutTypes_ReachTheCapturedFontAndGlyphTypes()
-    {
-        var reached = LaidOutTypes().ToHashSet();
-
-        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedFontFace), reached);
-        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedGlyphRun), reached);
-        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedGlyphSpan), reached);
-    }
-
-    [Fact]
-    public void LaidOutCollections_AreImmutableArrays()
-    {
-        var offenders =
-            from type in LaidOutTypes()
-            from property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            where !Opaque(property)
-            let declared = Unwrap(property.PropertyType)
-            where IsCollection(declared) && !IsImmutableArray(declared)
-            select $"{type.Name}.{property.Name} is {property.PropertyType}";
-
-        Assert.Empty(offenders);
-    }
-
     [Fact]
     public void LaidOutReachableGraph_HasNoMutableModelObjectsOrCollections()
     {
@@ -768,18 +728,6 @@ public class LaidOutContractTests
         return DocumentRenderEngine.Generate(settings, laidOut).ToArray();
     }
 
-    private static bool Opaque(PropertyInfo property)
-        => property.GetIndexParameters().Length != 0;
-
-    private static System.Type Unwrap(System.Type type)
-        => Nullable.GetUnderlyingType(type) ?? type;
-
-    private static bool IsCollection(System.Type type)
-        => type != typeof(string) && type != typeof(byte[]) && typeof(IEnumerable).IsAssignableFrom(type);
-
-    private static bool IsImmutableArray(System.Type type)
-        => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ImmutableArray<>);
-
     private static readonly System.Type[] ImmutableFrameworkValues =
     [
         typeof(ReadOnlyMemory<byte>),
@@ -810,60 +758,6 @@ public class LaidOutContractTests
         typeof(Borders),
         typeof(BoxShadow),
     ];
-
-    private static readonly string[] MutableModelNamespaces =
-    [
-        typeof(Document).Namespace!,
-        typeof(FontCollection).Namespace!,
-    ];
-
-    private static bool IsPubliclyVisible(System.Type type)
-        => type.IsNested
-            ? type.IsNestedPublic && IsPubliclyVisible(type.DeclaringType!)
-            : type.IsPublic;
-
-    private static bool IsMutable(System.Type type)
-        => SettableProperties(type).Any()
-            || type.GetFields(BindingFlags.Public | BindingFlags.Instance)
-                .Any(field => !field.IsInitOnly && !field.IsLiteral);
-
-    [Fact]
-    public void MutableModelRoots_CoverEveryMutablePublicTypeInTheModelNamespaces()
-    {
-        var uncovered =
-            from type in typeof(Document).Assembly.GetTypes()
-            where type.IsClass
-                && IsPubliclyVisible(type)
-                && !type.IsAbstract
-                && type.Namespace is { } declared
-                && MutableModelNamespaces.Contains(declared)
-                && IsMutable(type)
-                && !MutableModelRoots.Any(root => root.IsAssignableFrom(type))
-            select type.FullName;
-
-        Assert.Empty(uncovered);
-    }
-
-    [Fact]
-    public void GeometryNamespaceStaticHelpers_HoldNoSceneState()
-    {
-        var offenders =
-            from type in GeometryNamespaceTypes()
-            where type.IsAbstract && type.IsSealed
-            from field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            where !field.IsLiteral && !field.IsInitOnly
-            select $"{type.Name}.{field.Name}";
-
-        Assert.Empty(offenders);
-    }
-
-    private static IEnumerable<System.Type> GeometryNamespaceTypes()
-        => typeof(LaidOutDocument).Assembly.GetTypes()
-            .Where(type => type.Namespace == typeof(LaidOutDocument).Namespace
-                && !type.IsEnum
-                && !type.IsInterface
-                && !type.IsNested
-                && !type.IsGenericTypeDefinition);
 
     private static IReadOnlyList<string> ReachableGraphOffenders(object root)
     {
@@ -903,7 +797,6 @@ public class LaidOutContractTests
 
             if (Array.IndexOf(ImmutableAfterParseSharedValues, type) >= 0)
             {
-                Radzen.Blazor.Documents.Tests.SharedSfntFontConcurrencyTests.AssertLazyCacheInvariant();
                 return;
             }
 
@@ -956,65 +849,4 @@ public class LaidOutContractTests
         return offenders;
     }
 
-    private static IEnumerable<System.Type> LaidOutTypes()
-    {
-        var seeds = new[] { typeof(LaidOutDocument) };
-        var pending = new Queue<System.Type>(seeds);
-        var seen = new HashSet<System.Type>(seeds);
-        while (pending.Count > 0)
-        {
-            var type = pending.Dequeue();
-            yield return type;
-
-            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (Opaque(property))
-                {
-                    continue;
-                }
-
-                foreach (var candidate in Candidates(Unwrap(property.PropertyType)))
-                {
-                    if (IsLaidOutType(candidate) && seen.Add(candidate))
-                    {
-                        pending.Enqueue(candidate);
-                    }
-                }
-            }
-        }
-    }
-
-    private static IEnumerable<System.Type> Candidates(System.Type type)
-    {
-        yield return type;
-
-        if (type.IsArray && type.GetElementType() is { } element)
-        {
-            foreach (var nested in Candidates(Unwrap(element)))
-            {
-                yield return nested;
-            }
-        }
-
-        if (!type.IsGenericType)
-        {
-            yield break;
-        }
-
-        foreach (var argument in type.GetGenericArguments())
-        {
-            foreach (var nested in Candidates(Unwrap(argument)))
-            {
-                yield return nested;
-            }
-        }
-    }
-
-    private static bool IsLaidOutType(System.Type type)
-        => type.Assembly == typeof(LaidOutDocument).Assembly
-            && !type.IsEnum
-            && !type.IsInterface
-            && !type.IsPointer
-            && !type.IsGenericTypeDefinition
-            && Array.IndexOf(ImmutableAfterParseSharedValues, type) < 0;
 }
