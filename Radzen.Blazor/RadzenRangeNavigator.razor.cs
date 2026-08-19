@@ -1,10 +1,9 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -280,10 +279,10 @@ namespace Radzen.Blazor
             var isDate = CategoryScale is DateScale;
             var inputStart = CategoryScale?.Input?.Start ?? 0;
             var inputEnd = CategoryScale?.Input?.End ?? 0;
-
+            var format = HandleLabelFormatString ?? "{0:MM/dd/yyyy}";
             try
             {
-                JSRuntime.InvokeVoidAsync("Radzen.updateRangeNavigatorLabels", Element, isDate, inputStart, inputEnd);
+                JSRuntime.InvokeVoidAsync("Radzen.updateRangeNavigatorLabels", Element, isDate, inputStart, inputEnd, format);
             }
             catch
             {

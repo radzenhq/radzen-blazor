@@ -3348,20 +3348,96 @@ window.Radzen = {
     ref.navLabelInputEnd = 0;
 
     function formatLabel(fraction) {
-      var inputStart = ref.navLabelInputStart;
-      var inputEnd = ref.navLabelInputEnd;
-      if (inputStart === inputEnd) return '';
-      var value = inputStart + fraction * (inputEnd - inputStart);
-      if (ref.navLabelIsDate) {
-        // .NET ticks to JS Date: ticks are 100ns intervals from 0001-01-01
-        var ticksToMs = value / 10000 - 62135596800000;
-        var d = new Date(ticksToMs);
-        var m = d.getMonth() + 1;
-        var day = d.getDate();
-        var y = d.getFullYear();
-        return (m < 10 ? '0' : '') + m + '/' + (day < 10 ? '0' : '') + day + '/' + y;
-      }
-      return Math.round(value).toString();
+        var inputStart = ref.navLabelInputStart;
+        var inputEnd = ref.navLabelInputEnd;
+        if (inputStart === inputEnd) return '';
+
+        var value = inputStart + fraction * (inputEnd - inputStart);
+
+        if (ref.navLabelIsDate) {
+            // .NET ticks -> JavaScript Date
+            var ticksToMs = value / 10000 - 62135596800000;
+            var d = new Date(ticksToMs);
+
+            var format = ref.handleLabelFormatString || "{0:MM/dd/yyyy}";
+
+            // Extract the format from "{0:MM/dd/yyyy}"
+            format = format.replace(/^\{0:/, '').replace(/\}$/, '');
+
+            var month = d.getMonth();
+            var monthNumber = month + 1;
+            var day = d.getDate();
+            var hours24 = d.getHours();
+            var hours12 = hours24 % 12 || 12;
+
+            var monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            var monthNamesShort = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+
+            var year = d.getFullYear();
+
+            // Single-pass tokenizer. Quoted literals are preserved
+            return format.replace(
+                /'([^']*)'|yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|hh|mm|ss|tt/g,
+                function (match, literal) {
+                    if (literal !== undefined) {
+                        return literal;
+                    }
+
+                    switch (match) {
+                        case 'yyyy':
+                            return String(year);
+
+                        case 'yy':
+                            return String(year % 100).padStart(2, '0');
+
+                        case 'MMMM':
+                            return monthNames[month];
+
+                        case 'MMM':
+                            return monthNamesShort[month];
+
+                        case 'MM':
+                            return String(monthNumber).padStart(2, '0');
+
+                        case 'M':
+                            return String(monthNumber);
+
+                        case 'dd':
+                            return String(day).padStart(2, '0');
+
+                        case 'd':
+                            return String(day);
+
+                        case 'HH':
+                            return String(hours24).padStart(2, '0');
+
+                        case 'hh':
+                            return String(hours12).padStart(2, '0');
+
+                        case 'mm':
+                            return String(d.getMinutes()).padStart(2, '0');
+
+                        case 'ss':
+                            return String(d.getSeconds()).padStart(2, '0');
+
+                        case 'tt':
+                            return hours24 < 12 ? 'AM' : 'PM';
+
+                        default:
+                            return match;
+                    }
+                }
+            );
+        }
+
+        return Math.round(value).toString();
     }
 
     function setLabelText(el, text) {
@@ -3531,12 +3607,13 @@ window.Radzen = {
     return [width, height];
   },
 
-  updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd) {
-    if (!ref) return;
-    ref.navLabelIsDate = isDate;
-    ref.navLabelInputStart = inputStart;
-    ref.navLabelInputEnd = inputEnd;
-  },
+    updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd, handleLabelFormatString) {
+        if (!ref) return;
+        ref.navLabelIsDate = isDate;
+        ref.navLabelInputStart = inputStart;
+        ref.navLabelInputEnd = inputEnd;
+        ref.handleLabelFormatString = handleLabelFormatString;
+    },
 
   destroyGauge: function (ref) {
     if (ref._gaugeRTLObserver) {
