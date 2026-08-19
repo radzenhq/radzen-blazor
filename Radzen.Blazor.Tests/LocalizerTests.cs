@@ -201,6 +201,100 @@ public class LocalizerTests
         Assert.DoesNotContain("Page 1 of 3", component.Markup);
     }
 
+    [Fact]
+    public void Localizer_Resolves_Override_From_App_Satellite_Assembly()
+    {
+        var original = Localizer.AppAssembly;
+
+        try
+        {
+            Localizer.AppAssembly = typeof(LocalizerTests).Assembly;
+
+            var result = Localizer.Default.Get(nameof(RadzenStrings.Pager_FirstPageTitle), new CultureInfo("en-GB"));
+
+            Assert.Equal("Custom first page", result);
+        }
+        finally
+        {
+            Localizer.AppAssembly = original;
+        }
+    }
+
+    [Fact]
+    public void Localizer_App_Satellite_Falls_Back_To_Builtin_For_Missing_Keys()
+    {
+        var original = Localizer.AppAssembly;
+
+        try
+        {
+            Localizer.AppAssembly = typeof(LocalizerTests).Assembly;
+
+            Assert.Equal("Previous page", Localizer.Default.Get(nameof(RadzenStrings.Pager_PrevPageTitle), new CultureInfo("en-GB")));
+            Assert.Equal("Erste Seite", Localizer.Default.Get(nameof(RadzenStrings.Pager_FirstPageTitle), new CultureInfo("de")));
+        }
+        finally
+        {
+            Localizer.AppAssembly = original;
+        }
+    }
+
+    [Fact]
+    public void Localizer_App_Satellite_Does_Not_Break_Parent_Culture_Fallback()
+    {
+        var original = Localizer.AppAssembly;
+
+        try
+        {
+            Localizer.AppAssembly = typeof(LocalizerTests).Assembly;
+
+            Assert.Equal("Erste Seite", Localizer.Default.Get(nameof(RadzenStrings.Pager_FirstPageTitle), new CultureInfo("de-DE")));
+            Assert.Equal("First page", Localizer.Default.Get(nameof(RadzenStrings.Pager_FirstPageTitle), new CultureInfo("en-US")));
+        }
+        finally
+        {
+            Localizer.AppAssembly = original;
+        }
+    }
+
+    [Fact]
+    public void DataGrid_Pager_Uses_App_Satellite_Override()
+    {
+        var original = Localizer.AppAssembly;
+
+        try
+        {
+            Localizer.AppAssembly = typeof(LocalizerTests).Assembly;
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            ctx.Services.AddRadzenComponents();
+
+            var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+                .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
+                .Add(p => p.Value, new CultureInfo("en-GB"))
+                .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid
+                    .Add(g => g.Data, (IEnumerable<dynamic>)Enumerable.Range(0, 3).Select(i => new { Id = i }))
+                    .Add(g => g.Columns, builder =>
+                    {
+                        builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                        builder.AddAttribute(1, "Property", "Id");
+                        builder.AddAttribute(2, "Title", "Id");
+                        builder.CloseComponent();
+                    })
+                    .Add(g => g.AllowPaging, true)
+                    .Add(g => g.PageSize, 1)));
+
+            Assert.Contains("Custom first page", component.Markup);
+            Assert.DoesNotContain("First page", component.Markup);
+            Assert.Contains("Previous page", component.Markup);
+        }
+        finally
+        {
+            Localizer.AppAssembly = original;
+        }
+    }
+
     private class TestLocalizer : ILocalizer
     {
         private readonly string key;

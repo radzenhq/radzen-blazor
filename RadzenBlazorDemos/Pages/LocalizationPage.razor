@@ -123,13 +123,16 @@ builder.Services.AddRadzenComponents();
 <pre>
 <code>
 &lt;ItemGroup&gt;
-  &lt;EmbeddedResource Include="RadzenStrings.de.resx"
+  &lt;EmbeddedResource Update="RadzenStrings.de.resx"
                     LogicalName="Radzen.Blazor.RadzenStrings.de.resources" /&gt;
 &lt;/ItemGroup&gt;
 </code>
 </pre>
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mt-4">
+    Use <code>Update</code> rather than <code>Include</code> &mdash; SDK-style projects already include <code>.resx</code> files implicitly, and adding them a second time fails with error <code>NETSDK1022</code>.
+</RadzenAlert>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4">
-    The <code>ResourceManager</code> will automatically load the correct culture at runtime based on <code>CultureInfo.CurrentUICulture</code>.
+    The resource compiles into your application's satellite assembly (e.g. <code>de/YourApp.resources.dll</code>). At runtime Radzen components look the string up in your application's resources first and fall back to the built-in translations, based on <code>CultureInfo.CurrentUICulture</code>. You can also embed a culture-less <code>RadzenStrings.resx</code> the same way (with <code>LogicalName="Radzen.Blazor.RadzenStrings.resources"</code>) to override strings for all cultures &mdash; application-provided resources always take precedence over the built-in translations.
 </RadzenText>
 
 <RadzenText Anchor="localization#parameter-override" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
@@ -232,6 +235,7 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("de");
 <ol class="rz-text-body1">
     <li><strong>Parameter value</strong> &mdash; explicitly set on the component instance.</li>
     <li><strong>ILocalizer</strong> &mdash; custom translations registered in DI.</li>
-    <li><strong>RadzenStrings.resx</strong> &mdash; built-in resource file (supports satellite assemblies).</li>
+    <li><strong>Application resources</strong> &mdash; <code>RadzenStrings.[culture].resx</code> files embedded in your application (satellite assemblies).</li>
+    <li><strong>RadzenStrings.resx</strong> &mdash; built-in resource file with the bundled translations.</li>
     <li><strong>Key itself</strong> &mdash; if the key is not found in any source, the key string is returned as-is (fallback).</li>
 </ol>

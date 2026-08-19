@@ -25,4 +25,9 @@
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="RadzenStrings.en-GB.resx"
+                      LogicalName="Radzen.Blazor.RadzenStrings.en-GB.resources" />
+  </ItemGroup>
+
 </Project>
