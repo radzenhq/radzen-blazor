@@ -3348,7 +3348,9 @@ window.Radzen = {
         var inputStart = ref.navLabelInputStart;
         var inputEnd = ref.navLabelInputEnd;
         if (inputStart === inputEnd) return '';
+
         var value = inputStart + fraction * (inputEnd - inputStart);
+
         if (ref.navLabelIsDate) {
             // .NET ticks -> JavaScript Date
             var ticksToMs = value / 10000 - 62135596800000;
@@ -3356,18 +3358,80 @@ window.Radzen = {
 
             var format = ref.handleLabelFormatString || "{0:MM/dd/yyyy}";
 
-            // Extract "MM/dd/yyyy" from "{0:MM/dd/yyyy}"
+            // Extract the format from "{0:MM/dd/yyyy}"
             format = format.replace(/^\{0:/, '').replace(/\}$/, '');
 
-            return format
-                .replace(/yyyy/g, d.getFullYear().toString())
-                .replace(/MM/g, String(d.getMonth() + 1).padStart(2, '0'))
-                .replace(/dd/g, String(d.getDate()).padStart(2, '0'))
-                .replace(/HH/g, String(d.getHours()).padStart(2, '0'))
-                .replace(/mm/g, String(d.getMinutes()).padStart(2, '0'))
-                .replace(/ss/g, String(d.getSeconds()).padStart(2, '0'))
-                .replace(/M/g, String(d.getMonth() + 1))
-                .replace(/d/g, String(d.getDate()));
+            var month = d.getMonth();
+            var monthNumber = month + 1;
+            var day = d.getDate();
+            var hours24 = d.getHours();
+            var hours12 = hours24 % 12 || 12;
+
+            var monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            var monthNamesShort = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+
+            var year = d.getFullYear();
+
+            // Single-pass tokenizer. Quoted literals are preserved
+            return format.replace(
+                /'([^']*)'|yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|hh|mm|ss|tt/g,
+                function (match, literal) {
+                    if (literal !== undefined) {
+                        return literal;
+                    }
+
+                    switch (match) {
+                        case 'yyyy':
+                            return String(year);
+
+                        case 'yy':
+                            return String(year % 100).padStart(2, '0');
+
+                        case 'MMMM':
+                            return monthNames[month];
+
+                        case 'MMM':
+                            return monthNamesShort[month];
+
+                        case 'MM':
+                            return String(monthNumber).padStart(2, '0');
+
+                        case 'M':
+                            return String(monthNumber);
+
+                        case 'dd':
+                            return String(day).padStart(2, '0');
+
+                        case 'd':
+                            return String(day);
+
+                        case 'HH':
+                            return String(hours24).padStart(2, '0');
+
+                        case 'hh':
+                            return String(hours12).padStart(2, '0');
+
+                        case 'mm':
+                            return String(d.getMinutes()).padStart(2, '0');
+
+                        case 'ss':
+                            return String(d.getSeconds()).padStart(2, '0');
+
+                        case 'tt':
+                            return hours24 < 12 ? 'AM' : 'PM';
+
+                        default:
+                            return match;
+                    }
+                }
+            );
         }
 
         return Math.round(value).toString();
