@@ -570,6 +570,8 @@ namespace Radzen.Blazor
 
         internal string GridID => $"{PopupID}-grid";
 
+        internal string GridDataID => $"{GridID}-data";
+
         internal string? SelectedAriaLabel
         {
             get

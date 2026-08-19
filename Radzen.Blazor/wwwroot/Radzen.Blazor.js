@@ -1548,7 +1548,10 @@ window.Radzen = {
         }
         if (el && el.id !== activeId) { el.id = activeId; }
         if (el) {
-            grid.setAttribute('aria-activedescendant', activeId);
+            var roleTarget = grid.matches('[role="grid"],[role="treegrid"]')
+                ? grid
+                : grid.querySelector('[role="grid"],[role="treegrid"]') || grid;
+            roleTarget.setAttribute('aria-activedescendant', activeId);
         }
     };
 

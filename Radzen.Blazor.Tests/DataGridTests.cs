@@ -3889,10 +3889,43 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var wrapper = component.Find("div.rz-data-grid");
+            var wrapper = component.Find("div.rz-data-grid-data");
             Assert.Equal("grid", wrapper.GetAttribute("role"));
             Assert.Equal("0", wrapper.GetAttribute("tabindex"));
             Assert.True(string.IsNullOrEmpty(wrapper.GetAttribute("aria-activedescendant")));
+            Assert.Null(component.Find("div.rz-data-grid").GetAttribute("role"));
+        }
+
+        [Fact]
+        public void DataGrid_GridRole_OwnsOnlyRowStructure()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
+                parameterBuilder.Add(p => p.AllowPaging, true);
+                parameterBuilder.Add(p => p.PagerAlwaysVisible, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            var gridRole = component.Find("[role=grid]");
+            Assert.Contains("rz-data-grid-data", gridRole.ClassName);
+
+            var table = component.Find("[role=grid] > table");
+            Assert.Equal("presentation", table.GetAttribute("role"));
+            Assert.Equal("rowgroup", component.Find("[role=grid] > table > thead").GetAttribute("role"));
+            Assert.Equal("rowgroup", component.Find("[role=grid] > table > tbody").GetAttribute("role"));
+
+            Assert.NotEmpty(component.FindAll("div.rz-data-grid nav"));
+            Assert.Empty(component.FindAll("[role=grid] nav"));
         }
 
         [Fact]

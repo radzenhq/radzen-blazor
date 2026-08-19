@@ -9,7 +9,7 @@
 @if (Visible)
 {
     <div @ref="@Element" aria-label="@SelectedAriaLabel" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
-         role="combobox" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@GridID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())" aria-activedescendant="@ActiveDescendantId"
+         role="combobox" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@GridDataID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())" aria-activedescendant="@ActiveDescendantId"
          style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown">
         <div class="rz-helper-hidden-accessible">
@@ -135,7 +135,7 @@
                     <div class="rz-lookup-search">
                         <div class="rz-lookup-search-input-container">
                             <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@(SearchTextPlaceholder ?? string.Empty)"
-                                role="combobox" aria-controls="@GridID" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-autocomplete="list" aria-activedescendant="@ActiveDescendantId"
+                                role="combobox" aria-controls="@GridDataID" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-autocomplete="list" aria-activedescendant="@ActiveDescendantId"
                                 @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" style="@(ShowSearch ? "" : "margin-right:0px;")"
                                 @oninput="@OnFilterInput" />
                             @if (!string.IsNullOrEmpty(searchText))
