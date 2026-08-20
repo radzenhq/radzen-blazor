@@ -196,6 +196,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Markdown_Renders_Link_WithInvalidDestination_AsText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // "https://" has no host: NavigationManager.ToAbsoluteUri throws UriFormatException for it.
+            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            {
+                parameters.Add(p => p.Text, "[Click here](https://)");
+            });
+
+            Assert.Contains("Click here", component.Markup);
+            Assert.DoesNotContain("https://", component.Markup);
+        }
+
+        [Fact]
         public void Markdown_EmptyText_StillRenders()
         {
             using var ctx = new TestContext();

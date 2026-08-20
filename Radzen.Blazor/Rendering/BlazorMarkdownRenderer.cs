@@ -212,7 +212,12 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         {
             builder.OpenComponent<RadzenLink>(0);
 
-            if (!string.IsNullOrEmpty(link.Destination) && !HtmlSanitizer.IsDangerousUrl(link.Destination))
+            // NavLink (used by RadzenLink) calls NavigationManager.ToAbsoluteUri(href), which throws
+            // UriFormatException for destinations like "https://" (empty host). Skip those instead
+            // of letting the exception take down the component tree.
+            if (!string.IsNullOrEmpty(link.Destination)
+                && !HtmlSanitizer.IsDangerousUrl(link.Destination)
+                && Uri.TryCreate(link.Destination, UriKind.RelativeOrAbsolute, out _))
             {
                 builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
             }
