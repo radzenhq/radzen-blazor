@@ -762,6 +762,146 @@ public class SpreadsheetTests
         Assert.False(fired);
     }
 
+    // ── Change ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task Change_Fires_AfterCommandRuns()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A1"].Value = "before";
+
+        SpreadsheetChangeEventArgs seen = null;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args =>
+            {
+                seen = args;
+                Assert.Null(sheet.Cells["A1"].Value);
+            }));
+        });
+
+        var cmd = new ClearContentsCommand(sheet, RangeRef.Parse("A1"));
+        var ran = await Run(c, cmd);
+
+        Assert.True(ran);
+        Assert.NotNull(seen);
+        Assert.Equal(SpreadsheetChangeReason.Command, seen.Reason);
+        Assert.Same(cmd, seen.Command);
+        Assert.Same(sheet, seen.Worksheet);
+    }
+
+    [Fact]
+    public async Task Change_NotFired_WhenCommandRejected()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+
+        var fired = false;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(args => args.PreventDefault()));
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(_ => fired = true));
+        });
+
+        var ran = await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
+
+        Assert.False(ran);
+        Assert.False(fired);
+    }
+
+    [Fact]
+    public async Task Change_NotFired_WhenReadOnly()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+
+        var fired = false;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.ReadOnly, true);
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(_ => fired = true));
+        });
+
+        var ran = await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
+
+        Assert.False(ran);
+        Assert.False(fired);
+    }
+
+    [Fact]
+    public async Task Change_Fires_OnUndoAndRedo()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A1"].Value = "before";
+
+        var seen = new List<SpreadsheetChangeReason>();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args => seen.Add(args.Reason)));
+        });
+
+        await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
+
+        await c.InvokeAsync(() => c.Instance.Undo());
+        Assert.Equal("before", sheet.Cells["A1"].Value);
+
+        await c.InvokeAsync(() => c.Instance.Redo());
+        Assert.Null(sheet.Cells["A1"].Value);
+
+        Assert.Equal(new[] { SpreadsheetChangeReason.Command, SpreadsheetChangeReason.Undo, SpreadsheetChangeReason.Redo }, seen);
+    }
+
+    [Fact]
+    public async Task Change_NotFired_WhenNothingToUndoOrRedo()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+
+        var fired = false;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(_ => fired = true));
+        });
+
+        await c.InvokeAsync(() => c.Instance.Undo());
+        await c.InvokeAsync(() => c.Instance.Redo());
+
+        Assert.False(fired);
+    }
+
+    [Fact]
+    public void Change_Fires_WhenSheetAdded()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+
+        SpreadsheetChangeEventArgs seen = null;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args => seen = args));
+        });
+
+        c.Find(".rz-spreadsheet-add-sheet").Click();
+
+        Assert.NotNull(seen);
+        Assert.Equal(SpreadsheetChangeReason.SheetAdded, seen.Reason);
+        Assert.Equal(2, wb.Sheets.Count);
+        Assert.Same(wb.Sheets[1], seen.Worksheet);
+        Assert.Null(seen.Command);
+    }
+
     // ── SelectedSheetIndex (@bind-SelectedSheetIndex) ──────────────────────
 
     private static Workbook TwoSheetWorkbook()

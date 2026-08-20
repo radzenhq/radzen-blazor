@@ -264,6 +264,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public EventCallback<SpreadsheetCommandEventArgs> CommandExecuting { get; set; }
 
     /// <summary>
+    /// Fires after the workbook has been mutated: a command executed, undone, or redone,
+    /// or a sheet added, removed, renamed, or moved. Loading a different workbook raises
+    /// <see cref="WorkbookChanged"/> instead.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SpreadsheetChangeEventArgs> Change { get; set; }
+
+    /// <summary>
     /// Replaces the built-in toolsets. When set, the supplied content sits inside the
     /// toolbar's <see cref="RadzenTabs.Tabs"/> slot — each child should be a
     /// <see cref="RadzenTabsItem"/>. Add
@@ -438,10 +446,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             clipboard.Clear();
         }
-        
+
+        if (executed)
+        {
+            await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.Command, ActiveView?.Worksheet, command));
+        }
+
         return executed;
     }
-    
+
     /// <inheritdoc/>
     public void Undo()
     {
@@ -450,7 +463,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return;
         }
 
-        ActiveView?.Commands.Undo();
+        var view = ActiveView;
+
+        if (view?.Commands.CanUndo != true)
+        {
+            return;
+        }
+
+        view.Commands.Undo();
+
+        _ = Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.Undo, view.Worksheet));
     }
 
     /// <inheritdoc/>
@@ -461,7 +483,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return;
         }
 
-        ActiveView?.Commands.Redo();
+        var view = ActiveView;
+
+        if (view?.Commands.CanRedo != true)
+        {
+            return;
+        }
+
+        view.Commands.Redo();
+
+        _ = Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.Redo, view.Worksheet));
     }
 
     /// <inheritdoc/>
@@ -554,6 +585,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         var name = GenerateSheetName();
         workbook.AddSheet(name, 100, 26);
         await SelectSheetAsync(workbook.Sheets.Count - 1);
+
+        await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.SheetAdded, workbook.Sheets[^1]));
     }
 
     private async Task OnSheetAction(RadzenSplitButtonItem? item, Worksheet sheet)
@@ -599,6 +632,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             sheetIndex >= workbook.Sheets.Count ? workbook.Sheets.Count - 1 :
             removedIndex < sheetIndex ? sheetIndex - 1 :
             sheetIndex);
+
+        await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.SheetRemoved, sheet));
     }
 
     private async Task OnRenameSheetAsync(Worksheet sheet)
@@ -617,9 +652,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new Dictionary<string, object?> { { "Name", sheet.Name }, { "ExistingNames", existingNames } },
             new DialogOptions { Width = "300px" });
 
-        if (name is string newName && !string.IsNullOrWhiteSpace(newName))
+        if (name is string newName && !string.IsNullOrWhiteSpace(newName) && newName != sheet.Name)
         {
             sheet.Name = newName;
+
+            await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.SheetRenamed, sheet));
         }
     }
 
@@ -647,6 +684,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             }
 
             await NotifySelectedSheetIndexChangedAsync(previous);
+
+            await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.SheetMoved, sheet));
         }
     }
 
@@ -674,6 +713,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             }
 
             await NotifySelectedSheetIndexChangedAsync(previous);
+
+            await Change.InvokeAsync(new SpreadsheetChangeEventArgs(SpreadsheetChangeReason.SheetMoved, sheet));
         }
     }
 
