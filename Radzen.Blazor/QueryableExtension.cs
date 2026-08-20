@@ -23,6 +23,82 @@ namespace Radzen
         static Expression notNullCheck(Expression property) => Nullable.GetUnderlyingType(property.Type) != null || property.Type == typeof(string) ?
             Expression.Coalesce(property, property.Type == typeof(string) ? Expression.Constant(string.Empty) : Expression.Constant(null, property.Type)) : property;
 
+        [RequiresUnreferencedCode(ReflectionWarning)]
+        static IList? NormalizeFilterValues(object? value, Type targetType)
+        {
+            if (value is not IEnumerable enumerable || value is string)
+            {
+                return null;
+            }
+
+            var values = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetType))!;
+
+            foreach (var item in enumerable)
+            {
+                if (item == null)
+                {
+                    continue;
+                }
+
+                if (targetType.IsInstanceOfType(item))
+                {
+                    values.Add(item);
+                }
+                else
+                {
+                    try
+                    {
+                        values.Add(targetType.IsEnum ? Enum.ToObject(targetType, item) :
+                            Convert.ChangeType(item, targetType, CultureInfo.InvariantCulture));
+                    }
+                    catch (ArgumentException)
+                    {
+                    }
+                    catch (InvalidCastException)
+                    {
+                    }
+                    catch (FormatException)
+                    {
+                    }
+                    catch (OverflowException)
+                    {
+                    }
+                }
+            }
+
+            return values;
+        }
+
+        [RequiresUnreferencedCode(ReflectionWarning)]
+        static Expression GetInExpression(Expression property, object? filterValue, bool negate)
+        {
+            var targetType = Nullable.GetUnderlyingType(property.Type) ?? property.Type;
+            var values = NormalizeFilterValues(filterValue, targetType);
+
+            if (values == null)
+            {
+                return Expression.Constant(true);
+            }
+
+            var constant = Expression.Constant(values, values.GetType());
+
+            if (Nullable.GetUnderlyingType(property.Type) != null)
+            {
+                Expression contains = Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new[] { targetType },
+                    constant, Expression.Property(property, "Value"));
+
+                return Expression.Condition(
+                    Expression.Property(property, "HasValue"),
+                    negate ? Expression.Not(contains) : contains,
+                    Expression.Constant(negate, typeof(bool)));
+            }
+
+            Expression call = Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new[] { targetType },
+                constant, notNullCheck(property));
+
+            return negate ? Expression.Not(call) : call;
+        }
+
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
@@ -802,7 +878,8 @@ namespace Radzen
                 FilterOperator.In => isEnumerable &&
                                     isEnumerableProperty ?
                     Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType! },
-                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Intersect), new Type[] { collectionItemType! }, constant, notNullCheck(property))) : Expression.Constant(true),
+                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Intersect), new Type[] { collectionItemType! }, constant, notNullCheck(property))) :
+                    isEnumerableProperty ? Expression.Constant(true) : GetInExpression(property, filter.FilterValue, false),
                 FilterOperator.DoesNotContain => isEnumerable ?
                     Expression.Not(Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new Type[] { property.Type }, constant, notNullCheck(property))) :
                         isEnumerableProperty ?
@@ -811,7 +888,8 @@ namespace Radzen
                 FilterOperator.NotIn => isEnumerable &&
                                     isEnumerableProperty ?
                     Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType! },
-                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Except), new Type[] { collectionItemType! }, constant, notNullCheck(property))) : Expression.Constant(true),
+                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Except), new Type[] { collectionItemType! }, constant, notNullCheck(property))) :
+                    isEnumerableProperty ? Expression.Constant(true) : GetInExpression(property, filter.FilterValue, true),
                 FilterOperator.StartsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!, constant),
                 FilterOperator.EndsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("EndsWith", new[] { typeof(string) })!, constant),
                 FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
@@ -848,7 +926,17 @@ namespace Radzen
                     FilterOperator.GreaterThan => Expression.GreaterThan(notNullCheck(property), secondConstant!),
                     FilterOperator.GreaterThanOrEquals => Expression.GreaterThanOrEqual(notNullCheck(property), secondConstant!),
                     FilterOperator.Contains => Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) })!, secondConstant!),
-                    FilterOperator.DoesNotContain => Expression.Not(Expression.Call(notNullCheck(property), property.Type.GetMethod("Contains", new[] { typeof(string) })!, secondConstant!)),
+                    FilterOperator.DoesNotContain => Expression.Not(Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) })!, secondConstant!)),
+                    FilterOperator.In => secondValueType != null && IsEnumerable(secondValueType) && secondValueType != typeof(string) &&
+                                        isEnumerableProperty ?
+                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType! },
+                            Expression.Call(typeof(Enumerable), nameof(Enumerable.Intersect), new Type[] { collectionItemType! }, secondConstant!, notNullCheck(property))) :
+                        isEnumerableProperty ? Expression.Constant(true) : GetInExpression(property, filter.SecondFilterValue, false),
+                    FilterOperator.NotIn => secondValueType != null && IsEnumerable(secondValueType) && secondValueType != typeof(string) &&
+                                        isEnumerableProperty ?
+                        Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType! },
+                            Expression.Call(typeof(Enumerable), nameof(Enumerable.Except), new Type[] { collectionItemType! }, secondConstant!, notNullCheck(property))) :
+                        isEnumerableProperty ? Expression.Constant(true) : GetInExpression(property, filter.SecondFilterValue, true),
                     FilterOperator.StartsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!, secondConstant!),
                     FilterOperator.EndsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("EndsWith", new[] { typeof(string) })!, secondConstant!),
                     FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
