@@ -140,7 +140,7 @@
                     }
                 </colgroup>
                 }
-                <thead role="presentation">
+                <thead role="rowgroup">
                     @if (ShowHeader)
                     {
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
@@ -234,7 +234,7 @@
                         </tr>
                     }
                 </thead>
-                <tbody role="presentation">
+                <tbody role="rowgroup">
                     @if (Data != null)
                     {
                         @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Count > 0 && HasAnyData() : true) || LoadData.HasDelegate && HasAnyData() || itemsToInsert.Count > 0)
@@ -278,7 +278,7 @@
                 </tbody>
                 @if (allColumns.Where(c => c.Visible && c.FooterTemplate != null).Any())
                 {
-                    <tfoot role="presentation" class="rz-datatable-tfoot" @onkeydown:stopPropagation>
+                    <tfoot role="rowgroup" class="rz-datatable-tfoot" @onkeydown:stopPropagation>
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
                             <tr role="row">
