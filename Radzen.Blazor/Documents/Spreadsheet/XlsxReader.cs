@@ -435,22 +435,28 @@ static class XlsxReader
         return sheet;
     }
 
-    // The sheet must be large enough to hold its used range; a fixed grid dropped any content
-    // beyond it. 100x100 is kept as a floor so nearly-empty files still render a full default grid.
     private static (int Rows, int Columns) ComputeSheetSize(XDocument sheetDoc, XNamespace sNs)
     {
-        var maxRow = 100;
-        var maxColumn = 100;
+        var maxRow = 1;
+        var maxColumn = 1;
+        var hasDimension = false;
 
         var dimensionRef = sheetDoc.Descendants(sNs + "dimension").FirstOrDefault()?.Attribute("ref")?.Value;
         if (!string.IsNullOrEmpty(dimensionRef))
         {
             var range = RangeRef.Parse(dimensionRef);
-            if (!range.Equals(RangeRef.Invalid))
+            if (!range.Equals(RangeRef.Invalid) && !range.Start.Equals(range.End))
             {
+                hasDimension = true;
                 maxRow = Math.Max(maxRow, range.End.Row + 1);
                 maxColumn = Math.Max(maxColumn, range.End.Column + 1);
             }
+        }
+
+        if (!hasDimension)
+        {
+            maxRow = 100;
+            maxColumn = 100;
         }
 
         // The dimension element is optional and sometimes understated, so cross-check against the

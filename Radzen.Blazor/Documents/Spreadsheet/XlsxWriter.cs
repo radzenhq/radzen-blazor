@@ -1134,25 +1134,9 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private static XElement CreateDimension(Worksheet sheet)
     {
-        var populated = sheet.Cells.GetPopulatedCells()
-            .Where(c => c.Value is not null || c.Formula is not null)
-            .ToList();
-
-        string refStr;
-        if (populated.Count == 0)
-        {
-            refStr = "A1";
-        }
-        else
-        {
-            var minRow = populated.Min(c => c.Address.Row);
-            var maxRow = populated.Max(c => c.Address.Row);
-            var minCol = populated.Min(c => c.Address.Column);
-            var maxCol = populated.Max(c => c.Address.Column);
-            refStr = minRow == maxRow && minCol == maxCol
-                ? new CellRef(minRow, minCol).ToString()
-                : $"{new CellRef(minRow, minCol)}:{new CellRef(maxRow, maxCol)}";
-        }
+        var refStr = sheet.RowCount == 1 && sheet.ColumnCount == 1
+            ? "A1"
+            : $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}";
 
         return new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("ref", refStr));

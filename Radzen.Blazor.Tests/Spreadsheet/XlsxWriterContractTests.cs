@@ -223,9 +223,8 @@ public class XlsxWriterContractTests
         Assert.Null(ws.Element(Main + "sheetPr"));
     }
 
-    // ── #8 <dimension> should be the data extent, not the whole grid ────────
     [Fact]
-    public void Dimension_ShouldEqualDataExtent()
+    public void Dimension_ShouldEqualGridExtent()
     {
         var wb = new Workbook();
         var s = wb.AddSheet("Sheet1", 100, 50);
@@ -236,7 +235,7 @@ public class XlsxWriterContractTests
         var dim = (string?)pkg.Part("xl/worksheets/sheet1.xml")
                               .Descendants(Main + "dimension").Single().Attribute("ref");
 
-        Assert.Equal("A1:C3", dim);
+        Assert.Equal("A1:AX100", dim);
     }
 
     // ── #9 sheetFormatPr + pageMargins + row/@spans ─────────────────────────
