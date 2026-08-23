@@ -42,7 +42,6 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    [CascadingTypeParameter(nameof(TValue))]
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>, IRadzenCheckBoxList
     {
         string ItemClass(IRadzenCheckBoxListItem item) => ClassList.Create("rz-chkbox-box")

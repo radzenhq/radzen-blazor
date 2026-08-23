@@ -37,7 +37,6 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    [CascadingTypeParameter(nameof(TValue))]
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>, IRadzenRadioButtonList
     {
         string ItemClass(IRadzenRadioButtonListItem item) => ClassList.Create("rz-radiobutton-box")
