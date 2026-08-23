@@ -271,9 +271,10 @@ namespace Radzen.Blazor
                 {
                     var displayAttr = propInfo.GetCustomAttributes(typeof(DisplayAttribute), true)
                         .FirstOrDefault() as DisplayAttribute;
-                    if (displayAttr?.Name != null)
+                    var shortName = displayAttr?.GetShortName();
+                    if (shortName != null)
                     {
-                        Title = displayAttr.Name;
+                        Title = shortName;
                     }
                 }
             }
