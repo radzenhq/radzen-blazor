@@ -383,8 +383,10 @@ namespace Radzen.Blazor
         public string Title { get; set; } = string.Empty;
 
         /// <summary>
-        /// Indicates whether the column should automatically use the <see cref="DisplayAttribute.Name"/>
-        /// of the bound property as the header.
+        /// Indicates whether the column should automatically use the <see cref="DisplayAttribute"/>
+        /// of the bound property as the header. The header is resolved via <see cref="DisplayAttribute.GetShortName"/>,
+        /// which returns the localized <see cref="DisplayAttribute.ShortName"/> when set and falls back to the
+        /// localized <see cref="DisplayAttribute.Name"/> otherwise.
         /// </summary>
         [Parameter]
         public bool UseDisplayName { get; set; }
