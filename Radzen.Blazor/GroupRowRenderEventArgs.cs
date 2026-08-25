@@ -7,10 +7,18 @@ namespace Radzen;
 /// </summary>
 public class GroupRowRenderEventArgs
 {
+    private IDictionary<string, object>? attributes;
+
     /// <summary>
     /// Gets or sets the group row HTML attributes. They will apply to the table row (tr) element which RadzenDataGrid renders for every group row.
     /// </summary>
-    public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
+    /// <remarks>The backing dictionary is allocated on first access, so a group row with no GroupRowRender handler pays nothing.</remarks>
+    public IDictionary<string, object> Attributes => attributes ??= new Dictionary<string, object>();
+
+    /// <summary>
+    /// Whether any attributes were added, without forcing the backing dictionary to be allocated.
+    /// </summary>
+    internal bool HasAttributes => attributes is { Count: > 0 };
 
     /// <summary>
     /// Gets the data item which the current row represents.

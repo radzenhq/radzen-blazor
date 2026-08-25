@@ -313,9 +313,10 @@ namespace Radzen.Blazor
                                 b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
                                 b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
 
-                                if (editContexts.Keys.Any(i => ItemEquals(i, context)))
+                                // O(1) lookup instead of scanning editContexts.Keys per rendered row.
+                                if (editContexts.TryGetValue(context, out var editContext))
                                 {
-                                    b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                                    b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContext);
                                 }
 
                                 b.SetKey(context);
@@ -505,7 +506,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnGroupEventArgs<TItem>> Group { get; set; }
 
-        internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+        internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column)
         {
             if (!column.IsFrozen())
             {
@@ -1283,14 +1284,21 @@ namespace Radzen.Blazor
             }
         }
 
+        static readonly IReadOnlyDictionary<string, object> EmptyAttributes =
+            new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
+
         internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
         {
+            // Without a CellRender handler there are no custom attributes; return a shared empty dictionary
+            // instead of allocating event args and a dictionary per cell. Callers only read the result.
+            if (CellRender == null)
+            {
+                return EmptyAttributes;
+            }
+
             var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Data = item, Column = column };
 
-            if (CellRender != null)
-            {
-                CellRender(args);
-            }
+            CellRender(args);
 
             return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
         }
@@ -1315,19 +1323,25 @@ namespace Radzen.Blazor
                     break;
             }
 
-            return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
+            return args.HasAttributes
+                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
+                : EmptyAttributes;
         }
 
         internal IReadOnlyDictionary<string, object> FooterCellAttributes(RadzenDataGridColumn<TItem> column)
         {
-            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
-
-            if (FooterCellRender != null)
+            if (FooterCellRender == null)
             {
-                FooterCellRender(args);
+                return EmptyAttributes;
             }
 
-            return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
+
+            FooterCellRender(args);
+
+            return args.HasAttributes
+                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
+                : EmptyAttributes;
         }
 
         internal Dictionary<int, int> rowSpans = new Dictionary<int, int>();
@@ -2798,6 +2812,31 @@ namespace Radzen.Blazor
             return keyPropertyGetter != null ? Equals(keyPropertyGetter(item), keyPropertyGetter(otherItem)) : item.Equals(otherItem);
         }
 
+        // Membership test equivalent to items.Keys.Any(i => ItemEquals(i, item)), but O(1) when no
+        // KeyProperty is set, avoiding an O(selected) scan per row on every render.
+        bool ContainsItemKey(Dictionary<TItem, bool> items, TItem item)
+        {
+            if (items.Count == 0)
+            {
+                return false;
+            }
+
+            if (keyPropertyGetter == null)
+            {
+                return item != null && items.ContainsKey(item);
+            }
+
+            foreach (var i in items.Keys)
+            {
+                if (ItemEquals(i, item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal bool? allGroupsExpanded;
 
         /// <summary>
@@ -2831,16 +2870,27 @@ namespace Radzen.Blazor
 
         internal string ExpandedItemStyle(TItem item)
         {
-            return expandedItems.Keys.Any(i => ItemEquals(i, item)) ? "notranslate rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
+            return ContainsItemKey(expandedItems, item) ? "notranslate rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
         }
 
         internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
 
+        // RowStyle only ever produces one of these four constants; returning them avoids allocating an
+        // identical string per row on every render.
+        const string RowClass = "rz-data-row  ";
+        const string RowClassEditing = "rz-data-row rz-datatable-edit ";
+        const string RowClassSelected = "rz-state-highlight rz-data-row  ";
+        const string RowClassSelectedEditing = "rz-state-highlight rz-data-row rz-datatable-edit ";
+
         internal string RowStyle(TItem item, int index)
         {
-            var isInEditMode = IsRowInEditMode(item) ? "rz-datatable-edit" : "";
+            var editing = IsRowInEditMode(item);
+            var selected = (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
+                && ContainsItemKey(selectedItems, item);
 
-            return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Any(i => ItemEquals(i, item)) ? $"rz-state-highlight rz-data-row {isInEditMode} " : $"rz-data-row {isInEditMode} ";
+            return selected
+                ? (editing ? RowClassSelectedEditing : RowClassSelected)
+                : (editing ? RowClassEditing : RowClass);
         }
 
         internal string? RowAriaSelected(TItem item, int index)
@@ -2850,7 +2900,7 @@ namespace Radzen.Blazor
                 return null;
             }
 
-            return selectedItems.Keys.Any(i => ItemEquals(i, item)) ? "true" : "false";
+            return ContainsItemKey(selectedItems, item) ? "true" : "false";
         }
 
         int HeaderRowCount()
@@ -2892,7 +2942,11 @@ namespace Radzen.Blazor
                 RowRender(args);
             }
 
-            return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
+            var attributes = args.HasAttributes
+                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
+                : EmptyAttributes;
+
+            return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, attributes);
         }
 
         internal Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>> GroupRowAttributes(RadzenDataGridGroupRow<TItem> item)
@@ -2904,7 +2958,11 @@ namespace Radzen.Blazor
                 GroupRowRender(args);
             }
 
-            return new Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
+            var attributes = args.HasAttributes
+                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
+                : EmptyAttributes;
+
+            return new Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>>(args, attributes);
         }
 
         bool settingsChanged;
@@ -3119,7 +3177,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public bool IsRowExpanded(TItem item)
         {
-            return expandedItems.Keys.Any(i => ItemEquals(i, item));
+            return ContainsItemKey(expandedItems, item);
         }
 
         /// <summary>
@@ -3137,7 +3195,7 @@ namespace Radzen.Blazor
 
             foreach (TItem item in items)
             {
-                if (!expandedItems.Keys.Any(i => ItemEquals(i, item)))
+                if (!ContainsItemKey(expandedItems, item))
                 {
                     expandedItems.Add(item, true);
                     await RowExpand.InvokeAsync(item);
@@ -3216,7 +3274,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!expandedItems.Keys.Any(i => ItemEquals(i, item)))
+            if (!ContainsItemKey(expandedItems, item))
             {
                 expandedItems.Add(item, true);
                 await RowExpand.InvokeAsync(item);
@@ -3385,7 +3443,7 @@ namespace Radzen.Blazor
                 focusedIndex = focusedIndexResult.Index + 1;
             }
 
-            if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Any(i => ItemEquals(i, item)))
+            if (SelectionMode == DataGridSelectionMode.Single && item != null && ContainsItemKey(selectedItems, item))
             {
                 // Legacy RowSelect raise
                 if (raiseChange)
@@ -3407,7 +3465,7 @@ namespace Radzen.Blazor
 
             if (item != null)
             {
-                if (!selectedItems.Keys.Any(i => ItemEquals(i, item)))
+                if (!ContainsItemKey(selectedItems, item))
                 {
                     selectedItems.Add(item, true);
                     if (raiseChange)
@@ -3511,7 +3569,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!editedItems.Keys.Any(i => ItemEquals(i, item)))
+            if (!ContainsItemKey(editedItems, item))
             {
                 editedItems.Add(item, true);
 
@@ -3539,7 +3597,7 @@ namespace Radzen.Blazor
 
             foreach (TItem item in items)
             {
-                if (!editedItems.Keys.Any(i => ItemEquals(i, item)))
+                if (!ContainsItemKey(editedItems, item))
                 {
                     editedItems.Add(item, true);
 
@@ -3559,7 +3617,7 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task UpdateRow(TItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            if (editedItems.Keys.Any(i => ItemEquals(i, item)))
+            if (ContainsItemKey(editedItems, item))
             {
                 var editContext = editContexts.FirstOrDefault(i => ItemEquals(i.Key, item)).Value;
 
@@ -3616,7 +3674,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (editedItems.Keys.Any(i => ItemEquals(i, item)))
+                if (ContainsItemKey(editedItems, item))
                 {
                     editedItems.Remove(item);
                     editContexts.Remove(item);
@@ -3635,7 +3693,7 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(items);
             foreach (TItem item in items)
             {
-                if (editedItems.Keys.Any(i => ItemEquals(i, item)))
+                if (ContainsItemKey(editedItems, item))
                 {
                     editedItems.Remove(item);
                     editContexts.Remove(item);
@@ -3651,7 +3709,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if row in edit mode; otherwise, <c>false</c>.</returns>
         public bool IsRowInEditMode(TItem item)
         {
-            return editedItems.Keys.Any(i => ItemEquals(i, item));
+            return ContainsItemKey(editedItems, item);
         }
 
         List<TItem> itemsToInsert = new List<TItem>();
