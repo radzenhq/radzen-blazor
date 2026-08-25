@@ -1756,16 +1756,34 @@ namespace Radzen.Blazor
             return !string.IsNullOrWhiteSpace(internalWidth) ? internalWidth : Grid?.ColumnWidth;
         }
 
+        IEnumerable<FilterOperator>? _filterOperatorsCache;
+        Type? _filterOperatorsTypeKey;
+
         /// <summary>
         /// Get possible column filter operators.
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
+            // Caller-provided operators are returned live, so in-place changes to the bound collection are honored.
             if (FilterOperators != null)
             {
                 return FilterOperators;
             }
 
+            // The computed/default set depends only on FilterPropertyType but is a lazy LINQ query re-run on
+            // each enumeration, so materialize it once and reuse until the type changes.
+            if (_filterOperatorsCache != null && _filterOperatorsTypeKey == FilterPropertyType)
+            {
+                return _filterOperatorsCache;
+            }
+
+            _filterOperatorsTypeKey = FilterPropertyType;
+            _filterOperatorsCache = ComputeFilterOperators().ToArray();
+            return _filterOperatorsCache;
+        }
+
+        private IEnumerable<FilterOperator> ComputeFilterOperators()
+        {
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || FilterPropertyType == typeof(bool)))
             {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
