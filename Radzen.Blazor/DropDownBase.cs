@@ -170,18 +170,9 @@ namespace Radzen
             //
         }
 
-        HashSet<object> keys = new HashSet<object>();
-
         internal object? GetKey(object item)
         {
-            var value = GetItemOrValueFromProperty(item, ValueProperty ?? string.Empty);
-
-            if (value != null)
-            {
-                keys.Add(value);
-            }
-
-            return value;
+            return GetItemOrValueFromProperty(item, ValueProperty ?? string.Empty);
         }
 
         /// <summary>
@@ -1719,8 +1710,6 @@ namespace Radzen
         public override void Dispose()
         {
             base.Dispose();
-
-            keys.Clear();
 
             GC.SuppressFinalize(this);
         }
