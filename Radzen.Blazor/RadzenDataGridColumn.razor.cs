@@ -239,16 +239,8 @@ namespace Radzen.Blazor
             {
                 _filterPropertyType = Type;
             }
-            else if (!string.IsNullOrEmpty(Property))
-            {
-                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-            }
 
-            if (!string.IsNullOrEmpty(Property) && (typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition()) ||
-                typeof(IDictionary).IsAssignableFrom(typeof(TItem)) || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem))))
-            {
-                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-            }
+            EnsurePropertyValueGetter();
 
             if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
             {
@@ -773,6 +765,44 @@ namespace Radzen.Blazor
         public IFormatProvider? FormatProvider { get; set; }
 
         Func<TItem, object>? propertyValueGetter;
+        string? propertyValueGetterProperty;
+
+        string? sortValueGetterProperty;
+        Func<TItem, object>? sortValueGetter;
+
+        // Rebuilds the cached value getter when the bound Property changes, so a reused column instance whose
+        // Property parameter is reassigned does not keep rendering the old property.
+        private void EnsurePropertyValueGetter()
+        {
+            if (propertyValueGetterProperty == Property)
+            {
+                return;
+            }
+
+            propertyValueGetterProperty = Property;
+
+            if (string.IsNullOrEmpty(Property))
+            {
+                propertyValueGetter = null;
+                return;
+            }
+
+            try
+            {
+                var indexed = typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition())
+                    || typeof(IDictionary).IsAssignableFrom(typeof(TItem))
+                    || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem));
+
+                // Dictionary / DataRow items resolve through an indexer, so they keep the standard getter.
+                propertyValueGetter = indexed
+                    ? PropertyAccess.Getter<TItem, object>(Property)
+                    : PropertyAccess.NullSafeGetter<TItem>(Property);
+            }
+            catch
+            {
+                propertyValueGetter = null;
+            }
+        }
 
         /// <summary>
         /// Gets the value for specified item.
@@ -781,7 +811,12 @@ namespace Radzen.Blazor
         /// <returns>System.Object.</returns>
         public virtual object? GetValue(TItem item)
         {
-            var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.', StringComparison.Ordinal) ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+            EnsurePropertyValueGetter();
+
+            // Use the cached compiled getter when one was built; reflection remains the fallback only for
+            // columns whose property could not be compiled (e.g. late-bound dynamic items).
+            var value = propertyValueGetter != null ? propertyValueGetter(item)
+                : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
 
 
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || PropertyAccess.IsNullableEnum(FilterPropertyType) ||
@@ -941,8 +976,38 @@ namespace Radzen.Blazor
         /// </summary>
         internal object? GetSortValue(TItem item)
         {
+            EnsurePropertyValueGetter();
+
             var sortProperty = GetSortProperty();
-            return string.IsNullOrEmpty(sortProperty) ? null : PropertyAccess.GetValue(item, sortProperty);
+            if (string.IsNullOrEmpty(sortProperty))
+            {
+                return null;
+            }
+
+            if (sortProperty != sortValueGetterProperty)
+            {
+                sortValueGetterProperty = sortProperty;
+
+                if (sortProperty == Property && propertyValueGetter != null)
+                {
+                    sortValueGetter = propertyValueGetter;
+                }
+                else
+                {
+                    // A compiled getter avoids per-row reflection while sorting; items that cannot be compiled
+                    // (late-bound dynamic) fall back to reflection below.
+                    try
+                    {
+                        sortValueGetter = PropertyAccess.NullSafeGetter<TItem>(sortProperty);
+                    }
+                    catch
+                    {
+                        sortValueGetter = null;
+                    }
+                }
+            }
+
+            return sortValueGetter != null ? sortValueGetter(item) : PropertyAccess.GetValue(item, sortProperty);
         }
 
         internal void SetSortOrder(SortOrder? order)

@@ -12,6 +12,27 @@ namespace Radzen.Blazor.Tests
             public string Property { get; set; }
         }
 
+        class CountingHolder
+        {
+            public int InnerReads;
+            private SimpleObject inner;
+            public SimpleObject Inner { get { InnerReads++; return inner; } set { inner = value; } }
+        }
+
+        [Fact]
+        public void NullSafeGetter_ReadsEachIntermediateOnce()
+        {
+            // A computed/side-effecting intermediate must be read once, not once for the null-check and again
+            // for the leaf - otherwise a getter returning a value then null would throw.
+            var holder = new CountingHolder { Inner = new SimpleObject { Prop1 = "X" } };
+            var getter = PropertyAccess.NullSafeGetter<CountingHolder>("Inner.Prop1");
+
+            var value = getter(holder);
+
+            Assert.Equal("X", value);
+            Assert.Equal(1, holder.InnerReads);
+        }
+
         [Fact]
         public void Getter_With_DifferentTargetType()
         {
