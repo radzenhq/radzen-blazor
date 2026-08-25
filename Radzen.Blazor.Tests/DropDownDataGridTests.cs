@@ -268,6 +268,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDownDataGrid_Multiple_DoesNotDuplicateItemsForRepeatedBoundValues()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Company1" },
+                new Customer { Id = 2, CompanyName = "Company2" },
+                new Customer { Id = 3, CompanyName = "Company3" }
+            };
+            // A value repeated in the bound collection must map to its item exactly once.
+            var selectedItems = new List<int> { 1, 1, 2 };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, selectedItems);
+            });
+
+            var wrapper = component.Find(".rz-dropdown-chips-wrapper");
+            Assert.Equal("Company1,Company2", wrapper.GetAttribute("title"));
+        }
+
+        [Fact]
         public void DropDownDataGrid_Renders_Multiple_WithLabel_SelectedItemsTitle()
         {
             using var ctx = new TestContext();

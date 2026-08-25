@@ -928,16 +928,24 @@ namespace Radzen.Blazor
                         var valueList = values.Cast<object>().ToList();
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in valueList)
+                            if (typeof(EnumerableQuery).IsAssignableFrom(Query.GetType()))
                             {
-                                var item = Query.Where(new FilterDescriptor[]
-                                    {
-                                        new FilterDescriptor() { Property = ValueProperty, FilterValue = v }
-                                    }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
-
-                                if (item != null && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
+                                AddSelectedItemsByValue(Query, valueList);
+                            }
+                            else
+                            {
+                                // Non-in-memory (e.g. EF): keep the per-value query so the lookup stays server-side.
+                                foreach (object v in valueList)
                                 {
-                                    selectedItems.Add(item);
+                                    var item = Query.Where(new FilterDescriptor[]
+                                        {
+                                            new FilterDescriptor() { Property = ValueProperty, FilterValue = v }
+                                        }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
+
+                                    if (item != null && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
+                                    {
+                                        selectedItems.Add(item);
+                                    }
                                 }
                             }
                         }

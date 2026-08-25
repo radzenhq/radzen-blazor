@@ -188,6 +188,125 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_Multiple_SelectsItemsMatchingBoundValueByValueProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<int> { 2 });
+            });
+
+            var selected = component.FindAll(".rz-state-highlight");
+            Assert.Equal(1, selected.Count);
+            Assert.Equal("Item 2", selected[0].TextContent.Trim());
+        }
+
+        [Fact]
+        public void DropDown_Multiple_DoesNotDuplicateItemsForRepeatedBoundValues()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // A value repeated in the bound collection must still select its item exactly once.
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<int> { 1, 1, 2 });
+            });
+
+            var selected = component.FindAll(".rz-state-highlight");
+            Assert.Equal(2, selected.Count);
+            var texts = selected.Select(s => s.TextContent.Trim()).OrderBy(t => t).ToList();
+            Assert.Equal(new[] { "Item 1", "Item 2" }, texts);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_InPlaceValueMutation_UpdatesSelectionOnReRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // Same collection reference kept throughout, as external code doing value.Add(..);
+            // StateHasChanged() would. The selected-values lookup must not go stale.
+            var value = new List<int> { 2 };
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, value);
+            });
+
+            Assert.Equal(1, component.FindAll(".rz-state-highlight").Count);
+
+            value.Add(1);
+            component.Render();
+
+            var selected = component.FindAll(".rz-state-highlight");
+            Assert.Equal(2, selected.Count);
+            Assert.Equal(new[] { "Item 1", "Item 2" }, selected.Select(s => s.TextContent.Trim()).OrderBy(t => t).ToArray());
+        }
+
+        [Fact]
+        public void DropDown_Multiple_InPlaceElementReplacement_UpdatesSelectionOnReRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // Same reference and same count: replace element [2] with [1]. A membership set keyed only on the
+            // reference (and count) would stay stale; it must be rebuilt so the highlight moves to Item 1.
+            var value = new List<int> { 2 };
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, value);
+            });
+
+            Assert.Equal(new[] { "Item 2" },
+                component.FindAll(".rz-state-highlight").Select(s => s.TextContent.Trim()).ToArray());
+
+            value[0] = 1;
+            component.Render();
+
+            Assert.Equal(new[] { "Item 1" },
+                component.FindAll(".rz-state-highlight").Select(s => s.TextContent.Trim()).ToArray());
+        }
+
+        [Fact]
+        public void DropDown_ItemText_UpdatesWhenItemMutatedInPlace()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // ShouldRender must compare the resolved text, not the Item reference: mutating an item's
+            // TextProperty value in place (same reference) then re-rendering must update the displayed text.
+            var data = new List<DataItem>
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            Assert.Contains("Item 1", component.Markup);
+
+            data[0].Text = "Renamed";
+            component.Render();
+
+            Assert.Contains("Renamed", component.Markup);
+            Assert.DoesNotContain("Item 1", component.Markup);
+        }
+
+        [Fact]
         public void DropDown_AppliesSelectionStyleWhenMultipleSelectionIsEnabled()
         {
             using var ctx = new TestContext();
