@@ -848,6 +848,14 @@ namespace Radzen.Blazor
             }
         }
 
+        // Memo for the row-independent data-cell style; _dataCellStyle != null is the validity flag.
+        string? _dataCellStyle;
+        string? _dataCellStyleWidth;
+        TextAlign _dataCellStyleAlign;
+        string? _dataCellStyleMin;
+        string? _dataCellStyleMax;
+        bool _dataCellStyleColGroup;
+
         /// <summary>
         /// Gets the cell style.
         /// </summary>
@@ -857,44 +865,91 @@ namespace Radzen.Blazor
         /// <returns>System.String.</returns>
         public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false, bool isForCol = false)
         {
-            var style = new List<string>();
-
+#pragma warning disable CA1508 // Lazy init: the first '??=' is intentionally reached with a null list.
             var width = GetWidthOrGridSetting()?.Trim();
 
-            var hasColGroup = Grid.allColumns.All(c => c.Parent == null);
-
-            if (!string.IsNullOrEmpty(width) && (isForCol || !hasColGroup))
+            // Fast path: a plain data cell of a non-frozen column has a row-independent style, so it is memoized.
+            var isDataCell = forCell && !isHeaderOrFooterCell && !isForCol && !IsFrozen();
+            var colGroup = false;
+            if (isDataCell)
             {
-                style.Add($"width:{width}");
+                colGroup = !string.IsNullOrEmpty(width) && !GridHasNoColumnGroups();
+                if (_dataCellStyle != null
+                    && _dataCellStyleWidth == width && _dataCellStyleAlign == TextAlign
+                    && _dataCellStyleMin == MinWidth && _dataCellStyleMax == MaxWidth
+                    && _dataCellStyleColGroup == colGroup)
+                {
+                    return _dataCellStyle;
+                }
+            }
+
+            // Most data cells contribute no style, so allocate the list lazily.
+            List<string>? style = null;
+
+            // Include the width unless the grid uses column groups (which carry it themselves).
+            var includeWidth = isDataCell
+                ? colGroup
+                : !string.IsNullOrEmpty(width) && (isForCol || !GridHasNoColumnGroups());
+            if (includeWidth)
+            {
+                (style ??= new List<string>()).Add($"width:{width}");
             }
 
             if (forCell && TextAlign != TextAlign.Left)
             {
                 var enumName = Enum.GetName<TextAlign>(TextAlign);
-                style.Add($"text-align:{(enumName ?? TextAlign.ToString()).ToLower(CultureInfo.InvariantCulture)};");
+                (style ??= new List<string>()).Add($"text-align:{(enumName ?? TextAlign.ToString()).ToLower(CultureInfo.InvariantCulture)};");
             }
 
             if (forCell && IsFrozen())
             {
-                style.Add(GetStackedStyleForFrozen());
+                (style ??= new List<string>()).Add(GetStackedStyleForFrozen());
             }
 
             if (!isHeaderOrFooterCell && IsFrozen() || (isHeaderOrFooterCell && Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).Any()))
             {
-                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
+                (style ??= new List<string>()).Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
             }
 
             if (!string.IsNullOrEmpty(MinWidth))
             {
-                style.Add($"min-width:{MinWidth}");
+                (style ??= new List<string>()).Add($"min-width:{MinWidth}");
             }
 
             if (!string.IsNullOrEmpty(MaxWidth))
             {
-                style.Add($"max-width:{MaxWidth}");
+                (style ??= new List<string>()).Add($"max-width:{MaxWidth}");
             }
 
-            return string.Join(";", style);
+            var result = style == null ? string.Empty : string.Join(";", style);
+
+            if (isDataCell)
+            {
+                _dataCellStyleWidth = width;
+                _dataCellStyleAlign = TextAlign;
+                _dataCellStyleMin = MinWidth;
+                _dataCellStyleMax = MaxWidth;
+                _dataCellStyleColGroup = colGroup;
+                _dataCellStyle = result;
+            }
+
+            return result;
+#pragma warning restore CA1508
+        }
+
+        // Allocation-free equivalent of Grid.allColumns.All(c => c.Parent == null), called for every cell.
+        private bool GridHasNoColumnGroups()
+        {
+            var columns = Grid.allColumns;
+            for (int i = 0; i < columns.Count; i++)
+            {
+                if (columns[i].Parent != null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private string GetStackedStyleForFrozen()
@@ -1377,14 +1432,24 @@ namespace Radzen.Blazor
             return collectionFilterMode ?? CollectionFilterMode;
         }
 
+        WhiteSpace _cellClassWhiteSpace;
+        string? _cellClass;
+
         /// <summary>
         /// Get body column class.
         /// </summary>
         /// <returns></returns>
         internal string GetCellClass()
         {
-            var enumName = Enum.GetName<WhiteSpace>(WhiteSpace);
-            return $"rz-cell-data rz-text-{(enumName ?? WhiteSpace.ToString()).ToLower(CultureInfo.InvariantCulture)}";
+            // Constant per column; recompute only when WhiteSpace changes rather than per data cell.
+            if (_cellClass == null || _cellClassWhiteSpace != WhiteSpace)
+            {
+                _cellClassWhiteSpace = WhiteSpace;
+                var enumName = Enum.GetName<WhiteSpace>(WhiteSpace);
+                _cellClass = $"rz-cell-data rz-text-{(enumName ?? WhiteSpace.ToString()).ToLower(CultureInfo.InvariantCulture)}";
+            }
+
+            return _cellClass;
         }
 
         /// <summary>
