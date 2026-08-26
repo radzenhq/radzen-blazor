@@ -644,20 +644,20 @@
                 SetAttribute(cellAttributes, "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
             }
 
-            IReadOnlyDictionary<string, object> CellAttributes = new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(cellAttributes);
-
-            var spanAttributes = new Dictionary<string, object>();
             var title = column.Template == null && this.ShowCellDataAsTooltip || column.ShowCellDataAsTooltip ? $"{column.GetValue(Item)}" : "";
+            IReadOnlyDictionary<string, object> spanAttributes = EmptyAttributes;
             if(!string.IsNullOrEmpty(title))
             {
-                SetAttribute(spanAttributes, "title", title);
+                var titleAttrs = new Dictionary<string, object>();
+                SetAttribute(titleAttrs, "title", title);
+                spanAttributes = titleAttrs;
             }
 
             return __builder => {
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td role="gridcell" @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
+                <td role="gridcell" @attributes="@cellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">
@@ -781,24 +781,27 @@
 
     string? GetCellCssClass(RadzenDataGridColumn<TItem> column, TItem item, IReadOnlyDictionary<string, object> Attributes)
     {
-        List<string> classes = [
-            column.CalculatedCssClass?.Invoke(column, item) ?? string.Empty,
+        var calculated = column.CalculatedCssClass?.Invoke(column, item);
+        string? attributeClass = null;
+        if (Attributes?.TryGetValue("class", out var ac) is true)
+        {
+            attributeClass = Convert.ToString(ac);
+        }
+
+        if (string.IsNullOrEmpty(calculated) && string.IsNullOrWhiteSpace(attributeClass))
+        {
+            return column.GetCachedCellCssClass(getFrozenColumnClass(column), getCompositeCellCSSClass(column));
+        }
+
+        var result = string.Join(" ", new[]
+        {
+            calculated ?? string.Empty,
             column.CssClass,
             getFrozenColumnClass(column),
             getCompositeCellCSSClass(column),
-        ];
-        
-        if (Attributes?.TryGetValue("class", out var attributeClass) is true)
-        {
-            var classValue = Convert.ToString(attributeClass);
-            if (classValue != null)
-            {
-                classes.Add(classValue);
-            }
-        }
-
-        var result = string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)));
-        return !String.IsNullOrWhiteSpace(result) ? result : null;
+            attributeClass ?? string.Empty,
+        }.Where(c => !string.IsNullOrWhiteSpace(c)));
+        return !string.IsNullOrWhiteSpace(result) ? result : null;
     }
 
     async Task OnContextMenu(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)

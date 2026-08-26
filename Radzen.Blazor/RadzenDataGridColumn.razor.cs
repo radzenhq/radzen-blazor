@@ -856,6 +856,28 @@ namespace Radzen.Blazor
         string? _dataCellStyleMax;
         bool _dataCellStyleColGroup;
 
+        // Memo for the row-independent cell class; _cellCssClass != null is the validity flag.
+        string? _cellCssClass;
+        string? _cellCssClassCss;
+        string? _cellCssClassFrozen;
+        string? _cellCssClassComposite;
+
+        internal string? GetCachedCellCssClass(string frozen, string composite)
+        {
+            if (_cellCssClass is not null && _cellCssClassCss == CssClass
+                && _cellCssClassFrozen == frozen && _cellCssClassComposite == composite)
+            {
+                return _cellCssClass.Length == 0 ? null : _cellCssClass;
+            }
+
+            var joined = string.Join(" ", new[] { CssClass, frozen, composite }.Where(c => !string.IsNullOrWhiteSpace(c)));
+            _cellCssClassCss = CssClass;
+            _cellCssClassFrozen = frozen;
+            _cellCssClassComposite = composite;
+            _cellCssClass = joined;
+            return joined.Length == 0 ? null : joined;
+        }
+
         /// <summary>
         /// Gets the cell style.
         /// </summary>
