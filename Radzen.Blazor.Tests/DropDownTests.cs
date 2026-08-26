@@ -278,6 +278,35 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_Multiple_InPlaceDataMutation_ResolvesSelectedLabelOnReRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // Bind value 3, whose item is not in Data yet, then add the matching item to the SAME Data
+            // list (same reference) and re-render. Resolving the bound value must see the new item so its
+            // label shows - a value->item lookup keyed only on the Data reference would stay stale and blank.
+            var data = new List<DataItem>
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<int> { 3 });
+            });
+
+            data.Add(new DataItem { Text = "Item 3", Id = 3 });
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Data, data));
+
+            Assert.Contains(component.FindAll(".rz-dropdown-label"), l => l.TextContent.Contains("Item 3"));
+        }
+
+        [Fact]
         public void DropDown_ItemText_UpdatesWhenItemMutatedInPlace()
         {
             using var ctx = new TestContext();
