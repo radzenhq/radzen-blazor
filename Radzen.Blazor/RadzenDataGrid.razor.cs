@@ -2933,6 +2933,28 @@ namespace Radzen.Blazor
             return (level + 1).ToString(CultureInfo.InvariantCulture);
         }
 
+        private static bool IsChainableClickHandler(object value) => value is
+            EventCallback<MouseEventArgs> or EventCallback or Func<MouseEventArgs, Task> or Func<Task> or Action<MouseEventArgs> or Action;
+
+        // Runs the built-in row click (and selection) first, then a consumer-supplied onclick from RowRender,
+        // so a consumer onclick that reads selection state observes it after the click.
+        private EventCallback<MouseEventArgs> CombineRowClick(object existing, TItem item)
+        {
+            return EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+            {
+                await OnRowClickHandler(item, e);
+                switch (existing)
+                {
+                    case EventCallback<MouseEventArgs> ec: await ec.InvokeAsync(e); break;
+                    case EventCallback ec: await ec.InvokeAsync(e); break;
+                    case Func<MouseEventArgs, Task> f: await f(e); break;
+                    case Func<Task> f: await f(); break;
+                    case Action<MouseEventArgs> a: a(e); break;
+                    case Action a: a(); break;
+                }
+            });
+        }
+
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
         {
             var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Index = index, Expandable = Template != null || LoadChildData.HasDelegate };
@@ -2942,9 +2964,23 @@ namespace Radzen.Blazor
                 RowRender(args);
             }
 
-            var attributes = args.HasAttributes
-                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
-                : EmptyAttributes;
+            IReadOnlyDictionary<string, object> attributes;
+            if (RowClickActive)
+            {
+                var dict = args.HasAttributes ? new Dictionary<string, object>(args.Attributes) : new Dictionary<string, object>();
+                // A chainable consumer onclick runs after the built-in row click; anything else (e.g. a string
+                // HTML handler) is kept as-is rather than wrapped and dropped.
+                dict["onclick"] = dict.TryGetValue("onclick", out var existing) && existing != null
+                    ? IsChainableClickHandler(existing) ? CombineRowClick(existing, item) : existing
+                    : EventCallback.Factory.Create<MouseEventArgs>(this, e => OnRowClickHandler(item, e));
+                attributes = dict;
+            }
+            else
+            {
+                attributes = args.HasAttributes
+                    ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
+                    : EmptyAttributes;
+            }
 
             return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, attributes);
         }
