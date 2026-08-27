@@ -162,10 +162,10 @@ internal static class MarkdownFormatter
 
     static MarkdownEdit HorizontalRule(string text, int start, int end)
     {
-        var before = AtLineStart(text, start) ? string.Empty : "\n";
+        var before = AtLineStart(text, end) ? string.Empty : "\n";
         var after = AtLineEnd(text, end) && end < text.Length ? string.Empty : "\n";
         var replacement = before + "---" + after;
-        return new MarkdownEdit(start, end, replacement, start + replacement.Length, start + replacement.Length);
+        return new MarkdownEdit(end, end, replacement, end + replacement.Length, end + replacement.Length);
     }
 
     static MarkdownEdit Link(string text, int start, int end, string? url, string? label, string open)

@@ -79,6 +79,15 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Wrap_EmptyCaretBetweenTokens_Unwraps()
+        {
+            // "****" with the caret between the two pairs of tokens (2..2) unwraps rather than re-wrapping
+            var edit = MarkdownFormatter.Apply("****", 2, 2, MarkdownEditorCommands.Bold);
+
+            Assert.Equal(new MarkdownEdit(0, 4, "", 0, 0), edit);
+        }
+
+        [Fact]
         public void Wrap_DoesNotUnwrapDifferentToken()
         {
             // italic applied to "**hi**" selected → wrap, not unwrap
@@ -227,6 +236,14 @@ namespace Radzen.Blazor.Tests
             var edit = MarkdownFormatter.Apply("a\nb", 1, 1, MarkdownEditorCommands.HorizontalRule);
 
             Assert.Equal(new MarkdownEdit(1, 1, "\n---", 5, 5), edit);
+        }
+
+        [Fact]
+        public void HorizontalRule_WithSelection_InsertsAfterSelectionWithoutReplacing()
+        {
+            var edit = MarkdownFormatter.Apply("ab cd", 0, 2, MarkdownEditorCommands.HorizontalRule);
+
+            Assert.Equal(new MarkdownEdit(2, 2, "\n---\n", 7, 7), edit);
         }
 
         [Theory]
