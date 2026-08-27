@@ -7139,7 +7139,7 @@ Radzen.markdownEditorApply = function (textarea, start, end, replacement, select
     if (document.execCommand) {
       if (replacement.length > 0) {
         document.execCommand('insertText', false, replacement);
-      } else {
+      } else if (start !== end) {
         document.execCommand('delete', false);
       }
     }
@@ -7157,6 +7157,10 @@ Radzen.markdownEditorApply = function (textarea, start, end, replacement, select
 };
 
 Radzen.createMarkdownEditor = function (textarea, instance, shortcuts) {
+  if (!textarea) {
+    return { dispose: function () {} };
+  }
+
   shortcuts = shortcuts || [];
 
   var listener = function (e) {
@@ -7175,7 +7179,7 @@ Radzen.createMarkdownEditor = function (textarea, instance, shortcuts) {
 
     if (shortcuts.includes(key)) {
       e.preventDefault();
-      instance.invokeMethodAsync('ExecuteShortcutAsync', key);
+      try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
     }
   };
 
