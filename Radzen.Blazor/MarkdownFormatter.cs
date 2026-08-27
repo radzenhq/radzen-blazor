@@ -55,6 +55,14 @@ internal static class MarkdownFormatter
                 return PrefixLines(text, start, end, "- [ ] ");
             case MarkdownEditorCommands.OrderedList:
                 return OrderedList(text, start, end);
+            case MarkdownEditorCommands.CodeBlock:
+                return CodeBlock(text, start, end);
+            case MarkdownEditorCommands.HorizontalRule:
+                return HorizontalRule(text, start, end);
+            case MarkdownEditorCommands.Link:
+                return Link(text, start, end, value, label, "[");
+            case MarkdownEditorCommands.Image:
+                return Link(text, start, end, value, label, "![");
             default:
                 return null;
         }
@@ -135,5 +143,42 @@ internal static class MarkdownFormatter
             var prefix = next == 0 ? string.Empty : new string('#', next) + " ";
             return lines.Select(l => prefix + HeadingPrefix.Replace(l, string.Empty, 1)).ToArray();
         });
+    }
+
+    static bool AtLineStart(string text, int index) => index == 0 || text[index - 1] == '\n';
+    static bool AtLineEnd(string text, int index) => index == text.Length || text[index] == '\n';
+
+    static MarkdownEdit CodeBlock(string text, int start, int end)
+    {
+        var selected = text.Substring(start, end - start);
+        var before = AtLineStart(text, start) ? string.Empty : "\n";
+        var after = AtLineEnd(text, end) ? string.Empty : "\n";
+        var innerNewline = selected.EndsWith('\n') ? string.Empty : "\n";
+
+        var replacement = before + "```\n" + selected + innerNewline + "```" + after;
+        var innerStart = start + before.Length + 4;
+        return new MarkdownEdit(start, end, replacement, innerStart, innerStart + selected.Length);
+    }
+
+    static MarkdownEdit HorizontalRule(string text, int start, int end)
+    {
+        var before = AtLineStart(text, start) ? string.Empty : "\n";
+        var after = AtLineEnd(text, end) && end < text.Length ? string.Empty : "\n";
+        var replacement = before + "---" + after;
+        return new MarkdownEdit(start, end, replacement, start + replacement.Length, start + replacement.Length);
+    }
+
+    static MarkdownEdit Link(string text, int start, int end, string? url, string? label, string open)
+    {
+        var selected = text.Substring(start, end - start);
+        var linkText = selected.Length > 0 ? selected : label ?? string.Empty;
+        var replacement = open + linkText + "](" + (url ?? string.Empty) + ")";
+
+        if (linkText.Length == 0)
+        {
+            return new MarkdownEdit(start, end, replacement, start + open.Length, start + open.Length);
+        }
+
+        return new MarkdownEdit(start, end, replacement, start + replacement.Length, start + replacement.Length);
     }
 }
