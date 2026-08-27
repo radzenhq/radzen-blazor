@@ -7128,23 +7128,28 @@ Radzen.markdownEditorApply = function (textarea, start, end, replacement, select
     return;
   }
 
+  var before = textarea.value;
+  var expected = before.substring(0, start) + replacement + before.substring(end);
+
   textarea.focus();
   textarea.setSelectionRange(start, end);
 
-  var applied = false;
   try {
     // execCommand keeps the browser's native undo stack intact.
     if (document.execCommand) {
-      applied = replacement.length > 0
-        ? document.execCommand('insertText', false, replacement)
-        : document.execCommand('delete', false);
+      if (replacement.length > 0) {
+        document.execCommand('insertText', false, replacement);
+      } else {
+        document.execCommand('delete', false);
+      }
     }
   } catch (e) {
-    applied = false;
+    // fall through to the verification below
   }
 
-  if (!applied || textarea.value.substring(start, start + replacement.length) !== replacement) {
-    textarea.setRangeText(replacement, start, end, 'end');
+  if (textarea.value !== expected) {
+    // execCommand unsupported or applied incorrectly: set the exact result (native undo is lost only on this path).
+    textarea.value = expected;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
