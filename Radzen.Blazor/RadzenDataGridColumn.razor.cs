@@ -239,16 +239,8 @@ namespace Radzen.Blazor
             {
                 _filterPropertyType = Type;
             }
-            else if (!string.IsNullOrEmpty(Property))
-            {
-                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-            }
 
-            if (!string.IsNullOrEmpty(Property) && (typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition()) ||
-                typeof(IDictionary).IsAssignableFrom(typeof(TItem)) || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem))))
-            {
-                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-            }
+            EnsurePropertyValueGetter();
 
             if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
             {
@@ -773,6 +765,44 @@ namespace Radzen.Blazor
         public IFormatProvider? FormatProvider { get; set; }
 
         Func<TItem, object>? propertyValueGetter;
+        string? propertyValueGetterProperty;
+
+        string? sortValueGetterProperty;
+        Func<TItem, object>? sortValueGetter;
+
+        // Rebuilds the cached value getter when the bound Property changes, so a reused column instance whose
+        // Property parameter is reassigned does not keep rendering the old property.
+        private void EnsurePropertyValueGetter()
+        {
+            if (propertyValueGetterProperty == Property)
+            {
+                return;
+            }
+
+            propertyValueGetterProperty = Property;
+
+            if (string.IsNullOrEmpty(Property))
+            {
+                propertyValueGetter = null;
+                return;
+            }
+
+            try
+            {
+                var indexed = typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition())
+                    || typeof(IDictionary).IsAssignableFrom(typeof(TItem))
+                    || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem));
+
+                // Dictionary / DataRow items resolve through an indexer, so they keep the standard getter.
+                propertyValueGetter = indexed
+                    ? PropertyAccess.Getter<TItem, object>(Property)
+                    : PropertyAccess.NullSafeGetter<TItem>(Property);
+            }
+            catch
+            {
+                propertyValueGetter = null;
+            }
+        }
 
         /// <summary>
         /// Gets the value for specified item.
@@ -781,7 +811,12 @@ namespace Radzen.Blazor
         /// <returns>System.Object.</returns>
         public virtual object? GetValue(TItem item)
         {
-            var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.', StringComparison.Ordinal) ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+            EnsurePropertyValueGetter();
+
+            // Use the cached compiled getter when one was built; reflection remains the fallback only for
+            // columns whose property could not be compiled (e.g. late-bound dynamic items).
+            var value = propertyValueGetter != null ? propertyValueGetter(item)
+                : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
 
 
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || PropertyAccess.IsNullableEnum(FilterPropertyType) ||
@@ -813,6 +848,36 @@ namespace Radzen.Blazor
             }
         }
 
+        // Memo for the row-independent data-cell style; _dataCellStyle != null is the validity flag.
+        string? _dataCellStyle;
+        string? _dataCellStyleWidth;
+        TextAlign _dataCellStyleAlign;
+        string? _dataCellStyleMin;
+        string? _dataCellStyleMax;
+        bool _dataCellStyleColGroup;
+
+        // Memo for the row-independent cell class; _cellCssClass != null is the validity flag.
+        string? _cellCssClass;
+        string? _cellCssClassCss;
+        string? _cellCssClassFrozen;
+        string? _cellCssClassComposite;
+
+        internal string? GetCachedCellCssClass(string frozen, string composite)
+        {
+            if (_cellCssClass is not null && _cellCssClassCss == CssClass
+                && _cellCssClassFrozen == frozen && _cellCssClassComposite == composite)
+            {
+                return _cellCssClass.Length == 0 ? null : _cellCssClass;
+            }
+
+            var joined = string.Join(" ", new[] { CssClass, frozen, composite }.Where(c => !string.IsNullOrWhiteSpace(c)));
+            _cellCssClassCss = CssClass;
+            _cellCssClassFrozen = frozen;
+            _cellCssClassComposite = composite;
+            _cellCssClass = joined;
+            return joined.Length == 0 ? null : joined;
+        }
+
         /// <summary>
         /// Gets the cell style.
         /// </summary>
@@ -822,44 +887,91 @@ namespace Radzen.Blazor
         /// <returns>System.String.</returns>
         public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false, bool isForCol = false)
         {
-            var style = new List<string>();
-
+#pragma warning disable CA1508 // Lazy init: the first '??=' is intentionally reached with a null list.
             var width = GetWidthOrGridSetting()?.Trim();
 
-            var hasColGroup = Grid.allColumns.All(c => c.Parent == null);
-
-            if (!string.IsNullOrEmpty(width) && (isForCol || !hasColGroup))
+            // Fast path: a plain data cell of a non-frozen column has a row-independent style, so it is memoized.
+            var isDataCell = forCell && !isHeaderOrFooterCell && !isForCol && !IsFrozen();
+            var colGroup = false;
+            if (isDataCell)
             {
-                style.Add($"width:{width}");
+                colGroup = !string.IsNullOrEmpty(width) && !GridHasNoColumnGroups();
+                if (_dataCellStyle != null
+                    && _dataCellStyleWidth == width && _dataCellStyleAlign == TextAlign
+                    && _dataCellStyleMin == MinWidth && _dataCellStyleMax == MaxWidth
+                    && _dataCellStyleColGroup == colGroup)
+                {
+                    return _dataCellStyle;
+                }
+            }
+
+            // Most data cells contribute no style, so allocate the list lazily.
+            List<string>? style = null;
+
+            // Include the width unless the grid uses column groups (which carry it themselves).
+            var includeWidth = isDataCell
+                ? colGroup
+                : !string.IsNullOrEmpty(width) && (isForCol || !GridHasNoColumnGroups());
+            if (includeWidth)
+            {
+                (style ??= new List<string>()).Add($"width:{width}");
             }
 
             if (forCell && TextAlign != TextAlign.Left)
             {
                 var enumName = Enum.GetName<TextAlign>(TextAlign);
-                style.Add($"text-align:{(enumName ?? TextAlign.ToString()).ToLower(CultureInfo.InvariantCulture)};");
+                (style ??= new List<string>()).Add($"text-align:{(enumName ?? TextAlign.ToString()).ToLower(CultureInfo.InvariantCulture)};");
             }
 
             if (forCell && IsFrozen())
             {
-                style.Add(GetStackedStyleForFrozen());
+                (style ??= new List<string>()).Add(GetStackedStyleForFrozen());
             }
 
             if (!isHeaderOrFooterCell && IsFrozen() || (isHeaderOrFooterCell && Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).Any()))
             {
-                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
+                (style ??= new List<string>()).Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
             }
 
             if (!string.IsNullOrEmpty(MinWidth))
             {
-                style.Add($"min-width:{MinWidth}");
+                (style ??= new List<string>()).Add($"min-width:{MinWidth}");
             }
 
             if (!string.IsNullOrEmpty(MaxWidth))
             {
-                style.Add($"max-width:{MaxWidth}");
+                (style ??= new List<string>()).Add($"max-width:{MaxWidth}");
             }
 
-            return string.Join(";", style);
+            var result = style == null ? string.Empty : string.Join(";", style);
+
+            if (isDataCell)
+            {
+                _dataCellStyleWidth = width;
+                _dataCellStyleAlign = TextAlign;
+                _dataCellStyleMin = MinWidth;
+                _dataCellStyleMax = MaxWidth;
+                _dataCellStyleColGroup = colGroup;
+                _dataCellStyle = result;
+            }
+
+            return result;
+#pragma warning restore CA1508
+        }
+
+        // Allocation-free equivalent of Grid.allColumns.All(c => c.Parent == null), called for every cell.
+        private bool GridHasNoColumnGroups()
+        {
+            var columns = Grid.allColumns;
+            for (int i = 0; i < columns.Count; i++)
+            {
+                if (columns[i].Parent != null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private string GetStackedStyleForFrozen()
@@ -941,8 +1053,38 @@ namespace Radzen.Blazor
         /// </summary>
         internal object? GetSortValue(TItem item)
         {
+            EnsurePropertyValueGetter();
+
             var sortProperty = GetSortProperty();
-            return string.IsNullOrEmpty(sortProperty) ? null : PropertyAccess.GetValue(item, sortProperty);
+            if (string.IsNullOrEmpty(sortProperty))
+            {
+                return null;
+            }
+
+            if (sortProperty != sortValueGetterProperty)
+            {
+                sortValueGetterProperty = sortProperty;
+
+                if (sortProperty == Property && propertyValueGetter != null)
+                {
+                    sortValueGetter = propertyValueGetter;
+                }
+                else
+                {
+                    // A compiled getter avoids per-row reflection while sorting; items that cannot be compiled
+                    // (late-bound dynamic) fall back to reflection below.
+                    try
+                    {
+                        sortValueGetter = PropertyAccess.NullSafeGetter<TItem>(sortProperty);
+                    }
+                    catch
+                    {
+                        sortValueGetter = null;
+                    }
+                }
+            }
+
+            return sortValueGetter != null ? sortValueGetter(item) : PropertyAccess.GetValue(item, sortProperty);
         }
 
         internal void SetSortOrder(SortOrder? order)
@@ -1312,14 +1454,24 @@ namespace Radzen.Blazor
             return collectionFilterMode ?? CollectionFilterMode;
         }
 
+        WhiteSpace _cellClassWhiteSpace;
+        string? _cellClass;
+
         /// <summary>
         /// Get body column class.
         /// </summary>
         /// <returns></returns>
         internal string GetCellClass()
         {
-            var enumName = Enum.GetName<WhiteSpace>(WhiteSpace);
-            return $"rz-cell-data rz-text-{(enumName ?? WhiteSpace.ToString()).ToLower(CultureInfo.InvariantCulture)}";
+            // Constant per column; recompute only when WhiteSpace changes rather than per data cell.
+            if (_cellClass == null || _cellClassWhiteSpace != WhiteSpace)
+            {
+                _cellClassWhiteSpace = WhiteSpace;
+                var enumName = Enum.GetName<WhiteSpace>(WhiteSpace);
+                _cellClass = $"rz-cell-data rz-text-{(enumName ?? WhiteSpace.ToString()).ToLower(CultureInfo.InvariantCulture)}";
+            }
+
+            return _cellClass;
         }
 
         /// <summary>
@@ -1626,16 +1778,34 @@ namespace Radzen.Blazor
             return !string.IsNullOrWhiteSpace(internalWidth) ? internalWidth : Grid?.ColumnWidth;
         }
 
+        IEnumerable<FilterOperator>? _filterOperatorsCache;
+        Type? _filterOperatorsTypeKey;
+
         /// <summary>
         /// Get possible column filter operators.
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
+            // Caller-provided operators are returned live, so in-place changes to the bound collection are honored.
             if (FilterOperators != null)
             {
                 return FilterOperators;
             }
 
+            // The computed/default set depends only on FilterPropertyType but is a lazy LINQ query re-run on
+            // each enumeration, so materialize it once and reuse until the type changes.
+            if (_filterOperatorsCache != null && _filterOperatorsTypeKey == FilterPropertyType)
+            {
+                return _filterOperatorsCache;
+            }
+
+            _filterOperatorsTypeKey = FilterPropertyType;
+            _filterOperatorsCache = ComputeFilterOperators().ToArray();
+            return _filterOperatorsCache;
+        }
+
+        private IEnumerable<FilterOperator> ComputeFilterOperators()
+        {
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || FilterPropertyType == typeof(bool)))
             {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };

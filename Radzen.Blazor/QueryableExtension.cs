@@ -572,9 +572,13 @@ namespace Radzen
             var parameter = Expression.Parameter(typeof(T), "x");
             Expression? combinedExpression = null;
 
+            // Only an in-memory (LINQ-to-Objects) source can use OrdinalIgnoreCase string comparisons;
+            // a provider such as EF Core can't translate them and needs the ToLower path.
+            var inMemory = source is System.Linq.EnumerableQuery;
+
             foreach (var filter in filterList)
             {
-                var expression = GetExpression<T>(parameter, filter, filterCaseSensitivity, filter.Type ?? typeof(object));
+                var expression = GetExpression<T>(parameter, filter, filterCaseSensitivity, filter.Type ?? typeof(object), inMemory);
                 if (expression == null)
                 {
                     continue;
@@ -770,7 +774,7 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
-        internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
+        internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type, bool useOrdinalIgnoreCaseStrings = false)
         {
             Type? valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
             var isEnumerable = valueType != null && IsEnumerable(valueType) && valueType != typeof(string);
@@ -799,9 +803,14 @@ namespace Radzen
             var isEnum = !isEnumerable && (PropertyAccess.IsEnum(property.Type) || PropertyAccess.IsNullableEnum(property.Type));
             var caseInsensitive = property.Type == typeof(string) && !isEnumerable && filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
 
+            // EF can't translate the StringComparison overloads, so only an in-memory source uses them.
+            var useOrdinal = caseInsensitive && useOrdinalIgnoreCaseStrings;
+
             var isEnumerableProperty = IsEnumerable(property.Type) && property.Type != typeof(string);
 
-            var constantValue = caseInsensitive
+            var constantValue = useOrdinal
+                ? $"{filter.FilterValue}"
+                : caseInsensitive
                 ? $"{filter.FilterValue}".ToLowerInvariant()
                 : isEnum && !isEnumerable && filter.FilterValue != null
                     ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue)
@@ -830,7 +839,7 @@ namespace Radzen
 
             var rawProperty = property;
 
-            if (caseInsensitive && !isEnumerable)
+            if (caseInsensitive && !isEnumerable && !useOrdinal)
             {
                 property = Expression.Call(notNullCheck(property), typeof(string).GetMethod("ToLower", Type.EmptyTypes)!);
             }
@@ -838,7 +847,9 @@ namespace Radzen
             Expression? secondConstant = null;
             if (filter.SecondFilterValue != null)
             {
-                var secondValue = caseInsensitive
+                var secondValue = useOrdinal
+                    ? $"{filter.SecondFilterValue}"
+                    : caseInsensitive
                     ? $"{filter.SecondFilterValue}".ToLowerInvariant()
                     : isEnum
                         ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.SecondFilterValue)
@@ -860,6 +871,22 @@ namespace Radzen
                 }
 
                 secondConstant = Expression.Constant(secondValue, secondConstantType);
+            }
+
+            Expression? OrdinalStringOp(FilterOperator op, Expression value)
+            {
+                var ordinal = Expression.Constant(StringComparison.OrdinalIgnoreCase);
+                var target = notNullCheck(property);
+                return op switch
+                {
+                    FilterOperator.Equals => Expression.Call(target, typeof(string).GetMethod("Equals", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal),
+                    FilterOperator.NotEquals => Expression.Not(Expression.Call(target, typeof(string).GetMethod("Equals", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal)),
+                    FilterOperator.Contains => Expression.Call(target, typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal),
+                    FilterOperator.DoesNotContain => Expression.Not(Expression.Call(target, typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal)),
+                    FilterOperator.StartsWith => Expression.Call(target, typeof(string).GetMethod("StartsWith", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal),
+                    FilterOperator.EndsWith => Expression.Call(target, typeof(string).GetMethod("EndsWith", new[] { typeof(string), typeof(StringComparison) })!, value, ordinal),
+                    _ => null
+                };
             }
 
             Expression? primaryExpression = filter.FilterOperator switch
@@ -898,6 +925,11 @@ namespace Radzen
                 FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                 _ => null
             };
+
+            if (useOrdinal && OrdinalStringOp(filter.FilterOperator, constant) is { } ordinalPrimary)
+            {
+                primaryExpression = ordinalPrimary;
+            }
 
         if (collectionItemType != null && primaryExpression != null &&
             !(filter.FilterOperator == FilterOperator.In || filter.FilterOperator == FilterOperator.NotIn))
@@ -945,6 +977,11 @@ namespace Radzen
                     FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                     _ => null
                 };
+
+                if (useOrdinal && secondConstant != null && OrdinalStringOp(filter.SecondFilterOperator, secondConstant) is { } ordinalSecond)
+                {
+                    secondExpression = ordinalSecond;
+                }
             }
 
         if (collectionItemType != null && secondExpression != null &&

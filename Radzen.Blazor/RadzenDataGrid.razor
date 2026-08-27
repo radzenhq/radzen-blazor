@@ -195,7 +195,7 @@
                                 var columnIndex = visibleColumns.IndexOf(column);
                                 var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
-                                <RadzenDataGridHeaderCell @key=column RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
+                                <RadzenDataGridHeaderCell @key=column RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
                         </tr>
                     }
@@ -221,7 +221,7 @@
                             @foreach (var column in visibleColumns)
                             {
                                 var filterMode = column.FilterMode ?? FilterMode;
-                                <th @key=column role="columnheader" colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column, visibleColumns)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
+                                <th @key=column role="columnheader" colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
                                     @if (allColumns.All(c => c.Parent == null) && AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                     {
                                         if(filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu)
@@ -314,7 +314,7 @@
                                     }
 
                                     <RadzenDataGridFooterCell RowIndex="@i" Grid="@this" Column="@column"
-                                              CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)}".Trim())"
+                                              CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column)} {getCompositeCellCSSClass(column)}".Trim())"
                                               Attributes="@(cellAttr)" />
                                 }
                             </tr>
@@ -629,9 +629,19 @@
                 SetAttribute(cellAttributes, "class", cellClass);
             }
 
-            if (CellClick.HasDelegate || RowClick.HasDelegate || RowSelect.HasDelegate || RowDeselect.HasDelegate  || ValueChanged.HasDelegate)
+            // A non-chainable consumer onclick (e.g. a string) occupies the <tr>, so the built-in row click
+            // can't ride it - raise it from the cell for that row instead, alongside any cell click.
+            if (RowClickActive && rowArgs.Item2.TryGetValue("onclick", out var rowOnclick) && !IsChainableClickHandler(rowOnclick))
             {
-                SetAttribute(cellAttributes, "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
+                SetAttribute(cellAttributes, "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: async (eventArgs) =>
+                {
+                    if (CellClick.HasDelegate) { await OnCellClickHandler(column, Item, eventArgs); }
+                    await OnRowClickHandler(Item, eventArgs);
+                }));
+            }
+            else if (CellClick.HasDelegate)
+            {
+                SetAttribute(cellAttributes, "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnCellClickHandler(column, Item, eventArgs)));
             }
 
             if (CellDoubleClick.HasDelegate || RowDoubleClick.HasDelegate)
@@ -644,20 +654,20 @@
                 SetAttribute(cellAttributes, "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
             }
 
-            IReadOnlyDictionary<string, object> CellAttributes = new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(cellAttributes);
-
-            var spanAttributes = new Dictionary<string, object>();
             var title = column.Template == null && this.ShowCellDataAsTooltip || column.ShowCellDataAsTooltip ? $"{column.GetValue(Item)}" : "";
+            IReadOnlyDictionary<string, object> spanAttributes = EmptyAttributes;
             if(!string.IsNullOrEmpty(title))
             {
-                SetAttribute(spanAttributes, "title", title);
+                var titleAttrs = new Dictionary<string, object>();
+                SetAttribute(titleAttrs, "title", title);
+                spanAttributes = titleAttrs;
             }
 
             return __builder => {
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td role="gridcell" @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
+                <td role="gridcell" @attributes="@cellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">
@@ -781,24 +791,27 @@
 
     string? GetCellCssClass(RadzenDataGridColumn<TItem> column, TItem item, IReadOnlyDictionary<string, object> Attributes)
     {
-        List<string> classes = [
-            column.CalculatedCssClass?.Invoke(column, item) ?? string.Empty,
-            column.CssClass,
-            getFrozenColumnClass(column, columns.Where(c => c.GetVisible()).ToList()),
-            getCompositeCellCSSClass(column),
-        ];
-        
-        if (Attributes?.TryGetValue("class", out var attributeClass) is true)
+        var calculated = column.CalculatedCssClass?.Invoke(column, item);
+        string? attributeClass = null;
+        if (Attributes?.TryGetValue("class", out var ac) is true)
         {
-            var classValue = Convert.ToString(attributeClass);
-            if (classValue != null)
-            {
-                classes.Add(classValue);
-            }
+            attributeClass = Convert.ToString(ac);
         }
 
-        var result = string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)));
-        return !String.IsNullOrWhiteSpace(result) ? result : null;
+        if (string.IsNullOrEmpty(calculated) && string.IsNullOrWhiteSpace(attributeClass))
+        {
+            return column.GetCachedCellCssClass(getFrozenColumnClass(column), getCompositeCellCSSClass(column));
+        }
+
+        var result = string.Join(" ", new[]
+        {
+            calculated ?? string.Empty,
+            column.CssClass,
+            getFrozenColumnClass(column),
+            getCompositeCellCSSClass(column),
+            attributeClass ?? string.Empty,
+        }.Where(c => !string.IsNullOrWhiteSpace(c)));
+        return !string.IsNullOrWhiteSpace(result) ? result : null;
     }
 
     async Task OnContextMenu(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
@@ -825,7 +838,13 @@
     }
 
     bool clicking;
-    async Task OnClick(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
+    bool rowClicking;
+
+    internal bool RowClickActive => CellClick.HasDelegate || RowClick.HasDelegate
+        || RowSelect.HasDelegate || RowDeselect.HasDelegate || ValueChanged.HasDelegate;
+    // Cell click fires only the cell-specific event; the row click + selection is raised once per row
+    // by OnRowClickHandler, wired on the <tr> (see RowAttributes).
+    async Task OnCellClickHandler(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
     {
         if (clicking)
         {
@@ -834,49 +853,63 @@
         try
         {
             clicking = true;
-        await OnCellClick(new DataGridCellMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            OffsetX = args.OffsetX,
-            OffsetY = args.OffsetY,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type,
-            Column = Column
-        });
-
-        await OnRowClick(new DataGridRowMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            OffsetX = args.OffsetX,
-            OffsetY = args.OffsetY,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type
-        });
-
+            await OnCellClick(new DataGridCellMouseEventArgs<TItem>
+            {
+                Data = Item,
+                AltKey = args.AltKey,
+                Button = args.Button,
+                Buttons = args.Buttons,
+                ClientX = args.ClientX,
+                ClientY = args.ClientY,
+                CtrlKey = args.CtrlKey,
+                Detail = args.Detail,
+                MetaKey = args.MetaKey,
+                OffsetX = args.OffsetX,
+                OffsetY = args.OffsetY,
+                ScreenX = args.ScreenX,
+                ScreenY = args.ScreenY,
+                ShiftKey = args.ShiftKey,
+                Type = args.Type,
+                Column = Column
+            });
         }
         finally
         {
             clicking = false;
+        }
+    }
+
+    internal async Task OnRowClickHandler(TItem Item, MouseEventArgs args)
+    {
+        if (rowClicking)
+        {
+            return;
+        }
+        try
+        {
+            rowClicking = true;
+            await OnRowClick(new DataGridRowMouseEventArgs<TItem>
+            {
+                Data = Item,
+                AltKey = args.AltKey,
+                Button = args.Button,
+                Buttons = args.Buttons,
+                ClientX = args.ClientX,
+                ClientY = args.ClientY,
+                CtrlKey = args.CtrlKey,
+                Detail = args.Detail,
+                MetaKey = args.MetaKey,
+                OffsetX = args.OffsetX,
+                OffsetY = args.OffsetY,
+                ScreenX = args.ScreenX,
+                ScreenY = args.ScreenY,
+                ShiftKey = args.ShiftKey,
+                Type = args.Type
+            });
+        }
+        finally
+        {
+            rowClicking = false;
         }
     }
 

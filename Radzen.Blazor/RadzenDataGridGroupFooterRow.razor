@@ -19,7 +19,7 @@
         }
         @foreach (var column in Columns)
         {
-            <RadzenDataGridGroupFooterCell Group="@Group" RowIndex="@i" Grid="@Grid" Column="@column" CssClass="@($"{column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column, Columns)} {Grid.getCompositeCellCSSClass(column)}".Trim())" />
+            <RadzenDataGridGroupFooterCell Group="@Group" RowIndex="@i" Grid="@Grid" Column="@column" CssClass="@($"{column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column)} {Grid.getCompositeCellCSSClass(column)}".Trim())" />
         }
     </tr>
 }
