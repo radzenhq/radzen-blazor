@@ -3261,7 +3261,7 @@ namespace RadzenBlazorDemos
         {
             Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" } ],
             Name = "MarkdownEditor",
-            Icon = "",
+            Icon = "\uf552",
             Path = "markdown-editor",
             Title = "Blazor Markdown Editor | Free UI Components by Radzen",
             Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a live preview with Write, Preview and Split modes.",
