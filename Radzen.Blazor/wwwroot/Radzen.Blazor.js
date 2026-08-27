@@ -7122,3 +7122,63 @@ Radzen.datePickerKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
+
+Radzen.markdownEditorApply = function (textarea, start, end, replacement, selectionStart, selectionEnd) {
+  if (!textarea) {
+    return;
+  }
+
+  textarea.focus();
+  textarea.setSelectionRange(start, end);
+
+  var applied = false;
+  try {
+    // execCommand keeps the browser's native undo stack intact.
+    if (document.execCommand) {
+      applied = replacement.length > 0
+        ? document.execCommand('insertText', false, replacement)
+        : document.execCommand('delete', false);
+    }
+  } catch (e) {
+    applied = false;
+  }
+
+  if (!applied || textarea.value.substring(start, start + replacement.length) !== replacement) {
+    textarea.setRangeText(replacement, start, end, 'end');
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  textarea.setSelectionRange(selectionStart, selectionEnd);
+};
+
+Radzen.createMarkdownEditor = function (textarea, instance, shortcuts) {
+  shortcuts = shortcuts || [];
+
+  var listener = function (e) {
+    if (!(e.ctrlKey || e.metaKey) || !e.code) {
+      return;
+    }
+
+    var key = 'Ctrl+';
+    if (e.altKey) {
+      key += 'Alt+';
+    }
+    if (e.shiftKey) {
+      key += 'Shift+';
+    }
+    key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
+
+    if (shortcuts.includes(key)) {
+      e.preventDefault();
+      instance.invokeMethodAsync('ExecuteShortcutAsync', key);
+    }
+  };
+
+  textarea.addEventListener('keydown', listener);
+
+  return {
+    dispose: function () {
+      textarea.removeEventListener('keydown', listener);
+    }
+  };
+};
