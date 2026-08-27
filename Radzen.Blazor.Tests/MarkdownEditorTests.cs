@@ -215,5 +215,38 @@ namespace Radzen.Blazor.Tests
             var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[2]);
             Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
         }
+
+        [Fact]
+        public void CustomTool_Click_RaisesExecute_WithCommandName()
+        {
+            using var ctx = CreateContext();
+            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            apply.SetVoidResult();
+            string? executed = null;
+
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Execute, args => executed = args.CommandName)
+                .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
+                    .Add(x => x.CommandName, "InsertToday")
+                    .Add(x => x.Icon, "today")));
+
+            component.Find(".rz-markdown-editor-tools button").Click();
+
+            Assert.Equal("InsertToday", executed);
+            Assert.Empty(apply.Invocations);
+        }
+
+        [Fact]
+        public void CustomTool_RendersTemplate_WithEditor()
+        {
+            using var ctx = CreateContext();
+
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
+                    .Add(x => x.Template, editor => b => b.AddContent(0, $"mode:{editor.Mode}"))));
+
+            Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
+            Assert.Contains("mode:Edit", component.Markup);
+        }
     }
 }

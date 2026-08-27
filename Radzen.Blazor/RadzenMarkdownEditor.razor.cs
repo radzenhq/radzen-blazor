@@ -64,7 +64,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public EventCallback<string> Input { get; set; }
 
     /// <summary>
-    /// A callback invoked after a command is executed, either by a built-in tool, a shortcut, <see cref="ExecuteCommandAsync" /> or a <c>RadzenMarkdownEditorCustomTool</c>.
+    /// A callback invoked after a command is executed, either by a built-in tool, a shortcut, <see cref="ExecuteCommandAsync" /> or a <see cref="RadzenMarkdownEditorCustomTool" />.
     /// </summary>
     [Parameter]
     public EventCallback<MarkdownEditorExecuteEventArgs> Execute { get; set; }
