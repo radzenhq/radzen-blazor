@@ -114,7 +114,7 @@ internal static class MarkdownFormatter
         return ReplaceLines(text, start, end, lines =>
             lines.All(l => l.StartsWith(prefix, StringComparison.Ordinal))
                 ? lines.Select(l => l.Substring(prefix.Length)).ToArray()
-                : lines.Select(l => prefix + l).ToArray());
+                : lines.Select(l => l.StartsWith(prefix, StringComparison.Ordinal) ? l : prefix + l).ToArray());
     }
 
     static MarkdownEdit OrderedList(string text, int start, int end)
@@ -122,7 +122,7 @@ internal static class MarkdownFormatter
         return ReplaceLines(text, start, end, lines =>
             lines.All(l => OrderedPrefix.IsMatch(l))
                 ? lines.Select(l => OrderedPrefix.Replace(l, string.Empty, 1)).ToArray()
-                : lines.Select((l, i) => $"{i + 1}. {l}").ToArray());
+                : lines.Select((l, i) => $"{i + 1}. {OrderedPrefix.Replace(l, string.Empty, 1)}").ToArray());
     }
 
     static MarkdownEdit Heading(string text, int start, int end)

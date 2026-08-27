@@ -163,5 +163,21 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new MarkdownEdit(0, 5, "## a\n## b", 0, 9), edit);
         }
+
+        [Fact]
+        public void PrefixLines_DoesNotDoublePrefix_PartiallyPrefixedSelection()
+        {
+            var edit = MarkdownFormatter.Apply("> a\nb", 0, 5, MarkdownEditorCommands.Quote);
+
+            Assert.Equal(new MarkdownEdit(0, 5, "> a\n> b", 0, 7), edit);
+        }
+
+        [Fact]
+        public void OrderedList_RenumbersPartiallyNumberedSelection()
+        {
+            var edit = MarkdownFormatter.Apply("1. a\nb\n7. c", 0, 11, MarkdownEditorCommands.OrderedList);
+
+            Assert.Equal(new MarkdownEdit(0, 11, "1. a\n2. b\n3. c", 0, 14), edit);
+        }
     }
 }
