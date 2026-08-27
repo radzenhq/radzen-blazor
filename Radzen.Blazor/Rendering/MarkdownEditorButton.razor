@@ -1,0 +1,54 @@
+<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@IsDisabled @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
+    <span class="rz-button-box">
+        <i class="notranslate rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    </span>
+</button>
+@code {
+    [CascadingParameter]
+    public RadzenMarkdownEditor? Editor { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Shortcut { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public EventCallback Click { get; set; }
+
+    async Task OnClick()
+    {
+        await Click.InvokeAsync(null);
+    }
+
+    string? GetTitle() => !string.IsNullOrEmpty(Shortcut) ? $"{Title} ({Shortcut})" : Title;
+
+    bool IsDisabled => Editor?.Disabled == true || Disabled || Editor?.Mode == MarkdownEditorMode.Preview;
+
+    string Class
+    {
+        get
+        {
+            var baseClasses = Selected && !IsDisabled
+                ? "rz-button rz-toggle-button rz-button-icon-only rz-button-sm rz-variant-flat rz-primary rz-shade-lighter rz-state-active"
+                : "rz-button rz-button-icon-only rz-button-sm rz-variant-text rz-base rz-shade-default";
+            return IsDisabled ? $"{baseClasses} rz-state-disabled" : baseClasses;
+        }
+    }
+
+    void Empty()
+    {
+    }
+}
