@@ -1,0 +1,17 @@
+<RadzenStack Gap="1rem">
+    <RadzenMarkdownEditor @bind-Value=@markdown @bind-Mode=@mode Style="min-height: 300px" />
+    <RadzenText TextStyle="TextStyle.Caption">Mode: @mode</RadzenText>
+    <RadzenTextArea Value=@markdown ReadOnly="true" Style="width: 100%; height: 120px" />
+</RadzenStack>
+
+@code {
+    MarkdownEditorMode mode = MarkdownEditorMode.Split;
+    string markdown = @"# Hello, Markdown :wave:
+
+- Select text and use the **toolbar** or `Ctrl+B` / `Ctrl+I` / `Ctrl+K`.
+- Switch between *Write*, *Preview* and *Split*.
+
+```csharp
+var editor = new RadzenMarkdownEditor();
+```";
+}
