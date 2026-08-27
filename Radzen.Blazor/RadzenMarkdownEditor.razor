@@ -1,0 +1,76 @@
+@using Radzen.Blazor.Rendering
+@inherits FormComponent<string>
+
+@if (Visible)
+{
+    <div @ref=Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+        @if (ShowToolbar)
+        {
+            <div class="rz-toolbar rz-markdown-editor-toolbar">
+                <div class="rz-markdown-editor-tools">
+                    <CascadingValue Value=@this>
+                        @if (ChildContent != null)
+                        {
+                            @ChildContent
+                        }
+                        else
+                        {
+                            @* default tools added in Task 7 *@
+                        }
+                    </CascadingValue>
+                </div>
+                <div class="rz-markdown-editor-modes">
+                    <RadzenSelectBar TValue="MarkdownEditorMode" Value=@Mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
+                        <Items>
+                            <RadzenSelectBarItem Value="MarkdownEditorMode.Edit" Text=@WriteText />
+                            <RadzenSelectBarItem Value="MarkdownEditorMode.Preview" Text=@PreviewText />
+                            <RadzenSelectBarItem Value="MarkdownEditorMode.Split" Text=@SplitText />
+                        </Items>
+                    </RadzenSelectBar>
+                </div>
+            </div>
+        }
+        <div class=@ContentClass>
+            <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(Mode == MarkdownEditorMode.Preview)
+                      name=@Name rows=@Rows placeholder=@Placeholder disabled=@Disabled
+                      value=@Value @oninput=@OnInput @onchange=@OnChange></textarea>
+            @if (Mode != MarkdownEditorMode.Edit)
+            {
+                <div class="rz-markdown-editor-preview">
+                    @if (string.IsNullOrWhiteSpace(Value))
+                    {
+                        <span class="rz-markdown-editor-empty">@NothingToPreviewText</span>
+                    }
+                    else
+                    {
+                        <RadzenMarkdown Text=@Value AllowHtml=@AllowHtml AllowedHtmlTags=@AllowedHtmlTags AllowedHtmlAttributes=@AllowedHtmlAttributes />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    RenderFragment<DialogService> LinkDialog(LinkDialogModel model, bool image, bool hasSelection) => ds =>
+    @<div class="rz-html-editor-dialog">
+        <RadzenTemplateForm TItem="LinkDialogModel" Data="@model" Submit="() => ds.Close(true)">
+            <div class="rz-html-editor-dialog-item">
+                <label>@(image ? ImageUrlText : UrlText)</label>
+                <RadzenTextBox @bind-Value=@model.Url Style="width: 100%" Name="Url" />
+                <RadzenRequiredValidator Component="Url" />
+            </div>
+            @if (!hasSelection)
+            {
+                <div class="rz-html-editor-dialog-item">
+                    <label>@(image ? ImageAltText : LinkText)</label>
+                    <RadzenTextBox @bind-Value=@model.Text Style="width: 100%" />
+                </div>
+            }
+            <div class="rz-html-editor-dialog-buttons">
+                <RadzenButton Text=@CancelText Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+                <RadzenButton Text=@OkText ButtonType="ButtonType.Submit" Variant="Variant.Flat" />
+            </div>
+        </RadzenTemplateForm>
+    </div>;
+}

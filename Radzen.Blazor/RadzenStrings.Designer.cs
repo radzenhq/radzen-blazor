@@ -809,5 +809,15 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_PieChartText { get { return ResourceManager.GetString("Spreadsheet_PieChartText", resourceCulture); } }
         public static string Spreadsheet_DonutChartText { get { return ResourceManager.GetString("Spreadsheet_DonutChartText", resourceCulture); } }
         public static string Spreadsheet_ScatterChartText { get { return ResourceManager.GetString("Spreadsheet_ScatterChartText", resourceCulture); } }
+        public static string MarkdownEditor_WriteText { get { return ResourceManager.GetString("MarkdownEditor_WriteText", resourceCulture); } }
+        public static string MarkdownEditor_PreviewText { get { return ResourceManager.GetString("MarkdownEditor_PreviewText", resourceCulture); } }
+        public static string MarkdownEditor_SplitText { get { return ResourceManager.GetString("MarkdownEditor_SplitText", resourceCulture); } }
+        public static string MarkdownEditor_NothingToPreviewText { get { return ResourceManager.GetString("MarkdownEditor_NothingToPreviewText", resourceCulture); } }
+        public static string MarkdownEditorLink_Title { get { return ResourceManager.GetString("MarkdownEditorLink_Title", resourceCulture); } }
+        public static string MarkdownEditorLink_UrlText { get { return ResourceManager.GetString("MarkdownEditorLink_UrlText", resourceCulture); } }
+        public static string MarkdownEditorLink_LinkText { get { return ResourceManager.GetString("MarkdownEditorLink_LinkText", resourceCulture); } }
+        public static string MarkdownEditorImage_Title { get { return ResourceManager.GetString("MarkdownEditorImage_Title", resourceCulture); } }
+        public static string MarkdownEditorImage_UrlText { get { return ResourceManager.GetString("MarkdownEditorImage_UrlText", resourceCulture); } }
+        public static string MarkdownEditorImage_AltText { get { return ResourceManager.GetString("MarkdownEditorImage_AltText", resourceCulture); } }
     }
 }

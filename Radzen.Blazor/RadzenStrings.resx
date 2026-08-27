@@ -2397,4 +2397,35 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Scatter Chart</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_WriteText" xml:space="preserve">
+    <value>Write</value>
+  </data>
+  <data name="MarkdownEditor_PreviewText" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="MarkdownEditor_SplitText" xml:space="preserve">
+    <value>Split</value>
+  </data>
+  <data name="MarkdownEditor_NothingToPreviewText" xml:space="preserve">
+    <value>Nothing to preview</value>
+  </data>
+  <data name="MarkdownEditorLink_Title" xml:space="preserve">
+    <value>Insert link</value>
+  </data>
+  <data name="MarkdownEditorLink_UrlText" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="MarkdownEditorLink_LinkText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="MarkdownEditorImage_Title" xml:space="preserve">
+    <value>Insert image</value>
+  </data>
+  <data name="MarkdownEditorImage_UrlText" xml:space="preserve">
+    <value>Image URL</value>
+  </data>
+  <data name="MarkdownEditorImage_AltText" xml:space="preserve">
+    <value>Alternative text</value>
+  </data>
 </root>
