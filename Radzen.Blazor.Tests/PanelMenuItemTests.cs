@@ -199,5 +199,58 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("_blank", component.Markup);
         }
+
+        [Fact]
+        public void PanelMenuItem_Renders_LevelVariable_ForNestedItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenPanelMenuItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Text), "Level1");
+                    builder.AddAttribute(2, nameof(RadzenPanelMenuItem.ChildContent), (RenderFragment)(level2Builder =>
+                    {
+                        level2Builder.OpenComponent<RadzenPanelMenuItem>(0);
+                        level2Builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Text), "Level2");
+                        level2Builder.AddAttribute(2, nameof(RadzenPanelMenuItem.ChildContent), (RenderFragment)(level3Builder =>
+                        {
+                            level3Builder.OpenComponent<RadzenPanelMenuItem>(0);
+                            level3Builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Text), "Level3");
+                            level3Builder.CloseComponent();
+                        }));
+                        level2Builder.CloseComponent();
+                    }));
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains("--rz-navigation-item-level: 1", component.Markup);
+            Assert.Contains("--rz-navigation-item-level: 2", component.Markup);
+            Assert.Contains("--rz-navigation-item-level: 3", component.Markup);
+        }
+
+        [Fact]
+        public void PanelMenuItem_Renders_LevelVariable_WithCustomStyle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenPanelMenuItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Text), "Styled");
+                    builder.AddAttribute(2, nameof(RadzenPanelMenuItem.Style), "color: red");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains("--rz-navigation-item-level: 1; color: red", component.Markup);
+        }
     }
 }
