@@ -5,6 +5,13 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which cycles the heading level of the selected lines.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorHeading /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorHeading : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />

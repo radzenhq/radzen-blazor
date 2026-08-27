@@ -5,6 +5,13 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which makes the selection bold.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorBold /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorBold : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />

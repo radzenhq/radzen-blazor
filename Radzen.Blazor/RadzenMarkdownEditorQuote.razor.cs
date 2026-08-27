@@ -5,6 +5,13 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which quotes the selected lines.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorQuote /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorQuote : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />

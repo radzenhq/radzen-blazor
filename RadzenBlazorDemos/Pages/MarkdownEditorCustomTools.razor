@@ -5,7 +5,7 @@
     <RadzenMarkdownEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today's date" />
     <RadzenMarkdownEditorCustomTool>
         <Template Context="editor">
-            <RadzenButton Size="ButtonSize.Small" Variant="Variant.Text" Text="Clear" Click="@(() => editor.ExecuteCommandAsync(MarkdownEditorCommands.InsertText, string.Empty))" />
+            <RadzenButton Size="ButtonSize.Small" Variant="Variant.Text" Text="Delete selection" Click="@(() => editor.ExecuteCommandAsync(MarkdownEditorCommands.InsertText, string.Empty))" />
         </Template>
     </RadzenMarkdownEditorCustomTool>
 </RadzenMarkdownEditor>
