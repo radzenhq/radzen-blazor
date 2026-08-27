@@ -2823,7 +2823,20 @@ namespace Radzen.Blazor
 
             if (keyPropertyGetter == null)
             {
-                return item != null && items.ContainsKey(item);
+                if (item == null)
+                {
+                    return false;
+                }
+
+                if (items.ContainsKey(item))
+                {
+                    return true;
+                }
+
+                if (!ItemTypeOverridesGetHashCode(item))
+                {
+                    return false;
+                }
             }
 
             foreach (var i in items.Keys)
@@ -2835,6 +2848,21 @@ namespace Radzen.Blazor
             }
 
             return false;
+        }
+
+        Type? hashCodeCheckType;
+        bool hashCodeCheckResult;
+
+        bool ItemTypeOverridesGetHashCode(TItem item)
+        {
+            var type = item!.GetType();
+            if (type != hashCodeCheckType)
+            {
+                hashCodeCheckType = type;
+                hashCodeCheckResult = type.GetMethod(nameof(GetHashCode), Type.EmptyTypes)?.DeclaringType != typeof(object);
+            }
+
+            return hashCodeCheckResult;
         }
 
         internal bool? allGroupsExpanded;
