@@ -17,7 +17,6 @@
                         {
                             <RadzenMarkdownEditorBold />
                             <RadzenMarkdownEditorItalic />
-                            <RadzenMarkdownEditorStrikethrough />
                             <RadzenMarkdownEditorSeparator />
                             <RadzenMarkdownEditorHeading />
                             <RadzenMarkdownEditorQuote />
@@ -26,7 +25,6 @@
                             <RadzenMarkdownEditorSeparator />
                             <RadzenMarkdownEditorUnorderedList />
                             <RadzenMarkdownEditorOrderedList />
-                            <RadzenMarkdownEditorTaskList />
                             <RadzenMarkdownEditorSeparator />
                             <RadzenMarkdownEditorLink />
                             <RadzenMarkdownEditorImage />
@@ -35,7 +33,7 @@
                     </CascadingValue>
                 </div>
                 <div class="rz-markdown-editor-modes">
-                    <RadzenSelectBar TValue="MarkdownEditorMode" Value=@Mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
+                    <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
                         <Items>
                             <RadzenSelectBarItem Value="MarkdownEditorMode.Edit" Text=@WriteText />
                             <RadzenSelectBarItem Value="MarkdownEditorMode.Preview" Text=@PreviewText />
@@ -46,10 +44,10 @@
             </div>
         }
         <div class=@ContentClass>
-            <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(Mode == MarkdownEditorMode.Preview)
-                      name=@Name rows=@Rows placeholder=@Placeholder disabled=@Disabled
+            <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Preview)
+                      name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
                       value=@Value @oninput=@OnInput @onchange=@OnChange></textarea>
-            @if (Mode != MarkdownEditorMode.Edit)
+            @if (mode != MarkdownEditorMode.Edit)
             {
                 <div class="rz-markdown-editor-preview">
                     @if (string.IsNullOrWhiteSpace(Value))
