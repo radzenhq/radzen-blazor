@@ -335,6 +335,108 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain("Item 1", component.Markup);
         }
 
+        enum ItemColor { Red = 1, Green = 2, Blue = 3 }
+
+        class ColorItem
+        {
+            public string Name { get; set; }
+            public ItemColor Code { get; set; }
+        }
+
+        [Fact]
+        public void DropDown_Multiple_ResolvesEnumValuePropertyFromIntegerValues()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new List<ColorItem>
+            {
+                new ColorItem { Name = "Red", Code = ItemColor.Red },
+                new ColorItem { Name = "Green", Code = ItemColor.Green },
+                new ColorItem { Name = "Blue", Code = ItemColor.Blue },
+            };
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(ColorItem.Name));
+                parameters.Add(p => p.ValueProperty, nameof(ColorItem.Code));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<int> { 1, 3 });
+            });
+
+            var label = component.Find(".rz-dropdown-label").TextContent;
+            Assert.Contains("Red", label);
+            Assert.Contains("Blue", label);
+            Assert.DoesNotContain("Green", label);
+        }
+
+        class CodeItem
+        {
+            public string Name { get; set; }
+            public string Code { get; set; }
+        }
+
+        [Fact]
+        public void DropDown_Multiple_NullBoundValue_SelectsItemWithNullValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new List<CodeItem>
+            {
+                new CodeItem { Name = "Alpha", Code = "a" },
+                new CodeItem { Name = "Beta", Code = null },
+            };
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(CodeItem.Name));
+                parameters.Add(p => p.ValueProperty, nameof(CodeItem.Code));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<string> { null, "a" });
+            });
+
+            var label = component.Find(".rz-dropdown-label").TextContent;
+            Assert.Contains("Alpha", label);
+            Assert.Contains("Beta", label);
+        }
+
+        class PreservingDropDown<TValue> : RadzenDropDown<TValue>
+        {
+            public PreservingDropDown()
+            {
+                PreserveCollectionOnSelection = true;
+            }
+        }
+
+        [Fact]
+        public void DropDown_Multiple_PreserveCollection_Clear_RemovesSelection()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new List<DataItem>
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+            var component = ctx.RenderComponent<PreservingDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Value, new List<int> { 2 });
+            });
+
+            Assert.Equal(1, component.FindAll(".rz-state-highlight").Count);
+
+            component.Find(".rz-dropdown-clear-icon").Click();
+
+            Assert.Empty(component.FindAll(".rz-state-highlight"));
+        }
+
         [Fact]
         public void DropDown_AppliesSelectionStyleWhenMultipleSelectionIsEnabled()
         {

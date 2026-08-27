@@ -417,6 +417,7 @@ namespace Radzen
             }
 
             internalValue = collectionAssignment.GetCleared();
+            _selectedValuesSet = null;
             selectedItem = null;
 
             selectedItems.Clear();
@@ -1648,21 +1649,29 @@ namespace Radzen
         [Parameter] public IEqualityComparer<object>? ItemComparer { get; set; }
 
         /// <summary>
-        /// Resolves each bound value against the in-memory <paramref name="source"/> and adds any not already selected, using a value-&gt;item lookup so a multiselect binding is O(items + selected) rather than O(items x selected). The non-in-memory (e.g. EF) path stays at each call site so its lookup remains server-side.
+        /// Resolves each bound value against the in-memory <paramref name="source"/> and adds any not already selected, using a value-&gt;item lookup so a multiselect binding is O(items + selected) rather than O(items x selected). A value whose type differs from the item value type (e.g. an integer bound against an enum property) is coerced like the FilterDescriptor-based path does, and a null value selects the first item whose value is null. The non-in-memory (e.g. EF) path stays at each call site so its lookup remains server-side.
         /// </summary>
         private protected void AddSelectedItemsByValue(IEnumerable source, IEnumerable values)
         {
             var itemsByValue = new Dictionary<object, object>();
+            object? itemWithNullValue = null;
+            Type? itemValueType = null;
             foreach (var i in source.OfType<object>())
             {
                 var iv = GetItemOrValueFromProperty(i, ValueProperty!);
                 if (iv != null)
                 {
                     itemsByValue.TryAdd(iv, i);
+                    itemValueType ??= iv.GetType();
+                }
+                else
+                {
+                    itemWithNullValue ??= i;
                 }
             }
 
             var existingValues = new HashSet<object>();
+            var nullValueSelected = false;
             foreach (var si in selectedItems)
             {
                 var sv = GetItemOrValueFromProperty(si, ValueProperty!);
@@ -1670,14 +1679,61 @@ namespace Radzen
                 {
                     existingValues.Add(sv);
                 }
+                else
+                {
+                    nullValueSelected = true;
+                }
             }
 
-            foreach (object v in values.Cast<object>())
+            foreach (var v in values.Cast<object?>())
             {
-                if (v != null && itemsByValue.TryGetValue(v, out var item) && existingValues.Add(v))
+                if (v == null)
+                {
+                    if (itemWithNullValue != null && !nullValueSelected)
+                    {
+                        nullValueSelected = true;
+                        selectedItems.Add(itemWithNullValue);
+                    }
+
+                    continue;
+                }
+
+                var key = itemsByValue.ContainsKey(v) ? v : CoerceValue(v, itemValueType);
+
+                if (key != null && itemsByValue.TryGetValue(key, out var item) && existingValues.Add(key))
                 {
                     selectedItems.Add(item);
                 }
+            }
+        }
+
+        static object? CoerceValue(object value, Type? targetType)
+        {
+            if (targetType == null || targetType == value.GetType())
+            {
+                return null;
+            }
+
+            try
+            {
+                return targetType.IsEnum ? Enum.ToObject(targetType, value) :
+                    Convert.ChangeType(value, targetType, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+            catch (InvalidCastException)
+            {
+                return null;
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            catch (OverflowException)
+            {
+                return null;
             }
         }
 

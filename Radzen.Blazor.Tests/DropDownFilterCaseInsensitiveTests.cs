@@ -1,5 +1,8 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Radzen;
 using Xunit;
 
@@ -42,6 +45,33 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("OrdinalIgnoreCase", expression);
             Assert.DoesNotContain("ToLower", expression);
+        }
+
+        private class WrappedQueryable<T> : IQueryable<T>
+        {
+            private readonly IQueryable<T> inner;
+
+            public WrappedQueryable(IQueryable<T> inner)
+            {
+                this.inner = inner;
+            }
+
+            public Type ElementType => inner.ElementType;
+            public Expression Expression => inner.Expression;
+            public IQueryProvider Provider => inner.Provider;
+            public IEnumerator<T> GetEnumerator() => inner.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => inner.GetEnumerator();
+        }
+
+        [Fact]
+        public void NonInMemorySearch_StillUsesToLower_NotStringComparison()
+        {
+            var query = new WrappedQueryable<Item>(Data()).Where("Name", "LIC", StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+            var expression = query.Expression.ToString();
+
+            Assert.Contains("ToLower", expression);
+            Assert.DoesNotContain("OrdinalIgnoreCase", expression);
+            Assert.Equal(new[] { "Alice" }, query.OfType<Item>().Select(i => i.Name).ToList());
         }
     }
 }
