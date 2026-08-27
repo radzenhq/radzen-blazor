@@ -35,8 +35,39 @@ internal static class MarkdownFormatter
             case MarkdownEditorCommands.InsertText:
                 var inserted = value ?? string.Empty;
                 return new MarkdownEdit(start, end, inserted, start + inserted.Length, start + inserted.Length);
+            case MarkdownEditorCommands.Bold:
+                return Wrap(text, start, end, "**");
+            case MarkdownEditorCommands.Italic:
+                return Wrap(text, start, end, "_");
+            case MarkdownEditorCommands.Strikethrough:
+                return Wrap(text, start, end, "~~");
+            case MarkdownEditorCommands.Code:
+                return Wrap(text, start, end, "`");
             default:
                 return null;
         }
+    }
+
+    static MarkdownEdit Wrap(string text, int start, int end, string token)
+    {
+        var selected = text.Substring(start, end - start);
+        var t = token.Length;
+
+        // Selection contains the tokens: **hi** → hi
+        if (selected.Length >= 2 * t && selected.StartsWith(token, StringComparison.Ordinal) && selected.EndsWith(token, StringComparison.Ordinal))
+        {
+            var inner = selected.Substring(t, selected.Length - 2 * t);
+            return new MarkdownEdit(start, end, inner, start, start + inner.Length);
+        }
+
+        // Tokens immediately outside the selection: **[hi]** → hi
+        if (start >= t && end + t <= text.Length
+            && string.CompareOrdinal(text, start - t, token, 0, t) == 0
+            && string.CompareOrdinal(text, end, token, 0, t) == 0)
+        {
+            return new MarkdownEdit(start - t, end + t, selected, start - t, start - t + selected.Length);
+        }
+
+        return new MarkdownEdit(start, end, token + selected + token, start + t, start + t + selected.Length);
     }
 }
