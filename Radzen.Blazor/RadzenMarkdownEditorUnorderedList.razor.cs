@@ -5,6 +5,13 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which converts the selected lines to a bulleted list.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorUnorderedList /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorUnorderedList : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />

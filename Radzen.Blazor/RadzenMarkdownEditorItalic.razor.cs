@@ -5,6 +5,13 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which makes the selection italic.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorItalic /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorItalic : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />

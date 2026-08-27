@@ -4,7 +4,15 @@ namespace Radzen.Blazor;
 
 /// <summary>
 /// A <see cref="RadzenMarkdownEditor" /> tool which strikes through the selection.
+/// Not rendered by <see cref="RadzenMarkdown" />, which does not support GitHub-flavoured strikethrough/task lists; therefore not part of the default toolbar.
 /// </summary>
+/// <example>
+/// <code>
+/// &lt;RadzenMarkdownEditor @bind-Value=@markdown&gt;
+///   &lt;RadzenMarkdownEditorStrikethrough /&gt;
+/// &lt;/RadzenMarkdownEditor&gt;
+/// </code>
+/// </example>
 public partial class RadzenMarkdownEditorStrikethrough : RadzenMarkdownEditorButtonBase
 {
     /// <inheritdoc />
