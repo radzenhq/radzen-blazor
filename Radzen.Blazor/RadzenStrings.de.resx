@@ -2400,6 +2400,36 @@
   <data name="MarkdownEditor_NothingToPreviewText" xml:space="preserve">
     <value>Keine Vorschau verfügbar</value>
   </data>
+  <data name="MarkdownEditorBold_Title" xml:space="preserve">
+    <value>Fett</value>
+  </data>
+  <data name="MarkdownEditorItalic_Title" xml:space="preserve">
+    <value>Kursiv</value>
+  </data>
+  <data name="MarkdownEditorStrikethrough_Title" xml:space="preserve">
+    <value>Durchgestrichen</value>
+  </data>
+  <data name="MarkdownEditorHeading_Title" xml:space="preserve">
+    <value>Überschrift</value>
+  </data>
+  <data name="MarkdownEditorQuote_Title" xml:space="preserve">
+    <value>Zitat</value>
+  </data>
+  <data name="MarkdownEditorCode_Title" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="MarkdownEditorCodeBlock_Title" xml:space="preserve">
+    <value>Codeblock</value>
+  </data>
+  <data name="MarkdownEditorUnorderedList_Title" xml:space="preserve">
+    <value>Aufzählung</value>
+  </data>
+  <data name="MarkdownEditorOrderedList_Title" xml:space="preserve">
+    <value>Nummerierte Liste</value>
+  </data>
+  <data name="MarkdownEditorTaskList_Title" xml:space="preserve">
+    <value>Aufgabenliste</value>
+  </data>
   <data name="MarkdownEditorLink_Title" xml:space="preserve">
     <value>Link einfügen</value>
   </data>
@@ -2417,5 +2447,8 @@
   </data>
   <data name="MarkdownEditorImage_AltText" xml:space="preserve">
     <value>Alternativtext</value>
+  </data>
+  <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
+    <value>Trennlinie</value>
   </data>
 </root>

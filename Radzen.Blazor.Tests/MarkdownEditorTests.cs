@@ -155,5 +155,65 @@ namespace Radzen.Blazor.Tests
             Assert.Empty(apply.Invocations);
             Assert.Equal("insertToday", executed);
         }
+
+        [Fact]
+        public void MarkdownEditor_RendersDefaultToolbar_WhenNoChildContent()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            var icons = component.FindAll(".rz-markdown-editor-tools .rzi").Select(i => i.TextContent).ToList();
+            Assert.Equal(new[] { "format_bold", "format_italic", "strikethrough_s", "title", "format_quote", "code", "code_blocks",
+                                 "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
+        }
+
+        [Fact]
+        public void MarkdownEditor_RendersOnlyChildContent_WhenProvided()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.AddChildContent<RadzenMarkdownEditorBold>());
+
+            var icons = component.FindAll(".rz-markdown-editor-tools .rzi").Select(i => i.TextContent).ToList();
+            Assert.Equal(new[] { "format_bold" }, icons);
+        }
+
+        [Fact]
+        public void MarkdownEditor_ToolClick_ExecutesCommand()
+        {
+            using var ctx = CreateContext();
+            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 2 });
+            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            apply.SetVoidResult();
+
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "hi")
+                .AddChildContent<RadzenMarkdownEditorItalic>());
+
+            component.Find(".rz-markdown-editor-tools button").Click();
+
+            var invocation = Assert.Single(apply.Invocations);
+            Assert.Equal("_hi_", invocation.Arguments[3]);
+        }
+
+        [Fact]
+        public void MarkdownEditor_Tools_AreDisabled_InPreviewMode()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
+
+            Assert.All(component.FindAll(".rz-markdown-editor-tools button"), b => Assert.True(b.HasAttribute("disabled")));
+        }
+
+        [Fact]
+        public void MarkdownEditor_Tools_RegisterShortcuts()
+        {
+            using var ctx = CreateContext();
+            ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            // Loose mode records every call; no Setup so the un-awaited OnAfterRenderAsync cannot hang on a missing result.
+            var invocation = Assert.Single(ctx.JSInterop.Invocations["Radzen.createMarkdownEditor"]);
+            var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[2]);
+            Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
+        }
     }
 }
