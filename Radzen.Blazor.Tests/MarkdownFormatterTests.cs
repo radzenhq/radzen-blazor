@@ -86,5 +86,82 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new MarkdownEdit(4, 10, "_**hi**_", 5, 11), edit);
         }
+
+        [Theory]
+        [InlineData("quote", "> ")]
+        [InlineData("unorderedList", "- ")]
+        [InlineData("taskList", "- [ ] ")]
+        public void PrefixLines_PrefixesEveryLineInSelection(string command, string prefix)
+        {
+            // caret in the middle of line 2 of three lines; only that line is affected
+            var text = "one\ntwo\nthree";
+            var edit = MarkdownFormatter.Apply(text, 5, 5, command);
+
+            var replacement = prefix + "two";
+            Assert.Equal(new MarkdownEdit(4, 7, replacement, 4, 4 + replacement.Length), edit);
+        }
+
+        [Fact]
+        public void PrefixLines_ExpandsPartialMultiLineSelection()
+        {
+            // select from inside "one" to inside "two"
+            var edit = MarkdownFormatter.Apply("one\ntwo\nthree", 1, 5, MarkdownEditorCommands.Quote);
+
+            Assert.Equal(new MarkdownEdit(0, 7, "> one\n> two", 0, 11), edit);
+        }
+
+        [Fact]
+        public void PrefixLines_StripsPrefixWhenAllLinesHaveIt()
+        {
+            var edit = MarkdownFormatter.Apply("- a\n- b", 0, 7, MarkdownEditorCommands.UnorderedList);
+
+            Assert.Equal(new MarkdownEdit(0, 7, "a\nb", 0, 3), edit);
+        }
+
+        [Fact]
+        public void PrefixLines_IgnoresTrailingNewlineInSelection()
+        {
+            // selecting "one\n" (0..4) must not drag line 2 in
+            var edit = MarkdownFormatter.Apply("one\ntwo", 0, 4, MarkdownEditorCommands.Quote);
+
+            Assert.Equal(new MarkdownEdit(0, 3, "> one", 0, 5), edit);
+        }
+
+        [Fact]
+        public void OrderedList_NumbersLines()
+        {
+            var edit = MarkdownFormatter.Apply("a\nb\nc", 0, 5, MarkdownEditorCommands.OrderedList);
+
+            Assert.Equal(new MarkdownEdit(0, 5, "1. a\n2. b\n3. c", 0, 14), edit);
+        }
+
+        [Fact]
+        public void OrderedList_StripsNumbersWhenAllLinesAreNumbered()
+        {
+            var edit = MarkdownFormatter.Apply("1. a\n12. b", 0, 10, MarkdownEditorCommands.OrderedList);
+
+            Assert.Equal(new MarkdownEdit(0, 10, "a\nb", 0, 3), edit);
+        }
+
+        [Theory]
+        [InlineData("title", "# title")]
+        [InlineData("# title", "## title")]
+        [InlineData("## title", "### title")]
+        [InlineData("### title", "title")]
+        [InlineData("###### title", "title")]
+        public void Heading_CyclesLevel(string line, string expected)
+        {
+            var edit = MarkdownFormatter.Apply(line, 0, 0, MarkdownEditorCommands.Heading);
+
+            Assert.Equal(new MarkdownEdit(0, line.Length, expected, 0, expected.Length), edit);
+        }
+
+        [Fact]
+        public void Heading_AppliesFirstLineLevelToAllSelectedLines()
+        {
+            var edit = MarkdownFormatter.Apply("# a\nb", 0, 5, MarkdownEditorCommands.Heading);
+
+            Assert.Equal(new MarkdownEdit(0, 5, "## a\n## b", 0, 9), edit);
+        }
     }
 }
