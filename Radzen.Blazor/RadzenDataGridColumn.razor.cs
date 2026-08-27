@@ -1189,53 +1189,99 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (parameters.DidParameterChange(nameof(Visible), Visible) ||
-                parameters.DidParameterChange(nameof(Title), Title))
+            var grid = Grid;
+
+            var visibleOrTitleChanged = parameters.DidParameterChange(nameof(Visible), Visible) ||
+                parameters.DidParameterChange(nameof(Title), Title);
+            var newVisible = parameters.GetValueOrDefault<bool>(nameof(Visible));
+
+            var orderIndexChanged = parameters.DidParameterChange(nameof(OrderIndex), OrderIndex);
+            var newOrderIndex = parameters.GetValueOrDefault<int?>(nameof(OrderIndex));
+
+            var pickableChanged = parameters.DidParameterChange(nameof(Pickable), Pickable);
+            var newPickable = parameters.GetValueOrDefault<bool>(nameof(Pickable));
+
+            var sortOrderChanged = parameters.DidParameterChange(nameof(SortOrder), SortOrder);
+            var newSortOrder = parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder));
+
+            var filterValueChanged = parameters.DidParameterChange(nameof(FilterValue), FilterValue);
+            var newFilterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+
+            var secondFilterValueChanged = parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue);
+            var newSecondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+
+            var customFilterExpressionChanged = parameters.DidParameterChange(nameof(CustomFilterExpression), CustomFilterExpression);
+            var newCustomFilterExpression = parameters.GetValueOrDefault<string>(nameof(CustomFilterExpression));
+            var hadCustomFilterExpression = CustomFilterExpression != null;
+
+            var collectionFilterModeChanged = parameters.DidParameterChange(nameof(CollectionFilterMode), CollectionFilterMode);
+            var newCollectionFilterMode = parameters.GetValueOrDefault<CollectionFilterMode?>(nameof(CollectionFilterMode));
+
+            var filterOperatorChanged = parameters.DidParameterChange(nameof(FilterOperator), FilterOperator);
+            var newFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
+            var filterOperatorFallback = _filterOperator;
+
+            var secondFilterOperatorChanged = parameters.DidParameterChange(nameof(SecondFilterOperator), SecondFilterOperator);
+            var newSecondFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(SecondFilterOperator));
+
+            var logicalFilterOperatorChanged = parameters.DidParameterChange(nameof(LogicalFilterOperator), LogicalFilterOperator);
+            var newLogicalFilterOperator = parameters.GetValueOrDefault<LogicalFilterOperator>(nameof(LogicalFilterOperator));
+
+            var filterTemplates = FilterTemplate != null || FilterValueTemplate != null;
+            var secondFilterTemplates = FilterTemplate != null || SecondFilterValueTemplate != null;
+
+            var skipBase = filterValueChanged && filterTemplates ||
+                secondFilterValueChanged && secondFilterTemplates ||
+                customFilterExpressionChanged && hadCustomFilterExpression ||
+                collectionFilterModeChanged && filterTemplates;
+
+            if (!skipBase)
             {
-                if (Grid != null)
+                await base.SetParametersAsync(parameters);
+            }
+
+            if (visibleOrTitleChanged)
+            {
+                if (grid != null)
                 {
-                    Grid.UpdatePickableColumn(this, parameters.GetValueOrDefault<bool>(nameof(Visible)));
-                    await Grid.ChangeState();
+                    grid.UpdatePickableColumn(this, newVisible);
+                    await grid.ChangeState();
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(OrderIndex), OrderIndex))
+            if (orderIndexChanged)
             {
-                var newOrderIndex = parameters.GetValueOrDefault<int?>(nameof(OrderIndex));
                 if (newOrderIndex != orderIndex)
                 {
                     SetOrderIndex(newOrderIndex);
 
-                    if (Grid != null)
+                    if (grid != null)
                     {
-                        Grid.UpdateColumnsOrder();
-                        await Grid.ChangeState();
+                        grid.UpdateColumnsOrder();
+                        await grid.ChangeState();
                     }
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(Pickable), Pickable))
+            if (pickableChanged)
             {
-                var newPickable = parameters.GetValueOrDefault<bool>(nameof(Pickable));
-
                 Pickable = newPickable;
 
-                if (Grid != null)
+                if (grid != null)
                 {
-                    Grid.UpdatePickableColumns();
-                    await Grid.ChangeState();
+                    grid.UpdatePickableColumns();
+                    await grid.ChangeState();
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
+            if (sortOrderChanged)
             {
-                var newSortOrder = parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder));
                 sortOrder = new SortOrder?[] { newSortOrder };
                 SortOrder = newSortOrder;
 
-                if (Grid != null)
+                if (grid != null)
                 {
-                    var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
+                    var descriptor = grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
                     if (newSortOrder.HasValue)
                     {
                         if (descriptor != null)
@@ -1244,68 +1290,68 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            Grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = newSortOrder.Value });
+                            grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = newSortOrder.Value });
                         }
                     }
                     else
                     {
                         if (descriptor != null)
                         {
-                            Grid.sorts.Remove(descriptor);
+                            grid.sorts.Remove(descriptor);
                         }
                     }
-                    Grid._view = null;
-                    await Grid.Reload();
+                    grid._view = null;
+                    await grid.Reload();
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
+            if (filterValueChanged)
             {
-                filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+                filterValue = newFilterValue;
 
                 FilterValue = filterValue;
-                if (Grid != null)
+                if (grid != null)
                 {
-                    Grid.SaveSettings();
-                    if (Grid.IsVirtualizationAllowed())
+                    grid.SaveSettings();
+                    if (grid.IsVirtualizationAllowed())
                     {
-                        if (Grid.virtualize != null)
+                        if (grid.virtualize != null)
                         {
-                            await Grid.virtualize.RefreshDataAsync();
+                            await grid.virtualize.RefreshDataAsync();
                         }
                     }
                     else
                     {
-                        await Grid.Reload();
+                        await grid.Reload();
                     }
                 }
 
-                if (FilterTemplate != null || FilterValueTemplate != null)
+                if (filterTemplates)
                 {
                     return;
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
+            if (secondFilterValueChanged)
             {
-                secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+                secondFilterValue = newSecondFilterValue;
 
-                if (FilterTemplate != null || SecondFilterValueTemplate != null)
+                if (secondFilterTemplates)
                 {
                     SecondFilterValue = secondFilterValue;
-                    if (Grid != null)
+                    if (grid != null)
                     {
-                        Grid.SaveSettings();
-                        if (Grid.IsVirtualizationAllowed())
+                        grid.SaveSettings();
+                        if (grid.IsVirtualizationAllowed())
                         {
-                            if (Grid.virtualize != null)
+                            if (grid.virtualize != null)
                             {
-                                await Grid.virtualize.RefreshDataAsync();
+                                await grid.virtualize.RefreshDataAsync();
                             }
                         }
                         else
                         {
-                            await Grid.Reload();
+                            await grid.Reload();
                         }
                     }
 
@@ -1313,26 +1359,26 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(CustomFilterExpression), CustomFilterExpression))
+            if (customFilterExpressionChanged)
             {
-                customFilterExpression = parameters.GetValueOrDefault<string>(nameof(CustomFilterExpression));
+                customFilterExpression = newCustomFilterExpression;
 
-                if (CustomFilterExpression != null)
+                if (hadCustomFilterExpression)
                 {
                     CustomFilterExpression = customFilterExpression ?? string.Empty;
-                    if (Grid != null)
+                    if (grid != null)
                     {
-                        Grid.SaveSettings();
-                        if (Grid.IsVirtualizationAllowed())
+                        grid.SaveSettings();
+                        if (grid.IsVirtualizationAllowed())
                         {
-                            if (Grid.virtualize != null)
+                            if (grid.virtualize != null)
                             {
-                                await Grid.virtualize.RefreshDataAsync();
+                                await grid.virtualize.RefreshDataAsync();
                             }
                         }
                         else
                         {
-                            await Grid.Reload();
+                            await grid.Reload();
                         }
                     }
 
@@ -1340,26 +1386,26 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(CollectionFilterMode), CollectionFilterMode))
+            if (collectionFilterModeChanged)
             {
-                collectionFilterMode = parameters.GetValueOrDefault<CollectionFilterMode?>(nameof(CollectionFilterMode));
+                collectionFilterMode = newCollectionFilterMode;
 
-                if (FilterTemplate != null || FilterValueTemplate != null)
+                if (filterTemplates)
                 {
                     CollectionFilterMode = collectionFilterMode ?? default(CollectionFilterMode);
-                    Grid?.SaveSettings();
-                    if (Grid?.IsVirtualizationAllowed() == true)
+                    grid?.SaveSettings();
+                    if (grid?.IsVirtualizationAllowed() == true)
                     {
-                        if (Grid?.virtualize != null)
+                        if (grid?.virtualize != null)
                         {
-                            await Grid.virtualize.RefreshDataAsync();
+                            await grid.virtualize.RefreshDataAsync();
                         }
                     }
                     else
                     {
-                        if (Grid != null)
+                        if (grid != null)
                         {
-                            await Grid.Reload();
+                            await grid.Reload();
                         }
                     }
 
@@ -1367,27 +1413,25 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (filterOperator == null && (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator) || _filterOperator != null))
+            if (filterOperator == null && (filterOperatorChanged || filterOperatorFallback != null))
             {
-                filterOperator = _filterOperator ?? parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
+                filterOperator = filterOperatorFallback ?? newFilterOperator;
             }
 
-            if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
+            if (secondFilterValueChanged)
             {
-                secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+                secondFilterValue = newSecondFilterValue;
             }
 
-            if (parameters.DidParameterChange(nameof(SecondFilterOperator), SecondFilterOperator))
+            if (secondFilterOperatorChanged)
             {
-                secondFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(SecondFilterOperator));
+                secondFilterOperator = newSecondFilterOperator;
             }
 
-            if (parameters.DidParameterChange(nameof(LogicalFilterOperator), LogicalFilterOperator))
+            if (logicalFilterOperatorChanged)
             {
-                logicalFilterOperator = parameters.GetValueOrDefault<LogicalFilterOperator>(nameof(LogicalFilterOperator));
+                logicalFilterOperator = newLogicalFilterOperator;
             }
-
-            await base.SetParametersAsync(parameters);
         }
 
         /// <summary>
