@@ -1,0 +1,88 @@
+.rz-markdown-editor {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--rz-editor-border-radius);
+  border: var(--rz-editor-border);
+  overflow: hidden;
+
+  &:focus-within {
+    outline: var(--rz-editor-focus-outline);
+    outline-offset: var(--rz-editor-focus-outline-offset);
+  }
+}
+
+.rz-markdown-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  border-bottom: var(--rz-editor-border);
+  background-color: var(--rz-editor-toolbar-background-color);
+  padding: 0.25rem;
+}
+
+.rz-markdown-editor-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+}
+
+.rz-markdown-editor-modes {
+  margin-inline-start: auto;
+}
+
+.rz-markdown-editor-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--rz-editor-content-background-color);
+}
+
+.rz-markdown-editor-content-split {
+  > .rz-markdown-editor-textarea,
+  > .rz-markdown-editor-preview {
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+
+  > .rz-markdown-editor-preview {
+    border-inline-start: var(--rz-editor-border);
+  }
+}
+
+.rz-markdown-editor-textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: vertical;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: var(--rz-input-font-size);
+  line-height: var(--rz-input-line-height);
+  color: var(--rz-input-value-color);
+  background-color: transparent;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.rz-markdown-editor-preview {
+  flex: 1;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.rz-markdown-editor-empty {
+  color: var(--rz-text-disabled-color);
+  font-style: italic;
+}
+
+.rz-markdown-editor-custom-tool {
+  display: inline-flex;
+  align-items: center;
+}
