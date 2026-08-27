@@ -179,5 +179,81 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new MarkdownEdit(0, 11, "1. a\n2. b\n3. c", 0, 14), edit);
         }
+
+        [Fact]
+        public void CodeBlock_FencesSelection_OnOwnLines()
+        {
+            // "ab" selected in the middle of a line
+            var edit = MarkdownFormatter.Apply("x ab y", 2, 4, MarkdownEditorCommands.CodeBlock);
+
+            Assert.Equal(new MarkdownEdit(2, 4, "\n```\nab\n```\n", 7, 9), edit);
+        }
+
+        [Fact]
+        public void CodeBlock_AtLineBoundaries_AddsNoExtraNewlines()
+        {
+            var edit = MarkdownFormatter.Apply("code\n", 0, 5, MarkdownEditorCommands.CodeBlock);
+
+            Assert.Equal(new MarkdownEdit(0, 5, "```\ncode\n```", 4, 9), edit);
+        }
+
+        [Fact]
+        public void CodeBlock_WithEmptySelection_PlacesCaretInsideFence()
+        {
+            var edit = MarkdownFormatter.Apply("", 0, 0, MarkdownEditorCommands.CodeBlock);
+
+            Assert.Equal(new MarkdownEdit(0, 0, "```\n\n```", 4, 4), edit);
+        }
+
+        [Fact]
+        public void HorizontalRule_AtLineStart_InsertsRuleAndNewline()
+        {
+            var edit = MarkdownFormatter.Apply("a\nb", 2, 2, MarkdownEditorCommands.HorizontalRule);
+
+            Assert.Equal(new MarkdownEdit(2, 2, "---\n", 6, 6), edit);
+        }
+
+        [Fact]
+        public void HorizontalRule_MidLine_AddsLeadingNewline()
+        {
+            var edit = MarkdownFormatter.Apply("ab", 1, 1, MarkdownEditorCommands.HorizontalRule);
+
+            Assert.Equal(new MarkdownEdit(1, 1, "\n---\n", 6, 6), edit);
+        }
+
+        [Fact]
+        public void HorizontalRule_BeforeExistingNewline_AddsNoTrailingNewline()
+        {
+            var edit = MarkdownFormatter.Apply("a\nb", 1, 1, MarkdownEditorCommands.HorizontalRule);
+
+            Assert.Equal(new MarkdownEdit(1, 1, "\n---", 5, 5), edit);
+        }
+
+        [Theory]
+        [InlineData("link", "[")]
+        [InlineData("image", "![")]
+        public void Link_WrapsSelection_AndPlacesCaretAfter(string command, string open)
+        {
+            var edit = MarkdownFormatter.Apply("see docs now", 4, 8, command, "https://x.y");
+
+            var replacement = open + "docs](https://x.y)";
+            Assert.Equal(new MarkdownEdit(4, 8, replacement, 4 + replacement.Length, 4 + replacement.Length), edit);
+        }
+
+        [Fact]
+        public void Link_WithEmptySelection_UsesLabel()
+        {
+            var edit = MarkdownFormatter.Apply("", 0, 0, MarkdownEditorCommands.Link, "https://x.y", "Docs");
+
+            Assert.Equal(new MarkdownEdit(0, 0, "[Docs](https://x.y)", 19, 19), edit);
+        }
+
+        [Fact]
+        public void Link_WithEmptySelectionAndNoLabel_PlacesCaretInsideBrackets()
+        {
+            var edit = MarkdownFormatter.Apply("", 0, 0, MarkdownEditorCommands.Image, "https://x.y/i.png");
+
+            Assert.Equal(new MarkdownEdit(0, 0, "![](https://x.y/i.png)", 2, 2), edit);
+        }
     }
 }
