@@ -1770,30 +1770,48 @@ namespace Radzen
                     propertyExpression = Expression.Call(string.IsNullOrEmpty(property) && inMemory ? notNullCheck(parameter) : notNullCheck(propertyExpression), "ToString", Type.EmptyTypes);
                 }
 
-                if (ignoreCase && propertyExpression != null)
+                // EF can't translate the StringComparison overloads, so only an in-memory source uses them.
+                var useOrdinal = ignoreCase && inMemory;
+
+                if (ignoreCase && !useOrdinal && propertyExpression != null)
                 {
                     propertyExpression = Expression.Call(notNullCheck(propertyExpression!), "ToLower", Type.EmptyTypes);
                 }
 
-                var constantExpression = Expression.Constant(ignoreCase ? value.ToLower(CultureInfo.InvariantCulture) : value, typeof(string));
+                var constantExpression = Expression.Constant(!ignoreCase || useOrdinal ? value : value.ToLower(CultureInfo.InvariantCulture), typeof(string));
                 Expression? comparisonExpression = null;
 
                 if (propertyExpression != null)
                 {
-                    switch (op)
+                    if (useOrdinal)
                     {
-                        case StringFilterOperator.Contains:
-                            comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "Contains", null, constantExpression);
-                            break;
-                        case StringFilterOperator.StartsWith:
-                            comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "StartsWith", null, constantExpression);
-                            break;
-                        case StringFilterOperator.EndsWith:
-                            comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "EndsWith", null, constantExpression);
-                            break;
-                        default:
-                            comparisonExpression = Expression.Equal(propertyExpression, constantExpression);
-                            break;
+                        var ordinal = Expression.Constant(StringComparison.OrdinalIgnoreCase);
+                        var target = notNullCheck(propertyExpression);
+                        comparisonExpression = op switch
+                        {
+                            StringFilterOperator.Contains => Expression.Call(target, typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!, constantExpression, ordinal),
+                            StringFilterOperator.StartsWith => Expression.Call(target, typeof(string).GetMethod("StartsWith", new[] { typeof(string), typeof(StringComparison) })!, constantExpression, ordinal),
+                            StringFilterOperator.EndsWith => Expression.Call(target, typeof(string).GetMethod("EndsWith", new[] { typeof(string), typeof(StringComparison) })!, constantExpression, ordinal),
+                            _ => Expression.Call(target, typeof(string).GetMethod("Equals", new[] { typeof(string), typeof(StringComparison) })!, constantExpression, ordinal),
+                        };
+                    }
+                    else
+                    {
+                        switch (op)
+                        {
+                            case StringFilterOperator.Contains:
+                                comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "Contains", null, constantExpression);
+                                break;
+                            case StringFilterOperator.StartsWith:
+                                comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "StartsWith", null, constantExpression);
+                                break;
+                            case StringFilterOperator.EndsWith:
+                                comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "EndsWith", null, constantExpression);
+                                break;
+                            default:
+                                comparisonExpression = Expression.Equal(propertyExpression, constantExpression);
+                                break;
+                        }
                     }
                 }
 

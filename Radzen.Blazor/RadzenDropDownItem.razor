@@ -67,6 +67,51 @@ else
     [Parameter]
     public object Item { get; set; } = default!;
 
+    bool hasRendered;
+    object? lastText;
+    bool lastSelected;
+    bool lastItemDisabled;
+    bool lastDropDownDisabled;
+    bool lastMultiple;
+
+    /// <summary>
+    /// Skips re-rendering a plain item whose output has not changed, avoiding O(items) wasted work when the parent re-renders for an unrelated reason. A Template or ItemRender item always re-renders; the plain item is tracked by its resolved text, selected state, disabled state and layout, so an in-place mutation still re-renders.
+    /// </summary>
+    protected override bool ShouldRender()
+    {
+        var dropDown = DropDown;
+        if (dropDown == null || dropDown.Template != null || dropDown.ItemRender != null)
+        {
+            // Invalidate the plain-render snapshot so removing the Template/ItemRender at runtime forces a re-render.
+            hasRendered = false;
+            return true;
+        }
+
+        var text = dropDown.GetItemOrValueFromProperty(Item, dropDown.TextProperty ?? string.Empty);
+        var selected = dropDown.IsSelected(Item);
+        var multiple = dropDown.Multiple;
+        var dropDownDisabled = dropDown.Disabled;
+        var itemDisabled = dropDown.GetItemDisabled(Item);
+
+        if (hasRendered
+            && Equals(lastText, text)
+            && lastSelected == selected
+            && lastItemDisabled == itemDisabled
+            && lastDropDownDisabled == dropDownDisabled
+            && lastMultiple == multiple)
+        {
+            return false;
+        }
+
+        hasRendered = true;
+        lastText = text;
+        lastSelected = selected;
+        lastItemDisabled = itemDisabled;
+        lastDropDownDisabled = dropDownDisabled;
+        lastMultiple = multiple;
+        return true;
+    }
+
     async Task SelectItem(MouseEventArgs args,bool isclick)
     {
         var dropDown = DropDown;

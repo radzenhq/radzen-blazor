@@ -170,18 +170,9 @@ namespace Radzen
             //
         }
 
-        HashSet<object> keys = new HashSet<object>();
-
         internal object? GetKey(object item)
         {
-            var value = GetItemOrValueFromProperty(item, ValueProperty ?? string.Empty);
-
-            if (value != null)
-            {
-                keys.Add(value);
-            }
-
-            return value;
+            return GetItemOrValueFromProperty(item, ValueProperty ?? string.Empty);
         }
 
         /// <summary>
@@ -479,6 +470,10 @@ namespace Radzen
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
+
+            // Drop the memoized multiselect membership set each render so an in-place change to the bound
+            // value collection (same reference, mutated elements) is reflected on the next render.
+            _selectedValuesSet = null;
 
             if (_data != null)
             {
@@ -1607,17 +1602,16 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values.Cast<dynamic>().ToList())
+                            if (typeof(EnumerableQuery).IsAssignableFrom(view.GetType()))
                             {
-                                dynamic item;
-
-                                if (typeof(EnumerableQuery).IsAssignableFrom(view.GetType()))
+                                AddSelectedItemsByValue(view, values);
+                            }
+                            else
+                            {
+                                // Non-in-memory (e.g. EF): keep the per-value query so the lookup stays server-side.
+                                foreach (object v in values.Cast<dynamic>().ToList())
                                 {
-                                    item = view.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).FirstOrDefault()!;
-                                }
-                                else
-                                {
-                                    item = view.AsQueryable().Where(new FilterDescriptor[]
+                                    dynamic item = view.AsQueryable().Where(new FilterDescriptor[]
                                     {
                                         new FilterDescriptor()
                                         {
@@ -1627,11 +1621,11 @@ namespace Radzen
                                     },
                                     LogicalFilterOperator.And,
                                     FilterCaseSensitivity.Default).FirstOrDefault()!;
-                                }
 
-                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
-                                {
-                                    selectedItems.Add(item);
+                                    if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
+                                    {
+                                        selectedItems.Add(item);
+                                    }
                                 }
                             }
                         }
@@ -1653,6 +1647,45 @@ namespace Radzen
         /// </summary>
         [Parameter] public IEqualityComparer<object>? ItemComparer { get; set; }
 
+        /// <summary>
+        /// Resolves each bound value against the in-memory <paramref name="source"/> and adds any not already selected, using a value-&gt;item lookup so a multiselect binding is O(items + selected) rather than O(items x selected). The non-in-memory (e.g. EF) path stays at each call site so its lookup remains server-side.
+        /// </summary>
+        private protected void AddSelectedItemsByValue(IEnumerable source, IEnumerable values)
+        {
+            var itemsByValue = new Dictionary<object, object>();
+            foreach (var i in source.OfType<object>())
+            {
+                var iv = GetItemOrValueFromProperty(i, ValueProperty!);
+                if (iv != null)
+                {
+                    itemsByValue.TryAdd(iv, i);
+                }
+            }
+
+            var existingValues = new HashSet<object>();
+            foreach (var si in selectedItems)
+            {
+                var sv = GetItemOrValueFromProperty(si, ValueProperty!);
+                if (sv != null)
+                {
+                    existingValues.Add(sv);
+                }
+            }
+
+            foreach (object v in values.Cast<object>())
+            {
+                if (v != null && itemsByValue.TryGetValue(v, out var item) && existingValues.Add(v))
+                {
+                    selectedItems.Add(item);
+                }
+            }
+        }
+
+        // O(1) IsItemSelectedByValue membership. Cleared each render (OnParametersSet), so an in-place change
+        // to the bound value collection is reflected on the next lookup.
+        IEnumerable? _selectedValuesSource;
+        HashSet<object>? _selectedValuesSet;
+
         internal bool IsItemSelectedByValue(object v)
         {
             switch (internalValue)
@@ -1660,7 +1693,12 @@ namespace Radzen
                 case string s:
                     return object.Equals(s, v);
                 case IEnumerable enumerable:
-                    return enumerable.Cast<object>().Contains(v);
+                    if (_selectedValuesSet == null || !ReferenceEquals(_selectedValuesSource, enumerable))
+                    {
+                        _selectedValuesSource = enumerable;
+                        _selectedValuesSet = new HashSet<object>(enumerable.Cast<object>());
+                    }
+                    return _selectedValuesSet.Contains(v);
                 case null:
                     return false;
                 default:
@@ -1672,8 +1710,6 @@ namespace Radzen
         public override void Dispose()
         {
             base.Dispose();
-
-            keys.Clear();
 
             GC.SuppressFinalize(this);
         }
