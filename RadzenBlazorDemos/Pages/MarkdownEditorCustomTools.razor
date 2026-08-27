@@ -1,0 +1,23 @@
+<RadzenMarkdownEditor @bind-Value=@markdown Execute=@OnExecute Style="min-height: 200px">
+    <RadzenMarkdownEditorBold />
+    <RadzenMarkdownEditorItalic />
+    <RadzenMarkdownEditorSeparator />
+    <RadzenMarkdownEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today's date" />
+    <RadzenMarkdownEditorCustomTool>
+        <Template Context="editor">
+            <RadzenButton Size="ButtonSize.Small" Variant="Variant.Text" Text="Clear" Click="@(() => editor.ExecuteCommandAsync(MarkdownEditorCommands.InsertText, string.Empty))" />
+        </Template>
+    </RadzenMarkdownEditorCustomTool>
+</RadzenMarkdownEditor>
+
+@code {
+    string markdown = "Click the calendar tool to insert today's date.";
+
+    async Task OnExecute(MarkdownEditorExecuteEventArgs args)
+    {
+        if (args.CommandName == "InsertToday")
+        {
+            await args.Editor.ExecuteCommandAsync(MarkdownEditorCommands.InsertText, DateTime.Today.ToLongDateString());
+        }
+    }
+}

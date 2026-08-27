@@ -3259,6 +3259,23 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" } ],
+            Name = "MarkdownEditor",
+            Icon = "",
+            Path = "markdown-editor",
+            Title = "Blazor Markdown Editor | Free UI Components by Radzen",
+            Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a live preview with Write, Preview and Split modes.",
+            Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
+            Related = new [] { "markdown", "html-editor", "textarea" },
+            Faq = new []
+            {
+                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; the toolbar and keyboard shortcuts insert Markdown syntax and the preview renders it with RadzenMarkdown." },
+                new FaqItem { Question = "Can I show the editor and preview side by side?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Split, or let users switch between Write, Preview and Split with the built-in mode switcher." },
+                new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
+            }
+        },
+        new Example
+        {
             Name = "Data",
             Icon = "\ue99c",
             Children = new [] {

@@ -1,0 +1,22 @@
+@page "/markdown-editor"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor Markdown Editor
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Blazor Markdown Editor component (RadzenMarkdownEditor) edits Markdown with a toolbar, keyboard shortcuts and a live preview rendered by RadzenMarkdown. Switch between Write, Preview and Split mode.
+</RadzenText>
+
+<RadzenExample ComponentName="MarkdownEditor" Example="MarkdownEditor">
+    <MarkdownEditor />
+</RadzenExample>
+
+<RadzenText Anchor="markdown-editor#custom-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Provide your own toolbar by placing tools inside <strong>RadzenMarkdownEditor</strong>. Use <code>RadzenMarkdownEditorCustomTool</code> to add buttons that run your own commands via the <code>Execute</code> event, or render arbitrary content with its <code>Template</code>.
+</RadzenText>
+<RadzenExample ComponentName="MarkdownEditor" Example="MarkdownEditorCustomTools">
+    <MarkdownEditorCustomTools />
+</RadzenExample>
