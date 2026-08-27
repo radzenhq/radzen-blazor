@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor;
 
@@ -43,6 +45,16 @@ internal static class MarkdownFormatter
                 return Wrap(text, start, end, "~~");
             case MarkdownEditorCommands.Code:
                 return Wrap(text, start, end, "`");
+            case MarkdownEditorCommands.Heading:
+                return Heading(text, start, end);
+            case MarkdownEditorCommands.Quote:
+                return PrefixLines(text, start, end, "> ");
+            case MarkdownEditorCommands.UnorderedList:
+                return PrefixLines(text, start, end, "- ");
+            case MarkdownEditorCommands.TaskList:
+                return PrefixLines(text, start, end, "- [ ] ");
+            case MarkdownEditorCommands.OrderedList:
+                return OrderedList(text, start, end);
             default:
                 return null;
         }
@@ -69,5 +81,59 @@ internal static class MarkdownFormatter
         }
 
         return new MarkdownEdit(start, end, token + selected + token, start + t, start + t + selected.Length);
+    }
+
+    static readonly Regex OrderedPrefix = new(@"^\d+\. ", RegexOptions.Compiled);
+    static readonly Regex HeadingPrefix = new(@"^(#{1,6}) ", RegexOptions.Compiled);
+
+    /// <summary>Expands [start, end) to whole lines. A selection ending right after a newline does not include the next line.</summary>
+    static (int LineStart, int LineEnd) ExpandToLines(string text, int start, int end)
+    {
+        var lineStart = start == 0 ? 0 : text.LastIndexOf('\n', start - 1) + 1;
+
+        var searchFrom = end > start && text[end - 1] == '\n' ? end - 1 : end;
+        var lineEnd = searchFrom < text.Length ? text.IndexOf('\n', searchFrom) : -1;
+        if (lineEnd == -1)
+        {
+            lineEnd = text.Length;
+        }
+
+        return (lineStart, lineEnd);
+    }
+
+    static MarkdownEdit ReplaceLines(string text, int start, int end, Func<string[], string[]> transform)
+    {
+        var (lineStart, lineEnd) = ExpandToLines(text, start, end);
+        var lines = text.Substring(lineStart, lineEnd - lineStart).Split('\n');
+        var replacement = string.Join("\n", transform(lines));
+        return new MarkdownEdit(lineStart, lineEnd, replacement, lineStart, lineStart + replacement.Length);
+    }
+
+    static MarkdownEdit PrefixLines(string text, int start, int end, string prefix)
+    {
+        return ReplaceLines(text, start, end, lines =>
+            lines.All(l => l.StartsWith(prefix, StringComparison.Ordinal))
+                ? lines.Select(l => l.Substring(prefix.Length)).ToArray()
+                : lines.Select(l => prefix + l).ToArray());
+    }
+
+    static MarkdownEdit OrderedList(string text, int start, int end)
+    {
+        return ReplaceLines(text, start, end, lines =>
+            lines.All(l => OrderedPrefix.IsMatch(l))
+                ? lines.Select(l => OrderedPrefix.Replace(l, string.Empty, 1)).ToArray()
+                : lines.Select((l, i) => $"{i + 1}. {l}").ToArray());
+    }
+
+    static MarkdownEdit Heading(string text, int start, int end)
+    {
+        return ReplaceLines(text, start, end, lines =>
+        {
+            var match = HeadingPrefix.Match(lines[0]);
+            var level = match.Success ? match.Groups[1].Value.Length : 0;
+            var next = level >= 3 ? 0 : level + 1;
+            var prefix = next == 0 ? string.Empty : new string('#', next) + " ";
+            return lines.Select(l => prefix + HeadingPrefix.Replace(l, string.Empty, 1)).ToArray();
+        });
     }
 }
