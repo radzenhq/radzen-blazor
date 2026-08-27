@@ -27,6 +27,7 @@ $panel-menu-item-2nd-level-margin-block: 0 !default;
 $panel-menu-item-2nd-level-margin-inline: 0 !default;
 $panel-menu-item-2nd-level-border-radius: 0 !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;
+$panel-menu-item-nested-offset: 1rem !default;
 $panel-menu-item-2nd-level-font-size: var(--rz-body-font-size) !default;
 $panel-menu-item-2nd-level-font-weight: 400 !default;
 $panel-menu-item-2nd-level-color: inherit !default;
@@ -260,7 +261,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
       .rz-navigation-item-link {
         padding-block: var(--rz-panel-menu-item-2nd-level-padding-block);
         padding-inline: var(--rz-panel-menu-item-2nd-level-padding-inline);
-        padding-inline-start: var(--rz-panel-menu-item-2nd-level-offset);
+        padding-inline-start: calc(var(--rz-panel-menu-item-2nd-level-offset) + (var(--rz-navigation-item-level, 2) - 2) * var(--rz-panel-menu-item-nested-offset));
       }
     }
 

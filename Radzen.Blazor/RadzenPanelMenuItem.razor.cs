@@ -286,6 +286,10 @@ namespace Radzen.Blazor
             SyncWithNavigationManager();
         }
 
+        internal int Level => ParentItem != null ? ParentItem.Level + 1 : 1;
+
+        string ItemStyle => string.IsNullOrEmpty(Style) ? $"--rz-navigation-item-level: {Level}" : $"--rz-navigation-item-level: {Level}; {Style}";
+
         string WrapperClass => ClassList.Create("rz-navigation-item-wrapper")
             .Add("rz-navigation-item-wrapper-active", selected)
             .ToString();
