@@ -27,6 +27,10 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     IJSObjectReference? jsRef;
     readonly Dictionary<string, Func<Task>> shortcuts = new();
 
+    MarkdownEditorMode mode;
+    bool visibleChanged;
+    int jsRefVersion;
+
     /// <summary>
     /// Gets or sets the mode of the editor. Two-way bindable.
     /// </summary>
@@ -53,6 +57,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
     /// <summary>
     /// Specifies whether <see cref="Input" /> is raised on every keystroke. Set to <c>false</c> by default.
+    /// Unlike <see cref="RadzenTextArea.Immediate" />, <see cref="FormComponent{T}.Value" /> is always updated on input; this only controls whether <see cref="Input" /> is raised per keystroke.
     /// </summary>
     [Parameter]
     public bool Immediate { get; set; }
@@ -104,17 +109,22 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
 
-    string ContentClass => Mode == MarkdownEditorMode.Split
+    string ContentClass => mode == MarkdownEditorMode.Split
         ? "rz-markdown-editor-content rz-markdown-editor-content-split"
         : "rz-markdown-editor-content";
 
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
 
-    async Task SetModeAsync(MarkdownEditorMode mode)
+    /// <summary>
+    /// Returns the current mode of the editor.
+    /// </summary>
+    public MarkdownEditorMode GetMode() => mode;
+
+    async Task SetModeAsync(MarkdownEditorMode value)
     {
-        Mode = mode;
-        await ModeChanged.InvokeAsync(mode);
+        mode = value;
+        await ModeChanged.InvokeAsync(value);
     }
 
     async Task OnInput(ChangeEventArgs args)
@@ -187,7 +197,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             label = model.Text;
         }
 
-        var edit = MarkdownFormatter.Apply(Value ?? string.Empty, start, end, name, value, label);
+        var edit = MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label);
 
         if (edit is { } e && JSRuntime != null)
         {
@@ -197,9 +207,16 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
     }
 
+    /// <summary>
+    /// <see cref="FormComponent{T}.Value" /> with line endings normalised to <c>\n</c>, matching the offsets
+    /// <c>Radzen.getSelectionRange</c> returns for the textarea (the HTML spec normalises the API value to LF).
+    /// </summary>
+    string NormalizedValue => (Value ?? string.Empty).Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
+
     async Task<(int Start, int End)> GetSelectionAsync()
     {
-        var length = Value?.Length ?? 0;
+        var text = NormalizedValue;
+        var length = text.Length;
 
         if (JSRuntime == null)
         {
@@ -214,14 +231,69 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        mode = Mode;
+
+        base.OnInitialized();
+    }
+
+    /// <inheritdoc />
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.DidParameterChange(nameof(Mode), Mode))
+        {
+            mode = parameters.GetValueOrDefault<MarkdownEditorMode>(nameof(Mode));
+        }
+
+        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+        await base.SetParametersAsync(parameters);
+
+        if (visibleChanged && !Visible && jsRef != null)
+        {
+            jsRefVersion++;
+            var stale = jsRef;
+            jsRef = null;
+            await stale.InvokeVoidAsync("dispose");
+            await stale.DisposeAsync();
+        }
+    }
+
+    /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender && Visible && JSRuntime != null)
+        if ((firstRender || visibleChanged) && Visible && JSRuntime != null)
         {
-            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", textarea, Reference, shortcuts.Keys);
+            var version = ++jsRefVersion;
+            var stale = jsRef;
+            jsRef = null;
+
+            if (stale != null)
+            {
+                await stale.InvokeVoidAsync("dispose");
+                await stale.DisposeAsync();
+            }
+
+            if (version == jsRefVersion)
+            {
+                var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", textarea, Reference, shortcuts.Keys);
+
+                if (version == jsRefVersion)
+                {
+                    jsRef = created;
+                }
+                else
+                {
+                    await created.InvokeVoidAsync("dispose");
+                    await created.DisposeAsync();
+                }
+            }
         }
+
+        visibleChanged = false;
     }
 
     /// <inheritdoc />

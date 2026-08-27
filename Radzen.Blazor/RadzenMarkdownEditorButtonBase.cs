@@ -35,7 +35,7 @@ public abstract class RadzenMarkdownEditorButtonBase : ComponentBase, IDisposabl
     protected virtual string? CommandName { get; }
 
     /// <summary>
-    /// The keyboard shortcut of this tool, e.g. <c>Ctrl+B</c>.
+    /// The keyboard shortcut of this tool, e.g. <c>Ctrl+B</c>. Only Ctrl/Cmd combinations are supported, e.g. <c>Ctrl+B</c> (Cmd on macOS).
     /// </summary>
     [Parameter]
     public virtual string? Shortcut { get; set; }
