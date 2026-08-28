@@ -45,22 +45,25 @@
         }
         <RadzenSplitter Orientation="Orientation.Horizontal" class="rz-markdown-editor-content">
             <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" BarVisible=@(mode == MarkdownEditorMode.Split)
-                                class=@(mode == MarkdownEditorMode.Preview ? "rz-markdown-editor-pane rz-markdown-editor-pane-hidden" : "rz-markdown-editor-pane")>
+                                class=@TextareaPaneClass>
                 <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Preview)
                           name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
                           value=@Value @oninput=@OnInput @onchange=@OnChange></textarea>
             </RadzenSplitterPane>
-            <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" Visible=@(mode != MarkdownEditorMode.Edit) class="rz-markdown-editor-pane">
-                <div class="rz-markdown-editor-preview">
-                    @if (string.IsNullOrWhiteSpace(Value))
-                    {
-                        <span class="rz-markdown-editor-empty">@NothingToPreviewText</span>
-                    }
-                    else
-                    {
-                        <RadzenMarkdown Text=@Value AllowHtml=@AllowHtml AllowedHtmlTags=@AllowedHtmlTags AllowedHtmlAttributes=@AllowedHtmlAttributes />
-                    }
-                </div>
+            <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" class=@PreviewPaneClass>
+                @if (mode != MarkdownEditorMode.Edit)
+                {
+                    <div class="rz-markdown-editor-preview">
+                        @if (string.IsNullOrWhiteSpace(Value))
+                        {
+                            <span class="rz-markdown-editor-empty">@NothingToPreviewText</span>
+                        }
+                        else
+                        {
+                            <RadzenMarkdown Text=@Value AllowHtml=@AllowHtml AllowedHtmlTags=@AllowedHtmlTags AllowedHtmlAttributes=@AllowedHtmlAttributes />
+                        }
+                    </div>
+                }
             </RadzenSplitterPane>
         </RadzenSplitter>
     </div>

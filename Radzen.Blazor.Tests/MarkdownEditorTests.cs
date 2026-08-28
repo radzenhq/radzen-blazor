@@ -361,5 +361,58 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(component.Find("textarea"));
             Assert.Single(component.FindAll(".rz-markdown-editor-pane-hidden"));
         }
+
+        [Theory]
+        [InlineData(MarkdownEditorMode.Edit, "rz-markdown-editor-pane-full")]
+        [InlineData(MarkdownEditorMode.Preview, "rz-markdown-editor-pane-hidden")]
+        public void MarkdownEditor_TextareaPane_HasModeClass(MarkdownEditorMode mode, string expectedClass)
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, mode));
+
+            var pane = component.Find("textarea").ParentElement!;
+            Assert.Contains(expectedClass, pane.ClassName);
+        }
+
+        [Fact]
+        public void MarkdownEditor_SplitMode_TextareaPane_HasNoModeClass()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Split));
+
+            var pane = component.Find("textarea").ParentElement!;
+            Assert.DoesNotContain("rz-markdown-editor-pane-full", pane.ClassName);
+            Assert.DoesNotContain("rz-markdown-editor-pane-hidden", pane.ClassName);
+            Assert.Contains("rz-markdown-editor-pane-fill", component.Find(".rz-markdown-editor-preview").ParentElement!.ClassName);
+        }
+
+        [Fact]
+        public void MarkdownEditor_SwitchingToSplit_AfterMount_RendersSplitterBar()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+            Assert.Empty(component.FindAll(".rz-splitter-bar"));
+
+            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Split));
+
+            Assert.Single(component.FindAll(".rz-splitter-bar"));
+            Assert.Equal(2, component.FindAll(".rz-markdown-editor-pane").Count);
+        }
+
+        [Fact]
+        public void MarkdownEditor_SwitchingToPreview_AfterMount_HidesTextareaPane_AndFillsPreviewPane()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
+
+            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
+
+            var panes = component.FindAll(".rz-markdown-editor-pane");
+            Assert.Equal(2, panes.Count);
+            Assert.Contains("rz-markdown-editor-pane-hidden", panes[0].ClassName);
+            Assert.Contains("rz-markdown-editor-pane-fill", panes[1].ClassName);
+            Assert.Contains("rz-splitter-pane-lastresizable", panes[1].ClassName);
+            Assert.Contains("<h1", component.Markup);
+        }
     }
 }

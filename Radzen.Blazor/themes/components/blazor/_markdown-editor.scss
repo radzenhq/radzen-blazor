@@ -46,6 +46,11 @@
   &.rz-markdown-editor-pane-hidden {
     display: none !important;
   }
+
+  &.rz-markdown-editor-pane-full,
+  &.rz-markdown-editor-pane-fill {
+    flex: 1 1 auto !important;
+  }
 }
 
 .rz-markdown-editor-textarea {
