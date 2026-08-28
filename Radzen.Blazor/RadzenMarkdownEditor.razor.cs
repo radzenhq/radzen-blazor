@@ -7,7 +7,7 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor;
 
 /// <summary>
-/// A markdown editor component with a toolbar, keyboard shortcuts and a live preview rendered by <see cref="RadzenMarkdown" />.
+/// A Markdown editor component with a toolbar, keyboard shortcuts, and a live preview rendered by <see cref="RadzenMarkdown" />.
 /// In <see cref="MarkdownEditorMode.Split" /> mode the editor and preview are separated by a <see cref="RadzenSplitter" /> so their ratio can be adjusted.
 /// </summary>
 /// <example>
@@ -21,16 +21,15 @@ namespace Radzen.Blazor;
 /// </example>
 public partial class RadzenMarkdownEditor : FormComponent<string>
 {
-    [Inject]
-    DialogService DialogService { get; set; } = default!;
+    [Inject] private DialogService DialogService { get; set; } = null!;
 
-    ElementReference textarea;
-    IJSObjectReference? jsRef;
-    readonly Dictionary<string, Func<Task>> shortcuts = new();
+    private ElementReference textarea;
+    private IJSObjectReference? jsRef;
+    private readonly Dictionary<string, Func<Task>> shortcuts = new();
 
-    MarkdownEditorMode mode;
-    bool visibleChanged;
-    int jsRefVersion;
+    private MarkdownEditorMode mode;
+    private bool visibleChanged;
+    private int jsRefVersion;
 
     /// <summary>
     /// Gets or sets the mode of the editor. Two-way bindable.
@@ -51,7 +50,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public bool ShowToolbar { get; set; } = true;
 
     /// <summary>
-    /// Custom toolbar content. When set it replaces the default toolbar tools.
+    /// Custom toolbar content. When set, it replaces the default toolbar tools.
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
@@ -99,25 +98,25 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [Parameter]
     public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
 
-    string WriteText => Localize(nameof(RadzenStrings.MarkdownEditor_WriteText));
-    string PreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_PreviewText));
-    string SplitText => Localize(nameof(RadzenStrings.MarkdownEditor_SplitText));
-    string NothingToPreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_NothingToPreviewText));
-    string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
-    string LinkText => Localize(nameof(RadzenStrings.MarkdownEditorLink_LinkText));
-    string ImageUrlText => Localize(nameof(RadzenStrings.MarkdownEditorImage_UrlText));
-    string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
-    string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
-    string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
+    private string WriteText => Localize(nameof(RadzenStrings.MarkdownEditor_WriteText));
+    private string PreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_PreviewText));
+    private string SplitText => Localize(nameof(RadzenStrings.MarkdownEditor_SplitText));
+    private string NothingToPreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_NothingToPreviewText));
+    private string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
+    private string LinkText => Localize(nameof(RadzenStrings.MarkdownEditorLink_LinkText));
+    private string ImageUrlText => Localize(nameof(RadzenStrings.MarkdownEditorImage_UrlText));
+    private string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
+    private string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
+    private string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
 
-    string TextareaPaneClass => mode switch
+    private string TextareaPaneClass => mode switch
     {
         MarkdownEditorMode.Edit => "rz-markdown-editor-pane rz-markdown-editor-pane-full",
         MarkdownEditorMode.Preview => "rz-markdown-editor-pane rz-markdown-editor-pane-hidden",
         _ => "rz-markdown-editor-pane"
     };
 
-    string PreviewPaneClass => mode == MarkdownEditorMode.Edit
+    private string PreviewPaneClass => mode == MarkdownEditorMode.Edit
         ? "rz-markdown-editor-pane rz-markdown-editor-pane-hidden"
         : "rz-markdown-editor-pane rz-markdown-editor-pane-fill";
 
@@ -129,15 +128,15 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     public MarkdownEditorMode GetMode() => mode;
 
-    async Task SetModeAsync(MarkdownEditorMode value)
+    private async Task SetModeAsync(MarkdownEditorMode value)
     {
         mode = value;
         await ModeChanged.InvokeAsync(value);
     }
 
-    async Task OnInput(ChangeEventArgs args)
+    private async Task OnInput(ChangeEventArgs args)
     {
-        var newValue = $"{args.Value}";
+        string newValue = $"{args.Value}";
         Value = newValue;
         await ValueChanged.InvokeAsync(newValue);
         NotifyFieldChanged(newValue);
@@ -148,7 +147,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         }
     }
 
-    async Task OnChange(ChangeEventArgs args)
+    private async Task OnChange(ChangeEventArgs args)
     {
         await Change.InvokeAsync($"{args.Value}");
     }
@@ -187,14 +186,14 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialog is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />.</param>
     public async Task ExecuteCommandAsync(string name, string? value = null)
     {
-        var (start, end) = await GetSelectionAsync();
+        (int start, int end) = await GetSelectionAsync();
         string? label = null;
 
         if (value == null && name is MarkdownEditorCommands.Link or MarkdownEditorCommands.Image)
         {
-            var model = new LinkDialogModel();
-            var title = Localize(name == MarkdownEditorCommands.Image ? nameof(RadzenStrings.MarkdownEditorImage_Title) : nameof(RadzenStrings.MarkdownEditorLink_Title));
-            var result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, end > start));
+            LinkDialogModel model = new();
+            string title = Localize(name == MarkdownEditorCommands.Image ? nameof(RadzenStrings.MarkdownEditorImage_Title) : nameof(RadzenStrings.MarkdownEditorLink_Title));
+            dynamic? result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, end > start));
 
             if (result is not true || string.IsNullOrWhiteSpace(model.Url))
             {
@@ -205,7 +204,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             label = model.Text;
         }
 
-        var edit = MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label);
+        MarkdownEdit? edit = MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label);
 
         if (edit is { } e && JSRuntime != null)
         {
@@ -219,19 +218,19 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// <see cref="FormComponent{T}.Value" /> with line endings normalised to <c>\n</c>, matching the offsets
     /// <c>Radzen.getSelectionRange</c> returns for the textarea (the HTML spec normalises the API value to LF).
     /// </summary>
-    string NormalizedValue => (Value ?? string.Empty).Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
+    private string NormalizedValue => (Value ?? string.Empty).Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
 
-    async Task<(int Start, int End)> GetSelectionAsync()
+    private async Task<(int Start, int End)> GetSelectionAsync()
     {
-        var text = NormalizedValue;
-        var length = text.Length;
+        string text = NormalizedValue;
+        int length = text.Length;
 
         if (JSRuntime == null)
         {
             return (length, length);
         }
 
-        var range = await JSRuntime.InvokeAsync<int[]?>("Radzen.getSelectionRange", textarea);
+        int[]? range = await JSRuntime.InvokeAsync<int[]?>("Radzen.getSelectionRange", textarea);
 
         return range is { Length: 2 }
             ? (Math.Clamp(range[0], 0, length), Math.Clamp(range[1], 0, length))
@@ -261,7 +260,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         if (visibleChanged && !Visible && jsRef != null)
         {
             jsRefVersion++;
-            var stale = jsRef;
+            IJSObjectReference stale = jsRef;
             jsRef = null;
             await stale.InvokeVoidAsync("dispose");
             await stale.DisposeAsync();
@@ -275,8 +274,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
         if ((firstRender || visibleChanged) && Visible && JSRuntime != null)
         {
-            var version = ++jsRefVersion;
-            var stale = jsRef;
+            int version = ++jsRefVersion;
+            IJSObjectReference? stale = jsRef;
             jsRef = null;
 
             if (stale != null)
@@ -287,7 +286,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
             if (version == jsRefVersion)
             {
-                var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", textarea, Reference, shortcuts.Keys);
+                IJSObjectReference created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", textarea, Reference, shortcuts.Keys);
 
                 if (version == jsRefVersion)
                 {
@@ -319,7 +318,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         GC.SuppressFinalize(this);
     }
 
-    class LinkDialogModel
+    private class LinkDialogModel
     {
         public string? Url { get; set; }
         public string? Text { get; set; }
