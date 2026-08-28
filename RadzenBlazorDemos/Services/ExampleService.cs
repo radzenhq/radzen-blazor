@@ -3259,7 +3259,7 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" } ],
+            Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
             Name = "MarkdownEditor",
             Icon = "\uf552",
             Path = "markdown-editor",
