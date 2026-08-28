@@ -33,21 +33,18 @@
 }
 
 .rz-markdown-editor-content {
-  display: flex;
   flex: 1;
   min-height: 0;
   background-color: var(--rz-editor-content-background-color);
 }
 
-.rz-markdown-editor-content-split {
-  > .rz-markdown-editor-textarea,
-  > .rz-markdown-editor-preview {
-    flex: 1 1 50%;
-    min-width: 0;
-  }
+.rz-markdown-editor-pane {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
 
-  > .rz-markdown-editor-preview {
-    border-inline-start: var(--rz-editor-border);
+  &.rz-markdown-editor-pane-hidden {
+    display: none !important;
   }
 }
 

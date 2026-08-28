@@ -8,6 +8,7 @@ namespace Radzen.Blazor;
 
 /// <summary>
 /// A markdown editor component with a toolbar, keyboard shortcuts and a live preview rendered by <see cref="RadzenMarkdown" />.
+/// In <see cref="MarkdownEditorMode.Split" /> mode the editor and preview are separated by a <see cref="RadzenSplitter" /> so their ratio can be adjusted.
 /// </summary>
 /// <example>
 /// <code>
@@ -108,10 +109,6 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
     string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
-
-    string ContentClass => mode == MarkdownEditorMode.Split
-        ? "rz-markdown-editor-content rz-markdown-editor-content-split"
-        : "rz-markdown-editor-content";
 
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
