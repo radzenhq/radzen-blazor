@@ -110,6 +110,17 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
 
+    string TextareaPaneClass => mode switch
+    {
+        MarkdownEditorMode.Edit => "rz-markdown-editor-pane rz-markdown-editor-pane-full",
+        MarkdownEditorMode.Preview => "rz-markdown-editor-pane rz-markdown-editor-pane-hidden",
+        _ => "rz-markdown-editor-pane"
+    };
+
+    string PreviewPaneClass => mode == MarkdownEditorMode.Edit
+        ? "rz-markdown-editor-pane rz-markdown-editor-pane-hidden"
+        : "rz-markdown-editor-pane rz-markdown-editor-pane-fill";
+
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
 
