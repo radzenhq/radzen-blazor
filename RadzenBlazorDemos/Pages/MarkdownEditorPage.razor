@@ -32,16 +32,16 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
         <li>RadzenMarkdownEditorSeparator - displays a vertical separator used to delimit groups of similar tools.</li>
         <li>RadzenMarkdownEditorBold - toggles <code>**bold**</code> on the selected text.</li>
         <li>RadzenMarkdownEditorItalic - toggles <code>_italic_</code> on the selected text.</li>
-        <li>RadzenMarkdownEditorStrikethrough - toggles <code>~~strikethrough~~</code> on the selected text. Not rendered by RadzenMarkdown yet, therefore not part of the default toolbar.</li>
+        <li>RadzenMarkdownEditorStrikethrough - toggles <code>~~strikethrough~~</code> on the selected text. Not rendered by RadzenMarkdown, therefore not part of the default toolbar.</li>
         <li>RadzenMarkdownEditorHeading - cycles the heading level of the selected lines (<code>#</code>, <code>##</code>, <code>###</code>, none).</li>
         <li>RadzenMarkdownEditorQuote - toggles <code>&gt; </code> block quotes on the selected lines.</li>
         <li>RadzenMarkdownEditorCode - toggles inline <code>`code`</code> on the selected text.</li>
         <li>RadzenMarkdownEditorCodeBlock - wraps the selection in a fenced <code>```</code> code block.</li>
         <li>RadzenMarkdownEditorUnorderedList - toggles a bullet list (<code>- </code>) on the selected lines.</li>
         <li>RadzenMarkdownEditorOrderedList - toggles a numbered list (<code>1. </code>) on the selected lines.</li>
-        <li>RadzenMarkdownEditorTaskList - toggles a task list (<code>- [ ] </code>) on the selected lines. Not rendered by RadzenMarkdown yet, therefore not part of the default toolbar.</li>
+        <li>RadzenMarkdownEditorTaskList - toggles a task list (<code>- [ ] </code>) on the selected lines. Not rendered by RadzenMarkdown, therefore not part of the default toolbar.</li>
         <li>RadzenMarkdownEditorLink - inserts a link; opens a dialog for the URL (and text when nothing is selected).</li>
-        <li>RadzenMarkdownEditorImage - inserts an image by URL; opens a dialog for the URL and alternative text.</li>
+        <li>RadzenMarkdownEditorImage - inserts an image by URL; opens a dialog for the URL (and alternative text when nothing is selected).</li>
         <li>RadzenMarkdownEditorHorizontalRule - inserts a horizontal rule (<code>---</code>) on its own line.</li>
         <li>RadzenMarkdownEditorCustomTool - allows the developer to implement a custom tool (see Custom tools above).</li>
     </ul>
@@ -92,7 +92,7 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
             <RadzenTableCell>Undo the last change, including toolbar actions.</RadzenTableCell>
         </RadzenTableRow>
         <RadzenTableRow>
-            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Y" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
             <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
             <RadzenTableCell>Redo the last undone change.</RadzenTableCell>
         </RadzenTableRow>
@@ -100,6 +100,11 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
             <RadzenTableCell><RadzenBadge Text="←" /> / <RadzenBadge Text="→" /></RadzenTableCell>
             <RadzenTableCell><RadzenBadge Text="←" /> / <RadzenBadge Text="→" /></RadzenTableCell>
             <RadzenTableCell>In Split mode, with the splitter handle focused (reach it with Tab): resize the editor and preview panes.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Home" /> / <RadzenBadge Text="End" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Home" /> / <RadzenBadge Text="End" /></RadzenTableCell>
+            <RadzenTableCell>With the splitter handle focused: move the split to its minimum / maximum position.</RadzenTableCell>
         </RadzenTableRow>
     </RadzenTableBody>
 </RadzenTable>
