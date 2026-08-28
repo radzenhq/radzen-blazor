@@ -339,5 +339,27 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
             Assert.Contains("mode:Edit", component.Markup);
         }
+
+        [Theory]
+        [InlineData(MarkdownEditorMode.Edit, false)]
+        [InlineData(MarkdownEditorMode.Preview, false)]
+        [InlineData(MarkdownEditorMode.Split, true)]
+        public void MarkdownEditor_RendersSplitterBar_OnlyInSplitMode(MarkdownEditorMode mode, bool expected)
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, mode));
+
+            Assert.Equal(expected, component.FindAll(".rz-splitter-bar").Count > 0);
+        }
+
+        [Fact]
+        public void MarkdownEditor_PreviewMode_HidesTextareaPane_ButKeepsTextareaInDom()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
+
+            Assert.NotNull(component.Find("textarea"));
+            Assert.Single(component.FindAll(".rz-markdown-editor-pane-hidden"));
+        }
     }
 }
