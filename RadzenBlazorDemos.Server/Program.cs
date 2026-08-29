@@ -11,6 +11,7 @@ using RadzenBlazorDemos.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents().AddHubOptions(o =>
@@ -121,7 +122,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 */
-app.UseStatusCodePagesWithReExecute("/not-found");
+app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), branch => branch.UseStatusCodePagesWithReExecute("/not-found"));
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
