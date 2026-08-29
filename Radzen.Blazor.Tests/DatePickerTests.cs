@@ -897,6 +897,54 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_Multiple_SelectedState_ReflectsToggleAndReassignment()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var initial = new DateTime(2024, 1, 1);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+            });
+
+            AngleSharp.Dom.IElement cell(string day) =>
+                component.FindAll("td:not(.rz-calendar-other-month)")
+                         .First(td => td.QuerySelector("span")?.TextContent == day);
+
+            bool isActive(string day) => cell(day).QuerySelector("span")!.ClassList.Contains("rz-state-active");
+
+            // In-place edits: select two days (Add), then deselect the first (RemoveAt). aria-selected and
+            // the rz-state-active highlight must both track the current selection each render.
+            cell("10").Click();
+            cell("12").Click();
+
+            Assert.Equal("true", cell("10").GetAttribute("aria-selected"));
+            Assert.Equal("true", cell("12").GetAttribute("aria-selected"));
+            Assert.True(isActive("10"));
+            Assert.True(isActive("12"));
+
+            cell("10").Click();
+
+            Assert.Equal("false", cell("10").GetAttribute("aria-selected"));
+            Assert.Equal("true", cell("12").GetAttribute("aria-selected"));
+            Assert.False(isActive("10"));
+
+            // Reference invalidation: reassign Value to a different selection and confirm the memo rebuilds.
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, new List<DateTime> { new DateTime(2024, 1, 20) });
+            });
+
+            Assert.Equal("true", cell("20").GetAttribute("aria-selected"));
+            Assert.Equal("false", cell("12").GetAttribute("aria-selected"));
+            Assert.True(isActive("20"));
+        }
+
+        [Fact]
         public void DatePicker_Multiple_Selects_IEnumerableNullableDateTime()
         {
             using var ctx = new TestContext();
