@@ -935,6 +935,83 @@ namespace Radzen.Blazor.Tests
             });
         }
 
+        // A pivot field's filter parameters are applied after the pivot has already run its own
+        // OnParametersSetAsync reload, so that reload composed the filters as they were before the
+        // change. The field reloaded the pivot only when it had a filter template, which left a plain
+        // bound FilterValue holding a new value that nothing ever asked for: the pivot went on rendering
+        // the previous filter's rows. RadzenDataGridColumn reloads its grid on the same change.
+        static void BuildFilteredPivot(ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>> p,
+            string region, FilterOperator filterOperator = FilterOperator.Equals)
+        {
+            p.Add(g => g.Data, AggregationData);
+            p.Add(g => g.AllowDrillDown, false);
+            p.Add(g => g.AllowFieldsPicking, false);
+
+            p.Add<RenderFragment>(g => g.Rows, b =>
+            {
+                b.OpenComponent<RadzenPivotRow<SalesData>>(0);
+                b.AddAttribute(1, nameof(RadzenPivotRow<SalesData>.Property), nameof(SalesData.Region));
+                b.AddAttribute(2, nameof(RadzenPivotRow<SalesData>.FilterValue), region);
+                b.AddAttribute(3, nameof(RadzenPivotRow<SalesData>.FilterOperator), filterOperator);
+                b.CloseComponent();
+            });
+
+            p.Add<RenderFragment>(g => g.Columns, b =>
+            {
+                b.OpenComponent<RadzenPivotColumn<SalesData>>(0);
+                b.AddAttribute(1, nameof(RadzenPivotColumn<SalesData>.Property), nameof(SalesData.Year));
+                b.CloseComponent();
+            });
+
+            p.Add<RenderFragment>(g => g.Aggregates, b =>
+            {
+                b.OpenComponent<RadzenPivotAggregate<SalesData>>(0);
+                b.AddAttribute(1, nameof(RadzenPivotAggregate<SalesData>.Property), nameof(SalesData.Amount));
+                b.AddAttribute(2, nameof(RadzenPivotAggregate<SalesData>.Aggregate), AggregateFunction.Sum);
+                b.CloseComponent();
+            });
+        }
+
+        static List<string> RowHeaders(IRenderedComponent<RadzenPivotDataGrid<SalesData>> component) =>
+            component.FindAll("tbody.rz-pivot-body td.rz-pivot-row-header")
+                .Select(c => c.TextContent.Trim()).ToList();
+
+        [Fact]
+        public void PivotDataGrid_ChangingABoundFilterValue_RefiltersTheRows()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+
+            Assert.Contains("North", RowHeaders(component));
+            Assert.DoesNotContain("South", RowHeaders(component));
+
+            component.SetParametersAndRender(p => BuildFilteredPivot(p, "South"));
+
+            Assert.Contains("South", RowHeaders(component));
+            Assert.DoesNotContain("North", RowHeaders(component));
+        }
+
+        [Fact]
+        public void PivotDataGrid_ClearingABoundFilterValue_RestoresEveryRow()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+
+            Assert.DoesNotContain("South", RowHeaders(component));
+
+            // Back to no filter at all, which is the same change in the other direction.
+            component.SetParametersAndRender(p => BuildFilteredPivot(p, null));
+
+            Assert.Contains("North", RowHeaders(component));
+            Assert.Contains("South", RowHeaders(component));
+        }
+
         [Fact]
         public void PivotDataGrid_Sort_OrdersRows()
         {

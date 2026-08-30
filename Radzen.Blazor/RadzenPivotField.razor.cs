@@ -469,6 +469,11 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            // Whether this parameter set changes what the pivot's View composes, and so needs a reload
+            // once the new values have been applied. The template branches below reload and return before
+            // reaching that, exactly as they did.
+            var filterChanged = false;
+
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
@@ -483,6 +488,8 @@ namespace Radzen.Blazor
 
                     return;
                 }
+
+                filterChanged = true;
             }
 
             if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
@@ -499,6 +506,8 @@ namespace Radzen.Blazor
 
                     return;
                 }
+
+                filterChanged = true;
             }
 
             if (filterOperator == null && (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator) || _filterOperator != null))
@@ -522,6 +531,17 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            // After the base call, so GetFilterValue() reads the value this parameter set carried. The
+            // pivot has already run its own OnParametersSetAsync reload by the time a field's parameters
+            // are applied, and that reload composed the filters as they were before this change - so
+            // without this the new filter is held but never asked for. RadzenDataGridColumn reloads its
+            // grid on the same change; the template check here only decides whether the work above has
+            // already been done, not whether a reload is owed.
+            if (filterChanged && PivotGrid != null)
+            {
+                await PivotGrid.Reload();
+            }
         }
     }
 } 
