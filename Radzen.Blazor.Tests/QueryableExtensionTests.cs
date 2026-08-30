@@ -123,6 +123,52 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(150, result[1].Value);
         }
 
+        [Theory]
+        [InlineData("")]
+        [InlineData(" asc")]
+        [InlineData(" desc")]
+        public void OrderBy_PreservesRepeatedSpacesInADynamicKey(string direction)
+        {
+            var data = new List<IDictionary<string, object>>
+            {
+                new Dictionary<string, object> { ["Employee  ID"] = 2 },
+                new Dictionary<string, object> { ["Employee  ID"] = 1 },
+            }.AsQueryable();
+
+            var selector = PropertyAccess.GetDynamicPropertyExpression("Employee  ID", typeof(int)) + direction;
+
+            var result = data.OrderBy(selector).ToList();
+
+            Assert.Equal(direction == " desc" ? 2 : 1, result[0]["Employee  ID"]);
+            Assert.Equal(direction == " desc" ? 1 : 2, result[1]["Employee  ID"]);
+        }
+
+        [Theory]
+        [InlineData("Value \tasc")]
+        [InlineData("Value \nasc")]
+        public void OrderBy_TreatsAWhitespaceWrappedAscAsDescending(string selector)
+        {
+            var data = GetTestData().AsQueryable();
+
+            var result = data.OrderBy(selector).ToList();
+            var descending = data.OrderBy("Value desc").ToList();
+
+            Assert.Equal(descending.Select(d => d.Value), result.Select(r => r.Value));
+        }
+
+        [Theory]
+        [InlineData("Value asc")]
+        [InlineData("Value")]
+        [InlineData("Value asc\t")]
+        public void OrderBy_TreatsAPlainAscAsAscending(string selector)
+        {
+            var data = GetTestData().AsQueryable();
+
+            var result = data.OrderBy(selector).ToList();
+
+            Assert.Equal(data.Select(d => d.Value).OrderBy(v => v), result.Select(r => r.Value));
+        }
+
         // Where tests with FilterDescriptor
         [Fact]
         public void Where_FiltersWithEquals()
