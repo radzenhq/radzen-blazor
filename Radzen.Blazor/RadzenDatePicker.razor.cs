@@ -66,6 +66,35 @@ namespace Radzen.Blazor
         // Holds selected dates when Multiple is true
         List<DateTime> selectedDates = new List<DateTime>();
 
+        List<DateTime>? selectedDatesSetSource;
+        int selectedDatesSetCount = -1;
+        HashSet<DateTime>? selectedDatesSet;
+
+        // Membership test for the Multiple-mode calendar. Rendering a month calls this ~2x per day cell
+        // (aria-selected and the day css class); memoizing the selected days as a set keeps that O(1) per
+        // cell instead of a selectedDates.Any() scan. The cache is dropped on reassignment (reference
+        // check) and on any count-changing in-place edit (an automatic backstop); InvalidateSelectedDates
+        // also drops it explicitly at each mutation site to cover a hypothetical net-zero-count edit.
+        bool IsSelectedDate(DateTime date)
+        {
+            if (selectedDatesSet == null || !ReferenceEquals(selectedDatesSetSource, selectedDates) || selectedDatesSetCount != selectedDates.Count)
+            {
+                selectedDatesSetSource = selectedDates;
+                selectedDatesSetCount = selectedDates.Count;
+                selectedDatesSet = new HashSet<DateTime>(selectedDates.Count);
+                foreach (var d in selectedDates)
+                {
+                    selectedDatesSet.Add(d.Date);
+                }
+            }
+
+            return selectedDatesSet.Contains(date.Date);
+        }
+
+        // Invalidate the memoized set after an in-place edit of selectedDates (reassignments and
+        // count changes are already caught in IsSelectedDate; this also covers a net-zero-count edit).
+        void InvalidateSelectedDates() => selectedDatesSet = null;
+
         private string? calendarWeekTitle;
 
         /// <summary>
@@ -211,7 +240,7 @@ namespace Radzen.Blazor
         {
             if (Multiple)
             {
-                return selectedDates.Any(d => d.Date == date.Date);
+                return IsSelectedDate(date);
             }
 
             return DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0;
@@ -864,6 +893,7 @@ namespace Radzen.Blazor
                         if (value == null)
                         {
                             selectedDates.Clear();
+                            InvalidateSelectedDates();
                             _value = null;
                             _dateTimeValue = null;
                         }
@@ -952,6 +982,7 @@ namespace Radzen.Blazor
                         else
                         {
                             selectedDates.Clear();
+                            InvalidateSelectedDates();
                             _value = null;
                             _dateTimeValue = null;
                         }
@@ -1217,6 +1248,7 @@ namespace Radzen.Blazor
                 else if (nullable)
                 {
                     selectedDates.Clear();
+                    InvalidateSelectedDates();
                     await UpdateValueFromSelectedDates(null);
                 }
             }
@@ -1345,6 +1377,7 @@ namespace Radzen.Blazor
             if (Multiple)
             {
                 selectedDates.Clear();
+                InvalidateSelectedDates();
                 _value = null;
                 _dateTimeValue = null;
 
@@ -1770,6 +1803,7 @@ namespace Radzen.Blazor
             {
                 selectedDates.Add(DateTime.SpecifyKind(date, Kind));
             }
+            InvalidateSelectedDates();
         }
 
         async Task UpdateValueFromSelectedDates(DateTime? lastSelected)
@@ -2038,7 +2072,7 @@ namespace Radzen.Blazor
             var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
                                .Add("rz-calendar-other-month", GetCalendarMonth(CurrentDate) != GetCalendarMonth(date))
-                               .Add("rz-state-active", !forCell && (Multiple ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
+                               .Add("rz-state-active", !forCell && (Multiple ? IsSelectedDate(date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-disabled", !forCell && dateArgs.Disabled);
