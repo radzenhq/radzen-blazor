@@ -181,10 +181,12 @@
                             builder.AddAttribute(5, "Item", item);
                             builder.AddAttribute(6, "InEditMode", Grid != null ? Grid.IsRowInEditMode((TItem)item) : false);
 
-                            if (Grid != null && Grid.editContexts.ContainsKey((TItem)item))
-                            {
-                                builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), Grid.editContexts[(TItem)item]);
-                            }
+                            // Always supply the value because omitted parameters retain their previous value.
+                            Microsoft.AspNetCore.Components.Forms.EditContext? editContext = null;
+
+                            Grid?.editContexts.TryGetValue((TItem)item, out editContext);
+
+                            builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), (object?)editContext);
 
                             builder.CloseComponent();
                             i++;

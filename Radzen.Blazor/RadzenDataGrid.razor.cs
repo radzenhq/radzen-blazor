@@ -313,11 +313,10 @@ namespace Radzen.Blazor
                                 b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
                                 b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
 
-                                // O(1) lookup instead of scanning editContexts.Keys per rendered row.
-                                if (editContexts.TryGetValue(context, out var editContext))
-                                {
-                                    b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContext);
-                                }
+                                // Always supply the value because omitted parameters retain their previous value.
+                                editContexts.TryGetValue(context, out EditContext? editContext);
+
+                                b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContext);
 
                                 b.SetKey(context);
                                 b.CloseComponent();
@@ -369,10 +368,10 @@ namespace Radzen.Blazor
                     builder.AddAttribute(5, "Item", item);
                     builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
 
-                    if (editContexts.TryGetValue(item, out var editContext))
-                    {
-                        builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContext);
-                    }
+                    // Always supply the value because omitted parameters retain their previous value.
+                    editContexts.TryGetValue(item, out EditContext? editContext);
+
+                    builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContext);
 
                     builder.SetKey(item);
 
