@@ -134,9 +134,9 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         await ModeChanged.InvokeAsync(value);
     }
 
-    private async Task OnInput(ChangeEventArgs args)
+    private async Task OnInputAsync(string? value)
     {
-        string newValue = $"{args.Value}";
+        string newValue = value ?? string.Empty;
         Value = newValue;
         await ValueChanged.InvokeAsync(newValue);
         NotifyFieldChanged(newValue);

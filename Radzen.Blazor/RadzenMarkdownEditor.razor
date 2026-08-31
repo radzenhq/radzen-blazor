@@ -48,7 +48,7 @@
                                 class=@TextareaPaneClass>
                 <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Preview)
                           name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
-                          value=@Value @oninput=@OnInput @onchange=@OnChange></textarea>
+                          @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange=@OnChange></textarea>
             </RadzenSplitterPane>
             <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" class=@PreviewPaneClass>
                 @if (mode != MarkdownEditorMode.Edit)
