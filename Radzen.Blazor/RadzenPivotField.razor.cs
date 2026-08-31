@@ -476,6 +476,7 @@ namespace Radzen.Blazor
 
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
+                internalFilterValue = null;
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
 
                 if (FilterTemplate != null || FilterValueTemplate != null)
@@ -494,6 +495,7 @@ namespace Radzen.Blazor
 
             if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
             {
+                internalSecondFilterValue = null;
                 secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
 
                 if (FilterTemplate != null || SecondFilterValueTemplate != null)
@@ -544,4 +546,4 @@ namespace Radzen.Blazor
             }
         }
     }
-} 
+}

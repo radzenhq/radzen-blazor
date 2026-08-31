@@ -941,7 +941,7 @@ namespace Radzen.Blazor.Tests
         // bound FilterValue holding a new value that nothing ever asked for: the pivot went on rendering
         // the previous filter's rows. RadzenDataGridColumn reloads its grid on the same change.
         static void BuildFilteredPivot(ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>> p,
-            string region, FilterOperator filterOperator = FilterOperator.Equals)
+            string region, string secondRegion = null)
         {
             p.Add(g => g.Data, AggregationData);
             p.Add(g => g.AllowDrillDown, false);
@@ -952,7 +952,10 @@ namespace Radzen.Blazor.Tests
                 b.OpenComponent<RadzenPivotRow<SalesData>>(0);
                 b.AddAttribute(1, nameof(RadzenPivotRow<SalesData>.Property), nameof(SalesData.Region));
                 b.AddAttribute(2, nameof(RadzenPivotRow<SalesData>.FilterValue), region);
-                b.AddAttribute(3, nameof(RadzenPivotRow<SalesData>.FilterOperator), filterOperator);
+                b.AddAttribute(3, nameof(RadzenPivotRow<SalesData>.FilterOperator), FilterOperator.Equals);
+                b.AddAttribute(4, nameof(RadzenPivotRow<SalesData>.SecondFilterValue), secondRegion);
+                b.AddAttribute(5, nameof(RadzenPivotRow<SalesData>.SecondFilterOperator), FilterOperator.Equals);
+                b.AddAttribute(6, nameof(RadzenPivotRow<SalesData>.LogicalFilterOperator), LogicalFilterOperator.Or);
                 b.CloseComponent();
             });
 
@@ -995,6 +998,23 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void PivotDataGrid_ChangingABoundFilterValue_ReplacesTheInteractiveValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+            var row = component.FindComponent<RadzenPivotRow<SalesData>>().Instance;
+            row.SetFilterValueInternal("North");
+
+            component.SetParametersAndRender(p => BuildFilteredPivot(p, "South"));
+
+            Assert.Contains("South", RowHeaders(component));
+            Assert.DoesNotContain("North", RowHeaders(component));
+        }
+
+        [Fact]
         public void PivotDataGrid_ClearingABoundFilterValue_RestoresEveryRow()
         {
             using var ctx = new TestContext();
@@ -1010,6 +1030,23 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("North", RowHeaders(component));
             Assert.Contains("South", RowHeaders(component));
+        }
+
+        [Fact]
+        public void PivotDataGrid_ClearingABoundSecondFilterValue_ReplacesTheInteractiveValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North", "South"));
+            var row = component.FindComponent<RadzenPivotRow<SalesData>>().Instance;
+            row.SetSecondFilterValueInternal("South");
+
+            component.SetParametersAndRender(p => BuildFilteredPivot(p, "North"));
+
+            Assert.Contains("North", RowHeaders(component));
+            Assert.DoesNotContain("South", RowHeaders(component));
         }
 
         [Fact]
@@ -2162,4 +2199,3 @@ namespace Radzen.Blazor.Tests
         }
     }
 }
-
