@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
@@ -218,6 +220,53 @@ namespace Radzen
         internal Localizer Localizer => localizer ??=
             Services.GetService<Localizer>() ?? Localizer.Default;
 
+        private bool asyncQueryExecutorResolved;
+        private IAsyncQueryExecutor? asyncQueryExecutor;
+
+        private IAsyncQueryExecutor? AsyncQueryExecutor
+        {
+            get
+            {
+                if (!asyncQueryExecutorResolved)
+                {
+                    asyncQueryExecutorResolved = true;
+                    asyncQueryExecutor = Services?.GetService<IAsyncQueryExecutor>();
+                }
+
+                return asyncQueryExecutor;
+            }
+        }
+
+        private AsyncQueryCoordinator? asyncQueryCoordinator;
+
+        private protected bool HasAsyncQueryExecutor => AsyncQueryExecutor != null;
+
+        // These adapters do not instantiate coordinator state.
+        private protected bool AsyncLoadPending => asyncQueryCoordinator?.LoadPending == true;
+
+        private protected Task SupersedeAsyncLoad() =>
+            asyncQueryCoordinator?.SupersedeAsyncLoad() ?? Task.CompletedTask;
+
+        private protected bool TryGetAsyncQueryCoordinator<T>(IQueryable<T> query,
+            [NotNullWhen(true)] out AsyncQueryCoordinator? coordinator)
+        {
+            var executor = AsyncQueryExecutor;
+
+            if (executor != null && executor.IsSupported(query))
+            {
+                coordinator = asyncQueryCoordinator ??= new AsyncQueryCoordinator(this, executor);
+                return true;
+            }
+
+            coordinator = null;
+            return false;
+        }
+
+        internal virtual void NotifyAsyncQueryCompleted()
+        {
+            StateHasChanged();
+        }
+
         /// <summary>
         /// Returns a localized string for the specified key using the current <see cref="UICulture"/>.
         /// </summary>
@@ -399,6 +448,8 @@ namespace Radzen
         public virtual void Dispose()
         {
             disposed = true;
+
+            asyncQueryCoordinator?.Dispose();
 
             debouncer?.Dispose();
             debouncer = null;
