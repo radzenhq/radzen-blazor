@@ -935,11 +935,6 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        // A pivot field's filter parameters are applied after the pivot has already run its own
-        // OnParametersSetAsync reload, so that reload composed the filters as they were before the
-        // change. The field reloaded the pivot only when it had a filter template, which left a plain
-        // bound FilterValue holding a new value that nothing ever asked for: the pivot went on rendering
-        // the previous filter's rows. RadzenDataGridColumn reloads its grid on the same change.
         static void BuildFilteredPivot(ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>> p,
             string region, string secondRegion = null)
         {
