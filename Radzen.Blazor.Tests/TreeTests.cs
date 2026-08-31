@@ -2,6 +2,7 @@ using Bunit;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Tests
 {
@@ -169,6 +170,170 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-chkbox", component.Markup);
+        }
+
+        [Fact]
+        public void Tree_CheckParents_RendersMixed_AndReflectsInPlaceMutation()
+        {
+            using var ctx = new TestContext();
+            var laptop = new Product { Name = "Laptop" };
+            var phone = new Product { Name = "Phone" };
+            var data = new List<Category>
+            {
+                new Category { Name = "Electronics", Products = new List<Product> { laptop, phone } }
+            };
+
+            var checkedValues = new List<object> { laptop };
+
+            void BuildTree(ComponentParameterCollectionBuilder<RadzenTree> parameters)
+            {
+                parameters.Add(p => p.AllowCheckBoxes, true);
+                parameters.Add(p => p.AllowCheckParents, true);
+                parameters.Add(p => p.CheckedValues, checkedValues);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "ChildrenProperty", "Products");
+                    builder.AddAttribute(3, "Expanded", (object c) => true);
+                    builder.AddAttribute(4, "HasChildren", (object c) => c is Category);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenTreeLevel>(5);
+                    builder.AddAttribute(6, "TextProperty", "Name");
+                    builder.AddAttribute(7, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            }
+
+            var component = ctx.RenderComponent<RadzenTree>(BuildTree);
+
+            // Child registration settles on the next render pass.
+            component.Render();
+
+            var parent = component.FindAll("[role=treeitem]").First(i => i.GetAttribute("aria-level") == "1");
+            Assert.Equal("mixed", parent.GetAttribute("aria-checked"));
+
+            checkedValues.Add(phone);
+            component.SetParametersAndRender(BuildTree);
+
+            parent = component.FindAll("[role=treeitem]").First(i => i.GetAttribute("aria-level") == "1");
+            Assert.Equal("false", parent.GetAttribute("aria-checked"));
+        }
+
+        // Keep the tree flat so it retains the caller's CheckedValues instance.
+        [Fact]
+        public async Task Tree_ReflectsSameCountMutation_OnInternalRender()
+        {
+            using var ctx = new TestContext();
+            var laptop = new Product { Name = "Laptop" };
+            var phone = new Product { Name = "Phone" };
+            var keyboard = new Product { Name = "Keyboard" };
+            var checkedValues = new List<object> { laptop, phone };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.AllowCheckBoxes, true);
+                parameters.Add(p => p.CheckedValues, checkedValues);
+                parameters.Add(p => p.Data, new List<Product> { laptop, phone, keyboard });
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            string Checked(string text) => component.FindAll("[role=treeitem]")
+                .First(i => i.TextContent.Contains(text)).GetAttribute("aria-checked");
+
+            Assert.Equal("true", Checked("Laptop"));
+            Assert.Equal("false", Checked("Keyboard"));
+
+            checkedValues[0] = keyboard;
+            await component.InvokeAsync(() => component.Instance.ChangeState());
+
+            Assert.Equal("false", Checked("Laptop"));
+            Assert.Equal("true", Checked("Keyboard"));
+        }
+
+        sealed class ByName : IEqualityComparer<object>
+        {
+            public new bool Equals(object x, object y) => Name(x) == Name(y);
+
+            public int GetHashCode(object obj) => Name(obj)?.GetHashCode() ?? 0;
+
+            static string Name(object o) => (o as Product)?.Name;
+        }
+
+        [Fact]
+        public void Tree_HonoursTheComparerOnTheBoundCheckedValues()
+        {
+            using var ctx = new TestContext();
+
+            var laptop = new Product { Name = "Laptop" };
+            var keyboard = new Product { Name = "Keyboard" };
+
+            var checkedValues = new HashSet<object>(new ByName()) { new Product { Name = "Laptop" } };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.AllowCheckBoxes, true);
+                parameters.Add(p => p.CheckedValues, checkedValues);
+                parameters.Add(p => p.Data, new List<Product> { laptop, keyboard });
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            string Checked(string text) => component.FindAll("[role=treeitem]")
+                .First(i => i.TextContent.Contains(text)).GetAttribute("aria-checked");
+
+            Assert.Equal("true", Checked("Laptop"));
+            Assert.Equal("false", Checked("Keyboard"));
+        }
+
+        [Fact]
+        public void Tree_ReflectsSameCountMutation_OnItemOnlyRender()
+        {
+            using var ctx = new TestContext();
+
+            var laptop = new Product { Name = "Laptop" };
+            var phone = new Product { Name = "Phone" };
+            var keyboard = new Product { Name = "Keyboard" };
+            var checkedValues = new List<object> { laptop, phone };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.AllowCheckBoxes, true);
+                parameters.Add(p => p.CheckedValues, checkedValues);
+                parameters.Add(p => p.Data, new List<Product> { laptop, phone, keyboard });
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            string Checked(string text) => component.FindAll("[role=treeitem]")
+                .First(i => i.TextContent.Contains(text)).GetAttribute("aria-checked");
+
+            Assert.Equal("true", Checked("Laptop"));
+
+            checkedValues[0] = keyboard;
+
+            component.FindAll("[role=treeitem]").First(i => i.TextContent.Contains("Laptop")).Click();
+
+            // Only the clicked item participates in this render batch.
+            Assert.Equal("false", Checked("Laptop"));
         }
 
         [Fact]
@@ -701,4 +866,3 @@ namespace Radzen.Blazor.Tests
         }
     }
 }
-
