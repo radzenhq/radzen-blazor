@@ -57,6 +57,7 @@ builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 
 builder.Services.AddDbContextFactory<NorthwindContext>();
+builder.Services.AddRadzenQueryableEntityFrameworkAdapter();
 
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();

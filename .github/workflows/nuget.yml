@@ -81,6 +81,9 @@ jobs:
       - name: Test
         run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj -c Release
 
+      - name: Pack Entity Framework adapter
+        run: dotnet pack Radzen.Blazor.EntityFrameworkAdapter/Radzen.Blazor.EntityFrameworkAdapter.csproj -c Release
+
       - name: Upload package artifact
         if: ${{ !inputs.publish }}
         uses: actions/upload-artifact@v4
@@ -89,7 +92,13 @@ jobs:
           path: |
             Radzen.Blazor/bin/Release/*.nupkg
             Radzen.Blazor/bin/Release/*.snupkg
+            Radzen.Blazor.EntityFrameworkAdapter/bin/Release/*.nupkg
+            Radzen.Blazor.EntityFrameworkAdapter/bin/Release/*.snupkg
 
       - name: Push to NuGet
         if: ${{ inputs.publish }}
         run: dotnet nuget push "Radzen.Blazor/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Push Entity Framework adapter to NuGet
+        if: ${{ inputs.publish }}
+        run: dotnet nuget push "Radzen.Blazor.EntityFrameworkAdapter/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

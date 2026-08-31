@@ -25,5 +25,7 @@ jobs:
     
     - name: Build
       run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj
+    - name: Build Entity Framework adapter
+      run: dotnet build Radzen.Blazor.EntityFrameworkAdapter/Radzen.Blazor.EntityFrameworkAdapter.csproj
     - name: Test
       run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj

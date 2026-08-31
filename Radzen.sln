@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radzen.Blazor.Api", "Radzen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radzen.Blazor.Api.Generator", "Radzen.Blazor.Api.Generator\Radzen.Blazor.Api.Generator.csproj", "{0CE710A6-8514-4358-ABFF-12943ACD4D72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radzen.Blazor.EntityFrameworkAdapter", "Radzen.Blazor.EntityFrameworkAdapter\Radzen.Blazor.EntityFrameworkAdapter.csproj", "{8E225C04-F5F9-47F7-9D78-01C5048B00D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,18 @@ Global
 		{0CE710A6-8514-4358-ABFF-12943ACD4D72}.Release|x64.Build.0 = Release|Any CPU
 		{0CE710A6-8514-4358-ABFF-12943ACD4D72}.Release|x86.ActiveCfg = Release|Any CPU
 		{0CE710A6-8514-4358-ABFF-12943ACD4D72}.Release|x86.Build.0 = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|x64.Build.0 = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E225C04-F5F9-47F7-9D78-01C5048B00D3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

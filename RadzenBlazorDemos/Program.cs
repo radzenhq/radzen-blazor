@@ -14,6 +14,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddDbContextFactory<NorthwindContext>();
+builder.Services.AddRadzenQueryableEntityFrameworkAdapter();
 
 builder.Services.AddScoped<ILocalizer, DemoLocalizer>();
 builder.Services.AddRadzenComponents();

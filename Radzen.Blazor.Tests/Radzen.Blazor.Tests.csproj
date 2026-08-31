@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+    <ProjectReference Include="..\Radzen.Blazor.EntityFrameworkAdapter\Radzen.Blazor.EntityFrameworkAdapter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -40,6 +40,6 @@
  
         employees = dbContext.Employees;
 
-        selectedEmployees = new List<Employee>(){ employees.FirstOrDefault() };
+        selectedEmployees = new List<Employee>() { await employees.FirstOrDefaultAsync() };
     }
 }

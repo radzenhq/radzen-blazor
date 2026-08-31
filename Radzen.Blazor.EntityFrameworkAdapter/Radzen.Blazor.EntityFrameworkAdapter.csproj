@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Radzen.Blazor.EntityFrameworkAdapter</PackageId>
+    <Description>Entity Framework Core adapter that lets data-bound Radzen.Blazor components execute their count and paging queries asynchronously.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>blazor;radzen;entityframework;efcore;async</PackageTags>
+    <Version>11.2.8</Version>
+    <Copyright>Radzen Ltd.</Copyright>
+    <Authors>Radzen Ltd.</Authors>
+    <PackageProjectUrl>https://www.radzen.com</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.*" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*" Condition="'$(TargetFramework)' == 'net9.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*-*" Condition="'$(TargetFramework)' == 'net10.0'" />
+    <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+  </ItemGroup>
+</Project>
