@@ -332,11 +332,20 @@ namespace Radzen
             {
                 if (_view == null)
                 {
+                    // Do not re-enter a provider owned by an async load from a render-time getter.
+                    if (AsyncLoadPending)
+                    {
+                        return Enumerable.Empty<T>().AsQueryable();
+                    }
+
                     _view = (AllowPaging && !LoadData.HasDelegate ? View.Skip(skip).Take(PageSize) : View).ToList().AsQueryable();
                 }
                 return _view;
             }
         }
+
+        /// <summary>Whether the component fetches virtual windows instead of rendering PagedView.</summary>
+        private protected virtual bool IsVirtualized => false;
 
         /// <summary>
         /// Gets the view.
@@ -362,11 +371,11 @@ namespace Radzen
         /// </summary>
         public async virtual Task Reload()
         {
-            _view = null;
+            await SupersedeAsyncLoad();
 
-            if (Data != null && !LoadData.HasDelegate)
+            if (!await LoadPagedViewAsync())
             {
-                Count = View.Count();
+                return;
             }
 
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize });
@@ -377,6 +386,41 @@ namespace Radzen
             {
                 StateHasChanged();
             }
+        }
+
+        private protected ValueTask<bool> LoadPagedViewAsync()
+        {
+            _view = null;
+
+            if (Data == null || LoadData.HasDelegate)
+            {
+                return new(true);
+            }
+
+            var view = View;
+
+            if (!TryGetAsyncQueryCoordinator(view, out var coordinator))
+            {
+                Count = view.Count();
+                return new(true);
+            }
+
+            return new(coordinator.RunLoadAsync(async load =>
+            {
+                if (IsVirtualized && !AllowPaging)
+                {
+                    var virtualCount = await load.CountAsync(view);
+                    load.ThrowIfSuperseded();
+                    Count = virtualCount;
+                    return;
+                }
+
+                var page = AllowPaging ? view.Skip(skip).Take(PageSize) : view;
+                var (count, items) = await load.CountAndPageAsync(view, page, AllowPaging);
+                load.ThrowIfSuperseded();
+                Count = count;
+                _view = items.AsQueryable();
+            }, () => Count = view.Count()));
         }
 
         /// <summary>

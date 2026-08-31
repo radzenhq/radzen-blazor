@@ -27,11 +27,16 @@ namespace Radzen
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed",
             Justification = "The virtual request lease disposes its source only after the request exits; coordinator disposal only cancels it.")]
         private CancellationTokenSource? virtualRequest;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213:Disposable fields should be disposed",
+            Justification = "The queued lookup disposes its source only after provider work exits; coordinator disposal only cancels it.")]
+        private CancellationTokenSource? lookupCancellation;
         private long loadOwner = NoLoad;
         private long loadSequence;
+        private long lookupSequence;
         private int awaitingProviderTurn;
         private Task loadCompletion = Task.CompletedTask;
         private Task providerTail = Task.CompletedTask;
+        private bool disposed;
 
         internal AsyncQueryCoordinator(RadzenComponent owner, IAsyncQueryExecutor executor)
         {
@@ -182,6 +187,12 @@ namespace Radzen
             virtualRequest?.Cancel();
         }
 
+        internal void CancelLookup()
+        {
+            lookupSequence++;
+            lookupCancellation?.Cancel();
+        }
+
         /// <summary>
         /// Cancels the current load and virtual request, then waits until the superseded load has no more
         /// provider work to append and the resulting queue tail has settled.
@@ -315,6 +326,59 @@ namespace Radzen
             return current;
         }
 
+        internal Task<T?> LookupAsync<T>(VirtualWindow<T> window, long queryGeneration,
+            IQueryable<T> view, int index)
+        {
+            long request = ++lookupSequence;
+
+            return QueueAsync(async executor =>
+            {
+                if (!OwnsLookup())
+                {
+                    return default;
+                }
+
+                using var cancellation = new CancellationTokenSource();
+                lookupCancellation = cancellation;
+
+                try
+                {
+                    T? item;
+
+                    try
+                    {
+                        item = (await executor.ToListAsync(view.Skip(index).Take(1), cancellation.Token))
+                            .FirstOrDefault();
+                    }
+                    catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+                    {
+                        return default;
+                    }
+                    catch (Exception exception) when (executor.CanFallBackToSynchronous(exception))
+                    {
+                        if (!OwnsLookup())
+                        {
+                            return default;
+                        }
+
+                        item = view.Skip(index).FirstOrDefault();
+                    }
+
+                    return OwnsLookup() ? item : default;
+                }
+                finally
+                {
+                    if (ReferenceEquals(lookupCancellation, cancellation))
+                    {
+                        lookupCancellation = null;
+                    }
+                }
+
+                bool OwnsLookup() => !disposed && request == lookupSequence
+                    && queryGeneration == window.QueryGeneration;
+            });
+        }
+
         /// <summary>Counts a query in provider order without a capturing delegate.</summary>
         internal Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken cancellationToken) =>
             QueueAsync((Query: query, Token: cancellationToken),
@@ -443,8 +507,10 @@ namespace Radzen
 
         public void Dispose()
         {
+            disposed = true;
             loadCancellation?.Cancel();
             virtualRequest?.Cancel();
+            lookupCancellation?.Cancel();
         }
     }
 }

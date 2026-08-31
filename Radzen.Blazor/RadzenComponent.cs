@@ -237,15 +237,20 @@ namespace Radzen
             }
         }
 
-        private AsyncQueryCoordinator? asyncQueryCoordinator;
-
         private protected bool HasAsyncQueryExecutor => AsyncQueryExecutor != null;
+
+        private AsyncQueryCoordinator? asyncQueryCoordinator;
 
         // These adapters do not instantiate coordinator state.
         private protected bool AsyncLoadPending => asyncQueryCoordinator?.LoadPending == true;
 
         private protected Task SupersedeAsyncLoad() =>
             asyncQueryCoordinator?.SupersedeAsyncLoad() ?? Task.CompletedTask;
+
+        private protected void CancelAsyncQueryLookup() => asyncQueryCoordinator?.CancelLookup();
+
+        private protected static int GetVirtualPageSize(int requested, int fallback) =>
+            requested > 0 ? requested : fallback;
 
         private protected bool TryGetAsyncQueryCoordinator<T>(IQueryable<T> query,
             [NotNullWhen(true)] out AsyncQueryCoordinator? coordinator)
