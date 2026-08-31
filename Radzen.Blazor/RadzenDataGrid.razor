@@ -603,37 +603,44 @@
 
     internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
     {
-            var cellAttributes = new Dictionary<string, object>(Attributes);
+            // Keep class/style in the splat so SetAttribute preserves CellRender precedence. Allocate the
+            // dictionary on first use; AddMultipleAttributes ignores null without enumerating it.
+            var cellStyle = GetCellStyle(column, Attributes);
+            var cellClass = GetCellCssClass(column, Item, Attributes);
 
             var rowspan = column.GetRowSpan(true);
-            if(rowspan > 1)
-            {
-                SetAttribute(cellAttributes, "rowspan", rowspan);
-            }
-
             var colspan = column.GetColSpan(true);
-            if(colspan > 1)
+
+            // A non-chainable row onclick occupies the <tr>, so raise the built-in click from the cell.
+            var rowClickFromCell = RowClickActive
+                && rowArgs.Item2.TryGetValue("onclick", out var rowOnclick)
+                && !IsChainableClickHandler(rowOnclick);
+
+            Dictionary<string, object>? cellAttributes = null;
+
+            if (Attributes.Count > 0)
             {
-                SetAttribute(cellAttributes, "colspan", colspan);
+                cellAttributes = new Dictionary<string, object>(Attributes.Count);
+
+                foreach (var attribute in Attributes)
+                {
+                    cellAttributes[attribute.Key] = attribute.Value;
+                }
             }
 
-            var cellStyle = GetCellStyle(column, Attributes);
-            if(!string.IsNullOrEmpty(cellStyle))
+            if (rowspan > 1)
             {
-                SetAttribute(cellAttributes, "style", cellStyle);
+                SetAttribute(cellAttributes ??= new(), "rowspan", rowspan);
             }
 
-            var cellClass = GetCellCssClass(column, Item, Attributes);
-            if (!string.IsNullOrEmpty(cellClass))
+            if (colspan > 1)
             {
-                SetAttribute(cellAttributes, "class", cellClass);
+                SetAttribute(cellAttributes ??= new(), "colspan", colspan);
             }
 
-            // A non-chainable consumer onclick (e.g. a string) occupies the <tr>, so the built-in row click
-            // can't ride it - raise it from the cell for that row instead, alongside any cell click.
-            if (RowClickActive && rowArgs.Item2.TryGetValue("onclick", out var rowOnclick) && !IsChainableClickHandler(rowOnclick))
+            if (rowClickFromCell)
             {
-                SetAttribute(cellAttributes, "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: async (eventArgs) =>
+                SetAttribute(cellAttributes ??= new(), "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: async (eventArgs) =>
                 {
                     if (CellClick.HasDelegate) { await OnCellClickHandler(column, Item, eventArgs); }
                     await OnRowClickHandler(Item, eventArgs);
@@ -641,34 +648,55 @@
             }
             else if (CellClick.HasDelegate)
             {
-                SetAttribute(cellAttributes, "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnCellClickHandler(column, Item, eventArgs)));
+                SetAttribute(cellAttributes ??= new(), "onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnCellClickHandler(column, Item, eventArgs)));
             }
 
             if (CellDoubleClick.HasDelegate || RowDoubleClick.HasDelegate)
             {
-                SetAttribute(cellAttributes, "ondblclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnDblClick(column, Item, eventArgs)));
+                SetAttribute(cellAttributes ??= new(), "ondblclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnDblClick(column, Item, eventArgs)));
+            }
+
+            if (!string.IsNullOrEmpty(cellStyle))
+            {
+                SetAttribute(cellAttributes ??= new(), "style", cellStyle);
+            }
+
+            if (!string.IsNullOrEmpty(cellClass))
+            {
+                SetAttribute(cellAttributes ??= new(), "class", cellClass);
             }
 
             if (CellContextMenu.HasDelegate)
             {
-                SetAttribute(cellAttributes, "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
+                SetAttribute(cellAttributes ??= new(), "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
             }
 
-            var title = column.Template == null && this.ShowCellDataAsTooltip || column.ShowCellDataAsTooltip ? $"{column.GetValue(Item)}" : "";
-            IReadOnlyDictionary<string, object> spanAttributes = EmptyAttributes;
-            if(!string.IsNullOrEmpty(title))
+            var hasTemplate = column.Template != null;
+
+            // Reuse the tooltip's formatted value in the body without hoisting GetValue into paths that
+            // do not need it. Track derivation separately because a GetValue override may return null.
+            object? cellValue = null;
+            var cellValueDerived = false;
+
+            string? title = null;
+
+            if (!hasTemplate && this.ShowCellDataAsTooltip || column.ShowCellDataAsTooltip)
             {
-                var titleAttrs = new Dictionary<string, object>();
-                SetAttribute(titleAttrs, "title", title);
-                spanAttributes = titleAttrs;
+                cellValue = column.GetValue(Item);
+                cellValueDerived = true;
+
+                var text = cellValue?.ToString();
+
+                // A null attribute is omitted; preserve that behavior for empty formatted values.
+                title = string.IsNullOrEmpty(text) ? null : text;
             }
 
             return __builder => {
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td role="gridcell" @attributes="@cellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
-                    @if (this.Responsive)
+                // The builder omits inactive modifier frames while keeping one stable <td> sequence.
+                RenderFragment cellContent = @<text>                    @if (this.Responsive)
                     {
                         <span class="rz-column-title">
                             @if (column.HeaderTemplate != null)
@@ -691,7 +719,7 @@
                                     @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">
                                 <span class="@(getExpandIconCssClass(this, Item)) @(this.ExpandedItemStyle(Item))"></span>
                             </button>
-                            <span class="@column.GetCellClass()" @attributes="@spanAttributes">
+                            <span class="@column.GetCellClass()" title="@title">
                                 @if (Item != null)
                                 {
                                     @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
@@ -712,7 +740,7 @@
                                         }
                                         else
                                         {
-                                            @column.GetValue(Item)
+                                            @(cellValueDerived ? cellValue : column.GetValue(Item))
                                         }
                                     }
                                     else if (column.Template != null)
@@ -721,7 +749,7 @@
                                     }
                                     else
                                     {
-                                        @column.GetValue(Item)
+                                        @(cellValueDerived ? cellValue : column.GetValue(Item))
                                     }
                                 }
                             </span>
@@ -729,7 +757,7 @@
                     }
                     else
                     {
-                            <span class="@column.GetCellClass()" @attributes="@spanAttributes">
+                            <span class="@column.GetCellClass()" title="@title">
                             @if (Item != null)
                             {
                                 @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
@@ -750,7 +778,7 @@
                                     }
                                     else
                                     {
-                                        @column.GetValue(Item)
+                                        @(cellValueDerived ? cellValue : column.GetValue(Item))
                                     }
                                 }
                                 else if (column.Template != null)
@@ -759,12 +787,13 @@
                                 }
                                 else
                                 {
-                                    @column.GetValue(Item)
+                                    @(cellValueDerived ? cellValue : column.GetValue(Item))
                                 }
                             }
                         </span>
-                    }
-                </td>
+                    }</text>;
+
+                @RenderCellElement(cellAttributes, cellContent)
             }
             else
             {
@@ -776,6 +805,24 @@
             </text>
         };
     }
+
+    // Keep one element frame so toggling context-menu modifiers preserves the cell subtree.
+    RenderFragment RenderCellElement(Dictionary<string, object>? cellAttributes, RenderFragment cellContent) => builder =>
+    {
+        builder.OpenElement(0, "td");
+        builder.AddAttribute(1, "role", "gridcell");
+        builder.AddMultipleAttributes(2, cellAttributes);
+
+        if (this.CellContextMenu.HasDelegate)
+        {
+            builder.AddEventPreventDefaultAttribute(3, "oncontextmenu", true);
+            builder.AddEventStopPropagationAttribute(4, "oncontextmenu", true);
+        }
+
+        builder.AddEventStopPropagationAttribute(5, "onkeydown", true);
+        builder.AddContent(6, cellContent);
+        builder.CloseElement();
+    };
 
     string GetCellStyle(RadzenDataGridColumn<TItem> column, IReadOnlyDictionary<string, object> Attributes)
     {
