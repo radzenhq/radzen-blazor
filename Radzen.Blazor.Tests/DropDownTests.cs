@@ -290,7 +290,6 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            // A value repeated in the bound collection must still select its item exactly once.
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
             {
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
@@ -304,30 +303,43 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new[] { "Item 1", "Item 2" }, texts);
         }
 
+        class SelfRenderingDropDown<TValue> : RadzenDropDown<TValue>
+        {
+            public Task Rerender() => InvokeAsync(StateHasChanged);
+        }
+
         [Fact]
-        public void DropDown_Multiple_InPlaceValueMutation_UpdatesSelectionOnReRender()
+        public async Task DropDown_Multiple_InPlaceElementReplacement_UpdatesSelectionOnInternalRender()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            // Same collection reference kept throughout, as external code doing value.Add(..);
-            // StateHasChanged() would. The selected-values lookup must not go stale.
-            var value = new List<int> { 2 };
-            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            var data = new[]
             {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var value = new List<int> { 2 };
+
+            var component = ctx.RenderComponent<SelfRenderingDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, value);
             });
 
-            Assert.Equal(1, component.FindAll(".rz-state-highlight").Count);
+            Assert.Equal(new[] { "Item 2" },
+                component.FindAll(".rz-state-highlight").Select(s => s.TextContent.Trim()).ToArray());
 
-            value.Add(1);
-            component.Render();
+            value[0] = 1;
 
-            var selected = component.FindAll(".rz-state-highlight");
-            Assert.Equal(2, selected.Count);
-            Assert.Equal(new[] { "Item 1", "Item 2" }, selected.Select(s => s.TextContent.Trim()).OrderBy(t => t).ToArray());
+            await component.Instance.Rerender();
+
+            Assert.Equal(new[] { "Item 1" },
+                component.FindAll(".rz-state-highlight").Select(s => s.TextContent.Trim()).ToArray());
         }
 
         [Fact]
@@ -336,8 +348,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            // Same reference and same count: replace element [2] with [1]. A membership set keyed only on the
-            // reference (and count) would stay stale; it must be rebuilt so the highlight moves to Item 1.
+            // Same list and count ensure the membership is rebuilt rather than reused.
             var value = new List<int> { 2 };
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
             {
