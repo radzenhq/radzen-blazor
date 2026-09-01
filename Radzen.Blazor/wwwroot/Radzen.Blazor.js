@@ -7128,7 +7128,8 @@ Radzen.markdownSerialize = function (root) {
     return text.replace(/[\\`*_~\[\]]/g, function (c) { return '\\' + c; });
   };
   var escapeBlockStart = function (line) {
-    return line.replace(/^(\s*)([#>+-]|\d+[.)])(\s)/, '$1\\$2$3');
+    return line.replace(/^(\s*)([#>+-])(\s)/, '$1\\$2$3')
+               .replace(/^(\s*)(\d+)([.)])(\s)/, '$1$2\\$3$4');
   };
   var styleWraps = function (el) {
     var wraps = [];
