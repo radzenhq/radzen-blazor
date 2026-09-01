@@ -394,6 +394,21 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void MarkdownEditor_ProgrammaticModeChange_ToDesign_TriggersSetContent()
+        {
+            using var ctx = CreateContext();
+            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "a")
+                .Add(x => x.Mode, MarkdownEditorMode.Source));
+            int countBeforeExternalChange = plannedSetContent.Invocations.Count; // bunit's Invocations dictionary has no Clear(); compare counts instead
+
+            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Design));
+
+            Assert.True(plannedSetContent.Invocations.Count > countBeforeExternalChange);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_FlushesPendingEdit_UpdatesValueOnce_WithoutSetContent()
         {
             using var ctx = CreateContext();

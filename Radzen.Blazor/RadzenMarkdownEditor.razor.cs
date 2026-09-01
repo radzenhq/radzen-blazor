@@ -139,6 +139,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
     private string? lastSurfaceValue;
     private bool valueChangedExternally;
+    private bool modeChangedExternally;
 
     /// <summary>
     /// Invoked from JavaScript when the design surface content changes.
@@ -339,6 +340,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         if (parameters.DidParameterChange(nameof(Mode), Mode))
         {
             mode = parameters.GetValueOrDefault<MarkdownEditorMode>(nameof(Mode));
+            modeChangedExternally = mode == MarkdownEditorMode.Design;
         }
 
         if (parameters.DidParameterChange(nameof(Value), Value))
@@ -399,6 +401,12 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         if (valueChangedExternally)
         {
             valueChangedExternally = false;
+            await SyncDesignContentAsync();
+        }
+
+        if (modeChangedExternally)
+        {
+            modeChangedExternally = false;
             await SyncDesignContentAsync();
         }
 

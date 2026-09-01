@@ -8,7 +8,7 @@ public static class MarkdownEditorCommands
 {
     /// <summary>Wraps the selection in <c>**</c>.</summary>
     public const string Bold = "bold";
-    /// <summary>Wraps the selection in <c>_</c>.</summary>
+    /// <summary>Wraps the selection in <c>*</c>.</summary>
     public const string Italic = "italic";
     /// <summary>Wraps the selection in <c>~~</c>.</summary>
     public const string Strikethrough = "strikethrough";
