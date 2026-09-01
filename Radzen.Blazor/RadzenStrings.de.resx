@@ -2388,17 +2388,11 @@
     <value>Punktdiagramm</value>
   </data>
   <!-- MarkdownEditor -->
-  <data name="MarkdownEditor_WriteText" xml:space="preserve">
-    <value>Schreiben</value>
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Design</value>
   </data>
-  <data name="MarkdownEditor_PreviewText" xml:space="preserve">
-    <value>Vorschau</value>
-  </data>
-  <data name="MarkdownEditor_SplitText" xml:space="preserve">
-    <value>Geteilt</value>
-  </data>
-  <data name="MarkdownEditor_NothingToPreviewText" xml:space="preserve">
-    <value>Keine Vorschau verfügbar</value>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Quelltext</value>
   </data>
   <data name="MarkdownEditorBold_Title" xml:space="preserve">
     <value>Fett</value>

@@ -7,15 +7,14 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor;
 
 /// <summary>
-/// A Markdown editor component with a toolbar, keyboard shortcuts, and a live preview rendered by <see cref="RadzenMarkdown" />.
-/// In <see cref="MarkdownEditorMode.Split" /> mode the editor and preview are separated by a <see cref="RadzenSplitter" /> so their ratio can be adjusted.
+/// A Markdown editor component with a toolbar, keyboard shortcuts, and a Design/Source mode switcher.
 /// </summary>
 /// <example>
 /// <code>
 /// &lt;RadzenMarkdownEditor @bind-Value=@markdown @bind-Mode=@mode /&gt;
 /// @code {
 ///   string markdown = "# Hello";
-///   MarkdownEditorMode mode = MarkdownEditorMode.Split;
+///   MarkdownEditorMode mode = MarkdownEditorMode.Design;
 /// }
 /// </code>
 /// </example>
@@ -23,6 +22,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 {
     [Inject] private DialogService DialogService { get; set; } = null!;
 
+    private ElementReference editable;
     private ElementReference textarea;
     private IJSObjectReference? jsRef;
     private readonly Dictionary<string, Func<Task>> shortcuts = new();
@@ -35,7 +35,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Gets or sets the mode of the editor. Two-way bindable.
     /// </summary>
     [Parameter]
-    public MarkdownEditorMode Mode { get; set; } = MarkdownEditorMode.Edit;
+    public MarkdownEditorMode Mode { get; set; } = MarkdownEditorMode.Design;
 
     /// <summary>
     /// A callback invoked when the user switches the mode.
@@ -80,45 +80,14 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [Parameter]
     public int Rows { get; set; } = 10;
 
-    /// <summary>
-    /// Specifies whether HTML in the markdown is rendered in the preview. Forwarded to <see cref="RadzenMarkdown.AllowHtml" />.
-    /// </summary>
-    [Parameter]
-    public bool AllowHtml { get; set; } = true;
-
-    /// <summary>
-    /// Forwarded to <see cref="RadzenMarkdown.AllowedHtmlTags" />.
-    /// </summary>
-    [Parameter]
-    public IEnumerable<string>? AllowedHtmlTags { get; set; }
-
-    /// <summary>
-    /// Forwarded to <see cref="RadzenMarkdown.AllowedHtmlAttributes" />.
-    /// </summary>
-    [Parameter]
-    public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
-
-    private string WriteText => Localize(nameof(RadzenStrings.MarkdownEditor_WriteText));
-    private string PreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_PreviewText));
-    private string SplitText => Localize(nameof(RadzenStrings.MarkdownEditor_SplitText));
-    private string NothingToPreviewText => Localize(nameof(RadzenStrings.MarkdownEditor_NothingToPreviewText));
+    private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
+    private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));
     private string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
     private string LinkText => Localize(nameof(RadzenStrings.MarkdownEditorLink_LinkText));
     private string ImageUrlText => Localize(nameof(RadzenStrings.MarkdownEditorImage_UrlText));
     private string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
     private string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     private string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
-
-    private string TextareaPaneClass => mode switch
-    {
-        MarkdownEditorMode.Edit => "rz-markdown-editor-pane rz-markdown-editor-pane-full",
-        MarkdownEditorMode.Preview => "rz-markdown-editor-pane rz-markdown-editor-pane-hidden",
-        _ => "rz-markdown-editor-pane"
-    };
-
-    private string PreviewPaneClass => mode == MarkdownEditorMode.Edit
-        ? "rz-markdown-editor-pane rz-markdown-editor-pane-hidden"
-        : "rz-markdown-editor-pane rz-markdown-editor-pane-fill";
 
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
@@ -175,9 +144,9 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <summary>
-    /// Focuses the textarea.
+    /// Focuses the editable surface in Design mode, or the textarea in Source mode.
     /// </summary>
-    public override ValueTask FocusAsync() => textarea.FocusAsync();
+    public override ValueTask FocusAsync() => mode == MarkdownEditorMode.Design ? editable.FocusAsync() : textarea.FocusAsync();
 
     /// <summary>
     /// Executes a command. Built-in commands (see <see cref="MarkdownEditorCommands" />) modify the text; unknown command names only raise <see cref="Execute" />.

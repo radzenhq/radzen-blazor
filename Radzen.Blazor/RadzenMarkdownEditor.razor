@@ -35,37 +35,20 @@
                 <div class="rz-markdown-editor-modes">
                     <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
                         <Items>
-                            <RadzenSelectBarItem Value="MarkdownEditorMode.Edit" Text=@WriteText />
-                            <RadzenSelectBarItem Value="MarkdownEditorMode.Preview" Text=@PreviewText />
-                            <RadzenSelectBarItem Value="MarkdownEditorMode.Split" Text=@SplitText />
+                            <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Text=@DesignText />
+                            <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Text=@SourceText />
                         </Items>
                     </RadzenSelectBar>
                 </div>
             </div>
         }
-        <RadzenSplitter Orientation="Orientation.Horizontal" class="rz-markdown-editor-content">
-            <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" BarVisible=@(mode == MarkdownEditorMode.Split)
-                                class=@TextareaPaneClass>
-                <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Preview)
-                          name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
-                          @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange=@OnChange></textarea>
-            </RadzenSplitterPane>
-            <RadzenSplitterPane Size="50%" Min="20%" Collapsible="false" class=@PreviewPaneClass>
-                @if (mode != MarkdownEditorMode.Edit)
-                {
-                    <div class="rz-markdown-editor-preview">
-                        @if (string.IsNullOrWhiteSpace(Value))
-                        {
-                            <span class="rz-markdown-editor-empty">@NothingToPreviewText</span>
-                        }
-                        else
-                        {
-                            <RadzenMarkdown Text=@Value AllowHtml=@AllowHtml AllowedHtmlTags=@AllowedHtmlTags AllowedHtmlAttributes=@AllowedHtmlAttributes />
-                        }
-                    </div>
-                }
-            </RadzenSplitterPane>
-        </RadzenSplitter>
+        <div class="rz-markdown-editor-content">
+            <div @ref=editable class="rz-markdown-editor-design" hidden=@(mode == MarkdownEditorMode.Source)
+                 contenteditable=@(Disabled ? "false" : "true")></div>
+            <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Design)
+                      name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
+                      @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange=@OnChange></textarea>
+        </div>
     </div>
 }
 

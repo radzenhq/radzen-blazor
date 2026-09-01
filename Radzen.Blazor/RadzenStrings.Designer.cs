@@ -809,10 +809,8 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_PieChartText { get { return ResourceManager.GetString("Spreadsheet_PieChartText", resourceCulture); } }
         public static string Spreadsheet_DonutChartText { get { return ResourceManager.GetString("Spreadsheet_DonutChartText", resourceCulture); } }
         public static string Spreadsheet_ScatterChartText { get { return ResourceManager.GetString("Spreadsheet_ScatterChartText", resourceCulture); } }
-        public static string MarkdownEditor_WriteText { get { return ResourceManager.GetString("MarkdownEditor_WriteText", resourceCulture); } }
-        public static string MarkdownEditor_PreviewText { get { return ResourceManager.GetString("MarkdownEditor_PreviewText", resourceCulture); } }
-        public static string MarkdownEditor_SplitText { get { return ResourceManager.GetString("MarkdownEditor_SplitText", resourceCulture); } }
-        public static string MarkdownEditor_NothingToPreviewText { get { return ResourceManager.GetString("MarkdownEditor_NothingToPreviewText", resourceCulture); } }
+        public static string MarkdownEditor_DesignText { get { return ResourceManager.GetString("MarkdownEditor_DesignText", resourceCulture); } }
+        public static string MarkdownEditor_SourceText { get { return ResourceManager.GetString("MarkdownEditor_SourceText", resourceCulture); } }
         public static string MarkdownEditorBold_Title { get { return ResourceManager.GetString("MarkdownEditorBold_Title", resourceCulture); } }
         public static string MarkdownEditorItalic_Title { get { return ResourceManager.GetString("MarkdownEditorItalic_Title", resourceCulture); } }
         public static string MarkdownEditorStrikethrough_Title { get { return ResourceManager.GetString("MarkdownEditorStrikethrough_Title", resourceCulture); } }

@@ -2387,4 +2387,11 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Graphique en nuage de points</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Création</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Source</value>
+  </data>
 </root>

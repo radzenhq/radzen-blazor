@@ -2387,4 +2387,11 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>散布図</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>デザイン</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>ソース</value>
+  </data>
 </root>

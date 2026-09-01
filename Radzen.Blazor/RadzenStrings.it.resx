@@ -2387,4 +2387,11 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Grafico a dispersione</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Sorgente</value>
+  </data>
 </root>
