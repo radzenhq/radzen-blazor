@@ -193,8 +193,18 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
 
             var icons = component.FindAll(".rz-markdown-editor-tools .rzi").Select(i => i.TextContent).ToList();
-            Assert.Equal(new[] { "format_bold", "format_italic", "title", "format_quote", "code", "code_blocks",
-                                 "format_list_bulleted", "format_list_numbered", "link", "image", "horizontal_rule" }, icons);
+            Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "title", "format_quote", "code", "code_blocks",
+                                 "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
+        }
+
+        [Fact]
+        public void MarkdownEditor_DefaultToolbar_HasUndoRedo()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            Assert.Contains("undo", component.Markup);
+            Assert.Contains("redo", component.Markup);
         }
 
         [Fact]

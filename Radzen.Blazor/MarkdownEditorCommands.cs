@@ -34,4 +34,8 @@ public static class MarkdownEditorCommands
     public const string HorizontalRule = "horizontalRule";
     /// <summary>Replaces the selection with the command value.</summary>
     public const string InsertText = "insertText";
+    /// <summary>Restores the previous state from the editor's history.</summary>
+    public const string Undo = "undo";
+    /// <summary>Restores the next state from the editor's history.</summary>
+    public const string Redo = "redo";
 }
