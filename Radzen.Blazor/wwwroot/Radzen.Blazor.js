@@ -7351,6 +7351,12 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
   var blocksInRange = function (range) {
     var first = blockOf(range.startContainer), last = blockOf(range.endContainer);
+    if (!first || !last) {
+      // empty editable: blockOf climbed out without finding a block. Give the command
+      // something to operate on instead of an empty list.
+      first = last = document.createElement('p');
+      editable.appendChild(first);
+    }
     var result = [];
     for (var el = first; el; el = el.nextSibling) {
       result.push(el);
@@ -7489,14 +7495,18 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       }
       case 'codeBlock': {
         var target = blockOf(range.startContainer);
-        if (target) {
-          var pre = document.createElement('pre');
-          var codeChild = document.createElement('code');
-          codeChild.textContent = target.textContent;
-          pre.appendChild(codeChild);
-          target.parentNode.replaceChild(pre, target);
-          selectStart(codeChild);
+        if (!target) {
+          // empty editable: give the command an empty block to convert, consistent with
+          // heading/quote/list via blocksInRange above.
+          target = document.createElement('p');
+          editable.appendChild(target);
         }
+        var pre = document.createElement('pre');
+        var codeChild = document.createElement('code');
+        codeChild.textContent = target.textContent;
+        pre.appendChild(codeChild);
+        target.parentNode.replaceChild(pre, target);
+        selectStart(codeChild);
         break;
       }
       case 'horizontalRule': {

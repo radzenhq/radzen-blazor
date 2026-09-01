@@ -148,6 +148,45 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_DesignMode_InvokesJsExecute()
+        {
+            using var ctx = CreateContext();
+            var execute = ctx.JSInterop.SetupVoid("execute", _ => true);
+            execute.SetVoidResult();
+            string? executed = null;
+
+            // Mode defaults to Design.
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "hello")
+                .Add(x => x.Execute, args => executed = args.CommandName));
+
+            await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
+
+            var invocation = Assert.Single(execute.Invocations);
+            Assert.Equal(new object?[] { "bold", null, null }, invocation.Arguments.ToArray());
+            Assert.Equal("bold", executed);
+        }
+
+        [Fact]
+        public void MarkdownEditor_ExecuteCommand_Link_DesignMode_SavesSelectionBeforeDialogOpens()
+        {
+            using var ctx = CreateContext();
+            var saveSelection = ctx.JSInterop.SetupVoid("saveSelection", _ => true);
+            saveSelection.SetVoidResult();
+            ctx.JSInterop.Setup<bool>("hasSelection", _ => true).SetResult(true);
+
+            // Mode defaults to Design.
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            // DialogService.OpenAsync never completes without a rendered <RadzenDialog> host, so this call
+            // is fired without awaiting; saveSelection runs synchronously before that (never-resolving)
+            // await, so it has already happened by the time this statement returns control.
+            _ = component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Link));
+
+            Assert.Single(saveSelection.Invocations);
+        }
+
+        [Fact]
         public void MarkdownEditor_RendersDefaultToolbar_WhenNoChildContent()
         {
             using var ctx = CreateContext();
