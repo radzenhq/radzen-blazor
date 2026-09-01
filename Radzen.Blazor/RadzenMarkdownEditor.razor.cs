@@ -81,6 +81,16 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [Parameter]
     public int Rows { get; set; } = 10;
 
+    /// <summary>
+    /// Whether the editor's history has a state to undo to.
+    /// </summary>
+    public bool CanUndo { get; private set; }
+
+    /// <summary>
+    /// Whether the editor's history has a state to redo to.
+    /// </summary>
+    public bool CanRedo { get; private set; }
+
     private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
     private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));
     private string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
@@ -241,6 +251,17 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
             value = model.Url;
             label = model.Text;
+        }
+
+        if (name is MarkdownEditorCommands.Undo or MarkdownEditorCommands.Redo)
+        {
+            if (jsRef != null)
+            {
+                await jsRef.InvokeVoidAsync("execute", name, null, null);
+            }
+
+            await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
+            return;
         }
 
         if (jsRef != null)

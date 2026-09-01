@@ -2394,4 +2394,10 @@
   <data name="MarkdownEditor_SourceText" xml:space="preserve">
     <value>ソース</value>
   </data>
+  <data name="MarkdownEditorUndo_Title" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="MarkdownEditorRedo_Title" xml:space="preserve">
+    <value>やり直し</value>
+  </data>
 </root>

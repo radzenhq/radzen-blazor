@@ -1,0 +1,4 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenMarkdownEditorButtonBase
+
+<MarkdownEditorButton Title=@Title Click=@OnClick Icon="redo" Disabled=@(Editor?.CanRedo != true) />

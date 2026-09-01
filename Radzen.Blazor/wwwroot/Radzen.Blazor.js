@@ -7281,6 +7281,17 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var onKeyDown = function (e) {
     if (!(e.ctrlKey || e.metaKey) || !e.code) return;
+    var codeKey = e.code;
+    if (codeKey === 'KeyZ' && !e.altKey) {
+      e.preventDefault();
+      if (e.shiftKey) editor.redo(); else editor.undo();
+      return;
+    }
+    if (codeKey === 'KeyY' && !e.altKey && !e.shiftKey) {
+      e.preventDefault();
+      editor.redo();
+      return;
+    }
     var key = 'Ctrl+';
     if (e.altKey) key += 'Alt+';
     if (e.shiftKey) key += 'Shift+';
@@ -7323,6 +7334,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
 
   editor.apply = function (start, end, replacement, selectionStart, selectionEnd) {
+    editor.snapshot(true);
     var before = textarea.value;
     textarea.focus();
     textarea.value = before.substring(0, start) + replacement + before.substring(end);
@@ -7424,12 +7436,109 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     return !!range && !range.collapsed;
   };
 
+  var history = { undo: [], redo: [] };
+  var lastInputTime = 0, lastInputType = null;
+  var HISTORY_LIMIT = 100;
+
+  var nodePath = function (node) {
+    var path = [];
+    while (node && node !== editable) {
+      var parent = node.parentNode;
+      path.unshift(Array.prototype.indexOf.call(parent.childNodes, node));
+      node = parent;
+    }
+    return path;
+  };
+  var resolvePath = function (path) {
+    var node = editable;
+    for (var i = 0; i < path.length && node; i++) node = node.childNodes[path[i]];
+    return node;
+  };
+  var captureState = function () {
+    var mode = textarea.hidden ? 'design' : 'source';
+    var state = { mode: mode, markdown: Radzen.markdownSerialize(editable) };
+    if (mode === 'design') {
+      state.html = editable.innerHTML;
+      var sel = window.getSelection();
+      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
+        var range = sel.getRangeAt(0);
+        state.sel = {
+          sp: nodePath(range.startContainer), so: range.startOffset,
+          ep: nodePath(range.endContainer), eo: range.endOffset
+        };
+      }
+    } else {
+      state.markdown = textarea.value;
+      state.sel = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    }
+    return state;
+  };
+  var restoreState = function (state) {
+    var mode = textarea.hidden ? 'design' : 'source';
+    if (mode === 'design') {
+      if (state.mode === 'design' && state.html !== undefined) {
+        editor.setContent(state.html);
+        if (state.sel) {
+          var start = resolvePath(state.sel.sp), end = resolvePath(state.sel.ep);
+          if (start && end) {
+            var range = document.createRange();
+            range.setStart(start, Math.min(state.sel.so, (start.length !== undefined ? start.length : start.childNodes.length)));
+            range.setEnd(end, Math.min(state.sel.eo, (end.length !== undefined ? end.length : end.childNodes.length)));
+            setRange(range);
+          }
+        }
+      } else {
+        // cross-mode entry: re-render markdown via .NET
+        instance.invokeMethodAsync('RenderMarkdownAsync', state.markdown).then(function (html) {
+          editor.setContent(html);
+        });
+      }
+    } else {
+      textarea.value = state.markdown;
+      if (state.sel && state.sel.start !== undefined) {
+        textarea.setSelectionRange(state.sel.start, state.sel.end);
+      }
+    }
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', state.markdown)); } catch { }
+  };
+
+  editor.snapshot = function (force) {
+    var now = Date.now();
+    if (!force && now - lastInputTime < 1000) return;
+    history.undo.push(captureState());
+    if (history.undo.length > HISTORY_LIMIT) history.undo.shift();
+    history.redo = [];
+    lastInputTime = now;
+  };
+  editor.undo = function () {
+    if (!history.undo.length) return;
+    history.redo.push(captureState());
+    restoreState(history.undo.pop());
+  };
+  editor.redo = function () {
+    if (!history.redo.length) return;
+    history.undo.push(captureState());
+    restoreState(history.redo.pop());
+  };
+
+  var onBeforeInput = function (e) {
+    var type = e.inputType || '';
+    var boundary = (type.indexOf('delete') === 0) !== ((lastInputType || '').indexOf('delete') === 0)
+      || type === 'insertParagraph' || type === 'insertFromPaste';
+    editor.snapshot(boundary);
+    lastInputType = type;
+    lastInputTime = Date.now();
+  };
+
   editor.execute = function (name, value, label) {
+    if (name === 'undo') { editor.undo(); return; }
+    if (name === 'redo') { editor.redo(); return; }
+
     var range = currentRange();
     if (!range) { editable.focus(); range = currentRange(); if (!range) return; }
     editable.focus();
     setRange(range);
-    if (editor.snapshot) editor.snapshot(true); // Task 10 provides this
+    editor.snapshot(true);
 
     switch (name) {
       case 'bold': toggleInline(range, 'strong', ['STRONG', 'B']); break;
@@ -7549,6 +7658,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   editable.addEventListener('blur', onBlur);
   editable.addEventListener('keydown', onKeyDown);
   textarea.addEventListener('keydown', onKeyDown);
+  editable.addEventListener('beforeinput', onBeforeInput);
+  textarea.addEventListener('beforeinput', onBeforeInput);
 
   editor.dispose = function () {
     clearTimeout(inputTimeout);
@@ -7557,6 +7668,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     editable.removeEventListener('blur', onBlur);
     editable.removeEventListener('keydown', onKeyDown);
     textarea.removeEventListener('keydown', onKeyDown);
+    editable.removeEventListener('beforeinput', onBeforeInput);
+    textarea.removeEventListener('beforeinput', onBeforeInput);
   };
 
   return editor;
