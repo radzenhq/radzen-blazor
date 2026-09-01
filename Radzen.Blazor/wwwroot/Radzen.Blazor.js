@@ -7306,6 +7306,11 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var html = e.clipboardData && e.clipboardData.getData('text/html');
     if (!html) return; // plain-text paste: native behavior is fine
     e.preventDefault();
+    // preventDefault suppresses the native beforeinput/insertFromPaste that onBeforeInput
+    // would otherwise snapshot on, so checkpoint here before laundering mutates the DOM.
+    editor.snapshot(true);
+    lastInputType = 'insertFromPaste';
+    lastInputTime = Date.now();
     // launder rich content: pasted HTML → markdown → canonical HTML via .NET
     var scratch = document.createElement('div');
     scratch.innerHTML = html;
@@ -7456,8 +7461,9 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
   var captureState = function () {
     var mode = textarea.hidden ? 'design' : 'source';
-    var state = { mode: mode, markdown: Radzen.markdownSerialize(editable) };
+    var state = { mode: mode };
     if (mode === 'design') {
+      state.markdown = Radzen.markdownSerialize(editable);
       state.html = editable.innerHTML;
       var sel = window.getSelection();
       if (sel.rangeCount && editable.contains(sel.anchorNode)) {
@@ -7514,11 +7520,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     if (!history.undo.length) return;
     history.redo.push(captureState());
     restoreState(history.undo.pop());
+    dirty = true;
   };
   editor.redo = function () {
     if (!history.redo.length) return;
     history.undo.push(captureState());
     restoreState(history.redo.pop());
+    dirty = true;
   };
 
   var onBeforeInput = function (e) {
