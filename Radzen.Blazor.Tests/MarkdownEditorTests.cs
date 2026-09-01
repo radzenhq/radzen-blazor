@@ -192,7 +192,7 @@ namespace Radzen.Blazor.Tests
             component.Find(".rz-markdown-editor-tools button").Click();
 
             var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal("_hi_", invocation.Arguments[3]);
+            Assert.Equal("*hi*", invocation.Arguments[3]);
         }
 
         [Fact]
