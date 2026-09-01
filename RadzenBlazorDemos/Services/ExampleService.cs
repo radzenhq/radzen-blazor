@@ -3264,13 +3264,13 @@ namespace RadzenBlazorDemos
             Icon = "\uf552",
             Path = "markdown-editor",
             Title = "Blazor Markdown Editor | Free UI Components by Radzen",
-            Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a live preview with Write, Preview and Split modes.",
+            Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a WYSIWYG Design mode with a Source mode for raw Markdown.",
             Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
             Related = new [] { "markdown", "html-editor", "textarea" },
             Faq = new []
             {
-                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; the toolbar and keyboard shortcuts insert Markdown syntax and the preview renders it with RadzenMarkdown." },
-                new FaqItem { Question = "Can I show the editor and preview side by side?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Split, or let users switch between Write, Preview and Split with the built-in mode switcher." },
+                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode rendered by RadzenMarkdown, with the toolbar and keyboard shortcuts editing the content directly." },
+                new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
                 new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
             }
         },

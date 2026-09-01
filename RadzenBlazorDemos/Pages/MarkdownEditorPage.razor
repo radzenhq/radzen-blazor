@@ -4,7 +4,7 @@
     Blazor Markdown Editor
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    The Blazor Markdown Editor component (RadzenMarkdownEditor) edits Markdown with a toolbar, keyboard shortcuts and a live preview rendered by RadzenMarkdown. Switch between Write, Preview and Split mode.
+    The Blazor Markdown Editor component (RadzenMarkdownEditor) edits Markdown with a toolbar and keyboard shortcuts. It defaults to a WYSIWYG Design mode rendered by RadzenMarkdown, with a Source mode to edit the raw Markdown text.
 </RadzenText>
 
 <RadzenExample ComponentName="MarkdownEditor" Example="MarkdownEditor">
@@ -29,17 +29,19 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1">
     <ul style="line-height: 2rem">
+        <li>RadzenMarkdownEditorUndo - undoes the last change.</li>
+        <li>RadzenMarkdownEditorRedo - redoes the last undone change.</li>
         <li>RadzenMarkdownEditorSeparator - displays a vertical separator used to delimit groups of similar tools.</li>
         <li>RadzenMarkdownEditorBold - toggles <code>**bold**</code> on the selected text.</li>
         <li>RadzenMarkdownEditorItalic - toggles <code>_italic_</code> on the selected text.</li>
-        <li>RadzenMarkdownEditorStrikethrough - toggles <code>~~strikethrough~~</code> on the selected text. Not rendered by RadzenMarkdown, therefore not part of the default toolbar.</li>
+        <li>RadzenMarkdownEditorStrikethrough - toggles <code>~~strikethrough~~</code> on the selected text.</li>
         <li>RadzenMarkdownEditorHeading - cycles the heading level of the selected lines (<code>#</code>, <code>##</code>, <code>###</code>, none).</li>
         <li>RadzenMarkdownEditorQuote - toggles <code>&gt; </code> block quotes on the selected lines.</li>
         <li>RadzenMarkdownEditorCode - toggles inline <code>`code`</code> on the selected text.</li>
         <li>RadzenMarkdownEditorCodeBlock - wraps the selection in a fenced <code>```</code> code block.</li>
         <li>RadzenMarkdownEditorUnorderedList - toggles a bullet list (<code>- </code>) on the selected lines.</li>
         <li>RadzenMarkdownEditorOrderedList - toggles a numbered list (<code>1. </code>) on the selected lines.</li>
-        <li>RadzenMarkdownEditorTaskList - toggles a task list (<code>- [ ] </code>) on the selected lines. Not rendered by RadzenMarkdown, therefore not part of the default toolbar.</li>
+        <li>RadzenMarkdownEditorTaskList - toggles a task list (<code>- [ ] </code>) on the selected lines.</li>
         <li>RadzenMarkdownEditorLink - inserts a link; opens a dialog for the URL (and text when nothing is selected).</li>
         <li>RadzenMarkdownEditorImage - inserts an image by URL; opens a dialog for the URL (and alternative text when nothing is selected).</li>
         <li>RadzenMarkdownEditorHorizontalRule - inserts a horizontal rule (<code>---</code>) on its own line.</li>
@@ -51,7 +53,7 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
     Keyboard Navigation
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor MarkdownEditor component.
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor MarkdownEditor component. Shortcuts work the same in Design and Source mode.
 </RadzenText>
 
 <RadzenTable>
@@ -97,14 +99,9 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
             <RadzenTableCell>Redo the last undone change.</RadzenTableCell>
         </RadzenTableRow>
         <RadzenTableRow>
-            <RadzenTableCell><RadzenBadge Text="←" /> / <RadzenBadge Text="→" /></RadzenTableCell>
-            <RadzenTableCell><RadzenBadge Text="←" /> / <RadzenBadge Text="→" /></RadzenTableCell>
-            <RadzenTableCell>In Split mode, with the splitter handle focused (reach it with Tab): resize the editor and preview panes.</RadzenTableCell>
-        </RadzenTableRow>
-        <RadzenTableRow>
-            <RadzenTableCell><RadzenBadge Text="Home" /> / <RadzenBadge Text="End" /></RadzenTableCell>
-            <RadzenTableCell><RadzenBadge Text="Home" /> / <RadzenBadge Text="End" /></RadzenTableCell>
-            <RadzenTableCell>With the splitter handle focused: move the split to its minimum / maximum position.</RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Y" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Y" /></RadzenTableCell>
+            <RadzenTableCell>Redo the last undone change (alternative to Ctrl+Shift+Z).</RadzenTableCell>
         </RadzenTableRow>
     </RadzenTableBody>
 </RadzenTable>
