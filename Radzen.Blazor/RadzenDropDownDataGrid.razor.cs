@@ -745,6 +745,8 @@ namespace Radzen.Blazor
         int? skip;
         async Task OnLoadData(LoadDataArgs args)
         {
+            await SupersedeAsyncLoad();
+
             skip = args.Skip;
 
             if (prevSearch != searchText)
@@ -812,9 +814,34 @@ namespace Radzen.Blazor
                     query = query.OrderBy(args.OrderBy);
                 }
 
-                count = await Task.FromResult(query.Cast<object>().Count());
+                var view = query.Cast<object>();
+                var pageQuery = view.Skip(skip ?? 0).Take(args.Top ?? PageSize);
 
-                pagedData = await Task.FromResult(query.Cast<object>().Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize).ToList());
+                if (TryGetAsyncQueryCoordinator(view, out var coordinator))
+                {
+                    var applied = await coordinator.RunLoadAsync(async load =>
+                    {
+                        var (fetchedCount, fetchedData) = await load.CountAndPageAsync(view, pageQuery, true);
+
+                        load.ThrowIfSuperseded();
+
+                        (count, pagedData) = (fetchedCount, fetchedData);
+                    }, () =>
+                    {
+                        count = view.Count();
+                        pagedData = pageQuery.ToList();
+                    });
+
+                    if (!applied)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    count = view.Count();
+                    pagedData = pageQuery.ToList();
+                }
 
                 internalView = query;
 

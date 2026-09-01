@@ -74,8 +74,13 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "IQueryable",
+                            Toc = [
+                                new () { Text = "Paging", Anchor = "#paging" },
+                                new () { Text = "Virtualization", Anchor = "#virtualization" },
+                                new () { Text = "Asynchronous queries", Anchor = "#async-setup" }
+                            ],
                             Title = "Bind a Blazor DataGrid to IQueryable and Entity Framework | Free UI Components by Radzen",
-                            Description = "Use RadzenDataGrid to display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.",
+                            Description = "Bind RadzenDataGrid directly to Entity Framework IQueryable and execute paging, sorting, filtering, and virtualized windows asynchronously without a LoadData handler.",
                             Path = "datagrid-iqueryable",
                             Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
                         },

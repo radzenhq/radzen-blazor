@@ -1315,10 +1315,7 @@ namespace Radzen.Blazor
                     grid.SaveSettings();
                     if (grid.IsVirtualizationAllowed())
                     {
-                        if (grid.virtualize != null)
-                        {
-                            await grid.virtualize.RefreshDataAsync();
-                        }
+                        await grid.RefreshVirtualizationAsync();
                     }
                     else
                     {
@@ -1344,10 +1341,7 @@ namespace Radzen.Blazor
                         grid.SaveSettings();
                         if (grid.IsVirtualizationAllowed())
                         {
-                            if (grid.virtualize != null)
-                            {
-                                await grid.virtualize.RefreshDataAsync();
-                            }
+                            await grid.RefreshVirtualizationAsync();
                         }
                         else
                         {
@@ -1371,10 +1365,7 @@ namespace Radzen.Blazor
                         grid.SaveSettings();
                         if (grid.IsVirtualizationAllowed())
                         {
-                            if (grid.virtualize != null)
-                            {
-                                await grid.virtualize.RefreshDataAsync();
-                            }
+                            await grid.RefreshVirtualizationAsync();
                         }
                         else
                         {
@@ -1396,10 +1387,7 @@ namespace Radzen.Blazor
                     grid?.SaveSettings();
                     if (grid?.IsVirtualizationAllowed() == true)
                     {
-                        if (grid?.virtualize != null)
-                        {
-                            await grid.virtualize.RefreshDataAsync();
-                        }
+                        await grid.RefreshVirtualizationAsync();
                     }
                     else
                     {

@@ -852,12 +852,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public async override Task Reload()
         {
-            InvalidatePivotCache();
-            _view = null;
+            await SupersedeAsyncLoad();
 
-            if (Data != null && !LoadData.HasDelegate)
+            InvalidatePivotCache();
+
+            if (!await LoadPagedViewAsync())
             {
-                Count = View.Count();
+                return;
             }
 
             await InvokeLoadData(skip, PageSize);
@@ -2582,6 +2583,12 @@ namespace Radzen.Blazor
         {
             get
             {
+                // Avoid render-time provider access while an async load owns the source.
+                if (AsyncLoadPending)
+                {
+                    return Enumerable.Empty<TItem>().AsQueryable();
+                }
+
                 var baseView = base.View;
 
                 var filters = GetFilters();

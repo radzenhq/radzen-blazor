@@ -1,3 +1,4 @@
+﻿using System;
 using Microsoft.AspNetCore.Components;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,6 +39,9 @@ namespace Radzen.Blazor
     [CascadingTypeParameter(nameof(TItem))]
     public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
     {
+        /// <inheritdoc />
+        private protected override bool IsVirtualized => AllowVirtualization;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -112,24 +116,39 @@ namespace Radzen.Blazor
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var view = AllowPaging ? PagedView : View;
-            var top = request.Count;
-
-            if(top <= 0)
-            {
-                top = PageSize;
-            }
+            var top = GetVirtualPageSize(request.Count, PageSize);
 
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
             {
                 Skip = request.StartIndex,
                 Top = top
             });
-            
-            var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
 
-            var virtualDataItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top))?.ToList();
+            if (LoadData.HasDelegate)
+            {
+                return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(
+                    Data ?? Enumerable.Empty<TItem>(), Count);
+            }
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems ?? Enumerable.Empty<TItem>(), totalItemsCount);
+            var page = view.Skip(request.StartIndex).Take(top);
+
+            if (TryGetAsyncQueryCoordinator(view, out var coordinator))
+            {
+                using var tracked = coordinator.TrackVirtualRequest(request.CancellationToken);
+                var result = await tracked.CountAndPageAsync(view, page, true);
+
+                if (result.HasValue)
+                {
+                    return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(
+                        result.Value.Items, result.Value.Count);
+                }
+
+                return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(
+                    Array.Empty<TItem>(), Count);
+            }
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(
+                page.ToList(), view.Count());
         }
         RenderFragment DrawDataListRows()
         {

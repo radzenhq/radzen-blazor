@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -98,8 +98,6 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem> where TItem : notnull
     {
-        private static readonly string[] DefaultGroupProperty = new string[] { "it" };
-
         /// <summary>
         /// Gets whether all inline edit validators in the DataGrid are currently valid.
         /// Use this property to check validation state before saving edited rows.
@@ -175,9 +173,10 @@ namespace Radzen.Blazor
             }
         }
 
-        List<TItem> virtualDataItems = new List<TItem>();
+        // Render-time state comes from the fetched rows, never from an in-flight provider query.
+        readonly VirtualItems<TItem> virtualItems = new();
+        readonly VirtualItems<GroupResult> virtualGroupItems = new();
 
-        int virtualItemsStartIndex;
 
         /// <summary>
         /// Clears the internal data cache and refreshes the DataGrid, reloading data from the source.
@@ -211,15 +210,12 @@ namespace Radzen.Blazor
 
         string? lastLoadDataArgs;
         Task lastLoadDataTask = Task.CompletedTask;
-        private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
+        internal async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
-            var view = AllowPaging ? PagedView : View;
-            var top = request.Count;
+            var fetch = virtualItems.BeginFetch();
 
-            if(top <= 0)
-            {
-                top = PageSize;
-            }
+            var view = AllowPaging ? PagedView : View;
+            var top = GetVirtualPageSize(request.Count, PageSize);
 
             var filter = isOData == true ?
                     allColumns.ToList().ToODataFilterString<TItem>() : allColumns.ToList().ToFilterString<TItem>();
@@ -232,41 +228,108 @@ namespace Radzen.Blazor
                 lastLoadDataArgs = loadDataArgs;
             }
 
-            var totalItemsCount = (LoadData.HasDelegate ? Count : view.Count()) + itemsToInsert.Count;
+            int totalItemsCount;
+            List<TItem> rows;
 
-            virtualDataItems = (LoadData.HasDelegate ? (itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(Data ?? Enumerable.Empty<TItem>()) : Data) : itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList() ?? new List<TItem>();
+            if (!AllowPaging && typeof(TItem) != typeof(object) && CanUseAsyncQuery
+                && TryGetAsyncQueryCoordinator(view, out var coordinator))
+            {
+                using var tracked = coordinator.TrackVirtualRequest(request.CancellationToken);
+                var result = await tracked.CountAndPageAsync(view,
+                    view.Skip(request.StartIndex).Take(top), true);
 
-            virtualItemsStartIndex = request.StartIndex;
+                if (!result.HasValue)
+                {
+                    return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(
+                        System.Array.Empty<TItem>(), virtualItems.TotalCount);
+                }
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
+                (totalItemsCount, rows) = result.Value;
+            }
+            else if (LoadData.HasDelegate)
+            {
+                totalItemsCount = Count;
+                rows = (Data ?? Enumerable.Empty<TItem>()).ToList();
+            }
+            else
+            {
+                totalItemsCount = view.Count();
+                rows = view.Skip(request.StartIndex).Take(top).ToList();
+            }
+
+            totalItemsCount += itemsToInsert.Count;
+
+            if (itemsToInsert.Count > 0)
+            {
+                rows = itemsToInsert.Concat(rows).ToList();
+            }
+
+            var hadRows = virtualItems.HasAny;
+
+            if (virtualItems.TryPublish(fetch, request.StartIndex, totalItemsCount, rows)
+                && virtualItems.HasAny != hadRows)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(rows, totalItemsCount);
         }
 
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>> LoadGroups(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
-            var top = request.Count;
+            var fetch = virtualGroupItems.BeginFetch();
 
-            if(top <= 0)
-            {
-                top = PageSize;
-            }
+            var top = GetVirtualPageSize(request.Count, PageSize);
 
             var view = AllowPaging ? PagedView : View;
 
             var query = Enumerable.Empty<TItem>().AsQueryable();
             var totalItemsCount = 0;
-            _groupedPagedView = Enumerable.Empty<GroupResult>();
+            var grouped = (IEnumerable<GroupResult>)System.Array.Empty<GroupResult>();
 
             if (Groups.Any())
             {
                 query = view.AsQueryable().OrderBy(Groups.Any() ? string.Join(',', Groups.Select(g => g.Property)) : null);
-                _groupedPagedView = await Task.FromResult(query.GroupByMany(Groups.Any() ? Groups.Select(g => g.Property).ToArray() : DefaultGroupProperty).ToList());
 
-                totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
+                if (!AllowPaging && typeof(TItem) != typeof(object) && CanUseAsyncQuery
+                    && TryGetAsyncQueryCoordinator(query, out var coordinator))
+                {
+                    using var tracked = coordinator.TrackVirtualRequest(request.CancellationToken);
+                    var result = await tracked.ToListAsync(query);
+
+                    if (result.HasValue)
+                    {
+                        query = result.Value.AsQueryable();
+                    }
+                    else if (!result.RequiresSynchronousFallback)
+                    {
+                        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(
+                            System.Array.Empty<GroupResult>(), virtualGroupItems.TotalCount);
+                    }
+                }
+
+                var groups = GroupRows(query);
+
+                grouped = groups;
+                totalItemsCount = groups.Count;
             }
 
-            _view = view;
+            var page = grouped.Skip(request.StartIndex).Take(top).ToList();
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Any() ? _groupedPagedView.Skip(request.StartIndex).Take(top) : _groupedPagedView, totalItemsCount);
+            var hadGroups = virtualGroupItems.HasAny;
+
+            if (virtualGroupItems.TryPublish(fetch, request.StartIndex, totalItemsCount, page))
+            {
+                _groupedPagedView = grouped;
+                _view = view;
+
+                if (virtualGroupItems.HasAny != hadGroups)
+                {
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(page, totalItemsCount);
         }
 
         RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
@@ -311,7 +374,7 @@ namespace Radzen.Blazor
                                 b.AddAttribute(6, "TItem", typeof(TItem));
                                 b.AddAttribute(7, "Item", context);
                                 b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
-                                b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
+                                b.AddAttribute(9, "Index", virtualItems.IndexOf(context));
 
                                 // O(1) lookup instead of scanning editContexts.Keys per rendered row.
                                 if (editContexts.TryGetValue(context, out var editContext))
@@ -472,14 +535,21 @@ namespace Radzen.Blazor
             {
                 if (_groupedPagedView == null)
                 {
-                    var orderBy = GetOrderBy();
-                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(string.Join(',', Groups.Select(g => $"{g.Property} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
-                    var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
-                    _groupedPagedView = v.GroupByMany(Groups.Select(g => g.Property).ToArray()).ToList();
+                    var query = ComposeGroupedQuery(View, GetOrderBy());
+                    var rows = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList();
+                    _groupedPagedView = GroupRows(rows);
                 }
                 return _groupedPagedView;
             }
         }
+
+        IQueryable<TItem> ComposeGroupedQuery(IQueryable<TItem> composed, string orderBy) =>
+            Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy)
+                ? composed
+                : composed.OrderBy(string.Join(',', Groups.Select(g => $"{g.Property} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
+
+        List<GroupResult> GroupRows(IEnumerable<TItem> rows) =>
+            rows.AsQueryable().GroupByMany(Groups.Select(g => g.Property).ToArray()).ToList();
 
         internal async Task RemoveGroupAsync(GroupDescriptor gd)
         {
@@ -2176,11 +2246,7 @@ namespace Radzen.Blazor
             {
                 if (typeof(TItem) == typeof(object))
                 {
-                    var firstItem = view.FirstOrDefault();
-                    if (firstItem != null)
-                    {
-                        view = QueryableExtension.Cast(view, firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
-                    }
+                    view = ApplyObjectTypeOrdering(view, view.FirstOrDefault(), orderBy);
                 }
                 else
                 {
@@ -2261,65 +2327,157 @@ namespace Radzen.Blazor
                     }
                 }
 
-                IQueryable<TItem> view;
-
-                if (childData.Count > 0)
+                // Avoid render-time provider access while an async load owns the source.
+                if (AsyncLoadPending)
                 {
-                    view = GetSelfRefView(base.View, orderBy);
-                }
-                else
-                {
-                    view = base.View.Where<TItem>(allColumns);
-
-                    if (!string.IsNullOrEmpty(orderBy))
-                    {
-                        if (HasSortComparer())
-                        {
-                            view = OrderByComparers(view);
-                        }
-                        else if (typeof(TItem) == typeof(object))
-                        {
-                            var firstItem = view.FirstOrDefault();
-                            if (firstItem != null)
-                            {
-                                view = QueryableExtension.Cast(view, firstItem.GetType());
-                                view = view.OrderBy(orderBy).Cast<TItem>();
-                            }
-                        }
-                        else
-                        {
-                            view = view.OrderBy(orderBy);
-                        }
-                    }
+                    return Enumerable.Empty<TItem>().AsQueryable();
                 }
 
-                if (!IsVirtualizationAllowed() || AllowPaging)
+                var view = ComposeLocalView(orderBy);
+
+                if ((!IsVirtualizationAllowed() || AllowPaging) && !asyncCountApplied)
                 {
-                    var count = view.Count();
-                    if (count != Count)
-                    {
-                        Count = count;
-
-                        if (skip >= Count && Count > PageSize)
-                        {
-                            skip = Count - PageSize;
-                        }
-
-                        if (Count <= PageSize)
-                        {
-                            skip = 0;
-                            CurrentPage = 0;
-                        }
-
-                        CalculatePager();
-
-                        StateHasChanged();
-                    }
+                    ApplyCount(view.Count());
                 }
 
                 return QueryOnlyVisibleColumns ? view
                     .Select(allColumns.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property)).Select(c => c.Property)) : view;
             }
+        }
+
+        IQueryable<TItem> ComposeLocalView(string orderBy)
+        {
+            if (childData.Count > 0)
+            {
+                return GetSelfRefView(base.View, orderBy);
+            }
+
+            var view = base.View.Where<TItem>(allColumns);
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (HasSortComparer())
+                {
+                    view = OrderByComparers(view);
+                }
+                else if (typeof(TItem) == typeof(object))
+                {
+                    view = ApplyObjectTypeOrdering(view, view.FirstOrDefault(), orderBy);
+                }
+                else
+                {
+                    view = view.OrderBy(orderBy);
+                }
+            }
+
+            return view;
+        }
+
+        IQueryable<TItem> ApplyObjectTypeOrdering(IQueryable<TItem> view, object? firstItem, string orderBy)
+        {
+            if (firstItem == null)
+            {
+                return view;
+            }
+
+            return QueryableExtension.Cast(view, firstItem.GetType()).OrderBy(orderBy).Cast<TItem>();
+        }
+
+        void ApplyCount(int count)
+        {
+            if (count == Count)
+            {
+                return;
+            }
+
+            Count = count;
+
+            if (skip >= Count && Count > PageSize)
+            {
+                skip = Count - PageSize;
+            }
+
+            if (Count <= PageSize)
+            {
+                skip = 0;
+                CurrentPage = 0;
+            }
+
+            CalculatePager();
+
+            StateHasChanged();
+        }
+
+        async Task MaterializeAsyncCore(IQueryable<TItem> composed, string orderBy,
+            AsyncQueryCoordinator.LoadLease load)
+        {
+            var grouped = Groups.Any();
+            var query = grouped ? ComposeGroupedQuery(composed, orderBy) : composed;
+
+            List<TItem> rows;
+
+            if (AllowPaging)
+            {
+                var count = await load.CountAsync(composed);
+
+                load.ThrowIfSuperseded();
+
+                ApplyCount(count);
+
+                rows = await load.ToListAsync(query.Skip(skip).Take(PageSize));
+
+                load.ThrowIfSuperseded();
+            }
+            else
+            {
+                rows = await load.ToListAsync(query);
+
+                load.ThrowIfSuperseded();
+
+                ApplyCount(rows.Count);
+            }
+
+            asyncCountApplied = true;
+
+            if (grouped)
+            {
+                _groupedPagedView = GroupRows(rows);
+            }
+            else
+            {
+                _view = rows.AsQueryable();
+            }
+        }
+
+        bool CanUseAsyncQuery => !LoadData.HasDelegate && !QueryOnlyVisibleColumns && childData.Count == 0;
+
+        bool asyncCountApplied;
+
+        internal async Task RefreshVirtualizationAsync()
+        {
+            virtualItems.Invalidate();
+            virtualGroupItems.Invalidate();
+
+            if (virtualize != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+
+            if (groupVirtualize != null)
+            {
+                await groupVirtualize.RefreshDataAsync();
+            }
+
+            StateHasChanged();
+        }
+
+        void ResetView()
+        {
+            _view = null;
+            asyncCountApplied = false;
+
+            virtualItems.Invalidate();
+            virtualGroupItems.Invalidate();
         }
 
         RadzenDataGridColumn<TItem>? SortColumn(SortDescriptor descriptor) =>
@@ -2374,6 +2532,11 @@ namespace Radzen.Blazor
             if (Data == null)
             {
                 return false;
+            }
+
+            if (IsVirtualizationAllowed() && !LoadData.HasDelegate)
+            {
+                return Groups.Count > 0 ? virtualGroupItems.HasAny : virtualItems.HasAny;
             }
 
             if (Data is IQueryable<TItem> queryable)
@@ -2577,7 +2740,7 @@ namespace Radzen.Blazor
         public void Reset(bool resetColumnState = true, bool resetRowState = false)
         {
             _groupedPagedView = null;
-            _view = null;
+            ResetView();
             _value = new List<TItem>();
 
             if (resetRowState)
@@ -2620,12 +2783,41 @@ namespace Radzen.Blazor
 
         internal async Task ReloadInternal()
         {
+            await SupersedeAsyncLoad();
+
             _groupedPagedView = null;
-            _view = null;
+            ResetView();
 
             if (Data != null && !LoadData.HasDelegate)
             {
                 Count = 1;
+
+                var isObjectType = typeof(TItem) == typeof(object);
+
+                if (CanUseAsyncQuery && HasAsyncQueryExecutor && (!AllowVirtualization || AllowPaging)
+                    && !(isObjectType && HasSortComparer()))
+                {
+                    var orderBy = GetOrderBy();
+
+                    var source = isObjectType ? base.View.Where<TItem>(allColumns) : ComposeLocalView(orderBy);
+
+                    if (TryGetAsyncQueryCoordinator(source, out var coordinator))
+                    {
+                        var applied = await coordinator.RunLoadAsync(async load =>
+                        {
+                            var composed = isObjectType && !string.IsNullOrEmpty(orderBy)
+                                ? ApplyObjectTypeOrdering(source, (await load.ToListAsync(source.Take(1))).FirstOrDefault(), orderBy)
+                                : source;
+
+                            await MaterializeAsyncCore(composed, orderBy, load);
+                        });
+
+                        if (!applied)
+                        {
+                            return;
+                        }
+                    }
+                }
             }
 
             if (AllowVirtualization)
@@ -2943,7 +3135,7 @@ namespace Radzen.Blazor
 
         internal string? RowAriaRowIndex(int index)
         {
-            return IsVirtualizationAllowed() && Groups.Count == 0 ? (virtualItemsStartIndex + index + HeaderRowCount() + 1).ToString(CultureInfo.InvariantCulture) : null;
+            return IsVirtualizationAllowed() && Groups.Count == 0 ? (virtualItems.StartIndex + index + HeaderRowCount() + 1).ToString(CultureInfo.InvariantCulture) : null;
         }
 
         internal string? RowAriaLevel(TItem item)
@@ -3270,7 +3462,7 @@ namespace Radzen.Blazor
                     if (args.Data != null && !childData.ContainsKey(item))
                     {
                         childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data, ParentChildData = childData.Where(c => c.Value.Data?.Contains(item) == true).Select(c => c.Value).FirstOrDefault() });
-                        _view = null;
+                        ResetView();
                     }
                 }
             }
@@ -3316,7 +3508,7 @@ namespace Radzen.Blazor
 
             if (childData.Remove(item))
             {
-                _view = null;
+                ResetView();
             }
         }
 
@@ -3349,7 +3541,7 @@ namespace Radzen.Blazor
                 if (args.Data != null && !childData.ContainsKey(item))
                 {
                     childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data, ParentChildData = childData.Where(c => c.Value!.Data!.Contains(item)).Select(c => c.Value).FirstOrDefault() });
-                    _view = null;
+                    ResetView();
                 }
             }
             else
@@ -4271,7 +4463,7 @@ namespace Radzen.Blazor
 
             _value = null;
             Data = null;
-            _view = null;
+            ResetView();
             _groupedPagedView = null;
 
             if (Query != null)

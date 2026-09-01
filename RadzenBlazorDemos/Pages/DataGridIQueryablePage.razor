@@ -4,9 +4,35 @@
     DataGrid <strong>IQueryable</strong>
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.
+    Bind directly to an Entity Framework <code>IQueryable</code> and let the DataGrid compose and await its paging, sorting and filtering queries.
 </RadzenText>
 
+<RadzenText Anchor="datagrid-iqueryable#paging" TextStyle="TextStyle.H5" TagName="TagName.H2">
+    Paging
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    The grid awaits the total count and current page from the bound Entity Framework query.
+</RadzenText>
 <RadzenExample ComponentName="DataGrid" Example="DataGridIQueryable">
     <DataGridIQueryable />
 </RadzenExample>
+
+<RadzenText Anchor="datagrid-iqueryable#virtualization" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Virtualization
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    With virtualization enabled, each visible window is fetched asynchronously from the same bound query.
+</RadzenText>
+<RadzenExample ComponentName="DataGrid" Example="DataGridVirtualization">
+    <DataGridVirtualization />
+</RadzenExample>
+
+<RadzenText Anchor="datagrid-iqueryable#async-setup" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Asynchronous queries
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Asynchronous execution is automatic. When the bound <code>IQueryable</code> supports asynchronous enumeration - as Entity Framework Core queries do - the component awaits its count and page queries instead of blocking the circuit. No package, registration, or <code>LoadData</code> handler is required.
+</RadzenText>
+<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+    Page, sort, filter, or scroll the examples above. Their EF Core count and materialization queries run asynchronously while the grid retains control of query composition.
+</RadzenAlert>
