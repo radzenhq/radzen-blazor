@@ -7249,7 +7249,7 @@ Radzen.markdownSerialize = function (root) {
         var header = Array.prototype.map.call(rows[0].cells, tableCell);
         var aligns = Array.prototype.map.call(rows[0].cells, function (cell) {
           var a = cell.style.textAlign;
-          return a === 'center' ? ':---:' : a === 'right' ? '---:' : '---';
+          return a === 'center' ? ':---:' : a === 'right' ? '---:' : a === 'left' ? ':---' : '---';
         });
         var body = rows.slice(1).map(function (row) {
           return line(Array.prototype.map.call(row.cells, tableCell));
