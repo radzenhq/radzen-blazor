@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
 
@@ -38,13 +39,13 @@ internal static class MarkdownFormatter
                 var inserted = value ?? string.Empty;
                 return new MarkdownEdit(start, end, inserted, start + inserted.Length, start + inserted.Length);
             case MarkdownEditorCommands.Bold:
-                return Wrap(text, start, end, "**");
+                return ToggleInline(text, start, end, "**", s => s.Char is '*' or '_' && s.DelimiterLength == 2);
             case MarkdownEditorCommands.Italic:
-                return Wrap(text, start, end, "_");
+                return ToggleInline(text, start, end, "*", s => s.Char is '*' or '_' && s.DelimiterLength == 1);
             case MarkdownEditorCommands.Strikethrough:
-                return Wrap(text, start, end, "~~");
+                return ToggleInline(text, start, end, "~~", s => s.Char == '~');
             case MarkdownEditorCommands.Code:
-                return Wrap(text, start, end, "`");
+                return ToggleInline(text, start, end, "`", s => s.Char == '`');
             case MarkdownEditorCommands.Heading:
                 return Heading(text, start, end);
             case MarkdownEditorCommands.Quote:
@@ -68,27 +69,80 @@ internal static class MarkdownFormatter
         }
     }
 
-    static MarkdownEdit Wrap(string text, int start, int end, string token)
+    /// <summary>
+    /// Toggles an inline markdown token (bold/italic/strikethrough/code) on the selection, normalizing it
+    /// GitHub-style: trims whitespace off the edges, expands a collapsed caret to the surrounding word,
+    /// unwraps a token that already contains the selection, and otherwise strips any fully-selected matching
+    /// tokens before wrapping once.
+    /// </summary>
+    static MarkdownEdit ToggleInline(string text, int start, int end, string emit, Func<InlineSpan, bool> matches)
     {
-        var selected = text.Substring(start, end - start);
-        var t = token.Length;
+        // 1. scan only the lines the selection touches — inline tokens never matter across paragraphs here
+        var (lineStart, lineEnd) = ExpandToLines(text, start, end);
+        var line = text.Substring(lineStart, lineEnd - lineStart);
+        var spans = InlineParser.ScanSpans(line);
 
-        // Selection contains the tokens: **hi** → hi
-        if (selected.Length >= 2 * t && selected.StartsWith(token, StringComparison.Ordinal) && selected.EndsWith(token, StringComparison.Ordinal))
+        // ScanSpans trims its input, so span offsets are relative to the trimmed line. Leading whitespace
+        // on the line shifts them; trailing whitespace does not affect start-relative offsets.
+        var leadingWhitespace = line.Length - line.TrimStart().Length;
+
+        // 2. trim whitespace off the selection edges
+        while (start < end && char.IsWhiteSpace(text[start]))
         {
-            var inner = selected.Substring(t, selected.Length - 2 * t);
-            return new MarkdownEdit(start, end, inner, start, start + inner.Length);
+            start++;
+        }
+        while (end > start && char.IsWhiteSpace(text[end - 1]))
+        {
+            end--;
         }
 
-        // Tokens immediately outside the selection: **[hi]** → hi
-        if (start >= t && end + t <= text.Length
-            && string.CompareOrdinal(text, start - t, token, 0, t) == 0
-            && string.CompareOrdinal(text, end, token, 0, t) == 0)
+        // 3. collapsed caret: expand to the surrounding non-whitespace run
+        if (start == end)
         {
-            return new MarkdownEdit(start - t, end + t, selected, start - t, start - t + selected.Length);
+            while (start > lineStart && !char.IsWhiteSpace(text[start - 1]))
+            {
+                start--;
+            }
+            while (end < lineEnd && !char.IsWhiteSpace(text[end]))
+            {
+                end++;
+            }
+            if (start == end)
+            {
+                // caret in whitespace: insert empty delimiters, caret between them
+                return new MarkdownEdit(start, end, emit + emit, start + emit.Length, start + emit.Length);
+            }
         }
 
-        return new MarkdownEdit(start, end, token + selected + token, start + t, start + t + selected.Length);
+        // 4a. a matching token whose outer range contains the selection → unwrap it
+        foreach (var s in spans)
+        {
+            if (!matches(s))
+            {
+                continue;
+            }
+            int outerStart = lineStart + leadingWhitespace + s.Start, outerEnd = lineStart + leadingWhitespace + s.End;
+            if (outerStart <= start && end <= outerEnd)
+            {
+                var inner = text.Substring(outerStart + s.DelimiterLength, outerEnd - outerStart - 2 * s.DelimiterLength);
+                return new MarkdownEdit(outerStart, outerEnd, inner, outerStart, outerStart + inner.Length);
+            }
+        }
+
+        // 4b. otherwise: strip matching tokens fully inside the selection, then wrap once
+        var content = text.Substring(start, end - start);
+        foreach (var s in spans.Where(s => matches(s)
+                     && lineStart + leadingWhitespace + s.Start >= start && lineStart + leadingWhitespace + s.End <= end)
+                 .OrderByDescending(s => s.Start))
+        {
+            int rs = lineStart + leadingWhitespace + s.Start - start, re = lineStart + leadingWhitespace + s.End - start;
+            content = content[..rs]
+                + content[(rs + s.DelimiterLength)..(re - s.DelimiterLength)]
+                + content[re..];
+        }
+
+        var replacement = emit + content + emit;
+        return new MarkdownEdit(start, end, replacement, start + emit.Length, start + emit.Length + content.Length);
     }
 
     static readonly Regex OrderedPrefix = new(@"^\d+\. ", RegexOptions.Compiled);
