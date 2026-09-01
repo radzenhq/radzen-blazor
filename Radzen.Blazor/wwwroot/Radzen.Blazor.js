@@ -7156,6 +7156,133 @@ Radzen.markdownEditorApply = function (textarea, start, end, replacement, select
   textarea.setSelectionRange(selectionStart, selectionEnd);
 };
 
+Radzen.markdownSerialize = function (root) {
+  var escapeText = function (text) {
+    return text.replace(/[\\`*_~\[\]]/g, function (c) { return '\\' + c; });
+  };
+  var escapeBlockStart = function (line) {
+    return line.replace(/^(\s*)([#>+-]|\d+[.)])(\s)/, '$1\\$2$3');
+  };
+  var styleWraps = function (el) {
+    var wraps = [];
+    var s = el.style;
+    if (s.fontWeight === 'bold' || parseInt(s.fontWeight, 10) >= 600) wraps.push('**');
+    if (s.fontStyle === 'italic') wraps.push('*');
+    if ((s.textDecoration || '').indexOf('line-through') >= 0) wraps.push('~~');
+    return wraps;
+  };
+  var wrap = function (token, inner) {
+    var m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/); // keep edge whitespace outside tokens
+    return m[2] ? m[1] + token + m[2] + token + m[3] : inner;
+  };
+  var inline = function (node) {
+    var out = '';
+    node.childNodes.forEach(function (child) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        out += escapeText(child.data.replace(/\s+/g, ' '));
+        return;
+      }
+      if (child.nodeType !== Node.ELEMENT_NODE) return;
+      switch (child.tagName) {
+        case 'STRONG': case 'B': out += wrap('**', inline(child)); break;
+        case 'EM': case 'I': out += wrap('*', inline(child)); break;
+        case 'DEL': case 'S': case 'STRIKE': out += wrap('~~', inline(child)); break;
+        case 'CODE': {
+          var code = child.textContent;
+          out += code.indexOf('`') >= 0 ? '`` ' + code + ' ``' : '`' + code + '`';
+          break;
+        }
+        case 'A': out += '[' + inline(child) + '](' + (child.getAttribute('href') || '') + ')'; break;
+        case 'IMG': out += '![' + (child.getAttribute('alt') || '') + '](' + (child.getAttribute('src') || '') + ')'; break;
+        case 'BR': out += '  \n'; break;
+        case 'INPUT': break; // task checkboxes are handled by the list item
+        default: {
+          var text = inline(child);
+          styleWraps(child).forEach(function (token) { text = wrap(token, text); });
+          out += text;
+        }
+      }
+    });
+    return out;
+  };
+  var paragraph = function (el) {
+    var text = inline(el).replace(/^[ ]+|[ ]+$/g, '');
+    return text ? text.split('\n').map(escapeBlockStart).join('\n') : '';
+  };
+  var indent = function (text, first, rest) {
+    return text.split('\n').map(function (line, i) {
+      return (i === 0 ? first : rest) + line;
+    }).join('\n').replace(/[ ]+$/gm, '');
+  };
+  var listItem = function (li, marker) {
+    var checkbox = li.querySelector(':scope > input[type=checkbox], :scope > p:first-child > input[type=checkbox]:first-child');
+    if (checkbox) marker += checkbox.checked ? '[x] ' : '[ ] ';
+    var content = blocks(li) || '';
+    return indent(content, marker, ' '.repeat(marker.length));
+  };
+  var tableCell = function (cell) { return inline(cell).trim().replace(/\|/g, '\\|'); };
+  var block = function (el) {
+    switch (el.tagName) {
+      case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6':
+        return '#'.repeat(+el.tagName[1]) + ' ' + paragraph(el);
+      case 'P': case 'DIV': return paragraph(el);
+      case 'BLOCKQUOTE':
+        return (blocks(el) || '').split('\n').map(function (l) { return ('> ' + l).replace(/[ ]+$/, ''); }).join('\n');
+      case 'UL':
+        return Array.prototype.map.call(el.children, function (li) { return listItem(li, '- '); }).join('\n');
+      case 'OL': {
+        var start = parseInt(el.getAttribute('start'), 10) || 1;
+        return Array.prototype.map.call(el.children, function (li, i) { return listItem(li, (start + i) + '. '); }).join('\n');
+      }
+      case 'PRE': {
+        var codeEl = el.querySelector('code');
+        var lang = ((codeEl && codeEl.className || '').match(/language-(\S+)/) || [])[1] || '';
+        var code = (codeEl || el).textContent.replace(/\n$/, '');
+        var fence = /```/.test(code) ? '````' : '```';
+        return fence + lang + '\n' + code + '\n' + fence;
+      }
+      case 'HR': return '---';
+      case 'TABLE': {
+        var rows = Array.prototype.slice.call(el.querySelectorAll('tr'));
+        if (!rows.length) return '';
+        var line = function (cells) { return '| ' + cells.join(' | ') + ' |'; };
+        var header = Array.prototype.map.call(rows[0].cells, tableCell);
+        var aligns = Array.prototype.map.call(rows[0].cells, function (cell) {
+          var a = cell.style.textAlign;
+          return a === 'center' ? ':---:' : a === 'right' ? '---:' : '---';
+        });
+        var body = rows.slice(1).map(function (row) {
+          return line(Array.prototype.map.call(row.cells, tableCell));
+        });
+        return [line(header), line(aligns)].concat(body).join('\n');
+      }
+      default: return paragraph(el);
+    }
+  };
+  var blocks = function (parent) {
+    var out = [], pending = null;
+    var flush = function () {
+      if (pending) { var text = paragraph(pending); if (text) out.push(text); pending = null; }
+    };
+    parent.childNodes.forEach(function (child) {
+      var isBlock = child.nodeType === Node.ELEMENT_NODE &&
+        /^(H[1-6]|P|DIV|BLOCKQUOTE|UL|OL|PRE|HR|TABLE)$/.test(child.tagName);
+      if (isBlock) {
+        flush();
+        var text = block(child);
+        if (text) out.push(text);
+      } else {
+        // stray inline content at block level accumulates into an implicit paragraph
+        if (!pending) { pending = document.createElement('p'); }
+        pending.appendChild(child.cloneNode(true));
+      }
+    });
+    flush();
+    return out.join('\n\n');
+  };
+  return root ? blocks(root) : '';
+};
+
 Radzen.createMarkdownEditor = function (textarea, instance, shortcuts) {
   if (!textarea) {
     return { dispose: function () {} };
