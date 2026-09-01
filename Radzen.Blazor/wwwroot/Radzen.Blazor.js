@@ -7292,6 +7292,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   var editor = { editable: editable, textarea: textarea, instance: instance };
   var inputTimeout = null;
   var suppressInput = false;
+  var dirty = false; // true once the surface has genuinely been edited since the last setContent/blur flush
 
   var notifyValue = function () {
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
@@ -7299,12 +7300,15 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var onInput = function () {
     if (suppressInput) return;
+    dirty = true;
     clearTimeout(inputTimeout);
     inputTimeout = setTimeout(notifyValue, 250);
   };
 
   var onBlur = function () {
     clearTimeout(inputTimeout);
+    if (!dirty) return; // matches RadzenTextArea semantics: no edit, no Change
+    dirty = false;
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', Radzen.markdownSerialize(editable))); } catch { }
   };
 
@@ -7345,6 +7349,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   editor.setContent = function (html) {
     clearTimeout(inputTimeout);
+    dirty = false;
     suppressInput = true;
     editable.innerHTML = html;
     suppressInput = false;
