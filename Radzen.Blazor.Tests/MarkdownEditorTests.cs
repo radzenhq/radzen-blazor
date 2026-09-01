@@ -270,7 +270,7 @@ namespace Radzen.Blazor.Tests
 
             // Loose mode records every call; no Setup so the un-awaited OnAfterRenderAsync cannot hang on a missing result.
             var invocation = Assert.Single(ctx.JSInterop.Invocations["Radzen.createMarkdownEditor"]);
-            var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[2]);
+            var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[3]);
             Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
         }
 
@@ -305,6 +305,36 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
             Assert.Contains("mode:Design", component.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_DesignInput_UpdatesValue_WithoutSetContent()
+        {
+            using var ctx = CreateContext();
+            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            string? changed = null;
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "old")
+                .Add(x => x.ValueChanged, v => changed = v));
+            int countAfterMount = plannedSetContent.Invocations.Count; // initial render already syncs content once; bunit's Invocations dictionary has no Clear()
+
+            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("new **text**"));
+
+            Assert.Equal("new **text**", changed);
+            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count); // surface-originated change must not echo back
+        }
+
+        [Fact]
+        public void MarkdownEditor_ProgrammaticValueChange_TriggersSetContent()
+        {
+            using var ctx = CreateContext();
+            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            int countBeforeExternalChange = plannedSetContent.Invocations.Count; // bunit's Invocations dictionary has no Clear(); compare counts instead
+
+            component.SetParametersAndRender(p => p.Add(x => x.Value, "b"));
+
+            Assert.True(plannedSetContent.Invocations.Count > countBeforeExternalChange);
         }
     }
 }

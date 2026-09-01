@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
 
@@ -101,7 +102,55 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     {
         mode = value;
         await ModeChanged.InvokeAsync(value);
+
+        if (value == MarkdownEditorMode.Design)
+        {
+            await SyncDesignContentAsync();
+        }
     }
+
+    private string? lastSurfaceValue;
+    private bool valueChangedExternally;
+
+    /// <summary>
+    /// Invoked from JavaScript when the design surface content changes.
+    /// </summary>
+    [JSInvokable("OnDesignInputAsync")]
+    public async Task OnDesignInputAsync(string markdown)
+    {
+        lastSurfaceValue = markdown;
+        Value = markdown;
+        await ValueChanged.InvokeAsync(markdown);
+        NotifyFieldChanged(markdown);
+
+        if (Immediate)
+        {
+            await Input.InvokeAsync(markdown);
+        }
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the design surface loses focus.
+    /// </summary>
+    [JSInvokable("OnDesignChangeAsync")]
+    public async Task OnDesignChangeAsync(string markdown)
+    {
+        await Change.InvokeAsync(markdown);
+    }
+
+    private async Task SyncDesignContentAsync()
+    {
+        if (jsRef != null && mode == MarkdownEditorMode.Design)
+        {
+            await jsRef.InvokeVoidAsync("setContent", HtmlVisitor.ToHtml(NormalizedValue));
+        }
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript to render markdown as design-surface HTML (paste laundering, undo/redo cross-mode restore).
+    /// </summary>
+    [JSInvokable("RenderMarkdownAsync")]
+    public Task<string> RenderMarkdownAsync(string markdown) => Task.FromResult(HtmlVisitor.ToHtml(markdown ?? string.Empty));
 
     private async Task OnInputAsync(string? value)
     {
@@ -222,6 +271,12 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             mode = parameters.GetValueOrDefault<MarkdownEditorMode>(nameof(Mode));
         }
 
+        if (parameters.DidParameterChange(nameof(Value), Value))
+        {
+            var incoming = parameters.GetValueOrDefault<string?>(nameof(Value));
+            valueChangedExternally = incoming != lastSurfaceValue;
+        }
+
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         await base.SetParametersAsync(parameters);
@@ -255,7 +310,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
             if (version == jsRefVersion)
             {
-                IJSObjectReference created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", textarea, Reference, shortcuts.Keys);
+                IJSObjectReference created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", editable, textarea, Reference, shortcuts.Keys);
 
                 if (version == jsRefVersion)
                 {
@@ -267,6 +322,14 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
                     await created.DisposeAsync();
                 }
             }
+
+            await SyncDesignContentAsync();
+        }
+
+        if (valueChangedExternally)
+        {
+            valueChangedExternally = false;
+            await SyncDesignContentAsync();
         }
 
         visibleChanged = false;
