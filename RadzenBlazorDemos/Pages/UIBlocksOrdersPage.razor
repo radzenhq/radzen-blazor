@@ -1,0 +1,60 @@
+@page "/ui-blocks-orders"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Order blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    An order block covers the after-purchase experience: summaries, history with statuses, and delivery tracking.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-orders#order-summary" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Order summary
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An order block with the full cost breakdown.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/orders/order-summary" Title="Order summary" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-orders#order-history" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Order history
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An order block listing past orders with status badges.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/orders/order-history" Title="Order history" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-orders#order-tracking" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Order tracking
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An order block with the delivery progress as a timeline.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/orders/order-tracking" Title="Order tracking" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

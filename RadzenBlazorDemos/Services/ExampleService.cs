@@ -4169,6 +4169,71 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
+                    Name = "Blocks Gallery",
+                    Path = "ui-blocks",
+                    Title = "Blazor UI Blocks - 139 Ready-to-Use Blocks | Free UI Components by Radzen",
+                    Description = "Browse 139 ready-to-use Blazor UI blocks across 24 categories - heroes, stats, navbars, forms, e-commerce and more.",
+                    Icon = "\ue3b6",
+                    Tags = new [] { "blocks", "gallery", "overview", "sections", "templates" },
+                    New = true
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Activity timeline", Anchor = "#activity-timeline" }, new () { Text = "Notification list", Anchor = "#notification-list" }, new () { Text = "Comment feed", Anchor = "#comment-feed" }, new () { Text = "Audit log", Anchor = "#audit-log" } ],
+                    Name = "Activity Feeds",
+                    Title = "Blazor Activity Feeds | UI Blocks by Radzen",
+                    Icon = "\ue88e",
+                    Description = "Examples of Activity Feed and Notification UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-activity-feeds",
+                    Tags = new [] { "activity", "feed", "notifications", "timeline", "comments", "audit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Prompt suggestions", Anchor = "#prompt-suggestions" }, new () { Text = "Ask bar", Anchor = "#ask-bar" }, new () { Text = "AI settings", Anchor = "#ai-settings" }, new () { Text = "AI welcome", Anchor = "#ai-welcome" } ],
+                    Name = "AI Blocks",
+                    Title = "Blazor AI Blocks | UI Blocks by Radzen",
+                    Icon = "\ue89f",
+                    Description = "Examples of AI UI Blocks built around RadzenAIChat",
+                    New = true,
+                    Path = "ui-blocks-ai",
+                    Tags = new [] { "ai", "assistant", "chat", "copilot", "prompt" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Announcement bar", Anchor = "#announcement-bar" }, new () { Text = "Promo banner", Anchor = "#promo-banner" }, new () { Text = "Info banner", Anchor = "#info-banner" }, new () { Text = "Floating banner", Anchor = "#floating-banner" }, new () { Text = "Cookie consent banner", Anchor = "#cookie-banner" }, new () { Text = "Warning banner", Anchor = "#warning-banner" } ],
+                    Name = "Banners",
+                    Title = "Blazor Banners | UI Blocks by Radzen",
+                    Icon = "\ue0c9",
+                    Description = "Examples of Banner and Announcement UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-banners",
+                    Tags = new [] { "banner", "announcement", "promo", "cookie", "consent", "notification" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Feature bento", Anchor = "#feature-bento" }, new () { Text = "Bento with stats", Anchor = "#bento-with-stats" }, new () { Text = "Bento with images", Anchor = "#bento-with-images" }, new () { Text = "Dark bento", Anchor = "#dark-bento" } ],
+                    Name = "Bento Grids",
+                    Title = "Blazor Bento Grids | UI Blocks by Radzen",
+                    Icon = "\ue3ec",
+                    Description = "Examples of Bento Grid UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-bento",
+                    Tags = new [] { "bento", "grid", "mosaic", "features", "tiles" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Article cards", Anchor = "#article-cards" }, new () { Text = "Featured article", Anchor = "#featured-article" }, new () { Text = "Minimal list", Anchor = "#minimal-list" }, new () { Text = "Horizontal cards", Anchor = "#horizontal-cards" }, new () { Text = "Dark blog", Anchor = "#dark-blog" }, new () { Text = "Articles with authors", Anchor = "#articles-with-authors" }, new () { Text = "Blog with sidebar", Anchor = "#blog-with-sidebar" }, new () { Text = "Post hero", Anchor = "#post-hero" } ],
+                    Name = "Blog",
+                    Title = "Blazor Blog | UI Blocks by Radzen",
+                    Icon = "\uf04c",
+                    Description = "Examples of Blog UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-blog",
+                    Tags = new [] { "blog", "article", "news", "post", "cards" }
+                },
+                new Example
+                {
                     Name = "Call-to-Action",
                     Title = "Blazor Call-to-Action | UI Blocks by Radzen",
                     Icon = "\ue06c",
@@ -4185,6 +4250,61 @@ namespace RadzenBlazorDemos
                     Description = "Examples of Card Blocks",
                     Path = "ui-blocks-cards",
                     Tags = new [] { "card", "stats", "products" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Split checkout", Anchor = "#split-checkout" }, new () { Text = "Steps checkout", Anchor = "#steps-checkout" }, new () { Text = "Payment methods", Anchor = "#payment-methods" }, new () { Text = "Order confirmation", Anchor = "#order-confirmation" } ],
+                    Name = "Checkout",
+                    Title = "Blazor Checkout | UI Blocks by Radzen",
+                    Icon = "\ue8cc",
+                    Description = "Examples of Checkout UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-checkout",
+                    Tags = new [] { "checkout", "payment", "ecommerce", "shop", "order" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered contact form", Anchor = "#centered-contact-form" }, new () { Text = "Contact form with details", Anchor = "#contact-form-with-details" }, new () { Text = "Contact cards", Anchor = "#contact-cards" }, new () { Text = "Office locations", Anchor = "#office-locations" }, new () { Text = "Simple contact CTA", Anchor = "#simple-contact-cta" }, new () { Text = "Contact on primary", Anchor = "#contact-on-primary" }, new () { Text = "Centered contact info", Anchor = "#centered-contact-info" }, new () { Text = "Contact with office hours", Anchor = "#contact-with-hours" } ],
+                    Name = "Contact",
+                    Title = "Blazor Contact | UI Blocks by Radzen",
+                    Icon = "\uf18c",
+                    Description = "Examples of Contact UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-contact",
+                    Tags = new [] { "contact", "form", "email", "phone", "address" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Two-column content", Anchor = "#two-column-content" }, new () { Text = "Content with image", Anchor = "#content-with-image" }, new () { Text = "Centered article", Anchor = "#centered-article" }, new () { Text = "Content with checklist", Anchor = "#content-with-checklist" }, new () { Text = "Content with callout", Anchor = "#content-with-callout" }, new () { Text = "Content with CTA footer", Anchor = "#content-with-cta" } ],
+                    Name = "Text & Media",
+                    Title = "Blazor Text & Media | UI Blocks by Radzen",
+                    Icon = "\ue873",
+                    Description = "Examples of Text & Media UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-text-and-media",
+                    Tags = new [] { "content", "article", "text", "media", "prose", "about" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Simple empty state", Anchor = "#simple-empty-state" }, new () { Text = "Empty state with secondary action", Anchor = "#empty-state-with-secondary-action" }, new () { Text = "Dashed empty state", Anchor = "#dashed-empty-state" }, new () { Text = "Empty search results", Anchor = "#empty-search-results" }, new () { Text = "Empty state in card", Anchor = "#empty-state-in-card" }, new () { Text = "First-use checklist", Anchor = "#first-use-checklist" } ],
+                    Name = "Empty States",
+                    Title = "Blazor Empty States | UI Blocks by Radzen",
+                    Icon = "\ue661",
+                    Description = "Examples of Empty State UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-empty-states",
+                    Tags = new [] { "empty", "state", "placeholder", "no data", "onboarding" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "404 centered", Anchor = "#not-found-centered" }, new () { Text = "404 with image", Anchor = "#not-found-with-image" }, new () { Text = "404 with helpful links", Anchor = "#not-found-with-links" }, new () { Text = "500 error", Anchor = "#server-error" }, new () { Text = "Maintenance", Anchor = "#maintenance" }, new () { Text = "Access denied", Anchor = "#access-denied" } ],
+                    Name = "Error Pages",
+                    Title = "Blazor Error Pages | UI Blocks by Radzen",
+                    Icon = "\ue001",
+                    Description = "Examples of Error Page UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-error-pages",
+                    Tags = new [] { "error", "404", "500", "not found", "maintenance", "access denied" }
                 },
                 new Example
                 {
@@ -4208,6 +4328,17 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Sidebar filters", Anchor = "#sidebar-filters" }, new () { Text = "Filter toolbar", Anchor = "#filter-toolbar" }, new () { Text = "Applied filter chips", Anchor = "#applied-filter-chips" }, new () { Text = "Collapsible filters", Anchor = "#collapsible-filters" } ],
+                    Name = "Filter Panels",
+                    Title = "Blazor Filter Panels | UI Blocks by Radzen",
+                    Icon = "\uef4f",
+                    Description = "Examples of Filter Panel UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-filter-panels",
+                    Tags = new [] { "filter", "filters", "search", "facets", "chips" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Footer with a sitemap", Anchor = "#footer-with-sitemap" }, new () { Text = "Centered Footer", Anchor = "#centered-footer" }, new () { Text = "Simple Footer", Anchor = "#simple-footer" } ],
                     Name = "Footers",
                     Title = "Blazor Footer | UI Blocks by Radzen",
@@ -4215,6 +4346,28 @@ namespace RadzenBlazorDemos
                     Description = "Preconfigured Footer UI Blocks",
                     Path = "ui-blocks-footers",
                     Tags = new [] { "footer" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Stacked form", Anchor = "#stacked-form" }, new () { Text = "Two-column form", Anchor = "#two-column-form" }, new () { Text = "Settings page", Anchor = "#settings-page" }, new () { Text = "Settings with side navigation", Anchor = "#settings-with-side-nav" }, new () { Text = "Danger zone", Anchor = "#danger-zone" } ],
+                    Name = "Form Layouts",
+                    Title = "Blazor Form Layouts | UI Blocks by Radzen",
+                    Icon = "\uf1c1",
+                    Description = "Examples of Form Layout and Settings UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-form-layouts",
+                    Tags = new [] { "form", "settings", "layout", "profile", "preferences" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered hero", Anchor = "#centered-hero" }, new () { Text = "Hero with image to the right", Anchor = "#hero-with-image-to-the-right" }, new () { Text = "Hero with announcement", Anchor = "#hero-with-announcement" }, new () { Text = "Hero with stats", Anchor = "#hero-with-stats" }, new () { Text = "Hero with sign-up", Anchor = "#hero-with-signup" }, new () { Text = "Hero with background image", Anchor = "#hero-with-background-image" }, new () { Text = "Hero with form", Anchor = "#hero-with-form" }, new () { Text = "Hero with logos", Anchor = "#hero-with-logos" } ],
+                    Name = "Hero",
+                    Title = "Blazor Hero Section | UI Blocks by Radzen",
+                    Icon = "\ue40b",
+                    Description = "Examples of Hero UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-hero",
+                    Tags = new [] { "hero", "banner", "landing", "header", "headline" }
                 },
                 new Example
                 {
@@ -4228,6 +4381,17 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Simple navbar", Anchor = "#simple-navbar" }, new () { Text = "Navbar with search", Anchor = "#navbar-with-search" }, new () { Text = "Dark navbar", Anchor = "#dark-navbar" }, new () { Text = "Centered navbar", Anchor = "#centered-navbar" }, new () { Text = "Navbar with top bar", Anchor = "#navbar-with-top-bar" }, new () { Text = "Transparent navbar", Anchor = "#transparent-navbar" }, new () { Text = "Double-deck navbar", Anchor = "#double-deck-navbar" }, new () { Text = "Navbar with auth buttons", Anchor = "#navbar-with-auth-buttons" }, new () { Text = "Navbar with dropdown indicators", Anchor = "#navbar-with-dropdown-indicators" }, new () { Text = "Navbar with icon links", Anchor = "#navbar-with-icon-links" }, new () { Text = "Minimal navbar", Anchor = "#minimal-navbar" }, new () { Text = "Navbar with dividers", Anchor = "#navbar-with-dividers" } ],
+                    Name = "Navbars",
+                    Title = "Blazor Navbars | UI Blocks by Radzen",
+                    Icon = "\ue5d2",
+                    Description = "Examples of Navbar and Website Header UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-navbars",
+                    Tags = new [] { "navbar", "navigation", "header", "menu", "website" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Centered layout", Anchor = "#centered-layout" }, new () { Text = "Left-aligned with image", Anchor = "#left-aligned-with-image" } ],
                     Name = "Newsletter",
                     Title = "Blazor Newsletter | UI Blocks by Radzen",
@@ -4235,6 +4399,28 @@ namespace RadzenBlazorDemos
                     Description = "Examples of Newsletter subscription form UI Blocks",
                     Path = "ui-blocks-newsletter",
                     Tags = new [] { "newsletter", "subscribe", "subscription" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Steps wizard", Anchor = "#steps-wizard" }, new () { Text = "Progress checklist", Anchor = "#progress-checklist" }, new () { Text = "Vertical steps", Anchor = "#vertical-steps" }, new () { Text = "Welcome panel", Anchor = "#welcome-panel" } ],
+                    Name = "Onboarding",
+                    Title = "Blazor Onboarding | UI Blocks by Radzen",
+                    Icon = "\ue837",
+                    Description = "Examples of Onboarding and Wizard UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-onboarding",
+                    Tags = new [] { "onboarding", "wizard", "steps", "welcome", "checklist" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Order summary", Anchor = "#order-summary" }, new () { Text = "Order history", Anchor = "#order-history" }, new () { Text = "Order tracking", Anchor = "#order-tracking" } ],
+                    Name = "Orders",
+                    Title = "Blazor Orders | UI Blocks by Radzen",
+                    Icon = "\ue8b0",
+                    Description = "Examples of Order Summary, History, and Tracking UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-orders",
+                    Tags = new [] { "orders", "history", "tracking", "ecommerce", "invoice" }
                 },
                 new Example
                 {
@@ -4255,6 +4441,94 @@ namespace RadzenBlazorDemos
                     Description = "Examples of Pricing UI Blocks",
                     Path = "ui-blocks-pricing",
                     Tags = new [] { "pricing", "table" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Simple product card", Anchor = "#simple-product-card" }, new () { Text = "Card with rating", Anchor = "#card-with-rating" }, new () { Text = "Card with badges", Anchor = "#card-with-badges" }, new () { Text = "Card with add to cart", Anchor = "#card-with-add-to-cart" }, new () { Text = "Horizontal product card", Anchor = "#horizontal-product-card" }, new () { Text = "Card with quick actions", Anchor = "#card-with-quick-actions" } ],
+                    Name = "Product Cards",
+                    Title = "Blazor Product Cards | UI Blocks by Radzen",
+                    Icon = "\uf1cc",
+                    Description = "Examples of Product Card UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-product-cards",
+                    Tags = new [] { "product", "card", "ecommerce", "shop", "price", "rating" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Grid with toolbar", Anchor = "#grid-with-toolbar" }, new () { Text = "Product rows", Anchor = "#product-rows" }, new () { Text = "Collection tiles", Anchor = "#collection-tiles" }, new () { Text = "Featured and grid", Anchor = "#featured-and-grid" } ],
+                    Name = "Product Lists",
+                    Title = "Blazor Product Lists | UI Blocks by Radzen",
+                    Icon = "\ue8ef",
+                    Description = "Examples of Product List UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-product-lists",
+                    Tags = new [] { "product", "list", "grid", "collection", "ecommerce", "shop" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Split overview", Anchor = "#split-overview" }, new () { Text = "Overview with tabs", Anchor = "#overview-with-tabs" }, new () { Text = "Quick view", Anchor = "#quick-view" }, new () { Text = "Overview with incentives", Anchor = "#overview-with-incentives" } ],
+                    Name = "Product Overview",
+                    Title = "Blazor Product Overview | UI Blocks by Radzen",
+                    Icon = "\ue8f0",
+                    Description = "Examples of Product Overview UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-product-overview",
+                    Tags = new [] { "product", "overview", "details", "gallery", "ecommerce" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Rating summary", Anchor = "#rating-summary" }, new () { Text = "Review list", Anchor = "#review-list" }, new () { Text = "Write a review", Anchor = "#write-a-review" } ],
+                    Name = "Reviews",
+                    Title = "Blazor Reviews | UI Blocks by Radzen",
+                    Icon = "\ue8d1",
+                    Description = "Examples of Review and Rating UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-reviews",
+                    Tags = new [] { "reviews", "rating", "stars", "feedback", "ecommerce" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Cart page", Anchor = "#cart-page" }, new () { Text = "Cart panel", Anchor = "#cart-panel" }, new () { Text = "Mini cart", Anchor = "#mini-cart" }, new () { Text = "Empty cart", Anchor = "#empty-cart" } ],
+                    Name = "Shopping Carts",
+                    Title = "Blazor Shopping Carts | UI Blocks by Radzen",
+                    Icon = "\ue8cb",
+                    Description = "Examples of Shopping Cart UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-shopping-carts",
+                    Tags = new [] { "cart", "shopping", "basket", "ecommerce", "checkout" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered sign-in", Anchor = "#centered-sign-in" }, new () { Text = "Split sign-in", Anchor = "#split-sign-in" }, new () { Text = "Registration", Anchor = "#registration" }, new () { Text = "Sign-in with providers", Anchor = "#sign-in-with-providers" }, new () { Text = "Forgot password", Anchor = "#forgot-password" }, new () { Text = "Verification code", Anchor = "#verification-code" } ],
+                    Name = "Sign-in & Registration",
+                    Title = "Blazor Sign-in and Registration | UI Blocks by Radzen",
+                    Icon = "\ue9ea",
+                    Description = "Examples of Sign-in and Registration UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-auth",
+                    Tags = new [] { "sign-in", "login", "register", "registration", "authentication", "account" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered stats", Anchor = "#centered-stats" }, new () { Text = "Stats with description", Anchor = "#stats-with-description" }, new () { Text = "Stats in cards", Anchor = "#stats-in-cards" }, new () { Text = "Stats with dividers", Anchor = "#stats-with-dividers" }, new () { Text = "Stats with trends", Anchor = "#stats-with-trends" }, new () { Text = "Stats on primary", Anchor = "#stats-on-primary" }, new () { Text = "Stats with image", Anchor = "#stats-with-image" }, new () { Text = "Banded stats", Anchor = "#banded-stats" } ],
+                    Name = "Stats",
+                    Title = "Blazor Stats | UI Blocks by Radzen",
+                    Icon = "\ue991",
+                    Description = "Examples of Stats UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-stats",
+                    Tags = new [] { "stats", "statistics", "numbers", "metrics", "kpi" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Team grid", Anchor = "#team-grid" }, new () { Text = "Team cards", Anchor = "#team-cards" }, new () { Text = "Team with bios", Anchor = "#team-with-bios" }, new () { Text = "Team with square photos", Anchor = "#team-with-square-photos" }, new () { Text = "Compact team list", Anchor = "#compact-team-list" }, new () { Text = "Team with actions", Anchor = "#team-with-actions" } ],
+                    Name = "Team",
+                    Title = "Blazor Team | UI Blocks by Radzen",
+                    Icon = "\uf054",
+                    Description = "Examples of Team UI Blocks",
+                    New = true,
+                    Path = "ui-blocks-team",
+                    Tags = new [] { "team", "members", "people", "about" }
                 },
                 new Example
                 {

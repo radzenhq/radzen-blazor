@@ -1,0 +1,61 @@
+@page "/ui-blocks-reviews"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Review blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A review block builds buying confidence: an at-a-glance rating summary, the reviews themselves, and a form that makes leaving feedback easy.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-reviews#rating-summary" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Rating summary
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A review block with the average rating and star distribution.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/reviews/rating-summary" Title="Rating summary" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-reviews#review-list" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Review list
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A review block with individual reviews, ratings, and helpful votes.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/reviews/review-list" Title="Review list" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-reviews#write-a-review" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Write a review
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A review block with a rating input and comment form.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/reviews/write-a-review" Title="Write a review" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+

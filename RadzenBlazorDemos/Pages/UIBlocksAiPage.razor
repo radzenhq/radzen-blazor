@@ -1,0 +1,78 @@
+@page "/ui-blocks-ai"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    AI blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    An AI block gives your application's assistant a home: prompt suggestions, ask bars, welcome screens, and the settings that control the model. These blocks are built around the RadzenAIChat component; configure its service to connect them to your model provider.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-ai#prompt-suggestions" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Prompt suggestions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An AI block with starter prompt cards that send the prompt to the chat below.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/ai/prompt-suggestions" Title="Prompt suggestions" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-ai#ask-bar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Ask bar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An AI block with suggested queries in the chat's empty state.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/ai/ask-bar" Title="Ask bar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-ai#ai-settings" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI settings
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An AI block with model configuration bound live to the chat beside it.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/ai/ai-settings" Title="AI settings" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-ai#ai-welcome" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI welcome
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An AI block greeting the user before the first message, with capabilities in the chat's empty state.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/ai/ai-welcome" Title="AI welcome" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+

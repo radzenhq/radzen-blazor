@@ -1,0 +1,78 @@
+@page "/ui-blocks-shopping-carts"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Shopping Cart blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A shopping cart block lists what the customer is about to buy: line items with quantities, a clear total, and a path to checkout, in full-page, panel, and mini formats.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-shopping-carts#cart-page" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Cart page
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A cart block with line items and an order summary column.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/shopping-carts/cart-page" Title="Cart page" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-shopping-carts#cart-panel" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Cart panel
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A narrow cart block styled as a slide-over panel.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/shopping-carts/cart-panel" Title="Cart panel" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-shopping-carts#mini-cart" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Mini cart
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A dropdown-sized cart block with a subtotal and checkout shortcut.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/shopping-carts/mini-cart" Title="Mini cart" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-shopping-carts#empty-cart" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Empty cart
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A cart block for the moment there is nothing in it yet.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/shopping-carts/empty-cart" Title="Empty cart" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+

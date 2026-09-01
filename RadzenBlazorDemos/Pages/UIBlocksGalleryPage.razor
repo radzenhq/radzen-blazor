@@ -1,0 +1,257 @@
+@page "/ui-blocks"
+
+<PageTitle>Blazor UI Blocks - 174 Ready-Made Sections in Radzen Blazor Studio</PageTitle>
+<HeadContent>
+    <meta name="description" content="174 ready-made Blazor UI blocks in 34 categories with 920+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox.">
+    <meta name="author" content="Radzen">
+    <meta property="og:title" content="Blazor UI Blocks - 174 Ready-Made Sections in Radzen Blazor Studio" />
+    <meta property="og:description" content="174 ready-made Blazor UI blocks in 34 categories with 920+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox." />
+    <meta property="og:site_name" content="Radzen Blazor Components" />
+    <meta property="og:image" content="https://blazor.radzen.com/images/radzen-og.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://blazor.radzen.com/ui-blocks" />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Blazor UI Blocks - 174 Ready-Made Sections in Radzen Blazor Studio" />
+    <meta property="twitter:description" content="174 ready-made Blazor UI blocks in 34 categories with 920+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox." />
+</HeadContent>
+
+<div class="rz-w-100 rz-mx-auto" style="max-width: 1100px;">
+
+<RadzenRow Gap="3rem" RowGap="1.5rem" AlignItems="AlignItems.Center" class="rz-pt-8">
+    <RadzenColumn Size="12" SizeMD="5">
+        <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1">
+            Blazor UI Blocks
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-mb-6">
+            UI Blocks are ready-made, fully customizable page sections built into <RadzenLink Path="https://www.radzen.com/blazor-studio/" Text="Radzen Blazor Studio" target="_blank" />. Browse the live demos below, then drop any block into your app straight from the Studio toolbox and keep your focus on code, not layout. Most blocks are configurable on insert: pick full or fixed width and a light, dark, or primary background.
+        </RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="3rem" Wrap="FlexWrap.Wrap">
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">174</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">blocks</RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">34</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">categories</RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">920+</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">configurable variants</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" OffsetMD="1">
+        <RadzenCard Variant="Variant.Outlined" class="rz-p-2">
+            <div class="embed-container">
+            @if (playVideo)
+            {
+                <iframe src="https://www.youtube.com/embed/ZM3XGYdpUcA?autoplay=1&rel=0" frameborder="0" allow="autoplay" allowfullscreen=""></iframe>
+            }
+            else
+            {
+                <div class="video-facade" @onclick="@(() => playVideo = true)" role="button" tabindex="0" aria-label="Play video: UI Blocks in Radzen Blazor Studio">
+                    <img src="https://i.ytimg.com/vi/ZM3XGYdpUcA/hqdefault.jpg" alt="UI Blocks in Radzen Blazor Studio video" loading="lazy" />
+                    <div class="video-facade-play">
+                        <svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="28" fill="var(--rz-primary)"/><path d="M23 18 L40 28 L23 38 Z" fill="var(--rz-on-primary)"/></svg>
+                    </div>
+                </div>
+            }
+            </div>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+<style>
+    .block-gallery .rz-link {
+        --rz-link-text-decoration: none;
+        --rz-link-hover-text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.15s;
+
+        .rz-card {
+            transition: box-shadow 0.2s;
+        }
+    }
+
+    .block-gallery .rz-link:hover {
+        transform: translateY(-2px);
+
+        .rz-card {
+            box-shadow: var(--rz-shadow-2);
+        }
+    }
+
+    .block-gallery .rz-card {
+        height: 100%;
+    }
+
+    .block-gallery-thumb {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 264 / 168;
+        display: block;
+        border-radius: var(--rz-border-radius) var(--rz-border-radius) 0 0;
+        opacity: 0.65;
+        transition: opacity 0.15s;
+    }
+
+    .block-gallery .rz-link:hover .block-gallery-thumb {
+        opacity: 1;
+    }
+
+    .block-gallery .rz-badge {
+        opacity: 0.55;
+        transition: opacity 0.15s;
+    }
+
+    .block-gallery .rz-link:hover .rz-badge {
+        opacity: 1;
+    }
+
+    .video-facade {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+    }
+
+    .video-facade img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .video-facade-play {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s;
+    }
+
+    .video-facade:hover .video-facade-play {
+        transform: scale(1.08);
+    }
+
+    .block-gallery-filter {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        container-type: scroll-state;
+    }
+
+    .block-gallery-filter-inner {
+        background-color: var(--rz-body-background-color, var(--rz-base-background-color));
+        border-radius: var(--rz-border-radius);
+        padding: 0.75rem 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+    @@container scroll-state(stuck: top) {
+        .block-gallery-filter-inner {
+            box-shadow: var(--rz-shadow-4);
+        }
+    }
+</style>
+
+<div class="block-gallery-filter rz-mt-10 rz-mb-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="1rem" class="block-gallery-filter-inner">
+        <RadzenSelectBar @bind-Value="@selectedGroup" TValue="string" Size="ButtonSize.Small" class="rz-display-none rz-display-md-inline-flex">
+            <Items>
+                <RadzenSelectBarItem Text="All" Value="@("All")" />
+                @foreach (var g in groups)
+                {
+                    <RadzenSelectBarItem Text="@g" Value="@g" />
+                }
+            </Items>
+        </RadzenSelectBar>
+        <RadzenDropDown @bind-Value="@selectedGroup" Data="@(new[] { "All" }.Concat(groups))" TValue="string" InputSize="InputSize.Small" class="rz-display-md-none" Style="width: 100%; max-width: 220px" aria-label="Filter by group" />
+        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-disabled-color rz-m-0">
+            @Filtered.Count() of 34 categories
+        </RadzenText>
+    </RadzenStack>
+</div>
+
+<RadzenRow Gap="2rem" RowGap="2rem" class="block-gallery">
+    @foreach (var c in Filtered)
+    {
+        <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
+            <RadzenLink Path="@c.Path">
+                <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
+                    <svg class="block-gallery-thumb" viewBox="0 0 264 168" role="img" aria-label="@(c.Name + " blocks thumbnail")"><use href="@("images/blocks/" + c.Tile + "#tile")" /></svg>
+                    <RadzenStack Gap="0" class="rz-py-3 rz-px-4">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mb-0">@c.Name</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText TextStyle="TextStyle.Body2" class="rz-text-disabled-color rz-m-0">@c.Blocks blocks</RadzenText>
+                            <RadzenBadge Text="@c.Group" BadgeStyle="@c.Badge" Shade="Shade.Light" Style="text-transform: none;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenLink>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+@* --- CTA --- *@
+<RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mt-12 rz-mb-8 rz-py-12 rz-border-top rz-border-color-base-300">
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center">
+        Build your next page in minutes
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" TextAlign="TextAlign.Center" Style="max-width: 560px;">
+        All 174 UI Blocks and their 920+ variants ship with Radzen Blazor Studio. Insert any block straight from the toolbox and make it yours.
+    </RadzenText>
+    <RadzenLink Text="Get Radzen Blazor Studio" Path="https://www.radzen.com/blazor-studio/" target="_blank" class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default rz-text-align-center rz-mt-4" Style="--rz-link-hover-text-decoration: none" />
+</RadzenStack>
+
+</div>
+
+@code {
+    bool playVideo;
+    string selectedGroup = "All";
+    readonly string[] groups = [ "Application UI", "E-commerce", "Marketing", "Publisher" ];
+
+    record Category(string Name, string Path, string Tile, int Blocks, string Group, BadgeStyle Badge);
+
+    readonly Category[] categories =
+    [
+        new("AI Blocks", "/ui-blocks-ai", "block-ai-1.svg", 4, "Application UI", BadgeStyle.Info),
+        new("Activity Feeds", "/ui-blocks-activity-feeds", "block-activity-1.svg", 4, "Application UI", BadgeStyle.Info),
+        new("Banners", "/ui-blocks-banners", "block-banner-1.svg", 6, "Marketing", BadgeStyle.Primary),
+        new("Bento Grids", "/ui-blocks-bento", "block-bento-1.svg", 4, "Marketing", BadgeStyle.Primary),
+        new("Blog", "/ui-blocks-blog", "block-blog-1.svg", 8, "Publisher", BadgeStyle.Warning),
+        new("Call-to-action", "/ui-blocks-cta", "block-cta-1.svg", 5, "Marketing", BadgeStyle.Primary),
+        new("Checkout", "/ui-blocks-checkout", "block-checkout-1.svg", 4, "E-commerce", BadgeStyle.Success),
+        new("Contact", "/ui-blocks-contact", "block-contact-1.svg", 8, "Marketing", BadgeStyle.Primary),
+        new("Empty States", "/ui-blocks-empty-states", "block-empty-1.svg", 6, "Application UI", BadgeStyle.Info),
+        new("Error Pages", "/ui-blocks-error-pages", "block-error-1.svg", 6, "Application UI", BadgeStyle.Info),
+        new("FAQ", "/ui-blocks-faq", "block-faq-1.svg", 4, "Marketing", BadgeStyle.Primary),
+        new("Features", "/ui-blocks-features", "block-features-1.svg", 3, "Marketing", BadgeStyle.Primary),
+        new("Filter Panels", "/ui-blocks-filter-panels", "block-filter-1.svg", 4, "Application UI", BadgeStyle.Info),
+        new("Footers", "/ui-blocks-footers", "block-footer-1.svg", 3, "Marketing", BadgeStyle.Primary),
+        new("Form Layouts", "/ui-blocks-form-layouts", "block-form-1.svg", 5, "Application UI", BadgeStyle.Info),
+        new("Hero", "/ui-blocks-hero", "block-hero-1.svg", 8, "Marketing", BadgeStyle.Primary),
+        new("KPI Cards", "/ui-blocks-cards", "block-card-1.svg", 5, "Application UI", BadgeStyle.Info),
+        new("Logo Clouds", "/ui-blocks-logos", "block-logos-1.svg", 2, "Marketing", BadgeStyle.Primary),
+        new("Navbars", "/ui-blocks-navbars", "block-navbar-1.svg", 12, "Marketing", BadgeStyle.Primary),
+        new("Newsletter", "/ui-blocks-newsletter", "block-newsletter-1.svg", 2, "Marketing", BadgeStyle.Primary),
+        new("Onboarding", "/ui-blocks-onboarding", "block-onboarding-1.svg", 4, "Application UI", BadgeStyle.Info),
+        new("Orders", "/ui-blocks-orders", "block-order-1.svg", 3, "E-commerce", BadgeStyle.Success),
+        new("Page Headings", "/ui-blocks-page-headings", "block-page-heading-1.svg", 3, "Application UI", BadgeStyle.Info),
+        new("Pricing", "/ui-blocks-pricing", "block-pricing-1.svg", 2, "Marketing", BadgeStyle.Primary),
+        new("Product Cards", "/ui-blocks-product-cards", "block-product-card-1.svg", 6, "E-commerce", BadgeStyle.Success),
+        new("Product Lists", "/ui-blocks-product-lists", "block-product-list-1.svg", 10, "E-commerce", BadgeStyle.Success),
+        new("Product Overview", "/ui-blocks-product-overview", "block-product-overview-1.svg", 4, "E-commerce", BadgeStyle.Success),
+        new("Reviews", "/ui-blocks-reviews", "block-review-1.svg", 3, "E-commerce", BadgeStyle.Success),
+        new("Shopping Carts", "/ui-blocks-shopping-carts", "block-cart-1.svg", 4, "E-commerce", BadgeStyle.Success),
+        new("Sign-in & Registration", "/ui-blocks-auth", "block-auth-1.svg", 6, "Application UI", BadgeStyle.Info),
+        new("Stats", "/ui-blocks-stats", "block-stats-1.svg", 8, "Marketing", BadgeStyle.Primary),
+        new("Team", "/ui-blocks-team", "block-team-1.svg", 6, "Marketing", BadgeStyle.Primary),
+        new("Testimonials", "/ui-blocks-testimonials", "block-testimonials-1.svg", 6, "Marketing", BadgeStyle.Primary),
+        new("Text & Media", "/ui-blocks-text-and-media", "block-text-media-1.svg", 6, "Publisher", BadgeStyle.Warning),
+    ];
+
+    IEnumerable<Category> Filtered => selectedGroup == "All"
+        ? categories
+        : categories.Where(c => c.Group == selectedGroup);
+}

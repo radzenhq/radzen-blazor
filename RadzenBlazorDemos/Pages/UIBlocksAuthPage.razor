@@ -1,0 +1,111 @@
+@page "/ui-blocks-auth"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Sign-in and Registration blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    Sign-in and registration blocks let users authenticate or create an account. Clear labels, sensible defaults, and secondary options such as password recovery reduce friction at the door of your application.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-auth#centered-sign-in" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Centered sign-in
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A sign-in block with a centered card and a link to password recovery.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/auth/centered-sign-in" Title="Centered sign-in" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-auth#split-sign-in" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Split sign-in
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A sign-in block with a brand panel to the left and the form to the right.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Primary">
+                <UIBlock Path="/auth/split-sign-in" Title="Split sign-in" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-auth#registration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Registration
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A registration block with a centered card and terms consent.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/auth/registration" Title="Registration" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-auth#sign-in-with-providers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Sign-in with providers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A sign-in block with single sign-on providers and an email option.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/auth/sign-in-with-providers" Title="Sign-in with providers" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-auth#forgot-password" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Forgot password
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A password recovery block with a single email field.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/auth/forgot-password" Title="Forgot password" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-auth#verification-code" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Verification code
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A two-factor verification block using the SecurityCode component.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/auth/verification-code" Title="Verification code" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
