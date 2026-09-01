@@ -7267,6 +7267,11 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     reportState();
   };
 
+  // mirrors HtmlSanitizer.IsDangerousUrl (Radzen.Blazor/Documents/Markdown/HtmlSanitizer.cs)
+  var isDangerousUrl = function (url) {
+    return /^\s*(javascript|vbscript|data:text\/html)/i.test(url || '');
+  };
+
   var onInput = function () {
     if (suppressInput) return;
     dirty = true;
@@ -7314,8 +7319,9 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     lastInputType = 'insertFromPaste';
     lastInputTime = Date.now();
     // launder rich content: pasted HTML → markdown → canonical HTML via .NET
-    var scratch = document.createElement('div');
-    scratch.innerHTML = html;
+    // parsed via DOMParser (not a live-document div) so clipboard HTML like
+    // <img src=x onerror=...> can't execute while markdownSerialize reads it
+    var scratch = new DOMParser().parseFromString(html, 'text/html').body;
     var markdown = Radzen.markdownSerialize(scratch);
     try {
       suppressDisposed(instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
@@ -7671,13 +7677,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       case 'link': case 'image': {
         if (name === 'image') {
           var img = document.createElement('img');
-          img.src = value || '';
+          img.src = isDangerousUrl(value) ? '' : (value || '');
           img.alt = label || '';
           range.deleteContents();
           range.insertNode(img);
         } else {
           var a = document.createElement('a');
-          a.href = value || '';
+          a.href = isDangerousUrl(value) ? '' : (value || '');
           if (range.collapsed) a.textContent = label || value || '';
           else a.appendChild(range.extractContents());
           range.insertNode(a);
@@ -7694,7 +7700,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     dirty = true;
     clearTimeout(inputTimeout);
     notifyValue();
-    reportState();
   };
 
   editable.addEventListener('paste', onPaste);

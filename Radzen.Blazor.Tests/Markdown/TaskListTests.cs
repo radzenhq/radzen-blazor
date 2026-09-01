@@ -30,7 +30,7 @@ public class TaskListTests
     // parser's bracket handling (InlineParser.TryGetOpenerIndex) flushes the text
     // buffer before confirming a link, regardless of task-list parsing; this is
     // pre-existing behavior, reproduced here rather than merged, since fixing it
-    // is outside this task's scope. See task-2-report.md for details.
+    // is outside this task's scope.
     [InlineData("- [x]tight", @"<document>
     <list type=""bullet"" tight=""true"">
         <item>

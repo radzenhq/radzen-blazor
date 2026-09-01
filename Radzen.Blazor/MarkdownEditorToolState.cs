@@ -1,4 +1,4 @@
-namespace Radzen.Blazor;
+namespace Radzen;
 
 /// <summary>
 /// The active formats and history availability at the current design-surface selection, reported by JavaScript.

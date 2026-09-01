@@ -3269,7 +3269,7 @@ namespace RadzenBlazorDemos
             Related = new [] { "markdown", "html-editor", "textarea" },
             Faq = new []
             {
-                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode rendered by RadzenMarkdown, with the toolbar and keyboard shortcuts editing the content directly." },
+                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode - a contenteditable surface kept in sync with the Markdown - with the toolbar and keyboard shortcuts editing the content directly." },
                 new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
                 new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
             }
