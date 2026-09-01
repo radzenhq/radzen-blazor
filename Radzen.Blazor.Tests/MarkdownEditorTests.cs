@@ -113,18 +113,19 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 5 });
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
             string? executed = null;
 
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hello")
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName));
 
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
 
             var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal(new object?[] { 0, 5, "**hello**", 2, 7 }, invocation.Arguments.Skip(1).ToArray());
+            Assert.Equal(new object?[] { 0, 5, "**hello**", 2, 7 }, invocation.Arguments.ToArray());
             Assert.Equal("bold", executed);
         }
 
@@ -132,11 +133,12 @@ namespace Radzen.Blazor.Tests
         public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_UnknownCommand_RaisesExecuteWithoutApplying()
         {
             using var ctx = CreateContext();
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
             string? executed = null;
 
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName));
 
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync("insertToday"));
@@ -171,17 +173,18 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 2 });
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
 
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorItalic>());
 
             component.Find(".rz-markdown-editor-tools button").Click();
 
             var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal("*hi*", invocation.Arguments[3]);
+            Assert.Equal("*hi*", invocation.Arguments[2]);
         }
 
         [Fact]
@@ -229,17 +232,18 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 2 });
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
 
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorBold>());
 
             await component.InvokeAsync(() => component.Instance.ExecuteShortcutAsync("Ctrl+B"));
 
             var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal("**hi**", invocation.Arguments[3]);
+            Assert.Equal("**hi**", invocation.Arguments[2]);
 
             await component.InvokeAsync(() => component.Instance.ExecuteShortcutAsync("Ctrl+Z"));
 
@@ -251,15 +255,17 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 6, 11 });
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
 
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "line1\r\nline2"));
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "line1\r\nline2")
+                .Add(x => x.Mode, MarkdownEditorMode.Source));
 
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
 
             var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal(new object?[] { 6, 11, "**line2**", 8, 13 }, invocation.Arguments.Skip(1).ToArray());
+            Assert.Equal(new object?[] { 6, 11, "**line2**", 8, 13 }, invocation.Arguments.ToArray());
         }
 
         [Fact]
@@ -278,11 +284,12 @@ namespace Radzen.Blazor.Tests
         public void CustomTool_Click_RaisesExecute_WithCommandName()
         {
             using var ctx = CreateContext();
-            var apply = ctx.JSInterop.SetupVoid("Radzen.markdownEditorApply", _ => true);
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
             apply.SetVoidResult();
             string? executed = null;
 
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName)
                 .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
                     .Add(x => x.CommandName, "InsertToday")

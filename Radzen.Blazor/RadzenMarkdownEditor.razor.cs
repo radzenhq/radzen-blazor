@@ -217,14 +217,22 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialog is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />.</param>
     public async Task ExecuteCommandAsync(string name, string? value = null)
     {
-        (int start, int end) = await GetSelectionAsync();
         string? label = null;
 
         if (value == null && name is MarkdownEditorCommands.Link or MarkdownEditorCommands.Image)
         {
+            if (mode == MarkdownEditorMode.Design && jsRef != null)
+            {
+                await jsRef.InvokeVoidAsync("saveSelection");
+            }
+
+            bool hasSelection = mode == MarkdownEditorMode.Design
+                ? jsRef != null && await jsRef.InvokeAsync<bool>("hasSelection")
+                : await GetSelectionAsync() is var (s, e) && e > s;
+
             LinkDialogModel model = new();
             string title = Localize(name == MarkdownEditorCommands.Image ? nameof(RadzenStrings.MarkdownEditorImage_Title) : nameof(RadzenStrings.MarkdownEditorLink_Title));
-            dynamic? result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, end > start));
+            dynamic? result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, hasSelection));
 
             if (result is not true || string.IsNullOrWhiteSpace(model.Url))
             {
@@ -235,11 +243,21 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             label = model.Text;
         }
 
-        MarkdownEdit? edit = MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label);
-
-        if (edit is { } e && JSRuntime != null)
+        if (jsRef != null)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.markdownEditorApply", textarea, e.Start, e.End, e.Replacement, e.SelectionStart, e.SelectionEnd);
+            if (mode == MarkdownEditorMode.Design)
+            {
+                await jsRef.InvokeVoidAsync("execute", name, value, label);
+            }
+            else
+            {
+                (int start, int end) = await GetSelectionAsync();
+
+                if (MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label) is { } edit)
+                {
+                    await jsRef.InvokeVoidAsync("apply", edit.Start, edit.End, edit.Replacement, edit.SelectionStart, edit.SelectionEnd);
+                }
+            }
         }
 
         await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
