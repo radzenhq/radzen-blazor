@@ -205,6 +205,85 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Item 2", selected[0].TextContent.Trim());
         }
 
+#pragma warning disable 659
+        class FaultyHashValue
+        {
+            public int Id { get; set; }
+            public override bool Equals(object obj) => obj is FaultyHashValue other && other.Id == Id;
+        }
+#pragma warning restore 659
+
+        class FaultyHashItem
+        {
+            public string Text { get; set; }
+            public FaultyHashValue Key { get; set; }
+        }
+
+        [Fact]
+        public void DropDown_Multiple_SelectsEqualValuesWhenValueTypeDoesNotOverrideGetHashCode()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new FaultyHashItem { Text = "Item 1", Key = new FaultyHashValue { Id = 1 } },
+                new FaultyHashItem { Text = "Item 2", Key = new FaultyHashValue { Id = 2 } },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<FaultyHashValue>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(FaultyHashItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(FaultyHashItem.Key));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<FaultyHashValue> { new FaultyHashValue { Id = 2 } });
+            });
+
+            var selected = component.FindAll(".rz-state-highlight");
+            Assert.Equal(1, selected.Count);
+            Assert.Equal("Item 2", selected[0].TextContent.Trim());
+        }
+
+        class CaseInsensitiveObjectComparer : IEqualityComparer<object>
+        {
+            public new bool Equals(object x, object y) => string.Equals(x as string, y as string, StringComparison.OrdinalIgnoreCase);
+            public int GetHashCode(object obj) => obj is string s ? StringComparer.OrdinalIgnoreCase.GetHashCode(s) : obj?.GetHashCode() ?? 0;
+        }
+
+        class CaseInsensitiveValueCollection : ICollection<object>
+        {
+            readonly HashSet<object> items = new(new CaseInsensitiveObjectComparer());
+
+            public int Count => items.Count;
+            public bool IsReadOnly => false;
+            public void Add(object item) => items.Add(item);
+            public void Clear() => items.Clear();
+            public bool Contains(object item) => items.Contains(item);
+            public void CopyTo(object[] array, int arrayIndex) => items.CopyTo(array, arrayIndex);
+            public bool Remove(object item) => items.Remove(item);
+            public IEnumerator<object> GetEnumerator() => items.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+        }
+
+        [Fact]
+        public void DropDown_Multiple_AsksCustomCollectionsForMembership()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<ICollection<object>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new CaseInsensitiveValueCollection { "ITEM 2" });
+            });
+
+            var selected = component.FindAll(".rz-state-highlight");
+            Assert.Equal(1, selected.Count);
+            Assert.Equal("Item 2", selected[0].TextContent.Trim());
+        }
+
         [Fact]
         public void DropDown_Multiple_DoesNotDuplicateItemsForRepeatedBoundValues()
         {

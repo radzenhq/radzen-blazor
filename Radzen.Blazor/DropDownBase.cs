@@ -1837,7 +1837,8 @@ namespace Radzen
         // O(1) IsItemSelectedByValue membership. Cleared each render (OnParametersSet), so an in-place change
         // to the bound value collection is reflected on the next lookup.
         IEnumerable? _selectedValuesSource;
-        HashSet<object>? _selectedValuesSet;
+        HashSet<object?>? _selectedValuesSet;
+        bool _selectedValuesScan;
 
         internal bool IsItemSelectedByValue(object v)
         {
@@ -1846,12 +1847,17 @@ namespace Radzen
                 case string s:
                     return object.Equals(s, v);
                 case IEnumerable enumerable:
-                    if (_selectedValuesSet == null || !ReferenceEquals(_selectedValuesSource, enumerable))
+                    if (!ReferenceEquals(_selectedValuesSource, enumerable) || (_selectedValuesSet == null && !_selectedValuesScan))
                     {
                         _selectedValuesSource = enumerable;
-                        _selectedValuesSet = new HashSet<object>(enumerable.Cast<object>());
+                        _selectedValuesSet = SelectionEquality.TryCreateSet(enumerable);
+                        _selectedValuesScan = _selectedValuesSet == null;
                     }
-                    return _selectedValuesSet.Contains(v);
+                    if (_selectedValuesSet != null && (v == null || SelectionEquality.HashesReliably(v.GetType())))
+                    {
+                        return _selectedValuesSet.Contains(v);
+                    }
+                    return enumerable.Cast<object>().Contains(v);
                 case null:
                     return false;
                 default:
