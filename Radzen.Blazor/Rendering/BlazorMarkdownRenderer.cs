@@ -186,6 +186,14 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     }
 
     /// <inheritdoc />
+    public override void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        builder.OpenElement(0, "del");
+        VisitChildren(strikethrough.Children);
+        builder.CloseElement();
+    }
+
+    /// <inheritdoc />
     public override void VisitEmphasis(Emphasis emphasis)
     {
         builder.OpenElement(0, "em");

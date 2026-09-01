@@ -130,6 +130,13 @@ public class XmlVisitor : NodeVisitorBase, IDisposable
         writer.WriteEndElement();
     }
 
+    public override void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        writer.WriteStartElement("strikethrough");
+        base.VisitStrikethrough(strikethrough);
+        writer.WriteEndElement();
+    }
+
     public override void VisitCode(Code code)
     {
         writer.WriteElementString("code", code.Value);
