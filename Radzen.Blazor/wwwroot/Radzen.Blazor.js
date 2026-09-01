@@ -7328,20 +7328,23 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var scratch = document.createElement('div');
     scratch.innerHTML = html;
     var markdown = Radzen.markdownSerialize(scratch);
-    instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
-      var sel = window.getSelection();
-      if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return;
-      var range = sel.getRangeAt(0);
-      range.deleteContents();
-      var fragment = document.createRange().createContextualFragment(canonical);
-      var last = fragment.lastChild;
-      range.insertNode(fragment);
-      if (last) { range.setStartAfter(last); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
-      onInput();
-    });
+    try {
+      suppressDisposed(instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
+        var sel = window.getSelection();
+        if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return;
+        var range = sel.getRangeAt(0);
+        range.deleteContents();
+        var fragment = document.createRange().createContextualFragment(canonical);
+        var last = fragment.lastChild;
+        range.insertNode(fragment);
+        if (last) { range.setStartAfter(last); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
+        onInput();
+      }));
+    } catch { }
   };
 
   editor.setContent = function (html) {
+    clearTimeout(inputTimeout);
     suppressInput = true;
     editable.innerHTML = html;
     suppressInput = false;

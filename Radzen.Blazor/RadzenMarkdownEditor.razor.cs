@@ -118,10 +118,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [JSInvokable("OnDesignInputAsync")]
     public async Task OnDesignInputAsync(string markdown)
     {
-        lastSurfaceValue = markdown;
-        Value = markdown;
-        await ValueChanged.InvokeAsync(markdown);
-        NotifyFieldChanged(markdown);
+        await UpdateValueFromSurfaceAsync(markdown);
 
         if (Immediate)
         {
@@ -130,12 +127,28 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <summary>
-    /// Invoked from JavaScript when the design surface loses focus.
+    /// Invoked from JavaScript when the design surface loses focus. Flushes any edit still
+    /// pending inside the debounce window (JS clears the debounce timer on blur and reports
+    /// the surface's current content here) before raising <see cref="FormComponent{T}.Change" />, so a
+    /// keystroke immediately before blur is never lost.
     /// </summary>
     [JSInvokable("OnDesignChangeAsync")]
     public async Task OnDesignChangeAsync(string markdown)
     {
+        if (markdown != lastSurfaceValue)
+        {
+            await UpdateValueFromSurfaceAsync(markdown);
+        }
+
         await Change.InvokeAsync(markdown);
+    }
+
+    private async Task UpdateValueFromSurfaceAsync(string markdown)
+    {
+        lastSurfaceValue = markdown;
+        Value = markdown;
+        await ValueChanged.InvokeAsync(markdown);
+        NotifyFieldChanged(markdown);
     }
 
     private async Task SyncDesignContentAsync()

@@ -336,5 +336,48 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(plannedSetContent.Invocations.Count > countBeforeExternalChange);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_FlushesPendingEdit_UpdatesValueOnce_WithoutSetContent()
+        {
+            using var ctx = CreateContext();
+            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            int valueChangedCount = 0;
+            string? changed = null;
+            string? changeEventValue = null;
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "old")
+                .Add(x => x.ValueChanged, v => { changed = v; valueChangedCount++; })
+                .Add(x => x.Change, v => changeEventValue = v));
+            int countAfterMount = plannedSetContent.Invocations.Count;
+
+            // JS clears the debounce timer on blur and reports the surface's current content directly to
+            // OnDesignChangeAsync, without a preceding OnDesignInputAsync — the keystroke that landed inside
+            // the 250ms debounce window immediately before blur must still reach Value.
+            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("blurred **text**"));
+
+            Assert.Equal("blurred **text**", changed);
+            Assert.Equal(1, valueChangedCount); // flushed exactly once
+            Assert.Equal("blurred **text**", changeEventValue);
+            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count); // still no echo back to the surface
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_AfterMatchingInput_DoesNotDoubleFireValueChanged()
+        {
+            using var ctx = CreateContext();
+            ctx.JSInterop.SetupVoid("setContent", _ => true);
+            int valueChangedCount = 0;
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "old")
+                .Add(x => x.ValueChanged, _ => valueChangedCount++));
+
+            // The debounced OnDesignInputAsync already flushed this markdown; blur reporting the same
+            // content must not raise ValueChanged a second time.
+            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("same **text**"));
+            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("same **text**"));
+
+            Assert.Equal(1, valueChangedCount);
+        }
     }
 }
