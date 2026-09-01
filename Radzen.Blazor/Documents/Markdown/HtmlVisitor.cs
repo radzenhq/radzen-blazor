@@ -147,7 +147,9 @@ public class HtmlVisitor : NodeVisitorBase
     {
         ArgumentNullException.ThrowIfNull(link);
 
-        html.Append("<a href=\"").Append(Escape(link.Destination)).Append("\">");
+        var destination = HtmlSanitizer.IsDangerousUrl(link.Destination ?? string.Empty) ? string.Empty : link.Destination;
+
+        html.Append("<a href=\"").Append(Escape(destination)).Append("\">");
         base.VisitLink(link);
         html.Append("</a>");
     }
@@ -160,7 +162,9 @@ public class HtmlVisitor : NodeVisitorBase
         var alt = new StringBuilder();
         AppendPlainText(alt, image.Children);
 
-        html.Append("<img src=\"").Append(Escape(image.Destination)).Append("\" alt=\"").Append(Escape(alt.ToString())).Append("\">");
+        var destination = HtmlSanitizer.IsDangerousUrl(image.Destination ?? string.Empty) ? string.Empty : image.Destination;
+
+        html.Append("<img src=\"").Append(Escape(destination)).Append("\" alt=\"").Append(Escape(alt.ToString())).Append("\">");
     }
 
     private static void AppendPlainText(StringBuilder text, IReadOnlyList<Inline> nodes)

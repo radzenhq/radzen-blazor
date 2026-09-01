@@ -40,4 +40,13 @@ public class HtmlVisitorTests
             "<ul><li><p>a</p></li><li><p>b</p></li></ul>",
             HtmlVisitor.ToHtml("- a\n\n- b"));
     }
+
+    [Theory]
+    [InlineData("[x](javascript:alert(1))", "<p><a href=\"\">x</a></p>")]
+    [InlineData("[x](JaVaScRiPt:alert(1))", "<p><a href=\"\">x</a></p>")]
+    [InlineData("![a](javascript:alert(1))", "<p><img src=\"\" alt=\"a\"></p>")]
+    public void ToHtml_blanks_dangerous_urls(string markdown, string expected)
+    {
+        Assert.Equal(expected, HtmlVisitor.ToHtml(markdown));
+    }
 }
