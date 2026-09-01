@@ -5,12 +5,15 @@ using System;
 
 namespace Radzen.Documents.Markdown;
 
+internal readonly record struct InlineSpan(int Start, int End, int DelimiterLength, char Char);
+
 class InlineParser
 {
     class Delimiter
     {
         public char Char { get; set; }
         public int Length { get; set; }
+        public int OriginalLength { get; set; }
         public int Position { get; set; }
         public Text? Node { get; set; }
         public bool CanOpen { get; set; }
@@ -41,6 +44,7 @@ class InlineParser
     private readonly List<Inline> inlines = [];
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
+    private List<InlineSpan>? spans;
 
     enum LinkState
     {
@@ -142,6 +146,8 @@ class InlineParser
 
             newIndex = bestMatch + openingCount;
 
+            spans?.Add(new InlineSpan(index, newIndex, openingCount, Backtick));
+
             return true;
         }
 
@@ -228,6 +234,7 @@ class InlineParser
                 Node = node,
                 Char = ch,
                 Length = buffer.Length,
+                OriginalLength = buffer.Length,
                 Position = index,
                 CanClose = canClose,
                 CanOpen = canOpen
@@ -266,7 +273,21 @@ class InlineParser
     {
         var parser = new InlineParser();
 
-        return parser.ParseInlines(text.Trim(), linkReferences);
+        return parser.ParseInto(text, linkReferences);
+    }
+
+    internal static List<InlineSpan> ScanSpans(string text)
+    {
+        var parser = new InlineParser { spans = [] };
+
+        parser.ParseInto(text, []);
+
+        return parser.spans!;
+    }
+
+    private List<Inline> ParseInto(string text, Dictionary<string, LinkReference> linkReferences)
+    {
+        return ParseInlines(text.Trim(), linkReferences);
     }
 
     private static readonly Regex EmailRegex = new(@"^([a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)");
@@ -954,6 +975,12 @@ class InlineParser
                     {
                         parent.Add(child);
                     }
+
+                    spans?.Add(new InlineSpan(
+                        opener.Position + opener.Length - charsToConsume,
+                        closer.Position + (closer.OriginalLength - closer.Length) + charsToConsume,
+                        charsToConsume,
+                        closer.Char));
 
                     opener.Length -= charsToConsume;
 
