@@ -7283,38 +7283,84 @@ Radzen.markdownSerialize = function (root) {
   return root ? blocks(root) : '';
 };
 
-Radzen.createMarkdownEditor = function (textarea, instance, shortcuts) {
-  if (!textarea) {
-    return { dispose: function () {} };
+Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts) {
+  if (!editable || !textarea) {
+    return { setContent: function () {}, dispose: function () {} };
   }
 
   shortcuts = shortcuts || [];
+  var editor = { editable: editable, textarea: textarea, instance: instance };
+  var inputTimeout = null;
+  var suppressInput = false;
 
-  var listener = function (e) {
-    if (!(e.ctrlKey || e.metaKey) || !e.code) {
-      return;
-    }
+  var notifyValue = function () {
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
+  };
 
+  var onInput = function () {
+    if (suppressInput) return;
+    clearTimeout(inputTimeout);
+    inputTimeout = setTimeout(notifyValue, 250);
+  };
+
+  var onBlur = function () {
+    clearTimeout(inputTimeout);
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', Radzen.markdownSerialize(editable))); } catch { }
+  };
+
+  var onKeyDown = function (e) {
+    if (!(e.ctrlKey || e.metaKey) || !e.code) return;
     var key = 'Ctrl+';
-    if (e.altKey) {
-      key += 'Alt+';
-    }
-    if (e.shiftKey) {
-      key += 'Shift+';
-    }
+    if (e.altKey) key += 'Alt+';
+    if (e.shiftKey) key += 'Shift+';
     key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
-
     if (shortcuts.includes(key)) {
       e.preventDefault();
       try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
     }
   };
 
-  textarea.addEventListener('keydown', listener);
-
-  return {
-    dispose: function () {
-      textarea.removeEventListener('keydown', listener);
-    }
+  var onPaste = function (e) {
+    var html = e.clipboardData && e.clipboardData.getData('text/html');
+    if (!html) return; // plain-text paste: native behavior is fine
+    e.preventDefault();
+    // launder rich content: pasted HTML → markdown → canonical HTML via .NET
+    var scratch = document.createElement('div');
+    scratch.innerHTML = html;
+    var markdown = Radzen.markdownSerialize(scratch);
+    instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
+      var sel = window.getSelection();
+      if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return;
+      var range = sel.getRangeAt(0);
+      range.deleteContents();
+      var fragment = document.createRange().createContextualFragment(canonical);
+      var last = fragment.lastChild;
+      range.insertNode(fragment);
+      if (last) { range.setStartAfter(last); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
+      onInput();
+    });
   };
+
+  editor.setContent = function (html) {
+    suppressInput = true;
+    editable.innerHTML = html;
+    suppressInput = false;
+  };
+
+  editable.addEventListener('paste', onPaste);
+  editable.addEventListener('input', onInput);
+  editable.addEventListener('blur', onBlur);
+  editable.addEventListener('keydown', onKeyDown);
+  textarea.addEventListener('keydown', onKeyDown);
+
+  editor.dispose = function () {
+    clearTimeout(inputTimeout);
+    editable.removeEventListener('paste', onPaste);
+    editable.removeEventListener('input', onInput);
+    editable.removeEventListener('blur', onBlur);
+    editable.removeEventListener('keydown', onKeyDown);
+    textarea.removeEventListener('keydown', onKeyDown);
+  };
+
+  return editor;
 };
