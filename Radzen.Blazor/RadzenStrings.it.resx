@@ -2450,4 +2450,11 @@
   <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
     <value>Nascondi tastiera</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Sorgente</value>
+  </data>
 </root>

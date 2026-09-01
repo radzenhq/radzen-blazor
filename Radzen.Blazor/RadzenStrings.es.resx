@@ -2450,4 +2450,11 @@
   <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
     <value>Ocultar teclado</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Diseño</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Código</value>
+  </data>
 </root>

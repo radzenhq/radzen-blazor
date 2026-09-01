@@ -830,10 +830,8 @@ namespace Radzen.Blazor {
         public static string VirtualKeyboard_TabAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_TabAriaLabel", resourceCulture); } }
         public static string VirtualKeyboard_ClearAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_ClearAriaLabel", resourceCulture); } }
         public static string VirtualKeyboard_CloseAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_CloseAriaLabel", resourceCulture); } }
-        public static string MarkdownEditor_WriteText { get { return ResourceManager.GetString("MarkdownEditor_WriteText", resourceCulture); } }
-        public static string MarkdownEditor_PreviewText { get { return ResourceManager.GetString("MarkdownEditor_PreviewText", resourceCulture); } }
-        public static string MarkdownEditor_SplitText { get { return ResourceManager.GetString("MarkdownEditor_SplitText", resourceCulture); } }
-        public static string MarkdownEditor_NothingToPreviewText { get { return ResourceManager.GetString("MarkdownEditor_NothingToPreviewText", resourceCulture); } }
+        public static string MarkdownEditor_DesignText { get { return ResourceManager.GetString("MarkdownEditor_DesignText", resourceCulture); } }
+        public static string MarkdownEditor_SourceText { get { return ResourceManager.GetString("MarkdownEditor_SourceText", resourceCulture); } }
         public static string MarkdownEditorBold_Title { get { return ResourceManager.GetString("MarkdownEditorBold_Title", resourceCulture); } }
         public static string MarkdownEditorItalic_Title { get { return ResourceManager.GetString("MarkdownEditorItalic_Title", resourceCulture); } }
         public static string MarkdownEditorStrikethrough_Title { get { return ResourceManager.GetString("MarkdownEditorStrikethrough_Title", resourceCulture); } }

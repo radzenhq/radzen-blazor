@@ -1,22 +1,12 @@
-namespace Radzen;
+namespace Radzen.Blazor;
 
 /// <summary>
-/// Specifies the mode of <c>RadzenMarkdownEditor</c>.
+/// The mode of a <see cref="RadzenMarkdownEditor" />.
 /// </summary>
 public enum MarkdownEditorMode
 {
-    /// <summary>
-    /// Only the markdown source textarea is visible.
-    /// </summary>
-    Edit = 0,
-
-    /// <summary>
-    /// Only the rendered preview is visible.
-    /// </summary>
-    Preview = 1,
-
-    /// <summary>
-    /// The textarea and the rendered preview are shown side by side.
-    /// </summary>
-    Split = 2
+    /// <summary>WYSIWYG editing of the rendered markdown.</summary>
+    Design,
+    /// <summary>Editing the raw markdown source in a textarea.</summary>
+    Source
 }

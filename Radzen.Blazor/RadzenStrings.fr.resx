@@ -2450,4 +2450,11 @@
   <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
     <value>Masquer le clavier</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Création</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Source</value>
+  </data>
 </root>

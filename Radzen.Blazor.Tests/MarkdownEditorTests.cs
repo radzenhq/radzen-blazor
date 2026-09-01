@@ -36,47 +36,36 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void MarkdownEditor_EditMode_RendersNoPreview()
+        public void MarkdownEditor_DesignMode_RendersEditableAndHidesTextarea()
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
 
-            Assert.DoesNotContain("rz-markdown-editor-preview", component.Markup);
-            Assert.DoesNotContain("hidden", component.Find("textarea").OuterHtml);
-        }
-
-        [Fact]
-        public void MarkdownEditor_PreviewMode_HidesTextarea_AndRendersMarkdown()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Value, "# Hi")
-                .Add(x => x.Mode, MarkdownEditorMode.Preview));
-
-            Assert.Contains("rz-markdown-editor-preview", component.Markup);
-            Assert.Contains("<h1", component.Markup);
+            var editable = component.Find(".rz-markdown-editor-design");
+            Assert.Equal("true", editable.GetAttribute("contenteditable"));
+            Assert.Empty(editable.InnerHtml.Trim()); // Blazor renders it empty; JS owns content
             Assert.True(component.Find("textarea").HasAttribute("hidden"));
         }
 
         [Fact]
-        public void MarkdownEditor_SplitMode_RendersBoth()
+        public void MarkdownEditor_SourceMode_ShowsTextareaAndHidesEditable()
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
-                .Add(x => x.Mode, MarkdownEditorMode.Split));
+                .Add(x => x.Mode, MarkdownEditorMode.Source));
 
-            Assert.Contains("rz-markdown-editor-preview", component.Markup);
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
+            Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));
         }
 
         [Fact]
-        public void MarkdownEditor_PreviewMode_ShowsPlaceholder_WhenEmpty()
+        public void MarkdownEditor_DisabledRemovesContentEditable()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
 
-            Assert.Contains("Nothing to preview", component.Markup);
+            Assert.Equal("false", component.Find(".rz-markdown-editor-design").GetAttribute("contenteditable"));
         }
 
         [Fact]
@@ -89,7 +78,7 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-markdown-editor-modes button:nth-child(2)").Click();
 
-            Assert.Equal(MarkdownEditorMode.Preview, changed);
+            Assert.Equal(MarkdownEditorMode.Source, changed);
         }
 
         [Fact]
@@ -196,15 +185,6 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void MarkdownEditor_Tools_AreDisabled_InPreviewMode()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
-
-            Assert.All(component.FindAll(".rz-markdown-editor-tools button"), b => Assert.True(b.HasAttribute("disabled")));
-        }
-
-        [Fact]
         public void MarkdownEditor_Disabled_DisablesTextarea_AndAllTools()
         {
             using var ctx = CreateContext();
@@ -229,32 +209,19 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void MarkdownEditor_SplitMode_UpdatesPreview_OnInput()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Mode, MarkdownEditorMode.Split)
-                .Add(x => x.Value, "a"));
-
-            component.Find("textarea").Input("# Hi");
-
-            Assert.Contains("<h1", component.Markup);
-        }
-
-        [Fact]
         public void MarkdownEditor_ModeSwitcher_UpdatesInternalMode_WhenOneWayBound()
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
-                .Add(x => x.Mode, MarkdownEditorMode.Edit));
+                .Add(x => x.Mode, MarkdownEditorMode.Design));
 
             // Mode is one-way bound (no ModeChanged): the Mode parameter never changes, but the internal
             // mode field does, and rendering must follow the field, not the unchanged parameter.
             component.Find(".rz-markdown-editor-modes button:nth-child(2)").Click();
 
-            Assert.Contains("rz-markdown-editor-preview", component.Markup);
-            Assert.Contains("<h1", component.Markup);
+            Assert.False(component.Find("textarea").HasAttribute("hidden"));
+            Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));
         }
 
         [Fact]
@@ -337,82 +304,7 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Template, editor => b => b.AddContent(0, $"mode:{editor.Mode}"))));
 
             Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
-            Assert.Contains("mode:Edit", component.Markup);
-        }
-
-        [Theory]
-        [InlineData(MarkdownEditorMode.Edit, false)]
-        [InlineData(MarkdownEditorMode.Preview, false)]
-        [InlineData(MarkdownEditorMode.Split, true)]
-        public void MarkdownEditor_RendersSplitterBar_OnlyInSplitMode(MarkdownEditorMode mode, bool expected)
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, mode));
-
-            Assert.Equal(expected, component.FindAll(".rz-splitter-bar").Count > 0);
-        }
-
-        [Fact]
-        public void MarkdownEditor_PreviewMode_HidesTextareaPane_ButKeepsTextareaInDom()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
-
-            Assert.NotNull(component.Find("textarea"));
-            Assert.Single(component.FindAll(".rz-markdown-editor-pane-hidden"));
-        }
-
-        [Theory]
-        [InlineData(MarkdownEditorMode.Edit, "rz-markdown-editor-pane-full")]
-        [InlineData(MarkdownEditorMode.Preview, "rz-markdown-editor-pane-hidden")]
-        public void MarkdownEditor_TextareaPane_HasModeClass(MarkdownEditorMode mode, string expectedClass)
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, mode));
-
-            var pane = component.Find("textarea").ParentElement!;
-            Assert.Contains(expectedClass, pane.ClassName);
-        }
-
-        [Fact]
-        public void MarkdownEditor_SplitMode_TextareaPane_HasNoModeClass()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Split));
-
-            var pane = component.Find("textarea").ParentElement!;
-            Assert.DoesNotContain("rz-markdown-editor-pane-full", pane.ClassName);
-            Assert.DoesNotContain("rz-markdown-editor-pane-hidden", pane.ClassName);
-            Assert.Contains("rz-markdown-editor-pane-fill", component.Find(".rz-markdown-editor-preview").ParentElement!.ClassName);
-        }
-
-        [Fact]
-        public void MarkdownEditor_SwitchingToSplit_AfterMount_RendersSplitterBar()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-            Assert.Empty(component.FindAll(".rz-splitter-bar"));
-
-            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Split));
-
-            Assert.Single(component.FindAll(".rz-splitter-bar"));
-            Assert.Equal(2, component.FindAll(".rz-markdown-editor-pane").Count);
-        }
-
-        [Fact]
-        public void MarkdownEditor_SwitchingToPreview_AfterMount_HidesTextareaPane_AndFillsPreviewPane()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
-
-            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Preview));
-
-            var panes = component.FindAll(".rz-markdown-editor-pane");
-            Assert.Equal(2, panes.Count);
-            Assert.Contains("rz-markdown-editor-pane-hidden", panes[0].ClassName);
-            Assert.Contains("rz-markdown-editor-pane-fill", panes[1].ClassName);
-            Assert.Contains("rz-splitter-pane-lastresizable", panes[1].ClassName);
-            Assert.Contains("<h1", component.Markup);
+            Assert.Contains("mode:Design", component.Markup);
         }
     }
 }
