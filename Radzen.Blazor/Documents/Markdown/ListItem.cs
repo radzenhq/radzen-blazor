@@ -11,6 +11,11 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class ListItem : BlockContainer
 {
+    /// <summary>
+    /// For GFM task-list items: <c>true</c> for <c>[x]</c>, <c>false</c> for <c>[ ]</c>, <c>null</c> for a regular list item.
+    /// </summary>
+    public bool? Checked { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
@@ -53,6 +58,18 @@ public class ListItem : BlockContainer
     internal override void Close(BlockParser parser)
     {
         base.Close(parser);
+
+        if (Children.Count > 0 && Children[0] is Paragraph paragraph)
+        {
+            var value = paragraph.Value;
+
+            if (value.Length >= 4 && value[0] == '[' && value[2] == ']' && value[3] == ' '
+                && (value[1] is ' ' or 'x' or 'X'))
+            {
+                Checked = value[1] != ' ';
+                paragraph.Value = value[4..];
+            }
+        }
 
         if (LastChild != null)
         {
