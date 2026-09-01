@@ -7263,6 +7263,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var notifyValue = function () {
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
+    reportState();
   };
 
   var onInput = function () {
@@ -7345,6 +7346,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     textarea.value = before.substring(0, start) + replacement + before.substring(end);
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
     textarea.setSelectionRange(selectionStart, selectionEnd);
+    reportState();
   };
 
   var savedRange = null;
@@ -7521,13 +7523,45 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     history.redo.push(captureState());
     restoreState(history.undo.pop());
     dirty = true;
+    reportState();
   };
   editor.redo = function () {
     if (!history.redo.length) return;
     history.undo.push(captureState());
     restoreState(history.redo.pop());
     dirty = true;
+    reportState();
   };
+
+  var stateTimeout = null;
+  var reportState = function () {
+    clearTimeout(stateTimeout);
+    stateTimeout = setTimeout(function () {
+      var formats = [];
+      var sel = window.getSelection();
+      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
+        for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
+          if (node.nodeType !== Node.ELEMENT_NODE) continue;
+          switch (node.tagName) {
+            case 'STRONG': case 'B': formats.push('bold'); break;
+            case 'EM': case 'I': formats.push('italic'); break;
+            case 'DEL': case 'S': formats.push('strikethrough'); break;
+            case 'CODE': formats.push('code'); break;
+            case 'BLOCKQUOTE': formats.push('quote'); break;
+            case 'UL': formats.push('unorderedList'); break;
+            case 'OL': formats.push('orderedList'); break;
+          }
+          if (/^H[1-6]$/.test(node.tagName)) formats.push('heading');
+        }
+      }
+      try {
+        suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', {
+          formats: formats, canUndo: history.undo.length > 0, canRedo: history.redo.length > 0
+        }));
+      } catch { }
+    }, 100);
+  };
+  document.addEventListener('selectionchange', reportState);
 
   var onBeforeInput = function (e) {
     var type = e.inputType || '';
@@ -7659,6 +7693,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     dirty = true;
     clearTimeout(inputTimeout);
     notifyValue();
+    reportState();
   };
 
   editable.addEventListener('paste', onPaste);
@@ -7671,6 +7706,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   editor.dispose = function () {
     clearTimeout(inputTimeout);
+    clearTimeout(stateTimeout);
     editable.removeEventListener('paste', onPaste);
     editable.removeEventListener('input', onInput);
     editable.removeEventListener('blur', onBlur);
@@ -7678,6 +7714,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     textarea.removeEventListener('keydown', onKeyDown);
     editable.removeEventListener('beforeinput', onBeforeInput);
     textarea.removeEventListener('beforeinput', onBeforeInput);
+    document.removeEventListener('selectionchange', reportState);
   };
 
   return editor;
