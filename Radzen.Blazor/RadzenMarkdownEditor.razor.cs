@@ -81,15 +81,33 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [Parameter]
     public int Rows { get; set; } = 10;
 
+    private MarkdownEditorToolState toolState = new();
+
     /// <summary>
     /// Whether the editor's history has a state to undo to.
     /// </summary>
-    public bool CanUndo { get; private set; }
+    public bool CanUndo => toolState.CanUndo;
 
     /// <summary>
     /// Whether the editor's history has a state to redo to.
     /// </summary>
-    public bool CanRedo { get; private set; }
+    public bool CanRedo => toolState.CanRedo;
+
+    /// <summary>
+    /// Returns whether the current design-mode selection has the format of <paramref name="commandName" /> applied.
+    /// </summary>
+    public bool IsActive(string commandName) => Array.IndexOf(toolState.Formats ?? [], commandName) >= 0;
+
+    /// <summary>
+    /// Invoked from JavaScript when the selection or history state changes.
+    /// </summary>
+    [JSInvokable("OnToolStateAsync")]
+    public Task OnToolStateAsync(MarkdownEditorToolState state)
+    {
+        toolState = state ?? new();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
     private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
     private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));

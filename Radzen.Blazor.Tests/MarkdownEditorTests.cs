@@ -435,5 +435,19 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(1, valueChangedCount);
         }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_HighlightsActiveFormats()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(
+                new MarkdownEditorToolState { Formats = new[] { MarkdownEditorCommands.Bold }, CanUndo = true }));
+
+            Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
+            Assert.True(component.Instance.CanUndo);
+            Assert.Contains("rz-state-active", component.Markup); // Bold button highlighted
+        }
     }
 }
