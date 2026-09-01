@@ -1,7 +1,7 @@
-namespace Radzen.Blazor;
+namespace Radzen;
 
 /// <summary>
-/// The mode of a <see cref="RadzenMarkdownEditor" />.
+/// The mode of a <see cref="Radzen.Blazor.RadzenMarkdownEditor" />.
 /// </summary>
 public enum MarkdownEditorMode
 {
