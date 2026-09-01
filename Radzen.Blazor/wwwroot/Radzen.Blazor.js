@@ -7123,39 +7123,6 @@ Radzen.datePickerKeydown = function (e) {
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
 
-Radzen.markdownEditorApply = function (textarea, start, end, replacement, selectionStart, selectionEnd) {
-  if (!textarea) {
-    return;
-  }
-
-  var before = textarea.value;
-  var expected = before.substring(0, start) + replacement + before.substring(end);
-
-  textarea.focus();
-  textarea.setSelectionRange(start, end);
-
-  try {
-    // execCommand keeps the browser's native undo stack intact.
-    if (document.execCommand) {
-      if (replacement.length > 0) {
-        document.execCommand('insertText', false, replacement);
-      } else if (start !== end) {
-        document.execCommand('delete', false);
-      }
-    }
-  } catch (e) {
-    // fall through to the verification below
-  }
-
-  if (textarea.value !== expected) {
-    // execCommand unsupported or applied incorrectly: set the exact result (native undo is lost only on this path).
-    textarea.value = expected;
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-
-  textarea.setSelectionRange(selectionStart, selectionEnd);
-};
-
 Radzen.markdownSerialize = function (root) {
   var escapeText = function (text) {
     return text.replace(/[\\`*_~\[\]]/g, function (c) { return '\\' + c; });
@@ -7353,6 +7320,218 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     suppressInput = true;
     editable.innerHTML = html;
     suppressInput = false;
+  };
+
+  editor.apply = function (start, end, replacement, selectionStart, selectionEnd) {
+    var before = textarea.value;
+    textarea.focus();
+    textarea.value = before.substring(0, start) + replacement + before.substring(end);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.setSelectionRange(selectionStart, selectionEnd);
+  };
+
+  var savedRange = null;
+
+  var currentRange = function () {
+    // savedRange is only ever set by saveSelection(), called right before an async interruption
+    // (the link/image dialog) that leaves the live selection stale/collapsed; prefer it when present.
+    if (savedRange) return savedRange;
+    var sel = window.getSelection();
+    if (sel.rangeCount && editable.contains(sel.anchorNode)) return sel.getRangeAt(0);
+    return null;
+  };
+  var setRange = function (range) {
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+  var blockOf = function (node) {
+    while (node && node.parentNode !== editable) node = node.parentNode;
+    return node;
+  };
+  var blocksInRange = function (range) {
+    var first = blockOf(range.startContainer), last = blockOf(range.endContainer);
+    var result = [];
+    for (var el = first; el; el = el.nextSibling) {
+      result.push(el);
+      if (el === last) break;
+    }
+    return result;
+  };
+  var replaceTag = function (el, tag) {
+    var next = document.createElement(tag);
+    // insert next before moving children into it, so they stay attached to the document
+    // throughout the move (detaching them, even briefly, collapses the live selection)
+    el.parentNode.insertBefore(next, el);
+    while (el.firstChild) next.appendChild(el.firstChild);
+    el.parentNode.removeChild(el);
+    return next;
+  };
+  // reparenting a node (even between two attached positions) can silently collapse the
+  // live selection in Chromium, so block-restructuring commands must explicitly set a
+  // fresh, valid selection into the mutated result afterward.
+  var selectStart = function (el) {
+    if (!el) return;
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(true);
+    setRange(range);
+  };
+  var expandCollapsedToWord = function (range) {
+    if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE) return;
+    var text = range.startContainer.data, start = range.startOffset, end = range.endOffset;
+    while (start > 0 && !/\s/.test(text[start - 1])) start--;
+    while (end < text.length && !/\s/.test(text[end])) end++;
+    range.setStart(range.startContainer, start);
+    range.setEnd(range.startContainer, end);
+  };
+  var toggleInline = function (range, tag, alternates) {
+    // unwrap when an enclosing element of the type exists
+    for (var node = range.startContainer; node && node !== editable; node = node.parentNode) {
+      if (node.nodeType === Node.ELEMENT_NODE && alternates.includes(node.tagName)) {
+        var parent = node.parentNode;
+        while (node.firstChild) parent.insertBefore(node.firstChild, node);
+        parent.removeChild(node);
+        return;
+      }
+    }
+    expandCollapsedToWord(range);
+    if (range.collapsed) return;
+    var wrapper = document.createElement(tag);
+    wrapper.appendChild(range.extractContents());
+    // strip nested same-type elements inside the wrapper
+    wrapper.querySelectorAll(alternates.join(',')).forEach(function (el) {
+      while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
+      el.parentNode.removeChild(el);
+    });
+    range.insertNode(wrapper);
+    range.selectNodeContents(wrapper);
+    setRange(range);
+  };
+
+  editor.saveSelection = function () {
+    var sel = window.getSelection();
+    if (sel.rangeCount && editable.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
+  };
+  editor.hasSelection = function () {
+    var range = currentRange();
+    return !!range && !range.collapsed;
+  };
+
+  editor.execute = function (name, value, label) {
+    var range = currentRange();
+    if (!range) { editable.focus(); range = currentRange(); if (!range) return; }
+    editable.focus();
+    setRange(range);
+    if (editor.snapshot) editor.snapshot(true); // Task 10 provides this
+
+    switch (name) {
+      case 'bold': toggleInline(range, 'strong', ['STRONG', 'B']); break;
+      case 'italic': toggleInline(range, 'em', ['EM', 'I']); break;
+      case 'strikethrough': toggleInline(range, 'del', ['DEL', 'S', 'STRIKE']); break;
+      case 'code': toggleInline(range, 'code', ['CODE']); break;
+      case 'heading': {
+        var headed = blocksInRange(range).map(function (el) {
+          var level = /^H([1-6])$/.test(el.tagName) ? +RegExp.$1 : 0;
+          return replaceTag(el, level >= 3 ? 'p' : 'h' + (level + 1));
+        });
+        selectStart(headed[0]);
+        break;
+      }
+      case 'quote': {
+        var inside = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('blockquote');
+        if (inside && editable.contains(inside)) {
+          var unwrapped = inside.firstChild;
+          while (inside.firstChild) inside.parentNode.insertBefore(inside.firstChild, inside);
+          inside.parentNode.removeChild(inside);
+          selectStart(unwrapped);
+        } else {
+          var bq = document.createElement('blockquote');
+          var els = blocksInRange(range);
+          els[0].parentNode.insertBefore(bq, els[0]);
+          els.forEach(function (el) { bq.appendChild(el); });
+          selectStart(bq);
+        }
+        break;
+      }
+      case 'unorderedList': case 'orderedList': case 'taskList': {
+        var listTag = name === 'orderedList' ? 'ol' : 'ul';
+        var existing = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('ul,ol');
+        if (existing && editable.contains(existing) && existing.tagName.toLowerCase() === listTag && name !== 'taskList') {
+          var firstP = null;
+          Array.prototype.slice.call(existing.children).forEach(function (li) {
+            var p = document.createElement('p');
+            while (li.firstChild) p.appendChild(li.firstChild);
+            existing.parentNode.insertBefore(p, existing);
+            firstP = firstP || p;
+          });
+          existing.parentNode.removeChild(existing);
+          selectStart(firstP);
+        } else if (!existing || !editable.contains(existing)) {
+          var list = document.createElement(listTag);
+          var items = blocksInRange(range);
+          items[0].parentNode.insertBefore(list, items[0]);
+          items.forEach(function (el) {
+            var li = document.createElement('li');
+            if (name === 'taskList') {
+              var cb = document.createElement('input');
+              cb.type = 'checkbox';
+              li.appendChild(cb);
+              li.appendChild(document.createTextNode(' '));
+            }
+            while (el.firstChild) li.appendChild(el.firstChild);
+            el.parentNode.removeChild(el);
+            list.appendChild(li);
+          });
+          selectStart(list);
+        }
+        break;
+      }
+      case 'codeBlock': {
+        var target = blockOf(range.startContainer);
+        if (target) {
+          var pre = document.createElement('pre');
+          var codeChild = document.createElement('code');
+          codeChild.textContent = target.textContent;
+          pre.appendChild(codeChild);
+          target.parentNode.replaceChild(pre, target);
+          selectStart(codeChild);
+        }
+        break;
+      }
+      case 'horizontalRule': {
+        var after = blockOf(range.startContainer);
+        var hr = document.createElement('hr');
+        if (after && after.nextSibling) after.parentNode.insertBefore(hr, after.nextSibling);
+        else editable.appendChild(hr);
+        break;
+      }
+      case 'link': case 'image': {
+        if (name === 'image') {
+          var img = document.createElement('img');
+          img.src = value || '';
+          img.alt = label || '';
+          range.deleteContents();
+          range.insertNode(img);
+        } else {
+          var a = document.createElement('a');
+          a.href = value || '';
+          if (range.collapsed) a.textContent = label || value || '';
+          else a.appendChild(range.extractContents());
+          range.insertNode(a);
+        }
+        break;
+      }
+      case 'insertText':
+        range.deleteContents();
+        range.insertNode(document.createTextNode(value || ''));
+        break;
+    }
+
+    savedRange = null;
+    dirty = true;
+    clearTimeout(inputTimeout);
+    notifyValue();
   };
 
   editable.addEventListener('paste', onPaste);
