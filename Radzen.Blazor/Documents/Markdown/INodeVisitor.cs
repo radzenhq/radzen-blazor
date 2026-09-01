@@ -57,6 +57,11 @@ public interface INodeVisitor
     void VisitStrong(Strong strong);
 
     /// <summary>
+    /// Visits a strikethrough node.
+    /// </summary>
+    void VisitStrikethrough(Strikethrough strikethrough);
+
+    /// <summary>
     /// Visits a code node.
     /// </summary>
     void VisitCode(Code code);

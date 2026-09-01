@@ -20,6 +20,7 @@ class InlineParser
 
     private const char Asterisk = '*';
     private const char Underscore = '_';
+    internal const char Tilde = '~';
     internal const char Backslash = '\\';
     private const char Null = '\0';
     private const char Backtick = '`';
@@ -176,7 +177,7 @@ class InlineParser
     {
         var ch = text[index];
 
-        if (ch is not (Asterisk or Underscore or OpenBracket) && (ch is not Exclamation || next is not OpenBracket))
+        if (ch is not (Asterisk or Underscore or Tilde or OpenBracket) && (ch is not Exclamation || next is not OpenBracket))
         {
             newIndex = index;
             return false;
@@ -210,7 +211,7 @@ class InlineParser
             var canOpen = false;
             var canClose = false;
 
-            if (ch is Asterisk)
+            if (ch is Asterisk or Tilde)
             {
                 canOpen = leftFlanking;
                 canClose = rightFlanking;
@@ -934,7 +935,20 @@ class InlineParser
 
                     var charsToConsume = closer.Length == opener.Length && closer.Length > 1 ? 2 : 1;
 
-                    InlineContainer parent = charsToConsume == 1 ? new Emphasis() : new Strong();
+                    if (closer.Char == Tilde)
+                    {
+                        if (opener.Length < 2 || closer.Length < 2)
+                        {
+                            // single tildes never pair — deactivate both as emphasis candidates
+                            delimiters.RemoveAt(closerIndex);
+                            continue;
+                        }
+                        charsToConsume = 2;
+                    }
+
+                    InlineContainer parent = closer.Char == Tilde
+                        ? new Strikethrough()
+                        : charsToConsume == 1 ? new Emphasis() : new Strong();
 
                     foreach (var child in innerInlines)
                     {
@@ -990,7 +1004,7 @@ class InlineParser
         {
             var delimiter = delimiters[index];
 
-            if (delimiter.CanClose && (delimiter.Char is Asterisk or Underscore))
+            if (delimiter.CanClose && (delimiter.Char is Asterisk or Underscore or Tilde))
             {
                 return index;
             }
