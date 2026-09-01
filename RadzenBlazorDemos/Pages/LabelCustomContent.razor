@@ -1,7 +1,9 @@
 <RadzenStack Gap="1.5rem" class="rz-p-0 rz-p-md-12">
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
         <RadzenLabel Component="UsernameInput">
-            <RadzenIcon Icon="person" class="rz-mr-1" /> Username
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                <RadzenIcon Icon="person" /> Username
+            </RadzenStack>
         </RadzenLabel>
         <RadzenTextBox Name="UsernameInput" @bind-Value=@username Style="width: 100%; max-width: 300px;" />
     </RadzenStack>
@@ -22,7 +24,9 @@
 
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
         <RadzenLabel Component="ColorInput">
-            Choose Color <RadzenIcon Icon="palette" Style="color: var(--rz-primary);" class="rz-ml-1" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                Choose Color <RadzenIcon Icon="palette" Style="color: var(--rz-primary);" />
+            </RadzenStack>
         </RadzenLabel>
         <RadzenColorPicker Name="ColorInput" @bind-Value=@selectedColor Style="width: 100%; max-width: 300px;" />
     </RadzenStack>
