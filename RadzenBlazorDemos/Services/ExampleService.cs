@@ -4234,7 +4234,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Call-to-Action",
+                    Name = "Call-to-action",
                     Title = "Blazor Call-to-Action | UI Blocks by Radzen",
                     Icon = "\ue06c",
                     Description = "Examples of CTA UI Blocks",
@@ -4244,12 +4244,12 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Toc = [ new () { Text = "Simple stats", Anchor = "#simple-stats" }, new () { Text = "Simple stats with icon", Anchor = "#simple-stats-with-icon" }, new () { Text = "Stats with trends", Anchor = "#stats-with-trends" }, new () { Text = "Stats with trends to the right", Anchor = "#stats-with-trends-to-the-right" }, new () { Text = "Stats with square icon", Anchor = "#stats-with-square-icon" } ],
-                    Name = "Cards",
-                    Title = "Blazor Cards | UI Blocks by Radzen",
+                    Name = "KPI Cards",
+                    Title = "Blazor KPI Cards | UI Blocks by Radzen",
                     Icon = "\ue991",
-                    Description = "Examples of Card Blocks",
+                    Description = "Examples of KPI Card UI Blocks",
                     Path = "ui-blocks-cards",
-                    Tags = new [] { "card", "stats", "products" }
+                    Tags = new [] { "card", "kpi", "stats", "products" }
                 },
                 new Example
                 {
