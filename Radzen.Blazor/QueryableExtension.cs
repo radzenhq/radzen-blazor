@@ -830,7 +830,13 @@ namespace Radzen
             var propertyName = !isEnumerable && !IsEnumerable(p.Type) ? (!string.IsNullOrWhiteSpace(filter.FilterProperty) ? filter.FilterProperty : filter.Property) : filter.Property;
             Expression property = !string.IsNullOrEmpty(propertyName) ? GetNestedPropertyExpression(parameter, propertyName, type) : Expression.Constant(null);
 
-            Type? collectionItemType = IsEnumerable(property.Type) && property.Type.IsGenericType ? property.Type.GetGenericArguments()[0] : null;
+            // An array is enumerable but not generic, so asking only for generic arguments left an array
+            // property with no item type - and the filter was then built against the array itself,
+            // which throws ("the binary operator Equal is not defined for Int32[] and Int32").
+            Type? collectionItemType = !IsEnumerable(property.Type) ? null
+                : property.Type.IsGenericType ? property.Type.GetGenericArguments()[0]
+                : property.Type.IsArray ? property.Type.GetElementType()
+                : null;
 
             ParameterExpression? collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 

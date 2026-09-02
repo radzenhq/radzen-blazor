@@ -1626,6 +1626,61 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Where_FiltersArrayValuedProperty_WithEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Codes = new[] { 10, 20 } },
+                new { Id = 2, Codes = new[] { 30 } },
+                new { Id = 3, Codes = new[] { 20, 40 } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Codes",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.Equals
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WhenCollectionIsArray()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 } } },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 } } },
+                new { Id = 3, Tags = new[] { new { Name = "tag1", Value = 50 } } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "tag1",
+                    FilterOperator = FilterOperator.Equals
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
         public void Where_FiltersNestedCollectionItemProperty()
         {
             var testData = new[]
