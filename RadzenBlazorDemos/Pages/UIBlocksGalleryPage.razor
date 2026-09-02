@@ -157,16 +157,16 @@
 
 <div class="block-gallery-filter rz-mt-10 rz-mb-6">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="1rem" class="block-gallery-filter-inner">
-        <RadzenSelectBar @bind-Value="@selectedGroup" TValue="string" Size="ButtonSize.Small" class="rz-display-none rz-display-md-inline-flex">
-            <Items>
-                <RadzenSelectBarItem Text="All" Value="@("All")" />
-                @foreach (var g in groups)
-                {
-                    <RadzenSelectBarItem Text="@g" Value="@g" />
-                }
-            </Items>
-        </RadzenSelectBar>
-        <RadzenDropDown @bind-Value="@selectedGroup" Data="@(new[] { "All" }.Concat(groups))" TValue="string" InputSize="InputSize.Small" class="rz-display-md-none" Style="width: 100%; max-width: 220px" aria-label="Filter by group" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            @foreach (var g in new[] { "All" }.Concat(groups))
+            {
+                <RadzenButton Text="@g" Size="ButtonSize.Small"
+                              Variant="@(selectedGroup == g ? Variant.Flat : Variant.Outlined)"
+                              ButtonStyle="@(selectedGroup == g ? ButtonStyle.Primary : ButtonStyle.Base)"
+                              Click="@(() => selectedGroup = g)"
+                              Style="border-radius: 9999px" />
+            }
+        </RadzenStack>
         <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-disabled-color rz-m-0">
             @Filtered.Count() of 34 categories
         </RadzenText>
@@ -209,7 +209,7 @@
 @code {
     bool playVideo;
     string selectedGroup = "All";
-    readonly string[] groups = [ "Application UI", "E-commerce", "Marketing", "Publisher" ];
+    readonly string[] groups = [ "Application UI", "Marketing", "E-commerce" ];
 
     record Category(string Name, string Path, string Tile, int Blocks, string Group, BadgeStyle Badge);
 
@@ -219,7 +219,7 @@
         new("Activity Feeds", "/ui-blocks-activity-feeds", "block-activity-1.svg", 4, "Application UI", BadgeStyle.Info),
         new("Banners", "/ui-blocks-banners", "block-banner-1.svg", 6, "Marketing", BadgeStyle.Primary),
         new("Bento Grids", "/ui-blocks-bento", "block-bento-1.svg", 4, "Marketing", BadgeStyle.Primary),
-        new("Blog", "/ui-blocks-blog", "block-blog-1.svg", 8, "Publisher", BadgeStyle.Warning),
+        new("Blog", "/ui-blocks-blog", "block-blog-1.svg", 8, "Marketing", BadgeStyle.Primary),
         new("Call-to-action", "/ui-blocks-cta", "block-cta-1.svg", 5, "Marketing", BadgeStyle.Primary),
         new("Checkout", "/ui-blocks-checkout", "block-checkout-1.svg", 4, "E-commerce", BadgeStyle.Success),
         new("Contact", "/ui-blocks-contact", "block-contact-1.svg", 8, "Marketing", BadgeStyle.Primary),
@@ -248,7 +248,7 @@
         new("Stats", "/ui-blocks-stats", "block-stats-1.svg", 8, "Marketing", BadgeStyle.Primary),
         new("Team", "/ui-blocks-team", "block-team-1.svg", 6, "Marketing", BadgeStyle.Primary),
         new("Testimonials", "/ui-blocks-testimonials", "block-testimonials-1.svg", 6, "Marketing", BadgeStyle.Primary),
-        new("Text & Media", "/ui-blocks-text-and-media", "block-text-media-1.svg", 6, "Publisher", BadgeStyle.Warning),
+        new("Text & Media", "/ui-blocks-text-and-media", "block-text-media-1.svg", 6, "Marketing", BadgeStyle.Primary),
     ];
 
     IEnumerable<Category> Filtered => selectedGroup == "All"
