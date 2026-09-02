@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Tests
 {
     internal static class ChartTestHelper
     {
-        internal static TestContext CreateChartContext()
+        internal static TestContext CreateChartContext(double navigatorWidth = 200, double navigatorHeight = 200)
         {
             var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -15,7 +15,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
             ctx.JSInterop.Setup<double[]>("Radzen.createRangeNavigator", _ => true)
-                .SetResult(new double[] { 200, 200 });
+                .SetResult(new double[] { navigatorWidth, navigatorHeight });
             ctx.Services.AddScoped<TooltipService>();
             return ctx;
         }

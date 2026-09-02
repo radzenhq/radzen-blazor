@@ -7,7 +7,7 @@
 @if (Visible)
 {
 <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-    @if (NavigatorSeries.Count > 0)
+    @if (NavigatorSeries.Count > 0 && Width > 0)
     {
         <svg style="width: 100%; height: 100%;">
             @foreach (var series in NavigatorSeries)
