@@ -469,6 +469,7 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            var pivotGrid = PivotGrid;
             var filterChanged = false;
 
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
@@ -532,9 +533,9 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
 
             // Reload after applying parameters so the pivot uses the new filter values.
-            if (filterChanged && PivotGrid != null)
+            if (filterChanged && pivotGrid != null)
             {
-                await PivotGrid.Reload();
+                await pivotGrid.Reload();
             }
         }
     }
