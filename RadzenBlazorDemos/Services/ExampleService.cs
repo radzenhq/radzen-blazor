@@ -4318,7 +4318,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Features with small icons", Anchor = "#features-with-small-icons" }, new () { Text = "Features with large icons on top", Anchor = "#features-with-large-icons-on-top" }, new () { Text = "Centered features", Anchor = "#centered-features" } ],
+                    Toc = [ new () { Text = "Features with small icons", Anchor = "#features-with-small-icons" }, new () { Text = "Features with large icons on top", Anchor = "#features-with-large-icons-on-top" }, new () { Text = "Centered features", Anchor = "#centered-features" }, new () { Text = "Features with screenshot", Anchor = "#features-with-screenshot" }, new () { Text = "Alternating features", Anchor = "#alternating-features" }, new () { Text = "Features in cards", Anchor = "#features-in-cards" }, new () { Text = "Feature list with checkmarks", Anchor = "#feature-list-with-checkmarks" }, new () { Text = "Features with numbered steps", Anchor = "#features-with-numbered-steps" } ],
                     Name = "Features",
                     Title = "Blazor Features | UI Blocks by Radzen",
                     Icon = "\ue031",
@@ -4339,7 +4339,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Footer with a sitemap", Anchor = "#footer-with-sitemap" }, new () { Text = "Centered Footer", Anchor = "#centered-footer" }, new () { Text = "Simple Footer", Anchor = "#simple-footer" } ],
+                    Toc = [ new () { Text = "Footer with sitemap", Anchor = "#footer-with-sitemap" }, new () { Text = "Centered footer", Anchor = "#centered-footer" }, new () { Text = "Simple footer", Anchor = "#simple-footer" }, new () { Text = "Footer with newsletter", Anchor = "#footer-with-newsletter" }, new () { Text = "Footer with social links", Anchor = "#footer-with-social-links" }, new () { Text = "Footer with logo and mission", Anchor = "#footer-with-logo-and-mission" }, new () { Text = "Footer with language selector", Anchor = "#footer-with-language-selector" }, new () { Text = "Fat footer", Anchor = "#fat-footer" } ],
                     Name = "Footers",
                     Title = "Blazor Footer | UI Blocks by Radzen",
                     Icon = "\uf7e6",
@@ -4371,7 +4371,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Centered Logos", Anchor = "#centered-logos" }, new () { Text = "Logos to the right", Anchor = "#logos-to-the-right" } ],
+                    Toc = [ new () { Text = "Centered logos", Anchor = "#centered-logos" }, new () { Text = "Logos to the right", Anchor = "#logos-to-the-right" }, new () { Text = "Logos with heading", Anchor = "#logos-with-heading" }, new () { Text = "Logo grid", Anchor = "#logo-grid" }, new () { Text = "Logos with stat", Anchor = "#logos-with-stat" }, new () { Text = "Logos in cards", Anchor = "#logos-in-cards" }, new () { Text = "Logos with testimonial", Anchor = "#logos-with-testimonial" }, new () { Text = "Split logos", Anchor = "#split-logos" } ],
                     Name = "Logo Clouds",
                     Title = "Blazor Logo Clouds | UI Blocks by Radzen",
                     Icon = "\ue574",
@@ -4392,7 +4392,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Centered layout", Anchor = "#centered-layout" }, new () { Text = "Left-aligned with image", Anchor = "#left-aligned-with-image" } ],
+                    Toc = [ new () { Text = "Centered newsletter", Anchor = "#centered-layout" }, new () { Text = "Left-aligned with image", Anchor = "#left-aligned-with-image" }, new () { Text = "Newsletter banner", Anchor = "#newsletter-banner" }, new () { Text = "Newsletter in card", Anchor = "#newsletter-in-card" }, new () { Text = "Newsletter with perks", Anchor = "#newsletter-with-perks" }, new () { Text = "Newsletter with social proof", Anchor = "#newsletter-with-social-proof" }, new () { Text = "Split newsletter", Anchor = "#split-newsletter" }, new () { Text = "Newsletter with app links", Anchor = "#newsletter-with-app-links" } ],
                     Name = "Newsletter",
                     Title = "Blazor Newsletter | UI Blocks by Radzen",
                     Icon = "\uf18c",
@@ -4424,7 +4424,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Title with actions", Anchor = "#title-with-actions" }, new () { Text = "Title with breadcrumbs", Anchor = "#title-with-breadcrumbs" }, new () { Text = "Title with breadcrumbs and actions", Anchor = "#title-with-breadcrumbs-and-actions" } ],
+                    Toc = [ new () { Text = "Title with actions", Anchor = "#title-with-actions" }, new () { Text = "Title with breadcrumbs", Anchor = "#title-with-breadcrumbs" }, new () { Text = "Title with breadcrumbs and actions", Anchor = "#title-with-breadcrumbs-and-actions" }, new () { Text = "Title with tabs", Anchor = "#title-with-tabs" }, new () { Text = "Title with meta", Anchor = "#title-with-meta" }, new () { Text = "Title with search", Anchor = "#title-with-search" }, new () { Text = "Title with avatar", Anchor = "#title-with-avatar" }, new () { Text = "Title with stats", Anchor = "#title-with-stats" }, new () { Text = "Company header with banner", Anchor = "#company-header-with-banner" }, new () { Text = "Centered profile with banner", Anchor = "#centered-profile-with-banner" } ],
                     Name = "Page Headings",
                     Title = "Blazor Page Heading | UI Blocks by Radzen",
                     Icon = "\ue9ea",
@@ -4434,7 +4434,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Pricing Cards", Anchor = "#pricing-cards" }, new () { Text = "Basic pricing", Anchor = "#basic-pricing" } ],
+                    Toc = [ new () { Text = "Pricing cards", Anchor = "#pricing-cards" }, new () { Text = "Basic pricing", Anchor = "#basic-pricing" }, new () { Text = "Pricing with highlighted plan", Anchor = "#pricing-with-highlighted-plan" }, new () { Text = "Pricing with toggle", Anchor = "#pricing-with-toggle" }, new () { Text = "Pricing comparison table", Anchor = "#pricing-comparison-table" }, new () { Text = "Single plan with feature list", Anchor = "#single-plan-with-feature-list" }, new () { Text = "Pricing with FAQ", Anchor = "#pricing-with-faq" }, new () { Text = "Tiered pricing with enterprise CTA", Anchor = "#tiered-pricing-with-enterprise-cta" } ],
                     Name = "Pricing",
                     Title = "Blazor Pricing | UI Blocks by Radzen",
                     Icon = "\uf05b",
