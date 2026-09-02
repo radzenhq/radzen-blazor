@@ -96,6 +96,15 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenTree? Tree { get; set; }
 
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            // An item can render without the tree, so it must end the shared memo's lifetime.
+            Tree?.DiscardCheckedValuesMemo();
+
+            base.OnAfterRender(firstRender);
+        }
+
         /// <summary>
         /// The RadzenTreeItem which contains this item.
         /// </summary>
@@ -452,14 +461,30 @@ namespace Radzen.Blazor
 
         internal bool? IsChecked()
         {
-            var checkedValues = GetCheckedValues();
-
-            if (Tree?.AllowCheckParents == true && HasChildren && IsOneChildUnchecked() && IsOneChildChecked())
+            if (Tree?.AllowCheckParents == true && HasChildren)
             {
-                return null;
+                // Determine the mixed state in one subtree walk.
+                var anyChecked = false;
+                var anyUnchecked = false;
+                foreach (var childValue in GetAllChildValues())
+                {
+                    if (Tree.IsValueChecked(childValue))
+                    {
+                        anyChecked = true;
+                    }
+                    else
+                    {
+                        anyUnchecked = true;
+                    }
+
+                    if (anyChecked && anyUnchecked)
+                    {
+                        return null;
+                    }
+                }
             }
 
-            return checkedValues.Contains(Value);
+            return Tree?.IsValueChecked(Value) ?? false;
         }
 
         IEnumerable<object?> GetCheckedValues()
@@ -495,12 +520,6 @@ namespace Radzen.Blazor
         {
             var checkedValues = GetCheckedValues();
             return GetAllChildValues().Any(i => !checkedValues.Contains(i));
-        }
-
-        bool IsOneChildChecked()
-        {
-            var checkedValues = GetCheckedValues();
-            return GetAllChildValues().Any(i => checkedValues.Contains(i));
         }
 
         async Task UpdateCheckedValuesWithParents(bool? value)

@@ -160,10 +160,12 @@ namespace Radzen.Blazor
 
         internal Tuple<Radzen.TreeItemRenderEventArgs, IReadOnlyDictionary<string, object>> ItemAttributes(RadzenTreeItem item)
         {
-            var args = new TreeItemRenderEventArgs() { Data = item.GetAllChildValues(), Value = item.Value };
+            var args = new TreeItemRenderEventArgs() { Value = item.Value };
 
             if (ItemRender != null)
             {
+                // Avoid walking the subtree when no handler can consume it.
+                args.Data = item.GetAllChildValues();
                 ItemRender(args);
             }
 
@@ -752,6 +754,36 @@ namespace Radzen.Blazor
         internal async Task ChangeState()
         {
             await InvokeAsync(StateHasChanged);
+        }
+
+        // Shared by tree items within one render pass.
+        readonly SelectionMembership selection = new();
+
+        internal bool IsValueChecked(object? value) => selection.Contains(CheckedValues, value);
+
+        // Tree items can render independently, so each participating batch ends the memo's lifetime.
+        internal void DiscardCheckedValuesMemo() => selection.Invalidate();
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            DiscardCheckedValuesMemo();
+            return base.ShouldRender();
+        }
+
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            // ShouldRender is skipped for the first render.
+            DiscardCheckedValuesMemo();
+            base.OnParametersSet();
+        }
+
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            DiscardCheckedValuesMemo();
+            base.OnAfterRender(firstRender);
         }
 
         /// <inheritdoc />

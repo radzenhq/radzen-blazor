@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Radzen;
 
@@ -327,6 +329,79 @@ public static class PropertyAccess
         var body = Expression.Convert(Expression.Property(Expression.Convert(arg, type), propertyName), typeof(T));
 
         return Expression.Lambda<Func<object, T>>(body, arg).Compile();
+    }
+
+    static readonly ConditionalWeakTable<Type, ItemGetterCache> itemGetterCaches = new();
+
+    sealed class ItemGetter
+    {
+        internal ItemGetter(Func<object, object?>? get) => Get = get;
+
+        internal Func<object, object?>? Get { get; }
+    }
+
+    sealed class ItemGetterCache
+    {
+        const int MaxEntries = 64;
+
+        readonly ConcurrentDictionary<string, ItemGetter> getters = new();
+        int count;
+
+        internal ItemGetter GetOrCreate(object item, string property)
+        {
+            if (getters.TryGetValue(property, out var getter))
+            {
+                return getter;
+            }
+
+            var created = Create(item, property);
+
+            if (Interlocked.Increment(ref count) > MaxEntries)
+            {
+                Interlocked.Decrement(ref count);
+                return created;
+            }
+
+            var result = getters.GetOrAdd(property, created);
+
+            if (!ReferenceEquals(result, created))
+            {
+                Interlocked.Decrement(ref count);
+            }
+
+            return result;
+        }
+
+        static ItemGetter Create(object item, string property)
+        {
+            try
+            {
+                return new ItemGetter(Getter<object?>(item, property));
+            }
+            catch
+            {
+                return new ItemGetter(null);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads a simple property through a getter cached by runtime item type and property name.
+    /// </summary>
+    /// <remarks>Each runtime type owns up to 64 entries and is held weakly. Unsupported inputs use reflection.</remarks>
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
+    internal static object? GetItemProperty(object? item, string? property)
+    {
+        if (item == null || string.IsNullOrEmpty(property) || property.Contains('.', StringComparison.Ordinal)
+            || Convert.GetTypeCode(item) != TypeCode.Object)
+        {
+            return GetItemOrValueFromProperty(item, property ?? string.Empty);
+        }
+
+        var getter = itemGetterCaches.GetValue(item.GetType(), static _ => new ItemGetterCache())
+            .GetOrCreate(item, property).Get;
+
+        return getter != null ? getter(item) : GetItemOrValueFromProperty(item, property);
     }
 
     /// <summary>

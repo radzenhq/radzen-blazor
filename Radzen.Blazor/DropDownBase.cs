@@ -513,7 +513,7 @@ namespace Radzen
             }
 
             internalValue = collectionAssignment.GetCleared();
-            _selectedValuesSet = null;
+            selection.Invalidate();
             selectedItem = null;
 
             selectedItems.Clear();
@@ -569,9 +569,8 @@ namespace Radzen
         {
             base.OnParametersSet();
 
-            // Drop the memoized multiselect membership set each render so an in-place change to the bound
-            // value collection (same reference, mutated elements) is reflected on the next render.
-            _selectedValuesSet = null;
+            // ShouldRender is skipped for the first render.
+            selection.Invalidate();
 
             if (_data != null)
             {
@@ -1834,11 +1833,8 @@ namespace Radzen
             }
         }
 
-        // O(1) IsItemSelectedByValue membership. Cleared each render (OnParametersSet), so an in-place change
-        // to the bound value collection is reflected on the next lookup.
-        IEnumerable? _selectedValuesSource;
-        HashSet<object?>? _selectedValuesSet;
-        bool _selectedValuesScan;
+        // Shared for repeated membership checks within one render.
+        readonly SelectionMembership selection = new();
 
         internal bool IsItemSelectedByValue(object v)
         {
@@ -1847,22 +1843,21 @@ namespace Radzen
                 case string s:
                     return object.Equals(s, v);
                 case IEnumerable enumerable:
-                    if (!ReferenceEquals(_selectedValuesSource, enumerable) || (_selectedValuesSet == null && !_selectedValuesScan))
-                    {
-                        _selectedValuesSource = enumerable;
-                        _selectedValuesSet = SelectionEquality.TryCreateSet(enumerable);
-                        _selectedValuesScan = _selectedValuesSet == null;
-                    }
-                    if (_selectedValuesSet != null && (v == null || SelectionEquality.HashesReliably(v.GetType())))
-                    {
-                        return _selectedValuesSet.Contains(v);
-                    }
-                    return enumerable.Cast<object>().Contains(v);
+                    return selection.Contains(enumerable, v);
                 case null:
                     return false;
                 default:
                     return object.Equals(internalValue, v);
             }
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            // Bound collections may mutate in place between renders.
+            selection.Invalidate();
+
+            return base.ShouldRender();
         }
 
         /// <inheritdoc />

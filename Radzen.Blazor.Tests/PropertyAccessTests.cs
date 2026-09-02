@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -211,6 +214,55 @@ namespace Radzen.Blazor.Tests
             var value = PropertyAccess.GetValue(model, "SubModelInstance.SubModelProperty");
 
             Assert.Equal(true, value);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static WeakReference UseCollectibleType(string property)
+        {
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(
+                new AssemblyName($"PropertyAccessTests_{Guid.NewGuid():N}"), AssemblyBuilderAccess.RunAndCollect);
+            var module = assembly.DefineDynamicModule("Main");
+            var builder = module.DefineType("Item", TypeAttributes.Public);
+            builder.DefineDefaultConstructor(MethodAttributes.Public);
+
+            var getter = builder.DefineMethod("get_Name",
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                typeof(string), Type.EmptyTypes);
+            var il = getter.GetILGenerator();
+            il.Emit(OpCodes.Ldstr, "Item name");
+            il.Emit(OpCodes.Ret);
+            var name = builder.DefineProperty("Name", PropertyAttributes.None, typeof(string), null);
+            name.SetGetMethod(getter);
+
+            var type = builder.CreateType()!;
+            var item = Activator.CreateInstance(type)!;
+            PropertyAccess.GetItemProperty(item, property);
+
+            return new WeakReference(type);
+        }
+
+        static void AssertCollected(WeakReference reference)
+        {
+            for (var attempt = 0; attempt < 10 && reference.IsAlive; attempt++)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
+
+            Assert.False(reference.IsAlive);
+        }
+
+        [Fact]
+        public void ItemPropertyCache_DoesNotRetainCollectibleTypes()
+        {
+            AssertCollected(UseCollectibleType("Name"));
+        }
+
+        [Fact]
+        public void ItemPropertyCache_DoesNotRetainFailedLookupsForCollectibleTypes()
+        {
+            AssertCollected(UseCollectibleType("Missing"));
         }
     }
 }

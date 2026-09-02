@@ -114,7 +114,18 @@ namespace Radzen.Blazor
         {
             base.OnParametersSet();
 
+            // ShouldRender is skipped for the first render.
+            selection.Invalidate();
+
             UpdateAllItems();
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            // Bound collections may mutate in place between renders.
+            selection.Invalidate();
+            return base.ShouldRender();
         }
 
         void UpdateAllItems()
@@ -122,8 +133,8 @@ namespace Radzen.Blazor
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenSelectBarItem();
-                item.SetText($"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty ?? string.Empty)}");
-                item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty ?? string.Empty)!);
+                item.SetText($"{PropertyAccess.GetItemProperty(i, TextProperty)}");
+                item.SetValue(PropertyAccess.GetItemProperty(i, ValueProperty)!);
                 return item;
             })).ToList();
         }
@@ -194,6 +205,8 @@ namespace Radzen.Blazor
             }
         }
 
+        readonly SelectionMembership selection = new();
+
         /// <summary>
         /// Determines whether the specified item is selected.
         /// </summary>
@@ -204,7 +217,12 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(item);
             if (Multiple)
             {
-                return Value != null && ((IEnumerable)Value).Cast<object>().Contains(item.Value);
+                if (Value == null)
+                {
+                    return false;
+                }
+
+                return selection.Contains(Value as IEnumerable, item.Value);
             }
             else
             {
@@ -275,6 +293,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void Refresh()
         {
+            selection.Invalidate();
             StateHasChanged();
         }
 

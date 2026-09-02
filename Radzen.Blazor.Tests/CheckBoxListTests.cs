@@ -1,6 +1,7 @@
 using Bunit;
 using Xunit;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Tests
 {
@@ -219,6 +220,106 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void CheckBoxList_InPlaceValueMutation_ReflectedOnReRender()
+        {
+            using var ctx = new TestContext();
+            var data = new List<string> { "Option 1", "Option 2", "Option 3" };
+            var value = new List<string> { "Option 1" };
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, value);
+            });
+
+            var options = component.FindAll("div[role=\"checkbox\"]");
+            Assert.Equal("true", options[0].GetAttribute("aria-checked"));
+            Assert.Equal("false", options[1].GetAttribute("aria-checked"));
+
+            value.Add("Option 2");
+            component.Render();
+
+            options = component.FindAll("div[role=\"checkbox\"]");
+            Assert.Equal("true", options[0].GetAttribute("aria-checked"));
+            Assert.Equal("true", options[1].GetAttribute("aria-checked"));
+            Assert.Equal("false", options[2].GetAttribute("aria-checked"));
+        }
+
+        class SelfRendering<TValue> : RadzenCheckBoxList<TValue>
+        {
+            public Task Rerender() => InvokeAsync(StateHasChanged);
+        }
+
+        [Fact]
+        public async Task CheckBoxList_SameCountValueMutation_ReflectedOnInternalRender()
+        {
+            using var ctx = new TestContext();
+            var data = new List<string> { "Option 1", "Option 2", "Option 3" };
+            var value = new List<string> { "Option 1", "Option 2" };
+
+            var component = ctx.RenderComponent<SelfRendering<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, value);
+            });
+
+            string Checked(int i) => component.FindAll("div[role=\"checkbox\"]")[i].GetAttribute("aria-checked");
+
+            Assert.Equal("true", Checked(0));
+            Assert.Equal("false", Checked(2));
+
+            value[0] = "Option 3";
+            await component.Instance.Rerender();
+
+            Assert.Equal("false", Checked(0));
+            Assert.Equal("true", Checked(1));
+            Assert.Equal("true", Checked(2));
+        }
+
+        class Person
+        {
+            public string Name { get; set; }
+            public string Id { get; set; }
+        }
+
+        class Robot
+        {
+            public string Name { get; set; }
+            public string Id { get; set; }
+        }
+
+        // A/B/A verifies caching by runtime type rather than only the previous item type.
+        [Fact]
+        public void CheckBoxList_ResolvesProperties_AcrossMixedItemTypes()
+        {
+            using var ctx = new TestContext();
+            var data = new List<object>
+            {
+                new Person { Name = "Ada", Id = "p1" },
+                new Robot { Name = "Bender", Id = "r1" },
+                new Person { Name = "Grace", Id = "p2" },
+            };
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Value, new List<string> { "r1" });
+            });
+
+            var options = component.FindAll("div[role=\"checkbox\"]");
+
+            Assert.Equal(3, options.Count);
+            Assert.Contains("Ada", component.Markup);
+            Assert.Contains("Bender", component.Markup);
+            Assert.Contains("Grace", component.Markup);
+            Assert.Equal("false", options[0].GetAttribute("aria-checked"));
+            Assert.Equal("true", options[1].GetAttribute("aria-checked"));
+            Assert.Equal("false", options[2].GetAttribute("aria-checked"));
+        }
+
+        [Fact]
         public void CheckBoxList_Updates_AriaChecked_OnSelect()
         {
             using var ctx = new TestContext();
@@ -337,4 +438,3 @@ namespace Radzen.Blazor.Tests
         }
     }
 }
-
