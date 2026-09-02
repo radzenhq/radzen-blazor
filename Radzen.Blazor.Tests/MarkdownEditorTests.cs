@@ -464,5 +464,26 @@ namespace Radzen.Blazor.Tests
             Assert.True(component.Instance.CanUndo);
             Assert.Contains("rz-state-active", component.Markup); // Bold button highlighted
         }
+
+        [Theory]
+        [InlineData("smile", "\U0001f604")]
+        [InlineData("SMILE", "\U0001f604")] // shortcodes are case-insensitive, matching the parser
+        [InlineData("thumbsup", "\U0001f44d")]
+        public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsEmojiForKnownShortcode(string shortcode, string expected)
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            Assert.Equal(expected, await component.Instance.LookupEmojiAsync(shortcode));
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsNullForUnknownShortcode()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            Assert.Null(await component.Instance.LookupEmojiAsync("notarealemoji"));
+        }
     }
 }

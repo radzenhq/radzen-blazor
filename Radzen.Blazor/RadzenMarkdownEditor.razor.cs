@@ -196,6 +196,14 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [JSInvokable("RenderMarkdownAsync")]
     public Task<string> RenderMarkdownAsync(string markdown) => Task.FromResult(HtmlVisitor.ToHtml(markdown));
 
+    /// <summary>
+    /// Invoked from JavaScript when a <c>:shortcode:</c> is typed in the design surface. Returns the
+    /// emoji for the shortcode, or <c>null</c> when it is not a known emoji shortcode.
+    /// </summary>
+    [JSInvokable("LookupEmojiAsync")]
+    public Task<string?> LookupEmojiAsync(string shortcode) =>
+        Task.FromResult(EmojiMapping.Emojis.TryGetValue(shortcode ?? string.Empty, out var emoji) ? emoji : null);
+
     private async Task OnInputAsync(string? value)
     {
         string newValue = value ?? string.Empty;
