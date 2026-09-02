@@ -1,4 +1,3 @@
-@using Radzen.Blazor.Rendering
 @inherits FormComponent<string>
 
 @if (Visible)
@@ -37,14 +36,17 @@
                         }
                     </CascadingValue>
                 </div>
-                <div class="rz-markdown-editor-modes">
-                    <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
-                        <Items>
-                            <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Text=@DesignText />
-                            <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Text=@SourceText />
-                        </Items>
-                    </RadzenSelectBar>
-                </div>
+                @if (ShowModeSwitch)
+                {
+                    <div class="rz-markdown-editor-modes">
+                        <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
+                            <Items>
+                                <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Text=@DesignText/>
+                                <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Text=@SourceText/>
+                            </Items>
+                        </RadzenSelectBar>
+                    </div>
+                }
             </div>
         }
         <div class="rz-markdown-editor-content">
