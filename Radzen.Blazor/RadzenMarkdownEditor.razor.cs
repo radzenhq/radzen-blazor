@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Documents.Markdown;
 using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
@@ -36,7 +37,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Gets or sets the mode of the editor. Two-way bindable.
     /// </summary>
     [Parameter]
-    public MarkdownEditorMode Mode { get; set; } = MarkdownEditorMode.Design;
+    public MarkdownEditorMode Mode { get; set; }
 
     /// <summary>
     /// A callback invoked when the user switches the mode.
@@ -49,6 +50,12 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     [Parameter]
     public bool ShowToolbar { get; set; } = true;
+    
+    /// <summary>
+    /// Specifies whether the mode selector is shown. Set to <c>true</c> by default.
+    /// </summary>
+    [Parameter]
+    public bool ShowModeSwitch { get; set; } = true;
 
     /// <summary>
     /// Custom toolbar content. When set, it replaces the default toolbar tools.
@@ -104,7 +111,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [JSInvokable("OnToolStateAsync")]
     public Task OnToolStateAsync(MarkdownEditorToolState state)
     {
-        toolState = state ?? new();
+        toolState = state;
         StateHasChanged();
         return Task.CompletedTask;
     }
@@ -120,11 +127,6 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
-
-    /// <summary>
-    /// Returns the current mode of the editor.
-    /// </summary>
-    public MarkdownEditorMode GetMode() => mode;
 
     private async Task SetModeAsync(MarkdownEditorMode value)
     {
@@ -189,10 +191,10 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <summary>
-    /// Invoked from JavaScript to render markdown as design-surface HTML (paste laundering, undo/redo cross-mode restore).
+    /// Invoked from JavaScript to render Markdown as design-surface HTML (paste laundering, undo/redo cross-mode restore).
     /// </summary>
     [JSInvokable("RenderMarkdownAsync")]
-    public Task<string> RenderMarkdownAsync(string markdown) => Task.FromResult(HtmlVisitor.ToHtml(markdown ?? string.Empty));
+    public Task<string> RenderMarkdownAsync(string markdown) => Task.FromResult(HtmlVisitor.ToHtml(markdown));
 
     private async Task OnInputAsync(string? value)
     {
@@ -243,7 +245,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Executes a command. Built-in commands (see <see cref="MarkdownEditorCommands" />) modify the text; unknown command names only raise <see cref="Execute" />.
     /// </summary>
     /// <param name="name">The command name.</param>
-    /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialog is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />.</param>
+    /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialogue is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />.</param>
     public async Task ExecuteCommandAsync(string name, string? value = null)
     {
         string? label = null;

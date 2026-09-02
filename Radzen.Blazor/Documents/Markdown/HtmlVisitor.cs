@@ -1,11 +1,12 @@
+using Radzen.Documents.Markdown;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Radzen.Documents.Markdown;
+namespace Radzen.Blazor.Documents.Markdown;
 
 /// <summary>
-/// Renders a markdown document as an HTML string. Used by RadzenMarkdownEditor's design mode.
+/// Renders a Markdown document as an HTML string. Used by RadzenMarkdownEditor's design mode.
 /// </summary>
 public class HtmlVisitor : NodeVisitorBase
 {
@@ -23,7 +24,7 @@ public class HtmlVisitor : NodeVisitorBase
     }
 
     /// <summary>Parses <paramref name="markdown" /> and renders it as HTML.</summary>
-    public static string ToHtml(string markdown) => ToHtml(MarkdownParser.Parse(markdown ?? string.Empty));
+    public static string ToHtml(string markdown) => ToHtml(MarkdownParser.Parse(markdown));
 
     private static string Escape(string? text) => (text ?? string.Empty)
         .Replace("&", "&amp;", StringComparison.Ordinal)
@@ -119,7 +120,7 @@ public class HtmlVisitor : NodeVisitorBase
 
         html.Append("<li>");
 
-        if (listItem.Checked is bool isChecked)
+        if (listItem.Checked is { } isChecked)
         {
             html.Append("<input type=\"checkbox\"");
             if (isChecked)
@@ -129,8 +130,7 @@ public class HtmlVisitor : NodeVisitorBase
             html.Append("> ");
         }
 
-        var tight = listItem.Parent is List list && list.Tight
-            && listItem.Children.Count == 1 && listItem.Children[0] is Paragraph;
+        bool tight = listItem is { Parent: List { Tight: true }, Children: [Paragraph] };
 
         if (tight)
         {
