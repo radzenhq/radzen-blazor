@@ -647,5 +647,19 @@ namespace Radzen.Blazor.Tests
             return new WeakReference(type);
         }
 
+        [Fact]
+        public void AskingAboutACollectibleCollectionTypeDoesNotRetainIt()
+        {
+            var reference = UseCollectibleCollectionType();
+
+            for (var attempt = 0; attempt < 10 && reference.IsAlive; attempt++)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
+
+            Assert.False(reference.IsAlive, "the collectible collection type should have been collected");
+        }
     }
 }

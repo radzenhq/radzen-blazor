@@ -111,8 +111,6 @@ namespace Radzen.Blazor
 
         List<IRadzenRadioButtonListItem> allItems = new();
 
-
-
         void UpdateAllItems()
         {
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
