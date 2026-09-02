@@ -134,7 +134,9 @@ namespace Radzen.Blazor
         /// <param name="round">Wether to round.</param>
         public double NiceNumber(double range, bool round)
         {
-            if (range == 0)
+            // Callers normalize a degenerate domain first, but Math.Sign() throws on NaN and this
+            // is public API, so treat a non-finite range like a zero one rather than throwing.
+            if (range == 0 || !double.IsFinite(range))
             {
                 return 1;
             }

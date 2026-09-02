@@ -159,5 +159,40 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("50.00", component.Instance.GetHandleLabel(0.5));
         }
+
+        [Fact]
+        public void RangeNavigator_WithLineSeries_SkipsSeries_BeforeWidthIsMeasured()
+        {
+            // Rendering the series against the unmeasured scales used to throw (#2693).
+            using var ctx = CreateChartContext(navigatorWidth: 0, navigatorHeight: 0);
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Start, 0.1));
+
+            Assert.DoesNotContain("rz-range-nav-series", component.Markup);
+        }
+
+        [Fact]
+        public void RangeNavigator_WithLineSeries_RendersSeries_AfterWidthIsMeasured()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+
+            Assert.Contains("rz-range-nav-series", component.Markup);
+            Assert.DoesNotContain("NaN", component.Markup);
+        }
+
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithLineSeries(TestContext ctx)
+        {
+            return ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+                parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
+                {
+                    series.Add(p => p.Data, SampleData);
+                    series.Add(p => p.CategoryProperty, nameof(DataItem.Category));
+                    series.Add(p => p.ValueProperty, nameof(DataItem.Value));
+                }));
+        }
     }
 }
