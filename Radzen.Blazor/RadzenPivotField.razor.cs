@@ -469,8 +469,11 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            var filterChanged = false;
+
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
+                internalFilterValue = null;
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
 
                 if (FilterTemplate != null || FilterValueTemplate != null)
@@ -483,10 +486,13 @@ namespace Radzen.Blazor
 
                     return;
                 }
+
+                filterChanged = true;
             }
 
             if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
             {
+                internalSecondFilterValue = null;
                 secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
 
                 if (FilterTemplate != null || SecondFilterValueTemplate != null)
@@ -499,6 +505,8 @@ namespace Radzen.Blazor
 
                     return;
                 }
+
+                filterChanged = true;
             }
 
             if (filterOperator == null && (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator) || _filterOperator != null))
@@ -522,6 +530,12 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            // Reload after applying parameters so the pivot uses the new filter values.
+            if (filterChanged && PivotGrid != null)
+            {
+                await PivotGrid.Reload();
+            }
         }
     }
-} 
+}
