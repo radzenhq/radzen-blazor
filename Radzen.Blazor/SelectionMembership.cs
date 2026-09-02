@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,43 +5,53 @@ using System.Linq;
 namespace Radzen
 {
     /// <summary>
-    /// Tests selection membership, memoizing compatible collections for one render pass.
+    /// Answers "is this value one of the selected ones" for a component rendering a list of items,
+    /// memoized for the span of a single render pass where the memo can answer identically.
     /// </summary>
     /// <remarks>
-    /// <see cref="CollectionMembership" /> decides whether a binding can be memoized without changing its
-    /// equality semantics. Components must call <see cref="Invalidate" /> between render passes.
+    /// <para>
+    /// The question is asked several times per item per render, and again for the select-all state, so
+    /// answering it by scanning the bound collection each time makes a render O(items x selected). A set
+    /// built once per pass makes each answer O(1) against one pass over the selected values.
+    /// </para>
+    /// <para>
+    /// It is not available for every binding, and where it is not, the answer is the scan. Which is which
+    /// belongs to <see cref="SelectionEquality" />, not here: the memo may only answer where it answers
+    /// what <c>values.Cast&lt;object?&gt;().Contains(value)</c> answered, since that is the question these
+    /// components have always asked. A collection carrying <c>ICollection&lt;object&gt;</c> answers it for
+    /// itself, and a value whose type overrides <c>Equals</c> without <c>GetHashCode</c> cannot be found
+    /// in a set at all - both fall back to the scan.
+    /// </para>
+    /// <para>
+    /// The memo is not validated, it is discarded: nothing about a bound collection can be inferred from
+    /// outside it, since a caller may swap one selected value for another in place, changing neither the
+    /// reference nor the count. Components call <see cref="Invalidate" /> at the start of every render -
+    /// <c>ShouldRender</c>, plus <c>OnParametersSet</c> for the first render, which <c>ShouldRender</c> is
+    /// not consulted for - so the memo can never outlive the state it was built from.
+    /// </para>
     /// </remarks>
     internal sealed class SelectionMembership
     {
-        // The binding for the current render pass.
+        // The collection everything below was built for. The reference check is not the invalidation -
+        // Invalidate is - it only avoids rebuilding twice within one pass, and catches a reassignment that
+        // lands between two renders rather than through a parameter set.
         IEnumerable? current;
 
-        CollectionMembership.Decision decision;
-
-        // Null follows the binding's ICollection<object> contract when present.
-        Func<IEnumerable, object?, bool>? nullAsker;
-
-        // The collection that answers after forwarding wrappers are removed.
-        IEnumerable? target;
-
+        // Null when this collection has to be scanned instead, which is decided once per pass with it.
         HashSet<object?>? set;
 
-        // Cached because finding null may require a scan.
-        bool? holdsNull;
-
         /// <summary>
-        /// Discards state from the previous render pass.
+        /// Discards everything built for the previous render pass. Called at the start of every render by
+        /// the component that owns it.
         /// </summary>
         internal void Invalidate()
         {
             set = null;
-            holdsNull = null;
 
-            // Release the binding together with the memo.
+            // The collection goes with the memo. Keeping the reference pins the caller's collection for as
+            // long as the component lives: if the binding becomes null, nothing overwrites it and nothing
+            // reads it again either.
             current = null;
-            target = null;
-            decision = default;
-            nullAsker = null;
         }
 
         /// <summary>
@@ -58,27 +67,17 @@ namespace Radzen
             if (!ReferenceEquals(current, values))
             {
                 current = values;
-                target = CollectionMembership.Unwrap(values);
-                decision = CollectionMembership.For(values.GetType(), target.GetType());
-                nullAsker = CollectionMembership.NullAsker(values.GetType());
-                set = null;
-                holdsNull = null;
+                set = SelectionEquality.TryCreateSet(values);
             }
 
-            // Null dispatch belongs to the binding, not its unwrapped target.
-            if (value == null)
+            // The candidate is checked as well as the elements: a set built from values that hash reliably
+            // still cannot be asked about one that does not.
+            if (set != null && (value == null || SelectionEquality.HashesReliably(value.GetType())))
             {
-                return nullAsker != null
-                    ? nullAsker(current!, null)
-                    : holdsNull ??= CollectionMembership.HoldsNull(current!);
+                return set.Contains(value);
             }
 
-            if (decision.Policy == CollectionMembership.Policy.Ask)
-            {
-                return decision.Ask!(target!, value);
-            }
-
-            return (set ??= new HashSet<object?>(target!.Cast<object?>())).Contains(value);
+            return values.Cast<object?>().Contains(value);
         }
     }
 }
