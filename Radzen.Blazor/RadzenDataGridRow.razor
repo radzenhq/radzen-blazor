@@ -1,9 +1,11 @@
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TItem
 @implements IRadzenForm
- <CascadingValue Value=@EditContext>
-    <CascadingValue Value=this>
-@{var rowArgs = Grid?.RowAttributes(Item, Index); }
+@{
+    // The cached fragment reads current parameters through this, so it is reusable across renders.
+    rowContent ??= @<text>@{
+        var rowArgs = Grid?.RowAttributes(Item, Index);
+    }
 @{var firstLevel = Grid?.AllowCompositeDataCells == true ? 0 : (Grid?.deepestChildColumnLevel ?? 0); }
 @for(var i = firstLevel; (Grid?.AllowCompositeDataCells == true ? i <= (Grid?.deepestChildColumnLevel ?? 0) + 1 : i < (Grid?.deepestChildColumnLevel ?? 0) + 1); i++)
 {
@@ -113,8 +115,23 @@
         </tr>
     }
 }
+</text>;
+}
+@* Cascades are needed only by edit templates; the EditContext check also supports direct parameter use.
+   Read-only templates now inherit an outer form. Switching branches rebuilds the row and resets state
+   held by non-edited templates. *@
+@if (InEditMode || EditContext != null)
+{
+    <CascadingValue Value=@EditContext>
+        <CascadingValue Value=this>
+            @rowContent
+        </CascadingValue>
     </CascadingValue>
-</CascadingValue>
+}
+else
+{
+    @rowContent
+}
 @code {
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; } = new List<RadzenDataGridColumn<TItem>>();
@@ -142,6 +159,8 @@
 
         [Parameter]
         public EditContext? EditContext { get; set; }
+
+        RenderFragment? rowContent;
 
         List<IRadzenFormComponent> components = new();
 
