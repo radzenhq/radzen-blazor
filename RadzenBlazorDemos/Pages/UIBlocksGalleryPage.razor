@@ -1,0 +1,294 @@
+@page "/ui-blocks"
+
+<PageTitle>Blazor UI Blocks - 200+ Ready-Made Sections in Radzen Blazor Studio</PageTitle>
+<HeadContent>
+    <meta name="description" content="200+ ready-made Blazor UI blocks in 34 categories with 1,170+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox.">
+    <meta name="author" content="Radzen">
+    <meta property="og:title" content="Blazor UI Blocks - 200+ Ready-Made Sections in Radzen Blazor Studio" />
+    <meta property="og:description" content="200+ ready-made Blazor UI blocks in 34 categories with 1,170+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox." />
+    <meta property="og:site_name" content="Radzen Blazor Components" />
+    <meta property="og:image" content="https://blazor.radzen.com/images/radzen-og.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://blazor.radzen.com/ui-blocks" />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Blazor UI Blocks - 200+ Ready-Made Sections in Radzen Blazor Studio" />
+    <meta property="twitter:description" content="200+ ready-made Blazor UI blocks in 34 categories with 1,170+ configurable variants: heroes, forms, navbars, checkout and more. Responsive, theme-aware, and fully customizable. Built into Radzen Blazor Studio: browse live demos, then insert any block from the Studio toolbox." />
+</HeadContent>
+
+<div class="rz-w-100 rz-mx-auto" style="max-width: 1100px;">
+
+<RadzenRow Gap="3rem" RowGap="1.5rem" AlignItems="AlignItems.Center" class="rz-pt-8">
+    <RadzenColumn Size="12" SizeMD="5">
+        <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1">
+            Blazor UI Blocks
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-mb-6">
+            UI Blocks are ready-made, fully customizable page sections built into <RadzenLink Path="https://www.radzen.com/blazor-studio/" Text="Radzen Blazor Studio" target="_blank" />. Browse the live demos below, then insert any block into your app straight from the Studio toolbox.
+        </RadzenText>
+        <RadzenStack Gap="0.5rem" class="rz-mb-6">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Primary" />
+                <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">Responsive and theme-aware out of the box</RadzenText>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Primary" />
+                <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">Configurable on insert: width, background and more</RadzenText>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Primary" />
+                <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">Clean Blazor markup you own and extend</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="3rem" Wrap="FlexWrap.Wrap">
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">200+</RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" TagName="TagName.P" class="rz-text-secondary-color rz-m-0 rz-mt-1">blocks</RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">34</RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" TagName="TagName.P" class="rz-text-secondary-color rz-m-0 rz-mt-1">categories</RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" class="rz-m-0">1,170+</RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" TagName="TagName.P" class="rz-text-secondary-color rz-m-0 rz-mt-1">configurable variants</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" OffsetMD="1">
+        <RadzenCard Variant="Variant.Outlined" class="video-card rz-p-2">
+            <div class="embed-container">
+            @if (playVideo)
+            {
+                <iframe src="https://www.youtube.com/embed/ZM3XGYdpUcA?autoplay=1&rel=0" frameborder="0" allow="autoplay" allowfullscreen=""></iframe>
+            }
+            else
+            {
+                <div class="video-facade" @onclick="@(() => playVideo = true)" role="button" tabindex="0" aria-label="Play video: UI Blocks in Radzen Blazor Studio">
+                    <img src="https://i.ytimg.com/vi/ZM3XGYdpUcA/hqdefault.jpg" alt="UI Blocks in Radzen Blazor Studio video" loading="lazy" />
+                    <div class="video-facade-play">
+                        <svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="28" fill="var(--rz-primary)"/><path d="M23 18 L40 28 L23 38 Z" fill="var(--rz-on-primary)"/></svg>
+                    </div>
+                </div>
+            }
+            </div>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+<style>
+    .block-gallery .rz-link {
+        --rz-link-text-decoration: none;
+        --rz-link-hover-text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.15s;
+
+        .rz-card {
+            transition: box-shadow 0.2s;
+        }
+    }
+
+    .block-gallery .rz-link:hover {
+        transform: translateY(-2px);
+
+        .rz-card {
+            box-shadow: var(--rz-shadow-3);
+        }
+    }
+
+    .block-gallery .rz-card {
+        height: 100%;
+    }
+
+    .block-gallery-thumb {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 264 / 168;
+        display: block;
+        border-radius: var(--rz-border-radius) var(--rz-border-radius) 0 0;
+        opacity: 0.65;
+        transition: opacity 0.15s;
+    }
+
+    .block-gallery .rz-link:hover .block-gallery-thumb {
+        opacity: 1;
+    }
+
+    .video-card {
+        transition: box-shadow 0.2s;
+    }
+
+    .video-card:hover {
+        box-shadow: var(--rz-shadow-3);
+    }
+
+    .video-facade {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+    }
+
+    .video-facade img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .video-facade-play {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s;
+    }
+
+    .video-facade:hover .video-facade-play {
+        transform: scale(1.08);
+    }
+
+    .block-gallery-filter {
+        position: sticky;
+        top: 0.5rem;
+        z-index: 3;
+        container-type: scroll-state;
+    }
+
+    .block-gallery-filter-inner {
+        background-color: var(--rz-body-background-color, var(--rz-base-background-color));
+        border-radius: var(--rz-border-radius);
+        padding: 0.75rem 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+    @@container scroll-state(stuck: top) {
+        .block-gallery-filter-inner {
+            box-shadow: var(--rz-shadow-4);
+        }
+    }
+</style>
+
+<div class="block-gallery-filter rz-mb-6" style="margin-top: 4rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="1rem" class="block-gallery-filter-inner">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            @foreach (var g in new[] { "All" }.Concat(groups))
+            {
+                <RadzenButton Text="@ChipText(g)" Size="ButtonSize.Small"
+                              Variant="@(selectedGroup == g ? Variant.Flat : Variant.Outlined)"
+                              ButtonStyle="@(selectedGroup == g ? ButtonStyle.Primary : ButtonStyle.Base)"
+                              Click="@(() => selectedGroup = g)"
+                              Style="border-radius: 9999px" />
+            }
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenTextBox Value="@search" @oninput="@(a => search = a.Value?.ToString() ?? string.Empty)" Placeholder="Search blocks..." aria-label="Search blocks" Style="width: 200px; height: 2.25rem" />
+            <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-disabled-color rz-m-0">
+                @Filtered.Count() of 34 categories
+            </RadzenText>
+        </RadzenStack>
+    </RadzenStack>
+</div>
+
+<RadzenRow Gap="2rem" RowGap="2rem" class="block-gallery">
+    @foreach (var c in Filtered)
+    {
+        <RadzenColumn Size="12" SizeSM="6" SizeMD="4" SizeLG="3">
+            <RadzenLink Path="@c.Path">
+                <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
+                    <svg class="block-gallery-thumb" viewBox="0 0 264 168" role="img" aria-label="@(c.Name + " blocks thumbnail")"><use href="@("images/blocks/" + c.Tile + "#tile")" /></svg>
+                    <RadzenStack Gap="0" class="rz-py-3 rz-px-4">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mb-0">@c.Name</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-text-disabled-color rz-m-0">@c.Blocks blocks</RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenLink>
+        </RadzenColumn>
+    }
+    @if (!Filtered.Any())
+    {
+        <RadzenColumn Size="12">
+            <RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-py-12">
+                <RadzenIcon Icon="search_off" class="rz-text-disabled-color" Style="font-size: 48px" />
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-m-0">No blocks match your search</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color rz-m-0">Try a different term or clear the filters.</RadzenText>
+                <RadzenButton Text="Clear search" Variant="Variant.Text" Click="@ClearFilters" class="rz-mt-2" />
+            </RadzenStack>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+@* --- CTA --- *@
+<RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mt-12 rz-mb-8 rz-p-12 rz-background-color-base-lighter rz-border-radius-3">
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-color-on-base-lighter">
+        Build your next page in minutes
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" TextAlign="TextAlign.Center" Style="max-width: 560px;" class="rz-color-on-base-lighter">
+        All 200+ UI Blocks and their 1,170+ variants ship with Radzen Blazor Studio. Insert any block straight from the toolbox and make it yours.
+    </RadzenText>
+    <RadzenLink Text="Get Radzen Blazor Studio" Path="https://www.radzen.com/blazor-studio/" target="_blank" class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default rz-text-align-center rz-mt-4" Style="--rz-link-hover-text-decoration: none" />
+</RadzenStack>
+
+</div>
+
+@code {
+    bool playVideo;
+    string selectedGroup = "All";
+    string search = string.Empty;
+    readonly string[] groups = [ "Application UI", "Marketing", "E-commerce" ];
+
+    record Category(string Name, string Path, string Tile, int Blocks, string Group, string[] Items);
+
+    readonly Category[] categories =
+    [
+        new("AI Blocks", "/ui-blocks-ai", "block-ai-1.svg", 4, "Application UI", [ "Prompt suggestions", "Ask bar", "AI settings", "AI welcome" ]),
+        new("Activity Feeds", "/ui-blocks-activity-feeds", "block-activity-1.svg", 4, "Application UI", [ "Activity timeline", "Notification list", "Comment feed", "Audit log" ]),
+        new("Banners", "/ui-blocks-banners", "block-banner-1.svg", 6, "Marketing", [ "Announcement bar", "Promo banner", "Info banner", "Floating banner", "Cookie consent banner", "Warning banner" ]),
+        new("Bento Grids", "/ui-blocks-bento", "block-bento-1.svg", 4, "Marketing", [ "Feature bento", "Bento with stats", "Bento with images", "Outlined bento" ]),
+        new("Blog", "/ui-blocks-blog", "block-blog-1.svg", 8, "Marketing", [ "Article cards", "Featured article", "Minimal list", "Horizontal cards", "Dark blog", "Articles with authors", "Blog with sidebar", "Post hero" ]),
+        new("Call-to-action", "/ui-blocks-cta", "block-cta-1.svg", 5, "Marketing", [ "Centered CTA", "Left-aligned CTA", "Justified CTA", "Image to the left", "Image to the right" ]),
+        new("Checkout", "/ui-blocks-checkout", "block-checkout-1.svg", 4, "E-commerce", [ "Split checkout", "Steps checkout", "Payment methods", "Order confirmation" ]),
+        new("Contact", "/ui-blocks-contact", "block-contact-1.svg", 8, "Marketing", [ "Centered contact form", "Contact form with details", "Contact cards", "Office locations", "Simple contact CTA", "Contact on primary", "Centered contact info", "Contact with office hours" ]),
+        new("Empty States", "/ui-blocks-empty-states", "block-empty-1.svg", 6, "Application UI", [ "Simple empty state", "Empty state with secondary action", "Dashed empty state", "Empty search results", "Empty state in card", "First-use checklist" ]),
+        new("Error Pages", "/ui-blocks-error-pages", "block-error-1.svg", 6, "Application UI", [ "404 centered", "404 with image", "404 with helpful links", "500 error", "Maintenance", "Access denied" ]),
+        new("FAQ", "/ui-blocks-faq", "block-faq-1.svg", 4, "Marketing", [ "FAQ in 2 columns", "FAQ to the right", "FAQ Accordion to the right", "FAQ in centered Accordion" ]),
+        new("Features", "/ui-blocks-features", "block-features-1.svg", 8, "Marketing", [ "Features with small icons", "Features with large icons on top", "Centered features", "Features with screenshot", "Alternating features", "Features in cards", "Feature list with checkmarks", "Features with numbered steps" ]),
+        new("Filter Panels", "/ui-blocks-filter-panels", "block-filter-1.svg", 4, "Application UI", [ "Sidebar filters", "Filter toolbar", "Applied filter chips", "Collapsible filters" ]),
+        new("Footers", "/ui-blocks-footers", "block-footer-1.svg", 8, "Marketing", [ "Footer with sitemap", "Centered footer", "Simple footer", "Footer with newsletter", "Footer with social links", "Footer with logo and mission", "Footer with language selector", "Fat footer" ]),
+        new("Form Layouts", "/ui-blocks-form-layouts", "block-form-1.svg", 5, "Application UI", [ "Stacked form", "Two-column form", "Settings page", "Settings with side navigation", "Danger zone" ]),
+        new("Hero", "/ui-blocks-hero", "block-hero-1.svg", 8, "Marketing", [ "Centered hero", "Hero with image to the right", "Hero with announcement", "Hero with stats", "Hero with sign-up", "Hero with background image", "Hero with form", "Hero with logos" ]),
+        new("KPI Cards", "/ui-blocks-cards", "block-card-1.svg", 5, "Application UI", [ "Simple stats", "Simple stats with icon", "Stats with trends", "Stats with trends to the right", "Stats with square icon" ]),
+        new("Logo Clouds", "/ui-blocks-logos", "block-logos-1.svg", 8, "Marketing", [ "Centered logos", "Logos to the right", "Logos with heading", "Logo grid", "Logos with stat", "Logos in cards", "Logos with testimonial", "Split logos" ]),
+        new("Navbars", "/ui-blocks-navbars", "block-navbar-1.svg", 12, "Marketing", [ "Simple navbar", "Navbar with search", "Dark navbar", "Centered navbar", "Navbar with top bar", "Transparent navbar", "Double-deck navbar", "Navbar with auth buttons", "Navbar with dropdown indicators", "Navbar with icon links", "Minimal navbar", "Navbar with dividers" ]),
+        new("Newsletter", "/ui-blocks-newsletter", "block-newsletter-1.svg", 8, "Marketing", [ "Centered newsletter", "Left-aligned with image", "Newsletter banner", "Newsletter in card", "Newsletter with perks", "Newsletter with social proof", "Split newsletter", "Newsletter with app links" ]),
+        new("Onboarding", "/ui-blocks-onboarding", "block-onboarding-1.svg", 4, "Application UI", [ "Steps wizard", "Progress checklist", "Vertical steps", "Welcome panel" ]),
+        new("Orders", "/ui-blocks-orders", "block-order-1.svg", 3, "E-commerce", [ "Order summary", "Order history", "Order tracking" ]),
+        new("Page Headings", "/ui-blocks-page-headings", "block-page-heading-1.svg", 10, "Application UI", [ "Title with actions", "Title with breadcrumbs", "Title with breadcrumbs and actions", "Title with tabs", "Title with meta", "Title with search", "Title with avatar", "Title with stats", "Company header with banner", "Centered profile with banner" ]),
+        new("Pricing", "/ui-blocks-pricing", "block-pricing-1.svg", 8, "Marketing", [ "Pricing cards", "Basic pricing", "Pricing with highlighted plan", "Pricing with toggle", "Pricing comparison table", "Single plan with feature list", "Pricing with FAQ", "Tiered pricing with enterprise CTA" ]),
+        new("Product Cards", "/ui-blocks-product-cards", "block-product-card-1.svg", 6, "E-commerce", [ "Simple product card", "Card with rating", "Card with badges", "Card with add to cart", "Horizontal product card", "Card with quick actions" ]),
+        new("Product Lists", "/ui-blocks-product-lists", "block-product-list-1.svg", 10, "E-commerce", [ "Grid with toolbar", "Product rows", "Collection tiles", "Featured and grid", "Simple grid", "Grid with ratings", "Grid with badges", "Grid with add to cart", "Horizontal cards", "Grid with quick actions" ]),
+        new("Product Overview", "/ui-blocks-product-overview", "block-product-overview-1.svg", 4, "E-commerce", [ "Split overview", "Overview with tabs", "Quick view", "Overview with incentives" ]),
+        new("Reviews", "/ui-blocks-reviews", "block-review-1.svg", 3, "E-commerce", [ "Rating summary", "Review list", "Write a review" ]),
+        new("Shopping Carts", "/ui-blocks-shopping-carts", "block-cart-1.svg", 4, "E-commerce", [ "Cart page", "Cart panel", "Mini cart", "Empty cart" ]),
+        new("Sign-in & Registration", "/ui-blocks-auth", "block-auth-1.svg", 6, "Application UI", [ "Centered sign-in", "Split sign-in", "Registration", "Sign-in with providers", "Forgot password", "Verification code" ]),
+        new("Stats", "/ui-blocks-stats", "block-stats-1.svg", 8, "Marketing", [ "Centered stats", "Stats with description", "Stats in cards", "Stats with dividers", "Stats with trends", "Stats on primary", "Stats with image", "Banded stats" ]),
+        new("Team", "/ui-blocks-team", "block-team-1.svg", 6, "Marketing", [ "Team grid", "Team cards", "Team with bios", "Team with square photos", "Compact team list", "Team with actions" ]),
+        new("Testimonials", "/ui-blocks-testimonials", "block-testimonials-1.svg", 6, "Marketing", [ "Quotes in Carousel", "Quotes on a row", "Quotes in Cards", "Quotes in a CardGroup", "Centered quotes", "Single quote" ]),
+        new("Text & Media", "/ui-blocks-text-and-media", "block-text-media-1.svg", 6, "Marketing", [ "Two-column content", "Content with image", "Centered article", "Content with checklist", "Content with callout", "Content with CTA footer" ]),
+    ];
+
+    IEnumerable<Category> Filtered => categories
+        .Where(c => selectedGroup == "All" || c.Group == selectedGroup)
+        .Where(c => string.IsNullOrWhiteSpace(search)
+            || c.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || c.Items.Any(i => i.Contains(search, StringComparison.OrdinalIgnoreCase)));
+
+    string ChipText(string g) => g == "All"
+        ? $"All {categories.Length}"
+        : $"{g} {categories.Count(c => c.Group == g)}";
+
+    void ClearFilters()
+    {
+        search = string.Empty;
+        selectedGroup = "All";
+    }
+}

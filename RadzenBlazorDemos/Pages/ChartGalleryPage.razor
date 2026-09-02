@@ -15,6 +15,8 @@
     <meta property="twitter:description" content="40+ free Blazor data-visualization components, including 30+ chart types plus gauges, sparklines, treemap and Sankey. Drawn in C# as SVG, no JavaScript charting library." />
 </HeadContent>
 
+<div class="rz-w-100 rz-mx-auto" style="max-width: 1100px;">
+
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Blazor Chart Components
 </RadzenText>
@@ -59,6 +61,15 @@
         width: 100%;
         height: 100%;
     }
+
+    .chart-gallery-thumb {
+        opacity: 0.65;
+        transition: opacity 0.15s;
+    }
+
+    .chart-gallery .rz-link:hover .chart-gallery-thumb {
+        opacity: 1;
+    }
 </style>
 
 @* --- Area Chart --- *@
@@ -69,14 +80,14 @@
     @* Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Area chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V112H20V93Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
 
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Area</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -84,13 +95,13 @@
     @* Range Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/range-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Area chart thumbnail">
                         <path d="M180 75L164 84L148 73L132 92L116 78L100 98L84 83L68 95L52 89L36 98L20 96V93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V75Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Range Area <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Range Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -98,13 +109,13 @@
     @* Step Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/step-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Step Area chart thumbnail">
                         <path d="M20 93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V44.5V39H180V112H20V93Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Step Area <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Step Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -112,13 +123,13 @@
     @* Range Step Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/range-step-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Step Area chart thumbnail">
                         <path d="M180 84H164V73H148V92H132V78H116V98H100V83H84V95H68V89H52V98H36V96H20V93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V39H180V84Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Range Step Area <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Range Step Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -126,14 +137,14 @@
     @* Stacked Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/stacked-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Area chart thumbnail">
                         <path d="M180 75H179.984C179.823 75.0025 179.66 75.0443 179.51 75.1289L164.053 83.8223L147.819 72.6621L131.891 91.5762L115.872 77.5596L99.8936 97.5303L84.0713 82.6963L67.8389 94.8711L52.3516 89.0635L51.915 88.9004L51.5098 89.1289L35.7969 97.9668L20.124 96.0078C20.0896 96.0035 20.0554 96.0008 20.0215 96H20V93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V75Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                         <path d="M163.947 86.1768L180 77.1465V112H20V98.0068L36.2031 100.033L36.4902 99.8711L52.083 91.0996L68.1621 97.1289L68.5996 96.7998L83.9277 85.3027L100.105 100.47L116.128 80.4404L132.108 94.4238L148.181 75.3379L163.947 86.1768Z" fill="var(--rz-series-2)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Stacked Area</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Stacked Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -141,7 +152,7 @@
     @* Full Stacked Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/100-percent-stacked-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Area chart thumbnail">
                         <path d="M163.947 86.1768L180 77.1465V112H20V98.0068L36.2031 100.033L36.4902 99.8711L52.083 91.0996L68.1621 97.1289L68.5996 96.7998L83.9277 85.3027L100.105 100.47L116.128 80.4404L132.108 94.4238L148.181 75.3379L163.947 86.1768Z" fill="var(--rz-series-3)" fill-opacity="0.8"/>
@@ -149,7 +160,7 @@
                         <path d="M180 38C179.778 38 179.555 38.073 179.369 38.2236L163.784 50.8848L148.298 46.0459L147.701 45.8584L131.807 62.7441L115.731 53.7021L99.7812 74.6357L83.9033 63.7197L67.8506 78.7686L51.8291 69.7568L35.4463 86.1387L20 91.9307V20H180V38Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Full Stacked Area <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Full Stacked Area</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -157,13 +168,13 @@
     @* Area Negative Points *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/negative-area-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Area Negative Points chart thumbnail">
                         <path d="M20 80L36 96L52 40L68 100L84 48L100 36L116 88L132 92L148 40L164 88L180 32V65H20L20 80Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Area Negative Points <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Area Negative Points</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -177,7 +188,7 @@
     @* Bar Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/bar-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart thumbnail">
                         <path d="M106 32C107.105 32 108 31.1046 108 30L108 22C108 20.8954 107.105 20 106 20L20 20L20 32L106 32Z" fill="var(--rz-series-1)"/>
@@ -188,7 +199,7 @@
                         <path d="M86 112C87.1046 112 88 111.105 88 110L88 102C88 100.895 87.1046 100 86 100L20 100L20 112L86 112Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Bar</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Bar</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -196,7 +207,7 @@
     @* Range Bar Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/range-bar-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Bar chart thumbnail">
                         <path d="M142 32C143.105 32 144 31.1046 144 30L144 22C144 20.8954 143.105 20 142 20L58 20C56.8954 20 56 20.8954 56 22L56 30C56 31.1046 56.8954 32 58 32L142 32Z" fill="var(--rz-series-1)"/>
@@ -207,7 +218,7 @@
                         <path d="M109 112C110.105 112 111 111.105 111 110L111 102C111 100.895 110.105 100 109 100L45 100C43.8954 100 43 100.895 43 102L43 110C43 111.105 43.8954 112 45 112L109 112Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Range Bar <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Range Bar</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -215,7 +226,7 @@
     @* Stacked Bar Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/stacked-bar-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Bar chart thumbnail">
                         <path d="M85 32V20L20 20L20 32L85 32Z" fill="var(--rz-series-1)"/>
@@ -232,7 +243,7 @@
                         <path d="M86 112C87.1046 112 88 111.105 88 110V102C88 100.895 87.1046 100 86 100L66 100L66 112L86 112Z" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Stacked Bar</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Stacked Bar</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -240,7 +251,7 @@
     @* Full Stacked Bar Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/100-percent-stacked-bar-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Bar chart thumbnail">
                         <path d="M87 32V20L20 20L20 32L87 32Z" fill="var(--rz-series-1)"/>
@@ -263,7 +274,7 @@
                         <path d="M90 112V100L68 100L68 112L90 112Z" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Full Stacked Bar <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Full Stacked Bar</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -271,7 +282,7 @@
     @* Negative Stacked Bar *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/negative-stacked-bar-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Negative Stacked Bar chart thumbnail">
                         <path d="M100 32V20L39 20C37.8954 20 37 20.8954 37 22L37 30C37 31.1046 37.8954 32 39 32L100 32Z" fill="var(--rz-series-1)"/>
@@ -288,7 +299,7 @@
                         <path d="M140 112C141.105 112 142 111.105 142 110V102C142 100.895 141.105 100 140 100L100 100L100 112L140 112Z" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Negative Stacked Bar <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Negative Stacked Bar</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -302,7 +313,7 @@
     @* Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Column chart thumbnail">
                         <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-1)"/>
@@ -315,7 +326,7 @@
                         <path d="M30 79C30 77.8954 30.8954 77 32 77H42C43.1046 77 44 77.8954 44 79V112H30V79Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Column</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -323,7 +334,7 @@
     @* Range Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/range-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Column chart thumbnail">
                         <rect x="156" y="29" width="14" height="75" rx="2" fill="var(--rz-series-1)"/>
@@ -336,7 +347,7 @@
                         <rect x="30" y="51" width="14" height="35" rx="2" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Range Column <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Range Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -344,7 +355,7 @@
     @* Stacked Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/stacked-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Column chart thumbnail">
                         <path d="M30 93H44V112H30L30 93Z" fill="var(--rz-series-1)"/>
@@ -365,7 +376,7 @@
                         <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V66H156V39Z" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Stacked Column</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Stacked Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -373,7 +384,7 @@
     @* Full Stacked Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/100-percent-stacked-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Column chart thumbnail">
                         <path d="M30 91H44V112H30V91Z" fill="var(--rz-series-1)"/>
@@ -402,7 +413,7 @@
                         <rect x="30" y="20" width="14" height="55" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Full Stacked Column <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Full Stacked Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -410,7 +421,7 @@
     @* Histogram *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/histogram-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Histogram chart thumbnail">
                         <path d="M156 91C156 89.8954 156.895 89 158 89H168C169.105 89 170 89.8954 170 91V104H156V91Z" fill="var(--rz-series-1)"/>
@@ -423,7 +434,7 @@
                         <path d="M30 88C30 86.8954 30.8954 86 32 86H42C43.1046 86 44 86.8954 44 88V104H30V88Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Histogram <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Histogram</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -431,7 +442,7 @@
     @* Grouped Column *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/grouped-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grouped Column chart thumbnail">
                         <path d="M168 39C168 37.8954 168.895 37 170 37H180C181.105 37 182 37.8954 182 39V112H168V39Z" fill="var(--rz-series-2)"/>
@@ -444,7 +455,7 @@
                         <path d="M18 72C18 70.8954 18.8954 70 20 70H30C31.1046 70 32 70.8954 32 72V112H18V72Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Grouped Column <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Grouped Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -452,7 +463,7 @@
     @* Column Negative Points *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/negative-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Column Negative Points chart thumbnail">
                         <path d="M102 56C102 54.8954 102.895 54 104 54H114C115.105 54 116 54.8954 116 56V66H102V56Z" fill="var(--rz-series-1)"/>
@@ -465,7 +476,7 @@
                         <path d="M30 46C30 44.8954 30.8954 44 32 44H42C43.1046 44 44 44.8954 44 46V66H30V46Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Column Negative Points <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Column Negative Points</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -479,13 +490,13 @@
     @* Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/line-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Line</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Line</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -493,13 +504,13 @@
     @* Spline Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/spline-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spline chart thumbnail">
                         <path d="M20 93C28 93 28 87 36 87C44 87 44 71 52 71C60 71 60 80 68 80C76 80 76 65 84 65C92 65 92 76 100 76C108 76 108 55 116 55C124 55 124 64 132 64C140 64 140 47 148 47C156 47 156 52 164 52C172 52 172 39 180 39" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Spline <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Spline</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -507,13 +518,13 @@
     @* Step Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/step-line-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Step Line chart thumbnail">
                         <path d="M20 93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V44.5V39H180" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Step Line <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Step Line</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -521,14 +532,14 @@
     @* Stacked Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/stacked-line-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
                         <path d="M20 97L36 99L52 90L68 96L84 84L100 99L116 79L132 93L148 74L164 85L180 76" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Stacked Line <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Stacked Line</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -536,7 +547,7 @@
     @* Full Stacked Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/100-percent-stacked-line-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
@@ -544,7 +555,7 @@
                         <path d="M20 20H180" stroke="var(--rz-series-3)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Full Stacked Line <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Full Stacked Line</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -558,7 +569,7 @@
     @* Waterfall Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/waterfall-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Waterfall chart thumbnail">
                         <rect x="166" y="38" width="12" height="50" fill="var(--rz-success)"/>
@@ -573,7 +584,7 @@
                         <rect x="22" y="90" width="12" height="18" fill="var(--rz-success)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Waterfall <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Waterfall</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -581,7 +592,7 @@
     @* Horizontal Waterfall Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/horizontal-waterfall-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal Waterfall chart thumbnail">
                         <path d="M63 32V20L20 20L20 32L63 32Z" fill="var(--rz-success)"/>
@@ -592,7 +603,7 @@
                         <path d="M148 112V100L20 100L20 112L148 112Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Horizontal Waterfall <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Horizontal Waterfall</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -606,7 +617,7 @@
     @* Pie Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/pie-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pie chart thumbnail">
                         <path d="M145.987 67C145.455 91.9433 125.07 112 99.999 112C87.6559 112 76.4494 107.137 68.1875 99.2246L100.413 67H145.987Z" fill="var(--rz-series-2)"/>
@@ -614,7 +625,7 @@
                         <path d="M99 65.5859L66.7734 97.8115C58.8614 89.5497 54 78.3426 54 66C54 40.9291 74.0567 20.5427 99 20.0107V65.5859Z" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Pie</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Pie</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -622,7 +633,7 @@
     @* Donut Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/donut-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Donut chart thumbnail">
                         <path d="M145.987 67C145.455 91.9433 125.07 112 99.999 112C87.6559 112 76.4494 107.137 68.1875 99.2246L76.6758 90.7363C82.7638 96.4787 90.9696 100 99.999 100C118.442 100 133.454 85.3151 133.983 67H145.987Z" fill="var(--rz-series-2)"/>
@@ -630,7 +641,7 @@
                         <path d="M99 32.0146C80.6848 32.5437 66 47.5568 66 66C66 75.0289 69.52 83.2353 75.2617 89.3232L66.7734 97.8115C58.8614 89.5497 54 78.3426 54 66C54 40.9291 74.0567 20.5427 99 20.0107V32.0146Z" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Donut</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Donut</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -638,7 +649,7 @@
     @* Funnel Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/funnel-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Funnel chart thumbnail">
                         <path d="M157.172 40C157.702 40 158.211 39.7893 158.586 39.4142L166.586 31.4146C167.846 30.1547 166.953 28.0003 165.171 28.0003L34.8285 28.0004C33.0467 28.0004 32.1544 30.1547 33.4143 31.4146L41.4142 39.4142C41.7893 39.7893 42.298 40 42.8284 40L157.172 40Z" fill="var(--rz-series-1)"/>
@@ -648,7 +659,7 @@
                         <path d="M120 103.999C121.105 103.999 122 103.104 122 101.999V93.9998C122 92.8952 121.105 91.9998 120 91.9998L80 92.0003C78.8954 92.0003 78 92.8958 78 94.0003V102C78 103.105 78.8954 104 80 104L120 103.999Z" fill="var(--rz-series-5)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Funnel <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Funnel</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -656,7 +667,7 @@
     @* Pyramid Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/pyramid-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pyramid chart thumbnail">
                         <path d="M164.172 92C164.702 92 165.211 92.2107 165.586 92.5858L173.586 100.585C174.846 101.845 173.953 104 172.171 104L27.8285 104C26.0467 104 25.1544 101.845 26.4143 100.585L34.4142 92.5858C34.7893 92.2107 35.298 92 35.8284 92L164.172 92Z" fill="var(--rz-series-1)"/>
@@ -666,7 +677,7 @@
                         <path d="M100.172 28C100.702 28 101.211 28.2107 101.586 28.5858L109.586 36.5855C110.846 37.8454 109.953 39.9997 108.171 39.9997L91.8285 39.9997C90.0467 39.9997 89.1544 37.8453 90.4143 36.5854L98.4142 28.5858C98.7893 28.2107 99.298 28 99.8284 28L100.172 28Z" fill="var(--rz-series-5)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Pyramid <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Pyramid</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -680,7 +691,7 @@
     @* Scatter Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/scatter-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scatter chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
@@ -694,7 +705,7 @@
                         <circle cx="164" cy="52" r="5" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Scatter</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Scatter</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -702,7 +713,7 @@
     @* Scatter Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/scatter-line-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scatter Line chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
@@ -717,7 +728,7 @@
                         <path d="M36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Scatter Line <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Scatter Line</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -725,7 +736,7 @@
     @* Bubble Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/bubble-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bubble chart thumbnail">
                         <circle cx="32" cy="90" r="12" fill="var(--rz-series-1)" opacity="0.6"/>
@@ -736,7 +747,7 @@
                         <circle cx="165" cy="51" r="15" fill="var(--rz-series-6)" opacity="0.6"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Bubble</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Bubble</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -750,7 +761,7 @@
     @* Candlestick Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/candlestick-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Candlestick chart thumbnail">
                         <rect x="21" y="84" width="12" height="18" fill="var(--rz-danger)"/>
@@ -771,7 +782,7 @@
                         <line x1="174" y1="25" x2="174" y2="75" stroke="var(--rz-success)" stroke-width="2"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Candlestick <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Candlestick</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -779,7 +790,7 @@
     @* OHLC Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/ohlc-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OHLC chart thumbnail">
                         <path d="M29 106H34V108H29V112H27V92H22V90H27V76H29V106Z" fill="var(--rz-danger)"/>
@@ -794,7 +805,7 @@
                         <path d="M45 79H50V81H45V113H43V108H38V106H43V53H45V79Z" fill="var(--rz-success)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">OHLC <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">OHLC</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -802,7 +813,7 @@
     @* High-Low Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/highlow-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="High-Low chart thumbnail">
                         <rect x="170" y="29" width="4" height="75" rx="2" fill="var(--rz-series-1)"/>
@@ -817,7 +828,7 @@
                         <rect x="26" y="47" width="4" height="42" rx="2" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">High-Low <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">High-Low</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -825,7 +836,7 @@
     @* Box Plot Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/box-plot-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Box Plot chart thumbnail">
                         <path d="M33 81C33 82.1046 32.1046 83 31 83H28V87H32C32.5523 87 33 87.4477 33 88C33 88.5523 32.5523 89 32 89H22C21.4477 89 21 88.5523 21 88C21 87.4477 21.4477 87 22 87H26V83H23C21.8954 83 21 82.1046 21 81V70H33V81Z" fill="var(--rz-series-1)"/>
@@ -846,7 +857,7 @@
                         <path d="M179 29C179.552 29 180 29.4477 180 30C180 30.5523 179.552 31 179 31H175V59H178C179.105 59 180 59.8954 180 61V70H168V61C168 59.8954 168.895 59 170 59H173V31H169C168.448 31 168 30.5523 168 30C168 29.4477 168.448 29 169 29H179Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Box Plot <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Box Plot</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -860,7 +871,7 @@
     @* Trendline Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-trends">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trendline chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
@@ -875,7 +886,7 @@
                         <path d="M20 94L180 41" stroke="var(--rz-series-2)" stroke-width="3" stroke-dasharray="8 4"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Trendline <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Trendline</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -883,7 +894,7 @@
     @* Pareto Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/pareto-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pareto chart thumbnail">
                         <path d="M166 102C166 100.895 166.895 100 168 100H176C177.105 100 178 100.895 178 102V112H166V102Z" fill="var(--rz-series-1)"/>
@@ -899,7 +910,7 @@
                         <path d="M28 91L44 81L60 71L76 62L92 54L108 48L124 43L140 38L156 34L172 32" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Pareto <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Pareto</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -907,7 +918,7 @@
     @* DrillDown Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/drilldown-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DrillDown chart thumbnail">
                         <path d="M166 39C166 37.8954 166.895 37 168 37H176C177.105 37 178 37.8954 178 39V112H166V39Z" fill="var(--rz-series-1)"/>
@@ -923,7 +934,7 @@
                         <path d="M107.5 58.5L98.8398 43.5L106 43.5L106 35L109 35L109 43.5L116.16 43.5L107.5 58.5Z" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">DrillDown <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">DrillDown</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -931,7 +942,7 @@
     @* Bullet Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/bullet-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bullet chart thumbnail">
                         <rect opacity="0.2" width="12" height="68" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 88 112)" fill="var(--rz-series-1)"/>
@@ -954,7 +965,7 @@
                         <path d="M86 32L86 20L84 20L84 32L86 32Z" fill="var(--rz-danger)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Bullet <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Bullet</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -962,14 +973,14 @@
     @* Live Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/live-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live Chart chart thumbnail">
                         <path d="M20 73L36 87L52 63L68 96L84 57L100 80L116 39L132 72L148 47L164 84" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M180 39L164 84" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 8"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Live Chart <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Live Chart</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -984,7 +995,7 @@
     @* Heatmap *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/heatmap-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Heatmap chart thumbnail">
                         <rect opacity="0.6" x="118" y="26" width="28" height="24" rx="2" fill="var(--rz-series-1)"/>
@@ -1004,7 +1015,7 @@
                         <rect opacity="0.6" x="22" y="54" width="28" height="24" rx="2" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Heatmap <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Heatmap</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1012,7 +1023,7 @@
     @* Heatmap Series (numeric X/Y) *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/heatmap-series-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Heatmap series chart thumbnail">
                         <rect x="22" y="22" width="32" height="22" rx="2" fill="var(--rz-series-1)" opacity="0.15"/>
@@ -1037,7 +1048,7 @@
                         <rect x="158" y="94" width="20" height="14" rx="2" fill="var(--rz-series-1)" opacity="0.25"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Heatmap Series <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Heatmap Series</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1045,7 +1056,7 @@
     @* Contour (Isoilluminance) *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/contour-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Contour chart thumbnail">
                         <rect x="22" y="18" width="156" height="96" rx="2" fill="var(--rz-series-1)" opacity="0.25"/>
@@ -1059,7 +1070,7 @@
                         <ellipse cx="100" cy="66" rx="20" ry="11" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.75"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Contour <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Contour</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1067,7 +1078,7 @@
     @* Treemap *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/treemap-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Treemap chart thumbnail">
                         <rect x="24" y="26" width="88" height="52" rx="2" fill="var(--rz-series-1)"/>
@@ -1078,7 +1089,7 @@
                         <rect x="128" y="82" width="48" height="24" rx="2" fill="var(--rz-series-6)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Treemap <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Treemap</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1086,7 +1097,7 @@
     @* Sparkline *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/sparkline">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sparkline chart thumbnail">
                         <circle cx="24.5" cy="104.5" r="2.5" fill="var(--rz-series-1)"/>
@@ -1115,7 +1126,7 @@
                         <path d="M56.5 44.7876L40.3867 60.9004C36.4307 56.7695 34 51.1659 34 44.9946C34 32.4592 44.0283 22.266 56.5 22V44.7876Z" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Sparkline</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Sparkline</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1123,7 +1134,7 @@
     @* Spider Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/spider-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spider chart thumbnail">
                         <path d="M150 66L50 66" stroke="var(--rz-chart-axis-color)" stroke-width="2" stroke-linecap="round"/>
@@ -1134,7 +1145,7 @@
                         <path opacity="0.4" d="M121 66L109 50.5L87.5 44.5L81.5 66L89 85L109.5 82.5L121 66Z" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Spider <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Spider</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1142,7 +1153,7 @@
     @* Sankey Diagram *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/sankey-diagram">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sankey Diagram chart thumbnail">
                         <path d="M166 44H176C177.105 44 178 44.8954 178 46V87C178 88.1046 177.105 89 176 89H166V44Z" fill="var(--rz-series-4)"/>
@@ -1156,7 +1167,7 @@
                         <path opacity="0.3" d="M34.0006 20C100.001 20 100.001 44 166.001 44V57C100.001 57 100 34 34 34L34.0006 20Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Sankey Diagram</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Sankey Diagram</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1164,7 +1175,7 @@
     @* Timeline *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/timeline">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline chart thumbnail">
                         <path d="M172 66L28 66" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1176,7 +1187,7 @@
                         <circle cx="144.5" cy="91.5" r="10.5" fill="var(--rz-series-3)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Timeline</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Timeline</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1184,7 +1195,7 @@
     @* QRCode *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/qrcode">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QRCode chart thumbnail">
                         <rect x="56" y="22" width="24" height="24" rx="2" fill="var(--rz-series-1)"/>
@@ -1208,7 +1219,7 @@
                         <rect x="120" y="22" width="24" height="24" rx="2" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">QRCode <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">QRCode</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1216,7 +1227,7 @@
     @* Barcode *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/barcode">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barcode chart thumbnail">
                         <rect x="24" y="22" width="4" height="88" fill="var(--rz-series-1)"/>
@@ -1242,7 +1253,7 @@
                         <path d="M102 22H106V102H102L102 22Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Barcode <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Barcode</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1250,7 +1261,7 @@
     @* Radar Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/radar-column-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radar Column chart thumbnail">
                         <circle cx="100" cy="66" r="42.5" stroke="var(--rz-chart-axis-color)" stroke-width="1"/>
@@ -1266,7 +1277,7 @@
                         <path d="M79.0545 69.6754L100 65.9541L86.3045 82.2328L79.0545 69.6754Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Radar Column <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Radar Column</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1280,14 +1291,14 @@
     @* Arc Gauge *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/arc-gauge">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arc Gauge chart thumbnail">
                         <path d="M100 26C144.183 26 180 61.8172 180 106H169C169 67.8924 138.108 37 100 37C61.8924 37 31 67.8924 31 106H20C20 61.8172 55.8172 26 100 26Z" fill="var(--rz-chart-axis-color)"/>
 <path d="M100 26C107.176 26 114.13 26.9459 120.747 28.7178L117.899 39.3447C112.191 37.8156 106.191 37 100 37C61.8924 37 31 67.8924 31 106H20C20 61.8172 55.8172 26 100 26Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Arc Gauge</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Arc Gauge</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1295,7 +1306,7 @@
     @* Linear Gauge *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/linear-gauge">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linear Gauge chart thumbnail">
                         <rect width="12" height="160" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 180 72)" fill="var(--rz-chart-axis-color)"/>
@@ -1303,7 +1314,7 @@
                         <path d="M124 78H116L120 73L124 78Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Linear Gauge <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Linear Gauge</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1311,7 +1322,7 @@
     @* Radial Gauge *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/radial-gauge">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radial Gauge chart thumbnail">
                         <path d="M100 20C136.451 20 166 49.5492 166 86C166 95.0983 164.158 103.766 160.828 111.652L150.678 107.406C153.46 100.827 155 93.5932 155 86C155 55.6243 130.376 31 100 31C69.6243 31 45 55.6243 45 86C45 93.4566 46.4843 100.566 49.1729 107.051L39.0225 111.296C35.787 103.505 34 94.9614 34 86C34 49.5492 63.5492 20 100 20Z" fill="var(--rz-chart-axis-color)"/>
@@ -1319,7 +1330,7 @@
                         <path d="M123.108 47L100.014 87.0003" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Radial Gauge</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Radial Gauge</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1327,7 +1338,7 @@
     @* Styling Gauge *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/styling-gauge">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Styling Gauge chart thumbnail">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M100 20C125.405 20 146 40.5949 146 66C146 91.4051 125.405 112 100 112C74.5949 112 54 91.4051 54 66C54 40.5949 74.5949 20 100 20ZM100 31C80.67 31 65 46.67 65 66C65 85.33 80.67 101 100 101C119.33 101 135 85.33 135 66C135 46.67 119.33 31 100 31Z" fill="#F92063" opacity="0.4" />
@@ -1338,7 +1349,7 @@
                         <path d="M100.001 42C113.256 42 124.001 52.7452 124.001 66C124.001 79.2548 113.256 90 100.001 90C90.3626 90 82.0522 84.3179 78.2344 76.1211L88.2109 71.4814C90.2788 75.9217 94.7799 79 100.001 79C107.181 79 113.001 73.1797 113.001 66C113.001 58.8203 107.181 53 100.001 53V42Z" fill="#00FDEA"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Styling Gauge</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Styling Gauge</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1352,7 +1363,7 @@
     @* Zoom and Pan *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/zoom-pan-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zoom and Pan chart thumbnail">
                         <path d="M164 46C154.711 46 145 62 132 62M36 70C49 70 55 80 68 80C75.8181 80 81.1044 69.1499 86.9042 60.5" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
@@ -1360,7 +1371,7 @@
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M110 32C123.807 32 135 43.1929 135 57C135 63.1836 132.753 68.8408 129.033 73.2051L152.284 96.4551L149.456 99.2842L126.205 76.0332C121.841 79.7526 116.184 82 110 82C96.1929 82 85 70.8071 85 57C85 43.1929 96.1929 32 110 32ZM110 36C98.402 36 89 45.402 89 57C89 68.598 98.402 78 110 78C121.598 78 131 68.598 131 57C131 45.402 121.598 36 110 36Z" fill="var(--rz-chart-axis-label-color)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Zoom and Pan <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Zoom and Pan</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1368,7 +1379,7 @@
     @* Range Navigator *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/range-navigator">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Navigator chart thumbnail">
                         <path d="M172 36C164 36 164 41 156 41C148 41 148 36 140 36C132 36 132 49 124 49C116 49 116 40 108 40C100 40 100 57 92 57C84 57 84 46 76 46C68 46 68 57 60 57C52 57 52 48 44 48C36 48 36 64 28 64" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
@@ -1383,7 +1394,7 @@
                         <circle cx="51.5" cy="98.5" r="2.5" fill="var(--rz-chart-axis-color)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Range Navigator <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Range Navigator</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1397,7 +1408,7 @@
     @* Series *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-series">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Series chart thumbnail">
                         <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-8)"/>
@@ -1410,7 +1421,7 @@
                         <path d="M30 79C30 77.8954 30.8954 77 32 77H42C43.1046 77 44 77.8954 44 79V112H30V79Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Series</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Series</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1418,7 +1429,7 @@
     @* Axis *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-axis">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Axis chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1430,7 +1441,7 @@
                         <path d="M164 39C156 39 156 52 148 52C140 52 140 47 132 47C124 47 124 64 116 64C108 64 108 55 100 55C92 55 92 76 84 76C76 76 76 65 68 65C60 65 60 80 52 80C44 80 44 71 36 71" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Axis</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Axis</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1438,7 +1449,7 @@
     @* Multiple Axes *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/multiple-axes-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Multiple Axes chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1452,7 +1463,7 @@
                         <path d="M40 71C48 71 48 80 56 80C64 80 64 65 72 65C80 65 80 76 88 76C96 76 96 55 104 55C112 55 112 64 120 64C128 64 128 47 136 47" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Multiple Axes <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Multiple Axes</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1460,7 +1471,7 @@
     @* Inverted Axis *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/inverted-axis-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Inverted Axis chart thumbnail">
                         <path d="M178 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1472,7 +1483,7 @@
                         <path d="M164 39C156 39 156 52 148 52C140 52 140 47 132 47C124 47 124 64 116 64C108 64 108 55 100 55C92 55 92 76 84 76C76 76 76 65 68 65C60 65 60 80 52 80C44 80 44 71 36 71" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Inverted Axis <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Inverted Axis</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1480,7 +1491,7 @@
     @* Axis Crossing *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/axis-crossing-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Axis Crossing chart thumbnail">
                         <path d="M100 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1492,7 +1503,7 @@
                         <path d="M164 39C156 39 156 52 148 52C140 52 140 47 132 47C124 47 124 64 116 64C108 64 108 55 100 55C92 55 92 76 84 76C76 76 76 65 68 65C60 65 60 80 52 80C44 80 44 71 36 71" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Axis Crossing <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Axis Crossing</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1500,7 +1511,7 @@
     @* Logarithmic Axis *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/logarithmic-axis-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logarithmic Axis chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1512,7 +1523,7 @@
                         <path d="M163 36L132 43L100.001 55.0001L68.001 73.0002L36 96.0002" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Logarithmic Axis <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Logarithmic Axis</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1520,7 +1531,7 @@
     @* Indexed Category Axis *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/indexed-category-axis-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Indexed Category Axis chart thumbnail">
                         <path d="M168 31C168 29.8954 168.895 29 170 29H180C181.105 29 182 29.8954 182 31V100H168L168 31Z" fill="var(--rz-series-2)"/>
@@ -1537,7 +1548,7 @@
                         <path d="M157 108H175" stroke="var(--rz-chart-axis-label-color)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Indexed Category Axis <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" Style="vertical-align: text-top;" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Indexed Category Axis</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1545,7 +1556,7 @@
     @* Legend *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-legend">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Legend chart thumbnail">
                     <path d="M20 77L36 71L52 55L68 64L84 49L100 60L116 39L132 48L148 31L164 36L180 23" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
@@ -1557,7 +1568,7 @@
                     <circle cx="114.5" cy="107.5" r="4.5" fill="var(--rz-series-2)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Legend</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Legend</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1565,7 +1576,7 @@
     @* ToolTip *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-tooltip">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ToolTip chart thumbnail">
 <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-1)" opacity="0.4"/>
@@ -1579,7 +1590,7 @@
 <path d="M70 43C70 41.3431 71.3431 40 73 40H109C110.657 40 112 41.3431 112 43V55C112 56.6569 110.657 58 109 58H96.4419C95.5305 58 94.6686 58.4143 94.0993 59.1259L91 63L87.9007 59.1259C87.3314 58.4143 86.4695 58 85.5581 58H73C71.3431 58 70 56.6569 70 55V43Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">ToolTip</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">ToolTip</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1587,7 +1598,7 @@
     @* Label Rotation *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-label-rotation">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Label Rotation chart thumbnail">
                         <path opacity="0.3" d="M22 87H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1602,7 +1613,7 @@
                         <path d="M156 104.864L164.485 96.379" stroke="var(--rz-chart-axis-label-color)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Label Rotation</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Label Rotation</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1610,7 +1621,7 @@
     @* Interpolation *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-interpolation">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interpolation chart thumbnail">
                         <path d="M20 101H36V95H52V79H68V88H84V73H100V84H116V63H132V72H148V55H164V52.5V47H180V112H20V101Z" fill="var(--rz-series-2)" fill-opacity="0.3"/>
@@ -1618,7 +1629,7 @@
                         <path d="M20 109H36V103H52M180 63H164V68.5V71H148M84 85H100V92H116V75H132" stroke="var(--rz-series-3)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Interpolation</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Interpolation</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1626,7 +1637,7 @@
     @* Annotations *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-annotations">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotations chart thumbnail">
                     <path d="M20 81L36 75L52 59L68 68L84 53L100 64L116 43L132 52L148 35L164 40L180 27" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
@@ -1635,7 +1646,7 @@
                     <circle cx="148" cy="74" r="5" fill="var(--rz-chart-axis-label-color)"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Annotations</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Annotations</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
@@ -1643,7 +1654,7 @@
     @* Styling Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/styling-chart">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Styling Chart chart thumbnail">
                         <path d="M156 42C156 40.8954 156.895 40 158 40H168C169.105 40 170 40.8954 170 42V112H156V42Z" fill="#FFA600"/>
@@ -1656,9 +1667,9 @@
                         <path d="M30 72C30 70.8954 30.8954 70 32 70H42C43.1046 70 44 70.8954 44 72V112H30V72Z" fill="#003F5C"/>
                     </svg>
                 </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Styling Chart</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Styling Chart</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
 </RadzenRow>
-
+</div>

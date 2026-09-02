@@ -1,0 +1,213 @@
+@page "/ui-blocks-navbars"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Navbar blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A navbar block is the website header: brand, navigation links, and the primary call-to-action. Unlike an app shell header, it is built for marketing sites and landing pages. All blocks rearrange responsively: on narrow screens the brand and actions stay on the first row and the navigation reflows below them.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-navbars#simple-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Simple navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block with brand, links, and a call-to-action button. Below the md breakpoint the links move to a second row.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/simple-navbar" Title="Simple navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-search" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with search
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block with a search box and account actions, typical for a storefront. On narrow screens the search takes its own full-width row.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/navbars/navbar-with-search" Title="Navbar with search" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#dark-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Dark navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block on a dark background with sign-in and trial actions. The links reflow below the brand on narrow screens.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <UIBlock Path="/navbars/dark-navbar" Title="Dark navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#centered-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Centered navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A two-row navbar block with the brand centered above the navigation. Links wrap naturally on narrow screens.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/centered-navbar" Title="Centered navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-top-bar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with top bar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block with a slim utility strip for contact details above the main navigation.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/navbar-with-top-bar" Title="Navbar with top bar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#transparent-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Transparent navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block overlaying a hero image with light text.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Image">
+                <UIBlock Path="/navbars/transparent-navbar" Title="Transparent navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#double-deck-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Double-deck navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A storefront navbar block with brand, search, and account on the first row and categories on the second.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/double-deck-navbar" Title="Double-deck navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-auth-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with auth buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block with sign-in and sign-up actions.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/navbar-with-auth-buttons" Title="Navbar with auth buttons" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-dropdown-indicators" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with dropdown indicators
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block whose sections expand into menus, shown with chevron indicators.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/navbar-with-dropdown-indicators" Title="Navbar with dropdown indicators" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-icon-links" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with icon links
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block with leading icons on each navigation link.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/navbars/navbar-with-icon-links" Title="Navbar with icon links" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#minimal-navbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Minimal navbar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A navbar block reduced to brand, one action, and a menu button.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/navbars/minimal-navbar" Title="Minimal navbar" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-navbars#navbar-with-dividers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navbar with dividers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A dark navbar block with link groups separated by vertical dividers and utility icons.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <UIBlock Path="/navbars/navbar-with-dividers" Title="Navbar with dividers" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

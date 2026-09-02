@@ -1,0 +1,78 @@
+@page "/ui-blocks-activity-feeds"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Activity Feed blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    An activity feed block shows what happened and when: notifications, audit events, or team comments. Timeline connectors and unread markers help users scan for what needs attention.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-activity-feeds#activity-timeline" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Activity timeline
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    An activity block with icons on a connected timeline.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/activity-feeds/activity-timeline" Title="Activity timeline" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-activity-feeds#notification-list" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Notification list
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A notification block with unread indicators and a mark-all-read action.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/activity-feeds/notification-list" Title="Notification list" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-activity-feeds#comment-feed" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Comment feed
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A discussion block with avatars, timestamps, and a reply box.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/activity-feeds/comment-feed" Title="Comment feed" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-activity-feeds#audit-log" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Audit log
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A compact audit block with dates grouped and events aligned in rows.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/activity-feeds/audit-log" Title="Audit log" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+

@@ -1,0 +1,77 @@
+@page "/ui-blocks-checkout"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Checkout blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A checkout block collects shipping and payment details with as little friction as possible, keeps the order visible, and ends with a clear confirmation.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-checkout#split-checkout" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Split checkout
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A checkout block with the form to the left and the order summary to the right.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/checkout/split-checkout" Title="Split checkout" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-checkout#steps-checkout" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Steps checkout
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A checkout block split into shipping, payment, and review steps.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/checkout/steps-checkout" Title="Steps checkout" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-checkout#payment-methods" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Payment methods
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A checkout block for choosing how to pay.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <UIBlock Path="/checkout/payment-methods" Title="Payment methods" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-checkout#order-confirmation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Order confirmation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A thank-you block with the order number and what happens next.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <UIBlock Path="/checkout/order-confirmation" Title="Order confirmation" />
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
