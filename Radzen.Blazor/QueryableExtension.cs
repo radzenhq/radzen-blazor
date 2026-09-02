@@ -33,6 +33,29 @@ namespace Radzen
         static Expression notNullCheck(Expression property) => Nullable.GetUnderlyingType(property.Type) != null || property.Type == typeof(string) ?
             Expression.Coalesce(property, property.Type == typeof(string) ? Expression.Constant(string.Empty) : Expression.Constant(null, property.Type)) : property;
 
+        static bool IsNullOrEmptyOperator(FilterOperator filterOperator) =>
+            filterOperator == FilterOperator.IsNull || filterOperator == FilterOperator.IsNotNull ||
+            filterOperator == FilterOperator.IsEmpty || filterOperator == FilterOperator.IsNotEmpty;
+
+        static Expression? EnumerableIsEmpty(Expression collection, Type? elementType)
+        {
+            if (elementType == null || !IsEnumerable(collection.Type))
+            {
+                return null;
+            }
+
+            return Expression.OrElse(
+                Expression.Equal(collection, Expression.Constant(null, collection.Type)),
+                Expression.Not(Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { elementType }, collection)));
+        }
+
+        static Expression EnumerableAnyOrAll(Expression collection, Type elementType, LambdaExpression predicate, bool all = false)
+        {
+            return Expression.AndAlso(
+                Expression.NotEqual(collection, Expression.Constant(null, collection.Type)),
+                Expression.Call(typeof(Enumerable), all ? nameof(Enumerable.All) : nameof(Enumerable.Any), new Type[] { elementType }, collection, predicate));
+        }
+
         [RequiresUnreferencedCode(ReflectionWarning)]
         static IList? NormalizeFilterValues(object? value, Type targetType)
         {
@@ -830,13 +853,17 @@ namespace Radzen
             var propertyName = !isEnumerable && !IsEnumerable(p.Type) ? (!string.IsNullOrWhiteSpace(filter.FilterProperty) ? filter.FilterProperty : filter.Property) : filter.Property;
             Expression property = !string.IsNullOrEmpty(propertyName) ? GetNestedPropertyExpression(parameter, propertyName, type) : Expression.Constant(null);
 
-            // An array is enumerable but not generic, so asking only for generic arguments left an array
-            // property with no item type - and the filter was then built against the array itself,
-            // which throws ("the binary operator Equal is not defined for Int32[] and Int32").
             Type? collectionItemType = !IsEnumerable(property.Type) ? null
                 : property.Type.IsGenericType ? property.Type.GetGenericArguments()[0]
                 : property.Type.IsArray ? property.Type.GetElementType()
                 : null;
+
+            var collectionElementType = collectionItemType;
+
+            if (collectionItemType != null && string.IsNullOrEmpty(filter.FilterProperty) && IsNullOrEmptyOperator(filter.FilterOperator))
+            {
+                collectionItemType = null;
+            }
 
             ParameterExpression? collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 
@@ -971,8 +998,8 @@ namespace Radzen
                 FilterOperator.EndsWith => Expression.Call(notNullCheck(property), StringEndsWith, constant),
                 FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
                 FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
-                FilterOperator.IsEmpty => Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
-                FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
+                FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) is { } isEmpty ? Expression.Not(isEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                 _ => null
             };
 
@@ -986,8 +1013,8 @@ namespace Radzen
         {
             if (filter.Property != null)
             {
-                primaryExpression = Expression.Call(typeof(Enumerable), filter.CollectionFilterMode == CollectionFilterMode.Any ? nameof(Enumerable.Any) : nameof(Enumerable.All), new Type[] { collectionItemType! },
-                    GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter!));
+                primaryExpression = EnumerableAnyOrAll(GetNestedPropertyExpression(parameter, filter.Property), collectionItemType!,
+                    Expression.Lambda(primaryExpression, collectionItemTypeParameter!), filter.CollectionFilterMode == CollectionFilterMode.All);
             }
             }
 
@@ -1023,8 +1050,8 @@ namespace Radzen
                     FilterOperator.EndsWith => Expression.Call(notNullCheck(property), StringEndsWith, secondConstant!),
                     FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
                     FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
-                    FilterOperator.IsEmpty => Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
-                    FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
+                    FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                    FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) is { } secondIsEmpty ? Expression.Not(secondIsEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                     _ => null
                 };
 
@@ -1039,8 +1066,8 @@ namespace Radzen
         {
             if (filter.Property != null)
             {
-                secondExpression = Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType! },
-                    GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(secondExpression, collectionItemTypeParameter!));
+                secondExpression = EnumerableAnyOrAll(GetNestedPropertyExpression(parameter, filter.Property), collectionItemType!,
+                    Expression.Lambda(secondExpression, collectionItemTypeParameter!));
             }
             }
 

@@ -1681,6 +1681,134 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Where_FiltersArrayValuedProperty_SkipsNullCollections()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Codes = new[] { 10, 20 } },
+                new { Id = 2, Codes = (int[])null },
+                new { Id = 3, Codes = new[] { 20, 40 } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Codes", FilterValue = 20, FilterOperator = FilterOperator.Equals }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.DoesNotContain(result, r => r.Id == 2);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_SkipsNullCollections_AnyAndAll()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new List<TestTag> { new TestTag { Name = "tag1" }, new TestTag { Name = "tag1" } } },
+                new { Id = 2, Tags = (List<TestTag>)null },
+                new { Id = 3, Tags = new List<TestTag> { new TestTag { Name = "tag1" }, new TestTag { Name = "tag2" } } }
+            }.AsQueryable();
+
+            var any = testData.Where(new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Tags", FilterProperty = "Name", FilterValue = "tag1", FilterOperator = FilterOperator.Equals, CollectionFilterMode = CollectionFilterMode.Any }
+            }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            var all = testData.Where(new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Tags", FilterProperty = "Name", FilterValue = "tag1", FilterOperator = FilterOperator.Equals, CollectionFilterMode = CollectionFilterMode.All }
+            }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(new[] { 1, 3 }, any.Select(r => r.Id));
+            Assert.Equal(new[] { 1 }, all.Select(r => r.Id));
+        }
+
+        [Theory]
+        [InlineData(FilterOperator.IsNull, new[] { 2 })]
+        [InlineData(FilterOperator.IsNotNull, new[] { 1, 3, 4 })]
+        [InlineData(FilterOperator.IsEmpty, new[] { 2, 3 })]
+        [InlineData(FilterOperator.IsNotEmpty, new[] { 1, 4 })]
+        public void Where_FiltersArrayValuedProperty_NullAndEmptyOperatorsTestTheCollection(FilterOperator filterOperator, int[] expected)
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Codes = new[] { 10, 20 } },
+                new { Id = 2, Codes = (int[])null },
+                new { Id = 3, Codes = new int[0] },
+                new { Id = 4, Codes = new[] { 30 } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Codes", FilterOperator = filterOperator }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Theory]
+        [InlineData(FilterOperator.IsNull, new[] { 2 })]
+        [InlineData(FilterOperator.IsNotNull, new[] { 1, 3, 4 })]
+        [InlineData(FilterOperator.IsEmpty, new[] { 2, 3 })]
+        [InlineData(FilterOperator.IsNotEmpty, new[] { 1, 4 })]
+        public void Where_FiltersListValuedProperty_NullAndEmptyOperatorsTestTheCollection(FilterOperator filterOperator, int[] expected)
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new List<TestTag> { new TestTag { Name = "tag1" } } },
+                new { Id = 2, Tags = (List<TestTag>)null },
+                new { Id = 3, Tags = new List<TestTag>() },
+                new { Id = 4, Tags = new List<TestTag> { new TestTag { Name = null } } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Tags", FilterOperator = filterOperator }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithIsNull_AsSecondFilter_SkipsNullCollections()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new List<TestTag> { new TestTag { Name = "tag1" }, new TestTag { Name = null } } },
+                new { Id = 2, Tags = (List<TestTag>)null },
+                new { Id = 3, Tags = new List<TestTag> { new TestTag { Name = "tag3" } } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "tag3",
+                    FilterOperator = FilterOperator.Equals,
+                    SecondFilterOperator = FilterOperator.IsNull,
+                    LogicalFilterOperator = LogicalFilterOperator.Or
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(new[] { 1, 3 }, result.Select(r => r.Id));
+        }
+
+        public class TestTag
+        {
+            public string Name { get; set; }
+        }
+
+        [Fact]
         public void Where_FiltersNestedCollectionItemProperty()
         {
             var testData = new[]

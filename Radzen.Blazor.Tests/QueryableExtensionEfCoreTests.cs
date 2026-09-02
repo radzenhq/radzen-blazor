@@ -17,11 +17,26 @@ namespace Radzen.Blazor.Tests
             public string Name { get; set; }
         }
 
+        public class Order
+        {
+            public int Id { get; set; }
+            public List<OrderLine> Lines { get; set; }
+        }
+
+        public class OrderLine
+        {
+            public int Id { get; set; }
+            public int OrderId { get; set; }
+            public string Product { get; set; }
+        }
+
         class TestDbContext : DbContext
         {
             public TestDbContext(DbContextOptions options) : base(options) { }
 
             public DbSet<Client> Clients { get; set; }
+            public DbSet<Order> Orders { get; set; }
+            public DbSet<OrderLine> OrderLines { get; set; }
         }
 
         static TestDbContext CreateContext()
@@ -42,9 +57,71 @@ namespace Radzen.Blazor.Tests
                 new Client { Id = 3, ClientNr = 300, Nr = 300, Name = "c" },
                 new Client { Id = 4, ClientNr = null, Nr = 400, Name = null });
 
+            context.Orders.AddRange(
+                new Order { Id = 1, Lines = new List<OrderLine> { new OrderLine { Id = 1, Product = "apple" }, new OrderLine { Id = 2, Product = "pear" } } },
+                new Order { Id = 2, Lines = new List<OrderLine>() },
+                new Order { Id = 3, Lines = new List<OrderLine> { new OrderLine { Id = 3, Product = "apple" } } });
+
             context.SaveChanges();
 
             return context;
+        }
+
+        [Theory]
+        [InlineData(CollectionFilterMode.Any, new[] { 1, 3 })]
+        [InlineData(CollectionFilterMode.All, new[] { 2, 3 })]
+        public void Where_CollectionItemProperty_TranslatesToSql(CollectionFilterMode mode, int[] expected)
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Lines", FilterProperty = "Product", FilterValue = "apple", FilterOperator = FilterOperator.Equals, CollectionFilterMode = mode }
+            };
+
+            var query = context.Orders.AsQueryable().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default);
+            var sql = query.ToQueryString();
+            var result = query.OrderBy(o => o.Id).ToList();
+
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Theory]
+        [InlineData(FilterOperator.IsEmpty, new[] { 2 })]
+        [InlineData(FilterOperator.IsNotEmpty, new[] { 1, 3 })]
+        [InlineData(FilterOperator.IsNotNull, new[] { 1, 2, 3 })]
+        [InlineData(FilterOperator.IsNull, new int[0])]
+        public void Where_CollectionProperty_NullAndEmptyOperators_TranslateToSql(FilterOperator filterOperator, int[] expected)
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Lines", FilterOperator = filterOperator }
+            };
+
+            var query = context.Orders.AsQueryable().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default);
+            var sql = query.ToQueryString();
+            var result = query.OrderBy(o => o.Id).ToList();
+
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Fact]
+        public void Where_CollectionItemProperty_In_TranslatesToSql()
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Lines", FilterProperty = "Product", FilterValue = new[] { "pear" }, FilterOperator = FilterOperator.In }
+            };
+
+            var query = context.Orders.AsQueryable().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default);
+            var sql = query.ToQueryString();
+            var result = query.ToList();
+
+            Assert.Equal(new[] { 1 }, result.Select(r => r.Id));
         }
 
         [Fact]
