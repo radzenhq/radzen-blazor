@@ -7338,6 +7338,42 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     } catch { }
   };
 
+  var onEmojiInput = function (e) {
+    if (!e || e.inputType !== 'insertText' || e.data !== ':') return;
+    var sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed) return;
+    var node = sel.anchorNode;
+    if (!node || node.nodeType !== Node.TEXT_NODE || !editable.contains(node)) return;
+    for (var el = node.parentNode; el && el !== editable; el = el.parentNode) {
+      if (el.tagName === 'CODE' || el.tagName === 'PRE') return; // parser skips shortcodes in code
+    }
+    var match = node.data.substring(0, sel.anchorOffset).match(/:([A-Za-z0-9_+-]+):$/);
+    if (!match) return;
+    var start = sel.anchorOffset - match[0].length;
+    var shortcode = match[0];
+    try {
+      suppressDisposed(instance.invokeMethodAsync('LookupEmojiAsync', match[1]).then(function (emoji) {
+        // the lookup is async: bail out if the surface changed underneath it
+        if (!emoji || node.data.substring(start, start + shortcode.length) !== shortcode) return;
+        editor.snapshot(true); // its own history entry, so undo restores the shortcode text
+        var caret = window.getSelection();
+        var caretNode = caret.rangeCount ? caret.anchorNode : null;
+        var caretOffset = caret.rangeCount ? caret.anchorOffset : 0;
+        node.replaceData(start, shortcode.length, emoji);
+        if (caretNode === node) {
+          var end = start + shortcode.length;
+          var offset = caretOffset >= end ? caretOffset - shortcode.length + emoji.length
+            : caretOffset > start ? start + emoji.length : caretOffset;
+          var range = document.createRange();
+          range.setStart(node, Math.min(offset, node.length));
+          range.collapse(true);
+          setRange(range);
+        }
+        onInput();
+      }));
+    } catch { }
+  };
+
   editor.setContent = function (html) {
     clearTimeout(inputTimeout);
     dirty = false;
@@ -7704,6 +7740,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   editable.addEventListener('paste', onPaste);
   editable.addEventListener('input', onInput);
+  editable.addEventListener('input', onEmojiInput);
   editable.addEventListener('blur', onBlur);
   editable.addEventListener('keydown', onKeyDown);
   textarea.addEventListener('keydown', onKeyDown);
@@ -7715,6 +7752,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     clearTimeout(stateTimeout);
     editable.removeEventListener('paste', onPaste);
     editable.removeEventListener('input', onInput);
+    editable.removeEventListener('input', onEmojiInput);
     editable.removeEventListener('blur', onBlur);
     editable.removeEventListener('keydown', onKeyDown);
     textarea.removeEventListener('keydown', onKeyDown);
