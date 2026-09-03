@@ -674,42 +674,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-selectable {
   tbody {
     tr.rz-data-row {
-      td,
-      .rz-cell-data {
-        transition: background-color var(--rz-transition), color var(--rz-transition);
-
-        &.rz-frozen-cell {
-          &:before,
-          &:after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            transition: background-color var(--rz-transition), color var(--rz-transition);
-          }
-        }
-
-        &.rz-frozen-cell-left,
-        &.rz-frozen-cell-left-inner {
-          &:before {
-            z-index: -1;
-          }
-
-          &:after {
-            z-index: -2;
-          }
-        }
-
-        &.rz-frozen-cell-right,
-        &.rz-frozen-cell-right-inner {
-          &:before {
-            z-index: -2;
-          }
-
-          &:after {
-            z-index: -1;
-          }
-        }
-      }
 
       &.rz-state-highlight {
         > td {
@@ -787,6 +751,43 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-grid-table {
   tbody {
     tr.rz-data-row {
+      td,
+      .rz-cell-data {
+        transition: background-color var(--rz-transition), color var(--rz-transition);
+
+        &.rz-frozen-cell {
+          &:before,
+          &:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transition: background-color var(--rz-transition), color var(--rz-transition);
+          }
+        }
+
+        &.rz-frozen-cell-left,
+        &.rz-frozen-cell-left-inner {
+          &:before {
+            z-index: -1;
+          }
+
+          &:after {
+            z-index: -2;
+          }
+        }
+
+        &.rz-frozen-cell-right,
+        &.rz-frozen-cell-right-inner {
+          &:before {
+            z-index: -2;
+          }
+
+          &:after {
+            z-index: -1;
+          }
+        }
+      }
+
       &.rz-state-focused {
         > td {
           background-color: var(--rz-grid-cell-focus-background-color);
