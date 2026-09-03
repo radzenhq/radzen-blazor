@@ -2131,10 +2131,21 @@ window.Radzen = {
         bottom: ['bottom', 'top', 'right', 'left']
       }[position] || [position];
 
+      var tooltipContent = popup.children[0];
+      var tooltipSide = position;
+      var setTooltipSide = function (side) {
+        if (side == tooltipSide || !tooltipContent || !tooltipContent.classList.contains('rz-' + tooltipSide + '-tooltip-content')) return;
+        tooltipContent.classList.remove('rz-' + tooltipSide + '-tooltip-content');
+        tooltipContent.classList.add('rz-' + side + '-tooltip-content');
+        tooltipSide = side;
+        rect = popup.getBoundingClientRect();
+      };
+
       var resolvedPosition = null;
       var placement = null;
 
       for (var pi = 0; pi < fallbackOrder.length; pi++) {
+        setTooltipSide(fallbackOrder[pi]);
         var candidate = tooltipPlacement(fallbackOrder[pi]);
         if (tooltipFits(candidate)) {
           resolvedPosition = fallbackOrder[pi];
@@ -2144,6 +2155,7 @@ window.Radzen = {
       }
 
       if (!placement) {
+        setTooltipSide(position);
         resolvedPosition = position;
         placement = tooltipPlacement(position);
         placement.left = Math.max(0, Math.min(placement.left, window.innerWidth - rect.width));
@@ -2154,12 +2166,6 @@ window.Radzen = {
       top = placement.top;
 
       if (resolvedPosition != position) {
-        var tooltipContent = popup.children[0];
-        var previousClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent && tooltipContent.classList.contains(previousClassName)) {
-          tooltipContent.classList.remove(previousClassName);
-          tooltipContent.classList.add('rz-' + resolvedPosition + '-tooltip-content');
-        }
         position = resolvedPosition;
         if (instance && callback) {
           try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
