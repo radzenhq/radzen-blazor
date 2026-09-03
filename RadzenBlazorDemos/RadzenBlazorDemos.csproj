@@ -72,10 +72,6 @@
       <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net10.0\</LlmsTxtToolDir>
       <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>
       <LlmsTxtToolExe Condition="'$(OS)' != 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools</LlmsTxtToolExe>
-      <!-- Release builds use the published package (no source build); reflect over its XML doc. -->
-      <RadzenBlazorXmlDoc Condition="'$(Configuration)' == 'Release'">$(PkgRadzen_Blazor)/lib/net10.0/Radzen.Blazor.xml</RadzenBlazorXmlDoc>
-      <RadzenBlazorXmlDoc Condition="'$(Configuration)' != 'Release'">$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net8.0\Radzen.Blazor.xml</RadzenBlazorXmlDoc>
-      <RadzenBlazorSourceDir>$(MSBuildThisFileDirectory)..\Radzen.Blazor\</RadzenBlazorSourceDir>
     </PropertyGroup>
     
     <Message Text="Generating llms.txt and component .md files..." Importance="high" />
@@ -85,8 +81,8 @@
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolPath)')" />
     
-    <!-- Run the tool: <outputDir> <pagesPath> <exampleServicePath> [xmlDocPath] [sourceDir] -->
-    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputDir)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services\ExampleService.cs&quot; &quot;$(RadzenBlazorXmlDoc)&quot; &quot;$(RadzenBlazorSourceDir)&quot;"
+    <!-- Run the tool: <outputDir> <pagesPath> <exampleServicePath>. API reference twins under <outputDir>/md/docs/api come from the Radzen.Blazor.Api build and must exist first. -->
+    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputDir)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services\ExampleService.cs&quot;"
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolExe)')" />
     

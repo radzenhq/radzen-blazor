@@ -25,14 +25,16 @@ RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -p:Confi
 # Copy full source after restore layer
 COPY . .
 
-# Pre-generate API reference pages from the published Radzen.Blazor package - the deployed site uses that
-# same package, so there is no need to compile Radzen.Blazor (and its Sass/JS assets) from source.
-# Pages must exist on disk before publish evaluates the Api project's Razor globs.
+# Pre-generate API reference pages (and their markdown twins) from the published Radzen.Blazor package - the
+# deployed site uses that same package, so there is no need to compile Radzen.Blazor (and its Sass/JS assets)
+# from source. Pages must exist on disk before publish evaluates the Api project's Razor globs, and the markdown
+# twins must exist before the Release build of RadzenBlazorDemos generates llms.txt and the demo twins.
 RUN RADZEN_DLL=$(find /root/.nuget/packages/radzen.blazor -path '*/lib/net10.0/Radzen.Blazor.dll' | sort -V | tail -1) \
  && test -n "$RADZEN_DLL" \
  && dotnet run --project Radzen.Blazor.Api.Generator -- \
       "$RADZEN_DLL" "${RADZEN_DLL%.dll}.xml" \
-      Radzen.Blazor.Api/Generated/Pages
+      Radzen.Blazor.Api/Generated/Pages \
+      RadzenBlazorDemos.Host/wwwroot/md
 
 # Publish the Blazor host app (generated pages are now on disk for the SDK to discover)
 WORKDIR /src/RadzenBlazorDemos.Host

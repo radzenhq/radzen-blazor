@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -54,15 +53,6 @@ class Program
 
     static readonly string[] ExcludedPrefixes = ["Templates", "UIBlocks"];
 
-    static readonly HashSet<string> LifecycleMethodNames = new(StringComparer.Ordinal)
-    {
-        "OnInitialized", "OnInitializedAsync",
-        "OnParametersSet", "OnParametersSetAsync",
-        "OnAfterRender", "OnAfterRenderAsync",
-        "SetParametersAsync", "BuildRenderTree",
-        "ShouldRender", "Dispose", "DisposeAsync",
-    };
-
     static bool IsExcluded(string filePath)
     {
         var name = Path.GetFileNameWithoutExtension(filePath);
@@ -83,16 +73,13 @@ class Program
     {
         if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: RadzenBlazorDemos.Tools <outputDir> <pagesPath> <exampleServicePath> [xmlDocPath] [sourceDir]");
+            Console.Error.WriteLine("Usage: RadzenBlazorDemos.Tools <outputDir> <pagesPath> <exampleServicePath>");
             return 1;
         }
 
         var outputDir = args[0];
         var pagesPath = args[1];
         var exampleServicePath = args[2];
-        var xmlDocPath = args.Length > 3 && !string.IsNullOrWhiteSpace(args[3]) ? args[3] : null;
-        var inferredSourceDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(exampleServicePath) ?? "", "..", "..", "Radzen.Blazor"));
-        var sourceDir = args.Length > 4 && !string.IsNullOrWhiteSpace(args[4]) ? args[4] : inferredSourceDir;
 
         if (!Directory.Exists(pagesPath))
         {
@@ -109,21 +96,20 @@ class Program
         try
         {
             var categories = ParseExampleService(exampleServicePath);
-            var xmlDocs = xmlDocPath != null && File.Exists(xmlDocPath) ? ParseXmlDocs(xmlDocPath) : new Dictionary<string, XmlMemberDoc>();
-            var typeMap = Directory.Exists(sourceDir) ? BuildComponentTypeMap(sourceDir) : new Dictionary<string, ComponentTypeInfo>(StringComparer.Ordinal);
-
             Directory.CreateDirectory(outputDir);
             var mdDir = Path.Combine(outputDir, "md");
             Directory.CreateDirectory(mdDir);
 
-            GenerateComponentPages(categories, pagesPath, xmlDocs, typeMap, mdDir);
-            GenerateIndex(categories, Path.Combine(outputDir, "llms.txt"), xmlDocs);
+            var apiRoutes = LoadApiRoutes(Path.Combine(mdDir, "docs", "api"));
+            var apiIndexLinks = ReadApiIndexLinks(Path.Combine(mdDir, "docs", "api.md"));
+
+            GenerateComponentPages(categories, pagesPath, apiRoutes, mdDir);
+            GenerateIndex(categories, Path.Combine(outputDir, "llms.txt"), apiRoutes, apiIndexLinks);
             GenerateHomePage(pagesPath, Path.Combine(mdDir, "index.md"));
             GenerateSitemap(categories, pagesPath, outputDir);
 
-            var apiCount = Directory.Exists(Path.Combine(mdDir, "api")) ? Directory.GetFiles(Path.Combine(mdDir, "api"), "*.md").Length : 0;
             var pageCount = Directory.GetFiles(mdDir, "*.md").Length;
-            Console.WriteLine($"Generated llms.txt, {pageCount} component pages, and {apiCount} API reference files in: {outputDir}");
+            Console.WriteLine($"Generated llms.txt and {pageCount} component pages linking {apiRoutes.Count} API reference pages in: {outputDir}");
             return 0;
         }
         catch (Exception ex)
@@ -137,14 +123,6 @@ class Program
     // ── Data model ──────────────────────────────────────────────────────
 
     record ExampleNode(string Name, string Path, string Description, List<ExampleNode> Children, List<string> Tags);
-
-    record XmlMemberDoc(string Summary, string TypeName, string Value, string Example, string Remarks);
-
-    record ParameterDoc(string Name, string Type, string Summary, string ValueDescription, bool IsEvent);
-
-    record PropertyTypeInfo(string Name, string Type, string XmlPrefix);
-    record MethodTypeInfo(string Name, string ReturnType, List<(string Type, string Name)> Parameters, string XmlPrefix);
-    record ComponentTypeInfo(string ClassName, string BaseClassName, string XmlPrefix, List<PropertyTypeInfo> Properties, List<MethodTypeInfo> Methods);
 
     // ── ExampleService.cs parsing via Roslyn ────────────────────────────
 
@@ -258,281 +236,6 @@ class Program
         return elements.Select(ExtractStringLiteral).Where(s => !string.IsNullOrEmpty(s)).ToList();
     }
 
-    // ── XML documentation parsing ───────────────────────────────────────
-
-    static Dictionary<string, XmlMemberDoc> ParseXmlDocs(string xmlPath)
-    {
-        var docs = new Dictionary<string, XmlMemberDoc>(StringComparer.Ordinal);
-        var xdoc = XDocument.Load(xmlPath);
-        var members = xdoc.Root?.Element("members");
-
-        if (members == null)
-            return docs;
-
-        foreach (var member in members.Elements("member"))
-        {
-            var memberName = member.Attribute("name")?.Value;
-            if (memberName == null) continue;
-
-            var summary = CleanXmlDocText(member.Element("summary")?.Value);
-            var value = CleanXmlDocText(member.Element("value")?.Value);
-            var example = DecodeXmlCodeBlocks(member.Element("example"));
-            var remarks = CleanXmlDocText(member.Element("remarks")?.Value);
-
-            docs[memberName] = new XmlMemberDoc(summary, memberName, value, example, remarks);
-        }
-
-        return docs;
-    }
-
-    static string CleanXmlDocText(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return "";
-
-        var result = Regex.Replace(text, @"\s+", " ").Trim();
-        return result;
-    }
-
-    static string DecodeXmlCodeBlocks(XElement exampleElement)
-    {
-        if (exampleElement == null)
-            return "";
-
-        var sb = new StringBuilder();
-        foreach (var node in exampleElement.Nodes())
-        {
-            if (node is XElement element && element.Name.LocalName.Equals("code", StringComparison.OrdinalIgnoreCase))
-            {
-                var code = WebUtility.HtmlDecode(element.Value).Trim();
-                if (string.IsNullOrWhiteSpace(code))
-                    continue;
-
-                if (sb.Length > 0)
-                    sb.AppendLine();
-
-                sb.AppendLine("```razor");
-                sb.AppendLine(code);
-                sb.AppendLine("```");
-                continue;
-            }
-
-            var text = node is XText textNode
-                ? textNode.Value
-                : Regex.Replace(node.ToString(SaveOptions.DisableFormatting), "<[^>]+>", " ");
-            var prose = CleanXmlDocText(WebUtility.HtmlDecode(text));
-            if (!string.IsNullOrWhiteSpace(prose))
-            {
-                if (sb.Length > 0)
-                    sb.AppendLine();
-                sb.AppendLine(prose);
-            }
-        }
-
-        return sb.ToString().Trim();
-    }
-
-    // ── Component source parsing via Roslyn ─────────────────────────────
-
-    static Dictionary<string, ComponentTypeInfo> BuildComponentTypeMap(string radzenBlazorDir)
-    {
-        var map = new Dictionary<string, ComponentTypeInfo>(StringComparer.Ordinal);
-        var files = Directory.GetFiles(radzenBlazorDir, "*.razor.cs", SearchOption.AllDirectories)
-            .Concat(Directory.GetFiles(radzenBlazorDir, "*.cs", SearchOption.AllDirectories))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        foreach (var file in files)
-        {
-            var source = File.ReadAllText(file, Encoding.UTF8);
-            var tree = CSharpSyntaxTree.ParseText(source);
-            var root = tree.GetCompilationUnitRoot();
-
-            foreach (var classDecl in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
-            {
-                var className = ToMetadataClassName(classDecl);
-                if (string.IsNullOrEmpty(className))
-                    continue;
-
-                var ns = GetNamespace(classDecl);
-                var xmlPrefix = string.IsNullOrEmpty(ns) ? className : $"{ns}.{className}";
-
-                var baseClassName = ResolveBaseClassName(classDecl);
-                var properties = classDecl.Members
-                    .OfType<PropertyDeclarationSyntax>()
-                    .Where(HasParameterAttribute)
-                    .Select(p => new PropertyTypeInfo(
-                        p.Identifier.Text,
-                        NormalizeTypeText(p.Type.ToString()),
-                        xmlPrefix))
-                    .ToList();
-
-                var methods = classDecl.Members
-                    .OfType<MethodDeclarationSyntax>()
-                    .Where(IsPublicApiMethod)
-                    .Select(m => new MethodTypeInfo(
-                        m.Identifier.Text,
-                        NormalizeTypeText(m.ReturnType.ToString()),
-                        m.ParameterList.Parameters
-                            .Select(p => (
-                                NormalizeTypeText(p.Type?.ToString() ?? "object"),
-                                p.Identifier.Text))
-                            .ToList(),
-                        xmlPrefix))
-                    .ToList();
-
-                if (map.TryGetValue(className, out var existing))
-                {
-                    var mergedProps = existing.Properties.Concat(properties).ToList();
-                    var mergedMethods = existing.Methods.Concat(methods).ToList();
-                    map[className] = new ComponentTypeInfo(className, existing.BaseClassName ?? baseClassName, existing.XmlPrefix ?? xmlPrefix, mergedProps, mergedMethods);
-                }
-                else
-                {
-                    map[className] = new ComponentTypeInfo(className, baseClassName, xmlPrefix, properties, methods);
-                }
-            }
-        }
-
-        return map;
-    }
-
-    static bool HasParameterAttribute(PropertyDeclarationSyntax property)
-        => property.AttributeLists
-            .SelectMany(a => a.Attributes)
-            .Any(a =>
-            {
-                var name = a.Name.ToString();
-                return name == "Parameter" || name.EndsWith(".Parameter", StringComparison.Ordinal);
-            });
-
-    static bool IsPublicApiMethod(MethodDeclarationSyntax method)
-    {
-        if (!method.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword)))
-            return false;
-        if (method.Modifiers.Any(m => m.IsKind(SyntaxKind.OverrideKeyword)))
-            return false;
-        if (LifecycleMethodNames.Contains(method.Identifier.Text))
-            return false;
-        return true;
-    }
-
-    static string ResolveBaseClassName(ClassDeclarationSyntax classDecl)
-    {
-        if (classDecl.BaseList == null)
-            return null;
-
-        foreach (var baseType in classDecl.BaseList.Types)
-        {
-            var name = ToMetadataTypeName(baseType.Type);
-            if (string.IsNullOrWhiteSpace(name))
-                continue;
-            if (name.StartsWith("I", StringComparison.Ordinal) && name.Length > 1 && char.IsUpper(name[1]) && !name.Contains('`'))
-                continue;
-            return name;
-        }
-
-        return null;
-    }
-
-    static string ToMetadataClassName(ClassDeclarationSyntax classDecl)
-    {
-        var arity = classDecl.TypeParameterList?.Parameters.Count ?? 0;
-        return arity > 0 ? $"{classDecl.Identifier.Text}`{arity}" : classDecl.Identifier.Text;
-    }
-
-    static string ToMetadataTypeName(TypeSyntax typeSyntax)
-    {
-        return typeSyntax switch
-        {
-            IdentifierNameSyntax id => id.Identifier.Text,
-            GenericNameSyntax generic => $"{generic.Identifier.Text}`{generic.TypeArgumentList.Arguments.Count}",
-            QualifiedNameSyntax qualified => ToMetadataTypeName(qualified.Right),
-            AliasQualifiedNameSyntax aliasQualified => ToMetadataTypeName(aliasQualified.Name),
-            NullableTypeSyntax nullable => ToMetadataTypeName(nullable.ElementType),
-            _ => NormalizeTypeText(typeSyntax.ToString())
-        };
-    }
-
-    static string NormalizeTypeText(string type)
-        => Regex.Replace(type ?? "", @"\s+", " ").Trim();
-
-    static string GetNamespace(SyntaxNode node)
-    {
-        var parent = node.Parent;
-        while (parent != null)
-        {
-            if (parent is FileScopedNamespaceDeclarationSyntax fileNs)
-                return fileNs.Name.ToString();
-            if (parent is NamespaceDeclarationSyntax ns)
-                return ns.Name.ToString();
-            parent = parent.Parent;
-        }
-        return "";
-    }
-
-    // ── Inheritance resolution ───────────────────────────────────────────
-
-    static List<PropertyTypeInfo> ResolveFullPropertyList(string componentClassName, Dictionary<string, ComponentTypeInfo> typeMap)
-    {
-        var result = new List<PropertyTypeInfo>();
-        var seen = new HashSet<string>(StringComparer.Ordinal);
-        var current = componentClassName;
-        var visited = new HashSet<string>(StringComparer.Ordinal);
-
-        while (!string.IsNullOrWhiteSpace(current) && visited.Add(current))
-        {
-            if (!typeMap.TryGetValue(current, out var info))
-                break;
-
-            foreach (var prop in info.Properties)
-            {
-                if (seen.Add(prop.Name))
-                    result.Add(prop);
-            }
-
-            current = info.BaseClassName;
-        }
-
-        return result;
-    }
-
-    static List<MethodTypeInfo> ResolveComponentMethods(string componentClassName, Dictionary<string, ComponentTypeInfo> typeMap)
-    {
-        if (!typeMap.TryGetValue(componentClassName, out var info))
-            return [];
-
-        return info.Methods;
-    }
-
-    // ── Parameter/event extraction with types ───────────────────────────
-
-    static List<ParameterDoc> GetComponentParameters(
-        string componentClassName,
-        Dictionary<string, XmlMemberDoc> xmlDocs,
-        Dictionary<string, ComponentTypeInfo> typeMap)
-    {
-        var fullProps = ResolveFullPropertyList(componentClassName, typeMap);
-        var seen = new HashSet<string>(StringComparer.Ordinal);
-        var parameters = new List<ParameterDoc>();
-
-        foreach (var prop in fullProps)
-        {
-            if (!seen.Add(prop.Name))
-                continue;
-
-            var xmlKey = $"P:{prop.XmlPrefix}.{prop.Name}";
-            xmlDocs.TryGetValue(xmlKey, out var xmlDoc);
-
-            var summary = xmlDoc?.Summary ?? "";
-            var valueDesc = xmlDoc?.Value ?? "";
-            var isEvent = prop.Type.StartsWith("EventCallback", StringComparison.Ordinal);
-
-            parameters.Add(new ParameterDoc(prop.Name, prop.Type, summary, valueDesc, isEvent));
-        }
-
-        return parameters.OrderBy(p => p.IsEvent).ThenBy(p => p.Name, StringComparer.Ordinal).ToList();
-    }
-
     // ── Component name mapping ──────────────────────────────────────────
 
     static string MapToComponentClass(string exampleName)
@@ -541,161 +244,74 @@ class Program
         return $"Radzen{cleaned}";
     }
 
-    static string ResolveComponentClass(string exampleName, Dictionary<string, XmlMemberDoc> xmlDocs)
+    const string ChartClass = "RadzenChart";
+
+    static string ResolveComponentClass(string exampleName, Dictionary<string, string> apiRoutes)
     {
         var className = MapToComponentClass(exampleName);
-        if (HasTypeOrProperties(className, xmlDocs))
+        if (apiRoutes.ContainsKey(className))
             return className;
-        for (int arity = 1; arity <= 3; arity++)
-        {
-            var generic = $"{className}`{arity}";
-            if (HasTypeOrProperties(generic, xmlDocs))
-                return generic;
-        }
+        if (className.Contains("Chart", StringComparison.Ordinal) && apiRoutes.ContainsKey(ChartClass))
+            return ChartClass;
         return null;
     }
 
-    static bool HasTypeOrProperties(string className, Dictionary<string, XmlMemberDoc> xmlDocs)
-    {
-        if (xmlDocs.ContainsKey($"T:Radzen.Blazor.{className}"))
-            return true;
-        var propPrefix = $"P:Radzen.Blazor.{className}.";
-        return xmlDocs.Keys.Any(k => k.StartsWith(propPrefix));
-    }
-
     static (string ResolvedClass, string ParentDisplayName) ResolveComponentForNode(
-        ExampleNode node, List<string> ancestors, Dictionary<string, XmlMemberDoc> xmlDocs)
+        ExampleNode node, List<string> ancestors, Dictionary<string, string> apiRoutes)
     {
-        var resolved = ResolveComponentClass(node.Name, xmlDocs);
+        var resolved = ResolveComponentClass(node.Name, apiRoutes);
         if (resolved != null)
             return (resolved, null);
         for (int i = ancestors.Count - 1; i >= 0; i--)
         {
             if (i == 0 && OrganizationalCategories.Contains(ancestors[i]))
                 continue;
-            resolved = ResolveComponentClass(ancestors[i], xmlDocs);
+            resolved = ResolveComponentClass(ancestors[i], apiRoutes);
             if (resolved != null)
                 return (resolved, ancestors[i]);
         }
+        if (node.Path != null && node.Path.Contains("chart", StringComparison.OrdinalIgnoreCase) && apiRoutes.ContainsKey(ChartClass))
+            return (ChartClass, "Chart");
         return (null, null);
     }
 
-    // ── API reference slug helpers ──────────────────────────────────────
+    const string ApiRoutePrefix = "Radzen.Blazor.";
 
-    static string ComponentSlug(string metadataClassName)
+    static Dictionary<string, string> LoadApiRoutes(string apiDir)
     {
-        var name = metadataClassName;
-        var tick = name.IndexOf('`');
-        if (tick >= 0)
-            name = name[..tick];
+        var routes = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (!Directory.Exists(apiDir))
+            return routes;
 
-        if (name.StartsWith("Radzen", StringComparison.Ordinal))
-            name = name["Radzen".Length..];
-
-        return name.ToLowerInvariant();
-    }
-
-    static string ComponentDisplayName(string metadataClassName)
-    {
-        var name = metadataClassName;
-        var tick = name.IndexOf('`');
-        if (tick >= 0)
-            name = name[..tick];
-
-        return name;
-    }
-
-    // ── API reference generation ────────────────────────────────────────
-
-    static string GenerateApiReferencePage(
-        string componentClassName,
-        Dictionary<string, XmlMemberDoc> xmlDocs,
-        Dictionary<string, ComponentTypeInfo> typeMap)
-    {
-        var sb = new StringBuilder();
-        var displayName = ComponentDisplayName(componentClassName);
-
-        sb.AppendLine($"# {displayName} API Reference");
-        sb.AppendLine();
-
-        var parameters = GetComponentParameters(componentClassName, xmlDocs, typeMap);
-        var regularParams = parameters.Where(p => !p.IsEvent).ToList();
-        var eventParams = parameters.Where(p => p.IsEvent).ToList();
-
-        if (regularParams.Count > 0)
-        {
-            sb.AppendLine("## Parameters");
-            sb.AppendLine();
-            sb.AppendLine("| Parameter | Type | Description |");
-            sb.AppendLine("|-----------|------|-------------|");
-            foreach (var p in regularParams)
+        var candidates = Directory.GetFiles(apiDir, ApiRoutePrefix + "*.md")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Select(route => (Route: route, Class: route[ApiRoutePrefix.Length..]))
+            .Where(c => c.Class.Length > 0 && !c.Class.Contains('.'))
+            .Select(c =>
             {
-                var type = EscapePipe(p.Type);
-                var desc = EscapePipe(p.Summary);
-                sb.AppendLine($"| {p.Name} | `{type}` | {desc} |");
-            }
-            sb.AppendLine();
+                var dash = c.Class.IndexOf('-');
+                var arity = dash >= 0 && int.TryParse(c.Class[(dash + 1)..], out var n) ? n : 0;
+                return (c.Route, Class: dash >= 0 ? c.Class[..dash] : c.Class, Arity: arity);
+            })
+            .OrderBy(c => c.Arity);
+
+        foreach (var candidate in candidates)
+        {
+            routes.TryAdd(candidate.Class, candidate.Route);
         }
 
-        if (eventParams.Count > 0)
-        {
-            sb.AppendLine("## Events");
-            sb.AppendLine();
-            sb.AppendLine("| Event | Type | Description |");
-            sb.AppendLine("|-------|------|-------------|");
-            foreach (var p in eventParams)
-            {
-                var type = EscapePipe(p.Type);
-                var desc = EscapePipe(p.Summary);
-                sb.AppendLine($"| {p.Name} | `{type}` | {desc} |");
-            }
-            sb.AppendLine();
-        }
-
-        var methods = ResolveComponentMethods(componentClassName, typeMap);
-        if (methods.Count > 0)
-        {
-            var methodDocs = new List<(string Signature, string Returns, string Description)>();
-            foreach (var m in methods.OrderBy(m => m.Name, StringComparer.Ordinal))
-            {
-                var paramList = string.Join(", ", m.Parameters.Select(p => $"{p.Type} {p.Name}"));
-                var signature = $"{m.Name}({paramList})";
-
-                var xmlMethodSummary = FindMethodXmlSummary(componentClassName, m, xmlDocs);
-
-                methodDocs.Add((signature, m.ReturnType, xmlMethodSummary));
-            }
-
-            if (methodDocs.Count > 0)
-            {
-                sb.AppendLine("## Methods");
-                sb.AppendLine();
-                sb.AppendLine("| Method | Returns | Description |");
-                sb.AppendLine("|--------|---------|-------------|");
-                foreach (var (sig, ret, desc) in methodDocs)
-                {
-                    sb.AppendLine($"| {EscapePipe(sig)} | `{EscapePipe(ret)}` | {EscapePipe(desc)} |");
-                }
-                sb.AppendLine();
-            }
-        }
-
-        return sb.ToString();
+        return routes;
     }
 
-    static string FindMethodXmlSummary(string componentClassName, MethodTypeInfo method, Dictionary<string, XmlMemberDoc> xmlDocs)
+    static List<string> ReadApiIndexLinks(string apiIndexPath)
     {
-        var prefix = $"M:{method.XmlPrefix}.{method.Name}";
-        foreach (var (key, doc) in xmlDocs)
-        {
-            if (key.StartsWith(prefix, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(doc.Summary))
-                return doc.Summary;
-        }
-        return "";
-    }
+        if (!File.Exists(apiIndexPath))
+            return new List<string>();
 
-    static string EscapePipe(string text)
-        => (text ?? "").Replace("|", "\\|").Replace("\n", " ").Replace("\r", "");
+        return File.ReadLines(apiIndexPath, Encoding.UTF8)
+            .Where(line => line.StartsWith("- [", StringComparison.Ordinal))
+            .ToList();
+    }
 
     record LinkInfo(string Name, string Url, string Description, string ParentComponentName);
 
@@ -710,7 +326,7 @@ class Program
 
     // ── Index generation (llms.txt) ─────────────────────────────────────
 
-    static void GenerateIndex(List<ExampleNode> categories, string outputPath, Dictionary<string, XmlMemberDoc> xmlDocs)
+    static void GenerateIndex(List<ExampleNode> categories, string outputPath, Dictionary<string, string> apiRoutes, List<string> apiIndexLinks)
     {
         var sb = new StringBuilder();
 
@@ -743,7 +359,7 @@ class Program
             if (category.Children == null || category.Children.Count == 0)
                 continue;
 
-            var links = CollectLinkInfos(category, new List<string>(), xmlDocs);
+            var links = CollectLinkInfos(category, new List<string>(), apiRoutes);
             if (links.Count == 0)
                 continue;
 
@@ -760,6 +376,16 @@ class Program
             sb.AppendLine();
         }
 
+        if (apiIndexLinks.Count > 0)
+        {
+            sb.AppendLine("## API Reference");
+            sb.AppendLine();
+            sb.AppendLine($"- [API Reference]({BaseUrl}/docs/api.md): Every public type in Radzen.Blazor grouped by namespace, with parameters, methods, events and enum values");
+            foreach (var link in apiIndexLinks)
+                sb.AppendLine(link);
+            sb.AppendLine();
+        }
+
         if (optionalLinks.Count > 0)
         {
             sb.AppendLine("## Optional");
@@ -772,25 +398,25 @@ class Program
         File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
     }
 
-    static List<LinkInfo> CollectLinkInfos(ExampleNode node, List<string> ancestors, Dictionary<string, XmlMemberDoc> xmlDocs)
+    static List<LinkInfo> CollectLinkInfos(ExampleNode node, List<string> ancestors, Dictionary<string, string> apiRoutes)
     {
         var links = new List<LinkInfo>();
-        CollectLinkInfosRecursive(node, ancestors, xmlDocs, links);
+        CollectLinkInfosRecursive(node, ancestors, apiRoutes, links);
         return links;
     }
 
-    static void CollectLinkInfosRecursive(ExampleNode node, List<string> ancestors, Dictionary<string, XmlMemberDoc> xmlDocs, List<LinkInfo> links)
+    static void CollectLinkInfosRecursive(ExampleNode node, List<string> ancestors, Dictionary<string, string> apiRoutes, List<LinkInfo> links)
     {
         if (node.Children != null)
         {
             var newAncestors = new List<string>(ancestors) { node.Name };
             foreach (var child in node.Children)
-                CollectLinkInfosRecursive(child, newAncestors, xmlDocs, links);
+                CollectLinkInfosRecursive(child, newAncestors, apiRoutes, links);
         }
         else if (!string.IsNullOrEmpty(node.Path))
         {
             var path = node.Path.TrimStart('/');
-            var (_, parentDisplayName) = ResolveComponentForNode(node, ancestors, xmlDocs);
+            var (_, parentDisplayName) = ResolveComponentForNode(node, ancestors, apiRoutes);
             links.Add(new LinkInfo(node.Name, $"{BaseUrl}/{path}.md", node.Description, parentDisplayName));
         }
     }
@@ -831,8 +457,7 @@ class Program
 
     static void GenerateComponentPages(
         List<ExampleNode> categories, string pagesPath,
-        Dictionary<string, XmlMemberDoc> xmlDocs,
-        Dictionary<string, ComponentTypeInfo> typeMap,
+        Dictionary<string, string> apiRoutes,
         string mdDir)
     {
         var allLeaves = new List<(ExampleNode Node, string CategoryName, List<string> Ancestors)>();
@@ -843,36 +468,8 @@ class Program
             CollectLeaves(category, category.Name, new List<string>(), allLeaves);
         }
 
-        // Build a map of resolvedClass -> API file URL for linking
-        var apiPages = new Dictionary<string, string>(StringComparer.Ordinal);
-        var seenClasses = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var (node, _, ancestors) in allLeaves)
-        {
-            if (string.IsNullOrEmpty(node.Path)) continue;
-            var (resolvedClass, _) = ResolveComponentForNode(node, ancestors, xmlDocs);
-            if (resolvedClass != null)
-                seenClasses.Add(resolvedClass);
-        }
+        var apiPages = apiRoutes.ToDictionary(r => r.Key, r => $"{BaseUrl}/docs/api/{r.Value}.md", StringComparer.Ordinal);
 
-        // Generate API reference files for all resolved component classes
-        var apiDir = Path.Combine(mdDir, "api");
-        Directory.CreateDirectory(apiDir);
-
-        foreach (var resolvedClass in seenClasses)
-        {
-            var slug = ComponentSlug(resolvedClass);
-            var apiUrl = $"{BaseUrl}/api/{slug}.md";
-            apiPages[resolvedClass] = apiUrl;
-
-            var apiContent = GenerateApiReferencePage(resolvedClass, xmlDocs, typeMap);
-            if (!string.IsNullOrWhiteSpace(apiContent))
-            {
-                var apiPath = Path.Combine(apiDir, $"{slug}.md");
-                File.WriteAllText(apiPath, apiContent, Encoding.UTF8);
-            }
-        }
-
-        // Generate component pages
         foreach (var (node, categoryName, ancestors) in allLeaves)
         {
             if (string.IsNullOrEmpty(node.Path))
@@ -881,7 +478,7 @@ class Program
             var path = node.Path.TrimStart('/');
             var mdPath = Path.Combine(mdDir, $"{path}.md");
 
-            var mdContent = GenerateSingleComponentPage(node, categoryName, ancestors, pagesPath, xmlDocs, apiPages);
+            var mdContent = GenerateSingleComponentPage(node, categoryName, ancestors, pagesPath, apiRoutes, apiPages);
             if (!string.IsNullOrWhiteSpace(mdContent))
             {
                 var dir = Path.GetDirectoryName(mdPath);
@@ -908,12 +505,12 @@ class Program
 
     static string GenerateSingleComponentPage(
         ExampleNode node, string categoryName, List<string> ancestors,
-        string pagesPath, Dictionary<string, XmlMemberDoc> xmlDocs,
+        string pagesPath, Dictionary<string, string> apiRoutes,
         Dictionary<string, string> apiPages)
     {
         var sb = new StringBuilder();
 
-        var (resolvedClass, parentDisplayName) = ResolveComponentForNode(node, ancestors, xmlDocs);
+        var (resolvedClass, parentDisplayName) = ResolveComponentForNode(node, ancestors, apiRoutes);
 
         var title = !string.IsNullOrEmpty(parentDisplayName)
             ? $"{parentDisplayName}: {node.Name}"
@@ -936,8 +533,7 @@ class Program
 
         if (resolvedClass != null && apiPages.TryGetValue(resolvedClass, out var apiUrl))
         {
-            var displayName = ComponentDisplayName(resolvedClass);
-            sb.AppendLine($"> API reference: [{displayName} API]({apiUrl})");
+            sb.AppendLine($"> API reference: [{resolvedClass} API]({apiUrl})");
             sb.AppendLine();
         }
 

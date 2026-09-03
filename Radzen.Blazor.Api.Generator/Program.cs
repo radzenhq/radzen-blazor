@@ -13,13 +13,14 @@ sealed class Program
     {
         if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: Radzen.Blazor.Api.Generator <assemblyPath> <xmlDocPath> <outputDir>");
+            Console.Error.WriteLine("Usage: Radzen.Blazor.Api.Generator <assemblyPath> <xmlDocPath> <outputDir> [markdownOutputDir]");
             return 1;
         }
 
         var assemblyPath = args[0];
         var xmlDocPath = args[1];
         var outputDir = args[2];
+        var markdownOutputDir = args.Length > 3 && !string.IsNullOrWhiteSpace(args[3]) ? args[3] : null;
 
         if (!File.Exists(assemblyPath))
         {
@@ -42,6 +43,14 @@ sealed class Program
         generator.Generate();
 
         Console.WriteLine($"Generated {generator.PageCount} API reference pages in {outputDir}");
+
+        if (markdownOutputDir != null)
+        {
+            var markdownGenerator = new MarkdownPageGenerator(types, generator.TryResolveTypeUrl, markdownOutputDir);
+            markdownGenerator.Generate();
+            Console.WriteLine($"Generated {markdownGenerator.PageCount} API reference markdown pages in {markdownOutputDir}");
+        }
+
         return 0;
     }
 }
@@ -789,7 +798,7 @@ sealed class RazorPageGenerator
         }
     }
 
-    string? TryResolveTypeUrl(string typeName)
+    internal string? TryResolveTypeUrl(string typeName)
     {
         if (_typeUrlMap.TryGetValue(typeName, out var url))
             return url;
@@ -1503,7 +1512,7 @@ sealed class RazorPageGenerator
 
     static string TypePageUrl(ApiTypeInfo type) => $"/docs/api/{GetRouteTypeName(type)}";
 
-    static string GetRouteTypeName(ApiTypeInfo type)
+    internal static string GetRouteTypeName(ApiTypeInfo type)
     {
         var name = type.FullName;
         var ltIdx = name.IndexOf('<', StringComparison.Ordinal);
@@ -1560,7 +1569,7 @@ sealed class RazorPageGenerator
 
     static readonly string[] StripPrefixes = ["System.Collections.Generic.", "System.Collections.ObjectModel.", "System.Threading.Tasks.", "System.Linq.", "System.Linq.Expressions.", "Microsoft.AspNetCore.Components.Web.", "Microsoft.AspNetCore.Components.", "Radzen.Blazor.", "Radzen.", "System."];
 
-    static string SimplifyTypeName(string typeName)
+    internal static string SimplifyTypeName(string typeName)
     {
         if (string.IsNullOrEmpty(typeName)) return typeName;
 
@@ -1632,7 +1641,7 @@ sealed class RazorPageGenerator
         return simplified;
     }
 
-    static string SimplifySignature(string signature)
+    internal static string SimplifySignature(string signature)
     {
         var result = new StringBuilder();
         var tokens = TokenizeSignature(signature);

@@ -30,13 +30,6 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Generate static assets
-        run: |
-          dotnet run --project RadzenBlazorDemos.Tools -- \
-            RadzenBlazorDemos.Host/wwwroot \
-            RadzenBlazorDemos/Pages \
-            RadzenBlazorDemos/Services/ExampleService.cs
-
       # Kept out of the sources so forks, clones and local runs of the demos never report to
       # our analytics - only the image this workflow builds carries the snippet.
       - name: Inject analytics script
