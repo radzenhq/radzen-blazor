@@ -357,7 +357,7 @@ namespace Radzen
 
         private protected Task SupersedeAsyncLoad() => asyncQuery?.SupersedeLoad() ?? Task.CompletedTask;
 
-        private protected Task WaitForAsyncLoad() => asyncQuery?.WaitForLoad() ?? Task.CompletedTask;
+        internal Task WaitForAsyncLoad() => asyncQuery?.WaitForLoad() ?? Task.CompletedTask;
 
         private protected bool HasAsyncQueryExecutor => AsyncQuery.HasExecutor;
 
@@ -558,6 +558,8 @@ namespace Radzen
             ArgumentNullException.ThrowIfNull(args);
             skip = args.Skip;
             CurrentPage = args.PageIndex;
+
+            await SupersedeAsyncLoad();
 
             await Page.InvokeAsync(args);
 

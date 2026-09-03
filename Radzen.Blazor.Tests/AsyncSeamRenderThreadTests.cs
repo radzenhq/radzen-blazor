@@ -1144,5 +1144,166 @@ namespace Radzen.Blazor.Tests
             Assert.False(collapsedWhileParked);
             Assert.False(cut.Instance.IsRowExpanded(first));
         }
+        [Fact]
+        public async Task SelectingARowWaitsForThePendingLoadBeforeRowSelectRuns()
+        {
+            using var ctx = new TestContext();
+
+            var (provider, source) = Source(10);
+            var executor = new ParkingExecutor();
+            var first = source.First();
+            var selected = 0;
+            var selectedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = Grid(ctx, source, p =>
+            {
+                p.Add(g => g.AllowPaging, true);
+                p.Add(g => g.PageSize, 5);
+                p.Add(g => g.RowSelect, EventCallback.Factory.Create<Row>(this, _ =>
+                {
+                    selected++;
+                    selectedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var select = cut.InvokeAsync(() => cut.Instance.SelectRow(first));
+
+            Assert.False(select.IsCompleted);
+            Assert.Equal(0, selected);
+
+            executor.Release();
+
+            await select;
+
+            Assert.Equal(1, selected);
+            Assert.False(selectedWhileParked);
+        }
+
+        [Fact]
+        public async Task EditingARowWaitsForThePendingLoadBeforeRowEditRuns()
+        {
+            using var ctx = new TestContext();
+
+            var (provider, source) = Source(10);
+            var executor = new ParkingExecutor();
+            var first = source.First();
+            var edited = 0;
+            var editedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = Grid(ctx, source, p =>
+            {
+                p.Add(g => g.AllowPaging, true);
+                p.Add(g => g.PageSize, 5);
+                p.Add(g => g.RowEdit, EventCallback.Factory.Create<Row>(this, _ =>
+                {
+                    edited++;
+                    editedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var edit = cut.InvokeAsync(() => cut.Instance.EditRow(first));
+
+            Assert.False(edit.IsCompleted);
+            Assert.Equal(0, edited);
+
+            executor.Release();
+
+            await edit;
+
+            Assert.Equal(1, edited);
+            Assert.False(editedWhileParked);
+        }
+
+        [Fact]
+        public async Task SortingSupersedesThePendingLoadBeforeTheSortCallbackRuns()
+        {
+            using var ctx = new TestContext();
+
+            var (provider, source) = Source(10);
+            var executor = new ParkingExecutor();
+            var sorted = 0;
+            var sortedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = Grid(ctx, source, p =>
+            {
+                p.Add(g => g.AllowPaging, true);
+                p.Add(g => g.AllowSorting, true);
+                p.Add(g => g.PageSize, 5);
+                p.Add(g => g.Sort, EventCallback.Factory.Create<DataGridColumnSortEventArgs<Row>>(this, _ =>
+                {
+                    sorted++;
+                    sortedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var sort = cut.InvokeAsync(() => cut.Instance.OnSort(EventArgs.Empty, cut.Instance.ColumnsCollection.First()));
+
+            Assert.False(sort.IsCompleted);
+            Assert.Equal(0, sorted);
+
+            executor.Release();
+
+            await sort;
+
+            Assert.Equal(1, sorted);
+            Assert.False(sortedWhileParked);
+            Assert.Equal(SortOrder.Ascending, cut.Instance.ColumnsCollection.First().GetSortOrder());
+        }
+
+        [Fact]
+        public async Task SelectingAVirtualizedListBoxItemWaitsForThePendingWindowBeforeChangeRuns()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var (provider, source) = Source(40);
+            var executor = new ParkingExecutor();
+            var first = source.First();
+            var changed = 0;
+            var changedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = ctx.RenderComponent<RadzenListBox<int>>(p =>
+            {
+                p.Add(d => d.Data, source);
+                p.Add(d => d.TextProperty, "Name");
+                p.Add(d => d.ValueProperty, "Id");
+                p.Add(d => d.AllowVirtualization, true);
+                p.Add(d => d.PageSize, 5);
+                p.Add(d => d.Change, EventCallback.Factory.Create<object>(this, _ =>
+                {
+                    changed++;
+                    changedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var select = cut.InvokeAsync(() => cut.Instance.SelectItem(first));
+
+            Assert.False(select.IsCompleted);
+            Assert.Equal(0, changed);
+
+            executor.Release();
+
+            await select;
+
+            Assert.Equal(1, changed);
+            Assert.False(changedWhileParked);
+            Assert.Same(first, cut.Instance.SelectedItem);
+        }
     }
 }

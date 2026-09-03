@@ -558,6 +558,8 @@ namespace Radzen.Blazor
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
             if (column != null)
             {
+                await SupersedeAsyncLoad();
+
                 await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
             }
 
@@ -1152,6 +1154,8 @@ namespace Radzen.Blazor
                     skip = 0;
                     CurrentPage = 0;
 
+                    await SupersedeAsyncLoad();
+
                     await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
                     {
                         Column = column,
@@ -1213,6 +1217,8 @@ namespace Radzen.Blazor
         {
             if (AllowSorting && column.Sortable)
             {
+                await SupersedeAsyncLoad();
+
                 if (GotoFirstPageOnSort)
                 {
                     topPager?.FirstPage();
@@ -3069,6 +3075,8 @@ namespace Radzen.Blazor
                 return;
             }
 
+            await WaitForAsyncLoad();
+
             allGroupsExpanded = null;
             await AllGroupsExpandedChanged.InvokeAsync(allGroupsExpanded);
 
@@ -3766,6 +3774,8 @@ namespace Radzen.Blazor
         /// <param name="raiseEvent">Should raise RowSelect event.</param>
         public async System.Threading.Tasks.Task SelectRow(TItem item, bool raiseEvent = true)
         {
+            await WaitForAsyncLoad();
+
             await OnRowSelect(item, raiseEvent);
         }
 
@@ -3806,6 +3816,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public async System.Threading.Tasks.Task EditRow(TItem item)
         {
+            await WaitForAsyncLoad();
+
             if(itemsToInsert.Count > 0 && EditMode == DataGridEditMode.Single)
             {
                 var itemsToCancel = itemsToInsert.ToList();
@@ -3850,6 +3862,9 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task EditRows(IEnumerable<TItem> items)
         {
             ArgumentNullException.ThrowIfNull(items);
+
+            await WaitForAsyncLoad();
+
             // Only allow the functionality when multiple row edits is allowed
             if (this.EditMode != DataGridEditMode.Multiple)
             {
@@ -3878,6 +3893,9 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task UpdateRow(TItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
+
+            await WaitForAsyncLoad();
+
             if (ContainsItemKey(editedItems, item))
             {
                 var editContext = editContexts.FirstOrDefault(i => ItemEquals(i.Key, item)).Value;
@@ -3993,6 +4011,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(itemToInsert);
             ArgumentNullException.ThrowIfNull(rowItem);
+
+            await WaitForAsyncLoad();
+
             var list = this.PagedView.ToList();
             var index = list.IndexOf(rowItem);
             await InsertRowAtIndex(itemToInsert, index + 1);
@@ -4000,6 +4021,8 @@ namespace Radzen.Blazor
 
         private async System.Threading.Tasks.Task InsertRowAtIndex(TItem item, int insertIndex = 0)
         {
+            await WaitForAsyncLoad();
+
             itemsToInsert.Add(item);
             if (!IsVirtualizationAllowed())
             {
@@ -4211,6 +4234,8 @@ namespace Radzen.Blazor
                         descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.GetTitle(), SortOrder = column.GetSortOrder() ?? SortOrder.Ascending, FormatString = column.FormatString  };
                         Groups.Add(descriptor);
                         _groupedPagedView = null;
+
+                        await SupersedeAsyncLoad();
 
                         await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
 

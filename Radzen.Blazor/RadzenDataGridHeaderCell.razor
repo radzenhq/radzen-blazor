@@ -250,6 +250,8 @@ else
         {
             var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Property = property, Column = Column, Filter = loadDataArgs.Filter, Skip = loadDataArgs.Skip, Top = loadDataArgs.Top };
 
+            await Column.Grid.WaitForAsyncLoad();
+
             await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
 
             filterValues = !string.IsNullOrEmpty(args.Property) ? 

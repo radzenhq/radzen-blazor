@@ -45,6 +45,8 @@ namespace Radzen
 
         private protected Task SupersedeAsyncLoad() => asyncQuery?.SupersedeLoad() ?? Task.CompletedTask;
 
+        private protected Task WaitForAsyncLoad() => asyncQuery?.WaitForLoad() ?? Task.CompletedTask;
+
         private protected void CancelAsyncQueryLookup() => asyncQuery?.CancelLookup();
 
         private protected bool TryGetAsyncQueryCoordinator<TQuery>(IQueryable<TQuery> query,
@@ -451,6 +453,8 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
+            await WaitForAsyncLoad();
+
             if (internalValue != null)
             {
                 await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
@@ -519,6 +523,8 @@ namespace Radzen
             selectedItems.Clear();
 
             selectedIndex = -1;
+
+            await WaitForAsyncLoad();
 
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default(T)!);
@@ -1538,6 +1544,11 @@ namespace Radzen
 
                 SetSelectedIndexFromSelectedItem();
 
+                if (raiseChange)
+                {
+                    await WaitForAsyncLoad();
+                }
+
                 await SelectedItemChanged.InvokeAsync(selectedItem);
             }
             else
@@ -1583,6 +1594,8 @@ namespace Radzen
             }
             if (raiseChange)
             {
+                await WaitForAsyncLoad();
+
                 if (ValueChanged.HasDelegate)
                 {
                     if (Multiple)
