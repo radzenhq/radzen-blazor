@@ -50,6 +50,8 @@ namespace Radzen
 
         internal Task SupersedeLoad() => coordinator?.SupersedeAsyncLoad() ?? Task.CompletedTask;
 
+        internal Task WaitForLoad() => coordinator?.WaitForAsyncLoad() ?? Task.CompletedTask;
+
         internal void CancelLookup() => coordinator?.CancelLookup();
 
         internal bool TryGetCoordinator<T>(IQueryable<T> query,

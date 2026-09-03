@@ -357,6 +357,8 @@ namespace Radzen
 
         private protected Task SupersedeAsyncLoad() => asyncQuery?.SupersedeLoad() ?? Task.CompletedTask;
 
+        private protected Task WaitForAsyncLoad() => asyncQuery?.WaitForLoad() ?? Task.CompletedTask;
+
         private protected bool HasAsyncQueryExecutor => AsyncQuery.HasExecutor;
 
         private protected bool TryGetAsyncQueryCoordinator<TQuery>(IQueryable<TQuery> query,

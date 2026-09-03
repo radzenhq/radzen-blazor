@@ -223,6 +223,19 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Waits until the current load and any queued provider work have finished without cancelling them,
+        /// so callers that hand control to application code sharing the provider do not overlap its operations.
+        /// </summary>
+        internal async Task WaitForAsyncLoad()
+        {
+            while (!loadCompletion.IsCompleted || !providerTail.IsCompleted)
+            {
+                await loadCompletion;
+                await providerTail;
+            }
+        }
+
         private void CancelLoad()
         {
             CancellationTokenSource? previous = loadCancellation;

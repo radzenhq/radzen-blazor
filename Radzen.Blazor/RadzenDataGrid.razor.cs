@@ -3448,6 +3448,8 @@ namespace Radzen.Blazor
                 return;
             }
 
+            await WaitForAsyncLoad();
+
             foreach (TItem item in items)
             {
                 if (!ContainsItemKey(expandedItems, item))
@@ -3502,6 +3504,8 @@ namespace Radzen.Blazor
 
         private async Task CollapseItem(TItem item)
         {
+            await WaitForAsyncLoad();
+
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
 
@@ -3513,6 +3517,8 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task ExpandItem(TItem item)
         {
+            await WaitForAsyncLoad();
+
             if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Count > 0 && !LoadChildData.HasDelegate)
             {
                 var itemToCollapse = expandedItems.Keys.FirstOrDefault();

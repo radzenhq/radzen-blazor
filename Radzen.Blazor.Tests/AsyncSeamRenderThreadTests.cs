@@ -1061,5 +1061,88 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(executor.Started, provider.Executions);
         }
+        [Fact]
+        public async Task ExpandingARowWaitsForThePendingLoadBeforeRowExpandRuns()
+        {
+            using var ctx = new TestContext();
+
+            var (provider, source) = Source(10);
+            var executor = new ParkingExecutor();
+            var first = source.First();
+            var expanded = 0;
+            var expandedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = Grid(ctx, source, p =>
+            {
+                p.Add(g => g.AllowPaging, true);
+                p.Add(g => g.PageSize, 5);
+                p.Add(g => g.RowExpand, EventCallback.Factory.Create<Row>(this, _ =>
+                {
+                    expanded++;
+                    expandedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var expand = cut.InvokeAsync(() => cut.Instance.ExpandRow(first));
+
+            Assert.False(expand.IsCompleted);
+            Assert.Equal(0, expanded);
+
+            executor.Release();
+
+            await expand;
+
+            Assert.Equal(1, expanded);
+            Assert.False(expandedWhileParked);
+            Assert.True(cut.Instance.IsRowExpanded(first));
+        }
+
+        [Fact]
+        public async Task CollapsingARowWaitsForThePendingLoadBeforeRowCollapseRuns()
+        {
+            using var ctx = new TestContext();
+
+            var (provider, source) = Source(10);
+            var executor = new ParkingExecutor();
+            var first = source.First();
+            var collapsed = 0;
+            var collapsedWhileParked = false;
+
+            ctx.Services.AddSingleton<IAsyncQueryExecutor>(executor);
+
+            var cut = Grid(ctx, source, p =>
+            {
+                p.Add(g => g.AllowPaging, true);
+                p.Add(g => g.PageSize, 5);
+                p.Add(g => g.ExpandMode, DataGridExpandMode.Multiple);
+                p.Add(g => g.RowCollapse, EventCallback.Factory.Create<Row>(this, _ =>
+                {
+                    collapsed++;
+                    collapsedWhileParked |= executor.Parked;
+                }));
+            });
+
+            cut.WaitForState(() => executor.Parked);
+
+            var expand = cut.InvokeAsync(() => cut.Instance.ExpandRows(new[] { first }));
+
+            Assert.False(expand.IsCompleted);
+
+            executor.Release();
+
+            await expand;
+
+            Assert.True(cut.Instance.IsRowExpanded(first));
+
+            await cut.InvokeAsync(() => cut.Instance.CollapseRows(new[] { first }));
+
+            Assert.Equal(1, collapsed);
+            Assert.False(collapsedWhileParked);
+            Assert.False(cut.Instance.IsRowExpanded(first));
+        }
     }
 }
