@@ -743,6 +743,50 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         }
       }
 
+      &.rz-state-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      &:hover {
+        &:not(.rz-state-highlight) {
+          > td {
+            background-color: var(--rz-grid-hover-background-color);
+          }
+
+          > td.rz-frozen-cell {
+            background-color: var(--rz-grid-background-color);
+
+            &.rz-frozen-cell-left,
+            &.rz-frozen-cell-left-inner {
+              &:before {
+                background-color: var(--rz-grid-hover-background-color);
+              }
+            }
+
+            &.rz-frozen-cell-right,
+            &.rz-frozen-cell-right-inner {
+              &:after {
+                background-color: var(--rz-grid-hover-background-color);
+              }
+            }
+          }
+
+          .rz-cell-data {
+            color: var(--rz-grid-hover-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Keyboard focus is not selection, so it is not scoped to .rz-selectable, which a grid carries only
+// when a selection delegate is wired. Placed directly after that block so a focused row still wins
+// over a selected one at equal specificity, as it did when these rules lived inside it.
+.rz-grid-table {
+  tbody {
+    tr.rz-data-row {
       &.rz-state-focused {
         > td {
           background-color: var(--rz-grid-cell-focus-background-color);
@@ -782,39 +826,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         }
       }
 
-      &.rz-state-disabled {
-        opacity: 0.5;
-        pointer-events: none;
-      }
-
-      &:hover {
-        &:not(.rz-state-highlight) {
-          > td {
-            background-color: var(--rz-grid-hover-background-color);
-          }
-
-          > td.rz-frozen-cell {
-            background-color: var(--rz-grid-background-color);
-            
-            &.rz-frozen-cell-left,
-            &.rz-frozen-cell-left-inner {
-              &:before {
-                background-color: var(--rz-grid-hover-background-color);
-              }
-            }
-
-            &.rz-frozen-cell-right,
-            &.rz-frozen-cell-right-inner {
-              &:after {
-                background-color: var(--rz-grid-hover-background-color);
-              }
-            }
-          }
-
-          .rz-cell-data {
-            color: var(--rz-grid-hover-color);
-          }
-        }
+      // The focused *cell*, which the row background cannot show: RadzenDataGrid moves this class
+      // across the cells of a row on ArrowLeft/ArrowRight, and until now nothing drew it.
+      > td.rz-state-focused {
+        outline: var(--rz-grid-cell-focus-outline);
+        outline-offset: var(--rz-grid-cell-focus-outline-offset);
       }
     }
   }
@@ -868,7 +884,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         position: relative;
         min-width: calc(2 * map.get($button-sizes, md, min-width));
       }
-      
+
       .rz-textbox,
       .rz-inputtext {
         text-indent: map.get($button-sizes, md, min-width);
@@ -1053,7 +1069,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       box-shadow: var(--rz-grid-clear-filter-button-shadow);
       padding-inline: var(--rz-grid-filter-button-padding-inline);
     }
-  
+
     &.rz-apply-filter {
       background-color: var(--rz-grid-apply-filter-button-background-color);
       color: var(--rz-grid-apply-filter-button-color);
