@@ -5346,60 +5346,135 @@ window.Radzen = {
     } catch (e) { /* ignore */ }
   },
   startColumnReorder: function(id, gridId, gridRef) {
+      if (Radzen[id + 'reorderCleanup']) {
+          Radzen[id + 'reorderCleanup']();
+      }
+
       var grid = document.getElementById(gridId);
       var el = document.getElementById(id + '-drag');
-      Radzen[id + 'cell'] = el.parentNode.parentNode;
+      var cell = el.parentNode.parentNode;
       var visual = document.createElement("th");
-      visual.className = Radzen[id + 'cell'].className + ' rz-column-draggable';
-      visual.style = Radzen[id + 'cell'].style;
+      visual.className = cell.className + ' rz-column-draggable';
+      visual.style = cell.style;
       visual.style.display = 'none';
       visual.style.position = 'absolute';
-      visual.style.height = Radzen[id + 'cell'].offsetHeight + 'px';
-      visual.style.width = Radzen[id + 'cell'].offsetWidth + 'px';
+      visual.style.height = cell.offsetHeight + 'px';
+      visual.style.width = cell.offsetWidth + 'px';
       visual.style.zIndex = 2000;
       visual.style.pointerEvents = 'none';
-      visual.innerHTML = Radzen[id + 'cell'].firstChild.outerHTML;
+      visual.innerHTML = cell.firstChild.outerHTML;
       visual.id = id + 'visual';
       document.body.appendChild(visual);
 
-      var resizers = Radzen[id + 'cell'].parentNode.querySelectorAll('.rz-column-resizer');
+      var resizers = cell.parentNode.querySelectorAll('.rz-column-resizer');
       for (let i = 0; i < resizers.length; i++) {
           resizers[i].style.display = 'none';
       }
 
-      Radzen[id + 'lastTouchX'] = null;
-      Radzen[id + 'lastTouchY'] = null;
+      var lastTouchX = null;
+      var lastTouchY = null;
+      var scroller = grid.querySelector('.rz-data-grid-data');
+      var autoScrollSpeed = 0;
+      var autoScrollFrame = null;
 
-      Radzen[id + 'end'] = function (e) {
+      var stopAutoScroll = function () {
+          if (autoScrollFrame) {
+              cancelAnimationFrame(autoScrollFrame);
+          }
+          autoScrollFrame = null;
+          autoScrollSpeed = 0;
+      };
+
+      var autoScrollStep = function () {
+          autoScrollFrame = null;
+          if (!autoScrollSpeed || !scroller) {
+              return;
+          }
+          var before = scroller.scrollLeft;
+          scroller.scrollLeft = before + autoScrollSpeed;
+          if (Math.abs(scroller.scrollLeft - before) >= 0.5) {
+              autoScrollFrame = requestAnimationFrame(autoScrollStep);
+          }
+      };
+
+      var updateAutoScroll = function (clientX, clientY) {
+          if (!scroller || scroller.scrollWidth <= scroller.clientWidth) {
+              return;
+          }
+          var gridRect = grid.getBoundingClientRect();
+          var speed = 0;
+          if (clientY >= gridRect.top && clientY <= gridRect.bottom) {
+              var rect = scroller.getBoundingClientRect();
+              var left = rect.left;
+              var right = rect.right;
+              var middle = (rect.left + rect.right) / 2;
+              var frozen = scroller.querySelectorAll('thead th.rz-frozen-cell');
+              for (var i = 0; i < frozen.length; i++) {
+                  var frozenRect = frozen[i].getBoundingClientRect();
+                  if (frozenRect.width === 0) {
+                      continue;
+                  }
+                  if ((frozenRect.left + frozenRect.right) / 2 < middle) {
+                      left = Math.max(left, frozenRect.right);
+                  } else {
+                      right = Math.min(right, frozenRect.left);
+                  }
+              }
+              var visible = right - left;
+              if (visible > 0) {
+                  var zone = Math.max(24, Math.min(80, visible * 0.15));
+                  var depth = 0;
+                  if (clientX < left + zone) {
+                      depth = -(left + zone - clientX);
+                  } else if (clientX > right - zone) {
+                      depth = clientX - (right - zone);
+                  }
+                  if (depth) {
+                      var ratio = Math.min(1, Math.abs(depth) / zone);
+                      speed = Math.sign(depth) * Math.ceil(2 + 18 * ratio * ratio);
+                  }
+              }
+          }
+          autoScrollSpeed = speed;
+          if (speed && !autoScrollFrame) {
+              autoScrollFrame = requestAnimationFrame(autoScrollStep);
+          }
+      };
+
+      var cleanup = function () {
+          stopAutoScroll();
+
+          var ghost = document.getElementById(id + 'visual');
+          if (ghost && ghost.parentNode) {
+              ghost.parentNode.removeChild(ghost);
+          }
+          var resizers = cell.parentNode ? cell.parentNode.querySelectorAll('.rz-column-resizer') : [];
+          for (let i = 0; i < resizers.length; i++) {
+              resizers[i].style.display = 'block';
+          }
+
+          document.removeEventListener('mousemove', move);
+          grid.removeEventListener('touchmove', touchmove);
+          grid.removeEventListener('click', end);
+          document.removeEventListener('mouseup', end);
+          document.removeEventListener('touchend', end);
+          document.removeEventListener('touchcancel', end);
+
+          if (Radzen[id + 'reorderCleanup'] === cleanup) {
+              Radzen[id + 'reorderCleanup'] = null;
+          }
+      };
+
+      var end = function (e) {
           var triggeredByTouch = e && (e.type === 'touchend' || e.type === 'touchcancel');
-          var touchX = Radzen[id + 'lastTouchX'];
-          var touchY = Radzen[id + 'lastTouchY'];
+          var touchX = lastTouchX;
+          var touchY = lastTouchY;
           if (triggeredByTouch && e.changedTouches && e.changedTouches[0]) {
               touchX = e.changedTouches[0].clientX;
               touchY = e.changedTouches[0].clientY;
           }
 
-          var el = document.getElementById(id + 'visual');
-          if (el) {
-              document.body.removeChild(el);
-              var resizers = Radzen[id + 'cell'].parentNode.querySelectorAll('.rz-column-resizer');
-              for (let i = 0; i < resizers.length; i++) {
-                  resizers[i].style.display = 'block';
-              }
-          }
-
-          grid.removeEventListener('mousemove', Radzen[id + 'move']);
-          grid.removeEventListener('touchmove', Radzen[id + 'touchmove']);
-          grid.removeEventListener('click', Radzen[id + 'end']);
-          document.removeEventListener('mouseup', Radzen[id + 'end']);
-          document.removeEventListener('touchend', Radzen[id + 'end']);
-          document.removeEventListener('touchcancel', Radzen[id + 'end']);
-
-          Radzen[id + 'end'] = null;
-          Radzen[id + 'move'] = null;
-          Radzen[id + 'touchmove'] = null;
-          Radzen[id + 'lastTouchX'] = null;
-          Radzen[id + 'lastTouchY'] = null;
+          cleanup();
 
           if (triggeredByTouch && gridRef && touchX != null && touchY != null) {
               var target = document.elementFromPoint(touchX, touchY);
@@ -5418,20 +5493,17 @@ window.Radzen = {
                   }
               }
           }
-      }
-      grid.removeEventListener('click', Radzen[id + 'end']);
-      grid.addEventListener('click', Radzen[id + 'end']);
-      document.removeEventListener('mouseup', Radzen[id + 'end']);
-      document.addEventListener('mouseup', Radzen[id + 'end']);
-      document.removeEventListener('touchend', Radzen[id + 'end']);
-      document.addEventListener('touchend', Radzen[id + 'end'], { passive: true });
-      document.removeEventListener('touchcancel', Radzen[id + 'end']);
-      document.addEventListener('touchcancel', Radzen[id + 'end'], { passive: true });
+      };
 
-      Radzen[id + 'move'] = function (e) {
-          var el = document.getElementById(id + 'visual');
-          if (el) {
-              el.style.display = 'block';
+      var move = function (e) {
+          if (e.buttons === 0 || !grid.isConnected) {
+              cleanup();
+              return;
+          }
+
+          var ghost = document.getElementById(id + 'visual');
+          if (ghost) {
+              ghost.style.display = 'block';
 
               if (/Edge/.test(navigator.userAgent)) {
                   var scrollLeft = document.body.scrollLeft;
@@ -5441,25 +5513,31 @@ window.Radzen = {
                   var scrollTop = document.documentElement.scrollTop;
               }
 
-              el.style.top = e.clientY + scrollTop + 10 + 'px';
-              el.style.left = e.clientX + scrollLeft + 10 + 'px';
+              ghost.style.top = e.clientY + scrollTop + 10 + 'px';
+              ghost.style.left = e.clientX + scrollLeft + 10 + 'px';
           }
-      }
-      grid.removeEventListener('mousemove', Radzen[id + 'move']);
-      grid.addEventListener('mousemove', Radzen[id + 'move']);
+          updateAutoScroll(e.clientX, e.clientY);
+      };
 
-      Radzen[id + 'touchmove'] = function (e) {
+      var touchmove = function (e) {
           if (e.touches && e.touches[0]) {
-              Radzen[id + 'lastTouchX'] = e.touches[0].clientX;
-              Radzen[id + 'lastTouchY'] = e.touches[0].clientY;
-              Radzen[id + 'move']({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+              lastTouchX = e.touches[0].clientX;
+              lastTouchY = e.touches[0].clientY;
+              move({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
               if (e.cancelable) {
                   e.preventDefault();
               }
           }
-      }
-      grid.removeEventListener('touchmove', Radzen[id + 'touchmove']);
-      grid.addEventListener('touchmove', Radzen[id + 'touchmove'], { passive: false });
+      };
+
+      Radzen[id + 'reorderCleanup'] = cleanup;
+
+      grid.addEventListener('click', end);
+      document.addEventListener('mouseup', end);
+      document.addEventListener('touchend', end, { passive: true });
+      document.addEventListener('touchcancel', end, { passive: true });
+      document.addEventListener('mousemove', move);
+      grid.addEventListener('touchmove', touchmove, { passive: false });
   },
   stopColumnResize: function (id, grid, columnIndex) {
     var resize = Radzen[id + 'columnResize'];
