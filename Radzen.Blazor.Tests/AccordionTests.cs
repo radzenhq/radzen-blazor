@@ -665,6 +665,63 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("true", button.GetAttribute("aria-expanded"));
             Assert.False(string.IsNullOrEmpty(button.GetAttribute("aria-controls")));
         }
+
+        class AccordionMultipleHost : ComponentBase
+        {
+            public bool Multiple { get; set; }
+
+            public void Refresh() => StateHasChanged();
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenAccordion>(0);
+                builder.AddAttribute(1, nameof(RadzenAccordion.Multiple), Multiple);
+                builder.AddAttribute(2, nameof(RadzenAccordion.Items), (RenderFragment)(items =>
+                {
+                    items.OpenComponent<RadzenAccordionItem>(0);
+                    items.AddAttribute(1, "Text", "Item 1");
+                    items.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    items.CloseComponent();
+
+                    items.OpenComponent<RadzenAccordionItem>(3);
+                    items.AddAttribute(4, "Text", "Item 2");
+                    items.AddAttribute(5, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    items.CloseComponent();
+                }));
+                builder.CloseComponent();
+            }
+        }
+
+        [Fact]
+        public void Accordion_ChangingMultipleAtRuntime_DoesNotReadExpiredParameterView()
+        {
+            using var ctx = CreateContext();
+
+            var module = ctx.JSInterop.SetupModule("Radzen.createAccordion", _ => true);
+            var setMultiple = module.SetupVoid("setMultiple", _ => true);
+
+            var host = ctx.RenderComponent<AccordionMultipleHost>();
+            var accordion = host.FindComponent<RadzenAccordion>();
+
+            host.FindAll(".rz-accordion-header button")[0].Click();
+            Assert.Equal("true", host.FindAll(".rz-accordion-header button")[0].GetAttribute("aria-expanded"));
+
+            host.InvokeAsync(() =>
+            {
+                host.Instance.Multiple = true;
+                host.Instance.Refresh();
+            });
+
+            setMultiple.SetVoidResult();
+
+            host.WaitForAssertion(() => Assert.True(accordion.Instance.Multiple));
+            Assert.False(ctx.Renderer.UnhandledException.IsCompleted);
+            Assert.Contains(module.Invocations, i => i.Identifier == "setMultiple" && Equals(i.Arguments[0], true));
+
+            host.FindAll(".rz-accordion-header button")[1].Click();
+            var buttons = host.FindAll(".rz-accordion-header button");
+            Assert.Equal("true", buttons[0].GetAttribute("aria-expanded"));
+            Assert.Equal("true", buttons[1].GetAttribute("aria-expanded"));
+        }
     }
 }
-

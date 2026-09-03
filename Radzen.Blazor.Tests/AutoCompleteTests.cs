@@ -595,5 +595,53 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             }
         }
+
+        [Fact]
+        public void AutoComplete_ChangingSelectedItemAtRuntime_DoesNotReadExpiredParameterView()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var host = ctx.RenderComponent<RadzenAutoCompleteSelectedItemHost>();
+            var autoComplete = host.FindComponent<RadzenAutoComplete>();
+
+            host.InvokeAsync(() =>
+            {
+                host.Instance.SelectedItem = "Beta";
+                host.Instance.Refresh();
+            });
+
+            host.Instance.ChangeCompletion.SetResult(true);
+
+            host.WaitForAssertion(() =>
+            {
+                Assert.Equal("Beta", autoComplete.Instance.SelectedItem);
+                Assert.Equal("Beta", autoComplete.Instance.Value);
+            });
+            Assert.False(ctx.Renderer.UnhandledException.IsCompleted);
+        }
+
+        private sealed class RadzenAutoCompleteSelectedItemHost : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            private readonly string[] data = { "Alpha", "Beta" };
+
+            public object SelectedItem { get; set; }
+
+            public TaskCompletionSource<bool> ChangeCompletion { get; } = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            public void Refresh() => StateHasChanged();
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                var completion = ChangeCompletion;
+
+                builder.OpenComponent<RadzenAutoComplete>(0);
+                builder.AddAttribute(1, nameof(RadzenAutoComplete.Data), data);
+                builder.AddAttribute(2, nameof(RadzenAutoComplete.SelectedItem), SelectedItem);
+                builder.AddAttribute(3, nameof(RadzenAutoComplete.Change),
+                    new Microsoft.AspNetCore.Components.EventCallback<object>(null, (System.Func<object, Task>)(_ => completion.Task)));
+                builder.CloseComponent();
+            }
+        }
     }
 }

@@ -511,20 +511,13 @@ namespace Radzen.Blazor
                 _jsParamsChanged = true;
             }
 
-            if (parameters.DidParameterChange(nameof(SelectedItem), SelectedItem))
-            {
-                var item = parameters.GetValueOrDefault<object>(nameof(SelectedItem));
-                if (item != null)
-                {
-                    await SelectItem(item);
-                }
-            }
+            var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
 
             await base.SetParametersAsync(parameters);
 
-            if (parameters.DidParameterChange(nameof(Value), Value))
+            if (selectedItemChanged && SelectedItem != null)
             {
-                Value = parameters.GetValueOrDefault<string>(nameof(Value));
+                await SelectItem(SelectedItem);
             }
 
             if (shouldClose && !firstRender && JSRuntime != null)

@@ -503,21 +503,24 @@ namespace Radzen.Blazor
                 _visibleChanged = true;
             }
 
-            if (parameters.DidParameterChange(nameof(Multiple), Multiple) && accordionJs != null)
+            var multipleChanged = parameters.DidParameterChange(nameof(Multiple), Multiple);
+            var selectedIndexChanged = parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex);
+
+            await base.SetParametersAsync(parameters);
+
+            if (multipleChanged && accordionJs != null)
             {
-                await accordionJs.InvokeVoidAsync("setMultiple", parameters.GetValueOrDefault<bool>(nameof(Multiple)));
+                await accordionJs.InvokeVoidAsync("setMultiple", Multiple);
             }
 
-            if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
+            if (selectedIndexChanged)
             {
-                var item = items.Where(i => i.Visible).ElementAtOrDefault(parameters.GetValueOrDefault<int>(nameof(SelectedIndex)));
+                var item = items.Where(i => i.Visible).ElementAtOrDefault(SelectedIndex);
                 if (item != null && !item.GetSelected())
                 {
                     await SelectItem(item);
                 }
             }
-
-            await base.SetParametersAsync(parameters);
         }
 
         /// <inheritdoc />
