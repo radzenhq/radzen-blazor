@@ -121,7 +121,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string? GetId()
         {
-            return Name ?? base.GetId();
+            return GetIdAttribute() ?? Name ?? base.GetId();
         }
     }
 }

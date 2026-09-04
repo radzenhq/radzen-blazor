@@ -1,4 +1,5 @@
 using Bunit;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -325,6 +326,26 @@ namespace Radzen.Blazor.Tests
                     Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { HeldValue = v.ToUpperInvariant(); StateHasChanged(); }));
                 builder.CloseComponent();
             }
+        }
+
+        [Fact]
+        public void Mask_Renders_IdAttribute_OverNameParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenMask>(parameters => parameters
+                .Add(p => p.Name, "MaskName")
+                .AddUnmatched("id", "explicit-id"));
+
+            var element = component.Find("#explicit-id");
+
+            Assert.Equal("MaskName", element.GetAttribute("name"));
+            Assert.DoesNotContain(@"id=""MaskName""", component.Markup);
+
+            var maskCall = ctx.JSInterop.Invocations.First(i => i.Identifier == "Radzen.mask");
+
+            Assert.Equal("explicit-id", maskCall.Arguments[0]);
         }
     }
 }

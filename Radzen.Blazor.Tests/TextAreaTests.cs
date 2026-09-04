@@ -263,5 +263,22 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             }
         }
+
+        [Fact]
+        public void TextArea_Renders_IdAttribute_OverNameParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTextArea>(parameters => parameters
+                .Add(p => p.Name, "MaskName")
+                .AddUnmatched("id", "explicit-id"));
+
+            var element = component.Find("#explicit-id");
+
+            Assert.Equal("MaskName", element.GetAttribute("name"));
+            Assert.DoesNotContain(@"id=""MaskName""", component.Markup);
+
+        }
     }
 }
