@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.ModeChanged, m => changed = m));
 
-            component.Find(".rz-markdown-editor-modes button:nth-child(2)").Click();
+            component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
 
             Assert.Equal(MarkdownEditorMode.Source, changed);
         }
@@ -270,7 +270,7 @@ namespace Radzen.Blazor.Tests
 
             // Mode is one-way bound (no ModeChanged): the Mode parameter never changes, but the internal
             // mode field does, and rendering must follow the field, not the unchanged parameter.
-            component.Find(".rz-markdown-editor-modes button:nth-child(2)").Click();
+            component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
 
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
             Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));

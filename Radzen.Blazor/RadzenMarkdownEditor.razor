@@ -41,8 +41,8 @@
                     <div class="rz-markdown-editor-modes">
                         <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
                             <Items>
-                                <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Text=@DesignText/>
-                                <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Text=@SourceText/>
+                                <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Icon="markdown" AriaLabel=@SourceText title=@SourceText/>
+                                <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Icon="match_case" AriaLabel=@DesignText title=@DesignText/>
                             </Items>
                         </RadzenSelectBar>
                     </div>
