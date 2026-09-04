@@ -29,7 +29,7 @@
 }
 
 .rz-markdown-editor-modes {
-  margin-inline-start: auto;
+  margin-inline-end: 0.25rem;
 }
 
 .rz-markdown-editor-content {
@@ -107,4 +107,18 @@
 .rz-markdown-editor-custom-tool {
   display: inline-flex;
   align-items: center;
+}
+
+// GitHub-style task lists: no list marker, checkbox in the marker position
+.rz-markdown-editor-design,
+.rz-markdown {
+  li:has(> input[type='checkbox']:first-child) {
+    list-style: none;
+
+    > input[type='checkbox'] {
+      margin-inline-start: -1.4em;
+      margin-inline-end: 0.2em;
+      vertical-align: middle;
+    }
+  }
 }
