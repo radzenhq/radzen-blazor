@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System;
@@ -36,130 +36,33 @@ namespace Radzen
             }
         }
 
-        // Render and keyboard paths read the fetched items instead of re-entering the provider.
-        readonly VirtualItems<object> virtualItems = new();
+        List<object>? virtualItems;
+        int virtualStartIndex;
 
-        AsyncQueryHost? asyncQuery;
-
-        private AsyncQueryHost AsyncQuery => asyncQuery ??= new AsyncQueryHost(Services, StateHasChanged);
-
-        private protected Task SupersedeAsyncLoad() => asyncQuery?.SupersedeLoad() ?? Task.CompletedTask;
-
-        private protected Task WaitForAsyncLoad() => asyncQuery?.WaitForLoad() ?? Task.CompletedTask;
-
-        private protected void CancelAsyncQueryLookup() => asyncQuery?.CancelLookup();
-
-        private protected bool TryGetAsyncQueryCoordinator<TQuery>(IQueryable<TQuery> query,
-            [NotNullWhen(true)] out AsyncQueryCoordinator? coordinator) =>
-            AsyncQuery.TryGetCoordinator(query, out coordinator);
-
-        private protected static int GetVirtualPageSize(int requested, int fallback) =>
-            requested > 0 ? requested : fallback;
-
-        internal int VirtualStartIndex => virtualItems.StartIndex;
+        internal int VirtualStartIndex => virtualStartIndex;
 
         [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
-            var fetch = virtualItems.BeginFetch();
-
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
-
             var view = (LoadData.HasDelegate ? data : View)?.Cast<object>().AsQueryable() ?? Enumerable.Empty<object>().AsQueryable();
-            var top = GetVirtualPageSize(request.Count, PageSize);
+            var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
+            var top = request.Count;
 
-            int totalItemsCount;
-            List<object> items;
+            if (top <= 0)
+            {
+                top = PageSize;
+            }
 
             if (LoadData.HasDelegate)
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, Filter = searchText });
-                totalItemsCount = Count;
-                items = (Data ?? Enumerable.Empty<object>()).Cast<object>().ToList();
-            }
-            else
-            {
-                (totalItemsCount, items) = await FetchItemsAsync(view, request, top);
             }
 
-            var hadItems = virtualItems.HasAny;
+            virtualStartIndex = request.StartIndex;
+            virtualItems = (LoadData.HasDelegate ? (Data ?? Enumerable.Empty<object>()) : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
 
-            if (virtualItems.TryPublish(fetch, request.StartIndex, totalItemsCount, items)
-                && virtualItems.HasAny != hadItems)
-            {
-                await InvokeAsync(StateHasChanged);
-            }
-
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(items, totalItemsCount);
-        }
-
-        /// <summary>How many items the virtualized list holds in total, as of the last fetch.</summary>
-        int VirtualItemCount() => virtualItems.TotalCount;
-
-        /// <summary>
-        /// The item at <paramref name="index" /> in the virtualized list, taken from the fetched items
-        /// when they hold that index.
-        /// </summary>
-        internal async Task<object?> VirtualItemAt(int index)
-        {
-            var queryGeneration = virtualItems.QueryGeneration;
-
-            CancelAsyncQueryLookup();
-
-            if (virtualItems.TryGetAt(index, out var item))
-            {
-                return item;
-            }
-
-            var view = View?.Cast<object>().AsQueryable();
-
-            if (view == null)
-            {
-                return null;
-            }
-
-            if (!TryGetAsyncQueryCoordinator(view, out var coordinator))
-            {
-                return view.Skip(index).FirstOrDefault();
-            }
-
-            return await coordinator.LookupAsync(virtualItems, queryGeneration, view, index);
-        }
-
-        /// <summary>Invalidates the virtual items and cancels its outstanding lookup.</summary>
-        void InvalidateVirtualItems()
-        {
-            virtualItems.Invalidate();
-
-            CancelAsyncQueryLookup();
-        }
-
-        /// <summary>Whether the list has anything to show.</summary>
-        internal bool HasAnyItems()
-        {
-            if (IsVirtualizationAllowed() && !LoadData.HasDelegate)
-            {
-                return virtualItems.HasAny;
-            }
-
-            return View != null && View.Cast<object>().Any();
-        }
-
-        async Task<(int Count, List<object> Items)> FetchItemsAsync(IQueryable<object> view,
-            Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request, int top)
-        {
-            if (TryGetAsyncQueryCoordinator(view, out var coordinator))
-            {
-                using var tracked = coordinator.TrackVirtualRequest(request.CancellationToken);
-                var result = await tracked.CountAndPageAsync(view,
-                    view.Skip(request.StartIndex).Take(top), true);
-
-                return result.HasValue
-                    ? result.Value
-                    : (VirtualItemCount(), new List<object>());
-            }
-
-            return (view.Count(), view.Skip(request.StartIndex).Take(top).ToList());
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(virtualItems, LoadData.HasDelegate ? Count : totalItemsCount);
         }
 
         /// <summary>
@@ -453,8 +356,6 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
-            await WaitForAsyncLoad();
-
             if (internalValue != null)
             {
                 await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
@@ -509,7 +410,6 @@ namespace Radzen
 
             searchText = null;
             _view = null;
-            InvalidateVirtualItems();
             await SearchTextChanged.InvokeAsync(searchText);
             if (JSRuntime != null)
             {
@@ -523,8 +423,6 @@ namespace Radzen
             selectedItems.Clear();
 
             selectedIndex = -1;
-
-            await WaitForAsyncLoad();
 
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default(T)!);
@@ -557,7 +455,6 @@ namespace Radzen
                 {
                     _data = value;
                     _view = null;
-                    InvalidateVirtualItems();
 
                     if (!LoadData.HasDelegate)
                     {
@@ -808,7 +705,8 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed() && !LoadData.HasDelegate)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, VirtualItemCount());
+                    var totalCount = View != null ? View.Cast<object>().Count() : 0;
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, totalCount);
                 }
                 else
                 {
@@ -855,7 +753,7 @@ namespace Radzen
             {
                 if (useVirtualization)
                 {
-                    virtualTotalCount = VirtualItemCount();
+                    virtualTotalCount = View != null ? View.Cast<object>().AsQueryable().Count() : 0;
                 }
                 else
                 {
@@ -902,7 +800,7 @@ namespace Radzen
                         if (!Multiple && !popupOpened && shouldSelectOnChange != false)
                         {
                             object? selectedItemToChange = useVirtualization
-                                ? await VirtualItemAt(selectedIndex)
+                                ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
                                 : items.ElementAtOrDefault(selectedIndex);
                             if (selectedItemToChange != null)
                             {
@@ -940,7 +838,7 @@ namespace Radzen
                         if (!Multiple && !popupOpened && shouldSelectOnChange != false)
                         {
                             object? selectedItemToChange = useVirtualization
-                                ? await VirtualItemAt(selectedIndex)
+                                ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
                                 : items.ElementAtOrDefault(selectedIndex);
                             if (selectedItemToChange != null)
                             {
@@ -969,7 +867,7 @@ namespace Radzen
                     if (selectedIndex >= 0 && selectedIndex <= effectiveCount - 1)
                     {
                         object? itemToSelect = useVirtualization
-                            ? await VirtualItemAt(selectedIndex)
+                            ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
                             : items.ElementAtOrDefault(selectedIndex);
 
                         await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
@@ -1170,12 +1068,11 @@ namespace Radzen
             if (!LoadData.HasDelegate)
             {
                 _view = null;
-                InvalidateVirtualItems();
                 if (IsVirtualizationAllowed())
                 {
                     if (virtualize != null)
                     {
-                        await InvokeAsync(virtualize.RefreshDataAsync);
+                        await virtualize.RefreshDataAsync();
                     }
                 }
 
@@ -1544,11 +1441,6 @@ namespace Radzen
 
                 SetSelectedIndexFromSelectedItem();
 
-                if (raiseChange)
-                {
-                    await WaitForAsyncLoad();
-                }
-
                 await SelectedItemChanged.InvokeAsync(selectedItem);
             }
             else
@@ -1594,8 +1486,6 @@ namespace Radzen
             }
             if (raiseChange)
             {
-                await WaitForAsyncLoad();
-
                 if (ValueChanged.HasDelegate)
                 {
                     if (Multiple)
@@ -1877,8 +1767,6 @@ namespace Radzen
         public override void Dispose()
         {
             base.Dispose();
-
-            asyncQuery?.Dispose();
 
             GC.SuppressFinalize(this);
         }

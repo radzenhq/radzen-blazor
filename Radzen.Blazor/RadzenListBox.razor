@@ -66,7 +66,7 @@
                     aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId">
                     @RenderItems()
                 </ul>
-                @if (!HasAnyItems() && !IsLoading)
+                @if (!View.Cast<object>().Any() && !IsLoading)
                 {
                     <div class="rz-listbox-empty-message">
                         @if (EmptyTemplate != null)

@@ -208,7 +208,7 @@ namespace Radzen
         protected IJSRuntime? JSRuntime { get; set; }
 
         [Inject]
-        internal IServiceProvider Services { get; set; } = default!;
+        private IServiceProvider Services { get; set; } = default!;
 
         private Localizer? localizer;
 
