@@ -2,12 +2,23 @@
 
 @if (Visible)
 {
-    <div @ref=Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+    <div @ref="Element" style="@Style" @attributes="@Attributes" class="@GetCssClass()" id="@GetId()">
         @if (ShowToolbar)
         {
             <div class="rz-toolbar rz-markdown-editor-toolbar">
                 <div class="rz-markdown-editor-tools">
-                    <CascadingValue Value=@this>
+                    @if (ShowModeSwitch)
+                    {
+                        <div class="rz-markdown-editor-modes">
+                            <RadzenSelectBar TValue="MarkdownEditorMode" Value="@mode" ValueChanged="@SetModeAsync" Size="ButtonSize.Small" Disabled="@Disabled">
+                                <Items>
+                                    <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Icon="markdown" AriaLabel="@SourceText" title="@SourceText"/>
+                                    <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Icon="match_case" AriaLabel="@DesignText" title="@DesignText"/>
+                                </Items>
+                            </RadzenSelectBar>
+                        </div>
+                    }
+                    <CascadingValue Value="@this">
                         @if (ChildContent != null)
                         {
                             @ChildContent
@@ -36,25 +47,14 @@
                         }
                     </CascadingValue>
                 </div>
-                @if (ShowModeSwitch)
-                {
-                    <div class="rz-markdown-editor-modes">
-                        <RadzenSelectBar TValue="MarkdownEditorMode" Value=@mode ValueChanged=@SetModeAsync Size="ButtonSize.Small" Disabled=@Disabled>
-                            <Items>
-                                <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Icon="markdown" AriaLabel=@SourceText title=@SourceText/>
-                                <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Icon="match_case" AriaLabel=@DesignText title=@DesignText/>
-                            </Items>
-                        </RadzenSelectBar>
-                    </div>
-                }
             </div>
         }
         <div class="rz-markdown-editor-content">
-            <div @ref=editable class="rz-markdown-editor-design" hidden=@(mode == MarkdownEditorMode.Source)
-                 contenteditable=@(Disabled ? "false" : "true")></div>
-            <textarea @ref=textarea class="rz-markdown-editor-textarea" hidden=@(mode == MarkdownEditorMode.Design)
-                      name=@Name rows=@Rows placeholder=@CurrentPlaceholder disabled=@Disabled
-                      @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange=@OnChange></textarea>
+            <div @ref="editable" class="rz-markdown-editor-design" hidden="@(mode == MarkdownEditorMode.Source)"
+                 contenteditable='@(Disabled ? "false" : "true")'></div>
+            <textarea @ref="textarea" class="rz-markdown-editor-textarea" hidden="@(mode == MarkdownEditorMode.Design)"
+                      name="@Name" rows="@Rows" placeholder="@CurrentPlaceholder" disabled="@Disabled"
+                      @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange="@OnChange"></textarea>
         </div>
     </div>
 }
@@ -65,19 +65,19 @@
         <RadzenTemplateForm TItem="LinkDialogModel" Data="@model" Submit="() => ds.Close(true)">
             <div class="rz-html-editor-dialog-item">
                 <label>@(image ? ImageUrlText : UrlText)</label>
-                <RadzenTextBox @bind-Value=@model.Url Style="width: 100%" Name="Url" />
+                <RadzenTextBox @bind-Value="@model.Url" Style="width: 100%" Name="Url" />
                 <RadzenRequiredValidator Component="Url" />
             </div>
             @if (!hasSelection)
             {
                 <div class="rz-html-editor-dialog-item">
                     <label>@(image ? ImageAltText : LinkText)</label>
-                    <RadzenTextBox @bind-Value=@model.Text Style="width: 100%" />
+                    <RadzenTextBox @bind-Value="@model.Text" Style="width: 100%" />
                 </div>
             }
             <div class="rz-html-editor-dialog-buttons">
-                <RadzenButton Text=@CancelText Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
-                <RadzenButton Text=@OkText ButtonType="ButtonType.Submit" Variant="Variant.Flat" />
+                <RadzenButton Text="@CancelText" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+                <RadzenButton Text="@OkText" ButtonType="ButtonType.Submit" Variant="Variant.Flat" />
             </div>
         </RadzenTemplateForm>
     </div>;

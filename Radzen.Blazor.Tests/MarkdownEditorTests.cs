@@ -192,7 +192,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
 
-            var icons = component.FindAll(".rz-markdown-editor-tools .rzi").Select(i => i.TextContent).ToList();
+            var icons = component.FindAll(".rz-markdown-editor-tools > button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "title", "format_quote", "code", "code_blocks",
                                  "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
         }
@@ -213,7 +213,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.AddChildContent<RadzenMarkdownEditorBold>());
 
-            var icons = component.FindAll(".rz-markdown-editor-tools .rzi").Select(i => i.TextContent).ToList();
+            var icons = component.FindAll(".rz-markdown-editor-tools > button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "format_bold" }, icons);
         }
 
@@ -230,7 +230,7 @@ namespace Radzen.Blazor.Tests
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorItalic>());
 
-            component.Find(".rz-markdown-editor-tools button").Click();
+            component.Find(".rz-markdown-editor-tools > button").Click();
 
             var invocation = Assert.Single(apply.Invocations);
             Assert.Equal("*hi*", invocation.Arguments[2]);
@@ -344,7 +344,7 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.CommandName, "InsertToday")
                     .Add(x => x.Icon, "today")));
 
-            component.Find(".rz-markdown-editor-tools button").Click();
+            component.Find(".rz-markdown-editor-tools > button").Click();
 
             Assert.Equal("InsertToday", executed);
             Assert.Empty(apply.Invocations);
