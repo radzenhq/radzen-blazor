@@ -16,12 +16,12 @@ public abstract class RadzenMarkdownEditorButtonBase : ComponentBase, IDisposabl
 
     private Localizer? localizer;
 
-    internal Localizer Localizer => localizer ??= Services.GetService<Localizer>() ?? Localizer.Default;
+    private Localizer Localizer => localizer ??= Services.GetService<Localizer>() ?? Localizer.Default;
 
     /// <summary>
     /// Returns the localized string for <paramref name="key" /> using the editor's UI culture.
     /// </summary>
-    public string Localize(string key) => Localizer.Get(key, Editor?.UICulture ?? CultureInfo.CurrentUICulture);
+    protected string Localize(string key) => Localizer.Get(key, Editor?.UICulture ?? CultureInfo.CurrentUICulture);
 
     /// <summary>
     /// The <see cref="RadzenMarkdownEditor" /> this tool belongs to.
