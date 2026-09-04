@@ -2397,4 +2397,68 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Scatter Chart</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="MarkdownEditorUndo_Title" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="MarkdownEditorRedo_Title" xml:space="preserve">
+    <value>Redo</value>
+  </data>
+  <data name="MarkdownEditorBold_Title" xml:space="preserve">
+    <value>Bold</value>
+  </data>
+  <data name="MarkdownEditorItalic_Title" xml:space="preserve">
+    <value>Italic</value>
+  </data>
+  <data name="MarkdownEditorStrikethrough_Title" xml:space="preserve">
+    <value>Strikethrough</value>
+  </data>
+  <data name="MarkdownEditorHeading_Title" xml:space="preserve">
+    <value>Heading</value>
+  </data>
+  <data name="MarkdownEditorQuote_Title" xml:space="preserve">
+    <value>Quote</value>
+  </data>
+  <data name="MarkdownEditorCode_Title" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="MarkdownEditorCodeBlock_Title" xml:space="preserve">
+    <value>Code block</value>
+  </data>
+  <data name="MarkdownEditorUnorderedList_Title" xml:space="preserve">
+    <value>Bulleted list</value>
+  </data>
+  <data name="MarkdownEditorOrderedList_Title" xml:space="preserve">
+    <value>Numbered list</value>
+  </data>
+  <data name="MarkdownEditorTaskList_Title" xml:space="preserve">
+    <value>Task list</value>
+  </data>
+  <data name="MarkdownEditorLink_Title" xml:space="preserve">
+    <value>Insert link</value>
+  </data>
+  <data name="MarkdownEditorLink_UrlText" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="MarkdownEditorLink_LinkText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="MarkdownEditorImage_Title" xml:space="preserve">
+    <value>Insert image</value>
+  </data>
+  <data name="MarkdownEditorImage_UrlText" xml:space="preserve">
+    <value>Image URL</value>
+  </data>
+  <data name="MarkdownEditorImage_AltText" xml:space="preserve">
+    <value>Alternative text</value>
+  </data>
+  <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
+    <value>Horizontal rule</value>
+  </data>
 </root>

@@ -63,6 +63,10 @@ public class XmlVisitor : NodeVisitorBase, IDisposable
     public override void VisitListItem(ListItem listItem)
     {
         writer.WriteStartElement("item");
+        if (listItem.Checked is bool isChecked)
+        {
+            writer.WriteAttributeString("checked", isChecked ? "true" : "false");
+        }
         base.VisitListItem(listItem);
         writer.WriteEndElement();
     }
@@ -127,6 +131,13 @@ public class XmlVisitor : NodeVisitorBase, IDisposable
     {
         writer.WriteStartElement("strong");
         base.VisitStrong(strong);
+        writer.WriteEndElement();
+    }
+
+    public override void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        writer.WriteStartElement("strikethrough");
+        base.VisitStrikethrough(strikethrough);
         writer.WriteEndElement();
     }
 

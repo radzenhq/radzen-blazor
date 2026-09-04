@@ -809,5 +809,26 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_PieChartText { get { return ResourceManager.GetString("Spreadsheet_PieChartText", resourceCulture); } }
         public static string Spreadsheet_DonutChartText { get { return ResourceManager.GetString("Spreadsheet_DonutChartText", resourceCulture); } }
         public static string Spreadsheet_ScatterChartText { get { return ResourceManager.GetString("Spreadsheet_ScatterChartText", resourceCulture); } }
+        public static string MarkdownEditor_DesignText { get { return ResourceManager.GetString("MarkdownEditor_DesignText", resourceCulture); } }
+        public static string MarkdownEditor_SourceText { get { return ResourceManager.GetString("MarkdownEditor_SourceText", resourceCulture); } }
+        public static string MarkdownEditorUndo_Title { get { return ResourceManager.GetString("MarkdownEditorUndo_Title", resourceCulture); } }
+        public static string MarkdownEditorRedo_Title { get { return ResourceManager.GetString("MarkdownEditorRedo_Title", resourceCulture); } }
+        public static string MarkdownEditorBold_Title { get { return ResourceManager.GetString("MarkdownEditorBold_Title", resourceCulture); } }
+        public static string MarkdownEditorItalic_Title { get { return ResourceManager.GetString("MarkdownEditorItalic_Title", resourceCulture); } }
+        public static string MarkdownEditorStrikethrough_Title { get { return ResourceManager.GetString("MarkdownEditorStrikethrough_Title", resourceCulture); } }
+        public static string MarkdownEditorHeading_Title { get { return ResourceManager.GetString("MarkdownEditorHeading_Title", resourceCulture); } }
+        public static string MarkdownEditorQuote_Title { get { return ResourceManager.GetString("MarkdownEditorQuote_Title", resourceCulture); } }
+        public static string MarkdownEditorCode_Title { get { return ResourceManager.GetString("MarkdownEditorCode_Title", resourceCulture); } }
+        public static string MarkdownEditorCodeBlock_Title { get { return ResourceManager.GetString("MarkdownEditorCodeBlock_Title", resourceCulture); } }
+        public static string MarkdownEditorUnorderedList_Title { get { return ResourceManager.GetString("MarkdownEditorUnorderedList_Title", resourceCulture); } }
+        public static string MarkdownEditorOrderedList_Title { get { return ResourceManager.GetString("MarkdownEditorOrderedList_Title", resourceCulture); } }
+        public static string MarkdownEditorTaskList_Title { get { return ResourceManager.GetString("MarkdownEditorTaskList_Title", resourceCulture); } }
+        public static string MarkdownEditorLink_Title { get { return ResourceManager.GetString("MarkdownEditorLink_Title", resourceCulture); } }
+        public static string MarkdownEditorLink_UrlText { get { return ResourceManager.GetString("MarkdownEditorLink_UrlText", resourceCulture); } }
+        public static string MarkdownEditorLink_LinkText { get { return ResourceManager.GetString("MarkdownEditorLink_LinkText", resourceCulture); } }
+        public static string MarkdownEditorImage_Title { get { return ResourceManager.GetString("MarkdownEditorImage_Title", resourceCulture); } }
+        public static string MarkdownEditorImage_UrlText { get { return ResourceManager.GetString("MarkdownEditorImage_UrlText", resourceCulture); } }
+        public static string MarkdownEditorImage_AltText { get { return ResourceManager.GetString("MarkdownEditorImage_AltText", resourceCulture); } }
+        public static string MarkdownEditorHorizontalRule_Title { get { return ResourceManager.GetString("MarkdownEditorHorizontalRule_Title", resourceCulture); } }
     }
 }

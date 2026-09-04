@@ -3259,6 +3259,23 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+            Name = "MarkdownEditor",
+            Icon = "\uf552",
+            Path = "markdown-editor",
+            Title = "Blazor Markdown Editor | Free UI Components by Radzen",
+            Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a WYSIWYG Design mode with a Source mode for raw Markdown.",
+            Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
+            Related = new [] { "markdown", "html-editor", "textarea" },
+            Faq = new []
+            {
+                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode - a contenteditable surface kept in sync with the Markdown - with the toolbar and keyboard shortcuts editing the content directly." },
+                new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
+                new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
+            }
+        },
+        new Example
+        {
             Name = "Data",
             Icon = "\ue99c",
             Children = new [] {

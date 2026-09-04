@@ -2387,4 +2387,17 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>散布図</value>
   </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditor_DesignText" xml:space="preserve">
+    <value>デザイン</value>
+  </data>
+  <data name="MarkdownEditor_SourceText" xml:space="preserve">
+    <value>ソース</value>
+  </data>
+  <data name="MarkdownEditorUndo_Title" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="MarkdownEditorRedo_Title" xml:space="preserve">
+    <value>やり直し</value>
+  </data>
 </root>

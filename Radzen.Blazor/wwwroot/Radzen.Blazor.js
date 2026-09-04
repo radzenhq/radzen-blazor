@@ -7206,3 +7206,644 @@ Radzen.datePickerKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
+
+Radzen.markdownSerialize = function (root) {
+  var escapeText = function (text) {
+    return text.replace(/[\\`*_~\[\]]/g, function (c) { return '\\' + c; });
+  };
+  var escapeBlockStart = function (line) {
+    return line.replace(/^(\s*)([#>+-])(\s)/, '$1\\$2$3')
+               .replace(/^(\s*)(\d+)([.)])(\s)/, '$1$2\\$3$4');
+  };
+  var styleWraps = function (el) {
+    var wraps = [];
+    var s = el.style;
+    if (s.fontWeight === 'bold' || parseInt(s.fontWeight, 10) >= 600) wraps.push('**');
+    if (s.fontStyle === 'italic') wraps.push('*');
+    if ((s.textDecoration || '').indexOf('line-through') >= 0) wraps.push('~~');
+    return wraps;
+  };
+  var wrap = function (token, inner) {
+    var m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/); // keep edge whitespace outside tokens
+    return m[2] ? m[1] + token + m[2] + token + m[3] : inner;
+  };
+  var inline = function (node) {
+    var out = '';
+    node.childNodes.forEach(function (child) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        out += escapeText(child.data.replace(/\s+/g, ' '));
+        return;
+      }
+      if (child.nodeType !== Node.ELEMENT_NODE) return;
+      switch (child.tagName) {
+        case 'STRONG': case 'B': out += wrap('**', inline(child)); break;
+        case 'EM': case 'I': out += wrap('*', inline(child)); break;
+        case 'DEL': case 'S': case 'STRIKE': out += wrap('~~', inline(child)); break;
+        case 'CODE': {
+          var code = child.textContent;
+          out += code.indexOf('`') >= 0 ? '`` ' + code + ' ``' : '`' + code + '`';
+          break;
+        }
+        case 'A': out += '[' + inline(child) + '](' + (child.getAttribute('href') || '') + ')'; break;
+        case 'IMG': out += '![' + (child.getAttribute('alt') || '') + '](' + (child.getAttribute('src') || '') + ')'; break;
+        case 'BR': out += '  \n'; break;
+        case 'INPUT': break; // task checkboxes are handled by the list item
+        default: {
+          var text = inline(child);
+          styleWraps(child).forEach(function (token) { text = wrap(token, text); });
+          out += text;
+        }
+      }
+    });
+    return out;
+  };
+  var paragraph = function (el) {
+    var text = inline(el).replace(/^[ ]+|[ ]+$/g, '');
+    return text ? text.split('\n').map(escapeBlockStart).join('\n') : '';
+  };
+  var indent = function (text, first, rest) {
+    return text.split('\n').map(function (line, i) {
+      return (i === 0 ? first : rest) + line;
+    }).join('\n').replace(/[ ]+$/gm, '');
+  };
+  var listItem = function (li, marker) {
+    var checkbox = li.querySelector(':scope > input[type=checkbox], :scope > p:first-child > input[type=checkbox]:first-child');
+    if (checkbox) marker += checkbox.checked ? '[x] ' : '[ ] ';
+    var content = blocks(li) || '';
+    return indent(content, marker, ' '.repeat(marker.length));
+  };
+  var tableCell = function (cell) { return inline(cell).trim().replace(/\|/g, '\\|'); };
+  var block = function (el) {
+    switch (el.tagName) {
+      case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6':
+        return '#'.repeat(+el.tagName[1]) + ' ' + paragraph(el);
+      case 'P': case 'DIV': return paragraph(el);
+      case 'BLOCKQUOTE':
+        return (blocks(el) || '').split('\n').map(function (l) { return ('> ' + l).replace(/[ ]+$/, ''); }).join('\n');
+      case 'UL':
+        return Array.prototype.map.call(el.children, function (li) { return listItem(li, '- '); }).join('\n');
+      case 'OL': {
+        var start = parseInt(el.getAttribute('start'), 10) || 1;
+        return Array.prototype.map.call(el.children, function (li, i) { return listItem(li, (start + i) + '. '); }).join('\n');
+      }
+      case 'PRE': {
+        var codeEl = el.querySelector('code');
+        var lang = ((codeEl && codeEl.className || '').match(/language-(\S+)/) || [])[1] || '';
+        var code = (codeEl || el).textContent.replace(/\n$/, '');
+        var fence = /```/.test(code) ? '````' : '```';
+        return fence + lang + '\n' + code + '\n' + fence;
+      }
+      case 'HR': return '---';
+      case 'TABLE': {
+        var rows = Array.prototype.slice.call(el.querySelectorAll('tr'));
+        if (!rows.length) return '';
+        var line = function (cells) { return '| ' + cells.join(' | ') + ' |'; };
+        var header = Array.prototype.map.call(rows[0].cells, tableCell);
+        var aligns = Array.prototype.map.call(rows[0].cells, function (cell) {
+          var a = cell.style.textAlign;
+          return a === 'center' ? ':---:' : a === 'right' ? '---:' : a === 'left' ? ':---' : '---';
+        });
+        var body = rows.slice(1).map(function (row) {
+          return line(Array.prototype.map.call(row.cells, tableCell));
+        });
+        return [line(header), line(aligns)].concat(body).join('\n');
+      }
+      default: return paragraph(el);
+    }
+  };
+  var blocks = function (parent) {
+    var out = [], pending = null;
+    var flush = function () {
+      if (pending) { var text = paragraph(pending); if (text) out.push(text); pending = null; }
+    };
+    parent.childNodes.forEach(function (child) {
+      var isBlock = child.nodeType === Node.ELEMENT_NODE &&
+        /^(H[1-6]|P|DIV|BLOCKQUOTE|UL|OL|PRE|HR|TABLE)$/.test(child.tagName);
+      if (isBlock) {
+        flush();
+        var text = block(child);
+        if (text) out.push(text);
+      } else {
+        // stray inline content at block level accumulates into an implicit paragraph
+        if (!pending) { pending = document.createElement('p'); }
+        pending.appendChild(child.cloneNode(true));
+      }
+    });
+    flush();
+    return out.join('\n\n');
+  };
+  return root ? blocks(root) : '';
+};
+
+Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts) {
+  if (!editable || !textarea) {
+    return { setContent: function () {}, dispose: function () {} };
+  }
+
+  shortcuts = shortcuts || [];
+  var editor = { editable: editable, textarea: textarea, instance: instance };
+  var inputTimeout = null;
+  var suppressInput = false;
+  var dirty = false; // true once the surface has genuinely been edited since the last setContent/blur flush
+
+  var notifyValue = function () {
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
+    reportState();
+  };
+
+  // mirrors HtmlSanitizer.IsDangerousUrl (Radzen.Blazor/Documents/Markdown/HtmlSanitizer.cs)
+  var isDangerousUrl = function (url) {
+    return /^\s*(javascript|vbscript|data:text\/html)/i.test(url || '');
+  };
+
+  var onInput = function () {
+    if (suppressInput) return;
+    dirty = true;
+    clearTimeout(inputTimeout);
+    inputTimeout = setTimeout(notifyValue, 250);
+  };
+
+  var onBlur = function () {
+    clearTimeout(inputTimeout);
+    if (!dirty) return; // matches RadzenTextArea semantics: no edit, no Change
+    dirty = false;
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', Radzen.markdownSerialize(editable))); } catch { }
+  };
+
+  var onKeyDown = function (e) {
+    if (!(e.ctrlKey || e.metaKey) || !e.code) return;
+    var codeKey = e.code;
+    if (codeKey === 'KeyZ' && !e.altKey) {
+      e.preventDefault();
+      if (e.shiftKey) editor.redo(); else editor.undo();
+      return;
+    }
+    if (codeKey === 'KeyY' && !e.altKey && !e.shiftKey) {
+      e.preventDefault();
+      editor.redo();
+      return;
+    }
+    var key = 'Ctrl+';
+    if (e.altKey) key += 'Alt+';
+    if (e.shiftKey) key += 'Shift+';
+    key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
+    if (shortcuts.includes(key)) {
+      e.preventDefault();
+      try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
+    }
+  };
+
+  var onPaste = function (e) {
+    var html = e.clipboardData && e.clipboardData.getData('text/html');
+    if (!html) return; // plain-text paste: native behavior is fine
+    e.preventDefault();
+    // preventDefault suppresses the native beforeinput/insertFromPaste that onBeforeInput
+    // would otherwise snapshot on, so checkpoint here before laundering mutates the DOM.
+    editor.snapshot(true);
+    lastInputType = 'insertFromPaste';
+    lastInputTime = Date.now();
+    // launder rich content: pasted HTML → markdown → canonical HTML via .NET
+    // parsed via DOMParser (not a live-document div) so clipboard HTML like
+    // <img src=x onerror=...> can't execute while markdownSerialize reads it
+    var scratch = new DOMParser().parseFromString(html, 'text/html').body;
+    var markdown = Radzen.markdownSerialize(scratch);
+    try {
+      suppressDisposed(instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
+        var sel = window.getSelection();
+        if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return;
+        var range = sel.getRangeAt(0);
+        range.deleteContents();
+        var fragment = document.createRange().createContextualFragment(canonical);
+        var last = fragment.lastChild;
+        range.insertNode(fragment);
+        if (last) { range.setStartAfter(last); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
+        onInput();
+      }));
+    } catch { }
+  };
+
+  var onEmojiInput = function (e) {
+    if (!e || e.inputType !== 'insertText' || e.data !== ':') return;
+    var sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed) return;
+    var node = sel.anchorNode;
+    if (!node || node.nodeType !== Node.TEXT_NODE || !editable.contains(node)) return;
+    for (var el = node.parentNode; el && el !== editable; el = el.parentNode) {
+      if (el.tagName === 'CODE' || el.tagName === 'PRE') return; // parser skips shortcodes in code
+    }
+    var match = node.data.substring(0, sel.anchorOffset).match(/:([A-Za-z0-9_+-]+):$/);
+    if (!match) return;
+    var start = sel.anchorOffset - match[0].length;
+    var shortcode = match[0];
+    try {
+      suppressDisposed(instance.invokeMethodAsync('LookupEmojiAsync', match[1]).then(function (emoji) {
+        // the lookup is async: bail out if the surface changed underneath it
+        if (!emoji || node.data.substring(start, start + shortcode.length) !== shortcode) return;
+        editor.snapshot(true); // its own history entry, so undo restores the shortcode text
+        var caret = window.getSelection();
+        var caretNode = caret.rangeCount ? caret.anchorNode : null;
+        var caretOffset = caret.rangeCount ? caret.anchorOffset : 0;
+        node.replaceData(start, shortcode.length, emoji);
+        if (caretNode === node) {
+          var end = start + shortcode.length;
+          var offset = caretOffset >= end ? caretOffset - shortcode.length + emoji.length
+            : caretOffset > start ? start + emoji.length : caretOffset;
+          var range = document.createRange();
+          range.setStart(node, Math.min(offset, node.length));
+          range.collapse(true);
+          setRange(range);
+        }
+        onInput();
+      }));
+    } catch { }
+  };
+
+  editor.setContent = function (html) {
+    clearTimeout(inputTimeout);
+    dirty = false;
+    suppressInput = true;
+    editable.innerHTML = html;
+    suppressInput = false;
+  };
+
+  editor.apply = function (start, end, replacement, selectionStart, selectionEnd) {
+    editor.snapshot(true);
+    var before = textarea.value;
+    textarea.focus();
+    textarea.value = before.substring(0, start) + replacement + before.substring(end);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.setSelectionRange(selectionStart, selectionEnd);
+    reportState();
+  };
+
+  var savedRange = null;
+
+  var currentRange = function () {
+    // savedRange is only ever set by saveSelection(), called right before an async interruption
+    // (the link/image dialog) that leaves the live selection stale/collapsed; prefer it when present.
+    if (savedRange) return savedRange;
+    var sel = window.getSelection();
+    if (sel.rangeCount && editable.contains(sel.anchorNode)) return sel.getRangeAt(0);
+    return null;
+  };
+  var setRange = function (range) {
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+  var blockOf = function (node) {
+    while (node && node.parentNode !== editable) node = node.parentNode;
+    return node;
+  };
+  var blocksInRange = function (range) {
+    var first = blockOf(range.startContainer), last = blockOf(range.endContainer);
+    if (!first || !last) {
+      // empty editable: blockOf climbed out without finding a block. Give the command
+      // something to operate on instead of an empty list.
+      first = last = document.createElement('p');
+      editable.appendChild(first);
+    }
+    var result = [];
+    for (var el = first; el; el = el.nextSibling) {
+      result.push(el);
+      if (el === last) break;
+    }
+    return result;
+  };
+  var replaceTag = function (el, tag) {
+    var next = document.createElement(tag);
+    // insert next before moving children into it, so they stay attached to the document
+    // throughout the move (detaching them, even briefly, collapses the live selection)
+    el.parentNode.insertBefore(next, el);
+    while (el.firstChild) next.appendChild(el.firstChild);
+    el.parentNode.removeChild(el);
+    return next;
+  };
+  // reparenting a node (even between two attached positions) can silently collapse the
+  // live selection in Chromium, so block-restructuring commands must explicitly set a
+  // fresh, valid selection into the mutated result afterward.
+  var selectStart = function (el) {
+    if (!el) return;
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(true);
+    setRange(range);
+  };
+  var expandCollapsedToWord = function (range) {
+    if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE) return;
+    var text = range.startContainer.data, start = range.startOffset, end = range.endOffset;
+    while (start > 0 && !/\s/.test(text[start - 1])) start--;
+    while (end < text.length && !/\s/.test(text[end])) end++;
+    range.setStart(range.startContainer, start);
+    range.setEnd(range.startContainer, end);
+  };
+  var toggleInline = function (range, tag, alternates) {
+    // unwrap when an enclosing element of the type exists
+    for (var node = range.startContainer; node && node !== editable; node = node.parentNode) {
+      if (node.nodeType === Node.ELEMENT_NODE && alternates.includes(node.tagName)) {
+        var parent = node.parentNode;
+        while (node.firstChild) parent.insertBefore(node.firstChild, node);
+        parent.removeChild(node);
+        return;
+      }
+    }
+    expandCollapsedToWord(range);
+    if (range.collapsed) return;
+    var wrapper = document.createElement(tag);
+    wrapper.appendChild(range.extractContents());
+    // strip nested same-type elements inside the wrapper
+    wrapper.querySelectorAll(alternates.join(',')).forEach(function (el) {
+      while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
+      el.parentNode.removeChild(el);
+    });
+    range.insertNode(wrapper);
+    range.selectNodeContents(wrapper);
+    setRange(range);
+  };
+
+  editor.saveSelection = function () {
+    var sel = window.getSelection();
+    if (sel.rangeCount && editable.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
+  };
+  editor.hasSelection = function () {
+    var range = currentRange();
+    return !!range && !range.collapsed;
+  };
+
+  var history = { undo: [], redo: [] };
+  var lastInputTime = 0, lastInputType = null;
+  var HISTORY_LIMIT = 100;
+
+  var nodePath = function (node) {
+    var path = [];
+    while (node && node !== editable) {
+      var parent = node.parentNode;
+      path.unshift(Array.prototype.indexOf.call(parent.childNodes, node));
+      node = parent;
+    }
+    return path;
+  };
+  var resolvePath = function (path) {
+    var node = editable;
+    for (var i = 0; i < path.length && node; i++) node = node.childNodes[path[i]];
+    return node;
+  };
+  var captureState = function () {
+    var mode = textarea.hidden ? 'design' : 'source';
+    var state = { mode: mode };
+    if (mode === 'design') {
+      state.markdown = Radzen.markdownSerialize(editable);
+      state.html = editable.innerHTML;
+      var sel = window.getSelection();
+      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
+        var range = sel.getRangeAt(0);
+        state.sel = {
+          sp: nodePath(range.startContainer), so: range.startOffset,
+          ep: nodePath(range.endContainer), eo: range.endOffset
+        };
+      }
+    } else {
+      state.markdown = textarea.value;
+      state.sel = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    }
+    return state;
+  };
+  var restoreState = function (state) {
+    var mode = textarea.hidden ? 'design' : 'source';
+    if (mode === 'design') {
+      if (state.mode === 'design' && state.html !== undefined) {
+        editor.setContent(state.html);
+        if (state.sel) {
+          var start = resolvePath(state.sel.sp), end = resolvePath(state.sel.ep);
+          if (start && end) {
+            var range = document.createRange();
+            range.setStart(start, Math.min(state.sel.so, (start.length !== undefined ? start.length : start.childNodes.length)));
+            range.setEnd(end, Math.min(state.sel.eo, (end.length !== undefined ? end.length : end.childNodes.length)));
+            setRange(range);
+          }
+        }
+      } else {
+        // cross-mode entry: re-render markdown via .NET
+        instance.invokeMethodAsync('RenderMarkdownAsync', state.markdown).then(function (html) {
+          editor.setContent(html);
+        });
+      }
+    } else {
+      textarea.value = state.markdown;
+      if (state.sel && state.sel.start !== undefined) {
+        textarea.setSelectionRange(state.sel.start, state.sel.end);
+      }
+    }
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', state.markdown)); } catch { }
+  };
+
+  editor.snapshot = function (force) {
+    var now = Date.now();
+    if (!force && now - lastInputTime < 1000) return;
+    history.undo.push(captureState());
+    if (history.undo.length > HISTORY_LIMIT) history.undo.shift();
+    history.redo = [];
+    lastInputTime = now;
+  };
+  editor.undo = function () {
+    if (!history.undo.length) return;
+    history.redo.push(captureState());
+    restoreState(history.undo.pop());
+    dirty = true;
+    reportState();
+  };
+  editor.redo = function () {
+    if (!history.redo.length) return;
+    history.undo.push(captureState());
+    restoreState(history.redo.pop());
+    dirty = true;
+    reportState();
+  };
+
+  var stateTimeout = null;
+  var reportState = function () {
+    clearTimeout(stateTimeout);
+    stateTimeout = setTimeout(function () {
+      var formats = [];
+      var sel = window.getSelection();
+      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
+        for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
+          if (node.nodeType !== Node.ELEMENT_NODE) continue;
+          switch (node.tagName) {
+            case 'STRONG': case 'B': formats.push('bold'); break;
+            case 'EM': case 'I': formats.push('italic'); break;
+            case 'DEL': case 'S': formats.push('strikethrough'); break;
+            case 'CODE': formats.push('code'); break;
+            case 'BLOCKQUOTE': formats.push('quote'); break;
+            case 'UL': formats.push('unorderedList'); break;
+            case 'OL': formats.push('orderedList'); break;
+          }
+          if (/^H[1-6]$/.test(node.tagName)) formats.push('heading');
+        }
+      }
+      try {
+        suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', {
+          formats: formats, canUndo: history.undo.length > 0, canRedo: history.redo.length > 0
+        }));
+      } catch { }
+    }, 100);
+  };
+  document.addEventListener('selectionchange', reportState);
+
+  var onBeforeInput = function (e) {
+    var type = e.inputType || '';
+    var boundary = (type.indexOf('delete') === 0) !== ((lastInputType || '').indexOf('delete') === 0)
+      || type === 'insertParagraph' || type === 'insertFromPaste';
+    editor.snapshot(boundary);
+    lastInputType = type;
+    lastInputTime = Date.now();
+  };
+
+  editor.execute = function (name, value, label) {
+    if (name === 'undo') { editor.undo(); return; }
+    if (name === 'redo') { editor.redo(); return; }
+
+    var range = currentRange();
+    if (!range) { editable.focus(); range = currentRange(); if (!range) return; }
+    editable.focus();
+    setRange(range);
+    editor.snapshot(true);
+
+    switch (name) {
+      case 'bold': toggleInline(range, 'strong', ['STRONG', 'B']); break;
+      case 'italic': toggleInline(range, 'em', ['EM', 'I']); break;
+      case 'strikethrough': toggleInline(range, 'del', ['DEL', 'S', 'STRIKE']); break;
+      case 'code': toggleInline(range, 'code', ['CODE']); break;
+      case 'heading': {
+        var headed = blocksInRange(range).map(function (el) {
+          var level = /^H([1-6])$/.test(el.tagName) ? +RegExp.$1 : 0;
+          return replaceTag(el, level >= 3 ? 'p' : 'h' + (level + 1));
+        });
+        selectStart(headed[0]);
+        break;
+      }
+      case 'quote': {
+        var inside = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('blockquote');
+        if (inside && editable.contains(inside)) {
+          var unwrapped = inside.firstChild;
+          while (inside.firstChild) inside.parentNode.insertBefore(inside.firstChild, inside);
+          inside.parentNode.removeChild(inside);
+          selectStart(unwrapped);
+        } else {
+          var bq = document.createElement('blockquote');
+          var els = blocksInRange(range);
+          els[0].parentNode.insertBefore(bq, els[0]);
+          els.forEach(function (el) { bq.appendChild(el); });
+          selectStart(bq);
+        }
+        break;
+      }
+      case 'unorderedList': case 'orderedList': case 'taskList': {
+        var listTag = name === 'orderedList' ? 'ol' : 'ul';
+        var existing = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('ul,ol');
+        if (existing && editable.contains(existing) && existing.tagName.toLowerCase() === listTag && name !== 'taskList') {
+          var firstP = null;
+          Array.prototype.slice.call(existing.children).forEach(function (li) {
+            var p = document.createElement('p');
+            while (li.firstChild) p.appendChild(li.firstChild);
+            existing.parentNode.insertBefore(p, existing);
+            firstP = firstP || p;
+          });
+          existing.parentNode.removeChild(existing);
+          selectStart(firstP);
+        } else if (!existing || !editable.contains(existing)) {
+          var list = document.createElement(listTag);
+          var items = blocksInRange(range);
+          items[0].parentNode.insertBefore(list, items[0]);
+          items.forEach(function (el) {
+            var li = document.createElement('li');
+            if (name === 'taskList') {
+              var cb = document.createElement('input');
+              cb.type = 'checkbox';
+              li.appendChild(cb);
+              li.appendChild(document.createTextNode(' '));
+            }
+            while (el.firstChild) li.appendChild(el.firstChild);
+            el.parentNode.removeChild(el);
+            list.appendChild(li);
+          });
+          selectStart(list);
+        }
+        break;
+      }
+      case 'codeBlock': {
+        var target = blockOf(range.startContainer);
+        if (!target) {
+          // empty editable: give the command an empty block to convert, consistent with
+          // heading/quote/list via blocksInRange above.
+          target = document.createElement('p');
+          editable.appendChild(target);
+        }
+        var pre = document.createElement('pre');
+        var codeChild = document.createElement('code');
+        codeChild.textContent = target.textContent;
+        pre.appendChild(codeChild);
+        target.parentNode.replaceChild(pre, target);
+        selectStart(codeChild);
+        break;
+      }
+      case 'horizontalRule': {
+        var after = blockOf(range.startContainer);
+        var hr = document.createElement('hr');
+        if (after && after.nextSibling) after.parentNode.insertBefore(hr, after.nextSibling);
+        else editable.appendChild(hr);
+        break;
+      }
+      case 'link': case 'image': {
+        if (name === 'image') {
+          var img = document.createElement('img');
+          img.src = isDangerousUrl(value) ? '' : (value || '');
+          img.alt = label || '';
+          range.deleteContents();
+          range.insertNode(img);
+        } else {
+          var a = document.createElement('a');
+          a.href = isDangerousUrl(value) ? '' : (value || '');
+          if (range.collapsed) a.textContent = label || value || '';
+          else a.appendChild(range.extractContents());
+          range.insertNode(a);
+        }
+        break;
+      }
+      case 'insertText':
+        range.deleteContents();
+        range.insertNode(document.createTextNode(value || ''));
+        break;
+    }
+
+    savedRange = null;
+    dirty = true;
+    clearTimeout(inputTimeout);
+    notifyValue();
+  };
+
+  editable.addEventListener('paste', onPaste);
+  editable.addEventListener('input', onInput);
+  editable.addEventListener('input', onEmojiInput);
+  editable.addEventListener('blur', onBlur);
+  editable.addEventListener('keydown', onKeyDown);
+  textarea.addEventListener('keydown', onKeyDown);
+  editable.addEventListener('beforeinput', onBeforeInput);
+  textarea.addEventListener('beforeinput', onBeforeInput);
+
+  editor.dispose = function () {
+    clearTimeout(inputTimeout);
+    clearTimeout(stateTimeout);
+    editable.removeEventListener('paste', onPaste);
+    editable.removeEventListener('input', onInput);
+    editable.removeEventListener('input', onEmojiInput);
+    editable.removeEventListener('blur', onBlur);
+    editable.removeEventListener('keydown', onKeyDown);
+    textarea.removeEventListener('keydown', onKeyDown);
+    editable.removeEventListener('beforeinput', onBeforeInput);
+    textarea.removeEventListener('beforeinput', onBeforeInput);
+    document.removeEventListener('selectionchange', reportState);
+  };
+
+  return editor;
+};

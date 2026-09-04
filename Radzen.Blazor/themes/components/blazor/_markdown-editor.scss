@@ -1,0 +1,124 @@
+.rz-markdown-editor {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--rz-editor-border-radius);
+  border: var(--rz-editor-border);
+  overflow: hidden;
+
+  &:focus-within {
+    outline: var(--rz-editor-focus-outline);
+    outline-offset: var(--rz-editor-focus-outline-offset);
+  }
+}
+
+.rz-markdown-editor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: var(--rz-editor-border);
+  background-color: var(--rz-editor-toolbar-background-color);
+  padding: 0.25rem;
+}
+
+.rz-markdown-editor-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+}
+
+.rz-markdown-editor-modes {
+  margin-inline-end: 0.25rem;
+}
+
+.rz-markdown-editor-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--rz-editor-content-background-color);
+}
+
+.rz-markdown-editor-textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: var(--rz-input-font-size);
+  line-height: var(--rz-input-line-height);
+  color: var(--rz-input-value-color);
+  background-color: transparent;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.rz-markdown-editor-design {
+  flex: 1;
+  overflow: auto;
+  padding: 0.5rem;
+  outline: none;
+  color: var(--rz-input-value-color);
+
+  &[hidden] {
+    display: none;
+  }
+
+  > :first-child {
+    margin-block-start: 0;
+  }
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+
+  pre {
+    background-color: var(--rz-base-100);
+    border-radius: var(--rz-border-radius);
+    padding: 0.5rem;
+    overflow-x: auto;
+  }
+
+  blockquote {
+    border-inline-start: 3px solid var(--rz-base-300);
+    margin-inline-start: 0;
+    padding-inline-start: 0.75rem;
+    color: var(--rz-text-secondary-color);
+  }
+
+  table {
+    border-collapse: collapse;
+
+    th, td {
+      border: 1px solid var(--rz-base-300);
+      padding: 0.25rem 0.5rem;
+    }
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.rz-markdown-editor-custom-tool {
+  display: inline-flex;
+  align-items: center;
+}
+
+// GitHub-style task lists: no list marker, checkbox in the marker position
+.rz-markdown-editor-design,
+.rz-markdown {
+  li:has(> input[type='checkbox']:first-child) {
+    list-style: none;
+
+    > input[type='checkbox'] {
+      margin-inline-start: -1.4em;
+      margin-inline-end: 0.2em;
+      vertical-align: middle;
+    }
+  }
+}

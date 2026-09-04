@@ -5,12 +5,15 @@ using System;
 
 namespace Radzen.Documents.Markdown;
 
+internal readonly record struct InlineSpan(int Start, int End, int DelimiterLength, char Char);
+
 class InlineParser
 {
     class Delimiter
     {
         public char Char { get; set; }
         public int Length { get; set; }
+        public int OriginalLength { get; set; }
         public int Position { get; set; }
         public Text? Node { get; set; }
         public bool CanOpen { get; set; }
@@ -20,6 +23,7 @@ class InlineParser
 
     private const char Asterisk = '*';
     private const char Underscore = '_';
+    internal const char Tilde = '~';
     internal const char Backslash = '\\';
     private const char Null = '\0';
     private const char Backtick = '`';
@@ -40,6 +44,7 @@ class InlineParser
     private readonly List<Inline> inlines = [];
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
+    private List<InlineSpan>? spans;
 
     enum LinkState
     {
@@ -141,6 +146,8 @@ class InlineParser
 
             newIndex = bestMatch + openingCount;
 
+            spans?.Add(new InlineSpan(index, newIndex, openingCount, Backtick));
+
             return true;
         }
 
@@ -176,7 +183,7 @@ class InlineParser
     {
         var ch = text[index];
 
-        if (ch is not (Asterisk or Underscore or OpenBracket) && (ch is not Exclamation || next is not OpenBracket))
+        if (ch is not (Asterisk or Underscore or Tilde or OpenBracket) && (ch is not Exclamation || next is not OpenBracket))
         {
             newIndex = index;
             return false;
@@ -210,7 +217,7 @@ class InlineParser
             var canOpen = false;
             var canClose = false;
 
-            if (ch is Asterisk)
+            if (ch is Asterisk or Tilde)
             {
                 canOpen = leftFlanking;
                 canClose = rightFlanking;
@@ -227,6 +234,7 @@ class InlineParser
                 Node = node,
                 Char = ch,
                 Length = buffer.Length,
+                OriginalLength = buffer.Length,
                 Position = index,
                 CanClose = canClose,
                 CanOpen = canOpen
@@ -265,7 +273,21 @@ class InlineParser
     {
         var parser = new InlineParser();
 
-        return parser.ParseInlines(text.Trim(), linkReferences);
+        return parser.ParseInto(text, linkReferences);
+    }
+
+    internal static List<InlineSpan> ScanSpans(string text)
+    {
+        var parser = new InlineParser { spans = [] };
+
+        parser.ParseInto(text, []);
+
+        return parser.spans!;
+    }
+
+    private List<Inline> ParseInto(string text, Dictionary<string, LinkReference> linkReferences)
+    {
+        return ParseInlines(text.Trim(), linkReferences);
     }
 
     private static readonly Regex EmailRegex = new(@"^([a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)");
@@ -934,12 +956,31 @@ class InlineParser
 
                     var charsToConsume = closer.Length == opener.Length && closer.Length > 1 ? 2 : 1;
 
-                    InlineContainer parent = charsToConsume == 1 ? new Emphasis() : new Strong();
+                    if (closer.Char == Tilde)
+                    {
+                        if (opener.Length < 2 || closer.Length < 2)
+                        {
+                            // single tildes never pair — deactivate both as emphasis candidates
+                            delimiters.RemoveAt(closerIndex);
+                            continue;
+                        }
+                        charsToConsume = 2;
+                    }
+
+                    InlineContainer parent = closer.Char == Tilde
+                        ? new Strikethrough()
+                        : charsToConsume == 1 ? new Emphasis() : new Strong();
 
                     foreach (var child in innerInlines)
                     {
                         parent.Add(child);
                     }
+
+                    spans?.Add(new InlineSpan(
+                        opener.Position + opener.Length - charsToConsume,
+                        closer.Position + (closer.OriginalLength - closer.Length) + charsToConsume,
+                        charsToConsume,
+                        closer.Char));
 
                     opener.Length -= charsToConsume;
 
@@ -990,7 +1031,7 @@ class InlineParser
         {
             var delimiter = delimiters[index];
 
-            if (delimiter.CanClose && (delimiter.Char is Asterisk or Underscore))
+            if (delimiter.CanClose && (delimiter.Char is Asterisk or Underscore or Tilde))
             {
                 return index;
             }
