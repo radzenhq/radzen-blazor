@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen.Blazor.Documents.Markdown;
 using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
@@ -124,6 +123,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     private string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
     private string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     private string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
+    
+    private string ContentEditable => Disabled ? "false" : "true";
 
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();

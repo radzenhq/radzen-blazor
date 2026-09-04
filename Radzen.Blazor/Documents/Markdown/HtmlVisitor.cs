@@ -1,9 +1,8 @@
-using Radzen.Documents.Markdown;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Radzen.Blazor.Documents.Markdown;
+namespace Radzen.Documents.Markdown;
 
 /// <summary>
 /// Renders a Markdown document as an HTML string. Used by RadzenMarkdownEditor's design mode.

@@ -14,9 +14,9 @@ public static class MarkdownEditorCommands
     public const string Strikethrough = "strikethrough";
     /// <summary>Cycles the heading level of the selected lines (# → ## → ### → none).</summary>
     public const string Heading = "heading";
-    /// <summary>Wraps the selection in a markdown link. The command value is the URL.</summary>
+    /// <summary>Wraps the selection in a Markdown link. The command value is the URL.</summary>
     public const string Link = "link";
-    /// <summary>Wraps the selection in a markdown image. The command value is the image URL.</summary>
+    /// <summary>Wraps the selection in a Markdown image. The command value is the image URL.</summary>
     public const string Image = "image";
     /// <summary>Wraps the selection in backticks.</summary>
     public const string Code = "code";
