@@ -469,6 +469,7 @@ namespace Radzen.Blazor.Tests
         [InlineData("smile", "\U0001f604")]
         [InlineData("SMILE", "\U0001f604")] // shortcodes are case-insensitive, matching the parser
         [InlineData("thumbsup", "\U0001f44d")]
+        [InlineData("+1", "\U0001f44d")]
         public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsEmojiForKnownShortcode(string shortcode, string expected)
         {
             using var ctx = CreateContext();
