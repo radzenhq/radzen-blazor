@@ -1357,12 +1357,16 @@
   --rz-timeline-item-padding: #{$rz-timeline-item-padding};
   --rz-timeline-axis-size: #{$rz-timeline-axis-size};
   --rz-timeline-point-size: #{$rz-timeline-point-size};
+  --rz-timeline-point-font-size: #{$rz-timeline-point-font-size};
+  --rz-timeline-point-ring-width: #{$rz-timeline-point-ring-width};
+  --rz-timeline-point-ring-tint: #{$rz-timeline-point-ring-tint};
   --rz-timeline-point-border: #{$rz-timeline-point-border};
   --rz-timeline-point-border-radius: #{$rz-timeline-point-border-radius};
   --rz-timeline-point-background-color: #{$rz-timeline-point-background-color};
   --rz-timeline-point-color: #{$rz-timeline-point-color};
   --rz-timeline-line-color: #{$rz-timeline-line-color};
   --rz-timeline-line-width: #{$rz-timeline-line-width};
+  --rz-timeline-line-gap: #{$rz-timeline-line-gap};
   --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
 
   /* TimestampPicker */
