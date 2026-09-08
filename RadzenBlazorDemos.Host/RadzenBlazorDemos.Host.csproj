@@ -13,7 +13,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.*-*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.*-*" />
-    <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.*" />
   </ItemGroup>
   <ItemGroup>

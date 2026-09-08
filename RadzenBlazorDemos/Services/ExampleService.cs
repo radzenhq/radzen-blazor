@@ -772,7 +772,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with button",
                             Path="datagrid-custom-header",
-                            Related = new [] { "datagrid-custom-header-columnpicker", "datagrid-column-picker", "export-excel-csv" },
+                            Related = new [] { "datagrid-custom-header-columnpicker", "datagrid-column-picker", "datagrid-export" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I add a toolbar to the DataGrid?", Answer = "Use the HeaderTemplate to render your own toolbar - buttons, search, or any components - above the grid's columns." }
@@ -956,16 +956,19 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Export to Excel and CSV",
-                    Path = "export-excel-csv",
-                    Related = new [] { "datagrid-footer-totals", "datagrid-grouping-api", "datagrid-iqueryable" },
+                    Path = "datagrid-export",
+                    New = true,
+                    Toc = [ new () { Text = "Export", Anchor = "#export" }, new () { Text = "LoadData export", Anchor = "#loaddata" }, new () { Text = "Customization", Anchor = "#customization" } ],
+                    Related = new [] { "datagrid-footer-totals", "datagrid-grouping-api", "datagrid-loaddata" },
                     Faq = new []
                     {
-                        new FaqItem { Question = "How do I export the DataGrid to Excel or CSV?", Answer = "Call the grid's export and choose Excel or CSV; the export uses the current sort, filter, and columns." }
+                        new FaqItem { Question = "How do I export a DataGrid to Excel or CSV?", Answer = "Call ExportToExcelAsync or ExportToCsvAsync on the grid and select the current page or all filtered and sorted rows." },
+                        new FaqItem { Question = "Does the export respect the current sort and filter?", Answer = "Yes. Exports use the grid's view - the current sort, filter, column order, visibility, and format strings." }
                     },
                     Title = "Blazor DataGrid - Excel & CSV Export | Free UI Components by Radzen",
-                    Description = "This example demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.",
+                    Description = "Export a Radzen Blazor DataGrid to Excel and CSV directly in the browser, including chunked LoadData exports.",
                     Icon = "\ue0c3",
-                    Tags = new [] { "export", "excel", "csv" }
+                    Tags = new [] { "export", "excel", "csv", "datagrid" }
                 },
                 new Example
                 {

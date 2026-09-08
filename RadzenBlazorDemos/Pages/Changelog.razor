@@ -43,6 +43,16 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <RadzenLink Text="Multi-year timescale" Path="/gantt-multi-year" /> - new quarter-based Years view for multi-year projects and a rescaled Year view.</li>
 </ul>
 
+<RadzenText Anchor="changelog#v12-datagrid" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenDataGrid
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <RadzenLink Text="Export to Excel and CSV" Path="/datagrid-export" /> directly in the browser with <code>ExportToExcelAsync</code> and <code>ExportToCsvAsync</code> - no server endpoint required. Exports respect the current sort, filter, column order, visibility and format strings, and can include the current page or all rows.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Exporting all rows of a grid bound with <code>LoadData</code> requests the data in chunks, reports progress through <code>DataGridExportOptions.Progress</code>, supports cancellation and restores the visible page when done.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Excel exports apply the current theme - header and row colors, gridlines and font size - and typed values keep their number and date formats. Set <code>UseTheme="false"</code> to export plain cells.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> New <code>ExportValue</code> column parameter exports template columns that have no <code>Property</code>. <code>ToWorkbookAsync</code> returns the workbook before it is saved for further customization with the spreadsheet API.</li>
+</ul>
+
 <RadzenText Anchor="changelog#v12-datepicker" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     RadzenDatePicker
 </RadzenText>

@@ -208,6 +208,8 @@ namespace Radzen.Blazor
         }
 
         string? lastLoadDataArgs;
+        int lastLoadDataStart;
+        int lastLoadDataTop;
         Task lastLoadDataTask = Task.CompletedTask;
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
@@ -2569,6 +2571,13 @@ namespace Radzen.Blazor
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         protected override void OnDataChanged()
         {
+            if (exporting)
+            {
+                _view = null;
+                _groupedPagedView = null;
+                return;
+            }
+
             if (!string.IsNullOrEmpty(KeyProperty) && keyPropertyGetter == null)
             {
                 keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
@@ -2712,8 +2721,19 @@ namespace Radzen.Blazor
         IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
 
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-        internal async Task InvokeLoadData(int start, int top)
+        internal async Task InvokeLoadData(int start, int top, bool fromExport = false)
         {
+            if (exporting && !fromExport)
+            {
+                return;
+            }
+
+            if (!exporting)
+            {
+                lastLoadDataStart = start;
+                lastLoadDataTop = top;
+            }
+
             var orderBy = GetOrderBy();
 
             Query.Skip = skip;
