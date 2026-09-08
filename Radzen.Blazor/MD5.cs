@@ -67,7 +67,7 @@ public class MD5
         uint c0 = 0x98badcfe;   // C
         uint d0 = 0x10325476;   // D
 
-        var addLength = (56 - ((input.Length + 1) % 64)) % 64; // calculate the new length with padding
+        var addLength = (((56 - ((input.Length + 1) % 64)) % 64) + 64) % 64;
         var processedInput = new byte[input.Length + 1 + addLength + 8];
         Array.Copy(input, processedInput, input.Length);
         processedInput[input.Length] = 0x80; // add 1
