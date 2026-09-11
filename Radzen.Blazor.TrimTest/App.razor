@@ -1,21 +1,10 @@
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.TrimTest.Models
+@using Radzen.Documents.Spreadsheet
+@inject DialogService DialogService
 
-@*
-    Faithful end-to-end trimming repro (TRIMMING_AUDIT.md). Models come from a separate <IsTrimmable>
-    assembly and are bound to the real components by STRING Property / ValueProperty / CategoryProperty -
-    never via @context.X templates, which would root the getters and mask the bug.
-
-    The #trim-status element is the single signal the Playwright harness reads:
-      running       -> drive did not complete (treated as failure on timeout)
-      done          -> dynamic-LINQ over the model succeeded (getters preserved)
-      error:<msg>   -> reflection over the trimmed model threw (the hazard)
-
-    RED today: no DAM on the component generics, so the model getters are trimmed and the OrderBy/Where
-    drive throws -> error:... GREEN once the library annotates the item-typed component generics; rooting
-    RadzenDataGrid<Order> then preserves Order's members app-wide and the drive succeeds -> done.
-*@
+<RadzenComponents />
 
 <div id="trim-status">@status</div>
 
@@ -26,28 +15,30 @@
                 <RadzenDataGridColumn TItem="Order" Property="CustomerName" Title="Customer" />
                 <RadzenDataGridColumn TItem="Order" Property="Total" Title="Total" />
                 <RadzenDataGridColumn TItem="Order" Property="Status" Title="Status" />
-                <RadzenDataGridColumn TItem="Order" Property="Priority" Title="Priority" />   @* nullable enum (L5) *@
-                @* NOT gated: a nested path like Property="Customer.City" fails under trimming because DAM
-                   is not transitive - rooting nested model types is the consumer's responsibility (audit
-                   H14), not something the library can fix. Like AOT, we don't make a blocking gate out of
-                   what the library cannot guarantee. *@
+                <RadzenDataGridColumn TItem="Order" Property="Priority" Title="Priority" />
             </Columns>
         </RadzenDataGrid>
 
-        @* Trim-safe DropDown usage (value list). NOT gated: binding by TextProperty over an item type
-           that lives in a trimmable assembly is consumer-responsibility (audit H2) - the item type is
-           erased through Data=IEnumerable, so it is not the generic parameter and DAM cannot root it. *@
-        <RadzenDropDown TValue="string" Data="@(new[] { "A", "B", "C" })" @bind-Value="@selectedText" AllowFiltering="true" />
+        <RadzenDropDown id="value-dropdown" TValue="string" Data="@(new[] { "A", "B", "C" })" @bind-Value="@selectedText" AllowFiltering="true" />
 
-        @* NOT gated: chart series bind by CategoryProperty/ValueProperty over their TItem and need DAM on
-           the series generics (CartesianSeries<TItem> + 33 derived classes). That cascade is a deferred,
-           fixable follow-up (audit chart-series decision) - tracked separately, not blocking this gate. *@
+        <RadzenDropDown id="item-dropdown" TValue="int" Data="@dropDownItems" TextProperty="Text" ValueProperty="Value" @bind-Value="@selectedItem" />
 
         <RadzenScheduler TItem="Appt" Data="@appts" StartProperty="Start" EndProperty="End" TextProperty="Text">
             <RadzenMonthView />
         </RadzenScheduler>
 
         <RadzenUpload Url="upload" Multiple="true" />
+
+        <RadzenChart id="chart" Style="height: 200px">
+            <RadzenColumnSeries TItem="ChartPoint" Data="@points" CategoryProperty="Category" ValueProperty="Value" />
+        </RadzenChart>
+
+        <RadzenHtmlEditor id="editor" @bind-Value="@html" Style="height: 200px" />
+
+        <RadzenSpreadsheet id="spreadsheet" Workbook="@workbook" Style="height: 300px" />
+
+        <RadzenButton id="confirm" Text="Confirm" Click="@OpenConfirmAsync" />
+        <RadzenButton id="side-dialog" Text="Side dialog" Click="@OpenSideDialog" />
     </ChildContent>
     <ErrorContent Context="ex">
         <div>@SetError(ex)</div>
@@ -57,6 +48,8 @@
 @code {
     string status = "running";
     string? selectedText;
+    int selectedItem = 1;
+    string html = "<p>Trimmed editor</p>";
 
     Order[] orders =
     [
@@ -65,15 +58,25 @@
         new() { CustomerName = "Carol", Total = 15, Status = OrderStatus.Processing, Customer = new() { City = "Sofia" } },
     ];
     Appt[] appts = [new() { Start = new DateTime(2026, 1, 1), End = new DateTime(2026, 1, 2), Text = "Kickoff" }];
+    DropDownItem<int>[] dropDownItems = [new() { Text = "One", Value = 1 }, new() { Text = "Two", Value = 2 }];
+    ChartPoint[] points = [new() { Category = "Q1", Value = 10 }, new() { Category = "Q2", Value = 20 }];
+    Workbook workbook = CreateWorkbook();
+
+    static Workbook CreateWorkbook()
+    {
+        var workbook = new Workbook();
+        workbook.AddSheet("Sheet1", 20, 8);
+        return workbook;
+    }
+
+    Task OpenConfirmAsync() => DialogService.Confirm("Trimmed confirm", "Confirm", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No", CloseDialogOnEsc = true });
+
+    void OpenSideDialog() => DialogService.OpenSide<RadzenCard>("Side", options: new SideDialogOptions { CloseDialogOnOverlayClick = true, ShowMask = true });
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return Task.CompletedTask;
 
-        // Drive the grid's REAL in-memory filter/group engine over the trimmed model (not the raw
-        // dynamic-LINQ string-predicate parser, which is inherently trim-unsafe by design and not what
-        // the grid uses for in-memory data). Where(filters) -> GetExpression -> typeof(string).GetMethod;
-        // GroupByMany -> reflection over T. ErrorBoundary does NOT catch OnAfterRenderAsync, so catch here.
         try
         {
             var filters = new List<FilterDescriptor>
@@ -89,7 +92,6 @@
         }
         catch (Exception ex)
         {
-            // Surface the inner exception too - DynamicExtensions/QueryableExtension wrap the real cause.
             var root = ex.GetBaseException();
             status = $"error:{root.GetType().Name}: {root.Message}";
         }
@@ -100,7 +102,6 @@
 
     string SetError(Exception ex)
     {
-        // Render-time failure sink (e.g. a cell getter throwing).
         status = $"error:{ex.GetType().Name}: {ex.Message}";
         return status;
     }

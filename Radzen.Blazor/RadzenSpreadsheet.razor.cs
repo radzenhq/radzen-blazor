@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -2194,6 +2195,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private DotNetObjectReference<RadzenSpreadsheet>? dotNetRef;
 
     /// <inheritdoc/>
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(CellEventArgs))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ImageResizeEventArgs))]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && JSRuntime != null)

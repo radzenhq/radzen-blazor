@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
@@ -24,6 +24,7 @@ namespace Radzen
         /// <exception cref="Exception"></exception>
         /// <exception cref="Exception">Unable to parse the response.</exception>
         /// <exception cref="Exception"></exception>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ODataServiceResult<>))]
         public static async Task<T?> ReadAsync<
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this HttpResponseMessage response)
         {

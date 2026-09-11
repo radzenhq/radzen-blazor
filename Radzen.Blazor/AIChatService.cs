@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -32,6 +32,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ChatCompletionRequest))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ChatCompletionMessage))]
     public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))

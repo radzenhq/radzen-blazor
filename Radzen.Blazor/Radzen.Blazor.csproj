@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -52,9 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="LinkerConfig.xml">
-      <LogicalName>$(MSBuildProjectName).xml</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="Documents/Spreadsheet/theme1.xml" />
   </ItemGroup>
 

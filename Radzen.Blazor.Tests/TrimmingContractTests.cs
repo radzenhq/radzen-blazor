@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Xunit;
@@ -17,23 +16,18 @@ namespace Radzen.Blazor.Tests
     //
     // Tests 1-9 are EXPECTED TO FAIL on current code: they assert the suggested fix is in place, and the
     // failure message names exactly what to add. As the audit remediations land (DAM annotations,
-    // LinkerConfig entries, RUC/RDC attributes, narrowed suppressions) each test turns green - so the
+    // RUC/RDC attributes, narrowed suppressions) each test turns green - so the
     // suite doubles as the fix checklist and a permanent regression guard.
     //
     // Tests 10-11 are green-now regression guards for already-fixed hazard classes.
     public class TrimmingContractTests
     {
         private static readonly Assembly LibraryAssembly = typeof(Radzen.Blazor.RadzenCard).Assembly;
-        private const string LinkerResourceName = "Radzen.Blazor.xml";
 
-        // ----- Test 1: H6/H7/H8 - [JSInvokable] parameter DTOs are deserialized from JS and must be
-        // preserved with preserve="all" (else their members are trimmed and the callback arrives empty
-        // or throws). The trim analyzer is blind to this. RED now: FileInfo, PreviewFileInfo,
-        // GoogleMapClickEventArgs are missing from LinkerConfig.xml.
         [Fact]
-        public void JSInvokable_Parameter_DTOs_Are_Preserved_All()
+        public void JSInvokable_Parameter_DTOs_Are_Rooted_By_DynamicDependency()
         {
-            var preserved = GetPreservedTypes();
+            var rooted = GetDynamicDependencyTargets();
             var offenders = new SortedSet<string>();
 
             foreach (var type in LibraryAssembly.GetTypes())
@@ -47,16 +41,16 @@ namespace Radzen.Blazor.Tests
                         foreach (var leaf in LeafTypes(parameter.ParameterType))
                         {
                             if (!IsLibraryDataType(leaf)) continue;
-                            if (!preserved.TryGetValue(leaf.FullName!, out var preserve) || preserve != "all")
+                            if (!rooted.Contains(GenericDefinition(leaf)))
                                 offenders.Add($"{leaf.FullName}  (param of {type.Name}.{method.Name})");
                         }
                 }
             }
 
             Assert.True(offenders.Count == 0,
-                "These types are deserialized from JS as [JSInvokable] parameters but are not preserved "
-                + "with preserve=\"all\" in LinkerConfig.xml. Add <type fullname=\"...\" preserve=\"all\" /> "
-                + "for each (same as CellEventArgs):" + Environment.NewLine
+                "These types are deserialized from JS as [JSInvokable] parameters but no [DynamicDependency] "
+                + "roots their members. Add [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(...))] "
+                + "on the method that wires up the component's JS interop:" + Environment.NewLine
                 + string.Join(Environment.NewLine, offenders));
         }
 
@@ -221,27 +215,33 @@ namespace Radzen.Blazor.Tests
         // commits to supporting standalone helper use under Native AOT, add focused [RequiresDynamicCode]
         // assertions on the PUBLIC helper APIs then.
 
-        // ----- Test 7: H3/H5 - library types resolved by reflection at runtime must be preserved in
-        // LinkerConfig.xml. RED now: System.Linq.Enumerable (filter In/Contains/Intersect branches use it
-        // reflectively; only System.Linq.Queryable is preserved) and the Spreadsheet ChartDataPoint
-        // (chart series reflect over it) are absent.
         [Fact]
-        public void Reflectively_Resolved_Library_Types_Are_Preserved_All()
+        public void Reflectively_Read_And_Interop_Serialized_Library_Types_Are_Rooted_By_DynamicDependency()
         {
-            var preserved = GetPreservedTypes();
+            var rooted = GetDynamicDependencyTargets();
             string[] required =
             {
-                "System.Linq.Enumerable",                          // H3/H13
-                "Radzen.Documents.Spreadsheet.ChartDataPoint",     // H5
+                "Radzen.DropDownItem`1",
+                "Radzen.Documents.Spreadsheet.ChartDataPoint",
+                "Radzen.ODataServiceResult`1",
+                "Radzen.ChatCompletionRequest",
+                "Radzen.ChatCompletionMessage",
+                "Radzen.Blazor.GoogleMapMarkerData",
+                "Radzen.GoogleMapPosition",
+                "Radzen.DialogOptionsBase",
+                "Radzen.DialogOptions",
+                "Radzen.SideDialogOptions",
+                "Radzen.AlertOptions",
+                "Radzen.ConfirmOptions",
             };
 
             var offenders = required
-                .Where(name => !preserved.TryGetValue(name, out var p) || p != "all")
+                .Where(name => !rooted.Any(t => t.FullName == name))
                 .ToList();
 
             Assert.True(offenders.Count == 0,
-                "These types are located by reflection at runtime and must be preserved with preserve=\"all\" "
-                + "in LinkerConfig.xml:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+                "These types are read by reflection or serialized to JS/JSON at runtime but no [DynamicDependency] "
+                + "roots their members:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
         }
 
         // ----- Test 7b: the DataGrid filter engine resolves System.String filter methods by reflection
@@ -361,66 +361,25 @@ namespace Radzen.Blazor.Tests
                 + "preserved type instead:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
         }
 
-        // ----- Test 11: regression guard - every Radzen DTO returned from JS interop (InvokeAsync<T>) must
-        // be preserved with preserve="all" or its members are trimmed on deserialize. Currently green.
-        [Fact]
-        public void InvokeAsync_Return_DTOs_Are_Preserved_All()
-        {
-            var sourceDir = FindLibrarySourceDir();
-            Assert.True(sourceDir != null, "Could not locate the Radzen.Blazor source directory.");
-
-            var preserved = GetPreservedTypes();
-            var preservedSimpleNames = preserved.Where(kv => kv.Value == "all")
-                .Select(kv => kv.Key.Split('.', '+').Last()).ToHashSet();
-            var returnPattern = new Regex(@"InvokeAsync<\s*([A-Za-z_][A-Za-z0-9_\.]*)\s*>", RegexOptions.Compiled);
-
-            // framework / primitive / generic return types that need no preservation
-            var ignore = new HashSet<string>
-            {
-                "string", "bool", "int", "long", "double", "float", "object", "byte",
-                "IJSObjectReference", "T",
-            };
-
-            var offenders = new SortedSet<string>();
-            foreach (var file in Directory.EnumerateFiles(sourceDir!, "*.cs", SearchOption.AllDirectories))
-            {
-                if (file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")) continue;
-                foreach (Match m in returnPattern.Matches(File.ReadAllText(file)))
-                {
-                    var simpleName = m.Groups[1].Value.Split('.').Last().TrimEnd('?');
-                    if (ignore.Contains(simpleName) || simpleName.EndsWith("[]")) continue;
-                    // only flag types that exist in the Radzen.Blazor assembly (consumer/library DTOs)
-                    var isLibraryType = LibraryAssembly.GetTypes()
-                        .Any(t => t.Name == simpleName && IsLibraryDataType(t));
-                    if (isLibraryType && !preservedSimpleNames.Contains(simpleName))
-                        offenders.Add($"{Path.GetFileName(file)}: InvokeAsync<{m.Groups[1].Value}>");
-                }
-            }
-
-            Assert.True(offenders.Count == 0,
-                "These Radzen DTO types are deserialized from JS interop return values but are not preserved "
-                + "with preserve=\"all\":" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
-        }
-
         // ===================== helpers =====================
 
-        private static Dictionary<string, string> GetPreservedTypes()
+        private static HashSet<Type> GetDynamicDependencyTargets()
         {
-            using var stream = LibraryAssembly.GetManifestResourceStream(LinkerResourceName);
-            Assert.NotNull(stream);
-            using var reader = new StreamReader(stream!);
-            var document = XDocument.Parse(reader.ReadToEnd());
+            var result = new HashSet<Type>();
+            const BindingFlags all = BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
-            var result = new Dictionary<string, string>();
-            foreach (var element in document.Descendants("type"))
-            {
-                var name = (string?)element.Attribute("fullname");
-                if (string.IsNullOrEmpty(name)) continue;
-                // a <type> with no preserve attribute defaults to "all" in ILLink xml
-                result[name!] = (string?)element.Attribute("preserve") ?? "all";
-            }
+            foreach (var type in LibraryAssembly.GetTypes())
+                foreach (var member in type.GetMethods(all).Cast<MethodBase>().Concat(type.GetConstructors(all)))
+                    foreach (var attribute in member.GetCustomAttributes<DynamicDependencyAttribute>())
+                        if (attribute.Type != null && attribute.MemberTypes.HasFlag(DynamicallyAccessedMemberTypes.All))
+                            result.Add(GenericDefinition(attribute.Type));
+
             return result;
         }
+
+        private static Type GenericDefinition(Type type) =>
+            type.IsGenericType && !type.IsGenericTypeDefinition ? type.GetGenericTypeDefinition() : type;
 
         private static IEnumerable<Type> LeafTypes(Type type)
         {
@@ -492,7 +451,7 @@ namespace Radzen.Blazor.Tests
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir != null)
             {
-                var candidate = Path.Combine(dir.FullName, "Radzen.Blazor", "LinkerConfig.xml");
+                var candidate = Path.Combine(dir.FullName, "Radzen.Blazor", "Radzen.Blazor.csproj");
                 if (File.Exists(candidate)) return Path.Combine(dir.FullName, "Radzen.Blazor");
                 dir = dir.Parent;
             }

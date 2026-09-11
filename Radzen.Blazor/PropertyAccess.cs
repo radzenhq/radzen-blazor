@@ -347,6 +347,7 @@ public static class PropertyAccess
         readonly ConcurrentDictionary<string, ItemGetter> getters = new();
         int count;
 
+        [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
         internal ItemGetter GetOrCreate(object item, string property)
         {
             if (getters.TryGetValue(property, out var getter))
@@ -372,6 +373,7 @@ public static class PropertyAccess
             return result;
         }
 
+        [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
         static ItemGetter Create(object item, string property)
         {
             try

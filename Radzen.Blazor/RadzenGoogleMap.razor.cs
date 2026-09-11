@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -211,6 +212,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GoogleMapMarkerData))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GoogleMapPosition))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GoogleMapClickEventArgs))]
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
