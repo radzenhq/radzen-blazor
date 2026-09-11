@@ -466,6 +466,19 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_DisablesTheFormatBlockTool_WithoutParagraphOrHeading()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            Assert.DoesNotContain("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
+
+            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(new MarkdownEditorToolState { Block = null }));
+
+            Assert.Contains("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
+        }
+
+        [Fact]
         public void FormatBlock_Change_ExecutesFormatBlockWithTheLevel()
         {
             using var ctx = CreateContext();

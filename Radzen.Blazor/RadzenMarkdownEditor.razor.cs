@@ -93,7 +93,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     [Parameter]
     public int Rows { get; set; } = 10;
 
-    private MarkdownEditorToolState toolState = new();
+    private MarkdownEditorToolState toolState = new() { Block = string.Empty };
 
     /// <summary>
     /// Whether the editor's history has a state to undo to.
@@ -111,7 +111,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public bool IsActive(string commandName) => Array.IndexOf(toolState.Formats ?? [], commandName) >= 0;
 
     /// <summary>
-    /// The block at the current selection: <c>p</c> or <c>h1</c> to <c>h6</c>; <c>null</c> when it is neither a paragraph nor a heading.
+    /// The block at the current selection: <c>p</c> or <c>h1</c> to <c>h6</c>, an empty string when the selection spans several kinds of blocks,
+    /// or <c>null</c> when it contains no paragraph or heading at all.
     /// </summary>
     public string? FormatBlock => toolState.Block;
 
