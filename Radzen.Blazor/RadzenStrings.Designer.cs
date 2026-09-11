@@ -837,7 +837,6 @@ namespace Radzen.Blazor {
         public static string MarkdownEditorBold_Title { get { return ResourceManager.GetString("MarkdownEditorBold_Title", resourceCulture); } }
         public static string MarkdownEditorItalic_Title { get { return ResourceManager.GetString("MarkdownEditorItalic_Title", resourceCulture); } }
         public static string MarkdownEditorStrikethrough_Title { get { return ResourceManager.GetString("MarkdownEditorStrikethrough_Title", resourceCulture); } }
-        public static string MarkdownEditorHeading_Title { get { return ResourceManager.GetString("MarkdownEditorHeading_Title", resourceCulture); } }
         public static string MarkdownEditorQuote_Title { get { return ResourceManager.GetString("MarkdownEditorQuote_Title", resourceCulture); } }
         public static string MarkdownEditorCode_Title { get { return ResourceManager.GetString("MarkdownEditorCode_Title", resourceCulture); } }
         public static string MarkdownEditorCodeBlock_Title { get { return ResourceManager.GetString("MarkdownEditorCodeBlock_Title", resourceCulture); } }

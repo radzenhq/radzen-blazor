@@ -286,33 +286,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Theory]
-        [InlineData("title", "# title")]
-        [InlineData("# title", "## title")]
-        [InlineData("## title", "### title")]
-        [InlineData("### title", "title")]
-        [InlineData("###### title", "title")]
-        public void Heading_CyclesLevel(string line, string expected)
+        [InlineData("title", "h1", "# title")]
+        [InlineData("# title", "h3", "### title")]
+        [InlineData("## title", "h6", "###### title")]
+        [InlineData("### title", "p", "title")]
+        [InlineData("title", "p", "title")]
+        [InlineData("title", null, "title")]
+        public void FormatBlock_SetsTheHeadingLevel(string line, string? value, string expected)
         {
-            var edit = MarkdownFormatter.Apply(line, 0, 0, MarkdownEditorCommands.Heading);
+            var edit = MarkdownFormatter.Apply(line, 0, 0, MarkdownEditorCommands.FormatBlock, value);
 
             Assert.Equal(new MarkdownEdit(0, line.Length, expected, 0, expected.Length), edit);
         }
 
         [Fact]
-        public void Heading_CyclesEachSelectedLineOnItsOwn()
+        public void FormatBlock_AppliesTheLevelToEverySelectedLine()
         {
-            var edit = MarkdownFormatter.Apply("# a\nb", 0, 5, MarkdownEditorCommands.Heading);
+            var edit = MarkdownFormatter.Apply("# a\nb", 0, 5, MarkdownEditorCommands.FormatBlock, "h2");
 
-            Assert.Equal(new MarkdownEdit(0, 5, "## a\n# b", 0, 8), edit);
+            Assert.Equal(new MarkdownEdit(0, 5, "## a\n## b", 0, 9), edit);
         }
 
         [Fact]
-        public void Heading_OnlyTouchesParagraphsAndHeadings()
+        public void FormatBlock_OnlyTouchesParagraphsAndHeadings()
         {
             var text = "a\n\n- item\n1. one\n> quote\n| cell |\n---\n```\ncode\n```\n### b";
-            var edit = MarkdownFormatter.Apply(text, 0, text.Length, MarkdownEditorCommands.Heading);
+            var edit = MarkdownFormatter.Apply(text, 0, text.Length, MarkdownEditorCommands.FormatBlock, "h1");
 
-            var expected = "# a\n\n- item\n1. one\n> quote\n| cell |\n---\n```\ncode\n```\nb";
+            var expected = "# a\n\n- item\n1. one\n> quote\n| cell |\n---\n```\ncode\n```\n# b";
             Assert.Equal(new MarkdownEdit(0, text.Length, expected, 0, expected.Length), edit);
         }
 

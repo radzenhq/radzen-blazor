@@ -187,9 +187,10 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
 
-            var icons = component.FindAll(".rz-markdown-editor-tools > button .rzi").Select(i => i.TextContent).ToList();
-            Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "title", "format_quote", "code", "code_blocks",
+            var icons = component.FindAll(".rz-markdown-editor-tools > button.rz-button .rzi").Select(i => i.TextContent).ToList();
+            Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "format_quote", "code", "code_blocks",
                                  "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
+            Assert.Single(component.FindComponents<RadzenMarkdownEditorFormatBlock>());
         }
 
         [Fact]
@@ -450,6 +451,32 @@ namespace Radzen.Blazor.Tests
             Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
             Assert.True(component.Instance.CanUndo);
             Assert.Contains("rz-state-active", component.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_ShowsTheCurrentBlockInTheFormatBlockTool()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+
+            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(new MarkdownEditorToolState { Block = "h2" }));
+
+            Assert.Equal("h2", component.Instance.FormatBlock);
+            Assert.Equal("Heading 2", component.Find(".rz-dropdown-label").TextContent);
+        }
+
+        [Fact]
+        public void FormatBlock_Change_ExecutesFormatBlockWithTheLevel()
+        {
+            using var ctx = CreateContext();
+            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 0 });
+            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(e => e.Value, "title").Add(e => e.Mode, MarkdownEditorMode.Source));
+
+            component.FindComponent<RadzenMarkdownEditorFormatBlock>().FindAll(".rz-dropdown-item")[3].Click();
+
+            apply.VerifyInvoke("apply");
+            Assert.Equal("### title", apply.Invocations["apply"].Single().Arguments[2]);
         }
 
         [Theory]

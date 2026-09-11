@@ -1,4 +1,0 @@
-@using Radzen.Blazor.Rendering
-@inherits RadzenMarkdownEditorButtonBase
-
-<EditorButton Title="@Title" Shortcut="@Shortcut" Click="@OnClick" Icon="title" Selected="@(Editor?.IsActive(MarkdownEditorCommands.Heading) == true)" Disabled="@(Editor?.Disabled == true)" />

@@ -1,0 +1,26 @@
+@using Radzen.Blazor.Rendering
+
+<EditorDropDown Title="@Title" Value="@(Editor?.FormatBlock ?? "")" Change="@OnChange" Placeholder="@Placeholder" Disabled="@(Editor?.Disabled == true)"
+    Style="width:120px" PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
+    <EditorDropDownItem Text="@NormalText" Value="p">
+        <p>@context.Text</p>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading1Text" Value="h1">
+        <h1>@context.Text</h1>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading2Text" Value="h2">
+        <h2>@context.Text</h2>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading3Text" Value="h3">
+        <h3>@context.Text</h3>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading4Text" Value="h4">
+        <h4>@context.Text</h4>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading5Text" Value="h5">
+        <h5>@context.Text</h5>
+    </EditorDropDownItem>
+    <EditorDropDownItem Text="@Heading6Text" Value="h6">
+        <h6>@context.Text</h6>
+    </EditorDropDownItem>
+</EditorDropDown>

@@ -2472,9 +2472,6 @@
   <data name="MarkdownEditorStrikethrough_Title" xml:space="preserve">
     <value>Barré</value>
   </data>
-  <data name="MarkdownEditorHeading_Title" xml:space="preserve">
-    <value>Titre</value>
-  </data>
   <data name="MarkdownEditorQuote_Title" xml:space="preserve">
     <value>Citation</value>
   </data>
