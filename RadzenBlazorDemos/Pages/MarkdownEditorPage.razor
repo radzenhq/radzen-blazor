@@ -6,6 +6,9 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     The Blazor Markdown Editor component (RadzenMarkdownEditor) edits Markdown with a toolbar and keyboard shortcuts. It defaults to a WYSIWYG Design mode - a contenteditable surface synced with the Markdown - with a Source mode to edit the raw Markdown text.
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Edits in Design mode serialize the whole document back to canonical Markdown: <code>__bold__</code> becomes <code>**bold**</code> and characters with a Markdown meaning inside plain text are escaped (<code>snake_case</code> becomes <code>snake\_case</code>). The rendered result stays the same. Use Source mode when the exact Markdown text must be preserved.
+</RadzenText>
 
 <RadzenExample ComponentName="MarkdownEditor" Example="MarkdownEditor">
     <MarkdownEditor />
