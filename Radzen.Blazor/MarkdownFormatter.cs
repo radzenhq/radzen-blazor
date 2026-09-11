@@ -293,15 +293,35 @@ internal static class MarkdownFormatter
                 : lines.Select((l, i) => $"{i + 1}. {OrderedPrefix.Replace(l, string.Empty, 1)}").ToArray());
     }
 
+    static readonly Regex FenceLine = new(@"^\s*(```|~~~)", RegexOptions.Compiled);
+    static readonly Regex NonParagraphLine = new(@"^\s*([-*+] |\d+\. |> |\||---\s*$|\*\*\*\s*$|___\s*$)", RegexOptions.Compiled);
+
+    /// <summary>Cycles the heading level of every selected paragraph or heading line; other lines are left alone.</summary>
     static MarkdownEdit Heading(string text, int start, int end)
     {
         return ReplaceLines(text, start, end, lines =>
         {
-            var match = HeadingPrefix.Match(lines[0]);
-            var level = match.Success ? match.Groups[1].Value.Length : 0;
-            var next = level >= 3 ? 0 : level + 1;
-            var prefix = next == 0 ? string.Empty : new string('#', next) + " ";
-            return lines.Select(l => prefix + HeadingPrefix.Replace(l, string.Empty, 1)).ToArray();
+            var inFence = false;
+
+            return lines.Select(line =>
+            {
+                if (FenceLine.IsMatch(line))
+                {
+                    inFence = !inFence;
+                    return line;
+                }
+
+                if (inFence || line.Trim().Length == 0 || NonParagraphLine.IsMatch(line))
+                {
+                    return line;
+                }
+
+                var match = HeadingPrefix.Match(line);
+                var level = match.Success ? match.Groups[1].Value.Length : 0;
+                var next = level >= 3 ? 0 : level + 1;
+                var prefix = next == 0 ? string.Empty : new string('#', next) + " ";
+                return prefix + HeadingPrefix.Replace(line, string.Empty, 1);
+            }).ToArray();
         });
     }
 
