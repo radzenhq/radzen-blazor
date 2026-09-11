@@ -7140,7 +7140,7 @@ Radzen.markdownSerialize = function (root) {
     return wraps;
   };
   var wrap = function (token, inner) {
-    var m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/); // keep edge whitespace outside tokens
+    var m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/);
     return m[2] ? m[1] + token + m[2] + token + m[3] : inner;
   };
   var inline = function (node) {
@@ -7240,7 +7240,6 @@ Radzen.markdownSerialize = function (root) {
         var text = block(child);
         if (text) out.push(text);
       } else {
-        // stray inline content at block level accumulates into an implicit paragraph
         if (!pending) { pending = document.createElement('p'); }
         pending.appendChild(child.cloneNode(true));
       }
@@ -7260,14 +7259,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   var editor = { editable: editable, textarea: textarea, instance: instance };
   var inputTimeout = null;
   var suppressInput = false;
-  var dirty = false; // true once the surface has genuinely been edited since the last setContent/blur flush
+  var dirty = false;
 
   var notifyValue = function () {
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
     reportState();
   };
 
-  // mirrors HtmlSanitizer.IsDangerousUrl (Radzen.Blazor/Documents/Markdown/HtmlSanitizer.cs)
   var isDangerousUrl = function (url) {
     return /^\s*(javascript|vbscript|data:text\/html)/i.test(url || '');
   };
@@ -7281,7 +7279,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var onBlur = function () {
     clearTimeout(inputTimeout);
-    if (!dirty) return; // matches RadzenTextArea semantics: no edit, no Change
+    if (!dirty) return;
     dirty = false;
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', Radzen.markdownSerialize(editable))); } catch { }
   };
@@ -7311,16 +7309,11 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var onPaste = function (e) {
     var html = e.clipboardData && e.clipboardData.getData('text/html');
-    if (!html) return; // plain-text paste: native behavior is fine
+    if (!html) return;
     e.preventDefault();
-    // preventDefault suppresses the native beforeinput/insertFromPaste that onBeforeInput
-    // would otherwise snapshot on, so checkpoint here before laundering mutates the DOM.
     editor.snapshot(true);
     lastInputType = 'insertFromPaste';
     lastInputTime = Date.now();
-    // launder rich content: pasted HTML → markdown → canonical HTML via .NET
-    // parsed via DOMParser (not a live-document div) so clipboard HTML like
-    // <img src=x onerror=...> can't execute while markdownSerialize reads it
     var scratch = new DOMParser().parseFromString(html, 'text/html').body;
     var markdown = Radzen.markdownSerialize(scratch);
     try {
@@ -7353,9 +7346,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var shortcode = match[0];
     try {
       suppressDisposed(instance.invokeMethodAsync('LookupEmojiAsync', match[1]).then(function (emoji) {
-        // the lookup is async: bail out if the surface changed underneath it
         if (!emoji || node.data.substring(start, start + shortcode.length) !== shortcode) return;
-        editor.snapshot(true); // its own history entry, so undo restores the shortcode text
+        editor.snapshot(true);
         var caret = window.getSelection();
         var caretNode = caret.rangeCount ? caret.anchorNode : null;
         var caretOffset = caret.rangeCount ? caret.anchorOffset : 0;
@@ -7395,8 +7387,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   var savedRange = null;
 
   var currentRange = function () {
-    // savedRange is only ever set by saveSelection(), called right before an async interruption
-    // (the link/image dialog) that leaves the live selection stale/collapsed; prefer it when present.
     if (savedRange) return savedRange;
     var sel = window.getSelection();
     if (sel.rangeCount && editable.contains(sel.anchorNode)) return sel.getRangeAt(0);
@@ -7411,33 +7401,38 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     while (node && node.parentNode !== editable) node = node.parentNode;
     return node;
   };
+  var blockAt = function (container, offset, atEnd) {
+    if (container !== editable) return blockOf(container);
+    var index = Math.min(offset, editable.childNodes.length) - (atEnd ? 1 : 0);
+    return editable.childNodes[Math.max(0, index)] || null;
+  };
   var blocksInRange = function (range) {
-    var first = blockOf(range.startContainer), last = blockOf(range.endContainer);
+    var first = blockAt(range.startContainer, range.startOffset, false), last = blockAt(range.endContainer, range.endOffset, true);
     if (!first || !last) {
-      // empty editable: blockOf climbed out without finding a block. Give the command
-      // something to operate on instead of an empty list.
       first = last = document.createElement('p');
       editable.appendChild(first);
     }
     var result = [];
     for (var el = first; el; el = el.nextSibling) {
+      var isLast = el === last;
+      if (el.nodeType !== Node.ELEMENT_NODE) {
+        var p = document.createElement('p');
+        editable.insertBefore(p, el);
+        p.appendChild(el);
+        el = p;
+      }
       result.push(el);
-      if (el === last) break;
+      if (isLast) break;
     }
     return result;
   };
   var replaceTag = function (el, tag) {
     var next = document.createElement(tag);
-    // insert next before moving children into it, so they stay attached to the document
-    // throughout the move (detaching them, even briefly, collapses the live selection)
     el.parentNode.insertBefore(next, el);
     while (el.firstChild) next.appendChild(el.firstChild);
     el.parentNode.removeChild(el);
     return next;
   };
-  // reparenting a node (even between two attached positions) can silently collapse the
-  // live selection in Chromium, so block-restructuring commands must explicitly set a
-  // fresh, valid selection into the mutated result afterward.
   var selectStart = function (el) {
     if (!el) return;
     var range = document.createRange();
@@ -7445,36 +7440,135 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     range.collapse(true);
     setRange(range);
   };
-  var expandCollapsedToWord = function (range) {
-    if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE) return;
-    var text = range.startContainer.data, start = range.startOffset, end = range.endOffset;
-    while (start > 0 && !/\s/.test(text[start - 1])) start--;
-    while (end < text.length && !/\s/.test(text[end])) end++;
-    range.setStart(range.startContainer, start);
-    range.setEnd(range.startContainer, end);
+  var expandToWord = function (range) {
+    var start = range.startContainer, end = range.endContainer;
+    if (start.nodeType === Node.TEXT_NODE) {
+      var so = range.startOffset;
+      while (so > 0 && !/\s/.test(start.data[so - 1])) so--;
+      range.setStart(start, so);
+    }
+    if (end.nodeType === Node.TEXT_NODE) {
+      var eo = range.endOffset;
+      while (eo < end.length && !/\s/.test(end.data[eo])) eo++;
+      range.setEnd(end, eo);
+    }
+  };
+  var trimRange = function (range) {
+    var start = range.startContainer, end = range.endContainer;
+    if (start.nodeType === Node.TEXT_NODE) {
+      var so = range.startOffset, max = start === end ? range.endOffset : start.length;
+      while (so < max && /\s/.test(start.data[so])) so++;
+      range.setStart(start, so);
+    }
+    if (end.nodeType === Node.TEXT_NODE) {
+      var eo = range.endOffset, min = start === end ? range.startOffset : 0;
+      while (eo > min && /\s/.test(end.data[eo - 1])) eo--;
+      range.setEnd(end, eo);
+    }
+  };
+  var formatOf = function (node, alternates) {
+    for (; node && node !== editable; node = node.parentNode) {
+      if (node.nodeType === Node.ELEMENT_NODE && alternates.includes(node.tagName)) return node;
+    }
+    return null;
+  };
+  var unwrapElement = function (el) {
+    var parent = el.parentNode, first = el.firstChild, last = el.lastChild;
+    while (el.firstChild) parent.insertBefore(el.firstChild, el);
+    parent.removeChild(el);
+    return { start: first, end: last, inside: false };
+  };
+  var LEAF_BLOCKS = 'p,h1,h2,h3,h4,h5,h6,li,td,th,pre,div';
+  var splitByBlock = function (range) {
+    var groups = [];
+    var walker = document.createTreeWalker(editable, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) { return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; }
+    });
+    for (var text = walker.nextNode(); text; text = walker.nextNode()) {
+      var block = text.parentNode.closest(LEAF_BLOCKS);
+      if (!block || block === editable || !editable.contains(block) || block.tagName === 'PRE') continue;
+      var group = groups[groups.length - 1];
+      if (group && group.block === block) group.last = text;
+      else groups.push({ block: block, first: text, last: text });
+    }
+    var parts = [];
+    groups.forEach(function (group) {
+      var part = document.createRange();
+      part.setStart(group.first, group.first === range.startContainer ? range.startOffset : 0);
+      part.setEnd(group.last, group.last === range.endContainer ? range.endOffset : group.last.length);
+      trimRange(part);
+      if (!part.collapsed) parts.push(part);
+    });
+    return parts;
+  };
+  var removeFormat = function (part, alternates) {
+    var el = formatOf(part.startContainer, alternates);
+    expandToWord(part);
+    if (part.toString() === el.textContent) return unwrapElement(el);
+    var tail = document.createRange();
+    tail.setStart(part.endContainer, part.endOffset);
+    tail.setEnd(el, el.childNodes.length);
+    var tailContents = tail.extractContents();
+    var ancestors = [];
+    for (var node = part.commonAncestorContainer; node !== el; node = node.parentNode) {
+      if (node.nodeType === Node.ELEMENT_NODE) ancestors.push(node);
+    }
+    var middle = part.extractContents();
+    ancestors.forEach(function (ancestor) {
+      var clone = ancestor.cloneNode(false);
+      clone.appendChild(middle);
+      middle = clone;
+    });
+    var result = { start: middle.firstChild, end: middle.lastChild, inside: false };
+    var after = el.nextSibling;
+    if (tailContents.textContent.trim()) {
+      var tailEl = el.cloneNode(false);
+      tailEl.appendChild(tailContents);
+      el.parentNode.insertBefore(tailEl, after);
+      after = tailEl;
+    }
+    el.parentNode.insertBefore(middle, after);
+    if (!el.textContent.trim()) el.parentNode.removeChild(el);
+    return result;
+  };
+  var addFormat = function (part, tag, alternates) {
+    var wrapper = document.createElement(tag);
+    wrapper.appendChild(part.extractContents());
+    wrapper.querySelectorAll(alternates.join(',')).forEach(unwrapElement);
+    part.insertNode(wrapper);
+    if (formatOf(wrapper.parentNode, alternates)) return unwrapElement(wrapper);
+    var prev = wrapper.previousSibling, next = wrapper.nextSibling;
+    if (prev && prev.nodeType === Node.ELEMENT_NODE && alternates.includes(prev.tagName)) {
+      while (prev.lastChild) wrapper.insertBefore(prev.lastChild, wrapper.firstChild);
+      prev.parentNode.removeChild(prev);
+    }
+    if (next && next.nodeType === Node.ELEMENT_NODE && alternates.includes(next.tagName)) {
+      while (next.firstChild) wrapper.appendChild(next.firstChild);
+      next.parentNode.removeChild(next);
+    }
+    return { start: wrapper, end: wrapper, inside: true };
   };
   var toggleInline = function (range, tag, alternates) {
-    // unwrap when an enclosing element of the type exists
-    for (var node = range.startContainer; node && node !== editable; node = node.parentNode) {
-      if (node.nodeType === Node.ELEMENT_NODE && alternates.includes(node.tagName)) {
-        var parent = node.parentNode;
-        while (node.firstChild) parent.insertBefore(node.firstChild, node);
-        parent.removeChild(node);
-        return;
-      }
-    }
-    expandCollapsedToWord(range);
+    if (range.collapsed) expandToWord(range);
     if (range.collapsed) return;
-    var wrapper = document.createElement(tag);
-    wrapper.appendChild(range.extractContents());
-    // strip nested same-type elements inside the wrapper
-    wrapper.querySelectorAll(alternates.join(',')).forEach(function (el) {
-      while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
-      el.parentNode.removeChild(el);
+    var startContainer = range.startContainer, startOffset = range.startOffset, endContainer = range.endContainer, endOffset = range.endOffset;
+    blocksInRange(range);
+    range.setStart(startContainer, startOffset);
+    range.setEnd(endContainer, endOffset);
+    var parts = splitByBlock(range);
+    if (!parts.length) return;
+    var formatted = parts.every(function (part) {
+      var el = formatOf(part.startContainer, alternates);
+      return !!el && el.contains(part.endContainer);
     });
-    range.insertNode(wrapper);
-    range.selectNodeContents(wrapper);
-    setRange(range);
+    var results = parts.map(function (part) {
+      return formatted ? removeFormat(part, alternates) : addFormat(part, tag, alternates);
+    });
+    var first = results[0], last = results[results.length - 1];
+    var selection = document.createRange();
+    if (first.inside) selection.setStart(first.start, 0); else selection.setStartBefore(first.start);
+    if (last.inside) selection.setEnd(last.end, last.end.childNodes.length); else selection.setEndAfter(last.end);
+    setRange(selection);
   };
 
   editor.saveSelection = function () {
@@ -7539,7 +7633,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
           }
         }
       } else {
-        // cross-mode entry: re-render markdown via .NET
         instance.invokeMethodAsync('RenderMarkdownAsync', state.markdown).then(function (html) {
           editor.setContent(html);
         });
@@ -7576,7 +7669,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     reportState();
   };
 
-  var stateTimeout = null;
+  var stateTimeout = null, lastState = '';
   var reportState = function () {
     clearTimeout(stateTimeout);
     stateTimeout = setTimeout(function () {
@@ -7597,14 +7690,18 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
           if (/^H[1-6]$/.test(node.tagName)) formats.push('heading');
         }
       }
-      try {
-        suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', {
-          formats: formats, canUndo: history.undo.length > 0, canRedo: history.redo.length > 0
-        }));
-      } catch { }
+      var state = { formats: formats, canUndo: history.undo.length > 0, canRedo: history.redo.length > 0 };
+      var key = JSON.stringify(state);
+      if (key === lastState) return;
+      lastState = key;
+      try { suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', state)); } catch { }
     }, 100);
   };
-  document.addEventListener('selectionchange', reportState);
+  var onSelectionChange = function () {
+    var sel = window.getSelection();
+    if (sel.rangeCount && editable.contains(sel.anchorNode)) reportState();
+  };
+  document.addEventListener('selectionchange', onSelectionChange);
 
   var onBeforeInput = function (e) {
     var type = e.inputType || '';
@@ -7631,11 +7728,11 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       case 'strikethrough': toggleInline(range, 'del', ['DEL', 'S', 'STRIKE']); break;
       case 'code': toggleInline(range, 'code', ['CODE']); break;
       case 'heading': {
-        var headed = blocksInRange(range).map(function (el) {
+        var headed = blocksInRange(range).filter(function (el) { return /^(P|DIV|H[1-6])$/.test(el.tagName); }).map(function (el) {
           var level = /^H([1-6])$/.test(el.tagName) ? +RegExp.$1 : 0;
           return replaceTag(el, level >= 3 ? 'p' : 'h' + (level + 1));
         });
-        selectStart(headed[0]);
+        if (headed.length) selectStart(headed[0]);
         break;
       }
       case 'quote': {
@@ -7758,7 +7855,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     textarea.removeEventListener('keydown', onKeyDown);
     editable.removeEventListener('beforeinput', onBeforeInput);
     textarea.removeEventListener('beforeinput', onBeforeInput);
-    document.removeEventListener('selectionchange', reportState);
+    document.removeEventListener('selectionchange', onSelectionChange);
   };
 
   return editor;

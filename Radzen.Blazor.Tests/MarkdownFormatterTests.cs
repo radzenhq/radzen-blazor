@@ -47,8 +47,6 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new MarkdownEdit(6, 11, token + "world" + token, 6 + t, 11 + t), edit);
         }
 
-        // caret must sit in actual whitespace to insert empty delimiters; a caret merely at a word's
-        // edge (e.g. old "hello" at position 5) now expands to the word instead (see Bold_ExpandsCaretToWord).
         [Theory]
         [InlineData("bold", "**")]
         [InlineData("italic", "*")]
@@ -65,7 +63,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Wrap_UnwrapsWhenSelectionIncludesTokens()
         {
-            // "say **hi** now" — select "**hi**" (4..10)
             var edit = MarkdownFormatter.Apply("say **hi** now", 4, 10, MarkdownEditorCommands.Bold);
 
             Assert.Equal(new MarkdownEdit(4, 10, "hi", 4, 6), edit);
@@ -74,7 +71,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Wrap_UnwrapsWhenTokensSurroundSelection()
         {
-            // "say **hi** now" — select "hi" (6..8)
             var edit = MarkdownFormatter.Apply("say **hi** now", 6, 8, MarkdownEditorCommands.Bold);
 
             Assert.Equal(new MarkdownEdit(4, 10, "hi", 4, 6), edit);
@@ -83,10 +79,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Wrap_EmptyCaretBetweenTokens_WrapsUnflankedRun()
         {
-            // "****" has no whitespace around it and is unflanked, so InlineParser.ScanSpans never pairs
-            // the asterisks into a token (CommonMark flanking rules require non-whitespace/punctuation
-            // context to open/close). The caret at 2..2 therefore expands to the whole "****" run like any
-            // other word and gets wrapped, rather than being special-cased as "between empty tokens".
             var edit = MarkdownFormatter.Apply("****", 2, 2, MarkdownEditorCommands.Bold);
 
             Assert.Equal(new MarkdownEdit(0, 4, "**" + "****" + "**", 2, 6), edit);
@@ -95,22 +87,18 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Wrap_DoesNotUnwrapDifferentToken()
         {
-            // italic applied to "**hi**" selected → wrap (with the canonical "*" delimiter), not unwrap
             var edit = MarkdownFormatter.Apply("say **hi** now", 4, 10, MarkdownEditorCommands.Italic);
 
             Assert.Equal(new MarkdownEdit(4, 10, "*" + "**hi**" + "*", 5, 11), edit);
         }
 
-        // enchev repro 1: trailing space in selection
         [Fact]
         public void Bold_TrimsTrailingWhitespace()
         {
-            // "hello world", selection [0,6) = "hello "
             var edit = MarkdownFormatter.Apply("hello world", 0, 6, MarkdownEditorCommands.Bold);
             Assert.Equal(new MarkdownEdit(0, 5, "**hello**", 2, 7), edit);
         }
 
-        // enchev repro 2: caret inside a word expands to the word
         [Fact]
         public void Bold_ExpandsCaretToWord()
         {
@@ -125,16 +113,76 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new MarkdownEdit(2, 2, "****", 4, 4), edit);
         }
 
-        // enchev repro 3: partial selection inside existing bold unwraps the whole token
         [Fact]
         public void Bold_PartialSelectionInsideBold_UnwrapsToken()
         {
-            // "hello **world**", select "orl" [10,13)
             var edit = MarkdownFormatter.Apply("hello **world**", 10, 13, MarkdownEditorCommands.Bold);
             Assert.Equal(new MarkdownEdit(6, 15, "world", 6, 11), edit);
         }
 
-        // enchev repro 4: star emphasis is recognized by the italic toggle
+        [Fact]
+        public void Bold_WordSelectionInsideLongerBold_UnwrapsOnlyTheWord()
+        {
+            var edit = MarkdownFormatter.Apply("**foo bar baz**", 6, 9, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 15, "**foo** bar **baz**", 8, 11), edit);
+        }
+
+        [Fact]
+        public void Bold_SelectionAtStartOfBold_KeepsRestBold()
+        {
+            var edit = MarkdownFormatter.Apply("**foo bar**", 2, 5, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 11, "foo **bar**", 0, 3), edit);
+        }
+
+        [Fact]
+        public void Bold_SelectionAtEndOfBold_KeepsRestBold()
+        {
+            var edit = MarkdownFormatter.Apply("**foo bar**", 6, 9, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 11, "**foo** bar", 8, 11), edit);
+        }
+
+        [Fact]
+        public void Bold_CaretInsideLongerBold_UnwrapsOnlyTheWord()
+        {
+            var edit = MarkdownFormatter.Apply("**foo bar**", 7, 7, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 11, "**foo** bar", 8, 11), edit);
+        }
+
+        [Fact]
+        public void Bold_MidWordSelectionInsideLongerBold_NeverSplitsTheWord()
+        {
+            var edit = MarkdownFormatter.Apply("**foo bar**", 7, 8, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 11, "**foo** bar", 8, 11), edit);
+        }
+
+        [Fact]
+        public void Bold_MultiLineSelection_WrapsEachLine()
+        {
+            var edit = MarkdownFormatter.Apply("a\nb", 0, 3, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 3, "**a**\n**b**", 2, 9), edit);
+        }
+
+        [Fact]
+        public void Bold_MultiLineSelection_SkipsBlankLines()
+        {
+            var edit = MarkdownFormatter.Apply("a\n\nb", 0, 4, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 4, "**a**\n\n**b**", 2, 10), edit);
+        }
+
+        [Fact]
+        public void Bold_MultiLineSelection_AllBold_UnwrapsEachLine()
+        {
+            var edit = MarkdownFormatter.Apply("**a**\n**b**", 0, 11, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 11, "a\nb", 0, 3), edit);
+        }
+
+        [Fact]
+        public void Bold_MultiLineSelection_PartlyBold_WrapsEveryLine()
+        {
+            var edit = MarkdownFormatter.Apply("**a**\nb", 0, 7, MarkdownEditorCommands.Bold);
+            Assert.Equal(new MarkdownEdit(0, 7, "**a**\n**b**", 2, 9), edit);
+        }
+
         [Fact]
         public void Italic_UnwrapsStarEmphasis()
         {
@@ -156,11 +204,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new MarkdownEdit(0, 4, "*word*", 1, 5), edit);
         }
 
-        // overlapping: selection extends past an existing token → strip inner, wrap whole
         [Fact]
         public void Bold_SelectionContainingBoldToken_StripsAndWrapsWhole()
         {
-            // "**a** b", select all [0,7)
             var edit = MarkdownFormatter.Apply("**a** b", 0, 7, MarkdownEditorCommands.Bold);
             Assert.Equal(new MarkdownEdit(0, 7, "**a b**", 2, 5), edit);
         }
@@ -168,7 +214,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Bold_DoesNotMatchTokensOnOtherLines()
         {
-            // bold on line 2 must not affect detection for a selection on line 1
             var edit = MarkdownFormatter.Apply("plain\n**bold**", 0, 5, MarkdownEditorCommands.Bold);
             Assert.Equal(new MarkdownEdit(0, 5, "**plain**", 2, 7), edit);
         }
@@ -183,10 +228,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Bold_LeadingWhitespaceOnLine_MapsSpanOffsetsBackToDocumentCoordinates()
         {
-            // ScanSpans trims its input, so the span for "**bold**" is reported relative to the trimmed
-            // line ("**bold** x"), not the original line ("  **bold** x"). Selecting "ol" inside "bold"
-            // (document offsets 5..7) must still resolve to the correct outer token range (2..10) by
-            // compensating for the line's 2 leading spaces.
             var edit = MarkdownFormatter.Apply("  **bold** x", 5, 7, MarkdownEditorCommands.Bold);
             Assert.Equal(new MarkdownEdit(2, 10, "bold", 2, 6), edit);
         }
@@ -197,7 +238,6 @@ namespace Radzen.Blazor.Tests
         [InlineData("taskList", "- [ ] ")]
         public void PrefixLines_PrefixesEveryLineInSelection(string command, string prefix)
         {
-            // caret in the middle of line 2 of three lines; only that line is affected
             var text = "one\ntwo\nthree";
             var edit = MarkdownFormatter.Apply(text, 5, 5, command);
 
@@ -208,7 +248,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PrefixLines_ExpandsPartialMultiLineSelection()
         {
-            // select from inside "one" to inside "two"
             var edit = MarkdownFormatter.Apply("one\ntwo\nthree", 1, 5, MarkdownEditorCommands.Quote);
 
             Assert.Equal(new MarkdownEdit(0, 7, "> one\n> two", 0, 11), edit);
@@ -225,7 +264,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PrefixLines_IgnoresTrailingNewlineInSelection()
         {
-            // selecting "one\n" (0..4) must not drag line 2 in
             var edit = MarkdownFormatter.Apply("one\ntwo", 0, 4, MarkdownEditorCommands.Quote);
 
             Assert.Equal(new MarkdownEdit(0, 3, "> one", 0, 5), edit);
@@ -287,7 +325,6 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CodeBlock_FencesSelection_OnOwnLines()
         {
-            // "ab" selected in the middle of a line
             var edit = MarkdownFormatter.Apply("x ab y", 2, 4, MarkdownEditorCommands.CodeBlock);
 
             Assert.Equal(new MarkdownEdit(2, 4, "\n```\nab\n```\n", 7, 9), edit);

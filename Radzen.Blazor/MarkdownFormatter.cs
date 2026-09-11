@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Markdown;
 
@@ -71,78 +73,182 @@ internal static class MarkdownFormatter
 
     /// <summary>
     /// Toggles an inline markdown token (bold/italic/strikethrough/code) on the selection, normalizing it
-    /// GitHub-style: trims whitespace off the edges, expands a collapsed caret to the surrounding word,
-    /// unwraps a token that already contains the selection, and otherwise strips any fully-selected matching
-    /// tokens before wrapping once.
+    /// GitHub-style: trims whitespace off the edges, expands a collapsed caret to the surrounding word and
+    /// treats every selected line separately. When every line is already inside a matching token the token
+    /// is removed from the selected words (splitting the token when it contains more), otherwise any matching
+    /// tokens inside the selection are stripped and each line is wrapped once.
     /// </summary>
     static MarkdownEdit ToggleInline(string text, int start, int end, string emit, Func<InlineSpan, bool> matches)
     {
-        // 1. scan only the lines the selection touches — inline tokens never matter across paragraphs here
-        var (lineStart, lineEnd) = ExpandToLines(text, start, end);
+        var segments = Segments(text, start, end);
+
+        if (segments.Count == 0)
+        {
+            while (start < end && char.IsWhiteSpace(text[start]))
+            {
+                start++;
+            }
+
+            var (lineStart, lineEnd) = ExpandToLines(text, start, start);
+            var (wordStart, wordEnd) = ExpandToWord(text, start, start, lineStart, lineEnd);
+
+            if (wordStart == wordEnd)
+            {
+                return new MarkdownEdit(start, start, emit + emit, start + emit.Length, start + emit.Length);
+            }
+
+            segments.Add((wordStart, wordEnd));
+        }
+
+        var containing = segments.Select(segment => ContainingSpan(text, segment, matches)).ToList();
+
+        var edits = containing.All(span => span != null)
+            ? segments.Select((segment, i) => Unwrap(text, segment, containing[i]!.Value, emit)).ToList()
+            : segments.Select(segment => Wrap(text, segment, emit, matches)).ToList();
+
+        return Combine(text, edits);
+    }
+
+    /// <summary>Splits [start, end) into one whitespace-trimmed segment per non-blank line.</summary>
+    static List<(int Start, int End)> Segments(string text, int start, int end)
+    {
+        List<(int Start, int End)> segments = [];
+
+        for (var lineStart = start; lineStart < end;)
+        {
+            var newline = text.IndexOf('\n', lineStart, end - lineStart);
+            var lineEnd = newline == -1 ? end : newline;
+            var (segmentStart, segmentEnd) = (lineStart, lineEnd);
+
+            while (segmentStart < segmentEnd && char.IsWhiteSpace(text[segmentStart]))
+            {
+                segmentStart++;
+            }
+            while (segmentEnd > segmentStart && char.IsWhiteSpace(text[segmentEnd - 1]))
+            {
+                segmentEnd--;
+            }
+
+            if (segmentStart < segmentEnd)
+            {
+                segments.Add((segmentStart, segmentEnd));
+            }
+
+            lineStart = lineEnd + 1;
+        }
+
+        return segments;
+    }
+
+    static (int Start, int End) ExpandToWord(string text, int start, int end, int min, int max)
+    {
+        while (start > min && !char.IsWhiteSpace(text[start - 1]))
+        {
+            start--;
+        }
+        while (end < max && !char.IsWhiteSpace(text[end]))
+        {
+            end++;
+        }
+
+        return (start, end);
+    }
+
+    readonly record struct OuterSpan(int Start, int End, int DelimiterLength);
+
+    /// <summary>
+    /// Returns the matching inline spans of the line containing <paramref name="index" /> in document coordinates.
+    /// <see cref="InlineParser.ScanSpans" /> trims its input, so leading whitespace on the line shifts the offsets.
+    /// </summary>
+    static IEnumerable<OuterSpan> LineSpans(string text, int index, Func<InlineSpan, bool> matches)
+    {
+        var (lineStart, lineEnd) = ExpandToLines(text, index, index);
         var line = text.Substring(lineStart, lineEnd - lineStart);
-        var spans = InlineParser.ScanSpans(line);
+        var offset = lineStart + line.Length - line.TrimStart().Length;
 
-        // ScanSpans trims its input, so span offsets are relative to the trimmed line. Leading whitespace
-        // on the line shifts them; trailing whitespace does not affect start-relative offsets.
-        var leadingWhitespace = line.Length - line.TrimStart().Length;
+        return InlineParser.ScanSpans(line).Where(matches).Select(s => new OuterSpan(offset + s.Start, offset + s.End, s.DelimiterLength));
+    }
 
-        // 2. trim whitespace off the selection edges
-        while (start < end && char.IsWhiteSpace(text[start]))
+    static OuterSpan? ContainingSpan(string text, (int Start, int End) segment, Func<InlineSpan, bool> matches)
+    {
+        foreach (var span in LineSpans(text, segment.Start, matches))
         {
-            start++;
-        }
-        while (end > start && char.IsWhiteSpace(text[end - 1]))
-        {
-            end--;
-        }
-
-        // 3. collapsed caret: expand to the surrounding non-whitespace run
-        if (start == end)
-        {
-            while (start > lineStart && !char.IsWhiteSpace(text[start - 1]))
+            if (span.Start <= segment.Start && segment.End <= span.End)
             {
-                start--;
-            }
-            while (end < lineEnd && !char.IsWhiteSpace(text[end]))
-            {
-                end++;
-            }
-            if (start == end)
-            {
-                // caret in whitespace: insert empty delimiters, caret between them
-                return new MarkdownEdit(start, end, emit + emit, start + emit.Length, start + emit.Length);
+                return span;
             }
         }
 
-        // 4a. a matching token whose outer range contains the selection → unwrap it
-        foreach (var s in spans)
+        return null;
+    }
+
+    /// <summary>Removes the token from the words of <paramref name="segment" />, keeping the rest of the token wrapped.</summary>
+    static MarkdownEdit Unwrap(string text, (int Start, int End) segment, OuterSpan span, string emit)
+    {
+        var innerStart = span.Start + span.DelimiterLength;
+        var innerEnd = span.End - span.DelimiterLength;
+        var (start, end) = ExpandToWord(text, Math.Max(segment.Start, innerStart), Math.Min(segment.End, innerEnd), innerStart, innerEnd);
+
+        var head = Rewrap(text[innerStart..start], emit);
+        var middle = text[start..end];
+        var tail = Rewrap(text[end..innerEnd], emit);
+
+        return new MarkdownEdit(span.Start, span.End, head + middle + tail, span.Start + head.Length, span.Start + head.Length + middle.Length);
+    }
+
+    /// <summary>Wraps the non-blank part of <paramref name="part" /> in <paramref name="emit" />, keeping edge whitespace outside.</summary>
+    static string Rewrap(string part, string emit)
+    {
+        var trimmed = part.Trim();
+
+        if (trimmed.Length == 0)
         {
-            if (!matches(s))
-            {
-                continue;
-            }
-            int outerStart = lineStart + leadingWhitespace + s.Start, outerEnd = lineStart + leadingWhitespace + s.End;
-            if (outerStart <= start && end <= outerEnd)
-            {
-                var inner = text.Substring(outerStart + s.DelimiterLength, outerEnd - outerStart - 2 * s.DelimiterLength);
-                return new MarkdownEdit(outerStart, outerEnd, inner, outerStart, outerStart + inner.Length);
-            }
+            return part;
         }
 
-        // 4b. otherwise: strip matching tokens fully inside the selection, then wrap once
-        var content = text.Substring(start, end - start);
-        foreach (var s in spans.Where(s => matches(s)
-                     && lineStart + leadingWhitespace + s.Start >= start && lineStart + leadingWhitespace + s.End <= end)
-                 .OrderByDescending(s => s.Start))
+        var leading = part.Length - part.TrimStart().Length;
+
+        return part[..leading] + emit + trimmed + emit + part[(leading + trimmed.Length)..];
+    }
+
+    /// <summary>Strips matching tokens fully inside <paramref name="segment" />, then wraps it once.</summary>
+    static MarkdownEdit Wrap(string text, (int Start, int End) segment, string emit, Func<InlineSpan, bool> matches)
+    {
+        var (start, end) = segment;
+        var content = text[start..end];
+
+        foreach (var span in LineSpans(text, start, matches).Where(s => s.Start >= start && s.End <= end).OrderByDescending(s => s.Start))
         {
-            int rs = lineStart + leadingWhitespace + s.Start - start, re = lineStart + leadingWhitespace + s.End - start;
-            content = content[..rs]
-                + content[(rs + s.DelimiterLength)..(re - s.DelimiterLength)]
-                + content[re..];
+            int relativeStart = span.Start - start, relativeEnd = span.End - start;
+            content = content[..relativeStart]
+                + content[(relativeStart + span.DelimiterLength)..(relativeEnd - span.DelimiterLength)]
+                + content[relativeEnd..];
         }
 
-        var replacement = emit + content + emit;
-        return new MarkdownEdit(start, end, replacement, start + emit.Length, start + emit.Length + content.Length);
+        return new MarkdownEdit(start, end, emit + content + emit, start + emit.Length, start + emit.Length + content.Length);
+    }
+
+    /// <summary>Merges non-overlapping, ordered per-line edits into a single edit spanning all of them.</summary>
+    static MarkdownEdit Combine(string text, List<MarkdownEdit> edits)
+    {
+        if (edits.Count == 1)
+        {
+            return edits[0];
+        }
+
+        var replacement = new StringBuilder();
+        var position = edits[0].Start;
+
+        foreach (var edit in edits)
+        {
+            replacement.Append(text, position, edit.Start - position).Append(edit.Replacement);
+            position = edit.End;
+        }
+
+        var last = edits[^1];
+        var shift = edits.Take(edits.Count - 1).Sum(edit => edit.Replacement.Length - (edit.End - edit.Start));
+
+        return new MarkdownEdit(edits[0].Start, last.End, replacement.ToString(), edits[0].SelectionStart, last.SelectionEnd + shift);
     }
 
     static readonly Regex OrderedPrefix = new(@"^\d+\. ", RegexOptions.Compiled);
