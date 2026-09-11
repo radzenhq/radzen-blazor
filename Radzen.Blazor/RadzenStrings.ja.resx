@@ -2463,4 +2463,55 @@
   <data name="MarkdownEditorRedo_Title" xml:space="preserve">
     <value>やり直し</value>
   </data>
+  <data name="MarkdownEditorBold_Title" xml:space="preserve">
+    <value>太字</value>
+  </data>
+  <data name="MarkdownEditorItalic_Title" xml:space="preserve">
+    <value>斜体</value>
+  </data>
+  <data name="MarkdownEditorStrikethrough_Title" xml:space="preserve">
+    <value>取り消し線</value>
+  </data>
+  <data name="MarkdownEditorHeading_Title" xml:space="preserve">
+    <value>見出し</value>
+  </data>
+  <data name="MarkdownEditorQuote_Title" xml:space="preserve">
+    <value>引用</value>
+  </data>
+  <data name="MarkdownEditorCode_Title" xml:space="preserve">
+    <value>コード</value>
+  </data>
+  <data name="MarkdownEditorCodeBlock_Title" xml:space="preserve">
+    <value>コードブロック</value>
+  </data>
+  <data name="MarkdownEditorUnorderedList_Title" xml:space="preserve">
+    <value>箇条書きリスト</value>
+  </data>
+  <data name="MarkdownEditorOrderedList_Title" xml:space="preserve">
+    <value>番号付きリスト</value>
+  </data>
+  <data name="MarkdownEditorTaskList_Title" xml:space="preserve">
+    <value>タスクリスト</value>
+  </data>
+  <data name="MarkdownEditorLink_Title" xml:space="preserve">
+    <value>リンクの挿入</value>
+  </data>
+  <data name="MarkdownEditorLink_UrlText" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="MarkdownEditorLink_LinkText" xml:space="preserve">
+    <value>テキスト</value>
+  </data>
+  <data name="MarkdownEditorImage_Title" xml:space="preserve">
+    <value>画像の挿入</value>
+  </data>
+  <data name="MarkdownEditorImage_UrlText" xml:space="preserve">
+    <value>画像のURL</value>
+  </data>
+  <data name="MarkdownEditorImage_AltText" xml:space="preserve">
+    <value>代替テキスト</value>
+  </data>
+  <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
+    <value>水平線</value>
+  </data>
 </root>
