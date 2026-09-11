@@ -10,6 +10,12 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A Markdown editor component with a toolbar, keyboard shortcuts, and a Design/Source mode switcher.
 /// </summary>
+/// <remarks>
+/// Edits made in Design mode serialize the whole document back to Markdown in a canonical form: <c>__bold__</c> becomes
+/// <c>**bold**</c>, and characters with a Markdown meaning inside plain text are escaped, e.g. <c>snake_case</c> becomes
+/// <c>snake\_case</c> and <c>array[0]</c> becomes <c>array\[0\]</c>. The rendered result is unchanged. Use Source mode when
+/// the exact Markdown text must be preserved.
+/// </remarks>
 /// <example>
 /// <code>
 /// &lt;RadzenMarkdownEditor @bind-Value=@markdown @bind-Mode=@mode /&gt;
