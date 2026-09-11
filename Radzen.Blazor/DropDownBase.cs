@@ -1010,7 +1010,7 @@ namespace Radzen
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
                     query)
-                    .Cast(elementType).Cast<dynamic>().ToList();
+                    .Cast(elementType).Cast<object>().ToList();
 
                 if (previousKey != args.Key)
                 {
@@ -1641,9 +1641,9 @@ namespace Radzen
                             else
                             {
                                 // Non-in-memory (e.g. EF): keep the per-value query so the lookup stays server-side.
-                                foreach (object v in values.Cast<dynamic>().ToList())
+                                foreach (object v in values.Cast<object>().ToList())
                                 {
-                                    dynamic item = view.AsQueryable().Where(new FilterDescriptor[]
+                                    object item = view.AsQueryable().Where(new FilterDescriptor[]
                                     {
                                         new FilterDescriptor()
                                         {
