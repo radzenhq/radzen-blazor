@@ -8,7 +8,10 @@ public class MarkdownEditorToolState
     /// <summary>The commands (see <see cref="MarkdownEditorCommands" />) active at the current selection.</summary>
     public string[]? Formats { get; set; }
 
-    /// <summary>The block at the current selection: <c>p</c> or <c>h1</c> to <c>h6</c>; <c>null</c> when it is neither a paragraph nor a heading.</summary>
+    /// <summary>
+    /// The block at the current selection: <c>p</c> or <c>h1</c> to <c>h6</c>, an empty string when the selection spans several kinds of blocks,
+    /// or <c>null</c> when it contains no paragraph or heading at all.
+    /// </summary>
     public string? Block { get; set; }
 
     /// <summary>Whether the editor's history has a state to undo to.</summary>

@@ -8638,7 +8638,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
 
   var designState = function () {
-    var state = { formats: [], block: null };
+    var state = { formats: [], block: '' };
     var sel = window.getSelection();
     if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return state;
     for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
@@ -8651,16 +8651,29 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         case 'BLOCKQUOTE': state.formats.push('quote'); break;
         case 'UL': state.formats.push('unorderedList'); break;
         case 'OL': state.formats.push('orderedList'); break;
-        case 'P': case 'DIV': state.block = state.block || 'p'; break;
       }
-      if (/^H[1-6]$/.test(node.tagName)) state.block = state.block || node.tagName.toLowerCase();
+    }
+    var range = sel.getRangeAt(0);
+    var top = blockAt(range.startContainer, range.startOffset, false);
+    state.block = top && /^(P|DIV|H[1-6])$/.test(top.tagName) ? (top.tagName === 'DIV' ? 'p' : top.tagName.toLowerCase()) : null;
+    if (!state.block && !range.collapsed) {
+      var last = blockAt(range.endContainer, range.endOffset, true);
+      for (var block = blockAt(range.startContainer, range.startOffset, false); block; block = block.nextSibling) {
+        if (/^(P|DIV|H[1-6])$/.test(block.tagName)) { state.block = ''; break; }
+        if (block === last) break;
+      }
     }
     return state;
+  };
+  var sourceBlockOf = function (line) {
+    var heading = /^\s*(#{1,6}) /.exec(line);
+    if (heading) return 'h' + heading[1].length;
+    return /\S/.test(line) && !/^\s*([-*+] |\d+\. |> |\||```|~~~|---\s*$)/.test(line) ? 'p' : null;
   };
   var SOURCE_BLOCKS = [['quote', /^\s*> /], ['taskList', /^\s*[-*+] \[[ xX]\] /], ['unorderedList', /^\s*[-*+] (?!\[[ xX]\] )/], ['orderedList', /^\s*\d+\. /]];
   var SOURCE_INLINES = [['bold', /\*\*[^*\n]+\*\*|__[^_\n]+__/g], ['italic', /(^|[^*\w])(\*[^*\n]+\*|_[^_\n]+_)(?![*\w])/g], ['strikethrough', /~~[^~\n]+~~/g], ['code', /`[^`\n]+`/g]];
   var sourceState = function () {
-    var state = { formats: [], block: null };
+    var state = { formats: [], block: '' };
     if (document.activeElement !== textarea) return state;
     var formats = state.formats;
     var value = textarea.value, position = textarea.selectionStart;
@@ -8669,9 +8682,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var line = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
     var caret = position - lineStart;
     SOURCE_BLOCKS.forEach(function (block) { if (block[1].test(line)) formats.push(block[0]); });
-    var heading = /^\s*(#{1,6}) /.exec(line);
-    if (heading) state.block = 'h' + heading[1].length;
-    else if (!formats.length && /\S/.test(line) && !/^\s*(\||```|~~~|---\s*$)/.test(line)) state.block = 'p';
+    var fences = value.substring(0, lineStart).match(/^\s*(```|~~~)/gm) || [];
+    state.block = fences.length % 2 ? null : sourceBlockOf(line);
+    if (!state.block && textarea.selectionEnd > position) {
+      var selectionEnd = value.indexOf('\n', textarea.selectionEnd);
+      var selected = value.substring(lineStart, selectionEnd === -1 ? value.length : selectionEnd).split('\n');
+      if (selected.some(function (l) { return sourceBlockOf(l) && !/^\s*(```|~~~)/.test(l); })) state.block = '';
+    }
     SOURCE_INLINES.forEach(function (inline) {
       var match;
       inline[1].lastIndex = 0;
