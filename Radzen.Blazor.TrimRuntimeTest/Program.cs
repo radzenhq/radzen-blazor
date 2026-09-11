@@ -16,6 +16,7 @@
 // does not preserve anything. The closed-generic-component instantiation below is the mechanism the
 // DAM fix actually repairs.
 
+using System.Net.Http;
 using System.Reflection;
 using Radzen.Blazor;
 using Radzen.Blazor.TrimTest.Models;
@@ -64,6 +65,64 @@ foreach (var (type, members) in expectations)
     }
 }
 
+object[] interopOwners =
+[
+    new RadzenUpload(),
+    new RadzenFileInput<string>(),
+    new RadzenSpreadsheet(),
+    new RadzenGoogleMap(),
+    new RadzenDialog(),
+    new Radzen.Blazor.Rendering.DialogContainer(),
+    new RadzenHtmlEditor(),
+    new RadzenChart(),
+    new Radzen.DropDownItem<int>(),
+    new Radzen.Documents.Spreadsheet.ChartDataPoint(),
+    new HttpResponseMessage(),
+    (Func<HttpResponseMessage, Task<object?>>)Radzen.HttpResponseMessageExtensions.ReadAsync<object>,
+];
+GC.KeepAlive(interopOwners);
+
+var library = typeof(RadzenUpload).Assembly;
+string[] libraryNamespace = ["Radzen", "Radzen.Blazor", "Radzen.Blazor.Spreadsheet", "Radzen.Blazor.Rendering", "Radzen.Documents.Spreadsheet"];
+Type LibraryType(int ns, string name) => library.GetType(libraryNamespace[ns] + "." + name)
+    ?? throw new InvalidOperationException($"{name} was trimmed away entirely");
+
+(Type Type, string[] Setters, string[] Getters)[] dtoExpectations =
+[
+    (LibraryType(0, "FileInfo"), ["Name", "Size", "LastModified", "ContentType"], ["Source"]),
+    (LibraryType(0, "PreviewFileInfo"), ["Url"], []),
+    (LibraryType(2, "CellEventArgs"), ["Row", "Column", "Pointer"], []),
+    (LibraryType(2, "ImageResizeEventArgs"), ["Direction", "Pointer"], []),
+    (LibraryType(0, "GoogleMapClickEventArgs"), ["Position"], []),
+    (LibraryType(0, "GoogleMapPosition"), ["Lat", "Lng"], ["Lat", "Lng"]),
+    (LibraryType(1, "GoogleMapMarkerData"), [], ["Title", "Label", "Position"]),
+    (LibraryType(0, "DialogOptions"), [], ["Width", "Height", "Draggable", "Resizable", "CloseDialogOnEsc", "AutoFocusFirstElement"]),
+    (LibraryType(0, "SideDialogOptions"), [], ["Position", "ShowMask", "CloseDialogOnOverlayClick"]),
+    (LibraryType(0, "ConfirmOptions"), [], ["OkButtonText", "CancelButtonText"]),
+    (LibraryType(0, "ODataServiceResult`1"), ["Count", "Value"], []),
+    (LibraryType(0, "DropDownItem`1"), [], ["Text", "Value"]),
+    (LibraryType(4, "ChartDataPoint"), [], ["Category", "Value"]),
+    (LibraryType(3, "Rect"), ["Width", "Height", "Top", "Left"], []),
+    (LibraryType(1, "RadzenHtmlEditorCommandState"), ["Bold", "FontName", "Html", "Success"], []),
+    (LibraryType(0, "HtmlEditorTableSelection"), ["InTable", "RowIndex", "Columns"], []),
+    (LibraryType(2, "VirtualRegion"), [], []),
+];
+
+foreach (var (type, setters, getters) in dtoExpectations)
+{
+    foreach (var member in setters)
+    {
+        if (type.GetProperty(member)?.SetMethod == null)
+            failures.Add($"{type.Name}.{member}: setter trimmed away (JS interop deserialization would drop it)");
+    }
+
+    foreach (var member in getters)
+    {
+        if (type.GetProperty(member)?.GetMethod == null)
+            failures.Add($"{type.Name}.{member}: getter trimmed away (JS interop serialization or reflection would miss it)");
+    }
+}
+
 if (failures.Count > 0)
 {
     Console.Error.WriteLine(
@@ -75,5 +134,5 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine($"TRIM RUNTIME GATE PASSED - all {expectations.Sum(e => e.Members.Length)} gated model getters survived trimming.");
+Console.WriteLine($"TRIM RUNTIME GATE PASSED - all {expectations.Sum(e => e.Members.Length)} gated model getters and {dtoExpectations.Sum(e => e.Setters.Length + e.Getters.Length)} interop DTO accessors survived trimming.");
 return 0;
