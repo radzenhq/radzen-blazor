@@ -24,8 +24,8 @@ public class InlineSpanTests
     public void Finds_nested_strong_and_emphasis()
     {
         var spans = InlineParser.ScanSpans("***a***");
-        Assert.Contains(spans, s => s is { Start: 1, End: 6, DelimiterLength: 2 }); // **a** inner
-        Assert.Contains(spans, s => s is { Start: 0, End: 7, DelimiterLength: 1 }); // *…* outer
+        Assert.Contains(spans, s => s is { Start: 1, End: 6, DelimiterLength: 2 });
+        Assert.Contains(spans, s => s is { Start: 0, End: 7, DelimiterLength: 1 });
     }
 
     [Fact]

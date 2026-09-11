@@ -960,7 +960,6 @@ class InlineParser
                     {
                         if (opener.Length < 2 || closer.Length < 2)
                         {
-                            // single tildes never pair — deactivate both as emphasis candidates
                             delimiters.RemoveAt(closerIndex);
                             continue;
                         }

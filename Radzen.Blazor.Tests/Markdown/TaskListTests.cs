@@ -25,12 +25,6 @@ public class TaskListTests
         </item>
     </list>
 </document>")]
-    // no marker → no checked attribute; [x] not followed by space is literal.
-    // The unmatched "[" / "]" split into separate <text> nodes because the inline
-    // parser's bracket handling (InlineParser.TryGetOpenerIndex) flushes the text
-    // buffer before confirming a link, regardless of task-list parsing; this is
-    // pre-existing behavior, reproduced here rather than merged, since fixing it
-    // is outside this task's scope.
     [InlineData("- [x]tight", @"<document>
     <list type=""bullet"" tight=""true"">
         <item>
