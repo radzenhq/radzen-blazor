@@ -43,7 +43,7 @@ namespace Radzen.Blazor.Tests
 
             var editable = component.Find(".rz-markdown-editor-design");
             Assert.Equal("true", editable.GetAttribute("contenteditable"));
-            Assert.Empty(editable.InnerHtml.Trim()); // Blazor renders it empty; JS owns content
+            Assert.Empty(editable.InnerHtml.Trim());
             Assert.True(component.Find("textarea").HasAttribute("hidden"));
         }
 
@@ -155,7 +155,6 @@ namespace Radzen.Blazor.Tests
             execute.SetVoidResult();
             string? executed = null;
 
-            // Mode defaults to Design.
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hello")
                 .Add(x => x.Execute, args => executed = args.CommandName));
@@ -175,12 +174,8 @@ namespace Radzen.Blazor.Tests
             saveSelection.SetVoidResult();
             ctx.JSInterop.Setup<bool>("hasSelection", _ => true).SetResult(true);
 
-            // Mode defaults to Design.
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
 
-            // DialogService.OpenAsync never completes without a rendered <RadzenDialog> host, so this call
-            // is fired without awaiting; saveSelection runs synchronously before that (never-resolving)
-            // await, so it has already happened by the time this statement returns control.
             _ = component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Link));
 
             Assert.Single(saveSelection.Invocations);
@@ -268,8 +263,6 @@ namespace Radzen.Blazor.Tests
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Design));
 
-            // Mode is one-way bound (no ModeChanged): the Mode parameter never changes, but the internal
-            // mode field does, and rendering must follow the field, not the unchanged parameter.
             component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
 
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
@@ -323,7 +316,6 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             ctx.RenderComponent<RadzenMarkdownEditor>();
 
-            // Loose mode records every call; no Setup so the un-awaited OnAfterRenderAsync cannot hang on a missing result.
             var invocation = Assert.Single(ctx.JSInterop.Invocations["Radzen.createMarkdownEditor"]);
             var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[3]);
             Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
@@ -372,12 +364,12 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "old")
                 .Add(x => x.ValueChanged, v => changed = v));
-            int countAfterMount = plannedSetContent.Invocations.Count; // initial render already syncs content once; bunit's Invocations dictionary has no Clear()
+            int countAfterMount = plannedSetContent.Invocations.Count;
 
             await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("new **text**"));
 
             Assert.Equal("new **text**", changed);
-            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count); // surface-originated change must not echo back
+            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count);
         }
 
         [Fact]
@@ -386,7 +378,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
-            int countBeforeExternalChange = plannedSetContent.Invocations.Count; // bunit's Invocations dictionary has no Clear(); compare counts instead
+            int countBeforeExternalChange = plannedSetContent.Invocations.Count;
 
             component.SetParametersAndRender(p => p.Add(x => x.Value, "b"));
 
@@ -401,7 +393,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "a")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
-            int countBeforeExternalChange = plannedSetContent.Invocations.Count; // bunit's Invocations dictionary has no Clear(); compare counts instead
+            int countBeforeExternalChange = plannedSetContent.Invocations.Count;
 
             component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Design));
 
@@ -422,15 +414,12 @@ namespace Radzen.Blazor.Tests
                 .Add(x => x.Change, v => changeEventValue = v));
             int countAfterMount = plannedSetContent.Invocations.Count;
 
-            // JS clears the debounce timer on blur and reports the surface's current content directly to
-            // OnDesignChangeAsync, without a preceding OnDesignInputAsync — the keystroke that landed inside
-            // the 250ms debounce window immediately before blur must still reach Value.
             await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("blurred **text**"));
 
             Assert.Equal("blurred **text**", changed);
-            Assert.Equal(1, valueChangedCount); // flushed exactly once
+            Assert.Equal(1, valueChangedCount);
             Assert.Equal("blurred **text**", changeEventValue);
-            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count); // still no echo back to the surface
+            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count);
         }
 
         [Fact]
@@ -443,8 +432,6 @@ namespace Radzen.Blazor.Tests
                 .Add(x => x.Value, "old")
                 .Add(x => x.ValueChanged, _ => valueChangedCount++));
 
-            // The debounced OnDesignInputAsync already flushed this markdown; blur reporting the same
-            // content must not raise ValueChanged a second time.
             await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("same **text**"));
             await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("same **text**"));
 
@@ -462,12 +449,12 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
             Assert.True(component.Instance.CanUndo);
-            Assert.Contains("rz-state-active", component.Markup); // Bold button highlighted
+            Assert.Contains("rz-state-active", component.Markup);
         }
 
         [Theory]
         [InlineData("smile", "\U0001f604")]
-        [InlineData("SMILE", "\U0001f604")] // shortcodes are case-insensitive, matching the parser
+        [InlineData("SMILE", "\U0001f604")]
         [InlineData("thumbsup", "\U0001f44d")]
         [InlineData("+1", "\U0001f44d")]
         public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsEmojiForKnownShortcode(string shortcode, string expected)

@@ -109,7 +109,6 @@
   align-items: center;
 }
 
-// GitHub-style task lists: no list marker, checkbox in the marker position
 .rz-markdown-editor-design,
 .rz-markdown {
   li:has(> input[type='checkbox']:first-child) {
