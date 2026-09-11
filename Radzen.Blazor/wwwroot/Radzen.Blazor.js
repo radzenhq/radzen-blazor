@@ -8417,18 +8417,24 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       range.setEnd(end, eo);
     }
   };
-  var trimRange = function (range) {
-    var start = range.startContainer, end = range.endContainer;
-    if (start.nodeType === Node.TEXT_NODE) {
-      var so = range.startOffset, max = start === end ? range.endOffset : start.length;
-      while (so < max && /\s/.test(start.data[so])) so++;
-      range.setStart(start, so);
+  var partOf = function (texts, range) {
+    var i = 0, j = texts.length - 1;
+    var so = texts[i] === range.startContainer ? range.startOffset : 0;
+    var eo = texts[j] === range.endContainer ? range.endOffset : texts[j].length;
+    while (true) {
+      if (so >= (i === j ? eo : texts[i].length)) { if (i === j) break; i++; so = 0; continue; }
+      if (!/\s/.test(texts[i].data[so])) break;
+      so++;
     }
-    if (end.nodeType === Node.TEXT_NODE) {
-      var eo = range.endOffset, min = start === end ? range.startOffset : 0;
-      while (eo > min && /\s/.test(end.data[eo - 1])) eo--;
-      range.setEnd(end, eo);
+    while (true) {
+      if (eo <= (i === j ? so : 0)) { if (i === j) break; j--; eo = texts[j].length; continue; }
+      if (!/\s/.test(texts[j].data[eo - 1])) break;
+      eo--;
     }
+    var part = document.createRange();
+    part.setStart(texts[i], so);
+    part.setEnd(texts[j], eo);
+    return part;
   };
   var formatOf = function (node, alternates) {
     for (; node && node !== editable; node = node.parentNode) {
@@ -8450,17 +8456,14 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     });
     for (var text = walker.nextNode(); text; text = walker.nextNode()) {
       var block = text.parentNode.closest(LEAF_BLOCKS);
-      if (!block || block === editable || !editable.contains(block) || block.tagName === 'PRE') continue;
+      if (!block || block === editable || !editable.contains(block) || block.tagName === 'PRE' || !/\S/.test(text.data)) continue;
       var group = groups[groups.length - 1];
-      if (group && group.block === block) group.last = text;
-      else groups.push({ block: block, first: text, last: text });
+      if (group && group.block === block) group.texts.push(text);
+      else groups.push({ block: block, texts: [text] });
     }
     var parts = [];
     groups.forEach(function (group) {
-      var part = document.createRange();
-      part.setStart(group.first, group.first === range.startContainer ? range.startOffset : 0);
-      part.setEnd(group.last, group.last === range.endContainer ? range.endOffset : group.last.length);
-      trimRange(part);
+      var part = partOf(group.texts, range);
       if (!part.collapsed) parts.push(part);
     });
     return parts;
@@ -8528,6 +8531,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var results = parts.map(function (part) {
       return formatted ? removeFormat(part, alternates) : addFormat(part, tag, alternates);
     });
+    editable.querySelectorAll('strong:empty,b:empty,em:empty,i:empty,del:empty,s:empty,strike:empty,code:empty').forEach(function (el) { el.parentNode.removeChild(el); });
     var first = results[0], last = results[results.length - 1];
     var selection = document.createRange();
     if (first.inside) selection.setStart(first.start, 0); else selection.setStartBefore(first.start);
@@ -8683,6 +8687,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var range = currentRange();
     if (!range) { editable.focus(); range = currentRange(); if (!range) return; }
     editable.focus();
+    editable.normalize();
     setRange(range);
     editor.snapshot(true);
 
