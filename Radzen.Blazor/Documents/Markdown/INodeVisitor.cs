@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Markdown;
 
 
@@ -57,9 +59,17 @@ public interface INodeVisitor
     void VisitStrong(Strong strong);
 
     /// <summary>
-    /// Visits a strikethrough node.
+    /// Visits a strikethrough node. Visits its children by default.
     /// </summary>
-    void VisitStrikethrough(Strikethrough strikethrough);
+    void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        ArgumentNullException.ThrowIfNull(strikethrough);
+
+        foreach (var child in strikethrough.Children)
+        {
+            child.Accept(this);
+        }
+    }
 
     /// <summary>
     /// Visits a code node.
