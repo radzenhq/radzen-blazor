@@ -7673,27 +7673,51 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     reportState();
   };
 
+  var designFormats = function () {
+    var formats = [];
+    var sel = window.getSelection();
+    if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return formats;
+    for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
+      if (node.nodeType !== Node.ELEMENT_NODE) continue;
+      switch (node.tagName) {
+        case 'STRONG': case 'B': formats.push('bold'); break;
+        case 'EM': case 'I': formats.push('italic'); break;
+        case 'DEL': case 'S': formats.push('strikethrough'); break;
+        case 'CODE': formats.push('code'); break;
+        case 'BLOCKQUOTE': formats.push('quote'); break;
+        case 'UL': formats.push('unorderedList'); break;
+        case 'OL': formats.push('orderedList'); break;
+      }
+      if (/^H[1-6]$/.test(node.tagName)) formats.push('heading');
+    }
+    return formats;
+  };
+  var SOURCE_BLOCKS = [['heading', /^\s*#{1,6} /], ['quote', /^\s*> /], ['taskList', /^\s*[-*+] \[[ xX]\] /], ['unorderedList', /^\s*[-*+] (?!\[[ xX]\] )/], ['orderedList', /^\s*\d+\. /]];
+  var SOURCE_INLINES = [['bold', /\*\*[^*\n]+\*\*|__[^_\n]+__/g], ['italic', /(^|[^*\w])(\*[^*\n]+\*|_[^_\n]+_)(?![*\w])/g], ['strikethrough', /~~[^~\n]+~~/g], ['code', /`[^`\n]+`/g]];
+  var sourceFormats = function () {
+    var formats = [];
+    if (document.activeElement !== textarea) return formats;
+    var value = textarea.value, position = textarea.selectionStart;
+    var lineStart = value.lastIndexOf('\n', position - 1) + 1;
+    var lineEnd = value.indexOf('\n', position);
+    var line = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+    var caret = position - lineStart;
+    SOURCE_BLOCKS.forEach(function (block) { if (block[1].test(line)) formats.push(block[0]); });
+    SOURCE_INLINES.forEach(function (inline) {
+      var match;
+      inline[1].lastIndex = 0;
+      while ((match = inline[1].exec(line))) {
+        var start = match.index + (match.length > 2 ? match[1].length : 0);
+        if (start < caret && caret < start + match[0].length - (match.length > 2 ? match[1].length : 0)) { formats.push(inline[0]); break; }
+      }
+    });
+    return formats;
+  };
   var stateTimeout = null, lastState = '';
   var reportState = function () {
     clearTimeout(stateTimeout);
     stateTimeout = setTimeout(function () {
-      var formats = [];
-      var sel = window.getSelection();
-      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
-        for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
-          if (node.nodeType !== Node.ELEMENT_NODE) continue;
-          switch (node.tagName) {
-            case 'STRONG': case 'B': formats.push('bold'); break;
-            case 'EM': case 'I': formats.push('italic'); break;
-            case 'DEL': case 'S': formats.push('strikethrough'); break;
-            case 'CODE': formats.push('code'); break;
-            case 'BLOCKQUOTE': formats.push('quote'); break;
-            case 'UL': formats.push('unorderedList'); break;
-            case 'OL': formats.push('orderedList'); break;
-          }
-          if (/^H[1-6]$/.test(node.tagName)) formats.push('heading');
-        }
-      }
+      var formats = textarea.hidden ? designFormats() : sourceFormats();
       var state = { formats: formats, canUndo: history.undo.length > 0, canRedo: history.redo.length > 0 };
       var key = JSON.stringify(state);
       if (key === lastState) return;
@@ -7703,9 +7727,11 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
   var onSelectionChange = function () {
     var sel = window.getSelection();
-    if (sel.rangeCount && editable.contains(sel.anchorNode)) reportState();
+    if (document.activeElement === textarea || (sel.rangeCount && editable.contains(sel.anchorNode))) reportState();
   };
   document.addEventListener('selectionchange', onSelectionChange);
+  textarea.addEventListener('input', reportState);
+  editor.refreshState = reportState;
 
   var onBeforeInput = function (e) {
     var type = e.inputType || '';
@@ -7861,6 +7887,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     editable.removeEventListener('beforeinput', onBeforeInput);
     textarea.removeEventListener('beforeinput', onBeforeInput);
     document.removeEventListener('selectionchange', onSelectionChange);
+    textarea.removeEventListener('input', reportState);
   };
 
   return editor;
