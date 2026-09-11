@@ -964,6 +964,8 @@ partial class XlsxWriter(Workbook sourceWorkbook)
         // but Excel and downstream readers tolerate trailing position too.
         sheetDoc.Root!.Add(CreatePageMargins());
 
+        var tableParts = new List<(Table Table, int Id)>();
+
         if (sheet.Tables.Count > 0)
         {
             var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
@@ -987,7 +989,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
                     $"../tables/table{tableId}.xml",
                     false));
 
-                SaveTable(archive, table, tableId);
+                tableParts.Add((table, tableId));
             }
 
             sheetDoc.Root!.Add(tablePartsElement);
@@ -996,6 +998,11 @@ partial class XlsxWriter(Workbook sourceWorkbook)
         using (var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open())
         {
             WriteSheetXml(entry, sheetDoc, sheet, styleTracker, sharedStrings);
+        }
+
+        foreach (var (table, id) in tableParts)
+        {
+            SaveTable(archive, table, id);
         }
 
         if (sheetRelEntries.Count > 0)
