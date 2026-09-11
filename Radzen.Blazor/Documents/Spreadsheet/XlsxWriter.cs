@@ -24,6 +24,12 @@ partial class XlsxWriter(Workbook sourceWorkbook)
 
     private readonly char[] scratch = new char[ScratchLength];
 
+    private readonly Dictionary<string, string> mediaMap = [];
+
+    private int mediaIndex = 1;
+
+    private int tableIndex;
+
     public void Write(Stream stream)
     {
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);
@@ -32,8 +38,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
 
         using var sharedStrings = new SharedStringTable();
 
-        var totalTables = 0;
-        SaveSheets(archive, styleTracker, sharedStrings, ref totalTables);
+        SaveSheets(archive, styleTracker, sharedStrings);
         SaveStyles(archive, styleTracker);
         SaveSharedStrings(archive, sharedStrings);
         SaveWorkbook(archive);
@@ -41,7 +46,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
         SaveDocPropsCore(archive);
         SaveDocPropsApp(archive);
 
-        SaveContentTypes(archive, includeSharedStrings: sharedStrings.Count > 0, tableCount: totalTables);
+        SaveContentTypes(archive, includeSharedStrings: sharedStrings.Count > 0, tableCount: tableIndex);
         SaveRelationships(archive);
     }
 
@@ -235,7 +240,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
         public XElement? NumFmtsElement { get; set; }
     }
 
-    private static void SaveDrawing(ZipArchive archive, Worksheet sheet, int drawingIndex, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
+    private void SaveDrawing(ZipArchive archive, Worksheet sheet, int drawingIndex)
     {
         XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
         XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
@@ -258,7 +263,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
             if (!mediaMap.TryGetValue(hash, out var mediaPath))
             {
                 var ext = ContentTypeToExtension(image.ContentType);
-                mediaPath = $"xl/media/image{globalMediaIndex++}.{ext}";
+                mediaPath = $"xl/media/image{mediaIndex++}.{ext}";
                 mediaMap[hash] = mediaPath;
 
                 using (var mediaEntry = archive.CreateEntry(mediaPath).Open())
@@ -868,7 +873,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("builtinId", "0")));
     }
 
-    private void SaveSheets(ZipArchive archive, StyleTracker styleTracker, SharedStringTable sharedStrings, ref int globalTableIndex)
+    private void SaveSheets(ZipArchive archive, StyleTracker styleTracker, SharedStringTable sharedStrings)
     {
         var workbookRels = CreateWorkbookRelationships();
         var workbookRelsElement = workbookRels.Root!;
@@ -879,10 +884,6 @@ partial class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("Id", "rId2"),
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"),
             new XAttribute("Target", "styles.xml")));
-
-        // Media deduplication map (hash -> media path in archive)
-        var mediaMap = new Dictionary<string, string>();
-        var globalMediaIndex = 1;
 
         for (var i = 0; i < sheets.Count; i++)
         {
@@ -896,7 +897,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"),
                 new XAttribute("Target", $"worksheets/{sheetName}")));
 
-            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, mediaMap, ref globalMediaIndex, ref globalTableIndex);
+            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings);
         }
 
         workbookRelsElement.Add(new XElement(XName.Get("Relationship", pkgNs),
@@ -923,7 +924,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
             new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
     }
 
-    private void SaveSheet(ZipArchive archive, Worksheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, SharedStringTable sharedStrings, Dictionary<string, string> mediaMap, ref int globalMediaIndex, ref int globalTableIndex)
+    private void SaveSheet(ZipArchive archive, Worksheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, SharedStringTable sharedStrings)
     {
         var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
 
@@ -956,7 +957,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
 
             sheetRelEntries.Add((drawingRelId, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing", $"../drawings/drawing{drawingIndex}.xml", false));
 
-            SaveDrawing(archive, sheet, drawingIndex, mediaMap, ref globalMediaIndex);
+            SaveDrawing(archive, sheet, drawingIndex);
         }
 
         // pageMargins is appended last; ECMA-376 puts it before drawing,
@@ -974,8 +975,8 @@ partial class XlsxWriter(Workbook sourceWorkbook)
             var nextRelIndex = sheetRelEntries.Count + 1;
             foreach (var table in sheet.Tables)
             {
-                globalTableIndex++;
-                var tableId = globalTableIndex;
+                tableIndex++;
+                var tableId = tableIndex;
                 var tableRelId = $"rId{nextRelIndex++}";
 
                 tablePartsElement.Add(new XElement(XName.Get("tablePart", ns),
