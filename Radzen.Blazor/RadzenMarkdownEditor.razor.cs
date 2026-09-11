@@ -106,9 +106,14 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public bool CanRedo => toolState.CanRedo;
 
     /// <summary>
-    /// Returns whether the current design-mode selection has the format of <paramref name="commandName" /> applied.
+    /// Returns whether the current selection has the format of <paramref name="commandName" /> applied.
     /// </summary>
     public bool IsActive(string commandName) => Array.IndexOf(toolState.Formats ?? [], commandName) >= 0;
+
+    /// <summary>
+    /// The block at the current selection: <c>p</c> or <c>h1</c> to <c>h6</c>; <c>null</c> when it is neither a paragraph nor a heading.
+    /// </summary>
+    public string? FormatBlock => toolState.Block;
 
     /// <summary>
     /// Invoked from JavaScript when the selection or history state changes.

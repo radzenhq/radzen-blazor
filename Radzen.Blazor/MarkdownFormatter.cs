@@ -27,7 +27,7 @@ internal static class MarkdownFormatter
     /// <param name="start">Selection start (clamped).</param>
     /// <param name="end">Selection end (clamped).</param>
     /// <param name="command">One of <see cref="MarkdownEditorCommands" />.</param>
-    /// <param name="value">Command value: the URL for link/image, the text for insertText.</param>
+    /// <param name="value">Command value: the URL for link/image, the text for insertText, <c>p</c> or <c>h1</c> to <c>h6</c> for formatBlock.</param>
     /// <param name="label">Optional link/image label used when the selection is empty.</param>
     public static MarkdownEdit? Apply(string text, int start, int end, string command, string? value = null, string? label = null)
     {
@@ -48,8 +48,8 @@ internal static class MarkdownFormatter
                 return ToggleInline(text, start, end, "~~", s => s.Char == '~');
             case MarkdownEditorCommands.Code:
                 return ToggleInline(text, start, end, "`", s => s.Char == '`');
-            case MarkdownEditorCommands.Heading:
-                return Heading(text, start, end);
+            case MarkdownEditorCommands.FormatBlock:
+                return FormatBlock(text, start, end, value);
             case MarkdownEditorCommands.Quote:
                 return PrefixLines(text, start, end, "> ");
             case MarkdownEditorCommands.UnorderedList:
@@ -296,9 +296,11 @@ internal static class MarkdownFormatter
     static readonly Regex FenceLine = new(@"^\s*(```|~~~)", RegexOptions.Compiled);
     static readonly Regex NonParagraphLine = new(@"^\s*([-*+] |\d+\. |> |\||---\s*$|\*\*\*\s*$|___\s*$)", RegexOptions.Compiled);
 
-    /// <summary>Cycles the heading level of every selected paragraph or heading line; other lines are left alone.</summary>
-    static MarkdownEdit Heading(string text, int start, int end)
+    /// <summary>Makes every selected paragraph or heading line a heading of the level in <paramref name="value" /> (<c>h1</c> to <c>h6</c>) or a paragraph; other lines are left alone.</summary>
+    static MarkdownEdit FormatBlock(string text, int start, int end, string? value)
     {
+        var prefix = value is ['h', >= '1' and <= '6'] ? new string('#', value[1] - '0') + " " : string.Empty;
+
         return ReplaceLines(text, start, end, lines =>
         {
             var inFence = false;
@@ -316,10 +318,6 @@ internal static class MarkdownFormatter
                     return line;
                 }
 
-                var match = HeadingPrefix.Match(line);
-                var level = match.Success ? match.Groups[1].Value.Length : 0;
-                var next = level >= 3 ? 0 : level + 1;
-                var prefix = next == 0 ? string.Empty : new string('#', next) + " ";
                 return prefix + HeadingPrefix.Replace(line, string.Empty, 1);
             }).ToArray();
         });

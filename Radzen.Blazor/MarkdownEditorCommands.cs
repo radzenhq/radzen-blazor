@@ -12,8 +12,8 @@ public static class MarkdownEditorCommands
     public const string Italic = "italic";
     /// <summary>Wraps the selection in <c>~~</c>.</summary>
     public const string Strikethrough = "strikethrough";
-    /// <summary>Cycles the heading level of the selected lines (# → ## → ### → none).</summary>
-    public const string Heading = "heading";
+    /// <summary>Makes the selected paragraphs headings of the level given as value (<c>h1</c> to <c>h6</c>) or normal text (<c>p</c>).</summary>
+    public const string FormatBlock = "formatBlock";
     /// <summary>Wraps the selection in a Markdown link. The command value is the URL.</summary>
     public const string Link = "link";
     /// <summary>Wraps the selection in a Markdown image. The command value is the image URL.</summary>
