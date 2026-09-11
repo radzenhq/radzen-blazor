@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -165,6 +167,45 @@ public class Workbook
     public void SaveToStream(Stream stream)
     {
         new XlsxWriter(this).Write(stream);
+    }
+
+    /// <summary>
+    /// Saves the workbook to the specified stream in the Open XML Spreadsheet format (XLSX), appending
+    /// rows read from a source to its only sheet without building a cell for any of them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The workbook is the frame: its header, widths, frozen panes and tables are written as they are,
+    /// and the rows start directly below the last row it holds. They are read once, in order, and none
+    /// is kept, so what the save holds does not grow with the source: the appended rows' text is written
+    /// in each cell rather than in the shared string table, which keeps the frame's text only. A table whose last row is the
+    /// frame's last row, and which has no totals row, is written to cover the appended rows; the
+    /// workbook's own table is not changed. The <c>dimension</c> element is left out, which readers
+    /// accept.
+    /// </para>
+    /// <para>
+    /// Each row is one <see cref="CellData"/> per column, and a null writes nothing. Use
+    /// <see cref="CellData.FromString"/> to keep text that looks like a number as text: it is written
+    /// with the quote prefix, as <see cref="Cell.SetValue"/> writes text given a leading apostrophe.
+    /// </para>
+    /// <para>
+    /// A source that faults, a cancellation, or a limit breached leaves nothing that opens: a seekable
+    /// stream is truncated back to where it started.
+    /// </para>
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The rows to append.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    /// <exception cref="InvalidOperationException">
+    /// The workbook has more than one sheet, the rows run past the 1,048,576 a worksheet holds, a row
+    /// has more than 16,384 cells, or a string is longer than the 32,767 characters a cell holds.
+    /// </exception>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(rows);
+
+        return new XlsxWriter(this).WriteAsync(stream, XlsxWriter.WithoutFormats(rows, cancellationToken), cancellationToken);
     }
 
     /// <summary>
