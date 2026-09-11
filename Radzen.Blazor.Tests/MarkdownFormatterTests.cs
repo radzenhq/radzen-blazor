@@ -299,11 +299,21 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Heading_AppliesFirstLineLevelToAllSelectedLines()
+        public void Heading_CyclesEachSelectedLineOnItsOwn()
         {
             var edit = MarkdownFormatter.Apply("# a\nb", 0, 5, MarkdownEditorCommands.Heading);
 
-            Assert.Equal(new MarkdownEdit(0, 5, "## a\n## b", 0, 9), edit);
+            Assert.Equal(new MarkdownEdit(0, 5, "## a\n# b", 0, 8), edit);
+        }
+
+        [Fact]
+        public void Heading_OnlyTouchesParagraphsAndHeadings()
+        {
+            var text = "a\n\n- item\n1. one\n> quote\n| cell |\n---\n```\ncode\n```\n### b";
+            var edit = MarkdownFormatter.Apply(text, 0, text.Length, MarkdownEditorCommands.Heading);
+
+            var expected = "# a\n\n- item\n1. one\n> quote\n| cell |\n---\n```\ncode\n```\nb";
+            Assert.Equal(new MarkdownEdit(0, text.Length, expected, 0, expected.Length), edit);
         }
 
         [Fact]
