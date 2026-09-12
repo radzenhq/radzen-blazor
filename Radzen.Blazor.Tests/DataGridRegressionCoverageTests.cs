@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -80,6 +81,7 @@ namespace Radzen.Blazor.Tests
                     b.OpenComponent(0, typeof(RadzenDataGridColumn<Person>));
                     b.AddAttribute(1, nameof(RadzenDataGridColumn<Person>.Property), "Salary");
                     b.AddAttribute(2, nameof(RadzenDataGridColumn<Person>.FormatString), "{0:0.00}");
+                    b.AddAttribute(3, nameof(RadzenDataGridColumn<Person>.FormatProvider), CultureInfo.InvariantCulture);
                     b.CloseComponent();
                 });
             });
