@@ -595,6 +595,7 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The accessible name or <c>null</c>.</returns>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ToStringOverridesPreserved)]
         public string? GetItemAriaLabel(object? item)
         {
             if (item == null)

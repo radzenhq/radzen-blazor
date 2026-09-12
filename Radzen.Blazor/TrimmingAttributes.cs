@@ -47,5 +47,6 @@ namespace Radzen
         internal const string CollectionTypePreserved = "Collection types are preserved by the application.";
         internal const string AssemblyMetadataPreserved = "Assembly version metadata is always available.";
         internal const string EqualityOverridesPreserved = "Equals and GetHashCode overrides survive trimming because the virtual base methods are called by the collections that hash the values.";
+        internal const string ToStringOverridesPreserved = "ToString overrides survive trimming because the virtual base method is called when rendering values.";
     }
 }
