@@ -402,41 +402,24 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_FlushesPendingEdit_UpdatesValueOnce_WithoutSetContent()
+        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_RaisesChangeOnly()
         {
             using var ctx = CreateContext();
             var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
             int valueChangedCount = 0;
-            string? changed = null;
             string? changeEventValue = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "old")
-                .Add(x => x.ValueChanged, v => { changed = v; valueChangedCount++; })
+                .Add(x => x.ValueChanged, _ => valueChangedCount++)
                 .Add(x => x.Change, v => changeEventValue = v));
             int countAfterMount = plannedSetContent.Invocations.Count;
 
-            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("blurred **text**"));
+            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("typed **text**"));
+            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("typed **text**"));
 
-            Assert.Equal("blurred **text**", changed);
             Assert.Equal(1, valueChangedCount);
-            Assert.Equal("blurred **text**", changeEventValue);
+            Assert.Equal("typed **text**", changeEventValue);
             Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count);
-        }
-
-        [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_AfterMatchingInput_DoesNotDoubleFireValueChanged()
-        {
-            using var ctx = CreateContext();
-            ctx.JSInterop.SetupVoid("setContent", _ => true);
-            int valueChangedCount = 0;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Value, "old")
-                .Add(x => x.ValueChanged, _ => valueChangedCount++));
-
-            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("same **text**"));
-            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("same **text**"));
-
-            Assert.Equal(1, valueChangedCount);
         }
 
         [Fact]
