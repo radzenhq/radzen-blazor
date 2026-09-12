@@ -8127,7 +8127,7 @@ Radzen.markdownSerialize = function (root) {
         case 'A': out += '[' + inline(child) + '](' + (child.getAttribute('href') || '') + ')'; break;
         case 'IMG': out += '![' + (child.getAttribute('alt') || '') + '](' + (child.getAttribute('src') || '') + ')'; break;
         case 'BR': out += '  \n'; break;
-        case 'INPUT': break; // task checkboxes are handled by the list item
+        case 'INPUT': break;
         default: {
           var text = inline(child);
           styleWraps(child).forEach(function (token) { text = wrap(token, text); });
@@ -8221,9 +8221,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   shortcuts = shortcuts || [];
   var editor = { editable: editable, textarea: textarea, instance: instance };
-  var inputTimeout = null;
   var suppressInput = false;
-  var dirty = false;
+  var focusValue = null;
 
   var notifyValue = function () {
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
@@ -8236,16 +8235,30 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   var onInput = function () {
     if (suppressInput) return;
-    dirty = true;
-    clearTimeout(inputTimeout);
-    inputTimeout = setTimeout(notifyValue, 250);
+    notifyValue();
+  };
+
+  var onFocus = function () {
+    focusValue = Radzen.markdownSerialize(editable);
+    document.addEventListener('selectionchange', reportState);
+    reportState();
   };
 
   var onBlur = function () {
-    clearTimeout(inputTimeout);
-    if (!dirty) return;
-    dirty = false;
-    try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', Radzen.markdownSerialize(editable))); } catch { }
+    document.removeEventListener('selectionchange', reportState);
+    var value = Radzen.markdownSerialize(editable);
+    if (value === focusValue) return;
+    focusValue = value;
+    try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', value)); } catch { }
+  };
+
+  var onTextareaFocus = function () {
+    document.addEventListener('selectionchange', reportState);
+    reportState();
+  };
+
+  var onTextareaBlur = function () {
+    document.removeEventListener('selectionchange', reportState);
   };
 
   var onKeyDown = function (e) {
@@ -8275,9 +8288,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var html = e.clipboardData && e.clipboardData.getData('text/html');
     if (!html) return;
     e.preventDefault();
-    editor.snapshot(true);
+    editor.snapshot();
     lastInputType = 'insertFromPaste';
-    lastInputTime = Date.now();
     var scratch = new DOMParser().parseFromString(html, 'text/html').body;
     var markdown = Radzen.markdownSerialize(scratch);
     try {
@@ -8302,7 +8314,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     var node = sel.anchorNode;
     if (!node || node.nodeType !== Node.TEXT_NODE || !editable.contains(node)) return;
     for (var el = node.parentNode; el && el !== editable; el = el.parentNode) {
-      if (el.tagName === 'CODE' || el.tagName === 'PRE') return; // parser skips shortcodes in code
+      if (el.tagName === 'CODE' || el.tagName === 'PRE') return;
     }
     var match = node.data.substring(0, sel.anchorOffset).match(/:([A-Za-z0-9_+-]+):$/);
     if (!match) return;
@@ -8311,7 +8323,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     try {
       suppressDisposed(instance.invokeMethodAsync('LookupEmojiAsync', match[1]).then(function (emoji) {
         if (!emoji || node.data.substring(start, start + shortcode.length) !== shortcode) return;
-        editor.snapshot(true);
+        editor.snapshot();
+        lastInputType = null;
         var caret = window.getSelection();
         var caretNode = caret.rangeCount ? caret.anchorNode : null;
         var caretOffset = caret.rangeCount ? caret.anchorOffset : 0;
@@ -8331,15 +8344,15 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
 
   editor.setContent = function (html) {
-    clearTimeout(inputTimeout);
-    dirty = false;
+    lastInputType = null;
     suppressInput = true;
     editable.innerHTML = html;
     suppressInput = false;
   };
 
   editor.apply = function (start, end, replacement, selectionStart, selectionEnd) {
-    editor.snapshot(true);
+    editor.snapshot();
+    lastInputType = null;
     var before = textarea.value;
     textarea.focus();
     textarea.value = before.substring(0, start) + replacement + before.substring(end);
@@ -8549,7 +8562,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   };
 
   var history = { undo: [], redo: [] };
-  var lastInputTime = 0, lastInputType = null;
+  var lastInputType = null;
   var HISTORY_LIMIT = 100;
 
   var nodePath = function (node) {
@@ -8614,26 +8627,23 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', state.markdown)); } catch { }
   };
 
-  editor.snapshot = function (force) {
-    var now = Date.now();
-    if (!force && now - lastInputTime < 1000) return;
+  editor.snapshot = function () {
     history.undo.push(captureState());
     if (history.undo.length > HISTORY_LIMIT) history.undo.shift();
     history.redo = [];
-    lastInputTime = now;
   };
   editor.undo = function () {
     if (!history.undo.length) return;
     history.redo.push(captureState());
     restoreState(history.undo.pop());
-    dirty = true;
+    lastInputType = null;
     reportState();
   };
   editor.redo = function () {
     if (!history.redo.length) return;
     history.undo.push(captureState());
     restoreState(history.redo.pop());
-    dirty = true;
+    lastInputType = null;
     reportState();
   };
 
@@ -8699,34 +8709,26 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     });
     return state;
   };
-  var stateTimeout = null, lastState = '';
+  var lastState = '';
   var reportState = function () {
-    clearTimeout(stateTimeout);
-    stateTimeout = setTimeout(function () {
-      var state = textarea.hidden ? designState() : sourceState();
-      state.canUndo = history.undo.length > 0;
-      state.canRedo = history.redo.length > 0;
-      var key = JSON.stringify(state);
-      if (key === lastState) return;
-      lastState = key;
-      try { suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', state)); } catch { }
-    }, 100);
+    var state = textarea.hidden ? designState() : sourceState();
+    state.canUndo = history.undo.length > 0;
+    state.canRedo = history.redo.length > 0;
+    var key = JSON.stringify(state);
+    if (key === lastState) return;
+    lastState = key;
+    try { suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', state)); } catch { }
   };
-  var onSelectionChange = function () {
-    var sel = window.getSelection();
-    if (document.activeElement === textarea || (sel.rangeCount && editable.contains(sel.anchorNode))) reportState();
-  };
-  document.addEventListener('selectionchange', onSelectionChange);
-  textarea.addEventListener('input', reportState);
   editor.refreshState = reportState;
 
   var onBeforeInput = function (e) {
     var type = e.inputType || '';
-    var boundary = (type.indexOf('delete') === 0) !== ((lastInputType || '').indexOf('delete') === 0)
-      || type === 'insertParagraph' || type === 'insertFromPaste';
-    editor.snapshot(boundary);
+    var boundary = lastInputType === null
+      || (type.indexOf('delete') === 0) !== (lastInputType.indexOf('delete') === 0)
+      || type === 'insertParagraph' || type === 'insertFromPaste' || type === 'insertFromDrop'
+      || (type === 'insertText' && /\s/.test(e.data || ''));
+    if (boundary) editor.snapshot();
     lastInputType = type;
-    lastInputTime = Date.now();
   };
 
   editor.execute = function (name, value, label) {
@@ -8738,7 +8740,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     editable.focus();
     editable.normalize();
     setRange(range);
-    editor.snapshot(true);
+    editor.snapshot();
+    lastInputType = null;
 
     switch (name) {
       case 'bold': toggleInline(range, 'strong', ['STRONG', 'B']); break;
@@ -8813,8 +8816,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       case 'codeBlock': {
         var target = blockOf(range.startContainer);
         if (!target) {
-          // empty editable: give the command an empty block to convert, consistent with
-          // heading/quote/list via blocksInRange above.
           target = document.createElement('p');
           editable.appendChild(target);
         }
@@ -8856,33 +8857,36 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     }
 
     savedRange = null;
-    dirty = true;
-    clearTimeout(inputTimeout);
     notifyValue();
   };
 
   editable.addEventListener('paste', onPaste);
   editable.addEventListener('input', onInput);
   editable.addEventListener('input', onEmojiInput);
+  editable.addEventListener('focus', onFocus);
   editable.addEventListener('blur', onBlur);
   editable.addEventListener('keydown', onKeyDown);
-  textarea.addEventListener('keydown', onKeyDown);
   editable.addEventListener('beforeinput', onBeforeInput);
+  textarea.addEventListener('focus', onTextareaFocus);
+  textarea.addEventListener('blur', onTextareaBlur);
+  textarea.addEventListener('input', reportState);
+  textarea.addEventListener('keydown', onKeyDown);
   textarea.addEventListener('beforeinput', onBeforeInput);
 
   editor.dispose = function () {
-    clearTimeout(inputTimeout);
-    clearTimeout(stateTimeout);
     editable.removeEventListener('paste', onPaste);
     editable.removeEventListener('input', onInput);
     editable.removeEventListener('input', onEmojiInput);
+    editable.removeEventListener('focus', onFocus);
     editable.removeEventListener('blur', onBlur);
     editable.removeEventListener('keydown', onKeyDown);
-    textarea.removeEventListener('keydown', onKeyDown);
     editable.removeEventListener('beforeinput', onBeforeInput);
-    textarea.removeEventListener('beforeinput', onBeforeInput);
-    document.removeEventListener('selectionchange', onSelectionChange);
+    textarea.removeEventListener('focus', onTextareaFocus);
+    textarea.removeEventListener('blur', onTextareaBlur);
     textarea.removeEventListener('input', reportState);
+    textarea.removeEventListener('keydown', onKeyDown);
+    textarea.removeEventListener('beforeinput', onBeforeInput);
+    document.removeEventListener('selectionchange', reportState);
   };
 
   return editor;
