@@ -70,6 +70,11 @@ public class ListItem : BlockContainer
             {
                 Checked = value[1] != ' ';
                 paragraph.TrimContentStart(4);
+
+                if (paragraph.Value.Trim().Length == 0)
+                {
+                    Remove(paragraph);
+                }
             }
         }
 

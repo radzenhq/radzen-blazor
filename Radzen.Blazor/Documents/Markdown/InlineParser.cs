@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Collections.Generic;
@@ -82,7 +83,9 @@ class InlineParser
 
             if (trim)
             {
-                var trimmed = value.TrimEnd(); end -= value.Length - trimmed.Length; value = trimmed;
+                var trimmed = value.TrimEnd(Blanks);
+                end -= value.Length - trimmed.Length;
+                value = trimmed;
             }
 
             inlines.Add(new Text(value) { SourceStart = bufferStart, SourceEnd = Math.Max(bufferStart, end) });
@@ -160,6 +163,38 @@ class InlineParser
 
         newIndex = index + openingCount;
 
+        return true;
+    }
+
+    // CommonMark 0.31.2, 2.5 Entity and numeric character references
+    private static readonly Regex EntityRegex = new(@"\G&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});", RegexOptions.Compiled);
+
+    private bool TryParseEntity(string text, int index, out int newIndex)
+    {
+        newIndex = index;
+
+        if (text[index] != '&')
+        {
+            return false;
+        }
+
+        var match = EntityRegex.Match(text, index);
+
+        if (!match.Success)
+        {
+            return false;
+        }
+
+        var decoded = WebUtility.HtmlDecode(match.Value);
+
+        if (decoded == match.Value)
+        {
+            return false;
+        }
+
+        AddTextNode();
+        inlines.Add(new Text(decoded == "\0" ? "\uFFFD" : decoded) { SourceStart = index, SourceEnd = index + match.Length });
+        newIndex = index + match.Length;
         return true;
     }
 
@@ -313,11 +348,11 @@ class InlineParser
 
     private List<Inline> ParseInto(string text, Dictionary<string, LinkReference> linkReferences)
     {
-        var trimmed = text.Trim();
+        var trimmed = text.Trim(Blanks);
 
         var inlines = ParseInlines(trimmed, linkReferences);
 
-        Shift(inlines, text.Length - text.TrimStart().Length);
+        Shift(inlines, text.Length - text.TrimStart(Blanks).Length);
 
         return inlines;
     }
@@ -418,6 +453,11 @@ class InlineParser
                 continue;
             }
 
+            if (TryParseEntity(text, index, out index))
+            {
+                continue;
+            }
+
             char prev = index > 0 ? text[index - 1] : Null;
 
             if (TryParseDelimiter(text, index, next, prev, out index))
@@ -454,20 +494,23 @@ class InlineParser
         return inlines;
     }
 
+    // CommonMark 0.31.2, 4.8 Paragraphs: initial and final spaces or tabs are stripped
+    private static readonly char[] Blanks = [' ', '\t', '\r', '\n'];
+
     private void NormalizeText()
     {
         if (inlines.Count > 0)
         {
             if (inlines[0] is Text first)
             {
-                var start = first.Value.TrimStart();
+                var start = first.Value.TrimStart(Blanks);
                 first.SourceStart += first.Value.Length - start.Length;
                 first.Value = start;
             }
 
             if (inlines[^1] is Text last)
             {
-                var end = last.Value.TrimEnd();
+                var end = last.Value.TrimEnd(Blanks);
                 last.SourceEnd -= last.Value.Length - end.Length;
                 last.Value = end;
             }
@@ -655,28 +698,34 @@ class InlineParser
         while (position < text.Length)
         {
             var ch = text[position];
-            var prev = position > 0 ? text[position - 1] : Null;
             var next = position < text.Length - 1 ? text[position + 1] : Null;
 
-            if (angleBrackets && ch is CloseAngleBracket && prev is not Backslash)
+            if (ch is Backslash && next.IsEscapable())
+            {
+                destinationBuilder.Append(next);
+                position += 2;
+                continue;
+            }
+
+            if (angleBrackets && ch is CloseAngleBracket)
             {
                 position++;
                 break;
             }
 
             // CommonMark 0.31.2, 6.3 Links: a link destination in angle brackets contains no line endings or unescaped < or > characters
-            if (angleBrackets && (ch is LineFeed or CarrigeReturn || (ch is OpenAngleBracket && prev is not Backslash)))
+            if (angleBrackets && ch is LineFeed or CarrigeReturn or OpenAngleBracket)
             {
                 return false;
             }
 
             if (!angleBrackets)
             {
-                if (ch is OpenParenthesis && prev is not Backslash)
+                if (ch is OpenParenthesis)
                 {
                     parentheses++;
                 }
-                else if (ch is CloseParenthesis && prev is not Backslash)
+                else if (ch is CloseParenthesis)
                 {
                     if (parentheses == 0)
                     {
@@ -689,12 +738,6 @@ class InlineParser
                 {
                     break;
                 }
-            }
-
-            if (ch is Backslash && next.IsEscapable())
-            {
-                position++;
-                continue;
             }
 
             destinationBuilder.Append(ch);
@@ -1013,7 +1056,7 @@ class InlineParser
                 {
                     var innerInlines = inlines.GetRange(startIndex + 1, endIndex - startIndex - 1);
 
-                    var charsToConsume = closer.Length == opener.Length && closer.Length > 1 ? 2 : 1;
+                    var charsToConsume = closer.Length >= 2 && opener.Length >= 2 ? 2 : 1;
 
                     if (closer.Char == Tilde)
                     {
@@ -1067,6 +1110,8 @@ class InlineParser
                         delimiters.RemoveAt(closerIndex);
                     }
 
+                    delimiters.RemoveRange(openerIndex + 1, closerIndex - openerIndex - 1);
+
                     if (opener.Length == 0)
                     {
                         delimiters.RemoveAt(openerIndex);
@@ -1104,6 +1149,10 @@ class InlineParser
         return -1;
     }
 
+    // CommonMark 0.31.2, 6.2 Emphasis and strong emphasis, rule 9 and 10: the sum of the run lengths must not be a multiple of 3 when either delimiter can both open and close
+    private static bool OddMatch(Delimiter opener, Delimiter closer) =>
+        (closer.CanOpen || opener.CanClose) && closer.OriginalLength % 3 != 0 && (opener.OriginalLength + closer.OriginalLength) % 3 == 0;
+
     private int FindOpenerIndex(int startIndex, int endIndex)
     {
         var closer = delimiters[startIndex];
@@ -1112,7 +1161,7 @@ class InlineParser
         {
             var delimiter = delimiters[index];
 
-            if (delimiter.CanOpen && delimiter.Char == closer.Char)
+            if (delimiter.CanOpen && delimiter.Char == closer.Char && !OddMatch(delimiter, closer))
             {
                 return index;
             }

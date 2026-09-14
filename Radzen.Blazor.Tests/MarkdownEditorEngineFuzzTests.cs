@@ -129,6 +129,7 @@ public class MarkdownEditorEngineFuzzTests
             Assert.True(update.SelectionStart >= 0 && update.SelectionStart <= update.SelectionEnd && update.SelectionEnd <= engine.Length, $"{description} produced selection {update.SelectionStart}-{update.SelectionEnd} outside 0-{engine.Length}\n{log}");
             AssertStable(engine.Text, description, log);
             AssertReachable(update, description, log, engine);
+            AssertConsistent(update, engine.Text, description, log, engine);
 
             if (engine.Text == text && history.Count > 0)
             {
@@ -221,6 +222,33 @@ public class MarkdownEditorEngineFuzzTests
             var covered = segments.Any(segment => segment.Start <= offset && offset <= segment.End);
             Assert.True(covered || engine.HostAt(offset) is ThematicBreak, $"After {description} the caret {offset} has no place in the rendered html\nSegments: {string.Join(" ", segments.Select(s => $"{s.Start}-{s.End}:{s.Length}"))}\nModel:\n{Dump(engine)}{log}");
         }
+    }
+
+    private static string Structure(string html)
+    {
+        var structure = System.Text.RegularExpressions.Regex.Replace(html, @"\s|<br>|\u200B|data-gap=""\d+""", string.Empty);
+        structure = System.Text.RegularExpressions.Regex.Replace(structure, @"<p>(<input[^>]*>)</p>", "$1");
+        string previous;
+
+        do
+        {
+            previous = structure;
+            structure = System.Text.RegularExpressions.Regex.Replace(structure, @"<p(class=""[^""]*"")?></p>|<li></li>", string.Empty);
+        }
+        while (structure != previous);
+
+        return structure;
+    }
+
+    private static void AssertConsistent(MarkdownEditorUpdate update, string text, string description, StringBuilder log, MarkdownEditorEngine engine)
+    {
+        if (update.Html == null)
+        {
+            return;
+        }
+
+        var reparsed = HtmlVisitor.Render(text).Html;
+        Assert.True(Structure(reparsed) == Structure(update.Html), $"After {description} the model differs from the written text\nText: {Show(text)}\nModel html: {update.Html}\nText html: {reparsed}\nModel:\n{Dump(engine)}{log}");
     }
 
     private static void AssertStable(string text, string description, StringBuilder log)

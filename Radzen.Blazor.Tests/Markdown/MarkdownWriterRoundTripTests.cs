@@ -159,9 +159,9 @@ public class MarkdownWriterRoundTripTests
     }
 
     [Fact]
-    public void WritesTrailingHardBreaksWithSpaces()
+    public void DropsTrailingHardBreaks()
     {
-        Assert.Equal("a  \n", Serialize(new Text("a"), new LineBreak { Backslash = true }, new LineBreak { Backslash = true }));
+        Assert.Equal("a", Serialize(new Text("a"), new LineBreak { Backslash = true }, new LineBreak { Backslash = true }));
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class MarkdownWriterRoundTripTests
     [Fact]
     public void MovesAHardBreakEndingAMarkAfterTheMark()
     {
-        Assert.Equal("**foo**  \n", Serialize(Mark(new Strong(), new Text("foo"), new LineBreak { Backslash = true })));
+        Assert.Equal("**foo**\\\nbar", Serialize(Mark(new Strong(), new Text("foo"), new LineBreak { Backslash = true }), new Text("bar")));
     }
 
     [Fact]

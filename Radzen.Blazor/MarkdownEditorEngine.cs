@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
@@ -13,10 +14,15 @@ internal sealed class MarkdownEditorEngine
         public int Start { get; set; }
         public string Removed { get; set; } = string.Empty;
         public string Inserted { get; set; } = string.Empty;
+        public string TextBefore { get; set; } = string.Empty;
+        public string TextAfter { get; set; } = string.Empty;
         public (int Start, int End) Before { get; set; }
         public (int Start, int End) After { get; set; }
         public string? Key { get; set; }
         public bool Design { get; set; }
+        public Document? ModelBefore { get; set; }
+        public Document? ModelAfter { get; set; }
+        public string Source { get; set; } = string.Empty;
     }
 
     private sealed record Cursor(Block Block, IBlockInlineContainer? Content, int Offset);
@@ -31,6 +37,7 @@ internal sealed class MarkdownEditorEngine
     private (int Start, int End) pending;
     private (int Start, int End) pendingSource;
     private (int Position, List<Mark> Marks)? stored;
+    private Document? snapshot;
     private string source;
     private Document? document;
 
@@ -83,7 +90,7 @@ internal sealed class MarkdownEditorEngine
         return Render(after.Start, after.End);
     }
 
-    private void ApplyEdit(int start, int end, string inserted, (int Start, int End) after, string? key, bool merge, (int Start, int End)? before, bool design)
+    private void ApplyEdit(int start, int end, string inserted, (int Start, int End) after, string? key, bool merge, (int Start, int End)? before, bool design, Document? modelBefore = null, Document? modelAfter = null)
     {
         start = Math.Clamp(start, 0, Text.Length);
         end = Math.Clamp(end, start, Text.Length);
@@ -98,13 +105,18 @@ internal sealed class MarkdownEditorEngine
             Start = start,
             Removed = Text[start..end],
             Inserted = inserted,
+            TextBefore = Text,
             Before = before ?? (start, end),
             After = after,
             Key = key,
-            Design = design
+            Design = design,
+            ModelBefore = modelBefore,
+            ModelAfter = modelAfter,
+            Source = source
         };
 
         Text = Text[..start] + inserted + Text[end..];
+        edit.TextAfter = Text;
         redo.Clear();
 
         var last = undo.Count > 0 ? undo[^1] : null;
@@ -112,6 +124,8 @@ internal sealed class MarkdownEditorEngine
         if (merge && key != null && last?.Key == key && last.Design == design && Merge(last, edit))
         {
             last.After = after;
+            last.TextAfter = Text;
+            last.ModelAfter = modelAfter;
         }
         else
         {
@@ -121,6 +135,22 @@ internal sealed class MarkdownEditorEngine
             {
                 undo.RemoveAt(0);
             }
+        }
+    }
+
+    private void Restore(Edit edit, string text, Document? model)
+    {
+        Text = text;
+        stored = null;
+
+        if (model != null && RenderHtml)
+        {
+            document = DocumentCloner.Clone(model);
+            source = edit.Source;
+        }
+        else
+        {
+            document = null;
         }
     }
 
@@ -157,9 +187,7 @@ internal sealed class MarkdownEditorEngine
 
         var edit = undo[^1];
         undo.RemoveAt(undo.Count - 1);
-        Text = Text[..edit.Start] + edit.Removed + Text[(edit.Start + edit.Inserted.Length)..];
-        document = null;
-        stored = null;
+        Restore(edit, edit.TextBefore, edit.ModelBefore);
         redo.Add(edit);
         var (start, end) = Convert(edit.Before, edit.Design);
 
@@ -175,9 +203,7 @@ internal sealed class MarkdownEditorEngine
 
         var edit = redo[^1];
         redo.RemoveAt(redo.Count - 1);
-        Text = Text[..edit.Start] + edit.Inserted + Text[(edit.Start + edit.Removed.Length)..];
-        document = null;
-        stored = null;
+        Restore(edit, edit.TextAfter, edit.ModelAfter);
         undo.Add(edit);
         var (start, end) = Convert(edit.After, edit.Design);
 
@@ -418,6 +444,7 @@ internal sealed class MarkdownEditorEngine
     private (int Start, int End) Incoming(Document document, List<Host> hosts, int start, int end)
     {
         pendingSource = (start, end);
+        snapshot = DocumentCloner.Clone(document);
         stored = stored is { } kept && start == end && start == kept.Position ? stored : null;
 
         if (!RenderHtml)
@@ -536,6 +563,11 @@ internal sealed class MarkdownEditorEngine
             offset++;
         }
 
+        if (offset + 3 < text.Length && text[offset] == '[' && text[offset + 1] is ' ' or 'x' or 'X' && text[offset + 2] == ']' && text[offset + 3] == ' ')
+        {
+            return LineEnd(text, offset + 4);
+        }
+
         return offset;
     }
 
@@ -624,7 +656,7 @@ internal sealed class MarkdownEditorEngine
         return Size(hosts);
     }
 
-    private static (int Start, int End) SourceRange(Host host)
+    private (int Start, int End) SourceRange(Host host)
     {
         switch (host)
         {
@@ -638,7 +670,8 @@ internal sealed class MarkdownEditorEngine
             case { Block: ThematicBreak }:
                 return (host.Block.SourceStart, host.Block.SourceStart);
             default:
-                return (host.Block.SourceEnd, host.Block.SourceEnd);
+                var end = LineEnd(Text, host.Block.SourceEnd);
+                return (end, end);
         }
     }
 
@@ -713,6 +746,24 @@ internal sealed class MarkdownEditorEngine
         return start < text.Length && text[start] == ' ' && code.Value.Length > 0 && (code.Value[0] != ' ' || code.Value.Trim().Length == 0) ? start + 1 : start;
     }
 
+    // CommonMark 0.31.2, 4.6 HTML blocks: kinds 6 and 7 end at a blank line, which also separates the list items
+    private static bool EndsWithHtml(Block block)
+    {
+        while (block is BlockContainer { LastChild: { } last })
+        {
+            block = last;
+        }
+
+        return block is HtmlBlock;
+    }
+
+    private static bool Blank(Paragraph paragraph) => paragraph.Children.All(inline => inline switch
+    {
+        LineBreak or SoftLineBreak => true,
+        Text text => string.IsNullOrWhiteSpace(text.Value),
+        _ => false
+    });
+
     private static void NormalizeLists(BlockContainer container)
     {
         var index = 0;
@@ -726,20 +777,33 @@ internal sealed class MarkdownEditorEngine
                 NormalizeLists(nested);
             }
 
+            if (block is ListItem item)
+            {
+                foreach (var blank in item.Children.OfType<Paragraph>().Where(Blank).ToList())
+                {
+                    item.Remove(blank);
+                }
+            }
+
+            if (block is ListItem { Checked: not null } boxed && boxed.FirstChild is not (null or Paragraph))
+            {
+                boxed.Checked = null;
+            }
+
             if (block is List current)
             {
+                current.Tight = (current.Tight || (current.Children.Count == 1 && current.Children[0] is ListItem { Children.Count: <= 1 })) && !current.Children.OfType<ListItem>().Any(item => item.Children.Skip(1).Any(child => child is Paragraph or IndentedCodeBlock or HtmlBlock or List { FirstChild: ListItem { Children.Count: 0 } }) || item.Children.SkipLast(1).Any(child => child is HtmlBlock)) && !current.Children.SkipLast(1).Any(EndsWithHtml);
+
                 foreach (var step in new[] { -1, 1 })
                 {
                     var neighbour = index + step;
-                    var gapTouched = false;
 
-                    while (neighbour >= 0 && neighbour < container.Children.Count && container.Children[neighbour] is Paragraph { Children.Count: 0 } gap)
+                    while (neighbour >= 0 && neighbour < container.Children.Count && container.Children[neighbour] is Paragraph gap && Blank(gap))
                     {
-                        gapTouched |= !gap.Pristine;
                         neighbour += step;
                     }
 
-                    if (neighbour < 0 || neighbour >= container.Children.Count || container.Children[neighbour] is not List other || other.GetType() != current.GetType() || (step > 0 && (!other.Pristine || current.Pristine)) || (step < 0 && current.Pristine && !gapTouched))
+                    if (neighbour < 0 || neighbour >= container.Children.Count || container.Children[neighbour] is not List other || other.GetType() != current.GetType() || (step > 0 ? current.Pristine || !other.Pristine : current.Pristine && !other.Pristine))
                     {
                         continue;
                     }
@@ -769,8 +833,27 @@ internal sealed class MarkdownEditorEngine
         _ => Commit(document, block, 0)
     };
 
+    private static (INode Node, int Offset) StartOf(Block block) => block is BlockContainer container && EdgeLeaf(container, last: false) is { } leaf ? (leaf, 0) : (block, 0);
+
+    private static (INode Node, int Offset) EndOf(Block block) => block switch
+    {
+        FencedCodeBlock or IndentedCodeBlock or HtmlBlock => (block, HtmlVisitor.CodeLength((Leaf)block)),
+        IBlockInlineContainer content => (block, InlineLength(content)),
+        BlockContainer container when EdgeLeaf(container, last: true) is { } leaf => EndOf(leaf),
+        _ => (block, 0)
+    };
+
     private MarkdownEditorUpdate Commit(Document document, INode caretNode, int caretOffset, INode? endNode = null, int endOffset = 0, string? key = null, bool merge = false)
     {
+        if (caretNode is Paragraph { Parent: ListItem item } blank && Blank(blank))
+        {
+            var at = item.IndexOf(blank);
+            var next = item.Children.Skip(at + 1).FirstOrDefault(sibling => sibling is not Paragraph paragraph || !Blank(paragraph));
+            var previous = item.Children.Take(at).LastOrDefault(sibling => sibling is not Paragraph paragraph || !Blank(paragraph));
+            (caretNode, caretOffset) = next != null ? StartOf(next) : previous != null ? EndOf(previous) : (item, 0);
+        }
+
+        (caretNode, caretOffset) = NormalizeBlocks(document, caretNode, caretOffset);
         NormalizeLists(document);
         BlankLines.Pad(document, int.MaxValue, caretNode);
         var replacement = MarkdownWriter.Preserve(document, source);
@@ -805,7 +888,7 @@ internal sealed class MarkdownEditorEngine
                 suffix++;
             }
 
-            ApplyEdit(prefix, Text.Length - suffix, replacement[prefix..(replacement.Length - suffix)], selection, key, merge, before, design: RenderHtml);
+            ApplyEdit(prefix, Text.Length - suffix, replacement[prefix..(replacement.Length - suffix)], selection, key, merge, before, design: RenderHtml, snapshot, DocumentCloner.Clone(document));
         }
 
         this.document = document;
@@ -837,7 +920,7 @@ internal sealed class MarkdownEditorEngine
 
     private static void SetRuns(IBlockInlineContainer content, IReadOnlyList<Run> runs)
     {
-        var inlines = InlineContent.Rebuild(runs);
+        var inlines = InlineContent.Rebuild(content is Heading ? Single(runs) : runs);
 
         switch (content)
         {
@@ -850,9 +933,19 @@ internal sealed class MarkdownEditorEngine
                 cell.Pristine = false;
                 break;
         }
+
+        InlineNormalizer.Structure(content);
     }
 
     private static List<Run> Runs(IBlockInlineContainer content) => InlineContent.Flatten(content.Children);
+
+    // CommonMark 0.31.2, 4.2 ATX headings: a heading is a single line
+    private static List<Run> Single(IReadOnlyList<Run> runs) => runs.Select(run => run.Atom switch
+    {
+        LineBreak or SoftLineBreak => new Run(" ", run.Marks, null),
+        HtmlInline { Value: { } html } when html.Contains('\n', StringComparison.Ordinal) => new Run(new HtmlInline { Value = html.Replace('\n', ' ') }, run.Marks),
+        _ => run
+    }).ToList();
 
     public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool selection = false, bool preferRight = false)
     {
@@ -885,8 +978,7 @@ internal sealed class MarkdownEditorEngine
         {
             var code = (Leaf)cursor.Block;
             code.Value = code.Value[..cursor.Offset] + text + code.Value[cursor.Offset..];
-            Touch(code);
-            return Commit(document, code, cursor.Offset + text.Length, key: key, merge: merge);
+            return CommitCode(document, code, cursor.Offset + text.Length, key, merge);
         }
 
         cursor = Filled(cursor);
@@ -1036,6 +1128,71 @@ internal sealed class MarkdownEditorEngine
         return new Cursor(replacement, replacement, 0);
     }
 
+    private MarkdownEditorUpdate CommitCode(Document document, Leaf code, int offset, string? key, bool merge)
+    {
+        Touch(code);
+        return Commit(document, code, offset, key: key, merge: merge);
+    }
+
+    private static (INode Node, int Offset) NormalizeBlocks(Document document, INode caretNode, int caretOffset)
+    {
+        foreach (var block in Blocks(document).Where(block => !block.Pristine).ToList())
+        {
+            switch (block)
+            {
+                case Paragraph { Virtual: true, Children.Count: > 0 } paragraph:
+                    paragraph.Virtual = false;
+                    break;
+                // CommonMark 0.31.2, 4.4 Indented code blocks: blank lines preceding or following the block are not part of it
+                case IndentedCodeBlock code when BlankEdges.IsMatch(code.Value):
+                    var fenced = new FencedCodeBlock { Value = code.Value.EndsWith('\n') ? code.Value : code.Value + "\n", Closed = true };
+                    code.Parent.Replace(code, fenced);
+                    Touch(fenced);
+                    caretNode = caretNode == code ? fenced : caretNode;
+                    break;
+                // CommonMark 0.31.2, 4.6 HTML blocks: the start and end conditions decide where the block ends, so an edited block is parsed again
+                case HtmlBlock html:
+                    html.Value = html.Value.TrimStart(' ', '\t');
+                    var blocks = MarkdownParser.Parse(html.Value).Children.ToList();
+
+                    if (blocks is [HtmlBlock { Value: var value }] && value == html.Value)
+                    {
+                        break;
+                    }
+
+                    if (blocks.Count == 0)
+                    {
+                        blocks.Add(new Paragraph());
+                    }
+
+                    var parent = html.Parent;
+                    var index = parent.IndexOf(html);
+                    RemoveBlock(html);
+                    Splice(parent, index, blocks);
+
+                    foreach (var content in blocks.SelectMany(Descendants).OfType<IBlockInlineContainer>())
+                    {
+                        InlineNormalizer.Structure(content);
+                    }
+
+                    if (caretNode == html)
+                    {
+                        var target = blocks.LastOrDefault(candidate => candidate.SourceStart <= caretOffset) ?? blocks[0];
+                        caretNode = target;
+                        caretOffset = target is IBlockInlineContainer content ? Math.Clamp(caretOffset - target.SourceStart, 0, InlineLength(content)) : 0;
+                    }
+
+                    break;
+            }
+        }
+
+        return (caretNode, caretOffset);
+    }
+
+    private static readonly Regex BlankEdges = new(@"^[ \t]*(\n|$)|\n[ \t]*\n[ \t]*$", RegexOptions.Compiled);
+
+    private static IEnumerable<Block> Descendants(Block block) => block is BlockContainer container ? Blocks(container).Prepend(block) : [block];
+
     private static Cursor Filled(Cursor cursor)
     {
         if (cursor.Block is not ListItem item || cursor.Content != null)
@@ -1122,6 +1279,7 @@ internal sealed class MarkdownEditorEngine
         SetRuns(leaf, Trim(head, start: false));
         Leaf second = leaf is Heading heading ? new AtxHeading { Level = heading.Level } : new Paragraph();
         second.ReplaceInlines(InlineContent.Rebuild(Trim(tail, start: true)));
+        InlineNormalizer.Structure(second);
         InsertAfter(leaf, second);
         return second;
     }
@@ -1183,8 +1341,7 @@ internal sealed class MarkdownEditorEngine
 
             var from = forward ? caret.Offset : caret.Offset - 1;
             code.Value = code.Value[..from] + code.Value[(from + 1)..];
-            Touch(code);
-            return Commit(document, code, from, key: key, merge: merge);
+            return CommitCode(document, code, from, key, merge);
         }
 
         if (caret.Content == null)
@@ -1557,8 +1714,7 @@ internal sealed class MarkdownEditorEngine
             }
 
             code.Value = code.Value[..cursor.Offset] + "\n" + code.Value[cursor.Offset..];
-            Touch(code);
-            return Commit(document, code, cursor.Offset + 1);
+            return CommitCode(document, code, cursor.Offset + 1, null, false);
         }
 
         if (cursor.Block is Table table)
@@ -1579,7 +1735,7 @@ internal sealed class MarkdownEditorEngine
         var leafRuns = Runs(leaf);
         var length = InlineContent.Length(leafRuns);
 
-        if (!paragraph)
+        if (!paragraph && leaf is not Heading)
         {
             var head = InlineContent.Split(leafRuns, cursor.Offset, out var tail);
             var marks = head.Count > 0 ? head[^1].Marks : tail.Count > 0 ? tail[0].Marks : [];
@@ -1610,7 +1766,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, leaf, 0);
         }
 
-        if (leaf is Heading heading)
+        if (leaf is Heading heading && container is not ListItem)
         {
             if (cursor.Offset == 0)
             {
@@ -1634,6 +1790,12 @@ internal sealed class MarkdownEditorEngine
             var next = new ListItem { Checked = listItem.Checked != null ? false : null };
             var second = SplitLeaf(leaf, cursor.Offset);
             var moved = listItem.Children.Skip(listItem.IndexOf(second)).ToList();
+
+            if (leaf is Heading { Children.Count: 0 })
+            {
+                InsertBefore(leaf, new Paragraph());
+                listItem.Remove(leaf);
+            }
 
             if (moved.Count == 1 && second.Children.Count == 0)
             {
@@ -2076,9 +2238,8 @@ internal sealed class MarkdownEditorEngine
             }
 
             Leaf replacement = level == 0 ? new Paragraph() : new AtxHeading { Level = level };
-            replacement.ReplaceInlines(leaf.Children.ToList());
             leaf.Parent.Replace(leaf, replacement);
-            Touch(replacement);
+            SetRuns(replacement, Runs(leaf));
 
             if (level > 0 && replacement.Parent is ListItem item && item.Checked != null)
             {
@@ -2459,9 +2620,14 @@ internal sealed class MarkdownEditorEngine
 
         var blocks = MarkdownParser.Parse(value).Children.ToList();
 
+        if (blocks is [List { Children.Count: > 0 } list] && list.Children.All(child => child is ListItem { Children.Count: 0 }))
+        {
+            return InsertAt(document, cursor, value, key, merge, preferRight: false, marks: null);
+        }
+
         if (cursor.Content is not Leaf leaf || blocks.Count == 0)
         {
-            return null;
+            return start < end ? Commit(document, cursor.Content ?? (INode)cursor.Block, cursor.Offset) : null;
         }
 
         if (leaf is Paragraph { Virtual: true } virtualParagraph)
@@ -2472,7 +2638,8 @@ internal sealed class MarkdownEditorEngine
         if (blocks is [Paragraph single])
         {
             var head = InlineContent.Split(Runs(leaf), cursor.Offset, out var rest);
-            var inserted = InlineContent.Flatten(single.Children).Select(Detach).ToList();
+            var around = MarksAt(Runs(leaf), cursor.Offset).Where(mark => mark.Kind != MarkKind.Code).ToList();
+            var inserted = InlineContent.Flatten(single.Children).Select(Detach).Select(run => run.WithMarks(around.Concat(run.Marks))).ToList();
             SetRuns(leaf, head.Concat(inserted).Concat(rest).ToList());
             return Commit(document, leaf, cursor.Offset + InlineContent.Length(inserted), key: key, merge: merge);
         }

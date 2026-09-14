@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Xunit;
 
 namespace Radzen.Documents.Markdown.Tests;

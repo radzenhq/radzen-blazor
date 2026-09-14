@@ -12,7 +12,7 @@ public class FencedCodeBlock : Leaf
     /// The delimiter used to start and end the code block.
     /// </summary>
     public string? Delimiter { get; internal set; }
-    internal int Indent { get; private set; }
+    internal int Indent { get; set; }
 
     /// <summary>
     /// The info string of the code block. This is the first line of the code block and is used to specify the language of the code block.

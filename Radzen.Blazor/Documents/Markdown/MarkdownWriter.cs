@@ -107,7 +107,13 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
     }
 
-    private void CloseBlock(Block block) => closed = block;
+    private void CloseBlock(Block block)
+    {
+        closed = block;
+        closedContent = block is Paragraph { Children.Count: 0 } ? closedContent : block;
+    }
+
+    private Block? closedContent;
 
     private void WrapBlock(string delim, string? firstDelim, Block block, Action content)
     {
@@ -144,6 +150,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     {
         ArgumentNullException.ThrowIfNull(document);
         Block? previous = null;
+        Block? content = null;
         var pending = new List<Paragraph>();
         definitionsFollow = document.LinkReferenceDefinitions.Count > 0;
 
@@ -160,13 +167,15 @@ internal sealed class MarkdownWriter : INodeVisitor
                 continue;
             }
 
-            var verbatim = verbatimBlocks && IsPristine(block) && block.SourceEnd > block.SourceStart;
+            var verbatim = verbatimBlocks && IsPristine(block) && block.SourceEnd > block.SourceStart && !(block is IndentedCodeBlock && content is List);
             var previousVerbatim = previous != null && verbatimBlocks && IsPristine(previous) && previous.SourceEnd > previous.SourceStart && previous.SourceEnd <= block.SourceStart;
 
-            if (verbatim && previousVerbatim && source.AsSpan(previous!.SourceEnd, block.SourceStart - previous.SourceEnd).IsWhiteSpace() && BlankLines.Placeholders(source, previous.SourceEnd, block.SourceStart, true, true).Count == pending.Count)
+            var gapCopied = verbatim && previousVerbatim && source.AsSpan(previous!.SourceEnd, block.SourceStart - previous.SourceEnd).IsWhiteSpace() && BlankLines.Placeholders(source, previous.SourceEnd, block.SourceStart, true, true).Count == pending.Count;
+
+            if (gapCopied)
             {
                 closed = null;
-                output.Append(source, previous.SourceEnd, block.SourceStart - previous.SourceEnd);
+                output.Append(source, previous!.SourceEnd, block.SourceStart - previous.SourceEnd);
                 pending.Clear();
             }
             else
@@ -182,6 +191,12 @@ internal sealed class MarkdownWriter : INodeVisitor
             if (verbatim)
             {
                 FlushClose();
+
+                if (block is IndentedCodeBlock && !gapCopied)
+                {
+                    output.Append("    ");
+                }
+
                 output.Append(source, block.SourceStart, block.SourceEnd - block.SourceStart);
                 CloseBlock(block);
             }
@@ -191,6 +206,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             }
 
             previous = block;
+            content = block is Paragraph { Children.Count: 0 } ? content : block;
         }
 
         foreach (var paragraph in pending)
@@ -273,11 +289,13 @@ internal sealed class MarkdownWriter : INodeVisitor
     {
         ArgumentNullException.ThrowIfNull(heading);
 
-        if (heading is SetExtHeading && heading.Children.Count > 0)
+        var inlines = InlineNormalizer.Normalize(heading.Children, lineStart: true);
+
+        if (heading is SetExtHeading && inlines.Count > 0 && !(tight && heading.Parent is { } parent && parent.IndexOf(heading) is > 0 and var at && parent.Children[at - 1] is Paragraph))
         {
             FlushClose(LazySeparator());
             Emit(string.Empty);
-            RenderInlines(InlineNormalizer.Normalize(heading.Children, lineStart: true), "\n", lineStart: true, blockEnd: true);
+            RenderInlines(inlines, "\n", lineStart: true, blockEnd: true);
             var underline = ((SetExtHeading)heading).Underline ?? string.Empty;
             EnsureNewLine();
             Write(Regex.IsMatch(underline, "^[=-]+$") ? underline : new string(heading.Level == 1 ? '=' : '-', 3));
@@ -299,6 +317,8 @@ internal sealed class MarkdownWriter : INodeVisitor
         ArgumentNullException.ThrowIfNull(thematicBreak);
         var line = thematicBreak.Line ?? string.Empty;
         line = line.Length > 0 && !line.Contains('\n', StringComparison.Ordinal) ? line : "---";
+        // CommonMark 0.31.2, 4.1 Thematic breaks and 4.3 Setext headings: the line must not read as the list marker or as a heading underline
+        line = thematicBreak.Parent is ListItem item && (item.Children[0] == thematicBreak || item.Children[item.IndexOf(thematicBreak) - 1] is Paragraph) && line[0] is '-' or '*' ? "___" : line;
         Write(line);
         CloseBlock(thematicBreak);
     }
@@ -369,7 +389,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             output.Append(isChecked ? "[x] " : "[ ] ");
         }
 
-        if (item.Children.Count > 0 && (item.Checked != null ? item.Children[0] is not (Paragraph or Heading) : item.Children[0] is ThematicBreak))
+        if (item.Children.Count > 0 && item.Checked != null && item.Children[0] is not (Paragraph or Heading))
         {
             output.Append('\n');
         }
@@ -451,7 +471,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitIndentedCodeBlock(IndentedCodeBlock codeBlock)
     {
         ArgumentNullException.ThrowIfNull(codeBlock);
-        var fence = closed is List or ListItem ? new string('`', Math.Max(3, LongestRun(codeBlock.Value, '`') + 1)) : null;
+        var fence = closedContent is List or ListItem ? new string('`', Math.Max(3, LongestRun(codeBlock.Value, '`') + 1)) : null;
         FlushClose(tight ? 1 : 2);
         var previous = delimiter;
 
@@ -595,10 +615,11 @@ internal sealed class MarkdownWriter : INodeVisitor
             trailing--;
         }
 
-        for (var index = 0; index < inlines.Count; index++)
+        for (var index = 0; index < trailing; index++)
         {
-            following = index + 1 < inlines.Count ? InlineNormalizer.FirstChar(inlines[index + 1], after[0]).ToString() : after;
-            endsBlock = blockEnd && index >= trailing - 1;
+            next = index + 1 < trailing ? inlines[index + 1] : null;
+            following = next != null ? InlineNormalizer.FirstChar(next, after[0]).ToString() : after;
+            atBlockStart = inlineDepth == 1 && index == 0 && lineStart;
             inlines[index].Accept(this);
         }
 
@@ -608,7 +629,9 @@ internal sealed class MarkdownWriter : INodeVisitor
 
     private string following = "\n";
 
-    private bool endsBlock;
+    private Inline? next;
+
+    private bool atBlockStart;
 
     private int lineStartAt;
 
@@ -619,7 +642,12 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitText(Text text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        Emit(Safe(text.Value, Before(), following));
+        var value = text.Value;
+        var leading = Unflanked(value) ? Reference(value[0]) : string.Empty;
+        value = leading.Length > 0 ? value[1..] : value;
+        var trailing = Unflanking(value) ? Reference(value[^1]) : string.Empty;
+        value = trailing.Length > 0 ? value[..^1] : value;
+        Emit(leading + Safe(value, Before() + leading, trailing.Length > 0 ? trailing : following).Replace("\n", "&#10;", StringComparison.Ordinal) + trailing);
         atInlineLineStart = false;
     }
 
@@ -657,7 +685,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         new("!", After: @"\[", In: Construct.Phrasing, NotIn: Spans),
         new("\"", In: Construct.Title),
         new("#", AtBreak: true),
-        new("#", After: @"(?:[\r\n]|$)", In: Construct.HeadingAtx),
+        new("#", After: @"[ \t]*(?:[\r\n]|$)", In: Construct.HeadingAtx),
         new("&", After: "[#A-Za-z]", In: Construct.Phrasing),
         new("(", In: Construct.DestinationRaw),
         new("(", Before: @"\]", In: Construct.Phrasing, NotIn: Spans),
@@ -760,12 +788,57 @@ internal sealed class MarkdownWriter : INodeVisitor
         Emit(marker);
         RenderInlines(inline.Children, marker);
         output.Append(marker);
+        closerEnd = output.Length;
     }
+
+    private int closerEnd = -1;
+
+    // CommonMark 0.31.2, 6.2 Emphasis and strong emphasis: a delimiter run between punctuation and a letter is not flanking, so the letter is written as a character reference
+    private bool Unflanked(string value)
+    {
+        if (closerEnd != output.Length || value.Length == 0 || !char.IsLetterOrDigit(value[0]))
+        {
+            return false;
+        }
+
+        var marker = output[^1];
+        var run = output.Length;
+
+        while (run > 0 && output[run - 1] == marker)
+        {
+            run--;
+        }
+
+        return marker == '_' || (run > 0 && (output[run - 1] == '\\' ? run < output.Length - 1 : output[run - 1].IsPunctuation()));
+    }
+
+    private bool Unflanking(string value) => next is Emphasis or Strong or Strikethrough && value.Length > 0 && char.IsLetterOrDigit(value[^1]) && (InlineNormalizer.Marker(next) == '_' || (Opening((InlineContainer)next) is var inner && !char.IsWhiteSpace(inner) && inner.IsPunctuation()));
+
+    private static char Opening(InlineContainer mark)
+    {
+        while (mark.Children.Count > 0 && mark.Children[0] is Emphasis or Strong or Strikethrough)
+        {
+            var child = (InlineContainer)mark.Children[0];
+
+            if (InlineNormalizer.Marker(child) != InlineNormalizer.Marker(mark))
+            {
+                return InlineNormalizer.Marker(child);
+            }
+
+            mark = child;
+        }
+
+        return mark.Children.Count > 0 ? InlineNormalizer.FirstChar(mark.Children[0], ' ') : ' ';
+    }
+
+    private static string Reference(char ch) => "&#" + ((int)ch).ToString(CultureInfo.InvariantCulture) + ";";
 
     public void VisitCode(Code code)
     {
         ArgumentNullException.ThrowIfNull(code);
         var value = code.Value.Replace('\n', ' ');
+        // GFM 0.29-gfm, 4.10 Tables: a pipe inside a code span still splits the cell unless it is escaped
+        value = (constructs & Construct.TableCell) != 0 ? value.Replace("|", "\\|", StringComparison.Ordinal) : value;
         var ticks = new string('`', Math.Max(code.Ticks ?? 1, LongestRun(value, '`') + 1));
         var padded = value.Length > 0 && (value[0] == '`' || value[^1] == '`' || (value[0] == ' ' && value[^1] == ' ' && value.Trim().Length > 0));
         Emit(ticks);
@@ -852,7 +925,24 @@ internal sealed class MarkdownWriter : INodeVisitor
     }
 
     // CommonMark 0.31.2, 4.6 HTML blocks: only start conditions 1 to 6 may interrupt a paragraph
-    private static bool StartsHtmlBlock(string? line) => line != null && Enumerable.Range(1, 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
+    // CommonMark 0.31.2, 4.6 HTML blocks: kind 7 cannot interrupt a paragraph, so it only starts a block on the first line
+    private bool StartsHtmlBlock(string? value)
+    {
+        if (value == null)
+        {
+            return false;
+        }
+
+        var line = value.IndexOf('\n', StringComparison.Ordinal) is var end && end >= 0 ? value[..end] : value;
+        return Enumerable.Range(1, atBlockStart && end < 0 && LineEnds(next) ? 7 : 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
+    }
+
+    private static bool LineEnds(Inline? next) => next switch
+    {
+        null or LineBreak or SoftLineBreak => true,
+        Text text => string.IsNullOrWhiteSpace(text.Value),
+        _ => false
+    };
 
     public void VisitHtmlInline(HtmlInline html)
     {
@@ -867,7 +957,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitLineBreak(LineBreak lineBreak)
     {
         ArgumentNullException.ThrowIfNull(lineBreak);
-        Emit((lineBreak.Backslash == true || atInlineLineStart) && !endsBlock ? "\\" : "  ");
+        Emit(lineBreak.Backslash == true || atInlineLineStart ? "\\" : "  ");
         output.Append('\n');
         Emit(string.Empty);
         atInlineLineStart = true;

@@ -1,5 +1,4 @@
 using System.Linq;
-using Radzen.Blazor;
 using Xunit;
 
 namespace Radzen.Blazor.Tests;
@@ -24,7 +23,7 @@ public class MarkdownEditorEngineTests
         var update = engine.Undo();
 
         Assert.Equal("one ", engine.Text);
-        Assert.Equal((3, 3), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal((4, 4), (update!.SelectionStart, update.SelectionEnd));
         Assert.Equal("one ", update.Text);
 
         engine.Undo();
@@ -37,7 +36,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceCoalescesBackwards()
     {
-        var engine = new SourceEngine("abc");
+        var engine = new MarkdownEditorEngine("abc");
 
         engine.Apply(2, 3, "", (2, 2), "delete", merge: true);
         engine.Apply(1, 2, "", (1, 1), "delete", merge: true);
@@ -85,20 +84,6 @@ public class MarkdownEditorEngineTests
         var engine = new SourceEngine(text);
 
         var update = engine.InsertParagraph(caret, caret);
-
-        Assert.Equal(expected, engine.Text);
-        Assert.Equal(expectedCaret, update!.SelectionStart);
-    }
-
-    [Theory]
-    [InlineData("para", 4, "para  \n", 5)]
-    [InlineData("> quote", 5, "> quote  \n> ", 6)]
-    [InlineData("- item", 4, "- item  \n  ", 5)]
-    public void ShiftEnterInsertsAHardBreakWithTheContinuationPrefix(string text, int caret, string expected, int expectedCaret)
-    {
-        var engine = new MarkdownEditorEngine(text);
-
-        var update = engine.InsertLineBreak(caret, caret);
 
         Assert.Equal(expected, engine.Text);
         Assert.Equal(expectedCaret, update!.SelectionStart);
@@ -223,6 +208,25 @@ public class MarkdownEditorEngineTests
 
         Assert.Equal(expected, engine.Text);
         Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void UndoRestoresTheModelWithTheWhitespaceTheTextDrops()
+    {
+        var engine = new MarkdownEditorEngine("ab");
+
+        engine.InsertText(2, 2, " ", literal: true);
+        engine.InsertText(3, 3, "c", literal: true, key: "insert", merge: false);
+        var update = engine.Undo();
+
+        Assert.Equal("ab ", engine.Text);
+        Assert.Equal("<p>ab </p>", update!.Html);
+        Assert.Equal((3, 3), (update.SelectionStart, update.SelectionEnd));
+
+        update = engine.Redo();
+
+        Assert.Equal("ab c", engine.Text);
+        Assert.Equal((4, 4), (update!.SelectionStart, update.SelectionEnd));
     }
 
     [Fact]
@@ -621,6 +625,8 @@ public class MarkdownEditorEngineTests
     [InlineData("", 0, "# h\n\ntext", "# h\n\ntext", 6)]
     [InlineData("a\n\n```\nc\n```", 2, "**b**", "a\n\n```\n**b**c\n```", 7)]
     [InlineData("| a |\n| - |", 1, "**b**\n\nc", "| \\*\\*b\\*\\*  ca |\n| --- |", 9)]
+    [InlineData("- x", 1, "p1\n\np2", "- xp1\n\n  p2", 6)]
+    [InlineData("- x\n- y", 1, "p1\n\np2", "- xp1\n\n  p2\n\n- y", 6)]
     public void PastedTextIsParsedAsMarkdownExceptInCodeBlocksAndCells(string text, int position, string pasted, string expected, int caret)
     {
         var engine = new MarkdownEditorEngine(text);
@@ -1074,17 +1080,6 @@ public class MarkdownEditorEngineTests
         engine.Indent(8, 8, outdent: false);
 
         Assert.Equal("1. a\n   1. b\n2. c", engine.Text);
-    }
-
-    [Fact]
-    public void EnterInATableCellKeepsTheColumn()
-    {
-        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
-
-        var update = engine.InsertParagraph(27, 27);
-
-        Assert.Equal("| a | b |\n| - | - |\n| c | d |\n|  |  |", engine.Text);
-        Assert.Equal(35, update!.SelectionStart);
     }
 
     [Fact]

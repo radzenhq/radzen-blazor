@@ -472,6 +472,13 @@ internal static class InlineContent
             }
 
             var middle = run.Slice(from, to);
+
+            if (!remove.Value && middle.Text.Trim().Length == 0)
+            {
+                result.Add(run);
+                continue;
+            }
+
             var marks = remove.Value ? middle.Marks.Where(existing => existing.Kind != mark.Kind).ToList() : middle.Marks.Where(existing => existing.Kind != mark.Kind).Append(mark).ToList();
             result.Add(middle.WithMarks(marks));
 

@@ -7,7 +7,7 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class HtmlBlock : Leaf
 {
-    internal int Type { get; private set; }
+    internal int Type { get; set; }
 
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
