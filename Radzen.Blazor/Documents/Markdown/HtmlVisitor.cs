@@ -77,6 +77,7 @@ public class HtmlVisitor : NodeVisitorBase
     private void WrapLeaf(string tag, Leaf leaf, Action visitChildren)
     {
         html.Append('<').Append(tag).Append('>');
+        tag = tag.Split(' ')[0];
 
         if (pendingCheckbox is { } checkbox)
         {
@@ -216,6 +217,10 @@ public class HtmlVisitor : NodeVisitorBase
         {
             suppressParagraph = false;
             AppendContent(paragraph, () => base.VisitParagraph(paragraph));
+        }
+        else if (paragraph is { Virtual: true, Parent: Document parent } && parent.Children[0] != paragraph && parent.LastChild != paragraph)
+        {
+            WrapLeaf("p class=\"rz-markdown-editor-gap\"", paragraph, () => base.VisitParagraph(paragraph));
         }
         else
         {

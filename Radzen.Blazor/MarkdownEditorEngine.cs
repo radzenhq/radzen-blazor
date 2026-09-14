@@ -325,7 +325,7 @@ internal sealed class MarkdownEditorEngine
     {
         var (index, within) = InlineContent.Locate(runs, offset);
 
-        if (index < runs.Count && runs[index].Atom == null && (within > 0 || index == 0 || runs[index - 1].Atom != null) && (within < runs[index].Length || index == runs.Count - 1))
+        if (index < runs.Count && runs[index].Atom == null && (within > 0 || index == 0 || runs[index - 1].Atom != null))
         {
             return runs[index].Marks;
         }
@@ -949,8 +949,12 @@ internal sealed class MarkdownEditorEngine
     {
         var first = Resolve(hosts, start);
         var last = Resolve(hosts, end);
+        var firstExtent = Extent(hosts, first.Block);
+        var lastExtent = Extent(hosts, last.Block);
+        var firstCovered = firstExtent.Start >= start && firstExtent.End <= end && first.Block is not Paragraph { Children.Count: 0 };
+        var lastCovered = lastExtent.Start >= start && lastExtent.End <= end && last.Block is not Paragraph { Children.Count: 0 };
 
-        if (first.Block == last.Block && first.Content == last.Content)
+        if (first.Block == last.Block && first.Content == last.Content && !(BlankLines.IsSealed(first.Block) && firstCovered))
         {
             if (first.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
             {
@@ -968,12 +972,7 @@ internal sealed class MarkdownEditorEngine
             return first;
         }
 
-        var firstExtent = Extent(hosts, first.Block);
-        var lastExtent = Extent(hosts, last.Block);
-        var firstCovered = firstExtent.Start >= start && firstExtent.End <= end && first.Block is not Paragraph { Children.Count: 0 };
-        var lastCovered = lastExtent.Start >= start && lastExtent.End <= end && last.Block is not Paragraph { Children.Count: 0 };
-
-        if ((BlankLines.IsSealed(first.Block) && !firstCovered) || (BlankLines.IsSealed(last.Block) && !lastCovered) || first.Content is TableCell || last.Content is TableCell)
+        if ((BlankLines.IsSealed(first.Block) && !firstCovered) || (BlankLines.IsSealed(last.Block) && !lastCovered))
         {
             return null;
         }
@@ -985,9 +984,9 @@ internal sealed class MarkdownEditorEngine
             return null;
         }
 
-        var target = first.Content as Leaf;
+        var target = firstCovered ? null : first.Content as Leaf;
 
-        if (target != null && !firstCovered)
+        if (target != null)
         {
             SetRuns(target, InlineContent.Split(Runs(target), first.Offset, out _));
         }
@@ -996,7 +995,7 @@ internal sealed class MarkdownEditorEngine
         {
             InlineContent.Split(Runs(lastLeaf), last.Offset, out var tail);
 
-            if (target != null && !firstCovered)
+            if (target != null)
             {
                 SetRuns(target, InlineContent.Flatten(target.Children).Concat(tail).ToList());
                 var dissolved = lastLeaf.Parent is ListItem item && item != target.Parent && !IsAncestor(item, target) && item.IndexOf(lastLeaf) == 0 ? item : null;
@@ -1019,7 +1018,7 @@ internal sealed class MarkdownEditorEngine
             RemoveBlock(last.Block);
         }
 
-        if (firstCovered)
+        if (firstCovered && first.Block != last.Block)
         {
             RemoveBlock(first.Block);
         }
@@ -1053,6 +1052,12 @@ internal sealed class MarkdownEditorEngine
         if (last.Content is Leaf remaining && Attached(document, remaining))
         {
             return new Cursor(remaining, remaining, 0);
+        }
+
+        if (hosts.LastOrDefault(host => host.End < start && host.Content is Paragraph or Heading && !BlankLines.IsSealed(host.Block) && Attached(document, host.Block)) is { } before)
+        {
+            var leaf = (Leaf)before.Content!;
+            return new Cursor(leaf, leaf, InlineLength(leaf));
         }
 
         var replacement = new Paragraph();
@@ -1245,6 +1250,12 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, caret.Content, deleteStart, key: key, merge: merge);
     }
 
+    private MarkdownEditorUpdate? Select(Document document, Block block)
+    {
+        var (start, end) = Extent(Hosts(document), block);
+        return start < end ? Render(start, end) : null;
+    }
+
     private MarkdownEditorUpdate RemoveAndMove(Document document, Block block, bool forward)
     {
         var parent = block.Parent;
@@ -1306,8 +1317,7 @@ internal sealed class MarkdownEditorEngine
 
         if (previous != null && BlankLines.IsSealed(previous))
         {
-            var end = Extent(Hosts(document), previous).End;
-            return Render(end, end);
+            return Select(document, previous) ?? RemoveAndMove(document, previous, forward: true);
         }
 
         if (previous is Paragraph { Children.Count: 0 } emptyParagraph)
@@ -1477,8 +1487,7 @@ internal sealed class MarkdownEditorEngine
 
         if (BlankLines.IsSealed(next))
         {
-            var start = Extent(Hosts(document), next).Start;
-            return Render(start, start);
+            return Select(document, next) ?? RemoveAndMove(document, next, forward: false);
         }
 
         if (next is Paragraph { Children.Count: 0 } empty)
