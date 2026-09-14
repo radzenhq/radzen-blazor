@@ -36,6 +36,18 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDownDataGrid_TriggerIcon_IsHiddenFromAssistiveTechnology()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>();
+
+            var icon = component.Find(".rz-dropdown-trigger-icon");
+
+            Assert.Equal("true", icon.GetAttribute("aria-hidden"));
+        }
+
+        [Fact]
         public void DropDownDataGrid_Renders_WithData()
         {
             using var ctx = new TestContext();

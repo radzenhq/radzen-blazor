@@ -3,7 +3,7 @@
 <button tabindex="-1" type="button" aria-controls=@PopupId aria-expanded=@(open ? "true" : "false") aria-haspopup="listbox" title=@Title @ref=@Element class=@Class style=@Style @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes disabled=@IsDisabled>
     <span class="rz-dropdown-label rz-inputtext">@(SelectedItem?.Text ?? Placeholder)</span>
     <div class="rz-dropdown-trigger rz-corner-right">
-        <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
+        <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down" aria-hidden="true"></span>
     </div>
 </button>
 <RadzenPopup id=@PopupId role="listbox" Open=@OnPopupOpen Close=@OnPopupClose @ref=Popup class="rz-dropdown-panel rz-input-sm rz-editor-dropdown-panel" Style=@($"display:none;{PopupStyle}") PreventDefault=true>

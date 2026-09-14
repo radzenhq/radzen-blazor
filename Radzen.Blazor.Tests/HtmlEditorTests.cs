@@ -146,6 +146,19 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void HtmlEditor_DropDownTriggerIcons_AreHiddenFromAssistiveTechnology()
+        {
+            using var ctx = CreateContext();
+
+            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+
+            var icons = component.FindAll(".rz-dropdown-trigger-icon");
+
+            Assert.NotEmpty(icons);
+            Assert.All(icons, icon => Assert.Equal("true", icon.GetAttribute("aria-hidden")));
+        }
+
+        [Fact]
         public void HtmlEditorTable_Renders_PropertyPanelLabels()
         {
             using var ctx = CreateContext();
