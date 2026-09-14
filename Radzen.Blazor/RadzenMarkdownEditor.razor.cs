@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Radzen.Blazor;
@@ -27,6 +28,8 @@ namespace Radzen.Blazor;
 public partial class RadzenMarkdownEditor : FormComponent<string>
 {
     [Inject] private DialogService DialogService { get; set; } = null!;
+
+    [Inject] private ContextMenuService? ContextMenuService { get; set; }
 
     private ElementReference editable;
     private ElementReference textarea;
@@ -326,6 +329,53 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <summary>
+    /// Invoked from JavaScript when the context menu is requested inside a table. Opens the table commands.
+    /// </summary>
+    [JSInvokable("OnContextMenuAsync")]
+    public Task OnContextMenuAsync(double clientX, double clientY, int start, int end)
+    {
+        selection = (start, end);
+        toolState = engine.State(start, end);
+        ToolStateChanged?.Invoke();
+
+        if (ContextMenuService == null || !InTable)
+        {
+            return Task.CompletedTask;
+        }
+
+        var items = new List<ContextMenuItem>
+        {
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableRowBefore_Title), MarkdownEditorCommands.TableRowBefore, "north"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableRowAfter_Title), MarkdownEditorCommands.TableRowAfter, "south"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableColumnBefore_Title), MarkdownEditorCommands.TableColumnBefore, "west"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableColumnAfter_Title), MarkdownEditorCommands.TableColumnAfter, "east"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableDeleteRow_Title), MarkdownEditorCommands.TableDeleteRow, "horizontal_rule", disabled: TableRow == 0),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableDeleteColumn_Title), MarkdownEditorCommands.TableDeleteColumn, "vertical_align_center"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableAlignLeft_Title), MarkdownEditorCommands.TableAlign, "format_align_left", "left"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableAlignCenter_Title), MarkdownEditorCommands.TableAlign, "format_align_center", "center"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableAlignRight_Title), MarkdownEditorCommands.TableAlign, "format_align_right", "right"),
+            TableMenuItem(nameof(RadzenStrings.MarkdownEditorTableDelete_Title), MarkdownEditorCommands.TableDelete, "delete", iconColor: "var(--rz-danger)")
+        };
+
+        var args = new MouseEventArgs { ClientX = clientX, ClientY = clientY, Button = 2, Type = "contextmenu" };
+
+        ContextMenuService.Open(args, items, async e =>
+        {
+            ContextMenuService.Close();
+
+            if (e.Value is ValueTuple<string, string?> command)
+            {
+                await ExecuteAsync(command.Item1, command.Item2, (start, end));
+            }
+        });
+
+        return Task.CompletedTask;
+    }
+
+    private ContextMenuItem TableMenuItem(string title, string command, string icon, string? value = null, bool disabled = false, string? iconColor = null) =>
+        new() { Text = Localize(title), Value = (command, value), Icon = icon, Disabled = disabled, IconColor = iconColor };
+
+    /// <summary>
     /// Invoked from JavaScript when the undo shortcut is pressed.
     /// </summary>
     [JSInvokable("OnUndoAsync")]
@@ -418,10 +468,12 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// <param name="name">The command name.</param>
     /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialogue is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />,
     /// the size as <c>rows x columns</c> for <see cref="MarkdownEditorCommands.InsertTable" /> (a dialogue is opened when <c>null</c>), the alignment for <see cref="MarkdownEditorCommands.TableAlign" />.</param>
-    public async Task ExecuteCommandAsync(string name, string? value = null)
+    public async Task ExecuteCommandAsync(string name, string? value = null) => await ExecuteAsync(name, value, await GetSelectionAsync());
+
+    private async Task ExecuteAsync(string name, string? value, (int Start, int End) range)
     {
         string? label = null;
-        var (start, end) = await GetSelectionAsync();
+        var (start, end) = range;
 
         if (value == null && name is MarkdownEditorCommands.Link or MarkdownEditorCommands.Image)
         {

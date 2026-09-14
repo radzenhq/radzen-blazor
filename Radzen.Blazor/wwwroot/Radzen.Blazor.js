@@ -8644,6 +8644,22 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     }
   }
 
+  function onContextMenu(editor, event) {
+    const cell = event.target && event.target.closest ? event.target.closest('td,th') : null;
+    if (!cell || !editor.editable.contains(cell)) {
+      return;
+    }
+    const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(event.clientX, event.clientY) : null;
+    if (range && cell.contains(range.startContainer)) {
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    event.preventDefault();
+    reportSelection(editor);
+    invoke(editor, 'OnContextMenuAsync', event.clientX, event.clientY, editor.selection[0], editor.selection[1]);
+  }
+
   function reportSelection(editor) {
     if (editor.composing) {
       return;
@@ -8700,6 +8716,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   on(editable, 'compositionend', e => onCompositionEnd(editor, e));
   on(editable, 'keydown', e => onKeyDown(editor, e));
   on(editable, 'click', e => onClick(editor, e));
+  on(editable, 'contextmenu', e => onContextMenu(editor, e));
   on(editable, 'focus', () => {
     const selection = window.getSelection();
     if (!selection.rangeCount || !editable.contains(selection.anchorNode) || (selection.anchorNode === editable && selection.isCollapsed && !matchesTracked(editor, editable, selection.anchorOffset, 'from'))) {

@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
@@ -14,6 +15,7 @@ namespace Radzen.Blazor.Tests
             var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
+            ctx.Services.AddScoped<ContextMenuService>();
             return ctx;
         }
 
@@ -516,6 +518,38 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Source));
             component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.InsertTable, "1x2")).GetAwaiter().GetResult();
             Assert.Equal("|  |  |\n| --- | --- |", LastUpdate(module).Text);
+        }
+
+        [Fact]
+        public async Task MarkdownEditor_ContextMenu_InsideATable_OpensTheTableCommands()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "| a | b |\n| --- | --- |\n| 1 | 2 |"));
+            var service = ctx.Services.GetRequiredService<ContextMenuService>();
+            ContextMenuOptions? opened = null;
+            service.OnOpen += (_, options) => opened = options;
+
+            await component.InvokeAsync(() => component.Instance.OnContextMenuAsync(10, 20, 2, 2));
+
+            Assert.NotNull(opened);
+            var items = opened!.Items!.ToList();
+            Assert.Equal(10, items.Count);
+            Assert.Contains(items, item => item.Value is ValueTuple<string, string?> { Item1: MarkdownEditorCommands.TableDeleteRow, Item2: null } && item.Disabled);
+            Assert.Contains(items, item => item.Value is ValueTuple<string, string?> { Item1: MarkdownEditorCommands.TableAlign, Item2: "center" });
+        }
+
+        [Fact]
+        public async Task MarkdownEditor_ContextMenu_OutsideATable_DoesNotOpen()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "plain"));
+            var service = ctx.Services.GetRequiredService<ContextMenuService>();
+            var opened = false;
+            service.OnOpen += (_, _) => opened = true;
+
+            await component.InvokeAsync(() => component.Instance.OnContextMenuAsync(10, 20, 1, 1));
+
+            Assert.False(opened);
         }
     }
 }
