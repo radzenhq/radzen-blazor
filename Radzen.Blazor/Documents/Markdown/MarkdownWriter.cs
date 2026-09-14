@@ -31,24 +31,14 @@ internal sealed class MarkdownWriter : INodeVisitor
 
     public string Text => output.ToString();
 
-    public static string Write(Document document, string source, bool verbatimBlocks = false) => WriteDocument(document, source, verbatimBlocks).Text;
+    public static string Write(Document document, string source) => Serialize(document, source, verbatimBlocks: false).Text;
 
-    public static MarkdownWriter WriteDocument(Document document, string source, bool verbatimBlocks = true)
+    public static MarkdownWriter Preserve(Document document, string source) => Serialize(document, source, verbatimBlocks: true);
+
+    private static MarkdownWriter Serialize(Document document, string source, bool verbatimBlocks)
     {
         var writer = new MarkdownWriter(source, string.Empty, verbatimBlocks);
         document.Accept(writer);
-        return writer;
-    }
-
-    public static MarkdownWriter Write(IEnumerable<Block> blocks, string source, string delimiter = "")
-    {
-        var writer = new MarkdownWriter(source, delimiter, false);
-
-        foreach (var block in blocks)
-        {
-            block.Accept(writer);
-        }
-
         return writer;
     }
 
@@ -521,7 +511,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             {
                 var previousTight = tight;
                 tight = list.Tight;
-                RenderListItem(current);
+                RenderListItem(current, firstDelim);
                 tight = previousTight;
             });
             index++;
@@ -539,7 +529,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         return (list.Marker is '-' or '*' or '+' ? list.Marker : '-').ToString();
     }
 
-    private void RenderListItem(ListItem item)
+    private void RenderListItem(ListItem item, string marker)
     {
         if (item.Checked is { } isChecked)
         {
@@ -550,6 +540,9 @@ internal sealed class MarkdownWriter : INodeVisitor
                 output.Append('\n');
             }
         }
+
+        linePrefix = item.Children.Count > 0 && item.Children[0] is Paragraph { Children.Count: > 0 } ? (item.Checked is { } box ? box ? "[x] " : "[ ] " : string.Empty) : string.Empty;
+        markerPrefix = linePrefix.Length > 0 || (item.Children.Count > 0 && item.Children[0] is Paragraph { Children.Count: > 0 }) ? marker : string.Empty;
 
         if (item.Children.Count == 0)
         {
@@ -563,7 +556,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitListItem(ListItem listItem)
     {
         ArgumentNullException.ThrowIfNull(listItem);
-        RenderListItem(listItem);
+        RenderListItem(listItem, string.Empty);
     }
 
     public void VisitFencedCodeBlock(FencedCodeBlock fencedCodeBlock)
@@ -670,8 +663,15 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
         ArgumentNullException.ThrowIfNull(htmlBlock);
+        var afterList = closed is List or ListItem;
         FlushClose(tight ? 1 : 2);
         var lines = htmlBlock.Value.Split('\n');
+
+        if (afterList)
+        {
+            var indent = lines.Where(line => line.Trim().Length > 0).Select(line => line.Length - line.TrimStart(' ').Length).DefaultIfEmpty(0).Min();
+            lines = lines.Select(line => line.Length >= indent ? line[indent..] : line.TrimStart(' ')).ToArray();
+        }
 
         for (var index = 0; index < lines.Length; index++)
         {
@@ -790,19 +790,33 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         inlineDepth++;
 
-        foreach (var inline in inlines)
+        for (var index = 0; index < inlines.Count; index++)
         {
-            inline.Accept(this);
+            followingChar = index + 1 < inlines.Count && inlines[index + 1] is Text next && next.Value.Length > 0 ? next.Value[0] : '\0';
+            inlines[index].Accept(this);
         }
 
         inlineDepth--;
     }
+
+    private char followingChar;
+
+    // CommonMark 0.31.2, 6.2 Emphasis: a delimiter run next to punctuation is only flanking when the other side is whitespace or punctuation
+    private static bool Flanks(char outside, char inside) => !(IsPunctuation(inside) && !char.IsWhiteSpace(outside) && !IsPunctuation(outside) && outside != '\0');
+
+    // CommonMark 0.31.2, 2.1 Characters and lines: Unicode punctuation is the P categories plus ASCII symbols
+    private static bool IsPunctuation(char ch) => char.IsPunctuation(ch) || (ch < 128 && char.IsSymbol(ch));
 
     private void MarkLineStarts(IReadOnlyList<Inline> inlines)
     {
         var flat = new List<Inline?>();
         Collect(inlines, flat);
         var lineStart = true;
+        string? previousLine = null;
+        var prefix = linePrefix;
+        var marker = markerPrefix;
+        linePrefix = string.Empty;
+        markerPrefix = string.Empty;
 
         for (var index = 0; index < flat.Count; index++)
         {
@@ -848,6 +862,7 @@ internal sealed class MarkdownWriter : INodeVisitor
 
             var texts = new List<Text>();
             var line = new StringBuilder();
+            var wholeLine = new StringBuilder();
 
             for (var next = index; next < flat.Count && flat[next] is Text current; next++)
             {
@@ -855,10 +870,20 @@ internal sealed class MarkdownWriter : INodeVisitor
                 line.Append(current.Value);
             }
 
+            for (var next = index; next < flat.Count && flat[next] is not (LineBreak or SoftLineBreak); next++)
+            {
+                wholeLine.Append(flat[next] is Text part ? part.Value : flat[next] is InlineContainer ? string.Empty : "x");
+            }
+
             var value = line.ToString().TrimStart(' ', '\t');
             var skipped = line.Length - value.Length;
+            var delimiterRow = Table.DelimiterRegex.IsMatch(value) && previousLine != null && Cells(previousLine) == Cells(value);
+            var rule = marker.Length > 0 && ThematicBreakLine.IsMatch(marker + prefix + value);
+            previousLine = prefix + wholeLine.ToString().TrimStart(' ', '\t');
+            prefix = string.Empty;
+            marker = string.Empty;
 
-            if (!LineStart.IsMatch(value) && !Table.DelimiterRegex.IsMatch(value) && !(index > 0 && StartsHtmlBlock(value)))
+            if (!LineStart.IsMatch(value) && !delimiterRow && !rule && !(index > 0 && StartsHtmlBlock(value)))
             {
                 continue;
             }
@@ -879,6 +904,14 @@ internal sealed class MarkdownWriter : INodeVisitor
             }
         }
     }
+
+    private string linePrefix = string.Empty;
+
+    private string markerPrefix = string.Empty;
+
+    private static readonly Regex ThematicBreakLine = new(@"^(?:[\-*_][ \t]*){3,}$", RegexOptions.Compiled);
+
+    private static int Cells(string line) => Regex.Split(line.Trim().Trim('|'), @"(?<!\\)\|").Length;
 
     // CommonMark 0.31.2, 4.6 HTML blocks: only start conditions 1 to 6 may interrupt a paragraph
     private static bool StartsHtmlBlock(string? line) => line != null && Enumerable.Range(1, 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
@@ -1074,6 +1107,30 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
     }
 
+    private static int PunctuationPrefix(string value)
+    {
+        var count = 0;
+
+        while (count < value.Length && IsPunctuation(value[count]))
+        {
+            count++;
+        }
+
+        return count;
+    }
+
+    private static int PunctuationSuffix(string value)
+    {
+        var count = 0;
+
+        while (count < value.Length && IsPunctuation(value[^(count + 1)]))
+        {
+            count++;
+        }
+
+        return count;
+    }
+
     private void RenderMarkBody(InlineContainer inline, string marker)
     {
         var body = inline.Children;
@@ -1082,22 +1139,39 @@ internal sealed class MarkdownWriter : INodeVisitor
         Text? first = body.Count > 0 ? body[0] as Text : null;
         Text? last = body.Count > 0 ? body[^1] as Text : null;
 
+        var before = output.Length > 0 ? output[^1] : '\0';
+        var after = followingChar;
+
         if (first != null)
         {
-            leading = first.Value[..(first.Value.Length - first.Value.TrimStart().Length)];
+            var count = first.Value.Length - first.Value.TrimStart().Length;
+
+            if (count == 0 && first.Value.Length > 0 && !Flanks(before, first.Value[0]))
+            {
+                count = PunctuationPrefix(first.Value);
+            }
+
+            leading = first.Value[..count];
             RenderingOf(first).Leading = leading.Length;
         }
 
         if (last != null)
         {
             var remaining = last == first ? last.Value[leading.Length..] : last.Value;
-            trailing = remaining[remaining.TrimEnd().Length..];
+            var count = remaining.Length - remaining.TrimEnd().Length;
+
+            if (count == 0 && remaining.Length > 0 && !Flanks(after, remaining[^1]))
+            {
+                count = PunctuationSuffix(remaining);
+            }
+
+            trailing = remaining[(remaining.Length - count)..];
             RenderingOf(last).Trailing = trailing.Length;
         }
 
         if (leading.Length > 0)
         {
-            RenderingOf(first!).LeadingAt = Emit(leading);
+            RenderingOf(first!).LeadingAt = Emit(Escape(leading, -1));
         }
 
         if (body.All(child => child is Text text && text.Value.Length == RenderingOf(text).Leading + RenderingOf(text).Trailing))
@@ -1193,21 +1267,23 @@ internal sealed class MarkdownWriter : INodeVisitor
     {
         atInlineLineStart = false;
 
+        var outerStart = Emit(string.Empty);
+
         if (suffix != null)
         {
             Emit(image ? "![" : "[");
             var referenceStart = output.Length;
             RenderInlines(inline.Children);
-            positions[inline] = (referenceStart, output.Length);
+            positions[inline] = image ? (outerStart, output.Length + suffix.Length) : (referenceStart, output.Length);
             output.Append(suffix);
             return;
         }
 
-        if (inline is Link { Autolink: true } && inline.Children is [Text only] && only.Value == destination)
+        if (inline is Link { Autolink: true } && inline.Children is [Text only] && (only.Value == destination || "mailto:" + only.Value == destination))
         {
             Emit("<");
             var autolinkStart = output.Length;
-            output.Append(destination);
+            output.Append(only.Value);
             positions[inline] = (autolinkStart, output.Length);
             output.Append('>');
             atInlineLineStart = false;
@@ -1219,8 +1295,8 @@ internal sealed class MarkdownWriter : INodeVisitor
         RenderInlines(inline.Children);
         positions[inline] = (start, output.Length);
         output.Append("](");
-        var target = destination ?? string.Empty;
-        output.Append(target.Length == 0 || target.Any(ch => ch is ' ' or '(' or ')' or '\n') ? "<" + target.Replace("<", "\\<", StringComparison.Ordinal).Replace(">", "\\>", StringComparison.Ordinal) + ">" : target);
+        var target = (destination ?? string.Empty).Replace("\r", "%0D", StringComparison.Ordinal).Replace("\n", "%0A", StringComparison.Ordinal);
+        output.Append(target.Length == 0 || target.Any(ch => ch is ' ' or '(' or ')') ? "<" + target.Replace("<", "\\<", StringComparison.Ordinal).Replace(">", "\\>", StringComparison.Ordinal) + ">" : target);
 
         if (!string.IsNullOrEmpty(title))
         {
@@ -1229,6 +1305,11 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         output.Append(')');
         atInlineLineStart = false;
+
+        if (image)
+        {
+            positions[inline] = (outerStart, output.Length);
+        }
     }
 
     public void VisitHtmlInline(HtmlInline html)

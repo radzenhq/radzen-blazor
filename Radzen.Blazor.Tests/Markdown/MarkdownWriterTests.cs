@@ -11,11 +11,13 @@ public class MarkdownWriterTests(ITestOutputHelper output)
 
     private static string Structure(string markdown) => Canonical.Html(markdown);
 
+    private static readonly int[] ExamplesTheParserDeviatesFrom = [13, 237, 257, 313, 318];
+
     [Theory]
     [MemberData(nameof(SpecExamples))]
     public void WritingAPristineDocumentKeepsItsStructure(int example, string markdown)
     {
-        if (example is 13 or 237 or 257 or 313 or 318)
+        if (ExamplesTheParserDeviatesFrom.Contains(example))
         {
             return;
         }
@@ -78,7 +80,8 @@ public class MarkdownWriterTests(ITestOutputHelper output)
     {
         var markdown = "> # H\n>\n> a *b*";
         var document = MarkdownParser.Parse(markdown);
-        var writer = MarkdownWriter.Write(document.Children, markdown);
+        document.Children[0].Pristine = false;
+        var writer = MarkdownWriter.Preserve(document, markdown);
         var paragraph = (Paragraph)((BlockQuote)document.Children[0]).Children[1];
         var emphasis = (Emphasis)paragraph.Children[1];
 

@@ -15,6 +15,11 @@ internal static class Canonical
             leaf.ReplaceInlines(Inlines(leaf.Children, []));
         }
 
+        foreach (var html in Descendants(document).OfType<HtmlBlock>())
+        {
+            html.Value = string.Join('\n', html.Value.Split('\n').Select(line => line.TrimStart(' ')));
+        }
+
         foreach (var cell in Descendants(document).OfType<Table>().SelectMany(table => table.Rows).SelectMany(row => row.Cells))
         {
             cell.ReplaceInlines(Inlines(cell.Children, []));

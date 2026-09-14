@@ -8209,7 +8209,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
-    track(editor, from, to, start, end);
+    const covered = offset => editor.segments.some(segment => offset >= segment.start && offset <= segment.end);
+    track(editor, from, to, covered(start) ? start : toSource(editor, from.node, from.offset), covered(end) ? end : toSource(editor, to.node, to.offset));
   }
 
   function track(editor, from, to, start, end) {
@@ -8354,6 +8355,10 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       if (live[0] === live[1] && (deleting || captured[0] === captured[1])) {
         return around(transform(editor, live[0], version));
       }
+      if (captured[0] !== captured[1] && editor.applied.some(entry => entry.version > version && entry.start === captured[0] && entry.end === captured[1])) {
+        const after = transform(editor, captured[1], version);
+        return deleting ? null : [after, after];
+      }
       return [transform(editor, captured[0], version), transform(editor, captured[1], version)];
     };
   }
@@ -8445,8 +8450,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       default:
         if (type.indexOf('delete') === 0) {
           edit(editor, 'OnEditAsync', () => {
-            const [start, end] = range();
-            return end > start ? [start, end, '', kind] : null;
+            const resolved = range();
+            return resolved && resolved[1] > resolved[0] ? [resolved[0], resolved[1], '', kind] : null;
           }, live[0] === live[1] ? -1 : live[0] - live[1]);
         }
         break;
@@ -8735,9 +8740,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       }
       editor.version = value && value.version !== null && value.version !== undefined ? value.version : editor.version;
       applyUpdate(editor, value);
-      if (editor.textarea.hidden && value && value.html !== null && value.html !== undefined) {
-        editor.selection = [value.selectionStart, value.selectionEnd];
-      }
     },
     getSelection: function () {
       return editor.queue.then(() => currentSelection(editor), () => currentSelection(editor));

@@ -189,7 +189,8 @@ public class MarkdownEditorEngineTests
     {
         var engine = new MarkdownEditorEngine(text);
 
-        Assert.Null(engine.Delete(start, end));
+        engine.Delete(start, end);
+
         Assert.Equal(text, engine.Text);
     }
 
@@ -618,11 +619,14 @@ public class MarkdownEditorEngineTests
     }
 
     [Fact]
-    public void ForwardDeleteBeforeATableIsIgnored()
+    public void ForwardDeleteBeforeATableMovesIntoTheTable()
     {
         var engine = new MarkdownEditorEngine("> quote\n\n| a |\n| - |\n| b |");
 
-        Assert.Null(engine.Delete(7, 8, forward: true));
+        var update = engine.Delete(7, 8, forward: true);
+
+        Assert.Equal("> quote\n\n| a |\n| - |\n| b |", engine.Text);
+        Assert.Equal(11, update!.SelectionStart);
     }
 
     [Fact]
@@ -966,11 +970,14 @@ public class MarkdownEditorEngineTests
     }
 
     [Fact]
-    public void BackspaceAtTheStartOfTheParagraphAfterATableIsIgnored()
+    public void BackspaceAtTheStartOfTheParagraphAfterATableMovesIntoTheTable()
     {
         var engine = new MarkdownEditorEngine("| a |\n| - |\n\nAfter");
 
-        Assert.Null(engine.Delete(12, 13));
+        var update = engine.Delete(12, 13);
+
+        Assert.Equal("| a |\n| - |\n\nAfter", engine.Text);
+        Assert.Equal(3, update!.SelectionStart);
     }
 
     [Fact]
@@ -1369,6 +1376,233 @@ public class MarkdownEditorEngineTests
 
         Assert.Equal(html, update.Html);
         Assert.Equal(segments, string.Join(" ", System.Linq.Enumerable.Range(0, update.Segments!.Length / 3).Select(i => $"{update.Segments[i * 3]}-{update.Segments[i * 3 + 1]}:{update.Segments[i * 3 + 2]}")));
+    }
+}
+
+public class MarkdownEditorEngineReviewRegressionTests
+{
+    [Theory]
+    [InlineData("ab", 2, 2, "ab![alt](u.png)", 15)]
+    [InlineData("ab", 1, 1, "a![alt](u.png)b", 14)]
+    [InlineData("hello world", 6, 11, "hello ![alt](u.png)", 19)]
+    public void InsertingAnImageKeepsTheSurroundingText(string text, int start, int end, string expected, int caret)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        var update = engine.Command(MarkdownEditorCommands.Image, start, end, "u.png", "alt");
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(caret, update!.SelectionStart);
+    }
+
+    [Theory]
+    [InlineData("![i](j)abcd", 9, "![i](j)**abcd**")]
+    [InlineData("foo  \nbar", 8, "foo  \n**bar**")]
+    public void BoldAtACaretAfterAnAtomFormatsTheWholeWord(string text, int caret, string expected)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        engine.Command(MarkdownEditorCommands.Bold, caret, caret, null, null);
+
+        Assert.Equal(expected, engine.Text);
+    }
+
+    [Theory]
+    [InlineData("a **directly** b", 14, "Z", "a **directly**Z b")]
+    [InlineData("a **directly** b", 12, "Z", "a **directlyZ** b")]
+    [InlineData("a **directly** b", 4, "Z", "a **Zdirectly** b")]
+    [InlineData("a **directly** b", 2, "Z", "a Z**directly** b")]
+    public void TypingAtAMarkerDecidesTheSideByTheCaretPosition(string text, int caret, string typed, string expected)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        engine.InsertText(caret, caret, typed, literal: true);
+
+        Assert.Equal(expected, engine.Text);
+    }
+
+    [Fact]
+    public void EmptyingTheParagraphBetweenTwoListsKeepsThemApart()
+    {
+        var engine = new MarkdownEditorEngine("- one\n- two\n\nMiddle\n\n- three\n- four");
+
+        engine.Delete(13, 19, selection: true);
+
+        Assert.Equal("- one\n- two\n\n\n\n* three\n* four", engine.Text);
+    }
+
+    [Fact]
+    public void DeletingTheSpaceAfterALinkKeepsTheCaretOutsideTheLink()
+    {
+        var engine = new MarkdownEditorEngine("a [links](https://x) and");
+
+        var update = engine.Delete(21, 21);
+        engine.InsertText(update!.SelectionStart, update.SelectionStart, "Q", literal: true);
+
+        Assert.Equal("a [links](https://x)Qand", engine.Text);
+    }
+
+    [Theory]
+    [InlineData("- item\n\n---\n\nEnd", 13, false, "- item\n\nEnd", 8)]
+    [InlineData("- item\n\n---\n\nEnd", 6, true, "- item\n\nEnd", 6)]
+    public void BackspaceAndDeleteNextToARuleRemoveIt(string text, int caret, bool forward, string expected, int expectedCaret)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        var update = engine.Delete(caret, caret, forward);
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Theory]
+    [InlineData("```js\nx\n```\n\nEnd", 13, false, 7)]
+    [InlineData("End\n\n```js\nx\n```", 3, true, 11)]
+    public void BackspaceAndDeleteNextToACodeBlockMoveTheCaretIntoIt(string text, int caret, bool forward, int expectedCaret)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        var update = engine.Delete(caret, caret, forward);
+
+        Assert.Equal(text, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void BackspaceIntoAListLeavesTheFollowingBlocksInPlace()
+    {
+        var engine = new MarkdownEditorEngine("- a\n- b\n\nPara\n\n> quote\n\nlast");
+
+        engine.Delete(9, 9);
+
+        Assert.Equal("- a\n- bPara\n\n> quote\n\nlast", engine.Text);
+    }
+
+    [Theory]
+    [InlineData("it round-trips to", 8, 14, MarkdownEditorCommands.Bold, "it round-**trips** to")]
+    [InlineData("it round-trips to", 3, 9, MarkdownEditorCommands.Italic, "it *round*-trips to")]
+    [InlineData("say (hi) now", 4, 8, MarkdownEditorCommands.Bold, "say **(hi)** now")]
+    public void MarksNextToPunctuationLeaveThePunctuationOutside(string text, int start, int end, string command, string expected)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        engine.Command(command, start, end, null, null);
+
+        Assert.Equal(expected, engine.Text);
+    }
+
+    [Fact]
+    public void BackspaceInAnEmptyCodeBlockRemovesIt()
+    {
+        var engine = new MarkdownEditorEngine("> A quote line.\n\n```js\n```\n\n---");
+
+        var update = engine.Delete(23, 23);
+
+        Assert.Equal("> A quote line.\n\n---", engine.Text);
+        Assert.Equal(15, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void BackspaceAtTheStartOfACodeBlockWithContentDoesNothing()
+    {
+        var engine = new MarkdownEditorEngine("End\n\n```js\nx\n```");
+
+        Assert.Null(engine.Delete(11, 11));
+    }
+
+    [Fact]
+    public void DeletingAcrossTwoListItemsKeepsTheNestedListWithTheMergedItem()
+    {
+        var engine = new MarkdownEditorEngine("1. First item\n2. Second item\n   - nested one\n   - nested two\n3. Third item");
+
+        engine.Delete(11, 24, selection: true);
+
+        Assert.Equal("1. First ititem\n   - nested one\n   - nested two\n2. Third item", engine.Text);
+    }
+
+    [Fact]
+    public void BoldAfterATrailingSpaceDoesNotEatTheSpace()
+    {
+        var engine = new MarkdownEditorEngine("alpha *gamma* ");
+
+        var update = engine.Command(MarkdownEditorCommands.Bold, 14, 14, null, null);
+
+        Assert.Null(update);
+        engine.InsertText(14, 14, "X", literal: true);
+        Assert.Equal("alpha *gamma* X", engine.Text);
+    }
+
+    [Fact]
+    public void QuoteOnASelectionInsideAQuoteUnquotesIt()
+    {
+        var engine = new MarkdownEditorEngine("> Quoted one.\n>\n> Quoted two.");
+
+        engine.Command(MarkdownEditorCommands.Quote, 4, 20, null, null);
+
+        Assert.Equal("Quoted one.\n\nQuoted two.", engine.Text);
+    }
+
+    [Fact]
+    public void ADelimiterLookingLineIsEscapedOnlyWhenItWouldFormATable()
+    {
+        var engine = new MarkdownEditorEngine("| a | b |\n| --- |\n| 1 | 2 | 3 |");
+
+        engine.InsertText(7, 7, "Y", literal: true);
+
+        Assert.Equal("| a | bY |\n| --- |\n| 1 | 2 | 3 |", engine.Text);
+    }
+
+    [Fact]
+    public void TabInTheEmptyLastRowAppendsARow()
+    {
+        var engine = new MarkdownEditorEngine("| a | b |\n| --- | --- |\n|  |  |");
+
+        engine.AppendRow(24);
+
+        Assert.Equal("| a | b |\n| --- | --- |\n|  |  |\n|  |  |", engine.Text);
+    }
+
+    [Fact]
+    public void LinkingASelectionAcrossParagraphsLinksEachPart()
+    {
+        var engine = new MarkdownEditorEngine("one\n\ntwo");
+
+        engine.Command(MarkdownEditorCommands.Link, 1, 7, "http://x", "L");
+
+        Assert.Equal("o[ne](http://x)\n\n[tw](http://x)o", engine.Text);
+    }
+
+    [Theory]
+    [InlineData(false, 3, "ab", 1)]
+    [InlineData(true, 1, "ab", 1)]
+    public void DeletingNextToAnEmojiRemovesTheWholeCodePoint(bool forward, int caret, string expected, int expectedCaret)
+    {
+        var engine = new MarkdownEditorEngine("a\U0001F600b");
+
+        var update = engine.Delete(caret, caret, forward);
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void EditingNextToAnEmailAutolinkKeepsItAnAutolink()
+    {
+        var engine = new MarkdownEditorEngine("<foo@bar.com> x");
+
+        engine.InsertText(15, 15, "y", literal: true);
+
+        Assert.Equal("<foo@bar.com> xy", engine.Text);
+    }
+
+    [Fact]
+    public void ALinkDestinationWithALineBreakIsEncoded()
+    {
+        var engine = new MarkdownEditorEngine("abc");
+
+        engine.Command(MarkdownEditorCommands.Link, 0, 3, "a\nb", null);
+
+        Assert.Equal("[abc](a%0Ab)", engine.Text);
     }
 }
 

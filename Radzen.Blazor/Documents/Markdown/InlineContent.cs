@@ -56,11 +56,11 @@ internal sealed class Run
 
     private static List<Mark> Distinct(IReadOnlyList<Mark> marks) => marks.GroupBy(mark => mark.Kind).Select(group => group.First()).OrderBy(mark => (int)mark.Kind).ToList();
 
-    public string Text { get; set; }
+    public string Text { get; }
 
     public List<Mark> Marks { get; }
 
-    public Inline? Origin { get; set; }
+    public Inline? Origin { get; }
 
     public Inline? Atom { get; }
 
@@ -304,7 +304,7 @@ internal static class InlineContent
         return result;
     }
 
-    public static List<Run> Insert(IReadOnlyList<Run> runs, int offset, string text, IReadOnlyList<Mark>? marks = null)
+    public static List<Run> Insert(IReadOnlyList<Run> runs, int offset, string text, IReadOnlyList<Mark>? marks = null, bool preferRight = false)
     {
         var result = new List<Run>();
         var position = 0;
@@ -356,7 +356,7 @@ internal static class InlineContent
             {
                 var left = within == run.Length ? run.Marks : runStart > 0 ? runs[index - 1].Marks : [];
                 var right = within == run.Length ? index + 1 < runs.Count ? runs[index + 1].Marks : [] : run.Marks;
-                inherit = text.Length > 0 && char.IsWhiteSpace(text[0]) ? left.Intersect(right).ToList() : within == 0 && runStart == 0 ? [] : left;
+                inherit = text.Length > 0 && char.IsWhiteSpace(text[0]) ? left.Intersect(right).ToList() : preferRight ? right : within == 0 && runStart == 0 ? [] : left;
             }
 
             if (within > 0)

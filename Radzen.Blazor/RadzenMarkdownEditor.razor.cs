@@ -205,7 +205,6 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
     private async Task PushAsync(MarkdownEditorUpdate? update, bool includeText, bool focus = false)
     {
-        engine.RenderHtml = true;
         if (update == null)
         {
             return;
@@ -230,7 +229,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Invoked from JavaScript when text is inserted, replaced or deleted.
     /// </summary>
     [JSInvokable("OnEditAsync")]
-    public Task<MarkdownEditorUpdate> OnEditAsync(int start, int end, string text, string inputType, int version)
+    public async Task<MarkdownEditorUpdate?> OnEditAsync(int start, int end, string text, string inputType, int version)
     {
         text ??= string.Empty;
         inputType ??= string.Empty;
@@ -266,7 +265,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             ? engine.Delete(start, end, inputType.Contains("Forward", StringComparison.Ordinal), key, merge, selected)
             : engine.InsertText(start, end, text, literal, key, merge, paragraphs, selected);
 
-        return update == null ? Task.FromResult(engine.Render(start, start)) : PublishAsync(update, version, raiseInput: true);
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
     }
 
     /// <summary>
