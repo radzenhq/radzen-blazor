@@ -113,6 +113,12 @@ public class HtmlVisitor : NodeVisitorBase
         }
     }
 
+    private void Note(int length)
+    {
+        pendingAtom = length > 0 ? false : pendingAtom;
+        afterText = afterText || length > 0;
+    }
+
     private void FlushAtom()
     {
         if (editing && pendingAtom)
@@ -255,8 +261,7 @@ public class HtmlVisitor : NodeVisitorBase
     public override void VisitText(Text text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        pendingAtom = text.Value.Length > 0 ? false : pendingAtom;
-        afterText = afterText || text.Value.Length > 0;
+        Note(text.Value.Length);
         AppendText(text.Value);
     }
 
@@ -264,8 +269,7 @@ public class HtmlVisitor : NodeVisitorBase
     public override void VisitCode(Code code)
     {
         ArgumentNullException.ThrowIfNull(code);
-        pendingAtom = code.Value.Length > 0 ? false : pendingAtom;
-        afterText = afterText || code.Value.Length > 0;
+        Note(code.Value.Length);
         html.Append("<code>");
         AppendText(code.Value);
         html.Append("</code>");
@@ -449,8 +453,7 @@ public class HtmlVisitor : NodeVisitorBase
     {
         ArgumentNullException.ThrowIfNull(htmlInline);
         var value = htmlInline.Value ?? string.Empty;
-        pendingAtom = value.Length > 0 ? false : pendingAtom;
-        afterText = afterText || value.Length > 0;
+        Note(value.Length);
         html.Append(Escape(value));
 
         if (value.Length > 0)

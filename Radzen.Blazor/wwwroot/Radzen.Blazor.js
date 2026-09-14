@@ -8540,7 +8540,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         const code = el.querySelector('code') || el;
         const language = ((code.className || '').match(/language-([\w#+.-]+)/) || [])[1] || '';
         const text = code.textContent.replace(/\n$/, '');
-        const fence = '`'.repeat(Math.max(3, ((text.match(/`+/g) || []).reduce((longest, ticks) => Math.max(longest, ticks.length), 0)) + 1));
+        const fence = backticks(text, 3);
         return fence + language + '\n' + text + '\n' + fence;
       }
       case 'UL': case 'OL':
@@ -8552,6 +8552,10 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       default:
         return hasBlockChildren(el) ? markdownBlocks(el) : markdownInlines(el.childNodes).trim();
     }
+  }
+
+  function backticks(text, minimum) {
+    return '`'.repeat(Math.max(minimum, (text.match(/`+/g) || []).reduce((longest, run) => Math.max(longest, run.length), 0) + 1));
   }
 
   function markdownList(el) {
@@ -8624,7 +8628,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         return '';
       case 'CODE': {
         const text = node.textContent.replace(/\u200B/g, '');
-        const ticks = '`'.repeat(((text.match(/`+/g) || []).reduce((longest, run) => Math.max(longest, run.length), 0)) + 1);
+        const ticks = backticks(text, 1);
         return text ? ticks + (text.startsWith('`') || text.endsWith('`') ? ' ' + text + ' ' : text) + ticks : '';
       }
       case 'IMG':

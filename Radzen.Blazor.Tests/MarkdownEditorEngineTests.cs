@@ -128,6 +128,10 @@ public class MarkdownEditorEngineTests
     [InlineData("> quoted", 1, 2, "quoted", 0)]
     [InlineData("- a\n- bc", 6, 7, "- a\n- c", 6)]
     [InlineData("ab", 1, 2, "a", 1)]
+    [InlineData("- a\n\n> q", 3, 7, "- a\n\nq", 5)]
+    [InlineData("# h\n\np", 2, 6, "", 0)]
+    [InlineData("- a\n  - b", 3, 8, "- a\n- b", 6)]
+    [InlineData("p\n\n- a\n- b", 1, 10, "p", 1)]
     public void BackspaceAtAMarkerRemovesTheWholeMarker(string text, int start, int end, string expected, int expectedCaret)
     {
         var engine = new SourceEngine(text);
@@ -184,7 +188,7 @@ public class MarkdownEditorEngineTests
     [InlineData("[text](u) more", 5, 12, "[text](u)re", 5)]
     [InlineData("`code` x", 4, 7, "`cod`x", 4)]
     [InlineData("plain text", 2, 5, "pl text", 2)]
-    public void DeletingAcrossADelimiterKeepsTheDelimiter(string text, int start, int end, string expected, int expectedCaret)
+    public void DeletingASelectionAcrossAMarkBoundaryKeepsTheMark(string text, int start, int end, string expected, int expectedCaret)
     {
         var engine = new SourceEngine(text);
 
@@ -211,26 +215,11 @@ public class MarkdownEditorEngineTests
     [Theory]
     [InlineData("p\n\n- [ ] b", 1, 9, "pb", 1)]
     [InlineData("ab", 1, 2, "a", 1)]
-    public void ForwardDeleteJoinsInsteadOfRemovingMarkers(string text, int start, int end, string expected, int expectedCaret)
+    public void ForwardDeleteAtTheEndOfAParagraphJoinsTheNextBlock(string text, int start, int end, string expected, int expectedCaret)
     {
         var engine = new SourceEngine(text);
 
         var update = engine.Delete(start, end, forward: true);
-
-        Assert.Equal(expected, engine.Text);
-        Assert.Equal(expectedCaret, update!.SelectionStart);
-    }
-
-    [Theory]
-    [InlineData("- a\n\n> q", 3, 7, "- a\n\nq", 5)]
-    [InlineData("# h\n\np", 2, 6, "", 0)]
-    [InlineData("- a\n  - b", 3, 8, "- a\n- b", 6)]
-    [InlineData("p\n\n- a\n- b", 1, 10, "p", 1)]
-    public void BackspaceAtBlockStartsHandlesMarkersRegardlessOfTheBrowserRange(string text, int start, int end, string expected, int expectedCaret)
-    {
-        var engine = new SourceEngine(text);
-
-        var update = engine.Delete(start, end);
 
         Assert.Equal(expected, engine.Text);
         Assert.Equal(expectedCaret, update!.SelectionStart);
@@ -1398,7 +1387,7 @@ public class MarkdownEditorEngineTests
     }
 
     [Fact]
-    public void CommandsGoThroughTheFormatterAndSelectTheResult()
+    public void BoldOnASelectionWrapsItAndKeepsItSelected()
     {
         var engine = new SourceEngine("hello world");
 
@@ -1471,6 +1460,7 @@ public class MarkdownEditorEngineTests
     [InlineData("a\n\n```\nc\n```", "<p>a</p><pre><code>c</code></pre><p>\u200B</p>", "0-1:1 2-3:1 4-4:1")]
     [InlineData("a\n\n```\nc\n```\n\n", "<p>a</p><pre><code>c</code></pre><p>\u200B</p>", "0-1:1 2-3:1 4-4:1")]
     [InlineData("| a |\n| - |", "<p>\u200B</p><table><thead><tr><th>a</th></tr></thead><tbody></tbody></table><p>\u200B</p>", "0-0:1 1-2:1 3-3:1")]
+    [InlineData("- [x] a\n\n- [ ] b", "<ul><li><p><input type=\"checkbox\" checked> a</p></li><li><p><input type=\"checkbox\"> b</p></li></ul>", "0-0:1 0-1:1 2-2:1 2-3:1")]
     [InlineData("| a |\n| - |\n\n```\nc\n```", "<p>\u200B</p><table><thead><tr><th>a</th></tr></thead><tbody></tbody></table><p class=\"rz-markdown-editor-gap\">\u200B</p><pre><code>c</code></pre><p>\u200B</p>", "0-0:1 1-2:1 3-3:1 4-5:1 6-6:1")]
     public void RenderingPutsAPlaceholderOnEveryBlankLineThatIsNotASeparator(string text, string html, string segments)
     {
@@ -1479,10 +1469,6 @@ public class MarkdownEditorEngineTests
         Assert.Equal(html, update.Html);
         Assert.Equal(segments, string.Join(" ", System.Linq.Enumerable.Range(0, update.Segments!.Length / 3).Select(i => $"{update.Segments[i * 3]}-{update.Segments[i * 3 + 1]}:{update.Segments[i * 3 + 2]}")));
     }
-}
-
-public class MarkdownEditorEngineReviewRegressionTests
-{
     [Theory]
     [InlineData("ab", 2, 2, "ab![alt](u.png)", 15)]
     [InlineData("ab", 1, 1, "a![alt](u.png)b", 14)]

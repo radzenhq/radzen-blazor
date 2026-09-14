@@ -228,6 +228,13 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         }
     }
 
+    private async Task<MarkdownEditorUpdate?> RunAsync(Func<MarkdownEditorUpdate?> command, int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = command();
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
     private async Task<int> GetVersionAsync() => jsRef != null ? await jsRef.InvokeAsync<int>("getVersion") : 0;
 
     /// <summary>
@@ -284,56 +291,31 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Invoked from JavaScript when a task list checkbox is clicked in Design mode.
     /// </summary>
     [JSInvokable("OnToggleCheckAsync")]
-    public async Task<MarkdownEditorUpdate?> OnToggleCheckAsync(int position, int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.ToggleCheck(position);
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnToggleCheckAsync(int position, int version) => await RunAsync(() => engine.ToggleCheck(position), version);
 
     /// <summary>
     /// Invoked from JavaScript when Enter is pressed in Design mode.
     /// </summary>
     [JSInvokable("OnInsertParagraphAsync")]
-    public async Task<MarkdownEditorUpdate?> OnInsertParagraphAsync(int start, int end, int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.InsertParagraph(start, end);
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnInsertParagraphAsync(int start, int end, int version) => await RunAsync(() => engine.InsertParagraph(start, end), version);
 
     /// <summary>
     /// Invoked from JavaScript when Tab is pressed in the last table cell in Design mode.
     /// </summary>
     [JSInvokable("OnInsertRowAsync")]
-    public async Task<MarkdownEditorUpdate?> OnInsertRowAsync(int start, int end, int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.AppendRow(start);
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnInsertRowAsync(int start, int end, int version) => await RunAsync(() => engine.AppendRow(start), version);
 
     /// <summary>
     /// Invoked from JavaScript when Tab or Shift+Tab is pressed in a list item in Design mode.
     /// </summary>
     [JSInvokable("OnIndentAsync")]
-    public async Task<MarkdownEditorUpdate?> OnIndentAsync(int start, int end, bool outdent, int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.Indent(start, end, outdent);
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnIndentAsync(int start, int end, bool outdent, int version) => await RunAsync(() => engine.Indent(start, end, outdent), version);
 
     /// <summary>
     /// Invoked from JavaScript when Shift+Enter is pressed in Design mode.
     /// </summary>
     [JSInvokable("OnInsertLineBreakAsync")]
-    public async Task<MarkdownEditorUpdate?> OnInsertLineBreakAsync(int start, int end, int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.InsertLineBreak(start, end);
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnInsertLineBreakAsync(int start, int end, int version) => await RunAsync(() => engine.InsertLineBreak(start, end), version);
 
     /// <summary>
     /// Invoked from JavaScript when the selection changes. Returns the selected content as Markdown, which the browser puts on the clipboard when the selection is copied.
@@ -401,23 +383,13 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Invoked from JavaScript when the undo shortcut is pressed.
     /// </summary>
     [JSInvokable("OnUndoAsync")]
-    public async Task<MarkdownEditorUpdate?> OnUndoAsync(int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.Undo();
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnUndoAsync(int version) => await RunAsync(() => engine.Undo(), version);
 
     /// <summary>
     /// Invoked from JavaScript when the redo shortcut is pressed.
     /// </summary>
     [JSInvokable("OnRedoAsync")]
-    public async Task<MarkdownEditorUpdate?> OnRedoAsync(int version)
-    {
-        lastInsertEndedWithWhitespace = true;
-        var update = engine.Redo();
-        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
-    }
+    public async Task<MarkdownEditorUpdate?> OnRedoAsync(int version) => await RunAsync(() => engine.Redo(), version);
 
     /// <summary>
     /// Invoked from JavaScript when the editing surface gains focus.

@@ -765,7 +765,7 @@ internal sealed class MarkdownEditorEngine
     {
         FencedCodeBlock or IndentedCodeBlock or HtmlBlock => Commit(document, block, HtmlVisitor.CodeLength((Leaf)block)),
         IBlockInlineContainer content => Commit(document, content, InlineLength(content)),
-        BlockContainer container when LastLeaf(container) is { } leaf => CommitAtEnd(document, leaf),
+        BlockContainer container when EdgeLeaf(container, last: true) is { } leaf => CommitAtEnd(document, leaf),
         _ => Commit(document, block, 0)
     };
 
@@ -1317,10 +1317,10 @@ internal sealed class MarkdownEditorEngine
         if (leaf.Children.Count == 0)
         {
             RemoveBlock(leaf);
-            return CommitAtEnd(document, LastLeaf(previous) is Paragraph or Heading ? LastLeaf(previous)! : previous);
+            return CommitAtEnd(document, EdgeLeaf(previous, last: true) is Paragraph or Heading ? EdgeLeaf(previous, last: true)! : previous);
         }
 
-        var previousLeaf = LastLeaf(previous);
+        var previousLeaf = EdgeLeaf(previous, last: true);
 
         if (previousLeaf is not (Paragraph or Heading) || BlankLines.IsSealed(previous))
         {
@@ -1372,7 +1372,7 @@ internal sealed class MarkdownEditorEngine
         Touch(into);
     }
 
-    private static Leaf? LastLeaf(Block block)
+    private static Leaf? EdgeLeaf(Block block, bool last)
     {
         while (true)
         {
@@ -1381,32 +1381,14 @@ internal sealed class MarkdownEditorEngine
                 return leaf;
             }
 
-            if (block is BlockContainer { LastChild: { } last })
+            var next = last ? (block as BlockContainer)?.LastChild : (block as BlockContainer)?.FirstChild;
+
+            if (next == null)
             {
-                block = last;
-                continue;
+                return null;
             }
 
-            return null;
-        }
-    }
-
-    private static Leaf? FirstLeaf(Block block)
-    {
-        while (true)
-        {
-            if (block is Leaf leaf)
-            {
-                return leaf;
-            }
-
-            if (block is BlockContainer { FirstChild: { } first })
-            {
-                block = first;
-                continue;
-            }
-
-            return null;
+            block = next;
         }
     }
 
@@ -1428,7 +1410,7 @@ internal sealed class MarkdownEditorEngine
 
             if (previousBlock != null)
             {
-                return CommitAtEnd(document, LastLeaf(previousBlock) is Paragraph or Heading ? LastLeaf(previousBlock)! : previousBlock);
+                return CommitAtEnd(document, EdgeLeaf(previousBlock, last: true) is Paragraph or Heading ? EdgeLeaf(previousBlock, last: true)! : previousBlock);
             }
 
             return Commit(document, next ?? (document.Children.Count > 0 ? document.Children[0] : leaf), 0);
@@ -1456,7 +1438,7 @@ internal sealed class MarkdownEditorEngine
             return CommitAtEnd(document, leaf);
         }
 
-        var nextLeaf = FirstLeaf(next);
+        var nextLeaf = EdgeLeaf(next, last: false);
 
         if (nextLeaf is not (Paragraph or Heading) || BlankLines.IsSealed(next))
         {
@@ -1499,7 +1481,7 @@ internal sealed class MarkdownEditorEngine
         if (list.Parent is ListItem)
         {
             Outdent(item);
-            var target = leaf ?? FirstLeaf(item);
+            var target = leaf ?? EdgeLeaf(item, last: false);
             return target != null ? Commit(document, target, caretOffset) : Commit(document, item, 0);
         }
 
