@@ -441,7 +441,8 @@ Baz", @"<document>
     [InlineData(@"\> foo
 ------", @"<document>
     <heading level=""2"">
-        <text>&gt; foo</text>
+        <text>&gt;</text>
+        <text> foo</text>
     </heading>
 </document>")]
     [InlineData(@"Foo

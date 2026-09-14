@@ -8,6 +8,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class Paragraph : Leaf
 {
+    internal bool Virtual { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {

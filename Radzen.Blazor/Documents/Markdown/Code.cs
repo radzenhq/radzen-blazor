@@ -13,6 +13,8 @@ public class Code(string value) : Inline
     /// </summary>
     public string Value { get; set; } = value;
 
+    internal int? Ticks { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {

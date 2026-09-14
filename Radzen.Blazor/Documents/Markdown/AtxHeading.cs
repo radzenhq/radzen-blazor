@@ -35,7 +35,7 @@ public class AtxHeading : Heading
             // remove trailing ###s:
             line = parser.CurrentLine[parser.Offset..];
 
-            container.Value = EndRegex.Replace(StartRegex.Replace(line, ""), "");
+            container.SetContent(EndRegex.Replace(StartRegex.Replace(line, ""), ""), parser.SourceOffset);
 
             parser.AdvanceOffset(parser.CurrentLine.Length - parser.Offset, false);
 

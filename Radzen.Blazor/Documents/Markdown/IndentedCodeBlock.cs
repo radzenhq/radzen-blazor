@@ -49,10 +49,11 @@ public class IndentedCodeBlock : Leaf
             lines.RemoveAt(lines.Count - 1);
         }
 
-        Value = string.Join('\n', lines) + '\n';
+        TrimContentEnd(string.Join('\n', lines).Length + 1);
 
         Range.End.Line = Range.Start.Line + lines.Count - 1;
         Range.End.Column = Range.Start.Column + lines[^1].Length - 1;
+        SourceEnd = Content.ToSource(Value.Length - 1);
     }
 
     internal static BlockStart Start(BlockParser parser, Block container)

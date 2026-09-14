@@ -7,6 +7,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class Emphasis : InlineContainer
 {
+    internal char? Marker { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {

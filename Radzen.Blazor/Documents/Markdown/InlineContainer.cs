@@ -22,4 +22,10 @@ public abstract class InlineContainer : Inline
     {
         children.Add(node);
     }
+
+    internal void ReplaceInlines(IEnumerable<Inline> inlines)
+    {
+        children.Clear();
+        children.AddRange(inlines);
+    }
 }

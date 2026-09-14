@@ -12,6 +12,11 @@ public class HtmlVisitorTests
     [InlineData("![alt](img.png)", "<p><img src=\"img.png\" alt=\"alt\"></p>")]
     [InlineData("> quote", "<blockquote><p>quote</p></blockquote>")]
     [InlineData("- a\n- b", "<ul><li>a</li><li>b</li></ul>")]
+    [InlineData("- one\n  - nested\n- two", "<ul><li>one<ul><li>nested</li></ul></li><li>two</li></ul>")]
+    [InlineData("*~~`x`~~*", "<p><em><del><code>x</code></del></em></p>")]
+    [InlineData("~~*b*~~ c", "<p><del><em>b</em></del> c</p>")]
+    [InlineData("a ~~*b*.~~ c **d** e", "<p>a <del><em>b</em>.</del> c <strong>d</strong> e</p>")]
+    [InlineData("a\\`b", "<p>a`b</p>")]
     [InlineData("3. a", "<ol start=\"3\"><li>a</li></ol>")]
     [InlineData("- [x] done", "<ul><li><input type=\"checkbox\" checked> done</li></ul>")]
     [InlineData("```csharp\nvar x = 1;\n```", "<pre><code class=\"language-csharp\">var x = 1;\n</code></pre>")]
@@ -25,6 +30,16 @@ public class HtmlVisitorTests
     public void ToHtml_renders(string markdown, string expected)
     {
         Assert.Equal(expected, HtmlVisitor.ToHtml(markdown));
+    }
+
+    [Theory]
+    [InlineData("> a\n>\n> ", "<blockquote><p>a</p><p>\u200B</p></blockquote>")]
+    [InlineData("- [x] a\n\n- [ ] b", "<ul><li><p><input type=\"checkbox\" checked> a</p></li><li><p><input type=\"checkbox\"> b</p></li></ul>")]
+    [InlineData("a\n\n```\ncode\n```", "<p>a</p><pre data-gap=\"2\"><code>code</code></pre><p>\u200B</p>")]
+    [InlineData("a\n\n```\ncode\n\n```", "<p>a</p><pre data-gap=\"2\"><code>code\n\u200B</code></pre><p>\u200B</p>")]
+    public void EditingRenderKeepsTrailingEmptyLinesReachable(string markdown, string expected)
+    {
+        Assert.Equal(expected, HtmlVisitor.Render(markdown).Html);
     }
 
     [Fact]

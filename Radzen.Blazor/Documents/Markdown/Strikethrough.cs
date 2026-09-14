@@ -7,6 +7,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class Strikethrough : InlineContainer
 {
+    internal int? Tildes { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {

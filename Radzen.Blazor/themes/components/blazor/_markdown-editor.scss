@@ -61,8 +61,13 @@
   flex: 1;
   overflow: auto;
   padding: 0.5rem;
+
+  code {
+    display: inline;
+  }
   outline: none;
   color: var(--rz-input-value-color);
+  white-space: pre-wrap;
 
   &[hidden] {
     display: none;

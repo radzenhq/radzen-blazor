@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 
 namespace Radzen.Documents.Markdown;
 
@@ -22,13 +21,15 @@ public class HtmlBlock : Leaf
         return parser.Blank && (Type == 6 || Type == 7) ? BlockMatch.Skip : BlockMatch.Match;
     }
 
-    private static readonly Regex TrailinNewLineRegex = new(@"\n$");
 
     internal override void Close(BlockParser parser)
     {
         base.Close(parser);
 
-        Value = TrailinNewLineRegex.Replace(Value, "");
+        if (Value.EndsWith('\n'))
+        {
+            TrimContentEnd(Value.Length - 1);
+        }
     }
 
     internal static BlockStart Start(BlockParser parser, Block node)

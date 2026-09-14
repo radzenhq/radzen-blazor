@@ -54,8 +54,7 @@
             <div @ref="editable" class="rz-markdown-editor-design" hidden="@(mode == MarkdownEditorMode.Source)"
                  contenteditable="@ContentEditable"></div>
             <textarea @ref="textarea" class="rz-markdown-editor-textarea" hidden="@(mode == MarkdownEditorMode.Design)"
-                      name="@Name" rows="@Rows" placeholder="@CurrentPlaceholder" disabled="@Disabled"
-                      @bind:get="@Value" @bind:set="@OnInputAsync" @bind:event="oninput" @onchange="@OnChange"></textarea>
+                      name="@Name" rows="@Rows" placeholder="@CurrentPlaceholder" disabled="@Disabled"></textarea>
         </div>
     </div>
 }

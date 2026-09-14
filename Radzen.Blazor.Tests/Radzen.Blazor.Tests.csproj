@@ -30,4 +30,8 @@
                       LogicalName="Radzen.Blazor.RadzenStrings.en-GB.resources" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Markdown\commonmark-spec.json" LogicalName="commonmark-spec.json" />
+  </ItemGroup>
+
 </Project>

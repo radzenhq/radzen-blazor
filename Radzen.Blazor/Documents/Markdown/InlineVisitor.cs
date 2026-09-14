@@ -10,6 +10,15 @@ class InlineVisitor(Dictionary<string, LinkReference> references) : NodeVisitorB
     {
         var inlines = InlineParser.Parse(node.Value, references);
 
+        if (node is Leaf leaf)
+        {
+            InlineParser.Locate(inlines, leaf.Content);
+        }
+        else if (node is TableCell cell)
+        {
+            InlineParser.Locate(inlines, cell.Content);
+        }
+
         foreach (var inline in inlines)
         {
             node.Add(inline);

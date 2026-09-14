@@ -8087,807 +8087,669 @@ Radzen.datePickerKeydown = function (e) {
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
 
-Radzen.markdownSerialize = function (root) {
-  var escapeText = function (text) {
-    return text.replace(/[\\`*_~\[\]]/g, function (c) { return '\\' + c; });
-  };
-  var escapeBlockStart = function (line) {
-    return line.replace(/^(\s*)([#>+-])(\s)/, '$1\\$2$3')
-               .replace(/^(\s*)(\d+)([.)])(\s)/, '$1$2\\$3$4');
-  };
-  var styleWraps = function (el) {
-    var wraps = [];
-    var s = el.style;
-    if (s.fontWeight === 'bold' || parseInt(s.fontWeight, 10) >= 600) wraps.push('**');
-    if (s.fontStyle === 'italic') wraps.push('*');
-    if ((s.textDecoration || '').indexOf('line-through') >= 0) wraps.push('~~');
-    return wraps;
-  };
-  var wrap = function (token, inner) {
-    var m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/);
-    return m[2] ? m[1] + token + m[2] + token + m[3] : inner;
-  };
-  var inline = function (node) {
-    var out = '';
-    node.childNodes.forEach(function (child) {
-      if (child.nodeType === Node.TEXT_NODE) {
-        out += escapeText(child.data.replace(/\s+/g, ' '));
-        return;
-      }
-      if (child.nodeType !== Node.ELEMENT_NODE) return;
-      switch (child.tagName) {
-        case 'STRONG': case 'B': out += wrap('**', inline(child)); break;
-        case 'EM': case 'I': out += wrap('*', inline(child)); break;
-        case 'DEL': case 'S': case 'STRIKE': out += wrap('~~', inline(child)); break;
-        case 'CODE': {
-          var code = child.textContent;
-          out += code.indexOf('`') >= 0 ? '`` ' + code + ' ``' : '`' + code + '`';
-          break;
-        }
-        case 'A': out += '[' + inline(child) + '](' + (child.getAttribute('href') || '') + ')'; break;
-        case 'IMG': out += '![' + (child.getAttribute('alt') || '') + '](' + (child.getAttribute('src') || '') + ')'; break;
-        case 'BR': out += '  \n'; break;
-        case 'INPUT': break;
-        default: {
-          var text = inline(child);
-          styleWraps(child).forEach(function (token) { text = wrap(token, text); });
-          out += text;
-        }
-      }
-    });
-    return out;
-  };
-  var paragraph = function (el) {
-    var text = inline(el).replace(/^[ ]+|[ ]+$/g, '');
-    return text ? text.split('\n').map(escapeBlockStart).join('\n') : '';
-  };
-  var indent = function (text, first, rest) {
-    return text.split('\n').map(function (line, i) {
-      return (i === 0 ? first : rest) + line;
-    }).join('\n').replace(/[ ]+$/gm, '');
-  };
-  var listItem = function (li, marker) {
-    var checkbox = li.querySelector(':scope > input[type=checkbox], :scope > p:first-child > input[type=checkbox]:first-child');
-    if (checkbox) marker += checkbox.checked ? '[x] ' : '[ ] ';
-    var content = blocks(li) || '';
-    return indent(content, marker, ' '.repeat(marker.length));
-  };
-  var tableCell = function (cell) { return inline(cell).trim().replace(/\|/g, '\\|'); };
-  var block = function (el) {
-    switch (el.tagName) {
-      case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6':
-        return '#'.repeat(+el.tagName[1]) + ' ' + paragraph(el);
-      case 'P': case 'DIV': return paragraph(el);
-      case 'BLOCKQUOTE':
-        return (blocks(el) || '').split('\n').map(function (l) { return ('> ' + l).replace(/[ ]+$/, ''); }).join('\n');
-      case 'UL':
-        return Array.prototype.map.call(el.children, function (li) { return listItem(li, '- '); }).join('\n');
-      case 'OL': {
-        var start = parseInt(el.getAttribute('start'), 10) || 1;
-        return Array.prototype.map.call(el.children, function (li, i) { return listItem(li, (start + i) + '. '); }).join('\n');
-      }
-      case 'PRE': {
-        var codeEl = el.querySelector('code');
-        var lang = ((codeEl && codeEl.className || '').match(/language-(\S+)/) || [])[1] || '';
-        var code = (codeEl || el).textContent.replace(/\n$/, '');
-        var fence = /```/.test(code) ? '````' : '```';
-        return fence + lang + '\n' + code + '\n' + fence;
-      }
-      case 'HR': return '---';
-      case 'TABLE': {
-        var rows = Array.prototype.slice.call(el.querySelectorAll('tr'));
-        if (!rows.length) return '';
-        var line = function (cells) { return '| ' + cells.join(' | ') + ' |'; };
-        var header = Array.prototype.map.call(rows[0].cells, tableCell);
-        var aligns = Array.prototype.map.call(rows[0].cells, function (cell) {
-          var a = cell.style.textAlign;
-          return a === 'center' ? ':---:' : a === 'right' ? '---:' : a === 'left' ? ':---' : '---';
-        });
-        var body = rows.slice(1).map(function (row) {
-          return line(Array.prototype.map.call(row.cells, tableCell));
-        });
-        return [line(header), line(aligns)].concat(body).join('\n');
-      }
-      default: return paragraph(el);
-    }
-  };
-  var blocks = function (parent) {
-    var out = [], pending = null;
-    var flush = function () {
-      if (pending) { var text = paragraph(pending); if (text) out.push(text); pending = null; }
-    };
-    parent.childNodes.forEach(function (child) {
-      var isBlock = child.nodeType === Node.ELEMENT_NODE &&
-        /^(H[1-6]|P|DIV|BLOCKQUOTE|UL|OL|PRE|HR|TABLE)$/.test(child.tagName);
-      if (isBlock) {
-        flush();
-        var text = block(child);
-        if (text) out.push(text);
-      } else {
-        if (!pending) { pending = document.createElement('p'); }
-        pending.appendChild(child.cloneNode(true));
-      }
-    });
-    flush();
-    return out.join('\n\n');
-  };
-  return root ? blocks(root) : '';
-};
-
 Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts) {
   if (!editable || !textarea) {
-    return { setContent: function () {}, dispose: function () {} };
+    return { update: function () {}, getSelection: function () { return [0, 0]; }, getVersion: function () { return 0; }, dispose: function () {} };
   }
 
-  shortcuts = shortcuts || [];
-  var editor = { editable: editable, textarea: textarea, instance: instance };
-  var suppressInput = false;
-  var focusValue = null;
-
-  var notifyValue = function () {
-    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', Radzen.markdownSerialize(editable))); } catch { }
-    reportState();
-  };
-
-  var isDangerousUrl = function (url) {
-    return /^\s*(javascript|vbscript|data:text\/html)/i.test(url || '');
-  };
-
-  var onInput = function () {
-    if (suppressInput) return;
-    notifyValue();
-  };
-
-  var onFocus = function () {
-    focusValue = Radzen.markdownSerialize(editable);
-    document.addEventListener('selectionchange', reportState);
-    reportState();
-  };
-
-  var onBlur = function () {
-    document.removeEventListener('selectionchange', reportState);
-    var value = Radzen.markdownSerialize(editable);
-    if (value === focusValue) return;
-    focusValue = value;
-    try { suppressDisposed(instance.invokeMethodAsync('OnDesignChangeAsync', value)); } catch { }
-  };
-
-  var onTextareaFocus = function () {
-    document.addEventListener('selectionchange', reportState);
-    reportState();
-  };
-
-  var onTextareaBlur = function () {
-    document.removeEventListener('selectionchange', reportState);
-  };
-
-  var onKeyDown = function (e) {
-    if (!(e.ctrlKey || e.metaKey) || !e.code) return;
-    var codeKey = e.code;
-    if (codeKey === 'KeyZ' && !e.altKey) {
-      e.preventDefault();
-      if (e.shiftKey) editor.redo(); else editor.undo();
-      return;
-    }
-    if (codeKey === 'KeyY' && !e.altKey && !e.shiftKey) {
-      e.preventDefault();
-      editor.redo();
-      return;
-    }
-    var key = 'Ctrl+';
-    if (e.altKey) key += 'Alt+';
-    if (e.shiftKey) key += 'Shift+';
-    key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
-    if (shortcuts.includes(key)) {
-      e.preventDefault();
-      try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
-    }
-  };
-
-  var onPaste = function (e) {
-    var html = e.clipboardData && e.clipboardData.getData('text/html');
-    if (!html) return;
-    e.preventDefault();
-    editor.snapshot();
-    lastInputType = 'insertFromPaste';
-    var scratch = new DOMParser().parseFromString(html, 'text/html').body;
-    var markdown = Radzen.markdownSerialize(scratch);
+  function invoke(editor, name, ...args) {
     try {
-      suppressDisposed(instance.invokeMethodAsync('RenderMarkdownAsync', markdown).then(function (canonical) {
-        var sel = window.getSelection();
-        if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return;
-        var range = sel.getRangeAt(0);
-        range.deleteContents();
-        var fragment = document.createRange().createContextualFragment(canonical);
-        var last = fragment.lastChild;
-        range.insertNode(fragment);
-        if (last) { range.setStartAfter(last); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
-        onInput();
-      }));
-    } catch { }
-  };
-
-  var onEmojiInput = function (e) {
-    if (!e || e.inputType !== 'insertText' || e.data !== ':') return;
-    var sel = window.getSelection();
-    if (!sel.rangeCount || !sel.isCollapsed) return;
-    var node = sel.anchorNode;
-    if (!node || node.nodeType !== Node.TEXT_NODE || !editable.contains(node)) return;
-    for (var el = node.parentNode; el && el !== editable; el = el.parentNode) {
-      if (el.tagName === 'CODE' || el.tagName === 'PRE') return;
+      return editor.instance.invokeMethodAsync(name, ...args).catch(() => null);
+    } catch {
+      return Promise.resolve(null);
     }
-    var match = node.data.substring(0, sel.anchorOffset).match(/:([A-Za-z0-9_+-]+):$/);
-    if (!match) return;
-    var start = sel.anchorOffset - match[0].length;
-    var shortcode = match[0];
-    try {
-      suppressDisposed(instance.invokeMethodAsync('LookupEmojiAsync', match[1]).then(function (emoji) {
-        if (!emoji || node.data.substring(start, start + shortcode.length) !== shortcode) return;
-        editor.snapshot();
-        lastInputType = null;
-        var caret = window.getSelection();
-        var caretNode = caret.rangeCount ? caret.anchorNode : null;
-        var caretOffset = caret.rangeCount ? caret.anchorOffset : 0;
-        node.replaceData(start, shortcode.length, emoji);
-        if (caretNode === node) {
-          var end = start + shortcode.length;
-          var offset = caretOffset >= end ? caretOffset - shortcode.length + emoji.length
-            : caretOffset > start ? start + emoji.length : caretOffset;
-          var range = document.createRange();
-          range.setStart(node, Math.min(offset, node.length));
-          range.collapse(true);
-          setRange(range);
+  }
+
+  function textNodes(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const result = [];
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      result.push(node);
+    }
+    return result;
+  }
+
+  function render(editor, html, flat) {
+    editor.editable.innerHTML = html;
+    editor.segments = [];
+    const nodes = textNodes(editor.editable);
+    let index = 0;
+    let used = 0;
+    for (let i = 0; i + 2 < flat.length; i += 3) {
+      while (index < nodes.length && used >= nodes[index].length) {
+        index++;
+        used = 0;
+      }
+      if (index >= nodes.length) {
+        break;
+      }
+      editor.segments.push({ start: flat[i], end: flat[i + 1], length: flat[i + 2], node: nodes[index], offset: used });
+      used += flat[i + 2];
+    }
+  }
+
+  function isLinear(segment) {
+    return segment.end - segment.start === segment.length;
+  }
+
+  function follows(reference, node) {
+    const position = reference.compareDocumentPosition(node);
+    return (position & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 || (position & Node.DOCUMENT_POSITION_CONTAINED_BY) !== 0;
+  }
+
+  function toSource(editor, node, offset) {
+    const segments = editor.segments;
+    if (!segments.length) {
+      return 0;
+    }
+    if (node.nodeType === Node.TEXT_NODE) {
+      let last = null;
+      for (const segment of segments) {
+        if (segment.node !== node) {
+          continue;
         }
-        onInput();
-      }));
-    } catch { }
-  };
-
-  editor.setContent = function (html) {
-    lastInputType = null;
-    suppressInput = true;
-    editable.innerHTML = html;
-    suppressInput = false;
-  };
-
-  editor.apply = function (start, end, replacement, selectionStart, selectionEnd) {
-    editor.snapshot();
-    lastInputType = null;
-    var before = textarea.value;
-    textarea.focus();
-    textarea.value = before.substring(0, start) + replacement + before.substring(end);
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-    textarea.setSelectionRange(selectionStart, selectionEnd);
-    reportState();
-  };
-
-  var savedRange = null;
-
-  var currentRange = function () {
-    if (savedRange) return savedRange;
-    var sel = window.getSelection();
-    if (sel.rangeCount && editable.contains(sel.anchorNode)) return sel.getRangeAt(0);
-    return null;
-  };
-  var setRange = function (range) {
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  };
-  var blockOf = function (node) {
-    while (node && node.parentNode !== editable) node = node.parentNode;
-    return node;
-  };
-  var blockAt = function (container, offset, atEnd) {
-    if (container !== editable) return blockOf(container);
-    var index = Math.min(offset, editable.childNodes.length) - (atEnd ? 1 : 0);
-    return editable.childNodes[Math.max(0, index)] || null;
-  };
-  var blocksInRange = function (range) {
-    var first = blockAt(range.startContainer, range.startOffset, false), last = blockAt(range.endContainer, range.endOffset, true);
-    if (!first || !last) {
-      first = last = document.createElement('p');
-      editable.appendChild(first);
-    }
-    var result = [];
-    for (var el = first; el; el = el.nextSibling) {
-      var isLast = el === last;
-      if (el.nodeType !== Node.ELEMENT_NODE) {
-        var p = document.createElement('p');
-        editable.insertBefore(p, el);
-        p.appendChild(el);
-        el = p;
+        last = segment;
+        if (offset <= segment.offset + segment.length) {
+          const delta = Math.max(0, offset - segment.offset);
+          if (isLinear(segment)) {
+            return segment.start + delta;
+          }
+          return delta >= segment.length ? segment.end : segment.start;
+        }
       }
-      result.push(el);
-      if (isLast) break;
+      return last ? last.end : 0;
     }
-    return result;
-  };
-  var replaceTag = function (el, tag) {
-    var next = document.createElement(tag);
-    el.parentNode.insertBefore(next, el);
-    while (el.firstChild) next.appendChild(el.firstChild);
-    el.parentNode.removeChild(el);
-    return next;
-  };
-  var selectStart = function (el) {
-    if (!el) return;
-    var range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(true);
-    setRange(range);
-  };
-  var expandToWord = function (range) {
-    var start = range.startContainer, end = range.endContainer;
-    if (start.nodeType === Node.TEXT_NODE) {
-      var so = range.startOffset;
-      while (so > 0 && !/\s/.test(start.data[so - 1])) so--;
-      range.setStart(start, so);
+    const reference = offset < node.childNodes.length ? node.childNodes[offset] : null;
+    if (reference && reference.nodeType === Node.ELEMENT_NODE && reference.dataset && reference.dataset.gap !== undefined) {
+      return parseInt(reference.dataset.gap, 10);
     }
-    if (end.nodeType === Node.TEXT_NODE) {
-      var eo = range.endOffset;
-      while (eo < end.length && !/\s/.test(end.data[eo])) eo++;
-      range.setEnd(end, eo);
-    }
-  };
-  var partOf = function (texts, range) {
-    var i = 0, j = texts.length - 1;
-    var so = texts[i] === range.startContainer ? range.startOffset : 0;
-    var eo = texts[j] === range.endContainer ? range.endOffset : texts[j].length;
-    while (true) {
-      if (so >= (i === j ? eo : texts[i].length)) { if (i === j) break; i++; so = 0; continue; }
-      if (!/\s/.test(texts[i].data[so])) break;
-      so++;
-    }
-    while (true) {
-      if (eo <= (i === j ? so : 0)) { if (i === j) break; j--; eo = texts[j].length; continue; }
-      if (!/\s/.test(texts[j].data[eo - 1])) break;
-      eo--;
-    }
-    var part = document.createRange();
-    part.setStart(texts[i], so);
-    part.setEnd(texts[j], eo);
-    return part;
-  };
-  var formatOf = function (node, alternates) {
-    for (; node && node !== editable; node = node.parentNode) {
-      if (node.nodeType === Node.ELEMENT_NODE && alternates.includes(node.tagName)) return node;
-    }
-    return null;
-  };
-  var unwrapElement = function (el) {
-    var parent = el.parentNode, first = el.firstChild, last = el.lastChild;
-    while (el.firstChild) parent.insertBefore(el.firstChild, el);
-    parent.removeChild(el);
-    return { start: first, end: last, inside: false };
-  };
-  var LEAF_BLOCKS = 'p,h1,h2,h3,h4,h5,h6,li,td,th,pre,div';
-  var splitByBlock = function (range) {
-    var groups = [];
-    var walker = document.createTreeWalker(editable, NodeFilter.SHOW_TEXT, {
-      acceptNode: function (node) { return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; }
-    });
-    for (var text = walker.nextNode(); text; text = walker.nextNode()) {
-      var block = text.parentNode.closest(LEAF_BLOCKS);
-      if (!block || block === editable || !editable.contains(block) || block.tagName === 'PRE' || !/\S/.test(text.data)) continue;
-      var group = groups[groups.length - 1];
-      if (group && group.block === block) group.texts.push(text);
-      else groups.push({ block: block, texts: [text] });
-    }
-    var parts = [];
-    groups.forEach(function (group) {
-      var part = partOf(group.texts, range);
-      if (!part.collapsed) parts.push(part);
-    });
-    return parts;
-  };
-  var removeFormat = function (part, alternates) {
-    var el = formatOf(part.startContainer, alternates);
-    expandToWord(part);
-    if (part.toString() === el.textContent) return unwrapElement(el);
-    var tail = document.createRange();
-    tail.setStart(part.endContainer, part.endOffset);
-    tail.setEnd(el, el.childNodes.length);
-    var tailContents = tail.extractContents();
-    var ancestors = [];
-    for (var node = part.commonAncestorContainer; node !== el; node = node.parentNode) {
-      if (node.nodeType === Node.ELEMENT_NODE) ancestors.push(node);
-    }
-    var middle = part.extractContents();
-    ancestors.forEach(function (ancestor) {
-      var clone = ancestor.cloneNode(false);
-      clone.appendChild(middle);
-      middle = clone;
-    });
-    var result = { start: middle.firstChild, end: middle.lastChild, inside: false };
-    var after = el.nextSibling;
-    if (tailContents.textContent.trim()) {
-      var tailEl = el.cloneNode(false);
-      tailEl.appendChild(tailContents);
-      el.parentNode.insertBefore(tailEl, after);
-      after = tailEl;
-    }
-    el.parentNode.insertBefore(middle, after);
-    if (!el.textContent.trim()) el.parentNode.removeChild(el);
-    return result;
-  };
-  var addFormat = function (part, tag, alternates) {
-    var wrapper = document.createElement(tag);
-    wrapper.appendChild(part.extractContents());
-    wrapper.querySelectorAll(alternates.join(',')).forEach(unwrapElement);
-    part.insertNode(wrapper);
-    if (formatOf(wrapper.parentNode, alternates)) return unwrapElement(wrapper);
-    var prev = wrapper.previousSibling, next = wrapper.nextSibling;
-    if (prev && prev.nodeType === Node.ELEMENT_NODE && alternates.includes(prev.tagName)) {
-      while (prev.lastChild) wrapper.insertBefore(prev.lastChild, wrapper.firstChild);
-      prev.parentNode.removeChild(prev);
-    }
-    if (next && next.nodeType === Node.ELEMENT_NODE && alternates.includes(next.tagName)) {
-      while (next.firstChild) wrapper.appendChild(next.firstChild);
-      next.parentNode.removeChild(next);
-    }
-    return { start: wrapper, end: wrapper, inside: true };
-  };
-  var toggleInline = function (range, tag, alternates) {
-    if (range.collapsed) expandToWord(range);
-    if (range.collapsed) return;
-    var startContainer = range.startContainer, startOffset = range.startOffset, endContainer = range.endContainer, endOffset = range.endOffset;
-    blocksInRange(range);
-    range.setStart(startContainer, startOffset);
-    range.setEnd(endContainer, endOffset);
-    var parts = splitByBlock(range);
-    if (!parts.length) return;
-    var formatted = parts.every(function (part) {
-      var el = formatOf(part.startContainer, alternates);
-      return !!el && el.contains(part.endContainer);
-    });
-    var results = parts.map(function (part) {
-      return formatted ? removeFormat(part, alternates) : addFormat(part, tag, alternates);
-    });
-    editable.querySelectorAll('strong:empty,b:empty,em:empty,i:empty,del:empty,s:empty,strike:empty,code:empty').forEach(function (el) { el.parentNode.removeChild(el); });
-    var first = results[0], last = results[results.length - 1];
-    var selection = document.createRange();
-    if (first.inside) selection.setStart(first.start, 0); else selection.setStartBefore(first.start);
-    if (last.inside) selection.setEnd(last.end, last.end.childNodes.length); else selection.setEndAfter(last.end);
-    setRange(selection);
-  };
-
-  editor.saveSelection = function () {
-    var sel = window.getSelection();
-    if (sel.rangeCount && editable.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
-  };
-  editor.hasSelection = function () {
-    var range = currentRange();
-    return !!range && !range.collapsed;
-  };
-
-  var history = { undo: [], redo: [] };
-  var lastInputType = null;
-  var HISTORY_LIMIT = 100;
-
-  var nodePath = function (node) {
-    var path = [];
-    while (node && node !== editable) {
-      var parent = node.parentNode;
-      path.unshift(Array.prototype.indexOf.call(parent.childNodes, node));
-      node = parent;
-    }
-    return path;
-  };
-  var resolvePath = function (path) {
-    var node = editable;
-    for (var i = 0; i < path.length && node; i++) node = node.childNodes[path[i]];
-    return node;
-  };
-  var captureState = function () {
-    var mode = textarea.hidden ? 'design' : 'source';
-    var state = { mode: mode };
-    if (mode === 'design') {
-      state.markdown = Radzen.markdownSerialize(editable);
-      state.html = editable.innerHTML;
-      var sel = window.getSelection();
-      if (sel.rangeCount && editable.contains(sel.anchorNode)) {
-        var range = sel.getRangeAt(0);
-        state.sel = {
-          sp: nodePath(range.startContainer), so: range.startOffset,
-          ep: nodePath(range.endContainer), eo: range.endOffset
-        };
+    let inside = null;
+    for (const segment of segments) {
+      if (reference ? reference === segment.node || follows(reference, segment.node) : follows(node, segment.node) && !node.contains(segment.node)) {
+        return reference ? segment.start : inside ? inside.end : segment.start;
       }
-    } else {
-      state.markdown = textarea.value;
-      state.sel = { start: textarea.selectionStart, end: textarea.selectionEnd };
+      if (node.contains(segment.node)) {
+        inside = segment;
+      }
     }
-    return state;
-  };
-  var restoreState = function (state) {
-    var mode = textarea.hidden ? 'design' : 'source';
-    if (mode === 'design') {
-      if (state.mode === 'design' && state.html !== undefined) {
-        editor.setContent(state.html);
-        if (state.sel) {
-          var start = resolvePath(state.sel.sp), end = resolvePath(state.sel.ep);
-          if (start && end) {
-            var range = document.createRange();
-            range.setStart(start, Math.min(state.sel.so, (start.length !== undefined ? start.length : start.childNodes.length)));
-            range.setEnd(end, Math.min(state.sel.eo, (end.length !== undefined ? end.length : end.childNodes.length)));
-            setRange(range);
+    return inside ? inside.end : segments[segments.length - 1].end;
+  }
+
+  function toDom(editor, offset) {
+    const segments = editor.segments;
+    if (!segments.length) {
+      return { node: editor.editable, offset: 0 };
+    }
+    let previous = null;
+    for (const segment of segments) {
+      if (offset < segment.start) {
+        if (previous && offset - previous.end <= segment.start - offset) {
+          return { node: previous.node, offset: previous.offset + previous.length };
+        }
+        return { node: segment.node, offset: segment.offset };
+      }
+      previous = segment;
+      if (offset <= segment.end) {
+        if (isLinear(segment)) {
+          return { node: segment.node, offset: segment.offset + offset - segment.start };
+        }
+        return { node: segment.node, offset: segment.offset + (offset === segment.end ? segment.length : 0) };
+      }
+    }
+    const last = segments[segments.length - 1];
+    return { node: last.node, offset: last.offset + last.length };
+  }
+
+  function setSelection(editor, start, end) {
+    const from = toDom(editor, start);
+    const to = toDom(editor, end);
+    const range = document.createRange();
+    range.setStart(from.node, from.offset);
+    range.setEnd(to.node, to.offset);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    track(editor, from, to, start, end);
+  }
+
+  function track(editor, from, to, start, end) {
+    editor.selection = [start, end];
+    editor.tracked = { from, to };
+  }
+
+  function matchesTracked(editor, node, offset, which) {
+    const tracked = editor.tracked && editor.tracked[which];
+    return !!tracked && tracked.node === node && tracked.offset === offset;
+  }
+
+  function currentSelection(editor) {
+    if (!editor.textarea.hidden) {
+      return [editor.textarea.selectionStart, editor.textarea.selectionEnd];
+    }
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !editor.editable.contains(selection.anchorNode)) {
+      return editor.selection;
+    }
+    const range = selection.getRangeAt(0);
+    if (matchesTracked(editor, range.startContainer, range.startOffset, 'from') && matchesTracked(editor, range.endContainer, range.endOffset, 'to')) {
+      return editor.selection;
+    }
+    let start = toSource(editor, range.startContainer, range.startOffset);
+    let end = toSource(editor, range.endContainer, range.endOffset);
+    if (start > end) {
+      [start, end] = [end, start];
+    }
+    track(editor, { node: range.startContainer, offset: range.startOffset }, { node: range.endContainer, offset: range.endOffset }, start, end);
+    return [start, end];
+  }
+
+  function applyUpdate(editor, update) {
+    if (!update) {
+      return;
+    }
+    if (update.version !== null && update.version !== undefined && update.version !== editor.version) {
+      return;
+    }
+    if (!editor.textarea.hidden) {
+      if (update.text !== null && update.text !== undefined) {
+        editor.textarea.value = update.text;
+        editor.value = update.text;
+        editor.textarea.setSelectionRange(update.selectionStart, update.selectionEnd);
+      }
+      editor.selection = [update.selectionStart, update.selectionEnd];
+      editor.reported = editor.selection;
+      return;
+    }
+    if (update.html !== null && update.html !== undefined) {
+      const sent = editor.sent;
+      const now = domSelection(editor);
+      const stayed = !now || !editor.sentDom || (now.anchorNode === editor.sentDom.anchorNode && now.anchorOffset === editor.sentDom.anchorOffset && now.focusNode === editor.sentDom.focusNode && now.focusOffset === editor.sentDom.focusOffset);
+      const live = sent && !editor.virtual && !stayed && document.activeElement === editor.editable ? currentSelection(editor) : null;
+      const unmoved = !live || (live[0] === sent[0] && live[1] === sent[1]) || (live[0] === live[1] && (live[0] === sent[0] || live[0] === sent[1]));
+      const delta = sent ? update.selectionStart - sent[1] : 0;
+      const shift = offset => offset >= sent[1] ? offset + delta : offset > sent[0] ? update.selectionStart : offset;
+      let target = unmoved ? [update.selectionStart, update.selectionEnd] : [shift(live[0]), shift(live[1])];
+      if (editor.virtual) {
+        const offset = transform(editor, editor.virtual.offset, editor.virtual.version);
+        target = [offset, offset];
+        if (editor.pending === 0) {
+          editor.virtual = null;
+        }
+      }
+      render(editor, update.html, update.segments || []);
+      editor.reported = target;
+      if (document.activeElement === editor.editable) {
+        setSelection(editor, target[0], target[1]);
+      } else {
+        editor.selection = [update.selectionStart, update.selectionEnd];
+        editor.tracked = null;
+      }
+    }
+  }
+
+  function enqueue(editor, work) {
+    editor.queue = editor.queue.then(work, work);
+    return editor.queue;
+  }
+
+  function edit(editor, name, args, guess) {
+    editor.pending++;
+    guess = guess || 0;
+    editor.pendingDelta += guess;
+    const order = ++editor.queued;
+    return enqueue(editor, () => {
+      editor.version++;
+      const resolved = typeof args === 'function' ? args() : args;
+      if (!resolved) {
+        editor.pending--;
+        editor.pendingDelta -= guess;
+        return null;
+      }
+      editor.sent = resolved.length >= 2 && typeof resolved[0] === 'number' && typeof resolved[1] === 'number' ? [resolved[0], resolved[1]] : null;
+      editor.sentDom = domSelection(editor);
+      const version = editor.version;
+      if (editor.virtual && editor.sent && order > editor.virtual.order) {
+        editor.virtual = { offset: resolved[0] + Math.max(0, estimate(name, resolved)), version, order };
+      }
+      return invoke(editor, name, ...resolved, editor.version).then(update => {
+        editor.pending--;
+        editor.pendingDelta -= guess;
+        applyUpdate(editor, update);
+        if (editor.sent) {
+          editor.applied.push({ start: editor.sent[0], end: editor.sent[1], delta: update ? update.selectionStart - editor.sent[1] : 0, version });
+          if (editor.applied.length > 100) {
+            editor.applied.shift();
           }
         }
-      } else {
-        instance.invokeMethodAsync('RenderMarkdownAsync', state.markdown).then(function (html) {
-          editor.setContent(html);
-        });
-      }
-    } else {
-      textarea.value = state.markdown;
-      if (state.sel && state.sel.start !== undefined) {
-        textarea.setSelectionRange(state.sel.start, state.sel.end);
-      }
-    }
-    try { suppressDisposed(instance.invokeMethodAsync('OnDesignInputAsync', state.markdown)); } catch { }
-  };
-
-  editor.snapshot = function () {
-    history.undo.push(captureState());
-    if (history.undo.length > HISTORY_LIMIT) history.undo.shift();
-    history.redo = [];
-  };
-  editor.undo = function () {
-    if (!history.undo.length) return;
-    history.redo.push(captureState());
-    restoreState(history.undo.pop());
-    lastInputType = null;
-    reportState();
-  };
-  editor.redo = function () {
-    if (!history.redo.length) return;
-    history.undo.push(captureState());
-    restoreState(history.redo.pop());
-    lastInputType = null;
-    reportState();
-  };
-
-  var designState = function () {
-    var state = { formats: [], block: '' };
-    var sel = window.getSelection();
-    if (!sel.rangeCount || !editable.contains(sel.anchorNode)) return state;
-    for (var node = sel.anchorNode; node && node !== editable; node = node.parentNode) {
-      if (node.nodeType !== Node.ELEMENT_NODE) continue;
-      switch (node.tagName) {
-        case 'STRONG': case 'B': state.formats.push('bold'); break;
-        case 'EM': case 'I': state.formats.push('italic'); break;
-        case 'DEL': case 'S': state.formats.push('strikethrough'); break;
-        case 'CODE': state.formats.push('code'); break;
-        case 'BLOCKQUOTE': state.formats.push('quote'); break;
-        case 'UL': state.formats.push('unorderedList'); break;
-        case 'OL': state.formats.push('orderedList'); break;
-      }
-    }
-    var range = sel.getRangeAt(0);
-    var top = blockAt(range.startContainer, range.startOffset, false);
-    state.block = top && /^(P|DIV|H[1-6])$/.test(top.tagName) ? (top.tagName === 'DIV' ? 'p' : top.tagName.toLowerCase()) : null;
-    if (!state.block && !range.collapsed) {
-      var last = blockAt(range.endContainer, range.endOffset, true);
-      for (var block = blockAt(range.startContainer, range.startOffset, false); block; block = block.nextSibling) {
-        if (/^(P|DIV|H[1-6])$/.test(block.tagName)) { state.block = ''; break; }
-        if (block === last) break;
-      }
-    }
-    return state;
-  };
-  var sourceBlockOf = function (line) {
-    var heading = /^\s*(#{1,6}) /.exec(line);
-    if (heading) return 'h' + heading[1].length;
-    return /\S/.test(line) && !/^\s*([-*+] |\d+\. |> |\||```|~~~|---\s*$)/.test(line) ? 'p' : null;
-  };
-  var SOURCE_BLOCKS = [['quote', /^\s*> /], ['taskList', /^\s*[-*+] \[[ xX]\] /], ['unorderedList', /^\s*[-*+] (?!\[[ xX]\] )/], ['orderedList', /^\s*\d+\. /]];
-  var SOURCE_INLINES = [['bold', /\*\*[^*\n]+\*\*|__[^_\n]+__/g], ['italic', /(^|[^*\w])(\*[^*\n]+\*|_[^_\n]+_)(?![*\w])/g], ['strikethrough', /~~[^~\n]+~~/g], ['code', /`[^`\n]+`/g]];
-  var sourceState = function () {
-    var state = { formats: [], block: '' };
-    if (document.activeElement !== textarea) return state;
-    var formats = state.formats;
-    var value = textarea.value, position = textarea.selectionStart;
-    var lineStart = value.lastIndexOf('\n', position - 1) + 1;
-    var lineEnd = value.indexOf('\n', position);
-    var line = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
-    var caret = position - lineStart;
-    SOURCE_BLOCKS.forEach(function (block) { if (block[1].test(line)) formats.push(block[0]); });
-    var fences = value.substring(0, lineStart).match(/^\s*(```|~~~)/gm) || [];
-    state.block = fences.length % 2 ? null : sourceBlockOf(line);
-    if (!state.block && textarea.selectionEnd > position) {
-      var selectionEnd = value.indexOf('\n', textarea.selectionEnd);
-      var selected = value.substring(lineStart, selectionEnd === -1 ? value.length : selectionEnd).split('\n');
-      if (selected.some(function (l) { return sourceBlockOf(l) && !/^\s*(```|~~~)/.test(l); })) state.block = '';
-    }
-    SOURCE_INLINES.forEach(function (inline) {
-      var match;
-      inline[1].lastIndex = 0;
-      while ((match = inline[1].exec(line))) {
-        var start = match.index + (match.length > 2 ? match[1].length : 0);
-        if (start < caret && caret < start + match[0].length - (match.length > 2 ? match[1].length : 0)) { formats.push(inline[0]); break; }
-      }
+        editor.rendered = version;
+        editor.sent = null;
+      });
     });
-    return state;
-  };
-  var lastState = '';
-  var reportState = function () {
-    var state = textarea.hidden ? designState() : sourceState();
-    state.canUndo = history.undo.length > 0;
-    state.canRedo = history.redo.length > 0;
-    var key = JSON.stringify(state);
-    if (key === lastState) return;
-    lastState = key;
-    try { suppressDisposed(instance.invokeMethodAsync('OnToolStateAsync', state)); } catch { }
-  };
-  editor.refreshState = reportState;
+  }
 
-  var onBeforeInput = function (e) {
-    var type = e.inputType || '';
-    var boundary = lastInputType === null
-      || (type.indexOf('delete') === 0) !== (lastInputType.indexOf('delete') === 0)
-      || type === 'insertParagraph' || type === 'insertFromPaste' || type === 'insertFromDrop'
-      || (type === 'insertText' && /\s/.test(e.data || ''));
-    if (boundary) editor.snapshot();
-    lastInputType = type;
-  };
+  function domSelection(editor) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !editor.editable.contains(selection.anchorNode)) {
+      return null;
+    }
+    return { anchorNode: selection.anchorNode, anchorOffset: selection.anchorOffset, focusNode: selection.focusNode, focusOffset: selection.focusOffset };
+  }
 
-  editor.execute = function (name, value, label) {
-    if (name === 'undo') { editor.undo(); return; }
-    if (name === 'redo') { editor.redo(); return; }
+  function rangeFor(editor, event) {
+    const type = event.inputType || '';
+    const deleting = type.indexOf('delete') === 0;
+    const backward = type.indexOf('Backward') > 0;
+    const around = caret => deleting ? (backward ? [Math.max(0, caret - 1), caret] : [caret, caret + 1]) : [caret, caret];
+    if (editor.virtual) {
+      const virtual = editor.virtual;
+      return () => around(transform(editor, virtual.offset, virtual.version));
+    }
+    const captured = targetRange(editor, event);
+    if (editor.pending === 0) {
+      return () => captured;
+    }
+    const live = currentSelection(editor);
+    const version = editor.rendered;
+    return () => {
+      if (live[0] === live[1] && (deleting || captured[0] === captured[1])) {
+        return around(transform(editor, live[0], version));
+      }
+      return [transform(editor, captured[0], version), transform(editor, captured[1], version)];
+    };
+  }
 
-    var range = currentRange();
-    if (!range) { editable.focus(); range = currentRange(); if (!range) return; }
-    editable.focus();
-    editable.normalize();
-    setRange(range);
-    editor.snapshot();
-    lastInputType = null;
+  function estimate(name, resolved) {
+    if (name === 'OnEditAsync') {
+      return (resolved[2] || '').length - (resolved[1] - resolved[0]);
+    }
+    return name === 'OnInsertParagraphAsync' || name === 'OnInsertLineBreakAsync' ? 2 : 0;
+  }
 
-    switch (name) {
-      case 'bold': toggleInline(range, 'strong', ['STRONG', 'B']); break;
-      case 'italic': toggleInline(range, 'em', ['EM', 'I']); break;
-      case 'strikethrough': toggleInline(range, 'del', ['DEL', 'S', 'STRIKE']); break;
-      case 'code': toggleInline(range, 'code', ['CODE']); break;
-      case 'formatBlock': {
-        var tag = /^h[1-6]$/.test(value) ? value : 'p';
-        var collapsed = range.collapsed;
-        var formatted = blocksInRange(range).filter(function (el) { return /^(P|DIV|H[1-6])$/.test(el.tagName); }).map(function (el) {
-          return el.tagName.toLowerCase() === tag ? el : replaceTag(el, tag);
-        });
-        if (!formatted.length) break;
-        if (collapsed) selectStart(formatted[0]);
-        else {
-          var blocks = document.createRange();
-          blocks.setStart(formatted[0], 0);
-          blocks.setEnd(formatted[formatted.length - 1], formatted[formatted.length - 1].childNodes.length);
-          setRange(blocks);
-        }
-        break;
+  function transform(editor, offset, version) {
+    for (const entry of editor.applied) {
+      if (entry.version <= version) {
+        continue;
       }
-      case 'quote': {
-        var inside = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('blockquote');
-        if (inside && editable.contains(inside)) {
-          var unwrapped = inside.firstChild;
-          while (inside.firstChild) inside.parentNode.insertBefore(inside.firstChild, inside);
-          inside.parentNode.removeChild(inside);
-          selectStart(unwrapped);
-        } else {
-          var bq = document.createElement('blockquote');
-          var els = blocksInRange(range);
-          els[0].parentNode.insertBefore(bq, els[0]);
-          els.forEach(function (el) { bq.appendChild(el); });
-          selectStart(bq);
-        }
-        break;
+      if (offset >= entry.end) {
+        offset += entry.delta;
+      } else if (offset > entry.start) {
+        offset = entry.start;
       }
-      case 'unorderedList': case 'orderedList': case 'taskList': {
-        var listTag = name === 'orderedList' ? 'ol' : 'ul';
-        var existing = range.startContainer.parentNode.closest && range.startContainer.parentNode.closest('ul,ol');
-        if (existing && editable.contains(existing) && existing.tagName.toLowerCase() === listTag && name !== 'taskList') {
-          var firstP = null;
-          Array.prototype.slice.call(existing.children).forEach(function (li) {
-            var p = document.createElement('p');
-            while (li.firstChild) p.appendChild(li.firstChild);
-            existing.parentNode.insertBefore(p, existing);
-            firstP = firstP || p;
-          });
-          existing.parentNode.removeChild(existing);
-          selectStart(firstP);
-        } else if (!existing || !editable.contains(existing)) {
-          var list = document.createElement(listTag);
-          var items = blocksInRange(range);
-          items[0].parentNode.insertBefore(list, items[0]);
-          items.forEach(function (el) {
-            var li = document.createElement('li');
-            if (name === 'taskList') {
-              var cb = document.createElement('input');
-              cb.type = 'checkbox';
-              li.appendChild(cb);
-              li.appendChild(document.createTextNode(' '));
-            }
-            while (el.firstChild) li.appendChild(el.firstChild);
-            el.parentNode.removeChild(el);
-            list.appendChild(li);
-          });
-          selectStart(list);
-        }
-        break;
-      }
-      case 'codeBlock': {
-        var target = blockOf(range.startContainer);
-        if (!target) {
-          target = document.createElement('p');
-          editable.appendChild(target);
-        }
-        var pre = document.createElement('pre');
-        var codeChild = document.createElement('code');
-        codeChild.textContent = target.textContent;
-        pre.appendChild(codeChild);
-        target.parentNode.replaceChild(pre, target);
-        selectStart(codeChild);
-        break;
-      }
-      case 'horizontalRule': {
-        var after = blockOf(range.startContainer);
-        var hr = document.createElement('hr');
-        if (after && after.nextSibling) after.parentNode.insertBefore(hr, after.nextSibling);
-        else editable.appendChild(hr);
-        break;
-      }
-      case 'link': case 'image': {
-        if (name === 'image') {
-          var img = document.createElement('img');
-          img.src = isDangerousUrl(value) ? '' : (value || '');
-          img.alt = label || '';
-          range.deleteContents();
-          range.insertNode(img);
-        } else {
-          var a = document.createElement('a');
-          a.href = isDangerousUrl(value) ? '' : (value || '');
-          if (range.collapsed) a.textContent = label || value || '';
-          else a.appendChild(range.extractContents());
-          range.insertNode(a);
-        }
-        break;
-      }
+    }
+    return offset;
+  }
+
+  function targetRange(editor, event) {
+    const type = event.inputType || '';
+    const live = currentSelection(editor);
+    const ranges = event.getTargetRanges ? event.getTargetRanges() : [];
+    if (!ranges.length) {
+      return live;
+    }
+    const range = ranges[0];
+    const startMatches = matchesTracked(editor, range.startContainer, range.startOffset, 'from');
+    const endMatches = matchesTracked(editor, range.endContainer, range.endOffset, 'to');
+    if (startMatches && endMatches) {
+      return editor.selection;
+    }
+    const sameNode = range.startContainer === range.endContainer;
+    let start = startMatches ? editor.selection[0] : endMatches && sameNode ? editor.selection[1] - (range.endOffset - range.startOffset) : toSource(editor, range.startContainer, range.startOffset);
+    let end = endMatches ? editor.selection[1] : startMatches && sameNode ? editor.selection[0] + (range.endOffset - range.startOffset) : toSource(editor, range.endContainer, range.endOffset);
+    if (start > end) {
+      [start, end] = [end, start];
+    }
+    if (start === end && type.indexOf('delete') === 0) {
+      return type.indexOf('Backward') > 0 ? [Math.max(0, start - 1), start] : [start, start + 1];
+    }
+    return [start, end];
+  }
+
+  function onBeforeInput(editor, event) {
+    const type = event.inputType || '';
+    if (editor.composing || type === 'insertCompositionText' || type === 'deleteCompositionText') {
+      return;
+    }
+    event.preventDefault();
+    const range = rangeFor(editor, event);
+    const live = currentSelection(editor);
+    const kind = live[0] !== live[1] ? type + ':selection' : type;
+    switch (type) {
       case 'insertText':
-        range.deleteContents();
-        range.insertNode(document.createTextNode(value || ''));
+      case 'insertReplacementText': {
+        const text = event.data !== null && event.data !== undefined ? event.data : event.dataTransfer ? event.dataTransfer.getData('text/plain') : '';
+        if (text) {
+          edit(editor, 'OnEditAsync', () => [...range(), text, kind], text.length - (live[1] - live[0]));
+        }
+        break;
+      }
+      case 'insertParagraph':
+        edit(editor, 'OnInsertParagraphAsync', () => range(), 2);
+        break;
+      case 'insertLineBreak':
+        edit(editor, 'OnInsertLineBreakAsync', () => range(), 3);
+        break;
+      case 'insertFromPaste':
+      case 'insertFromDrop': {
+        const text = event.dataTransfer ? event.dataTransfer.getData('text/plain') : '';
+        if (text) {
+          edit(editor, 'OnEditAsync', () => [...range(), text, kind], text.length - (live[1] - live[0]));
+        }
+        break;
+      }
+      case 'historyUndo':
+        edit(editor, 'OnUndoAsync', []);
+        break;
+      case 'historyRedo':
+        edit(editor, 'OnRedoAsync', []);
+        break;
+      default:
+        if (type.indexOf('delete') === 0) {
+          edit(editor, 'OnEditAsync', () => {
+            const [start, end] = range();
+            return end > start ? [start, end, '', kind] : null;
+          }, live[0] === live[1] ? -1 : live[0] - live[1]);
+        }
         break;
     }
+  }
 
-    savedRange = null;
-    notifyValue();
+  function onCompositionStart(editor) {
+    editor.composing = true;
+    editor.compositionRange = currentSelection(editor);
+  }
+
+  function onCompositionEnd(editor, event) {
+    editor.composing = false;
+    const [start, end] = editor.compositionRange || currentSelection(editor);
+    edit(editor, 'OnEditAsync', [start, end, event.data || '', 'insertCompositionText']);
+  }
+
+  function closestBlock(editor, offset) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) {
+      return null;
+    }
+    let node = selection.getRangeAt(0).startContainer;
+    while (node && node !== editor.editable) {
+      if (node.nodeType === 1 && (node.tagName === 'LI' || node.tagName === 'TABLE' || node.tagName === 'PRE')) {
+        return node.tagName;
+      }
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  function moveAcrossCells(editor, forward) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) {
+      return;
+    }
+    let node = selection.anchorNode;
+    while (node && node !== editor.editable && !(node.nodeType === 1 && (node.tagName === 'TD' || node.tagName === 'TH'))) {
+      node = node.parentNode;
+    }
+    if (!node || node === editor.editable) {
+      return;
+    }
+    const cells = Array.from(node.closest('table').querySelectorAll('td, th'));
+    const target = cells[cells.indexOf(node) + (forward ? 1 : -1)];
+    if (!target) {
+      if (forward) {
+        edit(editor, 'OnInsertRowAsync', () => currentSelection(editor));
+      }
+      return;
+    }
+    const nodes = textNodes(target);
+    const range = document.createRange();
+    range.setStart(nodes.length ? nodes[0] : target, 0);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  function moveAcrossRows(editor, down) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !selection.isCollapsed) {
+      return false;
+    }
+    let node = selection.anchorNode;
+    while (node && node !== editor.editable && !(node.nodeType === 1 && (node.tagName === 'TD' || node.tagName === 'TH'))) {
+      node = node.parentNode;
+    }
+    if (!node || node === editor.editable) {
+      return false;
+    }
+    const row = node.parentNode;
+    const rows = Array.from(row.closest('table').rows);
+    const table = row.closest('table');
+    const target = rows[rows.indexOf(row) + (down ? 1 : -1)];
+    const outside = down ? table.nextElementSibling : table.previousElementSibling;
+    if (!target && !outside) {
+      return false;
+    }
+    const cell = target ? target.cells[Math.min(node.cellIndex, target.cells.length - 1)] : outside;
+    const nodes = textNodes(cell);
+    const range = document.createRange();
+    if (target || down) {
+      range.setStart(nodes.length ? nodes[0] : cell, 0);
+    } else if (nodes.length) {
+      range.setStart(nodes[nodes.length - 1], nodes[nodes.length - 1].length);
+    } else {
+      range.setStart(cell, cell.childNodes.length);
+    }
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    return true;
+  }
+
+  function onKeyDown(editor, event) {
+    if (event.key === 'Backspace' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && editor.segments.length) {
+      const [start, end] = currentSelection(editor);
+      const first = editor.segments[0];
+      if (start === end && start > 0 && start === first.start) {
+        event.preventDefault();
+        edit(editor, 'OnEditAsync', [start - 1, start, '', 'deleteContentBackward']);
+        return;
+      }
+    }
+    if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && editor.pending > 0) {
+      const [start, end] = currentSelection(editor);
+      if (start === end) {
+        event.preventDefault();
+        const base = editor.virtual ? transform(editor, editor.virtual.offset, editor.virtual.version) : transform(editor, start, editor.rendered) + editor.pendingDelta;
+        editor.virtual = { offset: Math.max(0, base + (event.key === 'ArrowRight' ? 1 : -1)), version: editor.version + editor.pending, order: editor.queued };
+        return;
+      }
+    }
+    if ((event.key === 'Home' || event.key === 'End') && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor, 0) === 'TABLE') {
+      const selection = window.getSelection();
+      let cell = selection.focusNode;
+      while (cell && cell !== editor.editable && !(cell.nodeType === 1 && (cell.tagName === 'TD' || cell.tagName === 'TH'))) {
+        cell = cell.parentNode;
+      }
+      if (cell && cell !== editor.editable) {
+        event.preventDefault();
+        const nodes = textNodes(cell);
+        if (event.key === 'End') {
+          const lastNode = nodes[nodes.length - 1];
+          selection.extend(lastNode || cell, lastNode ? lastNode.length : cell.childNodes.length);
+        } else {
+          selection.extend(nodes[0] || cell, 0);
+        }
+        return;
+      }
+    }
+    if ((event.key === 'ArrowUp' || event.key === 'ArrowDown') && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && moveAcrossRows(editor, event.key === 'ArrowDown')) {
+      event.preventDefault();
+      return;
+    }
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor, 0) === 'TABLE') {
+      event.preventDefault();
+      moveAcrossCells(editor, !event.shiftKey);
+      return;
+    }
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && closestBlock(editor, 0) === 'PRE') {
+      event.preventDefault();
+      edit(editor, 'OnEditAsync', () => [...currentSelection(editor), '\t', 'insertText']);
+      return;
+    }
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden) {
+      const [start, end] = currentSelection(editor);
+      if (editor.editable.querySelector('li') && closestBlock(editor, start) === 'LI') {
+        event.preventDefault();
+        edit(editor, 'OnIndentAsync', () => [...currentSelection(editor), event.shiftKey]);
+        return;
+      }
+    }
+    if (!(event.ctrlKey || event.metaKey) || !event.code) {
+      return;
+    }
+    if (event.code === 'KeyZ' && !event.altKey) {
+      event.preventDefault();
+      edit(editor, event.shiftKey ? 'OnRedoAsync' : 'OnUndoAsync', []);
+      return;
+    }
+    if (event.code === 'KeyY' && !event.altKey && !event.shiftKey) {
+      event.preventDefault();
+      edit(editor, 'OnRedoAsync', []);
+      return;
+    }
+    let key = 'Ctrl+';
+    if (event.altKey) key += 'Alt+';
+    if (event.shiftKey) key += 'Shift+';
+    key += event.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
+    if (editor.shortcuts.includes(key)) {
+      event.preventDefault();
+      invoke(editor, 'ExecuteShortcutAsync', key);
+    }
+  }
+
+  function onClick(editor, event) {
+    const checkbox = event.target;
+    if (!(checkbox instanceof HTMLInputElement) || checkbox.type !== 'checkbox') {
+      return;
+    }
+    event.preventDefault();
+    editor.editable.focus();
+    const segment = editor.segments.find(s => s.node === checkbox.nextSibling || follows(checkbox, s.node));
+    if (segment) {
+      const marker = segment.start - 3;
+      edit(editor, 'OnEditAsync', [marker, marker + 1, checkbox.checked ? 'x' : ' ', 'check']);
+    }
+  }
+
+  function reportSelection(editor) {
+    if (editor.composing) {
+      return;
+    }
+    const [start, end] = currentSelection(editor);
+    if (editor.reported && editor.reported[0] === start && editor.reported[1] === end) {
+      return;
+    }
+    editor.selection = [start, end];
+    editor.reported = [start, end];
+    invoke(editor, 'OnSelectionAsync', start, end);
+  }
+
+  function onTextareaInput(editor) {
+    const previous = editor.value;
+    const next = editor.textarea.value;
+    let prefix = 0;
+    const limit = Math.min(previous.length, next.length);
+    while (prefix < limit && previous[prefix] === next[prefix]) prefix++;
+    let suffix = 0;
+    while (suffix < limit - prefix && previous[previous.length - 1 - suffix] === next[next.length - 1 - suffix]) suffix++;
+    editor.value = next;
+    editor.version++;
+    invoke(editor, 'OnEditAsync', prefix, previous.length - suffix, next.substring(prefix, next.length - suffix), editor.inputType || 'insertText', editor.version).then(update => applyUpdate(editor, update));
+    editor.inputType = null;
+  }
+
+  const editor = {
+    editable, textarea, instance,
+    shortcuts: shortcuts || [],
+    segments: [],
+    selection: [0, 0],
+    tracked: null,
+    version: 0,
+    rendered: 0,
+    applied: [],
+    pendingDelta: 0,
+    queued: 0,
+    virtual: null,
+    queue: Promise.resolve(),
+    pending: 0,
+    value: textarea.value,
+    composing: false,
+    reported: null,
+    listeners: []
   };
-
-  editable.addEventListener('paste', onPaste);
-  editable.addEventListener('input', onInput);
-  editable.addEventListener('input', onEmojiInput);
-  editable.addEventListener('focus', onFocus);
-  editable.addEventListener('blur', onBlur);
-  editable.addEventListener('keydown', onKeyDown);
-  editable.addEventListener('beforeinput', onBeforeInput);
-  textarea.addEventListener('focus', onTextareaFocus);
-  textarea.addEventListener('blur', onTextareaBlur);
-  textarea.addEventListener('input', reportState);
-  textarea.addEventListener('keydown', onKeyDown);
-  textarea.addEventListener('beforeinput', onBeforeInput);
-
-  editor.dispose = function () {
-    editable.removeEventListener('paste', onPaste);
-    editable.removeEventListener('input', onInput);
-    editable.removeEventListener('input', onEmojiInput);
-    editable.removeEventListener('focus', onFocus);
-    editable.removeEventListener('blur', onBlur);
-    editable.removeEventListener('keydown', onKeyDown);
-    editable.removeEventListener('beforeinput', onBeforeInput);
-    textarea.removeEventListener('focus', onTextareaFocus);
-    textarea.removeEventListener('blur', onTextareaBlur);
-    textarea.removeEventListener('input', reportState);
-    textarea.removeEventListener('keydown', onKeyDown);
-    textarea.removeEventListener('beforeinput', onBeforeInput);
-    document.removeEventListener('selectionchange', reportState);
+  const on = (target, name, handler) => {
+    target.addEventListener(name, handler);
+    editor.listeners.push([target, name, handler]);
   };
+  const selectionListener = () => reportSelection(editor);
+  on(editable, 'beforeinput', e => onBeforeInput(editor, e));
+  on(editable, 'compositionstart', () => onCompositionStart(editor));
+  on(editable, 'compositionend', e => onCompositionEnd(editor, e));
+  on(editable, 'keydown', e => onKeyDown(editor, e));
+  on(editable, 'click', e => onClick(editor, e));
+  on(editable, 'focus', () => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !editable.contains(selection.anchorNode) || (selection.anchorNode === editable && selection.isCollapsed && !matchesTracked(editor, editable, selection.anchorOffset, 'from'))) {
+      setSelection(editor, editor.selection[0], editor.selection[1]);
+    }
+    document.addEventListener('selectionchange', selectionListener);
+    invoke(editor, 'OnFocusAsync');
+    reportSelection(editor);
+  });
+  on(editable, 'blur', () => {
+    document.removeEventListener('selectionchange', selectionListener);
+    invoke(editor, 'OnBlurAsync');
+  });
+  on(textarea, 'beforeinput', e => { editor.inputType = e.inputType; });
+  on(textarea, 'input', () => onTextareaInput(editor));
+  on(textarea, 'keydown', e => onKeyDown(editor, e));
+  on(textarea, 'focus', () => {
+    document.addEventListener('selectionchange', selectionListener);
+    invoke(editor, 'OnFocusAsync');
+    reportSelection(editor);
+  });
+  on(textarea, 'blur', () => {
+    document.removeEventListener('selectionchange', selectionListener);
+    invoke(editor, 'OnBlurAsync');
+  });
 
-  return editor;
+  return {
+    update: function (value, focus) {
+      if (focus && editor.textarea.hidden && document.activeElement !== editor.editable) {
+        editor.editable.focus();
+      }
+      if (focus && !editor.textarea.hidden && document.activeElement !== editor.textarea) {
+        editor.textarea.focus();
+      }
+      if (value && value.text !== null && value.text !== undefined) {
+        editor.value = value.text;
+        editor.textarea.value = value.text;
+      }
+      editor.version = value && value.version !== null && value.version !== undefined ? value.version : editor.version;
+      applyUpdate(editor, value);
+      if (editor.textarea.hidden && value && value.html !== null && value.html !== undefined) {
+        editor.selection = [value.selectionStart, value.selectionEnd];
+      }
+    },
+    getSelection: function () {
+      return currentSelection(editor);
+    },
+    getVersion: function () {
+      return editor.version;
+    },
+    dispose: function () {
+      for (const [target, name, handler] of editor.listeners) {
+        target.removeEventListener(name, handler);
+      }
+      document.removeEventListener('selectionchange', selectionListener);
+    }
+  };
 };

@@ -114,6 +114,17 @@ class BlockParser
 
         var lines = NewLineRegex.Split(markdown);
 
+        lineStarts = new int[lines.Length + 1];
+
+        var lineIndex = 1;
+
+        foreach (Match match in NewLineRegex.Matches(markdown))
+        {
+            lineStarts[lineIndex++] = match.Index + match.Length;
+        }
+
+        lineStarts[lines.Length] = markdown.Length;
+
         var length = lines.Length;
 
         if (markdown.EndsWith(InlineParser.LineFeed))
@@ -255,11 +266,22 @@ class BlockParser
 
     public int LastLineLength { get; set; }
 
+    private int[] lineStarts = [0];
+
+    public int OffsetAt(int line, int column) => lineStarts[Math.Clamp(line - 1, 0, lineStarts.Length - 1)] + column;
+
+    public int SourceOffset => OffsetAt(LineNumber, Offset);
+
+    public int LineEnd => OffsetAt(LineNumber, CurrentLine.Length);
+
+    public int NextLineStart => lineStarts[Math.Min(LineNumber, lineStarts.Length - 1)];
+
     public void Close(Block block, int lineNumber)
     {
         var above = block.Parent;
         block.Range.End.Line = lineNumber;
         block.Range.End.Column = LastLineLength;
+        block.SourceEnd = Math.Max(block.SourceStart, OffsetAt(lineNumber, LastLineLength));
         block.Close(this);
         Tip = above;
     }
@@ -289,6 +311,7 @@ class BlockParser
 
         node.Range.Start.Line = LineNumber;
         node.Range.Start.Column = columnNumber;
+        node.SourceStart = OffsetAt(LineNumber, offset);
 
         Tip = node;
     }
@@ -387,6 +410,8 @@ class BlockParser
 
     private readonly Dictionary<string, LinkReference> linkReferences = [];
 
+    internal void RecordLinkReferenceDefinition(string text) => document.LinkReferenceDefinitions.Add(text.TrimEnd('\n'));
+
     // https://spec.commonmark.org/0.31.2/#html-blocks
     internal static readonly Regex[] HtmlBlockOpenRegex = [
         new (@"."), // dummy for 1 based indexing
@@ -457,7 +482,7 @@ class BlockParser
         {
             var next = index < closeIndex - 1 ? markdown[index + 1] : default;
 
-            if (markdown[index] is not InlineParser.Backslash || !next.IsPunctuation())
+            if (markdown[index] is not InlineParser.Backslash || !next.IsEscapable())
             {
                 id.Append(markdown[index]);
             }

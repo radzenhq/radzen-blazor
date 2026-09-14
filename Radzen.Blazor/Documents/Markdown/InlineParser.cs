@@ -15,6 +15,8 @@ class InlineParser
         public int Length { get; set; }
         public int OriginalLength { get; set; }
         public int Position { get; set; }
+        public int Start { get; set; }
+        public int End { get; set; }
         public Text? Node { get; set; }
         public bool CanOpen { get; set; }
         public bool CanClose { get; set; }
@@ -45,6 +47,20 @@ class InlineParser
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
     private List<InlineSpan>? spans;
+    private int bufferStart;
+    private int bufferEnd;
+    
+    private void Append(char ch, int index)
+    {
+        if (buffer.Length == 0)
+        {
+            bufferStart = index;
+        }
+    
+        buffer.Append(ch);
+    
+        bufferEnd = index + 1;
+    }
 
     enum LinkState
     {
@@ -63,7 +79,7 @@ class InlineParser
             {
                 var ch = buffer[index];
 
-                if (ch is Backslash && index < buffer.Length - 1 && !buffer[index + 1].IsPunctuation())
+                if (ch is Backslash && index < buffer.Length - 1 && !buffer[index + 1].IsEscapable())
                 {
                     continue;
                 }
@@ -73,13 +89,14 @@ class InlineParser
                 }
             }
             var value = output.ToString();
+            var end = bufferEnd;
 
             if (trim)
             {
-                value = value.TrimEnd();
+                var trimmed = value.TrimEnd(); end -= value.Length - trimmed.Length; value = trimmed;
             }
 
-            inlines.Add(new Text(value));
+            inlines.Add(new Text(value) { SourceStart = bufferStart, SourceEnd = Math.Max(bufferStart, end) });
 
             buffer.Clear();
         }
@@ -142,7 +159,7 @@ class InlineParser
                 content = content[1..^1];
             }
 
-            inlines.Add(new Code(content));
+            inlines.Add(new Code(content) { SourceStart = index, SourceEnd = bestMatch + openingCount });
 
             newIndex = bestMatch + openingCount;
 
@@ -151,7 +168,7 @@ class InlineParser
             return true;
         }
 
-        inlines.Add(new Text($"{new string(Backtick, openingCount)}"));
+        inlines.Add(new Text(new string(Backtick, openingCount)) { SourceStart = index, SourceEnd = index + openingCount });
 
         newIndex = index + openingCount;
 
@@ -166,15 +183,15 @@ class InlineParser
             return false;
         }
 
-        if (next.IsPunctuation())
+        if (next.IsEscapable())
         {
             AddTextNode();
-            inlines.Add(new Text(text[index + 1].ToString()));
+            inlines.Add(new Text(text[index + 1].ToString()) { SourceStart = index, SourceEnd = index + 2 });
             newIndex = index + 2;
             return true;
         }
 
-        buffer.Append(text[index]);
+        Append(text[index], index);
         newIndex = index + 1;
         return true;
     }
@@ -195,14 +212,14 @@ class InlineParser
 
         while (position < text.Length && text[position] == ch)
         {
-            buffer.Append(ch);
+            Append(ch, position);
 
             position++;
         }
 
         if (ch is Exclamation)
         {
-            buffer.Append(OpenBracket);
+            Append(OpenBracket, position);
             position++;
         }
 
@@ -210,7 +227,7 @@ class InlineParser
 
         if (buffer.Length > 0)
         {
-            var node = new Text(buffer.ToString());
+            var node = new Text(buffer.ToString()) { SourceStart = index, SourceEnd = position };
             var leftFlanking = LeftFlanking(prev, next);
             var rightFlanking = RightFlanking(prev, next);
 
@@ -236,6 +253,8 @@ class InlineParser
                 Length = buffer.Length,
                 OriginalLength = buffer.Length,
                 Position = index,
+                Start = index,
+                End = position,
                 CanClose = canClose,
                 CanOpen = canOpen
             };
@@ -285,9 +304,43 @@ class InlineParser
         return parser.spans!;
     }
 
+    private static void Shift(IEnumerable<Inline> inlines, int offset)
+    {
+        foreach (var inline in inlines)
+        {
+            inline.SourceStart += offset;
+            inline.SourceEnd += offset;
+
+            if (inline is InlineContainer container)
+            {
+                Shift(container.Children, offset);
+            }
+        }
+    }
+
+    internal static void Locate(IEnumerable<Inline> inlines, ContentMap content)
+    {
+        foreach (var inline in inlines)
+        {
+            inline.SourceStart = content.ToSource(inline.SourceStart);
+            inline.SourceEnd = Math.Max(inline.SourceStart, content.ToSourceEnd(inline.SourceEnd));
+
+            if (inline is InlineContainer container)
+            {
+                Locate(container.Children, content);
+            }
+        }
+    }
+
     private List<Inline> ParseInto(string text, Dictionary<string, LinkReference> linkReferences)
     {
-        return ParseInlines(text.Trim(), linkReferences);
+        var trimmed = text.Trim();
+
+        var inlines = ParseInlines(trimmed, linkReferences);
+
+        Shift(inlines, text.Length - text.TrimStart().Length);
+
+        return inlines;
     }
 
     private static readonly Regex EmailRegex = new(@"^([a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)");
@@ -334,9 +387,11 @@ class InlineParser
             return false;
         }
 
-        var link = new Link { Destination = url };
+        AddTextNode();
 
-        link.Add(new Text(content));
+        var link = new Link { Destination = url, SourceStart = index, SourceEnd = position + 1 };
+
+        link.Add(new Text(content) { SourceStart = index + 1, SourceEnd = position });
 
         inlines.Add(link);
 
@@ -405,7 +460,7 @@ class InlineParser
                 continue;
             }
 
-            buffer.Append(text[index]);
+            Append(text[index], index);
 
             index++;
         }
@@ -425,12 +480,16 @@ class InlineParser
         {
             if (inlines[0] is Text first)
             {
-                first.Value = first.Value.TrimStart();
+                var start = first.Value.TrimStart();
+                first.SourceStart += first.Value.Length - start.Length;
+                first.Value = start;
             }
 
             if (inlines[^1] is Text last)
             {
-                last.Value = last.Value.TrimEnd();
+                var end = last.Value.TrimEnd();
+                last.SourceEnd -= last.Value.Length - end.Length;
+                last.Value = end;
             }
         }
     }
@@ -443,7 +502,7 @@ class InlineParser
         {
             AddTextNode(trim: true);
 
-            inlines.Add(new SoftLineBreak());
+            inlines.Add(new SoftLineBreak { SourceStart = index, SourceEnd = position });
 
             newIndex = position;
 
@@ -481,7 +540,7 @@ class InlineParser
         {
             AddTextNode(trim: true);
 
-            inlines.Add(new LineBreak());
+            inlines.Add(new LineBreak { SourceStart = index, SourceEnd = position });
 
             newIndex = position;
 
@@ -527,7 +586,7 @@ class InlineParser
 
             var value = text[index..(index + match.Length)];
 
-            inlines.Add(new HtmlInline { Value = value });
+            inlines.Add(new HtmlInline { Value = value, SourceStart = index, SourceEnd = index + match.Length });
 
             newIndex = index + match.Length;
 
@@ -572,7 +631,7 @@ class InlineParser
 
         AddTextNode();
 
-        inlines.Add(new Text(emoji));
+        inlines.Add(new Text(emoji) { SourceStart = index, SourceEnd = position + 1 });
 
         newIndex = position + 1;
 
@@ -641,7 +700,7 @@ class InlineParser
                 }
             }
 
-            if (ch is Backslash && next.IsPunctuation())
+            if (ch is Backslash && next.IsEscapable())
             {
                 position++;
                 continue;
@@ -778,6 +837,8 @@ class InlineParser
         var opener = delimiters[openerIndex];
 
         InlineContainer container = opener.Char == Exclamation ? new Image { Destination = destination, Title = title } : new Link { Destination = destination, Title = title };
+        container.SourceStart = opener.Node?.SourceStart ?? opener.Position;
+        container.SourceEnd = position + 1;
 
         ReplaceOpener(openerIndex, container);
 
@@ -906,6 +967,8 @@ class InlineParser
         }
 
         var link = new Link { Destination = reference.Destination, Title = reference.Title };
+        link.SourceStart = delimiters[openerIndex].Node?.SourceStart ?? 0;
+        link.SourceEnd = index + 1;
 
         foreach (var child in children)
         {
@@ -939,7 +1002,7 @@ class InlineParser
     {
         var closerIndex = 0;
 
-        while ((closerIndex = FindCloserIndex()) > 0)
+        while ((closerIndex = FindCloserIndex(index)) > 0)
         {
             var openerIndex = FindOpenerIndex(closerIndex, index);
 
@@ -970,30 +1033,37 @@ class InlineParser
                         ? new Strikethrough()
                         : charsToConsume == 1 ? new Emphasis() : new Strong();
 
+                    parent.SourceStart = opener.End - charsToConsume;
+                    parent.SourceEnd = closer.Start + charsToConsume;
+
                     foreach (var child in innerInlines)
                     {
                         parent.Add(child);
                     }
 
                     spans?.Add(new InlineSpan(
-                        opener.Position + opener.Length - charsToConsume,
-                        closer.Position + (closer.OriginalLength - closer.Length) + charsToConsume,
+                        opener.End - charsToConsume,
+                        closer.Start + charsToConsume,
                         charsToConsume,
                         closer.Char));
 
                     opener.Length -= charsToConsume;
+                    opener.End -= charsToConsume;
 
                     if (opener.Length > 0 && opener.Node != null)
                     {
                         opener.Node.Value = opener.Node.Value[..^charsToConsume];
+                        opener.Node.SourceEnd = opener.End;
                         startIndex += 1;
                     }
 
                     closer.Length -= charsToConsume;
+                    closer.Start += charsToConsume;
 
                     if (closer.Length > 0 && closer.Node != null)
                     {
                         closer.Node.Value = closer.Node.Value[..^charsToConsume];
+                        closer.Node.SourceStart = closer.Start;
                         endIndex -= 1;
                     }
 
@@ -1017,16 +1087,20 @@ class InlineParser
                     delimiters.RemoveAt(openerIndex);
                 }
             }
+            else if (delimiters[closerIndex].CanOpen)
+            {
+                delimiters[closerIndex].CanClose = false;
+            }
             else
             {
-                break;
+                delimiters.RemoveAt(closerIndex);
             }
         }
     }
 
-    private int FindCloserIndex()
+    private int FindCloserIndex(int bottom)
     {
-        for (var index = 1; index < delimiters.Count; index++)
+        for (var index = Math.Max(1, bottom + 1); index < delimiters.Count; index++)
         {
             var delimiter = delimiters[index];
 

@@ -16,8 +16,28 @@ namespace Radzen.Blazor;
 /// &lt;/RadzenMarkdownEditor&gt;
 /// </code>
 /// </example>
-public partial class RadzenMarkdownEditorFormatBlock : ComponentBase
+public partial class RadzenMarkdownEditorFormatBlock : ComponentBase, IDisposable
 {
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        if (Editor != null)
+        {
+            Editor.ToolStateChanged += StateHasChanged;
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (Editor != null)
+        {
+            Editor.ToolStateChanged -= StateHasChanged;
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// The <see cref="RadzenMarkdownEditor" /> this tool belongs to.
     /// </summary>

@@ -112,7 +112,9 @@ bar)", @"<document>
     <paragraph>
         <text>[</text>
         <text>link</text>
-        <text>](&lt;foo&gt;)</text>
+        <text>](&lt;foo</text>
+        <text>&gt;</text>
+        <text>)</text>
     </paragraph>
 </document>")]
     [InlineData(@"[a](<b)c
@@ -499,7 +501,9 @@ bar)", @"<document>
 </document>")]
     [InlineData(@"<foo\+@bar.example.com>", @"<document>
     <paragraph>
-        <text>&lt;foo+@bar.example.com&gt;</text>
+        <text>&lt;foo</text>
+        <text>+</text>
+        <text>@bar.example.com&gt;</text>
     </paragraph>
 </document>")]
     [InlineData(@"<>", @"<document>

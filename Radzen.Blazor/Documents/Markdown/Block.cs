@@ -47,6 +47,18 @@ public abstract class Block : INode
 
     internal Range Range;
 
+    /// <summary>
+    /// Gets the offset in the markdown source at which this block starts.
+    /// </summary>
+    public int SourceStart { get; internal set; }
+
+    /// <summary>
+    /// Gets the offset in the markdown source at which this block ends (exclusive).
+    /// </summary>
+    public int SourceEnd { get; internal set; }
+
+    internal bool Pristine { get; set; }
+
     internal virtual void Close(BlockParser parser)
     {
         Open = false;

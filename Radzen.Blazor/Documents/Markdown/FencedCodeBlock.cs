@@ -19,6 +19,8 @@ public class FencedCodeBlock : Leaf
     /// </summary>
     public string? Info { get; private set; }
 
+    internal bool Closed { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
@@ -34,7 +36,7 @@ public class FencedCodeBlock : Leaf
         var newlinePos = Value.IndexOf('\n', StringComparison.Ordinal);
         var firstLine = Value[..newlinePos];
         Info = firstLine.Trim();
-        Value = Value[(newlinePos + 1)..];
+        TrimContentStart(newlinePos + 1);
     }
 
     internal override BlockMatch Matches(BlockParser parser)
@@ -49,6 +51,7 @@ public class FencedCodeBlock : Leaf
         {
             // closing fence - we're at end of line, so we can return
             parser.LastLineLength = parser.Offset + indent + match.Length;
+            Closed = true;
             parser.Close(this, parser.LineNumber);
             return BlockMatch.Break;
         }

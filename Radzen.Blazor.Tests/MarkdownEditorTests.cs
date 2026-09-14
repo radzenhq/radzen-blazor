@@ -1,4 +1,6 @@
+#nullable enable
 using System.Linq;
+using System.Threading.Tasks;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -15,12 +17,16 @@ namespace Radzen.Blazor.Tests
             return ctx;
         }
 
+        static BunitJSModuleInterop Module(TestContext ctx) => ctx.JSInterop.SetupModule(invocation => invocation.Identifier == "Radzen.createMarkdownEditor");
+
+        static MarkdownEditorUpdate LastUpdate(BunitJSModuleInterop module) =>
+            Assert.IsType<MarkdownEditorUpdate>(module.Invocations["update"].Last().Arguments[0]);
+
         [Fact]
         public void MarkdownEditor_Renders_WithClassName()
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
             Assert.Contains("rz-markdown-editor", component.Markup);
             Assert.Contains("rz-markdown-editor-toolbar", component.Markup);
             Assert.Contains("rz-markdown-editor-textarea", component.Markup);
@@ -31,7 +37,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.ShowToolbar, false));
-
             Assert.DoesNotContain("rz-markdown-editor-toolbar", component.Markup);
         }
 
@@ -40,7 +45,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
-
             var editable = component.Find(".rz-markdown-editor-design");
             Assert.Equal("true", editable.GetAttribute("contenteditable"));
             Assert.Empty(editable.InnerHtml.Trim());
@@ -54,7 +58,6 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
-
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
             Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));
         }
@@ -64,7 +67,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
-
             Assert.Equal("false", component.Find(".rz-markdown-editor-design").GetAttribute("contenteditable"));
         }
 
@@ -75,110 +77,149 @@ namespace Radzen.Blazor.Tests
             MarkdownEditorMode? changed = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.ModeChanged, m => changed = m));
-
             component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
-
             Assert.Equal(MarkdownEditorMode.Source, changed);
         }
 
         [Fact]
-        public void MarkdownEditor_Input_UpdatesValue_AndRaisesValueChanged()
+        public async Task ToolbarFollowsTheCaretAcrossSelectionReports()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi\n\nplain **bold**"));
+
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(1, 1));
+            Assert.Contains("Heading 1", component.Find(".rz-dropdown-label").TextContent);
+            Assert.DoesNotContain("rz-state-active", component.Find("[title^='Bold']").ClassName);
+
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(15, 15));
+            Assert.Contains("Normal", component.Find(".rz-dropdown-label").TextContent);
+            Assert.Contains("rz-state-active", component.Find("[title^='Bold']").ClassName);
+
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(2, 2));
+            Assert.Contains("Heading 1", component.Find(".rz-dropdown-label").TextContent);
+            Assert.DoesNotContain("rz-state-active", component.Find("[title^='Bold']").ClassName);
+        }
+
+        [Fact]
+        public async Task MarkdownEditor_Edit_UpdatesValue_AndRaisesValueChanged()
         {
             using var ctx = CreateContext();
             string? value = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.ValueChanged, v => value = v));
-
-            component.Find("textarea").Input("typed");
-
+            var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(0, 0, "typed", "insertText", 1));
             Assert.Equal("typed", value);
+            Assert.Equal("typed", component.Instance.Value);
+            Assert.Equal(1, update.Version);
+            Assert.Null(update.Html);
+            Assert.Equal((5, 5), (update.SelectionStart, update.SelectionEnd));
         }
 
         [Fact]
-        public void MarkdownEditor_Input_RaisesInput_OnlyWhenImmediate()
+        public async Task MarkdownEditor_Edit_RaisesInput_OnlyWhenImmediate()
         {
             using var ctx = CreateContext();
             var count = 0;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Input, _ => count++));
-            component.Find("textarea").Input("a");
+            await component.InvokeAsync(() => component.Instance.OnEditAsync(0, 0, "a", "insertText", 1));
             Assert.Equal(0, count);
-
             component.SetParametersAndRender(p => p.Add(x => x.Immediate, true));
-            component.Find("textarea").Input("b");
+            await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 2));
             Assert.Equal(1, count);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_AppliesFormatterResult_AndRaisesExecute()
+        public async Task MarkdownEditor_Edit_InDesignMode_InsertsLiteralText_AndRendersIt()
         {
             using var ctx = CreateContext();
-            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 5 });
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
-            string? executed = null;
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "old"));
+            var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, " *x*", "insertText", 1));
+            Assert.Equal("old \\*x\\*", component.Instance.Value);
+            Assert.Equal("<p>old *x*</p>", update.Html);
+            Assert.Equal((9, 9), (update.SelectionStart, update.SelectionEnd));
+        }
 
+        [Fact]
+        public async Task MarkdownEditor_Enter_InAListItem_StartsANewItem()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "- item"));
+            var update = await component.InvokeAsync(() => component.Instance.OnInsertParagraphAsync(6, 6, 1));
+            Assert.Equal("- item\n- ", component.Instance.Value);
+            Assert.Contains("<li>​</li>", update!.Html);
+        }
+
+        [Fact]
+        public async Task MarkdownEditor_Undo_RevertsTheEdit_AndSendsTheText()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 1));
+            var update = await component.InvokeAsync(() => component.Instance.OnUndoAsync(2));
+            Assert.Equal("a", component.Instance.Value);
+            Assert.Equal("a", update!.Text);
+            Assert.False(component.Instance.CanUndo);
+            Assert.True(component.Instance.CanRedo);
+        }
+
+        [Fact]
+        public async Task MarkdownEditor_ExecuteCommand_AppliesTheFormatter_AndRaisesExecute()
+        {
+            using var ctx = CreateContext();
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 5 });
+            string? executed = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hello")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName));
-
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
-
-            var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal(new object?[] { 0, 5, "**hello**", 2, 7 }, invocation.Arguments.ToArray());
+            var update = LastUpdate(module);
+            Assert.Equal("**hello**", update.Text);
+            Assert.Equal((2, 7), (update.SelectionStart, update.SelectionEnd));
+            Assert.Equal("**hello**", component.Instance.Value);
             Assert.Equal("bold", executed);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_UnknownCommand_RaisesExecuteWithoutApplying()
+        public async Task MarkdownEditor_ExecuteCommand_UnknownCommand_RaisesExecuteWithoutApplying()
         {
             using var ctx = CreateContext();
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
+            var module = Module(ctx);
             string? executed = null;
-
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Mode, MarkdownEditorMode.Source)
+                .Add(x => x.Value, "text")
                 .Add(x => x.Execute, args => executed = args.CommandName));
-
+            var count = module.Invocations["update"].Count;
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync("insertToday"));
-
-            Assert.Empty(apply.Invocations);
+            Assert.Equal(count, module.Invocations["update"].Count);
             Assert.Equal("insertToday", executed);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_DesignMode_InvokesJsExecute()
+        public async Task MarkdownEditor_ExecuteCommand_InDesignMode_SendsTheRenderedHtml()
         {
             using var ctx = CreateContext();
-            var execute = ctx.JSInterop.SetupVoid("execute", _ => true);
-            execute.SetVoidResult();
-            string? executed = null;
-
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Value, "hello")
-                .Add(x => x.Execute, args => executed = args.CommandName));
-
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 5 });
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hello"));
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
-
-            var invocation = Assert.Single(execute.Invocations);
-            Assert.Equal(new object?[] { "bold", null, null }, invocation.Arguments.ToArray());
-            Assert.Equal("bold", executed);
+            var update = LastUpdate(module);
+            Assert.Equal("<p><strong>hello</strong></p>", update.Html);
+            Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
         }
 
         [Fact]
-        public void MarkdownEditor_ExecuteCommand_Link_DesignMode_SavesSelectionBeforeDialogOpens()
+        public void MarkdownEditor_ExecuteCommand_Link_ReadsTheSelectionBeforeTheDialogOpens()
         {
             using var ctx = CreateContext();
-            var saveSelection = ctx.JSInterop.SetupVoid("saveSelection", _ => true);
-            saveSelection.SetVoidResult();
-            ctx.JSInterop.Setup<bool>("hasSelection", _ => true).SetResult(true);
-
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
+            var module = Module(ctx);
+            var getSelection = module.Setup<int[]?>("getSelection", _ => true);
+            getSelection.SetResult(new[] { 0, 2 });
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hi"));
             _ = component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Link));
-
-            Assert.Single(saveSelection.Invocations);
+            Assert.Single(getSelection.Invocations);
         }
 
         [Fact]
@@ -186,7 +227,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
             var icons = component.FindAll(".rz-markdown-editor-tools > button.rz-button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "format_quote", "code", "code_blocks",
                                  "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
@@ -194,21 +234,10 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void MarkdownEditor_DefaultToolbar_HasUndoRedo()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
-            Assert.Contains("undo", component.Markup);
-            Assert.Contains("redo", component.Markup);
-        }
-
-        [Fact]
         public void MarkdownEditor_RendersOnlyChildContent_WhenProvided()
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.AddChildContent<RadzenMarkdownEditorBold>());
-
             var icons = component.FindAll(".rz-markdown-editor-tools > button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "format_bold" }, icons);
         }
@@ -217,19 +246,14 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_ToolClick_ExecutesCommand()
         {
             using var ctx = CreateContext();
-            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 2 });
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
-
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 2 });
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorItalic>());
-
             component.Find(".rz-markdown-editor-tools > button").Click();
-
-            var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal("*hi*", invocation.Arguments[2]);
+            Assert.Equal("*hi*", LastUpdate(module).Text);
         }
 
         [Fact]
@@ -237,22 +261,19 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
-
             Assert.True(component.Find("textarea").HasAttribute("disabled"));
             Assert.All(component.FindAll(".rz-markdown-editor-tools button"), b => Assert.True(b.HasAttribute("disabled")));
         }
 
         [Fact]
-        public void MarkdownEditor_Visible_False_DoesNotRender_OrCreateJsRef_ThenTrue_CreatesOnce()
+        public void MarkdownEditor_Visible_False_DoesNotInitialize_ThenTrue_Initializes()
         {
             using var ctx = CreateContext();
+            var module = Module(ctx);
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Visible, false));
-
             Assert.DoesNotContain("rz-markdown-editor", component.Markup);
             ctx.JSInterop.VerifyNotInvoke("Radzen.createMarkdownEditor");
-
             component.SetParametersAndRender(p => p.Add(x => x.Visible, true));
-
             ctx.JSInterop.VerifyInvoke("Radzen.createMarkdownEditor");
         }
 
@@ -263,52 +284,40 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Design));
-
             component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
-
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
             Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteShortcutAsync_AppliesRegisteredShortcut_AndIgnoresUnknownKey()
+        public async Task MarkdownEditor_ExecuteShortcutAsync_AppliesRegisteredShortcut_AndIgnoresUnknownKey()
         {
             using var ctx = CreateContext();
-            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 2 });
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
-
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 2 });
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorBold>());
-
+            var count = module.Invocations["update"].Count;
             await component.InvokeAsync(() => component.Instance.ExecuteShortcutAsync("Ctrl+B"));
-
-            var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal("**hi**", invocation.Arguments[2]);
-
-            await component.InvokeAsync(() => component.Instance.ExecuteShortcutAsync("Ctrl+Z"));
-
-            Assert.Single(apply.Invocations);
+            Assert.Equal("**hi**", LastUpdate(module).Text);
+            Assert.Equal(count + 1, module.Invocations["update"].Count);
+            await component.InvokeAsync(() => component.Instance.ExecuteShortcutAsync("Ctrl+Q"));
+            Assert.Equal(count + 1, module.Invocations["update"].Count);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ExecuteCommand_NormalizesCrlfSelectionOffsets()
+        public async Task MarkdownEditor_ExecuteCommand_NormalizesCrlfInTheValue()
         {
             using var ctx = CreateContext();
-            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 6, 11 });
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
-
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 6, 11 });
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "line1\r\nline2")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
-
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
-
-            var invocation = Assert.Single(apply.Invocations);
-            Assert.Equal(new object?[] { 6, 11, "**line2**", 8, 13 }, invocation.Arguments.ToArray());
+            Assert.Equal("line1\n**line2**", LastUpdate(module).Text);
         }
 
         [Fact]
@@ -316,7 +325,6 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             ctx.RenderComponent<RadzenMarkdownEditor>();
-
             var invocation = Assert.Single(ctx.JSInterop.Invocations["Radzen.createMarkdownEditor"]);
             var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[3]);
             Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
@@ -326,138 +334,118 @@ namespace Radzen.Blazor.Tests
         public void CustomTool_Click_RaisesExecute_WithCommandName()
         {
             using var ctx = CreateContext();
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
-            apply.SetVoidResult();
+            var module = Module(ctx);
             string? executed = null;
-
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName)
                 .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
                     .Add(x => x.CommandName, "InsertToday")
                     .Add(x => x.Icon, "today")));
-
+            var count = module.Invocations["update"].Count;
             component.Find(".rz-markdown-editor-tools > button").Click();
-
             Assert.Equal("InsertToday", executed);
-            Assert.Empty(apply.Invocations);
+            Assert.Equal(count, module.Invocations["update"].Count);
         }
 
         [Fact]
         public void CustomTool_RendersTemplate_WithEditor()
         {
             using var ctx = CreateContext();
-
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
                     .Add(x => x.Template, editor => b => b.AddContent(0, $"mode:{editor.Mode}"))));
-
             Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
             Assert.Contains("mode:Design", component.Markup);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_DesignInput_UpdatesValue_WithoutSetContent()
+        public void MarkdownEditor_ProgrammaticValueChange_SendsTheNewContent()
         {
             using var ctx = CreateContext();
-            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
-            string? changed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
-                .Add(x => x.Value, "old")
-                .Add(x => x.ValueChanged, v => changed = v));
-            int countAfterMount = plannedSetContent.Invocations.Count;
-
-            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("new **text**"));
-
-            Assert.Equal("new **text**", changed);
-            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count);
-        }
-
-        [Fact]
-        public void MarkdownEditor_ProgrammaticValueChange_TriggersSetContent()
-        {
-            using var ctx = CreateContext();
-            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            var module = Module(ctx);
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
-            int countBeforeExternalChange = plannedSetContent.Invocations.Count;
-
+            var count = module.Invocations["update"].Count;
             component.SetParametersAndRender(p => p.Add(x => x.Value, "b"));
-
-            Assert.True(plannedSetContent.Invocations.Count > countBeforeExternalChange);
+            Assert.Equal(count + 1, module.Invocations["update"].Count);
+            var update = LastUpdate(module);
+            Assert.Equal("b", update.Text);
+            Assert.Equal("<p>b</p>", update.Html);
         }
 
         [Fact]
-        public void MarkdownEditor_ProgrammaticModeChange_ToDesign_TriggersSetContent()
+        public async Task MarkdownEditor_ValueEchoedByTheParent_DoesNotResendTheContent()
         {
             using var ctx = CreateContext();
-            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
+            var module = Module(ctx);
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 1));
+            var count = module.Invocations["update"].Count;
+            component.SetParametersAndRender(p => p.Add(x => x.Value, "ab"));
+            Assert.Equal(count, module.Invocations["update"].Count);
+        }
+
+        [Fact]
+        public void MarkdownEditor_ProgrammaticModeChange_SendsTheContent()
+        {
+            using var ctx = CreateContext();
+            var module = Module(ctx);
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "a")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
-            int countBeforeExternalChange = plannedSetContent.Invocations.Count;
-
+            var count = module.Invocations["update"].Count;
             component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Design));
-
-            Assert.True(plannedSetContent.Invocations.Count > countBeforeExternalChange);
+            Assert.Equal(count + 1, module.Invocations["update"].Count);
+            Assert.Equal("<p>a</p>", LastUpdate(module).Html);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_DesignChange_RaisesChangeOnly()
+        public async Task MarkdownEditor_Blur_RaisesChange_OnlyWhenTheTextChanged()
         {
             using var ctx = CreateContext();
-            var plannedSetContent = ctx.JSInterop.SetupVoid("setContent", _ => true);
-            int valueChangedCount = 0;
-            string? changeEventValue = null;
+            string? changed = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "old")
-                .Add(x => x.ValueChanged, _ => valueChangedCount++)
-                .Add(x => x.Change, v => changeEventValue = v));
-            int countAfterMount = plannedSetContent.Invocations.Count;
-
-            await component.InvokeAsync(() => component.Instance.OnDesignInputAsync("typed **text**"));
-            await component.InvokeAsync(() => component.Instance.OnDesignChangeAsync("typed **text**"));
-
-            Assert.Equal(1, valueChangedCount);
-            Assert.Equal("typed **text**", changeEventValue);
-            Assert.Equal(countAfterMount, plannedSetContent.Invocations.Count);
+                .Add(x => x.Change, v => changed = v));
+            await component.InvokeAsync(() => component.Instance.OnFocusAsync());
+            await component.InvokeAsync(() => component.Instance.OnBlurAsync());
+            Assert.Null(changed);
+            await component.InvokeAsync(() => component.Instance.OnFocusAsync());
+            await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, "!", "insertText", 1));
+            await component.InvokeAsync(() => component.Instance.OnBlurAsync());
+            Assert.Equal("old!", changed);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_HighlightsActiveFormats()
+        public async Task MarkdownEditor_Selection_HighlightsActiveFormats()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
-            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(
-                new MarkdownEditorToolState { Formats = new[] { MarkdownEditorCommands.Bold }, CanUndo = true }));
-
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "**bold** plain"));
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(3, 3));
             Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
-            Assert.True(component.Instance.CanUndo);
             Assert.Contains("rz-state-active", component.Markup);
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(10, 10));
+            Assert.False(component.Instance.IsActive(MarkdownEditorCommands.Bold));
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_ShowsTheCurrentBlockInTheFormatBlockTool()
+        public async Task MarkdownEditor_Selection_ShowsTheCurrentBlockInTheFormatBlockTool()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
-            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(new MarkdownEditorToolState { Block = "h2" }));
-
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "## title"));
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(4, 4));
             Assert.Equal("h2", component.Instance.FormatBlock);
             Assert.Equal("Heading 2", component.Find(".rz-dropdown-label").TextContent);
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_ToolState_DisablesTheFormatBlockTool_WithoutParagraphOrHeading()
+        public async Task MarkdownEditor_Selection_DisablesTheFormatBlockTool_WithoutParagraphOrHeading()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "para\n\n```\ncode\n```"));
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(2, 2));
             Assert.DoesNotContain("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
-
-            await component.InvokeAsync(() => component.Instance.OnToolStateAsync(new MarkdownEditorToolState { Block = null }));
-
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(11, 11));
             Assert.Contains("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
         }
 
@@ -465,36 +453,11 @@ namespace Radzen.Blazor.Tests
         public void FormatBlock_Change_ExecutesFormatBlockWithTheLevel()
         {
             using var ctx = CreateContext();
-            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 0, 0 });
-            var apply = ctx.JSInterop.SetupVoid("apply", _ => true);
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 0 });
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(e => e.Value, "title").Add(e => e.Mode, MarkdownEditorMode.Source));
-
             component.FindComponent<RadzenMarkdownEditorFormatBlock>().FindAll(".rz-dropdown-item")[3].Click();
-
-            apply.VerifyInvoke("apply");
-            Assert.Equal("### title", apply.Invocations["apply"].Single().Arguments[2]);
-        }
-
-        [Theory]
-        [InlineData("smile", "\U0001f604")]
-        [InlineData("SMILE", "\U0001f604")]
-        [InlineData("thumbsup", "\U0001f44d")]
-        [InlineData("+1", "\U0001f44d")]
-        public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsEmojiForKnownShortcode(string shortcode, string expected)
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
-            Assert.Equal(expected, await component.Instance.LookupEmojiAsync(shortcode));
-        }
-
-        [Fact]
-        public async System.Threading.Tasks.Task MarkdownEditor_LookupEmoji_ReturnsNullForUnknownShortcode()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
-
-            Assert.Null(await component.Instance.LookupEmojiAsync("notarealemoji"));
+            Assert.Equal("### title", LastUpdate(module).Text);
         }
     }
 }

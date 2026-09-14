@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 
 namespace Radzen.Documents.Markdown;
@@ -7,6 +8,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class Document : BlockContainer
 {
+    internal List<string> LinkReferenceDefinitions { get; } = [];
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Document"/> class.
     /// </summary>

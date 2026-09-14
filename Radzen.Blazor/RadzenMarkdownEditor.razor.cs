@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen.Documents.Markdown;
 
 namespace Radzen.Blazor;
 
@@ -11,10 +11,9 @@ namespace Radzen.Blazor;
 /// A Markdown editor component with a toolbar, keyboard shortcuts, and a Design/Source mode switcher.
 /// </summary>
 /// <remarks>
-/// Edits made in Design mode serialize the whole document back to Markdown in a canonical form: <c>__bold__</c> becomes
-/// <c>**bold**</c>, and characters with a Markdown meaning inside plain text are escaped, e.g. <c>snake_case</c> becomes
-/// <c>snake\_case</c> and <c>array[0]</c> becomes <c>array\[0\]</c>. The rendered result is unchanged. Use Source mode when
-/// the exact Markdown text must be preserved.
+/// The Markdown text is the single source of truth in both modes. Design mode renders it and turns every edit into a
+/// text edit at the corresponding position, so the text outside the edited range is preserved as written. Text typed
+/// in Design mode is inserted literally: characters with a Markdown meaning are escaped.
 /// </remarks>
 /// <example>
 /// <code>
@@ -33,10 +32,17 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     private ElementReference textarea;
     private IJSObjectReference? jsRef;
     private readonly Dictionary<string, Func<Task>> shortcuts = new();
+    private readonly MarkdownEditorEngine engine = new(null);
 
     private MarkdownEditorMode mode;
     private bool visibleChanged;
-    private int jsRefVersion;
+    private bool valueChangedExternally;
+    private bool modeChanged;
+    private bool initialized;
+    private bool lastInsertEndedWithWhitespace = true;
+    private bool focusOnModeChange;
+    private string? valueAtFocus;
+    private (int Start, int End) selection;
 
     /// <summary>
     /// Gets or sets the mode of the editor. Two-way bindable.
@@ -55,7 +61,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     [Parameter]
     public bool ShowToolbar { get; set; } = true;
-    
+
     /// <summary>
     /// Specifies whether the mode selector is shown. Set to <c>true</c> by default.
     /// </summary>
@@ -95,6 +101,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
     private MarkdownEditorToolState toolState = new() { Block = string.Empty };
 
+    internal event Action? ToolStateChanged;
+
     /// <summary>
     /// Whether the editor's history has a state to undo to.
     /// </summary>
@@ -117,15 +125,9 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public string? FormatBlock => toolState.Block;
 
     /// <summary>
-    /// Invoked from JavaScript when the selection or history state changes.
+    /// The selection as offsets in the Markdown text.
     /// </summary>
-    [JSInvokable("OnToolStateAsync")]
-    public Task OnToolStateAsync(MarkdownEditorToolState state)
-    {
-        toolState = state;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
+    public (int Start, int End) Selection => selection;
 
     private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
     private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));
@@ -135,7 +137,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     private string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
     private string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
     private string CancelText => Localize(nameof(RadzenStrings.HtmlEditorLink_CancelText));
-    
+
     private string ContentEditable => Disabled ? "false" : "true";
 
     /// <inheritdoc />
@@ -145,85 +147,207 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     {
         mode = value;
         modeChanged = true;
+        focusOnModeChange = true;
         await ModeChanged.InvokeAsync(value);
+    }
 
-        if (value == MarkdownEditorMode.Design)
+    private async Task<MarkdownEditorUpdate> PublishAsync(MarkdownEditorUpdate update, int version, bool raiseInput)
+    {
+        engine.RenderHtml = mode == MarkdownEditorMode.Design;
+        update.Version = version;
+        selection = (update.SelectionStart, update.SelectionEnd);
+        toolState = update.State ?? toolState;
+        ToolStateChanged?.Invoke();
+
+        if (mode == MarkdownEditorMode.Source)
         {
-            await SyncDesignContentAsync();
+            update.Html = null;
+            update.Segments = null;
+        }
+
+        if (Value != engine.Text)
+        {
+            Value = engine.Text;
+            await ValueChanged.InvokeAsync(Value);
+            NotifyFieldChanged(Value);
+
+            if (raiseInput && Immediate)
+            {
+                await Input.InvokeAsync(Value);
+            }
+        }
+
+        StateHasChanged();
+
+        return update;
+    }
+
+    private async Task PushAsync(MarkdownEditorUpdate? update, bool includeText, bool focus = false)
+    {
+        engine.RenderHtml = true;
+        if (update == null)
+        {
+            return;
+        }
+
+        if (includeText)
+        {
+            update.Text = engine.Text;
+        }
+
+        await PublishAsync(update, await GetVersionAsync(), raiseInput: false);
+
+        if (jsRef != null)
+        {
+            await jsRef.InvokeVoidAsync("update", update, focus);
         }
     }
 
-    private string? lastSurfaceValue;
-    private bool valueChangedExternally;
-    private bool modeChangedExternally;
-    private bool modeChanged;
+    private async Task<int> GetVersionAsync() => jsRef != null ? await jsRef.InvokeAsync<int>("getVersion") : 0;
 
     /// <summary>
-    /// Invoked from JavaScript when the design surface content changes.
+    /// Invoked from JavaScript when text is inserted, replaced or deleted.
     /// </summary>
-    [JSInvokable("OnDesignInputAsync")]
-    public async Task OnDesignInputAsync(string markdown)
+    [JSInvokable("OnEditAsync")]
+    public Task<MarkdownEditorUpdate> OnEditAsync(int start, int end, string text, string inputType, int version)
     {
-        await UpdateValueFromSurfaceAsync(markdown);
+        text ??= string.Empty;
+        inputType ??= string.Empty;
+        engine.RenderHtml = mode == MarkdownEditorMode.Design;
+        string? key = null;
+        var merge = false;
+        var selected = inputType.EndsWith(":selection", StringComparison.Ordinal);
+        inputType = selected ? inputType[..^":selection".Length] : inputType;
 
-        if (Immediate)
+        switch (inputType)
         {
-            await Input.InvokeAsync(markdown);
+            case "insertText":
+                key = "insert";
+                merge = !(lastInsertEndedWithWhitespace && text.Length > 0 && !char.IsWhiteSpace(text[0]));
+                lastInsertEndedWithWhitespace = text.Length > 0 && char.IsWhiteSpace(text[^1]);
+                break;
+            case "deleteContentBackward":
+                key = "delete-backward";
+                merge = true;
+                break;
+            case "deleteContentForward":
+                key = "delete-forward";
+                merge = true;
+                break;
+            default:
+                lastInsertEndedWithWhitespace = true;
+                break;
         }
+
+        var literal = mode == MarkdownEditorMode.Design && inputType != "check";
+        var paragraphs = inputType is "insertFromPaste" or "insertFromDrop";
+        var update = text.Length == 0 && inputType.StartsWith("delete", StringComparison.Ordinal) && mode == MarkdownEditorMode.Design
+            ? engine.Delete(start, end, inputType.Contains("Forward", StringComparison.Ordinal), key, merge, selected)
+            : engine.InsertText(start, end, text, literal, key, merge, paragraphs, selected);
+
+        return update == null ? Task.FromResult(engine.Render(start, start)) : PublishAsync(update, version, raiseInput: true);
     }
 
     /// <summary>
-    /// Invoked from JavaScript when the design surface loses focus after its content changed.
+    /// Invoked from JavaScript when Enter is pressed in Design mode.
     /// </summary>
-    [JSInvokable("OnDesignChangeAsync")]
-    public Task OnDesignChangeAsync(string markdown) => Change.InvokeAsync(markdown);
-
-    private async Task UpdateValueFromSurfaceAsync(string markdown)
+    [JSInvokable("OnInsertParagraphAsync")]
+    public async Task<MarkdownEditorUpdate?> OnInsertParagraphAsync(int start, int end, int version)
     {
-        lastSurfaceValue = markdown;
-        Value = markdown;
-        await ValueChanged.InvokeAsync(markdown);
-        NotifyFieldChanged(markdown);
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.InsertParagraph(start, end);
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
     }
 
-    private async Task SyncDesignContentAsync()
+    /// <summary>
+    /// Invoked from JavaScript when Tab is pressed in the last table cell in Design mode.
+    /// </summary>
+    [JSInvokable("OnInsertRowAsync")]
+    public async Task<MarkdownEditorUpdate?> OnInsertRowAsync(int start, int end, int version)
     {
-        if (jsRef != null && mode == MarkdownEditorMode.Design)
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.AppendRow(start);
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when Tab or Shift+Tab is pressed in a list item in Design mode.
+    /// </summary>
+    [JSInvokable("OnIndentAsync")]
+    public async Task<MarkdownEditorUpdate?> OnIndentAsync(int start, int end, bool outdent, int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.Indent(start, end, outdent);
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when Shift+Enter is pressed in Design mode.
+    /// </summary>
+    [JSInvokable("OnInsertLineBreakAsync")]
+    public async Task<MarkdownEditorUpdate?> OnInsertLineBreakAsync(int start, int end, int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.InsertLineBreak(start, end);
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the selection changes.
+    /// </summary>
+    [JSInvokable("OnSelectionAsync")]
+    public Task OnSelectionAsync(int start, int end)
+    {
+        selection = (start, end);
+        toolState = engine.State(start, end);
+        ToolStateChanged?.Invoke();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the undo shortcut is pressed.
+    /// </summary>
+    [JSInvokable("OnUndoAsync")]
+    public async Task<MarkdownEditorUpdate?> OnUndoAsync(int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.Undo();
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the redo shortcut is pressed.
+    /// </summary>
+    [JSInvokable("OnRedoAsync")]
+    public async Task<MarkdownEditorUpdate?> OnRedoAsync(int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.Redo();
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the editing surface gains focus.
+    /// </summary>
+    [JSInvokable("OnFocusAsync")]
+    public Task OnFocusAsync()
+    {
+        valueAtFocus = engine.Text;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when the editing surface loses focus. Raises <see cref="FormComponent{T}.Change" /> when the text changed.
+    /// </summary>
+    [JSInvokable("OnBlurAsync")]
+    public async Task OnBlurAsync()
+    {
+        if (valueAtFocus != null && valueAtFocus != engine.Text)
         {
-            await jsRef.InvokeVoidAsync("setContent", HtmlVisitor.ToHtml(NormalizedValue));
+            valueAtFocus = engine.Text;
+            await Change.InvokeAsync(engine.Text);
         }
-    }
-
-    /// <summary>
-    /// Invoked from JavaScript to render Markdown as design-surface HTML (paste laundering, undo/redo cross-mode restore).
-    /// </summary>
-    [JSInvokable("RenderMarkdownAsync")]
-    public Task<string> RenderMarkdownAsync(string markdown) => Task.FromResult(HtmlVisitor.ToHtml(markdown));
-
-    /// <summary>
-    /// Invoked from JavaScript when a <c>:shortcode:</c> is typed in the design surface. Returns the
-    /// emoji for the shortcode, or <c>null</c> when it is not a known emoji shortcode.
-    /// </summary>
-    [JSInvokable("LookupEmojiAsync")]
-    public Task<string?> LookupEmojiAsync(string shortcode) =>
-        Task.FromResult(EmojiMapping.Emojis.TryGetValue(shortcode ?? string.Empty, out var emoji) ? emoji : null);
-
-    private async Task OnInputAsync(string? value)
-    {
-        string newValue = value ?? string.Empty;
-        Value = newValue;
-        await ValueChanged.InvokeAsync(newValue);
-        NotifyFieldChanged(newValue);
-
-        if (Immediate)
-        {
-            await Input.InvokeAsync(newValue);
-        }
-    }
-
-    private async Task OnChange(ChangeEventArgs args)
-    {
-        await Change.InvokeAsync($"{args.Value}");
     }
 
     /// <summary>
@@ -253,6 +377,21 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     public override ValueTask FocusAsync() => mode == MarkdownEditorMode.Design ? editable.FocusAsync() : textarea.FocusAsync();
 
+    private async Task<(int Start, int End)> GetSelectionAsync()
+    {
+        if (jsRef != null)
+        {
+            var range = await jsRef.InvokeAsync<int[]?>("getSelection");
+
+            if (range is { Length: 2 })
+            {
+                selection = (range[0], range[1]);
+            }
+        }
+
+        return selection;
+    }
+
     /// <summary>
     /// Executes a command. Built-in commands (see <see cref="MarkdownEditorCommands" />) modify the text; unknown command names only raise <see cref="Execute" />.
     /// </summary>
@@ -261,21 +400,13 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public async Task ExecuteCommandAsync(string name, string? value = null)
     {
         string? label = null;
+        var (start, end) = await GetSelectionAsync();
 
         if (value == null && name is MarkdownEditorCommands.Link or MarkdownEditorCommands.Image)
         {
-            if (mode == MarkdownEditorMode.Design && jsRef != null)
-            {
-                await jsRef.InvokeVoidAsync("saveSelection");
-            }
-
-            bool hasSelection = mode == MarkdownEditorMode.Design
-                ? jsRef != null && await jsRef.InvokeAsync<bool>("hasSelection")
-                : await GetSelectionAsync() is var (s, e) && e > s;
-
             LinkDialogModel model = new();
             string title = Localize(name == MarkdownEditorCommands.Image ? nameof(RadzenStrings.MarkdownEditorImage_Title) : nameof(RadzenStrings.MarkdownEditorLink_Title));
-            dynamic? result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, hasSelection));
+            dynamic? result = await DialogService.OpenAsync(title, LinkDialog(model, name == MarkdownEditorCommands.Image, end > start));
 
             if (result is not true || string.IsNullOrWhiteSpace(model.Url))
             {
@@ -286,65 +417,24 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             label = model.Text;
         }
 
-        if (name is MarkdownEditorCommands.Undo or MarkdownEditorCommands.Redo)
+        lastInsertEndedWithWhitespace = true;
+
+        var update = name switch
         {
-            if (jsRef != null)
-            {
-                await jsRef.InvokeVoidAsync("execute", name, null, null);
-            }
+            MarkdownEditorCommands.Undo => engine.Undo(),
+            MarkdownEditorCommands.Redo => engine.Redo(),
+            _ => engine.Command(name, start, end, value, label)
+        };
 
-            await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
-            return;
-        }
-
-        if (jsRef != null)
-        {
-            if (mode == MarkdownEditorMode.Design)
-            {
-                await jsRef.InvokeVoidAsync("execute", name, value, label);
-            }
-            else
-            {
-                (int start, int end) = await GetSelectionAsync();
-
-                if (MarkdownFormatter.Apply(NormalizedValue, start, end, name, value, label) is { } edit)
-                {
-                    await jsRef.InvokeVoidAsync("apply", edit.Start, edit.End, edit.Replacement, edit.SelectionStart, edit.SelectionEnd);
-                }
-            }
-        }
-
+        await PushAsync(update, includeText: true, focus: true);
         await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
-    }
-
-    /// <summary>
-    /// <see cref="FormComponent{T}.Value" /> with line endings normalised to <c>\n</c>, matching the offsets
-    /// <c>Radzen.getSelectionRange</c> returns for the textarea (the HTML spec normalises the API value to LF).
-    /// </summary>
-    private string NormalizedValue => (Value ?? string.Empty).Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
-
-    private async Task<(int Start, int End)> GetSelectionAsync()
-    {
-        string text = NormalizedValue;
-        int length = text.Length;
-
-        if (JSRuntime == null)
-        {
-            return (length, length);
-        }
-
-        int[]? range = await JSRuntime.InvokeAsync<int[]?>("Radzen.getSelectionRange", textarea);
-
-        return range is { Length: 2 }
-            ? (Math.Clamp(range[0], 0, length), Math.Clamp(range[1], 0, length))
-            : (length, length);
     }
 
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         mode = Mode;
-
+        engine.Reset(Value);
         base.OnInitialized();
     }
 
@@ -354,87 +444,75 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         if (parameters.DidParameterChange(nameof(Mode), Mode))
         {
             mode = parameters.GetValueOrDefault<MarkdownEditorMode>(nameof(Mode));
-            modeChangedExternally = mode == MarkdownEditorMode.Design;
             modeChanged = true;
         }
 
         if (parameters.DidParameterChange(nameof(Value), Value))
         {
             var incoming = parameters.GetValueOrDefault<string?>(nameof(Value));
-            valueChangedExternally = incoming != lastSurfaceValue;
+            valueChangedExternally = MarkdownEditorEngine.Normalize(incoming) != engine.Text;
         }
 
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         await base.SetParametersAsync(parameters);
 
-        if (visibleChanged && !Visible && jsRef != null)
+        if (visibleChanged && !Visible)
         {
-            jsRefVersion++;
-            IJSObjectReference stale = jsRef;
-            jsRef = null;
-            await stale.InvokeVoidAsync("dispose");
-            await stale.DisposeAsync();
+            await DisposeJsAsync();
         }
     }
 
-    /// <inheritdoc />
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task DisposeJsAsync()
     {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if ((firstRender || visibleChanged) && Visible && JSRuntime != null)
+        if (jsRef != null)
         {
-            int version = ++jsRefVersion;
-            IJSObjectReference? stale = jsRef;
+            var stale = jsRef;
             jsRef = null;
+            initialized = false;
 
-            if (stale != null)
+            try
             {
                 await stale.InvokeVoidAsync("dispose");
                 await stale.DisposeAsync();
             }
-
-            if (version == jsRefVersion)
+            catch (JSDisconnectedException)
             {
-                IJSObjectReference created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", editable, textarea, Reference, shortcuts.Keys);
-
-                if (version == jsRefVersion)
-                {
-                    jsRef = created;
-                }
-                else
-                {
-                    await created.InvokeVoidAsync("dispose");
-                    await created.DisposeAsync();
-                }
             }
-
-            await SyncDesignContentAsync();
-        }
-
-        if (valueChangedExternally)
-        {
-            valueChangedExternally = false;
-            await SyncDesignContentAsync();
-        }
-
-        if (modeChangedExternally)
-        {
-            modeChangedExternally = false;
-            await SyncDesignContentAsync();
-        }
-
-        if (modeChanged)
-        {
-            modeChanged = false;
-
-            if (jsRef != null)
+            catch (ObjectDisposedException)
             {
-                await jsRef.InvokeVoidAsync("refreshState");
             }
         }
+    }
 
+    /// <inheritdoc />
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(MarkdownEditorToolState))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(MarkdownEditorUpdate))]
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        engine.RenderHtml = true;
+
+        if ((firstRender || visibleChanged) && Visible && JSRuntime != null && !initialized)
+        {
+            initialized = true;
+            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", editable, textarea, Reference, shortcuts.Keys);
+            await PushAsync(engine.Render(0, 0), includeText: true);
+        }
+        else if (valueChangedExternally || modeChanged)
+        {
+            if (valueChangedExternally)
+            {
+                engine.Reset(Value);
+            }
+
+            await PushAsync(engine.Render(selection.Start, selection.End), includeText: true, focus: focusOnModeChange);
+        }
+
+        valueChangedExternally = false;
+        modeChanged = false;
+        focusOnModeChange = false;
         visibleChanged = false;
     }
 
@@ -445,9 +523,24 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
         if (jsRef != null)
         {
-            jsRef.InvokeVoid("dispose");
-            jsRef.DisposeFireAndForget();
+            var stale = jsRef;
             jsRef = null;
+
+            try
+            {
+                stale.InvokeVoid("dispose");
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            stale.DisposeFireAndForget();
         }
 
         GC.SuppressFinalize(this);

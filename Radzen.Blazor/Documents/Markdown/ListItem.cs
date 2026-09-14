@@ -67,13 +67,14 @@ public class ListItem : BlockContainer
                 && (value[1] is ' ' or 'x' or 'X'))
             {
                 Checked = value[1] != ' ';
-                paragraph.Value = value[4..];
+                paragraph.TrimContentStart(4);
             }
         }
 
         if (LastChild != null)
         {
             Range.End = LastChild.Range.End;
+            SourceEnd = LastChild.SourceEnd;
         }
         else
         {
@@ -84,6 +85,7 @@ public class ListItem : BlockContainer
             {
                 Range.End.Column = list.MarkerOffset + list.Padding;
             }
+            SourceEnd = ContentOffset;
         }
     }
 
@@ -103,6 +105,7 @@ public class ListItem : BlockContainer
 
             var node = parser.AddChild<ListItem>(parser.NextNonSpace);
             node.data = data;
+            node.ContentOffset = parser.SourceOffset;
 
             return BlockStart.Container;
         }
@@ -111,6 +114,8 @@ public class ListItem : BlockContainer
     }
 
     private List data = null!;
+
+    internal int ContentOffset { get; set; }
 
     private static readonly Regex UnorderedMarkerRegex = new(@"^[*+-]");
 

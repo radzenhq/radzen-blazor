@@ -17,6 +17,8 @@ public class Image : InlineContainer
     /// </summary>
     public string? Title { get; set; }
 
+    internal string? Suffix { get; set; }
+
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {

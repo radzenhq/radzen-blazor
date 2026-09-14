@@ -292,6 +292,42 @@ await drive('HtmlEditor type + Bold', '/html-editor', async (page, ctx) => {
   ctx.notes.push(`HtmlEditor Bold command mutated markup=${formatted}`);
 });
 
+// 8b. MarkdownEditor - every keystroke round-trips MarkdownEditorUpdate through JS interop,
+//     and the Bold command reads the selection back and pushes an update with the rendered HTML.
+await drive('MarkdownEditor type + Bold', '/markdown-editor', async (page, ctx) => {
+  const surface = await need(page, '.rz-markdown-editor-design', ctx, 'markdown editor design surface');
+  await page.evaluate(() => {
+    const el = document.querySelector('.rz-markdown-editor-design');
+    el.focus();
+    const r = document.createRange();
+    r.selectNodeContents(el.querySelector('p') || el);
+    r.collapse(false);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  });
+  await page.keyboard.type(' trimprobe');
+  await page.waitForTimeout(ctx.settleMs);
+  const typed = await surface.innerHTML().catch(() => '');
+  ctx.notes.push(`MarkdownEditor typed text rendered=${/trimprobe/.test(typed)}`);
+  await page.evaluate(() => {
+    const el = document.querySelector('.rz-markdown-editor-design');
+    const text = [...el.querySelectorAll('p')].map(p => p.firstChild).find(n => n && n.nodeType === 3);
+    const r = document.createRange();
+    r.setStart(text, 0);
+    r.setEnd(text, Math.min(4, text.length));
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  });
+  await page.waitForTimeout(400);
+  const bold = await need(page, '.rz-markdown-editor-toolbar button[title*="Bold" i]', ctx, 'Bold toolbar button');
+  await bold.click();
+  await page.waitForTimeout(ctx.settleMs);
+  const after = await surface.innerHTML().catch(() => '');
+  ctx.notes.push(`MarkdownEditor Bold command rendered strong=${/<strong>/.test(after)}`);
+});
+
 // 9. Spreadsheet - [JSInvokable] CellEventArgs (the original production crash).
 //    Click a cell, type a value, commit with Enter.
 await drive('Spreadsheet cell edit', '/spreadsheet', async (page, ctx) => {

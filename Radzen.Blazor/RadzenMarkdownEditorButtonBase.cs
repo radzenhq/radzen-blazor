@@ -58,6 +58,11 @@ public abstract class RadzenMarkdownEditorButtonBase : ComponentBase, IDisposabl
         {
             Editor?.RegisterShortcut(Shortcut, OnClick);
         }
+
+        if (Editor != null)
+        {
+            Editor.ToolStateChanged += StateHasChanged;
+        }
     }
 
     /// <inheritdoc />
@@ -66,6 +71,11 @@ public abstract class RadzenMarkdownEditorButtonBase : ComponentBase, IDisposabl
         if (!string.IsNullOrEmpty(Shortcut))
         {
             Editor?.UnregisterShortcut(Shortcut);
+        }
+
+        if (Editor != null)
+        {
+            Editor.ToolStateChanged -= StateHasChanged;
         }
 
         GC.SuppressFinalize(this);

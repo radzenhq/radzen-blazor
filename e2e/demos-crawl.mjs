@@ -69,6 +69,7 @@ const routes = [
   { route: '/scheduler', component: 'Scheduler', data: 'inline' },
   { route: '/radial-gauge', component: 'RadialGauge', data: 'inline' },
   { route: '/html-editor', component: 'HtmlEditor', data: 'inline' },
+  { route: '/markdown-editor', component: 'MarkdownEditor', data: 'inline' },
   { route: '/upload', component: 'Upload', data: 'inline' },
 ];
 
@@ -108,7 +109,7 @@ for (const entry of routes) {
         // runtime hydrated (interactive markup carries rz- classes well beyond the static chrome).
         rzNodes: document.querySelectorAll('[class*="rz-"]').length,
         component: document.querySelectorAll(
-          '.rz-data-grid, .rz-datatable, .rz-chart, svg, .rz-scheduler, .rz-dropdown, .rz-tree, .rz-listbox, .rz-upload, .rz-html-editor, .rz-gauge'
+          '.rz-data-grid, .rz-datatable, .rz-chart, svg, .rz-scheduler, .rz-dropdown, .rz-tree, .rz-listbox, .rz-upload, .rz-html-editor, .rz-markdown-editor, .rz-gauge'
         ).length,
       };
     });

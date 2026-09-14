@@ -12,6 +12,8 @@ public static class MarkdownParser
     /// <returns>The parsed document.</returns>
     public static Document Parse(string markdown)
     {
-        return BlockParser.Parse(markdown);
+        var document = BlockParser.Parse(markdown);
+        document.Accept(new PristineMarker());
+        return document;
     }
 }

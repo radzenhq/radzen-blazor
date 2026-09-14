@@ -26,6 +26,14 @@ public abstract class Leaf : Block, IBlockInlineContainer
     {
         children.Add(node);
     }
+
+    internal void ReplaceInlines(IEnumerable<Inline> inlines)
+    {
+        children.Clear();
+        children.AddRange(inlines);
+    }
+    internal ContentMap Content { get; } = new();
+
     internal void AddLine(BlockParser blockParser)
     {
         if (blockParser.PartiallyConsumedTab)
@@ -35,8 +43,48 @@ public abstract class Leaf : Block, IBlockInlineContainer
             var charsToTab = 4 - (blockParser.Column % 4);
 
             Value += new string(' ', charsToTab);
+
+            Content.Append(charsToTab, blockParser.SourceOffset - 1, 1);
         }
 
-        Value += blockParser.CurrentLine[blockParser.Offset..] + "\n";
+        var text = blockParser.CurrentLine[blockParser.Offset..];
+
+        Value += text + "\n";
+
+        Content.Append(text.Length, blockParser.SourceOffset, text.Length);
+
+        Content.Append(1, blockParser.LineEnd, blockParser.NextLineStart - blockParser.LineEnd);
+    }
+
+    internal void SetContent(string value, int sourceStart)
+    {
+        Value = value;
+
+        Content.Clear();
+
+        Content.Append(value.Length, sourceStart, value.Length);
+    }
+
+    internal void TrimContentStart(int count)
+    {
+        Value = Value[count..];
+
+        Content.TrimStart(count);
+    }
+
+    internal void TrimContentEnd(int length)
+    {
+        Value = Value[..length];
+
+        Content.TrimEnd(length);
+    }
+
+    internal void CopyContent(Leaf source)
+    {
+        Value = source.Value;
+
+        Content.Clear();
+
+        Content.Append(source.Content.Segments);
     }
 }

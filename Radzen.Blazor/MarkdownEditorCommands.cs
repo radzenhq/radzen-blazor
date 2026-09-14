@@ -38,4 +38,49 @@ public static class MarkdownEditorCommands
     public const string Undo = "undo";
     /// <summary>Restores the next state from the editor's history.</summary>
     public const string Redo = "redo";
+
+    /// <summary>
+    /// Inserts a table. The value is the size as <c>rows x columns</c>, for example <c>3x3</c>.
+    /// </summary>
+    public const string InsertTable = "insertTable";
+
+    /// <summary>
+    /// Inserts a table row above the current row.
+    /// </summary>
+    public const string TableRowBefore = "tableRowBefore";
+
+    /// <summary>
+    /// Inserts a table row below the current row.
+    /// </summary>
+    public const string TableRowAfter = "tableRowAfter";
+
+    /// <summary>
+    /// Inserts a table column before the current column.
+    /// </summary>
+    public const string TableColumnBefore = "tableColumnBefore";
+
+    /// <summary>
+    /// Inserts a table column after the current column.
+    /// </summary>
+    public const string TableColumnAfter = "tableColumnAfter";
+
+    /// <summary>
+    /// Deletes the current table row.
+    /// </summary>
+    public const string TableDeleteRow = "tableDeleteRow";
+
+    /// <summary>
+    /// Deletes the current table column.
+    /// </summary>
+    public const string TableDeleteColumn = "tableDeleteColumn";
+
+    /// <summary>
+    /// Deletes the current table.
+    /// </summary>
+    public const string TableDelete = "tableDelete";
+
+    /// <summary>
+    /// Sets the alignment of the current table column. The value is <c>left</c>, <c>center</c>, <c>right</c> or <c>none</c>.
+    /// </summary>
+    public const string TableAlign = "tableAlign";
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Documents.Markdown;
@@ -15,6 +16,10 @@ public class Table : Leaf
     /// Gets the rows of the table.
     /// </summary>
     public IReadOnlyList<TableRow> Rows => rows;
+
+    internal void InsertRow(int index, TableRow row) => rows.Insert(index, row);
+
+    internal void RemoveRow(TableRow row) => rows.Remove(row);
 
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
@@ -33,13 +38,14 @@ public class Table : Leaf
         var headerCells = header.Cells;
 
         var dataLines = Value.Split('\n');
+        var lineStart = 0;
 
         foreach (var line in dataLines)
         {
             if (!string.IsNullOrWhiteSpace(line))
             {
                 var row = new TableRow();
-                var cells = ParseRow(line);
+                var cells = ParseRow(line, index => Content.ToSource(lineStart + index));
 
                 // Trim excess cells
                 var count = Math.Min(cells.Count, headerCells.Count);
@@ -48,7 +54,7 @@ public class Table : Leaf
                 {
                     var alignment = cellIndex < headerCells.Count ? headerCells[cellIndex].Alignment : TableCellAlignment.None;
 
-                    row.Add(cells[cellIndex], alignment);
+                    row.Add(cells[cellIndex].Value, alignment, cells[cellIndex].Content);
                 }
 
                 for (int missingCellIndex = 0; missingCellIndex < header.Cells.Count - cells.Count; missingCellIndex++)
@@ -58,43 +64,85 @@ public class Table : Leaf
 
                 rows.Add(row);
             }
+            lineStart += line.Length + 1;
         }
     }
 
-    private static List<string> ParseRow(string line)
+    private readonly record struct CellText(string Value, ContentMap Content);
+
+    private static List<CellText> ParseRow(string line, Func<int, int> toSource)
     {
-        // Remove leading and trailing pipes if present
-        line = line.Trim();
+        var start = line.Length - line.TrimStart().Length;
+        var end = line.TrimEnd().Length;
 
-        if (line.StartsWith('|'))
+        if (end > start && line[start] == '|')
         {
-            line = line[1..];
-        }
-        if (line.EndsWith('|'))
-        {
-            line = line[..^1];
+            start++;
         }
 
-        // Split by pipe character, but not by escaped pipes
-        var cells = new List<string>();
-        var currentCell = "";
+        if (end > start && line[end - 1] == '|')
+        {
+            end--;
+        }
+
+        var cells = new List<CellText>();
+        var chars = new StringBuilder();
+        var indexes = new List<int>();
+
+        void Flush(int pipe)
+        {
+            var first = 0;
+            var last = chars.Length;
+
+            while (first < last && char.IsWhiteSpace(chars[first]))
+            {
+                first++;
+            }
+
+            while (last > first && char.IsWhiteSpace(chars[last - 1]))
+            {
+                last--;
+            }
+
+            var content = new ContentMap();
+            var runStart = first;
+
+            if (first == last)
+            {
+                content.Append(0, toSource(indexes.Count > 0 ? indexes[^1] : pipe), 0);
+            }
+
+            for (var k = first + 1; k <= last; k++)
+            {
+                if (k == last || indexes[k] != indexes[k - 1] + 1)
+                {
+                    var sourceStart = toSource(indexes[runStart]);
+                    content.Append(k - runStart, sourceStart, toSource(indexes[k - 1] + 1) - sourceStart);
+                    runStart = k;
+                }
+            }
+
+            cells.Add(new CellText(chars.ToString(first, last - first), content));
+            chars.Clear();
+            indexes.Clear();
+        }
+
         var escaped = false;
 
-        for (int i = 0; i < line.Length; i++)
+        for (var i = start; i < end; i++)
         {
             var c = line[i];
 
             if (escaped)
             {
-                // Add the escaped character (including escaped pipes)
-                if (c == '|')
+                if (c != '|')
                 {
-                    currentCell += '|'; // Replace \| with |
+                    chars.Append('\\');
+                    indexes.Add(i - 1);
                 }
-                else
-                {
-                    currentCell += $"\\{c}"; // Keep the escape character for other escaped chars
-                }
+
+                chars.Append(c);
+                indexes.Add(i);
                 escaped = false;
             }
             else if (c == '\\')
@@ -103,20 +151,18 @@ public class Table : Leaf
             }
             else if (c == '|')
             {
-                // End of cell
-                cells.Add(currentCell.Trim());
-                currentCell = "";
+                Flush(i);
             }
             else
             {
-                currentCell += c;
+                chars.Append(c);
+                indexes.Add(i);
             }
         }
 
-        // Add the last cell
-        if (!string.IsNullOrEmpty(currentCell) || cells.Count > 0)
+        if (chars.Length > 0 || cells.Count > 0)
         {
-            cells.Add(currentCell.Trim());
+            Flush(end);
         }
 
         return cells;
@@ -154,7 +200,7 @@ public class Table : Leaf
             var headerLine = paragraph.Value.Trim();
 
             // Parse header cells and delimiter cells
-            var headerCells = ParseRow(headerLine);
+            var headerCells = ParseRow(headerLine, index => paragraph.Content.ToSource(paragraph.Value.Length - paragraph.Value.TrimStart().Length + index));
 
             // Parse delimiter cells to determine alignments
             var cleanDelimiterRow = delimiterRow;
@@ -207,6 +253,7 @@ public class Table : Leaf
             // resolve reference links
             while (paragraph.Value.Peek() == '[' && parser.TryParseLinkReference(paragraph.Value, out var position))
             {
+                parser.RecordLinkReferenceDefinition(paragraph.Value[..position]);
                 paragraph.Value = paragraph.Value[position..];
             }
 
@@ -222,7 +269,7 @@ public class Table : Leaf
                 for (int cellindex = 0; cellindex < headerCells.Count; cellindex++)
                 {
                     var alignment = cellindex < alignments.Count ? alignments[cellindex] : TableCellAlignment.None;
-                    header.Add(headerCells[cellindex], alignment);
+                    header.Add(headerCells[cellindex].Value, alignment, headerCells[cellindex].Content);
                 }
 
                 paragraph.Parent.Replace(paragraph, table);
