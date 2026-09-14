@@ -344,7 +344,17 @@ public partial class Worksheet
         return new CellRef(Rows.NextVisible(0, 1, 0), Columns.NextVisible(0, 1, 0));
     }
 
-    private void EvaluateFormula(Cell cell)
+    private void EvaluateFormulas(IEnumerable<Cell> cells)
+    {
+        var evaluated = new Dictionary<Cell, CellData>();
+
+        foreach (var cell in cells)
+        {
+            EvaluateFormula(cell, evaluated);
+        }
+    }
+
+    private void EvaluateFormula(Cell cell, Dictionary<Cell, CellData> evaluated)
     {
         var tree = cell.FormulaSyntaxTree;
 
@@ -362,9 +372,16 @@ public partial class Worksheet
             isEvaluating = true;
             try
             {
-                var visitor = new FormulaEvaluator(this, cell);
+                var visitor = new FormulaEvaluator(this, cell, evaluated);
                 var eval = visitor.Evaluate(tree.Root);
+
+                if (eval.IsEmpty)
+                {
+                    eval = CellData.FromNumber(0d);
+                }
+
                 cell.Data = eval;
+                evaluated[cell] = eval;
             }
             finally
             {
@@ -400,12 +417,7 @@ public partial class Worksheet
         // itself is not a formula node, so it would never be notified - fire its event here.
         if (!IsUpdating && graph.HasDependents(cell))
         {
-            var dependents = graph.GetTopologicallySortedDependencies(cell);
-
-            foreach (var dependentCell in dependents)
-            {
-                EvaluateFormula(dependentCell);
-            }
+            EvaluateFormulas(graph.GetTopologicallySortedDependencies(cell));
         }
 
         cell.OnChanged();
@@ -417,14 +429,7 @@ public partial class Worksheet
 
         if (!IsUpdating)
         {
-            // Re-evaluate the changed cell and its transitive dependents only. The per-cell
-            // overload returns the dependents but not the cell itself, so evaluate it first.
-            EvaluateFormula(cell);
-
-            foreach (var c in graph.GetTopologicallySortedDependencies(cell))
-            {
-                EvaluateFormula(c);
-            }
+            EvaluateFormulas([cell, .. graph.GetTopologicallySortedDependencies(cell)]);
         }
     }
 
@@ -473,10 +478,7 @@ public partial class Worksheet
             return;
         }
 
-        foreach (var cell in graph.GetTopologicallySortedDependencies())
-        {
-            EvaluateFormula(cell);
-        }
+        EvaluateFormulas(graph.GetTopologicallySortedDependencies());
 
         Selection.TriggerPendingChange();
     }
@@ -970,11 +972,64 @@ public partial class Worksheet
             builder.Append('"');
         }
 
+        public override void VisitBooleanLiteral(BooleanLiteralSyntaxNode booleanLiteralSyntaxNode)
+        {
+            builder.Append(booleanLiteralSyntaxNode.Token.Value);
+        }
+
+        public override void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
+        {
+            builder.Append(errorLiteralSyntaxNode.Token.Value);
+        }
+
+        public override void VisitName(NameSyntaxNode nameSyntaxNode)
+        {
+            builder.Append(nameSyntaxNode.Name);
+        }
+
+        public override void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
+        {
+            builder.Append(unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate ? '-' : '+');
+            AppendOperand(unaryExpressionSyntaxNode.Operand, Precedence(unaryExpressionSyntaxNode), wrapEqual: false);
+        }
+
         public override void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
         {
-            binaryExpressionSyntaxNode.Left.Accept(this);
+            var precedence = Precedence(binaryExpressionSyntaxNode);
+            AppendOperand(binaryExpressionSyntaxNode.Left, precedence, wrapEqual: false);
             builder.Append(TokenToOperator(binaryExpressionSyntaxNode.Token));
-            binaryExpressionSyntaxNode.Right.Accept(this);
+            AppendOperand(binaryExpressionSyntaxNode.Right, precedence, wrapEqual: true);
+        }
+
+        private void AppendOperand(FormulaSyntaxNode operand, int parentPrecedence, bool wrapEqual)
+        {
+            var precedence = Precedence(operand);
+            var wrap = precedence < parentPrecedence || (wrapEqual && precedence == parentPrecedence);
+
+            if (wrap)
+            {
+                builder.Append('(');
+            }
+
+            operand.Accept(this);
+
+            if (wrap)
+            {
+                builder.Append(')');
+            }
+        }
+
+        private static int Precedence(FormulaSyntaxNode node)
+        {
+            return node switch
+            {
+                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Multiply or BinaryOperator.Divide } => 4,
+                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Plus or BinaryOperator.Minus } => 3,
+                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Concat } => 2,
+                BinaryExpressionSyntaxNode => 1,
+                UnaryExpressionSyntaxNode => 5,
+                _ => 6
+            };
         }
 
         public override void VisitCell(CellSyntaxNode cellSyntaxNode)
@@ -1102,6 +1157,7 @@ public partial class Worksheet
                 FormulaTokenType.Minus => "-",
                 FormulaTokenType.Star => "*",
                 FormulaTokenType.Slash => "/",
+                FormulaTokenType.Ampersand => "&",
                 FormulaTokenType.Equals => "=",
                 FormulaTokenType.GreaterThan => ">",
                 FormulaTokenType.GreaterThanOrEqual => ">=",

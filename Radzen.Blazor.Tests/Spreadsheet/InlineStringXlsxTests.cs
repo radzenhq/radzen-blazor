@@ -72,6 +72,32 @@ public class InlineStringXlsxTests
     }
 
     [Fact]
+    public void SharedStringThatLooksNumericLoadsAsTextWithoutQuotePrefix()
+    {
+        using var ms = BuildXlsxWithSharedStrings("""
+            <sheetData>
+              <row r="1">
+                <c r="A1" t="s"><v>0</v></c>
+                <c r="B1" t="s"><v>1</v></c>
+                <c r="C1"><v>5</v></c>
+              </row>
+            </sheetData>
+            """, """
+            <sst>
+              <si><t>05</t></si>
+              <si><t>1.50</t></si>
+            </sst>
+            """);
+
+        var sheet = Workbook.LoadFromStream(ms).Sheets[0];
+
+        Assert.Equal("05", sheet.Cells["A1"].Value);
+        Assert.False(sheet.Cells["A1"].QuotePrefix);
+        Assert.Equal("1.50", sheet.Cells["B1"].Value);
+        Assert.Equal(5d, sheet.Cells["C1"].Value);
+    }
+
+    [Fact]
     public void Read_InlineString_ReadsTheTextTheCellCarries()
     {
         using var ms = BuildXlsxWithSheetData("""

@@ -77,4 +77,20 @@ public class AdjustFormulaForCopyTests
         var result = Adjust(input, 1, 0);
         Assert.Equal(input, result);
     }
+
+    [Theory]
+    [InlineData("=(A1-B1)*2", "=(A2-B2)*2")]
+    [InlineData("=A1-(B1-C1)", "=A2-(B2-C2)")]
+    [InlineData("=A1/(B1*C1)", "=A2/(B2*C2)")]
+    [InlineData("=((A1-B1)*(5/7))+1", "=(A2-B2)*(5/7)+1")]
+    [InlineData("=-A1", "=-A2")]
+    [InlineData("=-(A1+B1)", "=-(A2+B2)")]
+    [InlineData("=+A1&+B1", "=+A2&+B2")]
+    [InlineData("=\"a\"&A1+1", "=\"a\"&A2+1")]
+    [InlineData("=(\"a\"&A1)=\"a1\"", "=\"a\"&A2=\"a1\"")]
+    [InlineData("=IF(A1=TRUE,#REF!,PLANhours)", "=IF(A2=TRUE,#REF!,PLANhours)")]
+    public void PreservesOperatorsParenthesesAndLiterals(string formula, string expected)
+    {
+        Assert.Equal(expected, Adjust(formula, 1, 0));
+    }
 }

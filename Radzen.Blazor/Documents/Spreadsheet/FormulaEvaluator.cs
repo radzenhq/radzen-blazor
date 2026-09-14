@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,10 +42,12 @@ public enum CellError
     Circular // #CIRCULAR - Circular reference
 }
 
-class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisitor
+class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellData>? evaluated = null) : IFormulaSyntaxNodeVisitor
 {
     private object? value;
     private readonly HashSet<Cell> evaluationStack = [];
+    private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<Cell, CellData> evaluated = evaluated ?? [];
 
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
@@ -100,15 +103,10 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             return;
         }
 
-        // Treat empty values as zero for arithmetic
-        if (left.IsEmpty)
+        if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Concat)
         {
-            left = CellData.FromNumber(0d);
-        }
-
-        if (right.IsEmpty)
-        {
-            right = CellData.FromNumber(0d);
+            value = CellData.FromString(ToText(left) + ToText(right));
+            return;
         }
 
         // For comparison operators, we don't need both sides to be numeric
@@ -116,6 +114,16 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             BinaryOperator.Equals or BinaryOperator.NotEquals or
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
+
+        if (left.IsEmpty)
+        {
+            left = isComparisonOperator ? EmptyAs(right) : CellData.FromNumber(0d);
+        }
+
+        if (right.IsEmpty)
+        {
+            right = isComparisonOperator ? EmptyAs(left) : CellData.FromNumber(0d);
+        }
 
         // Coerce Date and Boolean to Number for arithmetic operations (Excel semantics)
         if (!isComparisonOperator)
@@ -140,10 +148,13 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             }
         }
 
-        if (!isComparisonOperator && (left.Type != CellDataType.Number || right.Type != CellDataType.Number))
+        if (!isComparisonOperator)
         {
-            value = CellData.FromError(CellError.Value);
-            return;
+            if (!TryCoerceOperand(ref left) || !TryCoerceOperand(ref right))
+            {
+                value = CellData.FromError(CellError.Value);
+                return;
+            }
         }
 
         if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
@@ -216,35 +227,25 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             return;
         }
 
+        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        {
+            value = operand;
+            return;
+        }
+
         if (operand.IsEmpty)
         {
             operand = CellData.FromNumber(0d);
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
-        {
-            // Excel: unary plus is a no-op for booleans (=+TRUE returns TRUE)
-            if (operand.Type == CellDataType.Boolean)
-            {
-                return;
-            }
-
-            if (operand.Type != CellDataType.Number)
-            {
-                value = CellData.FromError(CellError.Value);
-                return;
-            }
-            return;
-        }
-
         if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate)
         {
-            if (operand.Type == CellDataType.Boolean)
+            if (operand.Type == CellDataType.Date)
             {
-                operand = CellData.FromNumber(operand.GetValueOrDefault<bool>() ? 1d : 0d);
+                operand = CellData.FromNumber(operand.GetValueOrDefault<DateTime>().ToNumber());
             }
 
-            if (operand.Type != CellDataType.Number)
+            if (!TryCoerceOperand(ref operand))
             {
                 value = CellData.FromError(CellError.Value);
                 return;
@@ -254,24 +255,64 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         }
     }
 
+    private static CellData EmptyAs(CellData other)
+    {
+        return other.Type switch
+        {
+            CellDataType.String => CellData.FromString(string.Empty),
+            CellDataType.Boolean => CellData.FromBoolean(false),
+            _ => CellData.FromNumber(0d)
+        };
+    }
+
+    private static bool TryCoerceOperand(ref CellData operand)
+    {
+        if (operand.Type == CellDataType.Number)
+        {
+            return true;
+        }
+
+        if (operand.TryCoerceToNumber(out var number, allowBooleans: true, nonNumericTextAsZero: false))
+        {
+            operand = CellData.FromNumber(number);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static string ToText(CellData data)
+    {
+        return data.Type switch
+        {
+            CellDataType.Empty => string.Empty,
+            CellDataType.Number => data.GetValueOrDefault<double>().ToString(CultureInfo.InvariantCulture),
+            CellDataType.Date => data.GetValueOrDefault<DateTime>().ToNumber().ToString(CultureInfo.InvariantCulture),
+            _ => data.ToString()
+        };
+    }
+
     private CellData EvaluateCell(Cell cell)
     {
+        if (cell.FormulaSyntaxTree is null)
+        {
+            return cell.Data;
+        }
+
+        if (evaluated.TryGetValue(cell, out var cached))
+        {
+            return cached;
+        }
+
         if (!evaluationStack.Add(cell))
         {
             return CellData.FromError(CellError.Circular);
         }
 
-        CellData result;
-        if (cell.FormulaSyntaxTree is not null)
-        {
-            cell.FormulaSyntaxTree.Root.Accept(this);
-            result = (CellData)value!;
-        }
-        else
-        {
-            result = cell.Data;
-        }
+        cell.FormulaSyntaxTree.Root.Accept(this);
+        var result = (CellData)value!;
         evaluationStack.Remove(cell);
+        evaluated[cell] = result;
         return result;
     }
 
@@ -311,6 +352,26 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         }
 
         value = EvaluateCell(cell);
+    }
+
+    public void VisitName(NameSyntaxNode nameSyntaxNode)
+    {
+        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name);
+
+        if (tree is null || tree.Errors.Count > 0)
+        {
+            value = CellData.FromError(CellError.Name);
+            return;
+        }
+
+        if (!nameStack.Add(nameSyntaxNode.Name))
+        {
+            value = CellData.FromError(CellError.Circular);
+            return;
+        }
+
+        tree.Root.Accept(this);
+        nameStack.Remove(nameSyntaxNode.Name);
     }
 
     public CellData Evaluate(FormulaSyntaxNode node)

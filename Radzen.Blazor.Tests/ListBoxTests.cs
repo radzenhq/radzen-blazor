@@ -490,8 +490,46 @@ namespace Radzen.Blazor.Tests
 
             Assert.Null(value);
         }
+
+        [Fact]
+        public void ListBox_OmitsOptionAriaLabel_WhenTextPropertyIsMissingAndItemHasNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] { new Item { Id = 1, Name = "First" }, new Item { Id = 2, Name = "Second" } };
+
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ValueProperty, nameof(Item.Id));
+            });
+
+            var options = component.FindAll("li[role='option']");
+
+            Assert.NotEmpty(options);
+            Assert.All(options, option => Assert.False(option.HasAttribute("aria-label")));
+        }
+
+        [Fact]
+        public void ListBox_RendersOptionAriaLabel_FromTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] { new Item { Id = 1, Name = "First" }, new Item { Id = 2, Name = "Second" } };
+
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(Item.Name));
+                parameters.Add(p => p.ValueProperty, nameof(Item.Id));
+            });
+
+            var options = component.FindAll("li[role='option']");
+
+            Assert.Equal("First", options[0].GetAttribute("aria-label"));
+            Assert.Equal("Second", options[1].GetAttribute("aria-label"));
+        }
     }
 }
-
-
-

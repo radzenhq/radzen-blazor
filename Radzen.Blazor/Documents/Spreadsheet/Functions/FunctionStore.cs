@@ -39,6 +39,7 @@ public class FunctionStore
         Add<CountAllFunction>();
         Add<IfFunction>();
         Add<IfErrorFunction>();
+        Add<NaFunction>();
         Add<IfsFunction>();
         Add<SwitchFunction>();
         Add<AndFunction>();

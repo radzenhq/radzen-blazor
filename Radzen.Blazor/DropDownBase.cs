@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -583,6 +584,36 @@ namespace Radzen
             }
 
             return item;
+        }
+
+        private static readonly ConcurrentDictionary<Type, bool> overridesToString = new();
+
+        /// <summary>
+        /// Gets the accessible name of an item. Returns <c>null</c> when no meaningful text can be
+        /// derived, so the caller can omit the aria-label and let assistive technology use the rendered content.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>The accessible name or <c>null</c>.</returns>
+        public string? GetItemAriaLabel(object? item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(TextProperty) && !overridesToString.GetOrAdd(item.GetType(), static type => type.GetMethod(nameof(ToString), Type.EmptyTypes)?.DeclaringType != typeof(object)))
+            {
+                return null;
+            }
+
+            return GetItemOrValueFromProperty(item, TextProperty ?? string.Empty)?.ToString();
+        }
+
+        internal string GetChipRemoveLabel(object item)
+        {
+            var label = GetItemAriaLabel(item);
+
+            return label != null ? $"{RemoveChipTitle} {label}" : RemoveChipTitle;
         }
 
         /// <inheritdoc/>

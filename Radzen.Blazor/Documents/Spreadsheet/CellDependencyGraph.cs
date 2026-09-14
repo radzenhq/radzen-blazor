@@ -119,6 +119,21 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
     public HashSet<Cell> Dependencies { get; } = [];
 
+    private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
+
+    public void VisitName(NameSyntaxNode nameSyntaxNode)
+    {
+        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name);
+
+        if (tree is null || tree.Errors.Count > 0 || !nameStack.Add(nameSyntaxNode.Name))
+        {
+            return;
+        }
+
+        tree.Root.Accept(this);
+        nameStack.Remove(nameSyntaxNode.Name);
+    }
+
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
     }

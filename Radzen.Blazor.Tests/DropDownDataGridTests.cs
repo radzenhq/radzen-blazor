@@ -695,6 +695,79 @@ namespace Radzen.Blazor.Tests
 
             Assert.Null(value);
         }
+
+        [Fact]
+        public void DropDownDataGrid_ComboboxAriaLabel_UsesTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" },
+                new Customer { Id = 2, CompanyName = "Tech Inc" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Value, 2);
+            });
+
+            var combobox = component.Find("div.rz-dropdown[role='combobox']");
+
+            Assert.Equal("Tech Inc", combobox.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDownDataGrid_OmitsComboboxAriaLabel_WhenSelectedItemHasNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer> { new Customer { Id = 1, CompanyName = "Acme Corp" } };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Value, 1);
+            });
+
+            var combobox = component.Find("div.rz-dropdown[role='combobox']");
+
+            Assert.False(combobox.HasAttribute("aria-label"));
+            Assert.DoesNotContain(typeof(Customer).FullName, combobox.GetAttribute("aria-label") ?? string.Empty);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Multiple_AriaLabelAndChipsFallBackToCount_WhenItemsHaveNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Company1" },
+                new Customer { Id = 2, CompanyName = "Company2" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var combobox = component.Find("div.rz-dropdown[role='combobox']");
+
+            Assert.Equal($"2 {component.Instance.SelectedItemsText}", combobox.GetAttribute("aria-label"));
+
+            var buttons = component.FindAll(".rz-chip button");
+
+            Assert.NotEmpty(buttons);
+            Assert.All(buttons, b => Assert.Equal(component.Instance.RemoveChipTitle, b.GetAttribute("aria-label")));
+        }
     }
 }
-

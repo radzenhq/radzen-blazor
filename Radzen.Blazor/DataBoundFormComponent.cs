@@ -184,7 +184,9 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets the text property.
+        /// Gets or sets the name of the property used as the display text of each item.
+        /// Required when <see cref="Data"/> contains objects and no <c>Template</c> is set; otherwise the item's
+        /// <see cref="object.ToString"/> result is displayed, which for plain classes is the type name.
         /// </summary>
         /// <value>The text property.</value>
         [Parameter]

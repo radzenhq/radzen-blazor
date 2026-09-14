@@ -195,11 +195,11 @@ public class Cell
     /// Stores the value as literal text and sets <see cref="QuotePrefix"/> - the apostrophe protocol
     /// of <see cref="SetValue"/> without the apostrophe.
     /// </summary>
-    internal void SetText(string value)
+    internal void SetText(string value, bool quotePrefix = true)
     {
         Formula = null;
         Data = CellData.FromString(value);
-        QuotePrefix = true;
+        QuotePrefix = quotePrefix;
 
         Worksheet.OnCellValueChanged(this);
     }

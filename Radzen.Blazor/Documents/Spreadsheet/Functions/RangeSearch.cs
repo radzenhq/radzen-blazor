@@ -13,14 +13,18 @@ static class RangeSearch
         error = null;
         var bestIndex = -1;
 
+        if (lookup.IsEmpty)
+        {
+            return -1;
+        }
+
         for (var i = 0; i < values.Count; i++)
         {
             var cell = values[i];
 
             if (cell.IsError)
             {
-                error = cell;
-                return -1;
+                continue;
             }
 
             if (IsExactMatch(cell, lookup, wildcards))

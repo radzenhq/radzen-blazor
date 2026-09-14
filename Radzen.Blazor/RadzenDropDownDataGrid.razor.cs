@@ -578,7 +578,12 @@ namespace Radzen.Blazor
             {
                 if (!Multiple)
                 {
-                    return internalValue != null ? $"{PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty)}" : EmptyAriaLabel;
+                    if (selectedItem != null)
+                    {
+                        return GetItemAriaLabel(selectedItem);
+                    }
+
+                    return SelectedValue != null && !(SelectedValue is IEnumerable && SelectedValue is not string) ? GetItemAriaLabel(SelectedValue) : EmptyAriaLabel;
                 }
 
                 var itemsToUse = SelectedValue is IEnumerable && SelectedValue is not string ? ((IEnumerable)SelectedValue).Cast<object>().ToHashSet() : selectedItems;
@@ -590,7 +595,12 @@ namespace Radzen.Blazor
 
                 if (itemsToUse.Count < MaxSelectedLabels)
                 {
-                    return string.Join(Separator, itemsToUse.Select(i => $"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty)}"));
+                    var labels = itemsToUse.Select(GetItemAriaLabel).ToList();
+
+                    if (labels.All(label => label != null))
+                    {
+                        return string.Join(Separator, labels);
+                    }
                 }
 
                 return $"{itemsToUse.Count} {SelectedItemsText}";

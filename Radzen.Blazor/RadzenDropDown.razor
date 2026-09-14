@@ -60,8 +60,8 @@
                             }
                         </span>
                         <button tabindex="-1"
-                                title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
-                                aria-label="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
+                                title="@GetChipRemoveLabel(item)"
+                                aria-label="@GetChipRemoveLabel(item)"
                                 type=button class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-button-icon-only @(Disabled ?"rz-state-disabled":"")"
                                 @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)">
                             <RadzenIcon Icon="close" />

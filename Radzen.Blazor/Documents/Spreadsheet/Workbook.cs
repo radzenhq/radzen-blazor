@@ -36,6 +36,31 @@ public class Workbook
     /// </summary>
     public WorkbookProtection Protection { get; set; } = new();
 
+    /// <summary>
+    /// Gets the workbook-scoped defined names. The key is the name and the value is the reference or
+    /// expression it refers to, written as a formula without the leading equals sign, for example
+    /// <c>Sheet1!$A$1:$A$10</c>. Formulas resolve names case-insensitively.
+    /// </summary>
+    public IDictionary<string, string> DefinedNames { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    private readonly Dictionary<string, FormulaSyntaxTree> definedNameTrees = [];
+
+    internal FormulaSyntaxTree? ResolveDefinedName(string name)
+    {
+        if (!DefinedNames.TryGetValue(name, out var refersTo))
+        {
+            return null;
+        }
+
+        if (!definedNameTrees.TryGetValue(refersTo, out var tree))
+        {
+            tree = FormulaParser.Parse("=" + refersTo);
+            definedNameTrees[refersTo] = tree;
+        }
+
+        return tree;
+    }
+
     internal Workbook(Worksheet sheet)
     {
         AddSheet(sheet);

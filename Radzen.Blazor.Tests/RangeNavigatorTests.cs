@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -188,6 +188,76 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-range-nav-series", component.Markup);
             Assert.DoesNotContain("NaN", component.Markup);
         }
+
+        [Fact]
+        public void RangeNavigator_WithLineSeries_UpdatesScales_WhenSeriesDataChanges()
+        {
+            // The scales used to keep the domain of the data first seen until a resize (#2713).
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+
+            Assert.Equal(10, component.Instance.ValueScale.Input.Start);
+            Assert.Equal(20, component.Instance.ValueScale.Input.End);
+
+            component.SetParametersAndRender(parameters =>
+                parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
+                {
+                    series.Add(p => p.Data, WiderData);
+                    series.Add(p => p.CategoryProperty, nameof(DataItem.Category));
+                    series.Add(p => p.ValueProperty, nameof(DataItem.Value));
+                }));
+
+            Assert.Equal(100, component.Instance.ValueScale.Input.Start);
+            Assert.Equal(300, component.Instance.ValueScale.Input.End);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void RangeNavigator_Rerenders_WhenDataChangesWithinTheSameDomain(bool renameCategories)
+        {
+            using var ctx = CreateChartContext();
+            var component = RenderNavigatorWithLineSeries(ctx);
+            component.SetParametersAndRender(p => p.Add(x => x.ShowAxis, true));
+            var data = new[]
+            {
+                new DataItem { Category = renameCategories ? "X" : "A", Value = 10 },
+                new DataItem { Category = renameCategories ? "Y" : "B", Value = 20 },
+                new DataItem { Category = renameCategories ? "Z" : "C", Value = renameCategories ? 15 : 12 },
+            };
+
+            component.SetParametersAndRender(parameters =>
+                parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
+                {
+                    series.Add(p => p.Data, data);
+                    series.Add(p => p.CategoryProperty, nameof(DataItem.Category));
+                    series.Add(p => p.ValueProperty, nameof(DataItem.Value));
+                }));
+
+            Assert.Equal(10, component.Instance.ValueScale.Input.Start);
+            Assert.Equal(20, component.Instance.ValueScale.Input.End);
+            if (renameCategories)
+            {
+                Assert.DoesNotContain(">A<", component.Markup);
+                Assert.Contains(">X<", component.Markup);
+            }
+            else
+            {
+                Assert.Contains("166.66666666666669 160 ", component.Markup);
+                Assert.DoesNotContain("166.66666666666669 100 ", component.Markup);
+            }
+            var renders = component.RenderCount;
+            component.SetParametersAndRender(p => p.Add(x => x.Start, 0.2));
+            Assert.Equal(renders + 1, component.RenderCount);
+        }
+
+        private static DataItem[] WiderData => new[]
+        {
+            new DataItem { Category = "A", Value = 100 },
+            new DataItem { Category = "B", Value = 300 },
+            new DataItem { Category = "C", Value = 200 },
+        };
 
         [Fact]
         public void RangeNavigator_TooltipPoints_OnePerItem_Ordered()

@@ -6,6 +6,8 @@ class IfFunction : FormulaFunction
 {
     public override string Name => "IF";
 
+    public override bool CanHandleErrors => true;
+
     public override FunctionParameter[] Parameters =>
     [
         new("logical_test", ParameterType.Single, isRequired: true),

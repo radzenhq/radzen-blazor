@@ -1666,5 +1666,117 @@ namespace Radzen.Blazor.Tests
 
             Assert.False(changed);
         }
+
+        [Fact]
+        public void DropDown_OmitsOptionAriaLabel_WhenTextPropertyIsMissingAndItemHasNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var template = (RenderFragment<dynamic>)(item => builder => builder.AddContent(0, item.Text));
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Template, template);
+                parameters.Add(p => p.Value, 1);
+            });
+
+            var options = component.FindAll("li[role='option']");
+
+            Assert.NotEmpty(options);
+            Assert.All(options, option => Assert.False(option.HasAttribute("aria-label")));
+            Assert.Equal("Item 1", options[0].TextContent.Trim());
+            Assert.DoesNotContain(typeof(DataItem).FullName, component.Markup);
+        }
+
+        [Fact]
+        public void DropDown_RendersOptionAriaLabel_FromTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx);
+
+            var options = component.FindAll("li[role='option']");
+
+            Assert.Equal("Item 1", options[0].GetAttribute("aria-label"));
+            Assert.Equal("Item 2", options[1].GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_RendersOptionAriaLabel_ForSimpleValuesWithoutTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDropDown<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new[] { "Apple", "Banana" });
+            });
+
+            var options = component.FindAll("li[role='option']");
+
+            Assert.Equal("Apple", options[0].GetAttribute("aria-label"));
+            Assert.Equal("Banana", options[1].GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_OmitsComboboxAriaLabel_WhenSelectedItemHasNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, 1);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.False(combobox.HasAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_Multiple_AriaLabelAndChipsFallBackToCount_WhenItemsHaveNoText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.Equal($"2 {component.Instance.SelectedItemsText}", combobox.GetAttribute("aria-label"));
+
+            var buttons = component.FindAll(".rz-chip button");
+
+            Assert.NotEmpty(buttons);
+            Assert.All(buttons, b => Assert.Equal(component.Instance.RemoveChipTitle, b.GetAttribute("aria-label")));
+        }
     }
 }

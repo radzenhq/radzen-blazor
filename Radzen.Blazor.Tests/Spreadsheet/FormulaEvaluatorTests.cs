@@ -154,6 +154,180 @@ public class FormulaEvaluationTests
     }
 
     [Fact]
+    public void ShouldEvaluateMutuallyReferencingRangesWithoutExponentialBlowup()
+    {
+        var sheet = new Worksheet(10, 2);
+
+        sheet.BeginUpdate();
+
+        for (var row = 1; row <= 10; row++)
+        {
+            sheet.Cells[$"A{row}"].Formula = "=SUM(B1:B10)";
+            sheet.Cells[$"B{row}"].Formula = "=SUM(A1:A10)";
+        }
+
+        sheet.EndUpdate();
+
+        Assert.Equal(CellError.Circular, sheet.Cells["A1"].Value);
+        Assert.Equal(CellError.Circular, sheet.Cells["B10"].Value);
+    }
+
+    [Fact]
+    public void UnaryPlusShouldReturnTextUnchanged()
+    {
+        sheet.Cells["A1"].Value = "abc";
+        sheet.Cells["A2"].Formula = "=+A1";
+        sheet.Cells["A3"].Formula = "=+\"abc\"";
+
+        Assert.Equal("abc", sheet.Cells["A2"].Value);
+        Assert.Equal("abc", sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public void UnaryPlusShouldKeepEmptyCellEmptySoConcatenationDoesNotProduceZero()
+    {
+        sheet.Cells["A2"].Formula = "=+A1";
+        sheet.Cells["A3"].Formula = "=+A1&+B1";
+        sheet.Cells["A4"].Formula = "=+A1+1";
+
+        Assert.Equal(0d, sheet.Cells["A2"].Value);
+        Assert.Equal("", sheet.Cells["A3"].Value);
+        Assert.Equal(1d, sheet.Cells["A4"].Value);
+    }
+
+    [Fact]
+    public void IfShouldIgnoreErrorsInTheBranchThatIsNotTaken()
+    {
+        sheet.Cells["A1"].Formula = "=IF(1=1,\"\",1/0)";
+        sheet.Cells["A2"].Formula = "=IF(1=0,1/0,\"ok\")";
+        sheet.Cells["A3"].Formula = "=IF(1=1,1/0,\"ok\")";
+        sheet.Cells["A4"].Formula = "=IF(1/0,1,2)";
+
+        Assert.Equal("", sheet.Cells["A1"].Value);
+        Assert.Equal("ok", sheet.Cells["A2"].Value);
+        Assert.Equal(CellError.Div0, sheet.Cells["A3"].Value);
+        Assert.Equal(CellError.Div0, sheet.Cells["A4"].Value);
+    }
+
+    [Fact]
+    public void NaShouldReturnTheNotAvailableError()
+    {
+        sheet.Cells["A1"].Formula = "=NA()";
+        sheet.Cells["A2"].Formula = "=IFERROR(NA(),\"caught\")";
+
+        Assert.Equal(CellError.NA, sheet.Cells["A1"].Value);
+        Assert.Equal("caught", sheet.Cells["A2"].Value);
+    }
+
+    [Fact]
+    public void AmpersandShouldConcatenateValuesAsText()
+    {
+        sheet.Cells["A1"].Value = "abc";
+        sheet.Cells["A2"].Value = 5;
+        sheet.Cells["A3"].Value = true;
+        sheet.Cells["B1"].Formula = "=A1&A2";
+        sheet.Cells["B2"].Formula = "=A2&A4";
+        sheet.Cells["B3"].Formula = "=+A1&+A2";
+        sheet.Cells["B4"].Formula = "=A1&\" \"&A3";
+
+        Assert.Equal("abc5", sheet.Cells["B1"].Value);
+        Assert.Equal("5", sheet.Cells["B2"].Value);
+        Assert.Equal("abc5", sheet.Cells["B3"].Value);
+        Assert.Equal("abc TRUE", sheet.Cells["B4"].Value);
+    }
+
+    [Fact]
+    public void AmpersandShouldBindLooserThanArithmeticAndTighterThanComparison()
+    {
+        sheet.Cells["A1"].Formula = "=\"a\"&1+2";
+        sheet.Cells["A2"].Formula = "=\"a\"&\"b\"=\"ab\"";
+        sheet.Cells["A3"].Formula = "=1&2*3";
+
+        Assert.Equal("a3", sheet.Cells["A1"].Value);
+        Assert.Equal(true, sheet.Cells["A2"].Value);
+        Assert.Equal("16", sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public void AmpersandShouldPropagateErrors()
+    {
+        sheet.Cells["A1"].Formula = "=\"a\"&1/0";
+
+        Assert.Equal(CellError.Div0, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void ArithmeticShouldCoerceNumericTextLikeExcel()
+    {
+        sheet.Cells["A1"].SetText("45");
+        sheet.Cells["A2"].Value = "abc";
+        sheet.Cells["B1"].Formula = "=A1+1";
+        sheet.Cells["B2"].Formula = "=\"3\"*\"4\"";
+        sheet.Cells["B3"].Formula = "=-A1";
+        sheet.Cells["B4"].Formula = "=A2+1";
+
+        Assert.Equal(46d, sheet.Cells["B1"].Value);
+        Assert.Equal(12d, sheet.Cells["B2"].Value);
+        Assert.Equal(-45d, sheet.Cells["B3"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["B4"].Value);
+    }
+
+    [Fact]
+    public void EmptyCellShouldCompareEqualToEmptyStringAndZero()
+    {
+        sheet.Cells["B1"].Formula = "=A1=\"\"";
+        sheet.Cells["B2"].Formula = "=A1=0";
+        sheet.Cells["B3"].Formula = "=A1<>\"\"";
+        sheet.Cells["B4"].Formula = "=IF(A1=\"\",\"empty\",\"filled\")";
+        sheet.Cells["B5"].Formula = "=A1=FALSE";
+
+        Assert.Equal(true, sheet.Cells["B1"].Value);
+        Assert.Equal(true, sheet.Cells["B2"].Value);
+        Assert.Equal(false, sheet.Cells["B3"].Value);
+        Assert.Equal("empty", sheet.Cells["B4"].Value);
+        Assert.Equal(true, sheet.Cells["B5"].Value);
+    }
+
+    [Fact]
+    public void MatchWithEmptyLookupValueReturnsNotAvailable()
+    {
+        sheet.Cells["A1"].Value = "x";
+        sheet.Cells["A2"].Value = "";
+        sheet.Cells["B1"].Formula = "=MATCH(C1,A1:A3,0)";
+        sheet.Cells["B2"].Formula = "=MATCH(C1,A1:A3,1)";
+
+        Assert.Equal(CellError.NA, sheet.Cells["B1"].Value);
+        Assert.Equal(CellError.NA, sheet.Cells["B2"].Value);
+    }
+
+    [Fact]
+    public void MatchSkipsErrorCellsInTheLookupArray()
+    {
+        sheet.Cells["A1"].Value = "a";
+        sheet.Cells["A2"].Formula = "=1/0";
+        sheet.Cells["A3"].Value = "x";
+        sheet.Cells["B1"].Formula = "=MATCH(\"x\",A1:A3,0)";
+        sheet.Cells["B2"].Formula = "=MATCH(\"z\",A1:A3,0)";
+
+        Assert.Equal(3d, sheet.Cells["B1"].Value);
+        Assert.Equal(CellError.NA, sheet.Cells["B2"].Value);
+    }
+
+    [Fact]
+    public void FormulaReturningAnEmptyCellDisplaysZero()
+    {
+        sheet.Cells["B1"].Formula = "=A1";
+        sheet.Cells["B2"].Formula = "=IF(TRUE,A1,1)";
+        sheet.Cells["B3"].Formula = "=INDEX(A1:A3,2)";
+        sheet.Cells["B4"].Formula = "=A1&\"\"";
+
+        Assert.Equal(0d, sheet.Cells["B1"].Value);
+        Assert.Equal(0d, sheet.Cells["B2"].Value);
+        Assert.Equal(0d, sheet.Cells["B3"].Value);
+        Assert.Equal("", sheet.Cells["B4"].Value);
+    }
+
+    [Fact]
     public void ShouldReturnNameErrorForUnknownFunction()
     {
         sheet.Cells["A1"].Formula = "=UNKNOWN()";

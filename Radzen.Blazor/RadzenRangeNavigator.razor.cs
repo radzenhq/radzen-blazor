@@ -155,6 +155,12 @@ namespace Radzen.Blazor
             NavigatorSeries.Remove(series);
         }
 
+        internal void Refresh()
+        {
+            UpdateScales();
+            StateHasChanged();
+        }
+
         internal void UpdateScales()
         {
             if (Width <= 0)

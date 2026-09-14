@@ -619,6 +619,11 @@ namespace Radzen.Blazor
         [JSInvokable]
         public void OnChange(string html)
         {
+            if (Disabled)
+            {
+                return;
+            }
+
             if (Html != html)
             {
                 Html = html;

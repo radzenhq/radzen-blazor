@@ -7,7 +7,7 @@
 {
 Disabled = itemArgs.Disabled;
 <li class="@GetComponentCssClass()" id="@(Index >= 0 ? ListBox?.GetItemId(Index) : null)" role="option" aria-selected="@(ListBox?.IsSelected(Item) == true ? "true" : "false")" tabindex="-1"
-        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox?.TextProperty)" @onclick="@SelectItem"
+        aria-label="@ListBox?.GetItemAriaLabel(Item)" @onclick="@SelectItem"
         aria-disabled="@(Disabled || ListBox?.Disabled == true ? "true" : "false")"
         @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
     @if (ListBox?.Multiple == true)

@@ -4955,9 +4955,28 @@ window.Radzen = {
   deleteTable: function (context) {
     context.table.remove();
   },
+  getEditorHtml: function (ref) {
+    var selected = Array.from(ref.querySelectorAll('img.rz-state-selected'));
+
+    for (var img of selected) {
+      img.classList.remove('rz-state-selected');
+
+      if (!img.getAttribute('class')) {
+        img.removeAttribute('class');
+      }
+    }
+
+    var html = ref.innerHTML;
+
+    for (var img of selected) {
+      img.classList.add('rz-state-selected');
+    }
+
+    return html;
+  },
   queryCommands: function (ref) {
     return {
-      html: ref != null ? ref.innerHTML : null,
+      html: ref != null ? this.getEditorHtml(ref) : null,
       fontName: document.queryCommandValue('fontName'),
       fontSize: document.queryCommandValue('fontSize'),
       formatBlock: document.queryCommandValue('formatBlock'),
@@ -4997,8 +5016,330 @@ window.Radzen = {
     }
   },
   createEditor: function (ref, uploadUrl, paste, instance, shortcuts) {
+    function trackDrag(move, end, key) {
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', end);
+
+      if (key) {
+        document.addEventListener('keydown', key, true);
+      }
+
+      return function () {
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', end);
+
+        if (key) {
+          document.removeEventListener('keydown', key, true);
+        }
+      };
+    }
+
+    var imageHandleDirections = {
+      nw: [-1, -1], n: [0, -1], ne: [1, -1],
+      w: [-1, 0], e: [1, 0],
+      sw: [-1, 1], s: [0, 1], se: [1, 1]
+    };
+    var minImageSize = 24;
+
+    ref.getSelectedImage = function () {
+      return ref.querySelector('img.rz-state-selected');
+    };
+
+    ref.getEditorContainer = function () {
+      return ref.closest('.rz-html-editor');
+    };
+
+    ref.removeImageHandles = function () {
+      if (!ref.imageHandles) {
+        return;
+      }
+
+      window.removeEventListener('resize', ref.positionImageHandles);
+      ref.imageHandlesClip.remove();
+      ref.imageHandlesClip = null;
+      ref.imageHandles = null;
+      ref.imageSizeLabel = null;
+      ref.imageSizeLabelSpace = 0;
+    };
+
+    ref.positionImageHandles = function () {
+      if (!ref.imageHandles) {
+        return;
+      }
+
+      var img = ref.getSelectedImage();
+      var container = ref.getEditorContainer();
+
+      if (!img || !container || ref.hidden || !ref.isContentEditable) {
+        ref.removeImageHandles();
+        return;
+      }
+
+      var containerRect = container.getBoundingClientRect();
+      var contentRect = ref.getBoundingClientRect();
+      var imgRect = img.getBoundingClientRect();
+      var clipLeft = contentRect.left - containerRect.left - container.clientLeft;
+      var clipTop = contentRect.top - containerRect.top - container.clientTop;
+
+      ref.imageHandlesClip.style.left = clipLeft + 'px';
+      ref.imageHandlesClip.style.top = clipTop + 'px';
+      ref.imageHandlesClip.style.width = contentRect.width + 'px';
+      ref.imageHandlesClip.style.height = contentRect.height + 'px';
+
+      ref.imageHandles.style.left = (imgRect.left - contentRect.left) + 'px';
+      ref.imageHandles.style.top = (imgRect.top - contentRect.top) + 'px';
+      ref.imageHandles.style.width = imgRect.width + 'px';
+      ref.imageHandles.style.height = imgRect.height + 'px';
+
+      var label = ref.imageSizeLabel;
+
+      if (label && !label.hidden) {
+        label.textContent = Math.round(imgRect.width) + ' × ' + Math.round(imgRect.height);
+        label.classList.toggle('rz-inside', imgRect.bottom + ref.imageSizeLabelSpace > contentRect.bottom);
+      }
+    };
+
+    ref.createImageHandles = function () {
+      ref.removeImageHandles();
+
+      var img = ref.getSelectedImage();
+      var container = ref.getEditorContainer();
+
+      if (!img || !container || !ref.isContentEditable) {
+        return;
+      }
+
+      var clip = document.createElement('div');
+      clip.className = 'rz-html-editor-image-clip';
+      clip.setAttribute('contenteditable', 'false');
+
+      var handles = document.createElement('div');
+      handles.className = 'rz-html-editor-image-handles';
+
+      Object.keys(imageHandleDirections).forEach(function (position) {
+        var handle = document.createElement('div');
+        handle.className = 'rz-html-editor-image-handle rz-' + position;
+        handle.dataset.position = position;
+        handle.addEventListener('mousedown', ref.imageResizeStartListener);
+        handles.appendChild(handle);
+      });
+
+      ref.imageSizeLabel = document.createElement('div');
+      ref.imageSizeLabel.className = 'rz-html-editor-image-size';
+      ref.imageSizeLabel.hidden = true;
+      handles.appendChild(ref.imageSizeLabel);
+
+      clip.appendChild(handles);
+      container.appendChild(clip);
+      ref.imageHandlesClip = clip;
+      ref.imageHandles = handles;
+
+      window.addEventListener('resize', ref.positionImageHandles);
+      ref.positionImageHandles();
+    };
+
+    ref.showImageSizeLabel = function (visible) {
+      var label = ref.imageSizeLabel;
+
+      if (!label) {
+        return;
+      }
+
+      label.hidden = !visible;
+
+      if (visible) {
+        label.textContent = '0 × 0';
+        ref.imageSizeLabelSpace = label.offsetHeight + parseFloat(getComputedStyle(label).marginTop || 0);
+      }
+    };
+
+    ref.imageResizeStartListener = function (e) {
+      var img = ref.getSelectedImage();
+
+      if (!img || ref.imageResize) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      ref.imageResize = {
+        img: img,
+        direction: imageHandleDirections[e.currentTarget.dataset.position],
+        startX: e.clientX,
+        startY: e.clientY,
+        startWidth: img.offsetWidth,
+        startHeight: img.offsetHeight,
+        startAttributes: { width: img.getAttribute('width'), height: img.getAttribute('height') },
+        startStyles: { width: img.style.width, height: img.style.height },
+        ratio: img.offsetHeight ? img.offsetWidth / img.offsetHeight : 1
+      };
+
+      img.style.width = '';
+      img.style.height = '';
+      img.setAttribute('width', ref.imageResize.startWidth);
+      img.setAttribute('height', ref.imageResize.startHeight);
+
+      ref.releaseImageDrag = trackDrag(
+        ref.documentImageResizeMoveListener,
+        ref.documentImageResizeEndListener,
+        ref.documentImageResizeKeyListener);
+      ref.showImageSizeLabel(true);
+      ref.positionImageHandles();
+    };
+
+    ref.restoreImageSize = function (state) {
+      Object.keys(state.startAttributes).forEach(function (name) {
+        var value = state.startAttributes[name];
+
+        if (value !== null) {
+          state.img.setAttribute(name, value);
+        } else {
+          state.img.removeAttribute(name);
+        }
+
+        state.img.style[name] = state.startStyles[name];
+      });
+    };
+
+    ref.documentImageResizeKeyListener = function (e) {
+      if (e.key !== 'Escape' || !ref.imageResize) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+      ref.restoreImageSize(ref.imageResize);
+      ref.stopImageDrag();
+      ref.positionImageHandles();
+    };
+
+    ref.documentImageResizeMoveListener = function (e) {
+      var state = ref.imageResize;
+
+      if (!state || !ref.isConnected) {
+        return;
+      }
+
+      e.preventDefault();
+
+      var horizontal = state.direction[0];
+      var vertical = state.direction[1];
+      var width = state.startWidth;
+      var height = state.startHeight;
+
+      if (horizontal) {
+        width = Math.max(Math.round(state.startWidth + horizontal * (e.clientX - state.startX)), minImageSize);
+      }
+
+      if (vertical && (!horizontal || e.shiftKey)) {
+        height = Math.max(Math.round(state.startHeight + vertical * (e.clientY - state.startY)), minImageSize);
+      } else if (horizontal && vertical) {
+        height = Math.max(Math.round(width / state.ratio), minImageSize);
+      }
+
+      state.img.setAttribute('width', width);
+      state.img.setAttribute('height', height);
+
+      ref.positionImageHandles();
+    };
+
+    ref.documentImageResizeEndListener = function () {
+      var state = ref.imageResize;
+
+      if (!state) {
+        return;
+      }
+
+      var img = state.img;
+      var width = img.getAttribute('width');
+      var height = img.getAttribute('height');
+
+      var index = Array.prototype.indexOf.call(ref.querySelectorAll('img'), img);
+
+      ref.stopImageDrag();
+      ref.restoreImageSize(state);
+
+      if (width === String(state.startWidth) && height === String(state.startHeight)) {
+        ref.positionImageHandles();
+        return;
+      }
+
+      ref.deselectImage(img);
+
+      var target = img;
+
+      while (target.parentElement && target.parentElement !== ref && getComputedStyle(target.parentElement).display === 'inline') {
+        target = target.parentElement;
+      }
+
+      var replacement = target.cloneNode(true);
+      var replacementImg = target === img
+        ? replacement
+        : replacement.querySelectorAll('img')[Array.prototype.indexOf.call(target.querySelectorAll('img'), img)];
+
+      replacementImg.setAttribute('width', width);
+      replacementImg.setAttribute('height', height);
+      replacementImg.style.width = '';
+      replacementImg.style.height = '';
+
+      if (!replacementImg.style.length) {
+        replacementImg.removeAttribute('style');
+      }
+
+      var range = document.createRange();
+      range.selectNode(target);
+      var selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      ref.focus();
+      document.execCommand('insertHTML', false, replacement.outerHTML);
+
+      ref.selectImage(ref.querySelectorAll('img')[index]);
+    };
+
+    ref.deselectImage = function (img) {
+      img.classList.remove('rz-state-selected');
+
+      if (!img.getAttribute('class')) {
+        img.removeAttribute('class');
+      }
+
+      ref.removeImageHandles();
+    };
+
+    ref.selectImage = function (img) {
+      if (!img) {
+        ref.removeImageHandles();
+        return;
+      }
+
+      img.classList.add('rz-state-selected');
+
+      var range = document.createRange();
+      range.selectNode(img);
+      var selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      ref.createImageHandles();
+    };
+
+    ref.imageHandlesObserver = new MutationObserver(ref.positionImageHandles);
+
+    ref.stopImageDrag = function () {
+      ref.imageResize = null;
+      ref.showImageSizeLabel(false);
+
+      if (ref.releaseImageDrag) {
+        ref.releaseImageDrag();
+        ref.releaseImageDrag = null;
+      }
+    };
+
     ref.inputListener = function () {
-      try { suppressDisposed(instance.invokeMethodAsync('OnChange', ref.innerHTML)); } catch { }
+      ref.positionImageHandles();
+      try { suppressDisposed(instance.invokeMethodAsync('OnChange', Radzen.getEditorHtml(ref))); } catch { }
     };
     ref.keydownListener = function (e) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
@@ -5102,15 +5443,11 @@ window.Radzen = {
         }
 
         for (var img of ref.querySelectorAll('img.rz-state-selected')) {
-          img.classList.remove('rz-state-selected');
+          ref.deselectImage(img);
         }
 
         if (e.target.matches('img')) {
-          e.target.classList.add('rz-state-selected');
-          var range = document.createRange();
-          range.selectNode(e.target);
-          getSelection().removeAllRanges();
-          getSelection().addRange(range);
+          ref.selectImage(e.target);
         } else {
           var clickedCell = e.target.closest && e.target.closest('td,th');
           if (clickedCell && ref.contains(clickedCell)) {
@@ -5169,8 +5506,7 @@ window.Radzen = {
         ref.isResizingColumn = true;
         ref.resizeStartX = e.clientX;
         ref.resizeStartWidth = ref.resizeTargetCell.getBoundingClientRect().width;
-        document.addEventListener('mouseup', ref.mouseupResizeListener);
-        document.addEventListener('mousemove', ref.documentMouseMoveResizeListener);
+        ref.releaseColumnDrag = trackDrag(ref.documentMouseMoveResizeListener, ref.mouseupResizeListener);
       }
     };
 
@@ -5178,9 +5514,9 @@ window.Radzen = {
       if (ref.isResizingColumn) {
         ref.isResizingColumn = false;
         ref.style.cursor = '';
-        document.removeEventListener('mouseup', ref.mouseupResizeListener);
-        document.removeEventListener('mousemove', ref.documentMouseMoveResizeListener);
-        try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
+        ref.releaseColumnDrag();
+        ref.releaseColumnDrag = null;
+        ref.inputListener();
       }
     };
 
@@ -5202,6 +5538,12 @@ window.Radzen = {
 
     ref.selectionChangeListener = function () {
       if (document.activeElement == ref) {
+        var selectedImage = ref.getSelectedImage();
+
+        if (selectedImage && !ref.imageResize && !getSelection().containsNode(selectedImage)) {
+          ref.deselectImage(selectedImage);
+        }
+
         try { suppressDisposed(instance.invokeMethodAsync('OnSelectionChange')); } catch { }
       }
     };
@@ -5307,6 +5649,8 @@ window.Radzen = {
     ref.addEventListener('contextmenu', ref.contextMenuListener);
     ref.addEventListener('mousemove', ref.mousemoveListener);
     ref.addEventListener('mousedown', ref.mousedownResizeListener);
+    ref.addEventListener('scroll', ref.positionImageHandles);
+    ref.imageHandlesObserver.observe(ref, { attributes: true, attributeFilter: ['hidden', 'contenteditable'], childList: true });
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     document.execCommand('styleWithCSS', false, true);
     return {
@@ -5320,9 +5664,16 @@ window.Radzen = {
           ref.removeEventListener('contextmenu', ref.contextMenuListener);
           ref.removeEventListener('mousemove', ref.mousemoveListener);
           ref.removeEventListener('mousedown', ref.mousedownResizeListener);
+          ref.removeEventListener('scroll', ref.positionImageHandles);
+          ref.imageHandlesObserver.disconnect();
+          ref.stopImageDrag();
+          ref.removeImageHandles();
           ref.isResizingColumn = false;
-          document.removeEventListener('mouseup', ref.mouseupResizeListener);
-          document.removeEventListener('mousemove', ref.documentMouseMoveResizeListener);
+
+          if (ref.releaseColumnDrag) {
+            ref.releaseColumnDrag();
+            ref.releaseColumnDrag = null;
+          }
           document.removeEventListener('selectionchange', ref.selectionChangeListener);
         }
       }

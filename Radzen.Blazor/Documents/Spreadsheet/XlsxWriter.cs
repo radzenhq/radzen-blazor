@@ -2773,6 +2773,19 @@ class XlsxWriter(Workbook sourceWorkbook)
             sheetsElement.AddBeforeSelf(wpElement);
         }
 
+        // ECMA-376 part 1, 18.2.6 (definedNames)
+        if (sourceWorkbook.DefinedNames.Count > 0)
+        {
+            var definedNames = new XElement(mainNs + "definedNames");
+
+            foreach (var definedName in sourceWorkbook.DefinedNames)
+            {
+                definedNames.Add(new XElement(mainNs + "definedName", new XAttribute("name", definedName.Key), definedName.Value));
+            }
+
+            sheetsElement.AddAfterSelf(definedNames);
+        }
+
         using var entry = archive.CreateEntry("xl/workbook.xml").Open();
         workbook.Save(entry);
     }
