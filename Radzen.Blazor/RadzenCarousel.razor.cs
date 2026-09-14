@@ -368,11 +368,8 @@ namespace Radzen.Blazor
             if (shouldUpdate)
             {
                 RefreshItems();
-
-                if (JSRuntime != null)
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, AnimationDuration.HasValue ? (object)AnimationDuration.Value : null);
-                }
+                scrollToSelected = true;
+                animateScrollToSelected = true;
             }
         }
 
@@ -502,6 +499,8 @@ namespace Radzen.Blazor
         IJSObjectReference? scrollDisposable;
         int scrollDisposableVersion;
         bool _visibleChanged;
+        bool scrollToSelected;
+        bool animateScrollToSelected;
 
         /// <summary>
         /// Called from JavaScript when the user scrolls the carousel items container.
@@ -575,7 +574,22 @@ namespace Radzen.Blazor
                     {
                         await created.InvokeVoidAsync("dispose");
                         await created.DisposeAsync();
+                        return;
                     }
+
+                    scrollToSelected = selectedIndex > 0;
+                    animateScrollToSelected = false;
+                }
+            }
+
+            if (scrollToSelected && Visible && JSRuntime != null)
+            {
+                scrollToSelected = false;
+
+                if (selectedIndex >= 0 && selectedIndex < items.Count)
+                {
+                    var duration = animateScrollToSelected ? (AnimationDuration.HasValue ? (object)AnimationDuration.Value : null) : 0;
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, duration);
                 }
             }
         }

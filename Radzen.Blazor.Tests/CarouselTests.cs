@@ -1,4 +1,4 @@
-using Bunit;
+﻿using Bunit;
 using Microsoft.AspNetCore.Components;
 using System.Linq;
 using Xunit;
@@ -443,6 +443,76 @@ namespace Radzen.Blazor.Tests
             var pagerButtons = component.FindAll(".rz-carousel-pager-button");
             Assert.Equal(6, pagerButtons.Count);
         }
+
+        static RenderFragment TenItems() => builder =>
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                var n = i + 1;
+                builder.OpenComponent<RadzenCarouselItem>(i * 2);
+                builder.AddAttribute(i * 2 + 1, "ChildContent", (RenderFragment)(b => b.AddContent(0, $"Slide {n}")));
+                builder.CloseComponent();
+            }
+        };
+
+        [Fact]
+        public void Carousel_InitialSelectedIndex_RendersAndScrollsToItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.Auto, false);
+                parameters.Add(p => p.SelectedIndex, 6);
+                parameters.Add(p => p.Items, TenItems());
+            });
+
+            var items = component.FindAll("li.rz-carousel-item");
+            Assert.Equal("0", items[6].GetAttribute("tabindex"));
+            Assert.Single(items.Where(li => li.GetAttribute("tabindex") == "0"));
+
+            var pagerButtons = component.FindAll(".rz-carousel-pager-button");
+            Assert.True(pagerButtons[6].ClassList.Contains("rz-state-active"));
+
+            var scroll = Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.scrollCarouselItem"));
+            var element = Assert.IsType<ElementReference>(scroll.Arguments[0]);
+            Assert.Equal(component.FindComponents<RadzenCarouselItem>()[6].Instance.element.Id, element.Id);
+            Assert.Equal(0, scroll.Arguments[1]);
+        }
+
+        [Fact]
+        public void Carousel_InitialSelectedIndex_Zero_DoesNotScroll()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.Auto, false);
+                parameters.Add(p => p.Items, TenItems());
+            });
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.scrollCarouselItem");
+        }
+
+        [Fact]
+        public void Carousel_SelectedIndex_ChangedAfterRender_ScrollsWithAnimation()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.Auto, false);
+                parameters.Add(p => p.Items, TenItems());
+            });
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.SelectedIndex, 6));
+
+            var items = component.FindAll("li.rz-carousel-item");
+            Assert.Equal("0", items[6].GetAttribute("tabindex"));
+
+            var scroll = Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.scrollCarouselItem"));
+            Assert.Equal(component.FindComponents<RadzenCarouselItem>()[6].Instance.element.Id, Assert.IsType<ElementReference>(scroll.Arguments[0]).Id);
+            Assert.Null(scroll.Arguments[1]);
+        }
     }
 }
-
