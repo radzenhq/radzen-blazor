@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 
@@ -81,13 +82,22 @@ namespace Radzen.Blazor
         private IList<TItem> Items { get; set; } = new List<TItem>();
 
         /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+
+            await base.SetParametersAsync(parameters);
+
+            if (dataChanged)
+            {
+                Navigator?.Refresh();
+            }
+        }
+
+        /// <inheritdoc />
         protected override void OnParametersSet()
         {
-            if (Data != null)
-            {
-                Items = Data.ToList();
-            }
-
+            Items = Data?.ToList() ?? new List<TItem>();
             Navigator?.AddSeries(this);
         }
 
