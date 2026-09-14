@@ -5,8 +5,6 @@ using System;
 
 namespace Radzen.Documents.Markdown;
 
-internal readonly record struct InlineSpan(int Start, int End, int DelimiterLength, char Char);
-
 class InlineParser
 {
     class Delimiter
@@ -46,7 +44,6 @@ class InlineParser
     private readonly List<Inline> inlines = [];
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
-    private List<InlineSpan>? spans;
     private int bufferStart;
     private int bufferEnd;
     
@@ -155,7 +152,6 @@ class InlineParser
 
             newIndex = bestMatch + openingCount;
 
-            spans?.Add(new InlineSpan(index, newIndex, openingCount, Backtick));
 
             return true;
         }
@@ -285,15 +281,6 @@ class InlineParser
         var parser = new InlineParser();
 
         return parser.ParseInto(text, linkReferences);
-    }
-
-    internal static List<InlineSpan> ScanSpans(string text)
-    {
-        var parser = new InlineParser { spans = [] };
-
-        parser.ParseInto(text, []);
-
-        return parser.spans!;
     }
 
     private static void Shift(IEnumerable<Inline> inlines, int offset)
@@ -1050,11 +1037,6 @@ class InlineParser
                         parent.Add(child);
                     }
 
-                    spans?.Add(new InlineSpan(
-                        opener.End - charsToConsume,
-                        closer.Start + charsToConsume,
-                        charsToConsume,
-                        closer.Char));
 
                     opener.Length -= charsToConsume;
                     opener.End -= charsToConsume;

@@ -151,7 +151,7 @@ internal static class InlineNormalizer
 
     private static Text? Expel(List<Inline> body, char outside, bool leading)
     {
-        var text = leading ? FirstText(body) : LastText(body);
+        var text = EdgeText(body, leading);
 
         if (text == null)
         {
@@ -163,7 +163,7 @@ internal static class InlineNormalizer
 
         if (count == 0 && value.Length > 0 && !Flanks(outside, leading ? value[0] : value[^1]))
         {
-            count = leading ? PunctuationPrefix(value) : PunctuationSuffix(value);
+            count = Punctuation(value, leading);
         }
 
         if (count == 0)
@@ -224,19 +224,29 @@ internal static class InlineNormalizer
         }
     }
 
-    private static Text? FirstText(IReadOnlyList<Inline> body) => body.Count == 0 ? null : body[0] switch
+    private static Text? EdgeText(IReadOnlyList<Inline> body, bool leading)
     {
-        Text text => text,
-        Emphasis or Strong or Strikethrough => FirstText(((InlineContainer)body[0]).Children),
-        _ => null
-    };
+        while (true)
+        {
+            if (body.Count == 0)
+            {
+                return null;
+            }
 
-    private static Text? LastText(IReadOnlyList<Inline> body) => body.Count == 0 ? null : body[^1] switch
-    {
-        Text text => text,
-        Emphasis or Strong or Strikethrough => LastText(((InlineContainer)body[^1]).Children),
-        _ => null
-    };
+            var edge = leading ? body[0] : body[^1];
+
+            switch (edge)
+            {
+                case Text text:
+                    return text;
+                case Emphasis or Strong or Strikethrough:
+                    body = ((InlineContainer)edge).Children;
+                    break;
+                default:
+                    return null;
+            }
+        }
+    }
 
     public static bool Blank(IReadOnlyList<Inline> body) => body.All(child => child switch
     {
@@ -276,28 +286,13 @@ internal static class InlineNormalizer
     private static char Lead(InlineContainer container, char marker) => container.Children is [Text { Value.Length: > 0 } first, ..] && char.IsWhiteSpace(first.Value[0]) ? first.Value[0] : marker;
 
     // CommonMark 0.31.2, 6.2 Emphasis: a delimiter run next to punctuation is only flanking when the other side is whitespace or punctuation
-    private static bool Flanks(char outside, char inside) => !(IsPunctuation(inside) && !char.IsWhiteSpace(outside) && !IsPunctuation(outside) && outside != '\0');
+    private static bool Flanks(char outside, char inside) => !(inside.IsPunctuation() && !char.IsWhiteSpace(outside) && !outside.IsPunctuation() && outside != '\0');
 
-    // CommonMark 0.31.2, 2.1 Characters and lines: Unicode punctuation is the P categories plus ASCII symbols
-    private static bool IsPunctuation(char ch) => char.IsPunctuation(ch) || (ch < 128 && char.IsSymbol(ch));
-
-    private static int PunctuationPrefix(string value)
+    private static int Punctuation(string value, bool leading)
     {
         var count = 0;
 
-        while (count < value.Length && IsPunctuation(value[count]))
-        {
-            count++;
-        }
-
-        return count;
-    }
-
-    private static int PunctuationSuffix(string value)
-    {
-        var count = 0;
-
-        while (count < value.Length && IsPunctuation(value[^(count + 1)]))
+        while (count < value.Length && (leading ? value[count] : value[^(count + 1)]).IsPunctuation())
         {
             count++;
         }

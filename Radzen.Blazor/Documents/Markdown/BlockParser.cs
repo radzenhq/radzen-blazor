@@ -280,7 +280,6 @@ class BlockParser
     {
         var above = block.Parent;
         block.Range.End.Line = lineNumber;
-        block.Range.End.Column = LastLineLength;
         block.SourceEnd = Math.Max(block.SourceStart, OffsetAt(lineNumber, LastLineLength));
         block.Close(this);
         Tip = above;

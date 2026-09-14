@@ -439,9 +439,9 @@ internal static class InlineContent
         return any;
     }
 
-    public static List<Run> ToggleMark(IReadOnlyList<Run> runs, int start, int end, Mark mark)
+    public static List<Run> ToggleMark(IReadOnlyList<Run> runs, int start, int end, Mark mark, bool? remove = null)
     {
-        var remove = AllHave(runs, start, end, mark.Kind);
+        remove ??= AllHave(runs, start, end, mark.Kind);
         var result = new List<Run>();
         var position = 0;
 
@@ -472,7 +472,7 @@ internal static class InlineContent
             }
 
             var middle = run.Slice(from, to);
-            var marks = remove ? middle.Marks.Where(existing => existing.Kind != mark.Kind).ToList() : middle.Marks.Where(existing => existing.Kind != mark.Kind).Append(mark).ToList();
+            var marks = remove.Value ? middle.Marks.Where(existing => existing.Kind != mark.Kind).ToList() : middle.Marks.Where(existing => existing.Kind != mark.Kind).Append(mark).ToList();
             result.Add(middle.WithMarks(marks));
 
             if (to < run.Length)

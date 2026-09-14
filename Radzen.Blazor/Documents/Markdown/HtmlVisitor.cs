@@ -15,7 +15,6 @@ public class HtmlVisitor : NodeVisitorBase
     private int position;
     private const string Placeholder = "​";
 
-    private bool suppressParagraph;
     private string? pendingCheckbox;
     private bool inHeaderRow;
 
@@ -219,9 +218,8 @@ public class HtmlVisitor : NodeVisitorBase
     {
         ArgumentNullException.ThrowIfNull(paragraph);
 
-        if (suppressParagraph || paragraph.Parent is ListItem { Parent: List { Tight: true } })
+        if (paragraph.Parent is ListItem { Parent: List { Tight: true } })
         {
-            suppressParagraph = false;
             AppendContent(paragraph, () => base.VisitParagraph(paragraph));
         }
         else if (paragraph is { Virtual: true, Parent: Document parent } && parent.Children[0] != paragraph && parent.LastChild != paragraph)
@@ -353,11 +351,6 @@ public class HtmlVisitor : NodeVisitorBase
                 html.Append(checkbox);
                 segments.Add(new TextSegment(position, position, 1));
             }
-        }
-
-        if (tight)
-        {
-            suppressParagraph = true;
         }
 
         VisitBlocks(listItem);

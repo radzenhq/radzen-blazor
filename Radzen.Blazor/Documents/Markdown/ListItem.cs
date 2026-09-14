@@ -83,10 +83,6 @@ public class ListItem : BlockContainer
             // Empty list item
             Range.End.Line = Range.Start.Line;
 
-            if (Parent is List list)
-            {
-                Range.End.Column = list.MarkerOffset + list.Padding;
-            }
             SourceEnd = ContentOffset;
         }
     }

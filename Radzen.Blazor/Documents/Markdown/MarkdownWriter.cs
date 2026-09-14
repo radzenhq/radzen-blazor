@@ -96,13 +96,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     private void Write(string text)
     {
         FlushClose(tight ? 1 : 2);
-
-        if (delimiter.Length > 0 && AtBlank)
-        {
-            output.Append(delimiter);
-        }
-
-        output.Append(text);
+        Emit(text);
     }
 
     private void EnsureNewLine()
@@ -119,13 +113,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     {
         var previous = delimiter;
         FlushClose(tight ? 1 : 2);
-
-        if (delimiter.Length > 0 && AtBlank)
-        {
-            output.Append(delimiter);
-        }
-
-        output.Append(firstDelim ?? delim);
+        Emit(firstDelim ?? delim);
         delimiter += delim;
         content();
         delimiter = previous;
@@ -276,17 +264,9 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         FlushClose(LazySeparator());
-        ContentStart();
+        Emit(string.Empty);
         RenderInlines(InlineNormalizer.Normalize(paragraph.Children, lineStart: true), "\n", lineStart: true, blockEnd: true);
         CloseBlock(paragraph);
-    }
-
-    private void ContentStart()
-    {
-        if (delimiter.Length > 0 && AtBlank)
-        {
-            output.Append(delimiter);
-        }
     }
 
     public void VisitHeading(Heading heading)
@@ -296,7 +276,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         if (heading is SetExtHeading && heading.Children.Count > 0)
         {
             FlushClose(LazySeparator());
-            ContentStart();
+            Emit(string.Empty);
             RenderInlines(InlineNormalizer.Normalize(heading.Children, lineStart: true), "\n", lineStart: true, blockEnd: true);
             var underline = ((SetExtHeading)heading).Underline ?? string.Empty;
             EnsureNewLine();
@@ -416,7 +396,11 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         Write(fence + (fencedCodeBlock.Info ?? string.Empty));
         var closed = fencedCodeBlock.Closed || HasFollowing(fencedCodeBlock) || definitionsFollow;
-        WriteLines(fencedCodeBlock.Value, keepTrailing: !closed);
+
+        if (fencedCodeBlock.Value.Length > 0)
+        {
+            WriteLines(fencedCodeBlock.Value, keepTrailing: !closed, leadingNewline: true, continuation: delimiter);
+        }
 
         if (closed)
         {
@@ -441,25 +425,23 @@ internal sealed class MarkdownWriter : INodeVisitor
         return longest;
     }
 
-    private void WriteLines(string value, bool keepTrailing = false)
+    private void WriteLines(string value, bool keepTrailing, bool leadingNewline, string continuation)
     {
-        if (value.Length == 0)
-        {
-            return;
-        }
-
         var lines = value.Split('\n');
         var count = lines.Length > 1 && lines[^1].Length == 0 && !keepTrailing ? lines.Length - 1 : lines.Length;
 
         for (var index = 0; index < count; index++)
         {
-            output.Append('\n');
+            if (leadingNewline || index > 0)
+            {
+                output.Append('\n');
+            }
 
             if (lines[index].Length > 0)
             {
-                output.Append(delimiter).Append(lines[index]);
+                output.Append(AtBlank ? delimiter : continuation).Append(lines[index]);
             }
-            else if (!keepTrailing || index < count - 1)
+            else if (AtBlank && (!keepTrailing || index < count - 1))
             {
                 output.Append(delimiter.TrimEnd());
             }
@@ -483,26 +465,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             delimiter += "    ";
         }
 
-        var lines = codeBlock.Value.Split('\n');
-        var count = lines.Length > 1 && lines[^1].Length == 0 ? lines.Length - 1 : lines.Length;
-
-        for (var index = 0; index < count; index++)
-        {
-            if (index > 0)
-            {
-                output.Append('\n');
-            }
-
-            if (lines[index].Length > 0)
-            {
-                output.Append(AtBlank ? delimiter : "    ");
-                output.Append(lines[index]);
-            }
-            else if (AtBlank)
-            {
-                output.Append(delimiter.TrimEnd());
-            }
-        }
+        WriteLines(codeBlock.Value, keepTrailing: false, leadingNewline: false, continuation: "    ");
 
         if (fence != null)
         {
@@ -527,20 +490,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             lines = lines.Select(line => line.Length >= indent ? line[indent..] : line.TrimStart(' ')).ToArray();
         }
 
-        for (var index = 0; index < lines.Length; index++)
-        {
-            if (index > 0)
-            {
-                output.Append('\n');
-            }
-
-            if (AtBlank)
-            {
-                output.Append(lines[index].Length > 0 ? delimiter : delimiter.TrimEnd());
-            }
-
-            output.Append(lines[index]);
-        }
+        WriteLines(string.Join('\n', lines), keepTrailing: true, leadingNewline: false, continuation: string.Empty);
 
         CloseBlock(htmlBlock);
     }
@@ -880,7 +830,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         output.Append("](");
         var target = (destination ?? string.Empty).Replace("\r", "%0D", StringComparison.Ordinal).Replace("\n", "%0A", StringComparison.Ordinal);
 
-        if ((target.Length == 0 && !string.IsNullOrEmpty(title)) || Regex.IsMatch(target, @"[ - ]"))
+        if ((target.Length == 0 && !string.IsNullOrEmpty(title)) || Regex.IsMatch(target, @"[\x00-\x20\x7F]"))
         {
             constructs = enclosing | Construct.DestinationLiteral;
             output.Append('<').Append(Safe(target, "<", ">")).Append('>');

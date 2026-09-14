@@ -889,13 +889,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, code, cursor.Offset + text.Length, key: key, merge: merge);
         }
 
-        if (cursor.Block is ListItem item && cursor.Content == null)
-        {
-            var paragraph = new Paragraph();
-            item.Insert(0, paragraph);
-            Touch(item);
-            cursor = new Cursor(paragraph, paragraph, 0);
-        }
+        cursor = Filled(cursor);
 
         if (cursor.Content == null)
         {
@@ -1040,6 +1034,19 @@ internal sealed class MarkdownEditorEngine
 
         Touch(replacement);
         return new Cursor(replacement, replacement, 0);
+    }
+
+    private static Cursor Filled(Cursor cursor)
+    {
+        if (cursor.Block is not ListItem item || cursor.Content != null)
+        {
+            return cursor;
+        }
+
+        var paragraph = new Paragraph();
+        item.Insert(0, paragraph);
+        Touch(item);
+        return new Cursor(paragraph, paragraph, 0);
     }
 
     private static bool Attached(Document document, Block block)
@@ -1322,7 +1329,7 @@ internal sealed class MarkdownEditorEngine
 
         var previousLeaf = EdgeLeaf(previous, last: true);
 
-        if (previousLeaf is not (Paragraph or Heading) || BlankLines.IsSealed(previous))
+        if (previousLeaf is not (Paragraph or Heading))
         {
             return null;
         }
@@ -1440,7 +1447,7 @@ internal sealed class MarkdownEditorEngine
 
         var nextLeaf = EdgeLeaf(next, last: false);
 
-        if (nextLeaf is not (Paragraph or Heading) || BlankLines.IsSealed(next))
+        if (nextLeaf is not (Paragraph or Heading))
         {
             return null;
         }
@@ -1950,7 +1957,7 @@ internal sealed class MarkdownEditorEngine
         if (start == end)
         {
             var runs = Runs(first.Content);
-            var (wordStart, wordEnd) = Extent(runs, first.Offset, kind);
+            var (wordStart, wordEnd) = WordExtent(runs, first.Offset, kind);
 
             if (wordStart == wordEnd)
             {
@@ -1973,15 +1980,7 @@ internal sealed class MarkdownEditorEngine
 
         foreach (var (content, from, to) in targets)
         {
-            var runs = Runs(content);
-            var toggled = InlineContent.ToggleMark(runs, from, to, mark);
-
-            if (InlineContent.AllHave(toggled, from, to, kind) == remove)
-            {
-                toggled = InlineContent.ToggleMark(toggled, from, to, mark);
-            }
-
-            SetRuns(content, toggled);
+            SetRuns(content, InlineContent.ToggleMark(Runs(content), from, to, mark, remove));
         }
 
         return Commit(document, first.Content, first.Offset, last.Content, last.Offset);
@@ -2011,7 +2010,7 @@ internal sealed class MarkdownEditorEngine
         return targets;
     }
 
-    private static (int Start, int End) Extent(IReadOnlyList<Run> runs, int offset, MarkKind kind)
+    private static (int Start, int End) WordExtent(IReadOnlyList<Run> runs, int offset, MarkKind kind)
     {
         var (index, _) = InlineContent.Locate(runs, offset);
 
@@ -2412,8 +2411,7 @@ internal sealed class MarkdownEditorEngine
 
             foreach (var (content, from, until) in Targets(hosts, start, end, cursor, last))
             {
-                var linked = InlineContent.ToggleMark(Runs(content), from, until, mark);
-                SetRuns(content, InlineContent.AllHave(linked, from, until, MarkKind.Link) ? linked : InlineContent.ToggleMark(linked, from, until, mark));
+                SetRuns(content, InlineContent.ToggleMark(Runs(content), from, until, mark, remove: false));
             }
 
             return Commit(document, cursor.Content, cursor.Offset, last.Content, last.Offset);
@@ -2432,14 +2430,7 @@ internal sealed class MarkdownEditorEngine
 
         if (to > cursor.Offset)
         {
-            var linked = InlineContent.ToggleMark(runs, cursor.Offset, to, link);
-
-            if (!InlineContent.AllHave(linked, cursor.Offset, to, MarkKind.Link))
-            {
-                linked = InlineContent.ToggleMark(linked, cursor.Offset, to, link);
-            }
-
-            SetRuns(cursor.Content, linked);
+            SetRuns(cursor.Content, InlineContent.ToggleMark(runs, cursor.Offset, to, link, remove: false));
             return Commit(document, cursor.Content, cursor.Offset, cursor.Content, to);
         }
 
@@ -2464,13 +2455,7 @@ internal sealed class MarkdownEditorEngine
             return InsertAt(document, cursor, value, key, merge, preferRight: false, marks: null);
         }
 
-        if (cursor.Block is ListItem item && cursor.Content == null)
-        {
-            var paragraph = new Paragraph();
-            item.Insert(0, paragraph);
-            Touch(item);
-            cursor = new Cursor(paragraph, paragraph, 0);
-        }
+        cursor = Filled(cursor);
 
         var blocks = MarkdownParser.Parse(value).Children.ToList();
 

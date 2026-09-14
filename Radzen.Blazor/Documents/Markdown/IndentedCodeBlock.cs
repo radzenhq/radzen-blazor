@@ -52,7 +52,6 @@ public class IndentedCodeBlock : Leaf
         TrimContentEnd(string.Join('\n', lines).Length + 1);
 
         Range.End.Line = Range.Start.Line + lines.Count - 1;
-        Range.End.Column = Range.Start.Column + lines[^1].Length - 1;
         SourceEnd = Content.ToSource(Value.Length - 1);
     }
 
