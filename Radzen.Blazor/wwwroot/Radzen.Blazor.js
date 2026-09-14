@@ -8088,10 +8088,6 @@ Radzen.datePickerKeydown = function (e) {
 document.addEventListener('keydown', Radzen.datePickerKeydown);
 
 Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts) {
-  if (!editable || !textarea) {
-    return { update: function () {}, getSelection: function () { return [0, 0]; }, getVersion: function () { return 0; }, dispose: function () {} };
-  }
-
   function invoke(editor, name, ...args) {
     try {
       return editor.instance.invokeMethodAsync(name, ...args).catch(() => null);
@@ -8160,7 +8156,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       return last ? last.end : 0;
     }
     const reference = offset < node.childNodes.length ? node.childNodes[offset] : null;
-    if (reference && reference.nodeType === Node.ELEMENT_NODE && reference.dataset && reference.dataset.gap !== undefined) {
+    if (reference && reference.nodeType === Node.ELEMENT_NODE && reference.dataset.gap !== undefined) {
       return parseInt(reference.dataset.gap, 10);
     }
     let inside = null;
@@ -8248,7 +8244,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     if (!update) {
       return;
     }
-    if (update.version !== null && update.version !== undefined && update.version !== editor.version) {
+    if (update.version !== editor.version) {
+      settle(editor);
       return;
     }
     if (!editor.textarea.hidden) {
@@ -8259,6 +8256,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       }
       editor.selection = [update.selectionStart, update.selectionEnd];
       editor.reported = editor.selection;
+      settle(editor);
       return;
     }
     if (update.html !== null && update.html !== undefined) {
@@ -8285,6 +8283,12 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         editor.selection = [update.selectionStart, update.selectionEnd];
         editor.tracked = null;
       }
+    }
+  }
+
+  function settle(editor) {
+    if (editor.pending === 0) {
+      editor.virtual = null;
     }
   }
 
@@ -8472,7 +8476,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       return '';
     }
     const plain = dataTransfer.getData('text/plain');
-    if (closestBlock(editor, 0) === 'PRE') {
+    if (closestBlock(editor) === 'PRE') {
       return plain;
     }
     const markdown = dataTransfer.getData('text/markdown');
@@ -8652,7 +8656,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
 
   function onCopy(editor, event, cut) {
     const selection = window.getSelection();
-    if (!editor.textarea.hidden || !event.clipboardData || !selection.rangeCount || selection.isCollapsed || !editor.editable.contains(selection.anchorNode)) {
+    if (!event.clipboardData || !selection.rangeCount || selection.isCollapsed || !editor.editable.contains(selection.anchorNode)) {
       return;
     }
     const [start, end] = currentSelection(editor);
@@ -8682,7 +8686,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     edit(editor, 'OnEditAsync', [start, end, event.data || '', 'insertCompositionText']);
   }
 
-  function closestBlock(editor, offset) {
+  function closestBlock(editor) {
     const selection = window.getSelection();
     if (!selection.rangeCount) {
       return null;
@@ -8697,16 +8701,31 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     return null;
   }
 
-  function moveAcrossCells(editor, forward) {
-    const selection = window.getSelection();
-    if (!selection.rangeCount) {
-      return;
-    }
-    let node = selection.anchorNode;
+  function closestCell(editor, node) {
     while (node && node !== editor.editable && !(node.nodeType === 1 && (node.tagName === 'TD' || node.tagName === 'TH'))) {
       node = node.parentNode;
     }
-    if (!node || node === editor.editable) {
+    return node && node !== editor.editable ? node : null;
+  }
+
+  function placeCaret(selection, container, atEnd) {
+    const nodes = textNodes(container);
+    const last = nodes[nodes.length - 1];
+    const range = document.createRange();
+    if (atEnd) {
+      range.setStart(last || container, last ? last.length : container.childNodes.length);
+    } else {
+      range.setStart(nodes.length ? nodes[0] : container, 0);
+    }
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  function moveAcrossCells(editor, forward) {
+    const selection = window.getSelection();
+    const node = selection.rangeCount ? closestCell(editor, selection.anchorNode) : null;
+    if (!node) {
       return;
     }
     const cells = Array.from(node.closest('table').querySelectorAll('td, th'));
@@ -8717,24 +8736,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       }
       return;
     }
-    const nodes = textNodes(target);
-    const range = document.createRange();
-    range.setStart(nodes.length ? nodes[0] : target, 0);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    placeCaret(selection, target, false);
   }
 
   function moveAcrossRows(editor, down) {
     const selection = window.getSelection();
-    if (!selection.rangeCount || !selection.isCollapsed) {
-      return false;
-    }
-    let node = selection.anchorNode;
-    while (node && node !== editor.editable && !(node.nodeType === 1 && (node.tagName === 'TD' || node.tagName === 'TH'))) {
-      node = node.parentNode;
-    }
-    if (!node || node === editor.editable) {
+    const node = selection.rangeCount && selection.isCollapsed ? closestCell(editor, selection.anchorNode) : null;
+    if (!node) {
       return false;
     }
     const row = node.parentNode;
@@ -8745,19 +8753,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     if (!target && !outside) {
       return false;
     }
-    const cell = target ? target.cells[Math.min(node.cellIndex, target.cells.length - 1)] : outside;
-    const nodes = textNodes(cell);
-    const range = document.createRange();
-    if (target || down) {
-      range.setStart(nodes.length ? nodes[0] : cell, 0);
-    } else if (nodes.length) {
-      range.setStart(nodes[nodes.length - 1], nodes[nodes.length - 1].length);
-    } else {
-      range.setStart(cell, cell.childNodes.length);
-    }
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    placeCaret(selection, target ? target.cells[Math.min(node.cellIndex, target.cells.length - 1)] : outside, !target && !down);
     return true;
   }
 
@@ -8771,13 +8767,10 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         return;
       }
     }
-    if ((event.key === 'Home' || event.key === 'End') && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor, 0) === 'TABLE') {
+    if ((event.key === 'Home' || event.key === 'End') && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor) === 'TABLE') {
       const selection = window.getSelection();
-      let cell = selection.focusNode;
-      while (cell && cell !== editor.editable && !(cell.nodeType === 1 && (cell.tagName === 'TD' || cell.tagName === 'TH'))) {
-        cell = cell.parentNode;
-      }
-      if (cell && cell !== editor.editable) {
+      const cell = closestCell(editor, selection.focusNode);
+      if (cell) {
         event.preventDefault();
         const nodes = textNodes(cell);
         if (event.key === 'End') {
@@ -8793,19 +8786,18 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       event.preventDefault();
       return;
     }
-    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor, 0) === 'TABLE') {
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && closestBlock(editor) === 'TABLE') {
       event.preventDefault();
       moveAcrossCells(editor, !event.shiftKey);
       return;
     }
-    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && closestBlock(editor, 0) === 'PRE') {
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && closestBlock(editor) === 'PRE') {
       event.preventDefault();
       edit(editor, 'OnEditAsync', () => [...currentSelection(editor), '\t', 'insertText']);
       return;
     }
     if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden) {
-      const [start, end] = currentSelection(editor);
-      if (editor.editable.querySelector('li') && closestBlock(editor, start) === 'LI') {
+      if (closestBlock(editor) === 'LI') {
         event.preventDefault();
         edit(editor, 'OnIndentAsync', () => [...currentSelection(editor), event.shiftKey]);
         return;
@@ -8873,9 +8865,13 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     }
     editor.selection = [start, end];
     editor.reported = [start, end];
-    invoke(editor, 'OnSelectionAsync', start, end).then(text => {
-      editor.markdown = { start, end, text };
-    });
+    invoke(editor, 'OnSelectionAsync', start, end);
+    clearTimeout(editor.copyTimer);
+    if (start !== end && editor.textarea.hidden) {
+      editor.copyTimer = setTimeout(() => invoke(editor, 'OnCopyAsync', start, end).then(text => {
+        editor.markdown = { start, end, text };
+      }), 150);
+    }
   }
 
   function onTextareaInput(editor) {
@@ -8910,6 +8906,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     composing: false,
     reported: null,
     markdown: null,
+    copyTimer: null,
     listeners: []
   };
   const on = (target, name, handler) => {
@@ -8963,16 +8960,17 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         editor.value = value.text;
         editor.textarea.value = value.text;
       }
-      editor.version = value && value.version !== null && value.version !== undefined ? value.version : editor.version;
+      editor.version = value.version;
       applyUpdate(editor, value);
     },
     getSelection: function () {
       return editor.queue.then(() => currentSelection(editor), () => currentSelection(editor));
     },
     getVersion: function () {
-      return editor.version;
+      return editor.queue.then(() => editor.version, () => editor.version);
     },
     dispose: function () {
+      clearTimeout(editor.copyTimer);
       for (const [target, name, handler] of editor.listeners) {
         target.removeEventListener(name, handler);
       }

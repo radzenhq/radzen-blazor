@@ -208,8 +208,11 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         return update;
     }
 
-    private async Task PushAsync(MarkdownEditorUpdate? update, bool includeText, bool focus = false)
+    private async Task PushAsync(Func<MarkdownEditorUpdate?> produce, bool includeText, bool focus = false)
     {
+        var version = await GetVersionAsync();
+        var update = produce();
+
         if (update == null)
         {
             return;
@@ -220,7 +223,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             update.Text = engine.Text;
         }
 
-        await PublishAsync(update, await GetVersionAsync(), raiseInput: false);
+        await PublishAsync(update, version, raiseInput: false);
 
         if (jsRef != null)
         {
@@ -318,18 +321,24 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public async Task<MarkdownEditorUpdate?> OnInsertLineBreakAsync(int start, int end, int version) => await RunAsync(() => engine.InsertLineBreak(start, end), version);
 
     /// <summary>
-    /// Invoked from JavaScript when the selection changes. Returns the selected content as Markdown, which the browser puts on the clipboard when the selection is copied.
+    /// Invoked from JavaScript when the selection changes.
     /// </summary>
     [JSInvokable("OnSelectionAsync")]
-    public Task<string?> OnSelectionAsync(int start, int end)
+    public Task OnSelectionAsync(int start, int end)
     {
         selection = (start, end);
         selectionMode = mode;
         toolState = engine.State(start, end);
         ToolStateChanged?.Invoke();
         StateHasChanged();
-        return Task.FromResult(mode == MarkdownEditorMode.Design && start < end ? engine.Copy(start, end) : null);
+        return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Invoked from JavaScript once a selection settles in Design mode. Returns the selected content as Markdown, which the browser puts on the clipboard when the selection is copied.
+    /// </summary>
+    [JSInvokable("OnCopyAsync")]
+    public Task<string?> OnCopyAsync(int start, int end) => Task.FromResult(mode == MarkdownEditorMode.Design && start < end ? engine.Copy(start, end) : null);
 
     /// <summary>
     /// Invoked from JavaScript when the context menu is requested inside a table. Opens the table commands.
@@ -499,14 +508,12 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
         lastInsertEndedWithWhitespace = true;
 
-        var update = name switch
+        await PushAsync(() => name switch
         {
             MarkdownEditorCommands.Undo => engine.Undo(),
             MarkdownEditorCommands.Redo => engine.Redo(),
             _ => engine.Command(name, start, end, value, label)
-        };
-
-        await PushAsync(update, includeText: true, focus: true);
+        }, includeText: true, focus: true);
         await Execute.InvokeAsync(new MarkdownEditorExecuteEventArgs(this) { CommandName = name });
     }
 
@@ -578,13 +585,15 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         {
             initialized = true;
             jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMarkdownEditor", editable, textarea, Reference, shortcuts.Keys);
-            await PushAsync(engine.Render(0, 0), includeText: true);
+            await PushAsync(() => engine.Render(0, 0), includeText: true);
         }
         else if (valueChangedExternally || modeChanged)
         {
             if (valueChangedExternally)
             {
                 engine.Reset(Value);
+                selection = (0, 0);
+                selectionMode = mode;
             }
             else if (selectionMode != mode)
             {
@@ -595,7 +604,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             }
 
             engine.RenderHtml = mode == MarkdownEditorMode.Design;
-            await PushAsync(engine.Render(selection.Start, selection.End), includeText: true, focus: focusOnModeChange);
+            await PushAsync(() => engine.Render(selection.Start, selection.End), includeText: true, focus: focusOnModeChange);
         }
 
         valueChangedExternally = false;

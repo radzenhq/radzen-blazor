@@ -51,6 +51,8 @@ public class HtmlVisitorTests
     [InlineData("[x](javascript:alert(1))", "<p><a href=\"\">x</a></p>")]
     [InlineData("[x](JaVaScRiPt:alert(1))", "<p><a href=\"\">x</a></p>")]
     [InlineData("![a](javascript:alert(1))", "<p><img src=\"\" alt=\"a\"></p>")]
+    [InlineData("[x](jav\tascript:alert(1))", "<p><a href=\"\">x</a></p>")]
+    [InlineData("[x](<java\u0000script:alert(1)>)", "<p><a href=\"\">x</a></p>")]
     public void ToHtml_blanks_dangerous_urls(string markdown, string expected)
     {
         Assert.Equal(expected, HtmlVisitor.ToHtml(markdown));

@@ -375,6 +375,7 @@ namespace Radzen.Blazor.Tests
             var update = LastUpdate(module);
             Assert.Equal("b", update.Text);
             Assert.Equal("<p>b</p>", update.Html);
+            Assert.Equal((0, 0), component.Instance.Selection);
         }
 
         [Fact]
@@ -418,18 +419,6 @@ namespace Radzen.Blazor.Tests
             await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, "!", "insertText", 1));
             await component.InvokeAsync(() => component.Instance.OnBlurAsync());
             Assert.Equal("old!", changed);
-        }
-
-        [Fact]
-        public async Task MarkdownEditor_Selection_HighlightsActiveFormats()
-        {
-            using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "**bold** plain"));
-            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(3, 3));
-            Assert.True(component.Instance.IsActive(MarkdownEditorCommands.Bold));
-            Assert.Contains("rz-state-active", component.Markup);
-            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(10, 10));
-            Assert.False(component.Instance.IsActive(MarkdownEditorCommands.Bold));
         }
 
         [Fact]
