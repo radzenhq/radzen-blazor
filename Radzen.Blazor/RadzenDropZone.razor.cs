@@ -72,13 +72,28 @@ namespace Radzen.Blazor
             cssClass = canDrop ? "rz-can-drop" : "rz-no-drop";
         }
 
+        // dragenter and dragleave bubble from the zone's children, so moving the pointer onto an item raises
+        // dragleave on the zone although the pointer is still inside it. Count enters and leaves to detect a real leave.
+        int dragDepth;
+
+        void OnDragEnter(DragEventArgs args)
+        {
+            dragDepth++;
+        }
+
         void OnDragLeave(DragEventArgs args)
         {
-            cssClass = "";
+            dragDepth = Math.Max(dragDepth - 1, 0);
+
+            if (dragDepth == 0)
+            {
+                cssClass = "";
+            }
         }
 
         async Task OnDrop(DragEventArgs args)
         {
+            dragDepth = 0;
             cssClass = "";
             await OnDropInternal();
         }

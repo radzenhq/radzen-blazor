@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components.Web;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -152,6 +153,64 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("display:flex", component.Markup);
+        }
+
+        static IRenderedComponent<RadzenDropZoneContainer<string>> RenderZoneWithItems(TestContext ctx)
+        {
+            return ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new[] { "Item1", "Item2" });
+                parameters.Add(p => p.ItemSelector, (item, zone) => true);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenDropZone<string>>(0);
+                    builder.CloseComponent();
+                });
+            });
+        }
+
+        static DragEventArgs DragArgs() => new DragEventArgs { DataTransfer = new DataTransfer() };
+
+        [Fact]
+        public void DropZone_KeepsCanDropClass_WhenDraggingOverItsItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderZoneWithItems(ctx);
+
+            component.Find(".rz-dropzone").TriggerEvent("ondragenter", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondragover", DragArgs());
+            Assert.Contains("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+
+            // Moving the pointer from the zone onto one of its items: the browser raises dragenter on the
+            // item (bubbling to the zone) and then dragleave on the zone, although the pointer is still inside it.
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragenter", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondragleave", DragArgs());
+            Assert.Contains("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+
+            // Moving from the first item to the second one: dragleave on the first item bubbles to the zone.
+            component.FindAll(".rz-dropzone-item")[1].TriggerEvent("ondragenter", DragArgs());
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragleave", DragArgs());
+            Assert.Contains("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+        }
+
+        [Fact]
+        public void DropZone_RemovesCanDropClass_WhenDragLeavesTheZone()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderZoneWithItems(ctx);
+
+            component.Find(".rz-dropzone").TriggerEvent("ondragenter", DragArgs());
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragenter", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondragleave", DragArgs());
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragover", DragArgs());
+            Assert.Contains("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragleave", DragArgs());
+            Assert.DoesNotContain("rz-can-drop", component.Find(".rz-dropzone").ClassList);
         }
     }
 }
