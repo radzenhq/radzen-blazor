@@ -252,10 +252,8 @@ public class MarkdownEditorEngineTests
 
     [Theory]
     [InlineData("ab\n\n- [x] cd", 1, 11, "a**b**\n\n- [x] **c**d", 3, 17)]
-    [InlineData("Edit this", 4, 4, "**Edit** this", 6, 6)]
-    [InlineData("**Edit** this", 6, 6, "Edit this", 4, 4)]
     [InlineData("ab", 0, 2, "**ab**", 2, 4)]
-    public void InlineCommandsApplyPerBlockAndKeepACollapsedCaret(string text, int start, int end, string expected, int selectionStart, int selectionEnd)
+    public void InlineCommandsApplyPerBlockAndKeepTheSelection(string text, int start, int end, string expected, int selectionStart, int selectionEnd)
     {
         var engine = new SourceEngine(text);
 
@@ -495,18 +493,77 @@ public class MarkdownEditorEngineTests
     }
 
     [Theory]
-    [InlineData("strikethrough", "to *markdown*. **x**", 6, "to *~~markdown~~*. **x**", 8)]
-    [InlineData("bold", "to *markdown*. **x**", 6, "to ***markdown***. **x**", 8)]
-    [InlineData("bold", "say hello, world", 6, "say **hello**, world", 8)]
-    [InlineData("bold", "a **b** c", 1, "**a** **b** c", 3)]
-    public void CollapsedCaretCommandsUseTheWordOrTheEnclosingInline(string command, string text, int caret, string expected, int expectedCaret)
+    [InlineData(MarkdownEditorCommands.Bold, "**x**")]
+    [InlineData(MarkdownEditorCommands.Italic, "*x*")]
+    [InlineData(MarkdownEditorCommands.Strikethrough, "~~x~~")]
+    [InlineData(MarkdownEditorCommands.Code, "`x`")]
+    public void AMarkCommandWithoutASelectionAppliesToTheTextTypedNext(string command, string expected)
     {
-        var engine = new SourceEngine(text);
+        var engine = new MarkdownEditorEngine("");
 
-        var update = engine.Command(command, caret, caret, null, null);
+        var update = engine.Command(command, 0, 0, null, null);
 
-        Assert.Equal(expected, engine.Text);
-        Assert.Equal(expectedCaret, update!.SelectionStart);
+        Assert.Equal("", engine.Text);
+        Assert.Contains(command, update!.State!.Formats!);
+
+        engine.InsertText(0, 0, "x", literal: true);
+        engine.InsertText(1, 1, "y", literal: true);
+
+        Assert.Equal(expected.Replace("x", "xy"), engine.Text);
+    }
+
+    [Fact]
+    public void AMarkCommandInsideAMarkedRunTurnsTheMarkOffForTheTextTypedNext()
+    {
+        var engine = new MarkdownEditorEngine("**bold**");
+
+        var update = engine.Command(MarkdownEditorCommands.Bold, 4, 4, null, null);
+
+        Assert.DoesNotContain(MarkdownEditorCommands.Bold, update!.State!.Formats!);
+
+        engine.InsertText(4, 4, "x", literal: true);
+
+        Assert.Equal("**bold**x", engine.Text);
+    }
+
+    [Fact]
+    public void AMarkCommandTwiceWithoutASelectionCancelsItself()
+    {
+        var engine = new MarkdownEditorEngine("");
+
+        engine.Command(MarkdownEditorCommands.Bold, 0, 0, null, null);
+        var update = engine.Command(MarkdownEditorCommands.Bold, 0, 0, null, null);
+
+        Assert.DoesNotContain(MarkdownEditorCommands.Bold, update!.State!.Formats!);
+
+        engine.InsertText(0, 0, "x", literal: true);
+
+        Assert.Equal("x", engine.Text);
+    }
+
+    [Fact]
+    public void MovingTheCaretDropsTheMarkToggledWithoutASelection()
+    {
+        var engine = new MarkdownEditorEngine("ab");
+
+        engine.Command(MarkdownEditorCommands.Bold, 1, 1, null, null);
+
+        Assert.DoesNotContain(MarkdownEditorCommands.Bold, engine.State(2, 2).Formats!);
+
+        engine.InsertText(2, 2, "x", literal: true);
+
+        Assert.Equal("abx", engine.Text);
+    }
+
+    [Fact]
+    public void InSourceModeAMarkCommandWithoutASelectionWrapsTheWord()
+    {
+        var engine = new MarkdownEditorEngine("say hello world") { RenderHtml = false };
+
+        var update = engine.Command(MarkdownEditorCommands.Bold, 6, 6, null, null);
+
+        Assert.Equal("say **hello** world", engine.Text);
+        Assert.Equal(8, update!.SelectionStart);
     }
 
     [Fact]
@@ -1375,18 +1432,6 @@ public class MarkdownEditorEngineReviewRegressionTests
 
         Assert.Equal(expected, engine.Text);
         Assert.Equal(caret, update!.SelectionStart);
-    }
-
-    [Theory]
-    [InlineData("![i](j)abcd", 9, "![i](j)**abcd**")]
-    [InlineData("foo  \nbar", 8, "foo  \n**bar**")]
-    public void BoldAtACaretAfterAnAtomFormatsTheWholeWord(string text, int caret, string expected)
-    {
-        var engine = new SourceEngine(text);
-
-        engine.Command(MarkdownEditorCommands.Bold, caret, caret, null, null);
-
-        Assert.Equal(expected, engine.Text);
     }
 
     [Theory]

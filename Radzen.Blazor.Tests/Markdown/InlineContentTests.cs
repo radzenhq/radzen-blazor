@@ -71,7 +71,7 @@ public class InlineContentTests
     [InlineData("*~~Toggle~~*", 0, 6, "Emphasis", "~~Toggle~~")]
     [InlineData("parax**y**", 5, 6, "Strikethrough", "parax**~~y~~**")]
     [InlineData("The quick **brown** fox", 10, 19, "Strong", "The quick **brown fox**")]
-    public void TogglingAMarkFollowsProseMirrorSemantics(string markdown, int start, int end, string kind, string expected)
+    public void TogglingAMarkOnASelectionAbsorbsPartiallySelectedRuns(string markdown, int start, int end, string kind, string expected)
     {
         var (document, paragraph) = Load(markdown);
         var runs = InlineContent.ToggleMark(InlineContent.Flatten(paragraph.Children), start, end, new Mark(System.Enum.Parse<MarkKind>(kind)));

@@ -30,6 +30,7 @@ internal sealed class MarkdownEditorEngine
     private readonly List<Edit> redo = [];
     private (int Start, int End) pending;
     private (int Start, int End) pendingSource;
+    private (int Position, List<Mark> Marks)? stored;
     private string source;
     private Document? document;
 
@@ -53,6 +54,7 @@ internal sealed class MarkdownEditorEngine
     {
         Text = Normalize(text);
         document = null;
+        stored = null;
         undo.Clear();
         redo.Clear();
     }
@@ -76,6 +78,7 @@ internal sealed class MarkdownEditorEngine
     public MarkdownEditorUpdate Apply(int start, int end, string inserted, (int Start, int End) after, string? key = null, bool merge = false, (int Start, int End)? before = null)
     {
         document = null;
+        stored = null;
         ApplyEdit(start, end, inserted, after, key, merge, before, design: false);
         return Render(after.Start, after.End);
     }
@@ -156,6 +159,7 @@ internal sealed class MarkdownEditorEngine
         undo.RemoveAt(undo.Count - 1);
         Text = Text[..edit.Start] + edit.Removed + Text[(edit.Start + edit.Inserted.Length)..];
         document = null;
+        stored = null;
         redo.Add(edit);
         var (start, end) = Convert(edit.Before, edit.Design);
 
@@ -173,6 +177,7 @@ internal sealed class MarkdownEditorEngine
         redo.RemoveAt(redo.Count - 1);
         Text = Text[..edit.Start] + edit.Inserted + Text[(edit.Start + edit.Removed.Length)..];
         document = null;
+        stored = null;
         undo.Add(edit);
         var (start, end) = Convert(edit.After, edit.Design);
 
@@ -237,6 +242,7 @@ internal sealed class MarkdownEditorEngine
         }
 
         (selectionStart, selectionEnd) = Clamp(hosts, selectionStart, selectionEnd);
+        stored = stored is { } kept && selectionStart == selectionEnd && selectionStart == kept.Position ? stored : null;
         return State(current, hosts, selectionStart, selectionEnd);
     }
 
@@ -271,19 +277,13 @@ internal sealed class MarkdownEditorEngine
             }
         }
 
-        if (cursor.Content != null)
+        if (stored is { } typing && typing.Position == start && start == end)
         {
-            var runs = InlineContent.Flatten(cursor.Content.Children);
-            var (index, offset) = InlineContent.Locate(runs, cursor.Offset);
-
-            if (index < runs.Count && runs[index].Atom == null && (offset > 0 || index == 0 || runs[index - 1].Atom != null) && (offset < runs[index].Length || index == runs.Count - 1))
-            {
-                formats.AddRange(runs[index].Marks.Select(FormatOf).OfType<string>());
-            }
-            else if (index > 0 && offset == 0 && runs[index - 1].Atom == null)
-            {
-                formats.AddRange(runs[index - 1].Marks.Select(FormatOf).OfType<string>());
-            }
+            formats.AddRange(typing.Marks.Select(FormatOf).OfType<string>());
+        }
+        else if (cursor.Content != null)
+        {
+            formats.AddRange(MarksAt(Runs(cursor.Content), cursor.Offset).Select(FormatOf).OfType<string>());
         }
 
         string? kind = null;
@@ -319,6 +319,18 @@ internal sealed class MarkdownEditorEngine
         }
 
         return state;
+    }
+
+    private static List<Mark> MarksAt(IReadOnlyList<Run> runs, int offset)
+    {
+        var (index, within) = InlineContent.Locate(runs, offset);
+
+        if (index < runs.Count && runs[index].Atom == null && (within > 0 || index == 0 || runs[index - 1].Atom != null) && (within < runs[index].Length || index == runs.Count - 1))
+        {
+            return runs[index].Marks;
+        }
+
+        return index > 0 && within == 0 && runs[index - 1].Atom == null ? runs[index - 1].Marks : [];
     }
 
     private static string? FormatOf(Mark mark) => mark.Kind switch
@@ -406,6 +418,7 @@ internal sealed class MarkdownEditorEngine
     private (int Start, int End) Incoming(Document document, List<Host> hosts, int start, int end)
     {
         pendingSource = (start, end);
+        stored = stored is { } kept && start == end && start == kept.Position ? stored : null;
 
         if (!RenderHtml)
         {
@@ -796,6 +809,7 @@ internal sealed class MarkdownEditorEngine
         }
 
         this.document = document;
+        stored = null;
         return Render(selection.Item1, selection.Item2);
     }
 
@@ -852,6 +866,7 @@ internal sealed class MarkdownEditorEngine
             return InsertMarkdown(document, hosts, start, end, text) ?? Render(start, start);
         }
 
+        var marks = stored?.Marks;
         var cursor = start < end ? DeleteRange(document, hosts, start, end) : Resolve(hosts, start);
 
         if (cursor == null)
@@ -859,10 +874,10 @@ internal sealed class MarkdownEditorEngine
             return Render(start, start);
         }
 
-        return InsertAt(document, cursor, text, paragraphs, key, merge, preferRight) ?? Render(start, start);
+        return InsertAt(document, cursor, text, paragraphs, key, merge, preferRight, marks) ?? Render(start, start);
     }
 
-    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, bool paragraphs, string? key, bool merge, bool preferRight)
+    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, bool paragraphs, string? key, bool merge, bool preferRight, List<Mark>? marks)
     {
         text = Normalize(text);
 
@@ -899,7 +914,7 @@ internal sealed class MarkdownEditorEngine
             return null;
         }
 
-        SetRuns(cursor.Content, InlineContent.Insert(Runs(cursor.Content), cursor.Offset, lines[0], preferRight: preferRight));
+        SetRuns(cursor.Content, InlineContent.Insert(Runs(cursor.Content), cursor.Offset, lines[0], marks, preferRight));
         INode caretContent = cursor.Content;
         var caretOffset = cursor.Offset + lines[0].Length;
 
@@ -1864,6 +1879,13 @@ internal sealed class MarkdownEditorEngine
         if (first.Content == null || first.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
         {
             return null;
+        }
+
+        if (start == end && RenderHtml)
+        {
+            var current = stored is { } typing ? typing.Marks : MarksAt(Runs(first.Content), first.Offset);
+            stored = (start, current.Any(mark => mark.Kind == kind) ? current.Where(mark => mark.Kind != kind).ToList() : [.. current, new Mark(kind)]);
+            return Render(start, start);
         }
 
         if (start == end)
