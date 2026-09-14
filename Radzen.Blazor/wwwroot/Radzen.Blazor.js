@@ -3489,6 +3489,108 @@ window.Radzen = {
       updateLabels(start, end);
     }
 
+    ref.navTooltipPoints = [];
+
+    ref.navHideTooltip = function () {
+      var tooltip = ref.querySelector('.rz-range-nav-tooltip');
+      if (tooltip) tooltip.style.display = 'none';
+    };
+
+    function nearestPoint(pos) {
+      var points = ref.navTooltipPoints;
+      var lo = 0, hi = points.length - 1;
+      while (lo < hi) {
+        var mid = (lo + hi) >> 1;
+        if (points[mid].x < pos) {
+          lo = mid + 1;
+        } else {
+          hi = mid;
+        }
+      }
+      if (lo > 0 && pos - points[lo - 1].x < points[lo].x - pos) lo--;
+      return points[lo];
+    }
+
+    function isOverTrack(e) {
+      var rect = ref.getBoundingClientRect();
+      return e.clientY <= rect.bottom - (parseFloat(getComputedStyle(ref).paddingBottom) || 0);
+    }
+
+    function clipBounds() {
+      var bounds = { top: 0, left: 0, right: document.documentElement.clientWidth };
+      for (var el = ref.parentElement; el && el !== document.body; el = el.parentElement) {
+        var style = getComputedStyle(el);
+        var rect = el.getBoundingClientRect();
+        if (style.overflowY !== 'visible') {
+          bounds.top = Math.max(bounds.top, rect.top);
+        }
+        if (style.overflowX !== 'visible') {
+          bounds.left = Math.max(bounds.left, rect.left);
+          bounds.right = Math.min(bounds.right, rect.right);
+        }
+        if (style.position === 'fixed') {
+          break;
+        }
+      }
+      return bounds;
+    }
+
+    function positionTooltip(tooltip, point) {
+      var track = ref.querySelector('svg');
+      tooltip.style.insetInlineStart = (point.x * 100) + '%';
+      tooltip.style.insetBlockStart = (point.y * (track ? track.clientHeight : 0)) + 'px';
+
+      var content = tooltip.querySelector('.rz-chart-tooltip-content');
+      var popup = content.parentElement;
+      var bounds = clipBounds();
+      popup.style.left = '';
+      popup.classList.remove('rz-bottom-chart-tooltip');
+      popup.classList.add('rz-top-chart-tooltip');
+      if (content.getBoundingClientRect().top < bounds.top) {
+        popup.classList.remove('rz-top-chart-tooltip');
+        popup.classList.add('rz-bottom-chart-tooltip');
+      }
+
+      var rect = popup.getBoundingClientRect();
+      if (rect.left < bounds.left) {
+        popup.style.left = (bounds.left - rect.left) + 'px';
+      } else if (rect.right > bounds.right) {
+        popup.style.left = (bounds.right - rect.right) + 'px';
+      }
+    }
+
+    var tooltipPoint = null;
+
+    ref.navHover = function (e) {
+      if (!ref.navTooltipPoints.length) return;
+
+      var tooltip = ref.querySelector('.rz-range-nav-tooltip');
+      if (!tooltip || dragging || !isOverTrack(e)) {
+        ref.navHideTooltip();
+        return;
+      }
+      var point = nearestPoint(getPositionFromEvent(e));
+      var wasHidden = tooltip.style.display === 'none';
+      var content = tooltip.querySelector('.rz-chart-tooltip-content');
+
+      if (point !== tooltipPoint || wasHidden) {
+        tooltipPoint = point;
+        tooltip.querySelector('.rz-chart-tooltip-title').textContent = point.category;
+        tooltip.querySelector('.rz-chart-tooltip-item-value').textContent = point.value;
+        tooltip.style.setProperty('--rz-series-color', point.color || 'currentColor');
+        content.style.border = '1px solid ' + getComputedStyle(tooltip.querySelector('.rz-active-point-dot')).fill;
+      }
+
+      tooltip.style.display = '';
+      positionTooltip(tooltip, point);
+
+      if (wasHidden) {
+        content.classList.remove('rz-chart-tooltip-enter');
+        void content.offsetWidth;
+        content.classList.add('rz-chart-tooltip-enter');
+      }
+    };
+
     function notifyBlazor(start, end) {
       instance.invokeMethodAsync('OnNavigatorDrag', snap(start), snap(end)).catch(function (ex) {
         console.error('RangeNav invoke error:', ex);
@@ -3498,6 +3600,7 @@ window.Radzen = {
     readPositionFromDOM();
 
     ref.navMouseDown = function (e) {
+      ref.navHideTooltip();
       // Always read fresh position from DOM on mousedown
       readPositionFromDOM();
 
@@ -3573,6 +3676,8 @@ window.Radzen = {
 
     ref.addEventListener('mousedown', ref.navMouseDown);
     ref.addEventListener('touchstart', ref.navMouseDown, { passive: false });
+    ref.addEventListener('mousemove', ref.navHover);
+    ref.addEventListener('mouseleave', ref.navHideTooltip);
     document.addEventListener('mousemove', ref.navMouseMove);
     document.addEventListener('touchmove', ref.navMouseMove, { passive: false });
     document.addEventListener('mouseup', ref.navMouseUp);
@@ -3594,6 +3699,12 @@ window.Radzen = {
         ref.removeEventListener('mousedown', ref.navMouseDown);
         ref.removeEventListener('touchstart', ref.navMouseDown);
         delete ref.navMouseDown;
+      }
+      if (ref.navHover) {
+        ref.removeEventListener('mousemove', ref.navHover);
+        ref.removeEventListener('mouseleave', ref.navHideTooltip);
+        delete ref.navHover;
+        delete ref.navHideTooltip;
       }
       if (ref.navMouseMove) {
         document.removeEventListener('mousemove', ref.navMouseMove);
@@ -3619,6 +3730,12 @@ window.Radzen = {
         ref.navLabelInputStart = inputStart;
         ref.navLabelInputEnd = inputEnd;
         ref.handleLabelFormatString = handleLabelFormatString;
+    },
+
+    updateRangeNavigatorTooltip: function (ref, points) {
+        if (!ref) return;
+        ref.navTooltipPoints = points || [];
+        if (!ref.navTooltipPoints.length && ref.navHideTooltip) ref.navHideTooltip();
     },
 
   destroyGauge: function (ref) {

@@ -32,6 +32,23 @@
         </div>
     </div>
     <div class="rz-range-nav-shade rz-range-nav-shade-end" style="width: @(((1 - End) * 100).ToInvariantString())%"></div>
+    @if (ShowTooltip && Width > 0)
+    {
+        <div class="rz-range-nav-tooltip" style="position: absolute; inset-block-start: 0; width: 0; height: 0; pointer-events: none; z-index: 4; display: none">
+            <svg style="position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; overflow: visible">
+                <g class="rz-active-point">
+                    <circle class="rz-active-point-halo" cx="12" cy="12" r="12"></circle>
+                    <circle class="rz-active-point-dot" cx="12" cy="12" r="5"></circle>
+                </g>
+            </svg>
+            <div class="rz-chart-tooltip rz-top-chart-tooltip">
+                <div class="rz-chart-tooltip-content">
+                    <div class="rz-chart-tooltip-title"></div>
+                    <div><span class="rz-chart-tooltip-item-value"></span></div>
+                </div>
+            </div>
+        </div>
+    }
     @if (ShowAxis && Width > 0)
     {
         <div class="rz-range-nav-axis">

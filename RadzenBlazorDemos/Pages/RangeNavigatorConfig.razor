@@ -23,7 +23,8 @@
             <RadzenAxisTitle Text="Price (USD)" />
         </RadzenValueAxis>
         <RadzenLegend Position="LegendPosition.Bottom" />
-        <RadzenChartRangeNavigator Height="80" ShowHandleLabels="true" HandleLabelFormatter="@FormatHandleLabel">
+        <RadzenChartRangeNavigator Height="80" ShowHandleLabels="true" HandleLabelFormatter="@FormatHandleLabel"
+                                   ShowTooltip="true" TooltipFormatString="${0:N2}">
             <RadzenRangeNavigatorLineSeries FillMode="FillMode.Gradient" Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
         </RadzenChartRangeNavigator>
     </RadzenChart>

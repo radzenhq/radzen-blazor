@@ -1,6 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Bunit;
+using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using Xunit;
 using static Radzen.Blazor.Tests.ChartTestHelper;
 
@@ -254,15 +259,248 @@ namespace Radzen.Blazor.Tests
             new DataItem { Category = "C", Value = 200 },
         };
 
-        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithLineSeries(TestContext ctx)
+        [Fact]
+        public void RangeNavigator_TooltipPoints_OnePerItem_Ordered()
         {
-            return ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx, parameters =>
+                parameters.Add(p => p.TooltipFormatString, "{0:N1}"));
+
+            var points = component.Instance.GetTooltipPoints();
+
+            Assert.Equal(new[] { "A: 10.0", "B: 20.0", "C: 15.0" }, points.Select(Describe));
+            Assert.True(points[0].X < points[1].X && points[1].X < points[2].X);
+            Assert.All(points, p => Assert.InRange(p.X, 0, 1));
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipPoints_PlacedOnTheLine()
+        {
+            using var ctx = CreateChartContext();
+
+            var points = RenderNavigatorWithLineSeries(ctx).Instance.GetTooltipPoints();
+
+            Assert.All(points, p => Assert.InRange(p.Y, 0, 1));
+            Assert.True(points[1].Y < points[2].Y && points[2].Y < points[0].Y);
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipPoints_TakeTheSeriesColor()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
                 parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
                 {
                     series.Add(p => p.Data, SampleData);
                     series.Add(p => p.CategoryProperty, nameof(DataItem.Category));
                     series.Add(p => p.ValueProperty, nameof(DataItem.Value));
+                    series.Add(p => p.Stroke, "#1E88E5");
                 }));
+
+            Assert.All(component.Instance.GetTooltipPoints(), p => Assert.Equal("#1E88E5", p.Color));
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipPoints_DateCategory_UsesHandleLabelFormat()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithDateSeries(ctx, parameters =>
+            {
+                parameters.Add(p => p.HandleLabelFormatString, "{0:yyyy-MM-dd}");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
+            });
+
+            var points = component.Instance.GetTooltipPoints();
+
+            Assert.Equal(new[] { "2024-01-01: 3.00", "2024-01-02: 5.00" }, points.Select(Describe));
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipPoints_EmptyForCustomSeriesWithoutGetDataPoints()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            component.Instance.AddSeries(new CustomSeries());
+
+            Assert.Empty(component.Instance.GetTooltipPoints());
+        }
+
+        [Fact]
+        public void RangeNavigator_ShowTooltip_SendsPoints()
+        {
+            using var ctx = CreateChartContext();
+
+            RenderNavigatorWithLineSeries(ctx, parameters =>
+            {
+                parameters.Add(p => p.ShowTooltip, true);
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
+            });
+
+            Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
+            Assert.Equal(new[] { "A: 10.00", "B: 20.00", "C: 15.00" }, LastSentTexts(ctx));
+        }
+
+        [Fact]
+        public void RangeNavigator_ShowTooltip_EnabledLater_SendsPoints()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ShowTooltip, true));
+
+            Assert.Contains(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipPoints_SkipsPointsWithoutAPosition()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+            component.Instance.AddSeries(new CustomSeriesWithPoints(new Point { X = double.NaN, Y = 1 }));
+
+            Assert.Equal(3, component.Instance.GetTooltipPoints().Count);
+        }
+
+        [Fact]
+        public void RangeNavigator_TooltipValue_UsesCulture()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx, parameters =>
+            {
+                parameters.Add(p => p.Culture, CultureInfo.GetCultureInfo("de-DE"));
+                parameters.Add(p => p.TooltipFormatString, "{0:N1}");
+            });
+
+            Assert.Equal("A: 10,0", Describe(component.Instance.GetTooltipPoints()[0]));
+        }
+
+        [Fact]
+        public async Task RangeNavigator_ChartWrapper_ForwardsTooltipParameters()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenChartRangeNavigator>(n => n
+                    .Add(x => x.ShowTooltip, true)
+                    .Add(x => x.TooltipFormatString, "{0:N1}")));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var navigator = chart.FindComponent<RadzenRangeNavigator>().Instance;
+            Assert.True(navigator.ShowTooltip);
+            Assert.Equal("{0:N1}", navigator.TooltipFormatString);
+        }
+
+        [Fact]
+        public void RangeNavigator_ShowTooltip_RendersTooltipElement()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx, parameters => parameters.Add(p => p.ShowTooltip, true));
+
+            Assert.Single(component.FindAll(".rz-range-nav-tooltip .rz-chart-tooltip.rz-top-chart-tooltip .rz-chart-tooltip-title"));
+            Assert.Single(component.FindAll(".rz-range-nav-tooltip .rz-chart-tooltip-item-value"));
+            Assert.Single(component.FindAll(".rz-range-nav-tooltip .rz-active-point .rz-active-point-dot"));
+        }
+
+        [Fact]
+        public void RangeNavigator_ShowTooltip_DefaultFalse()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = RenderNavigatorWithLineSeries(ctx);
+
+            Assert.False(component.Instance.ShowTooltip);
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
+        }
+
+        [Fact]
+        public void RangeNavigator_Tooltip_RefreshesFormattingAndClearsDisabledPoints()
+        {
+            using var ctx = CreateChartContext();
+            var component = RenderNavigatorWithLineSeries(ctx, p =>
+            {
+                p.Add(x => x.ShowTooltip, true);
+                p.Add(x => x.Culture, CultureInfo.InvariantCulture);
+            });
+            Assert.Equal("A: 10.00", LastSentTexts(ctx)[0]);
+
+            component.SetParametersAndRender(p => p.Add(x => x.TooltipFormatString, "{0:N1}"));
+            Assert.Equal("A: 10.0", LastSentTexts(ctx)[0]);
+
+            component.SetParametersAndRender(p => p.Add(x => x.Culture, CultureInfo.GetCultureInfo("de-DE")));
+            Assert.Equal("A: 10,0", LastSentTexts(ctx)[0]);
+
+            component.SetParametersAndRender(p => p.Add(x => x.ShowTooltip, false));
+            Assert.Empty(LastSentTexts(ctx));
+            component.SetParametersAndRender(p => p.Add(x => x.ShowTooltip, true));
+            Assert.Equal("A: 10,0", LastSentTexts(ctx)[0]);
+        }
+
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithLineSeries(TestContext ctx,
+            Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
+        {
+            return RenderNavigator(ctx, SampleData, nameof(DataItem.Category), nameof(DataItem.Value), configure);
+        }
+
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithDateSeries(TestContext ctx,
+            Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
+        {
+            var data = new[]
+            {
+                new DateItem { Date = new DateTime(2024, 1, 1), Value = 3 },
+                new DateItem { Date = new DateTime(2024, 1, 2), Value = 5 },
+            };
+
+            return RenderNavigator(ctx, data, nameof(DateItem.Date), nameof(DateItem.Value), configure);
+        }
+
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(TestContext ctx, IEnumerable<TItem> data,
+            string categoryProperty, string valueProperty, Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure)
+        {
+            return ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            {
+                configure?.Invoke(parameters);
+                parameters.AddChildContent<RadzenRangeNavigatorLineSeries<TItem>>(series =>
+                {
+                    series.Add(p => p.Data, data);
+                    series.Add(p => p.CategoryProperty, categoryProperty);
+                    series.Add(p => p.ValueProperty, valueProperty);
+                });
+            });
+        }
+
+        private static string Describe(RadzenRangeNavigator.TooltipPoint point) => $"{point.Category}: {point.Value}";
+
+        private static string[] LastSentTexts(TestContext ctx)
+        {
+            var last = ctx.JSInterop.Invocations.Last(i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
+            return Assert.IsAssignableFrom<IEnumerable<RadzenRangeNavigator.TooltipPoint>>(last.Arguments[1]).Select(Describe).ToArray();
+        }
+
+        private class DateItem
+        {
+            public DateTime Date { get; set; }
+            public double Value { get; set; }
+        }
+
+        private class CustomSeriesWithPoints(params Point[] points) : CustomSeries, IRangeNavigatorSeries
+        {
+            public IEnumerable<Point> GetDataPoints(ScaleBase categoryScale) => points;
+        }
+
+        private class CustomSeries : IRangeNavigatorSeries
+        {
+            public ScaleBase TransformCategoryScale(ScaleBase scale) => scale;
+
+            public ScaleBase TransformValueScale(ScaleBase scale) => scale;
+
+            public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale) => _ => { };
         }
     }
 }

@@ -254,6 +254,22 @@ namespace Radzen.Blazor
             };
         }
 
+        string? IRangeNavigatorSeries.Color => Stroke;
+
+        /// <inheritdoc />
+        public IEnumerable<Point> GetDataPoints(ScaleBase categoryScale)
+        {
+            if (Items == null || !Items.Any())
+            {
+                return Enumerable.Empty<Point>();
+            }
+
+            var category = Category(categoryScale);
+            var value = Value;
+
+            return Items.Select(item => new Point { X = category(item), Y = value(item) }).ToList();
+        }
+
         private Func<TItem, double> Category(ScaleBase scale)
         {
             if (IsNumeric(CategoryProperty))

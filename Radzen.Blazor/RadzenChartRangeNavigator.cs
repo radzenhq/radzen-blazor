@@ -58,6 +58,20 @@ namespace Radzen.Blazor
         public Func<object, string>? HandleLabelFormatter { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether hovering the navigator shows the nearest point's category and value.
+        /// </summary>
+        /// <value><c>true</c> to show the tooltip; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool ShowTooltip { get; set; }
+
+        /// <summary>
+        /// Gets or sets the format string used to format the value shown in the tooltip.
+        /// </summary>
+        /// <value>The tooltip value format string.</value>
+        [Parameter]
+        public string? TooltipFormatString { get; set; }
+
+        /// <summary>
         /// Gets or sets the child content. Used to declare <see cref="RadzenRangeNavigatorLineSeries{TItem}" /> preview series.
         /// </summary>
         /// <value>The child content.</value>
@@ -79,7 +93,9 @@ namespace Radzen.Blazor
             return parameters.DidParameterChange(nameof(Visible), Visible)
                 || parameters.DidParameterChange(nameof(Height), Height)
                 || parameters.DidParameterChange(nameof(ShowHandleLabels), ShowHandleLabels)
-                || parameters.DidParameterChange(nameof(HandleLabelFormatString), HandleLabelFormatString);
+                || parameters.DidParameterChange(nameof(HandleLabelFormatString), HandleLabelFormatString)
+                || parameters.DidParameterChange(nameof(ShowTooltip), ShowTooltip)
+                || parameters.DidParameterChange(nameof(TooltipFormatString), TooltipFormatString);
         }
     }
 }

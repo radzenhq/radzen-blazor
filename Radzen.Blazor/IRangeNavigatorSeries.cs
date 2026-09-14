@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -21,5 +24,17 @@ namespace Radzen.Blazor
         /// Renders the series using the specified scales.
         /// </summary>
         RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
+
+        /// <summary>
+        /// Gets the series data for the navigator tooltip: each point's X is its category in the input units
+        /// of <paramref name="categoryScale" /> and its Y is its value. A series that returns no points shows no tooltip.
+        /// </summary>
+        IEnumerable<Point> GetDataPoints(ScaleBase categoryScale) => Enumerable.Empty<Point>();
+
+        /// <summary>
+        /// Gets the color of the tooltip's marker and border for this series' points.
+        /// When <c>null</c>, the navigator's text color is used.
+        /// </summary>
+        string? Color => null;
     }
 }
