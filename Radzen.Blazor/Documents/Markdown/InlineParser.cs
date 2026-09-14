@@ -524,6 +524,11 @@ class InlineParser
             }
         }
 
+        if (position != index + 1 && text[index] is Backslash)
+        {
+            return false;
+        }
+
         if (text[index] is Space && position == index + 1)
         {
             return false;

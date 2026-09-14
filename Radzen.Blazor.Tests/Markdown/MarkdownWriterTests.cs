@@ -49,21 +49,6 @@ public class MarkdownWriterTests(ITestOutputHelper output)
 
         Assert.Equal("a _b x_  c", MarkdownWriter.Write(document, "a _b_ c"));
     }
-
-    [Fact]
-    public void PositionsPointAtTheWrittenContent()
-    {
-        var markdown = "> # H\n>\n> a *b*";
-        var document = MarkdownParser.Parse(markdown);
-        document.Children[0].Pristine = false;
-        var writer = MarkdownWriter.Preserve(document, markdown);
-        var paragraph = (Paragraph)((BlockQuote)document.Children[0]).Children[1];
-        var emphasis = (Emphasis)paragraph.Children[1];
-
-        Assert.Equal(markdown, writer.Text);
-        Assert.Equal((10, 15), writer.Positions[paragraph]);
-        Assert.Equal((13, 14), writer.Positions[emphasis]);
-    }
 }
 
 public class MarkdownWriterEscapingTests

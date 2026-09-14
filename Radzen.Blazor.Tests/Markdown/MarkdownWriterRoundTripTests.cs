@@ -161,7 +161,7 @@ public class MarkdownWriterRoundTripTests
     [Fact]
     public void WritesTrailingHardBreaksWithSpaces()
     {
-        Assert.Equal("a  \n  \n", Serialize(new Text("a"), new LineBreak { Backslash = true }, new LineBreak { Backslash = true }));
+        Assert.Equal("a  \n", Serialize(new Text("a"), new LineBreak { Backslash = true }, new LineBreak { Backslash = true }));
     }
 
     [Fact]

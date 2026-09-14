@@ -37,6 +37,11 @@ public class FencedCodeBlock : Leaf
         var firstLine = Value[..newlinePos];
         Info = firstLine.Trim();
         TrimContentStart(newlinePos + 1);
+
+        if (Content.Segments.Count == 0)
+        {
+            Content.Append(0, Math.Min(parser.OffsetAt(Range.Start.Line + 1, Range.Start.Column - 1), SourceEnd), 0);
+        }
     }
 
     internal override BlockMatch Matches(BlockParser parser)

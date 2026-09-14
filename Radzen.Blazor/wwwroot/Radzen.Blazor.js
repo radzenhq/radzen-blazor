@@ -8417,7 +8417,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     event.preventDefault();
     const range = rangeFor(editor, event);
     const live = currentSelection(editor);
-    const kind = live[0] !== live[1] ? type + ':selection' : type;
+    const kind = live[0] !== live[1] ? type + ':selection' : atTextStart(editor) ? type + ':right' : type;
     switch (type) {
       case 'insertText':
       case 'insertReplacementText': {
@@ -8456,6 +8456,15 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         }
         break;
     }
+  }
+
+  function atTextStart(editor) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !selection.isCollapsed) {
+      return false;
+    }
+    const range = selection.getRangeAt(0);
+    return range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === 0 && editor.editable.contains(range.startContainer);
   }
 
   function onCompositionStart(editor) {
@@ -8639,8 +8648,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     editor.editable.focus();
     const segment = editor.segments.find(s => s.node === checkbox.nextSibling || follows(checkbox, s.node));
     if (segment) {
-      const marker = segment.start - 3;
-      edit(editor, 'OnEditAsync', [marker, marker + 1, checkbox.checked ? 'x' : ' ', 'check']);
+      edit(editor, 'OnToggleCheckAsync', [segment.start]);
     }
   }
 

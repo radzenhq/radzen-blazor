@@ -12,9 +12,9 @@ namespace Radzen.Blazor;
 /// A Markdown editor component with a toolbar, keyboard shortcuts, and a Design/Source mode switcher.
 /// </summary>
 /// <remarks>
-/// The Markdown text is the single source of truth in both modes. Design mode renders it and turns every edit into a
-/// text edit at the corresponding position, so the text outside the edited range is preserved as written. Text typed
-/// in Design mode is inserted literally: characters with a Markdown meaning are escaped.
+/// The Markdown text is the value in both modes. Design mode edits a parsed document and writes it back to Markdown after
+/// every edit; blocks that were not edited are kept as written. Text typed in Design mode is inserted literally:
+/// characters with a Markdown meaning are escaped.
 /// </remarks>
 /// <example>
 /// <code>
@@ -46,6 +46,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     private bool focusOnModeChange;
     private string? valueAtFocus;
     private (int Start, int End) selection;
+    private MarkdownEditorMode selectionMode;
 
     /// <summary>
     /// Gets or sets the mode of the editor. Two-way bindable.
@@ -122,7 +123,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public string? FormatBlock => toolState.Block;
 
     /// <summary>
-    /// The selection as offsets in the Markdown text.
+    /// The selection: positions in the rendered document in Design mode, offsets in the Markdown text in Source mode.
     /// </summary>
     public (int Start, int End) Selection => selection;
 
@@ -180,6 +181,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         engine.RenderHtml = mode == MarkdownEditorMode.Design;
         update.Version = version;
         selection = (update.SelectionStart, update.SelectionEnd);
+        selectionMode = mode;
         toolState = update.State ?? toolState;
         ToolStateChanged?.Invoke();
 
@@ -241,6 +243,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         var merge = false;
         var selected = inputType.EndsWith(":selection", StringComparison.Ordinal);
         inputType = selected ? inputType[..^":selection".Length] : inputType;
+        var right = inputType.EndsWith(":right", StringComparison.Ordinal);
+        inputType = right ? inputType[..^":right".Length] : inputType;
 
         switch (inputType)
         {
@@ -262,12 +266,28 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
                 break;
         }
 
-        var literal = mode == MarkdownEditorMode.Design && inputType != "check";
-        var paragraphs = inputType is "insertFromPaste" or "insertFromDrop";
-        var update = text.Length == 0 && inputType.StartsWith("delete", StringComparison.Ordinal) && mode == MarkdownEditorMode.Design
-            ? engine.Delete(start, end, inputType.Contains("Forward", StringComparison.Ordinal), key, merge, selected)
-            : engine.InsertText(start, end, text, literal, key, merge, paragraphs, selected);
+        if (mode == MarkdownEditorMode.Source)
+        {
+            var caret = start + text.Length;
+            return await PublishAsync(engine.Apply(start, end, text, (caret, caret), key, merge), version, raiseInput: true);
+        }
 
+        var paragraphs = inputType is "insertFromPaste" or "insertFromDrop";
+        var update = text.Length == 0 && inputType.StartsWith("delete", StringComparison.Ordinal)
+            ? engine.Delete(start, end, inputType.Contains("Forward", StringComparison.Ordinal), key, merge, selected)
+            : engine.InsertText(start, end, text, literal: true, key, merge, paragraphs, selected, right);
+
+        return update == null ? null : await PublishAsync(update, version, raiseInput: true);
+    }
+
+    /// <summary>
+    /// Invoked from JavaScript when a task list checkbox is clicked in Design mode.
+    /// </summary>
+    [JSInvokable("OnToggleCheckAsync")]
+    public async Task<MarkdownEditorUpdate?> OnToggleCheckAsync(int position, int version)
+    {
+        lastInsertEndedWithWhitespace = true;
+        var update = engine.ToggleCheck(position);
         return update == null ? null : await PublishAsync(update, version, raiseInput: true);
     }
 
@@ -322,6 +342,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public Task OnSelectionAsync(int start, int end)
     {
         selection = (start, end);
+        selectionMode = mode;
         toolState = engine.State(start, end);
         ToolStateChanged?.Invoke();
         StateHasChanged();
@@ -335,6 +356,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public Task OnContextMenuAsync(double clientX, double clientY, int start, int end)
     {
         selection = (start, end);
+        selectionMode = mode;
         toolState = engine.State(start, end);
         ToolStateChanged?.Invoke();
 
@@ -578,7 +600,7 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        engine.RenderHtml = true;
+        engine.RenderHtml = mode == MarkdownEditorMode.Design;
 
         if ((firstRender || visibleChanged) && Visible && JSRuntime != null && !initialized)
         {
@@ -592,7 +614,15 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             {
                 engine.Reset(Value);
             }
+            else if (selectionMode != mode)
+            {
+                selection = mode == MarkdownEditorMode.Source
+                    ? (engine.ToSource(selection.Start), engine.ToSource(selection.End))
+                    : (engine.ToPosition(selection.Start), engine.ToPosition(selection.End));
+                selectionMode = mode;
+            }
 
+            engine.RenderHtml = mode == MarkdownEditorMode.Design;
             await PushAsync(engine.Render(selection.Start, selection.End), includeText: true, focus: focusOnModeChange);
         }
 

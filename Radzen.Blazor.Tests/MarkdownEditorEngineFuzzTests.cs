@@ -53,7 +53,7 @@ public class MarkdownEditorEngineFuzzTests
     public void RandomEditSequencesKeepTheEngineConsistent(int seed, int run)
     {
         var random = new Random(seed * 1000 + run);
-        var engine = new MarkdownEditorEngine(Seeds[seed]);
+        var engine = new MarkdownEditorEngine(Seeds[seed]) { RenderHtml = true };
         var log = new StringBuilder();
         var history = new Stack<string>();
         var caret = 0;
@@ -61,8 +61,9 @@ public class MarkdownEditorEngineFuzzTests
         for (var step = 0; step < 40; step++)
         {
             var text = engine.Text;
-            var start = random.Next(text.Length + 1);
-            var end = random.Next(4) == 0 ? Math.Min(text.Length, start + random.Next(12)) : start;
+            var size = engine.Length;
+            var start = random.Next(size + 1);
+            var end = random.Next(4) == 0 ? Math.Min(size, start + random.Next(12)) : start;
             var choice = random.Next(10);
             var description = string.Empty;
             MarkdownEditorUpdate? update = null;
@@ -79,7 +80,7 @@ public class MarkdownEditorEngineFuzzTests
                         break;
                     case 3 or 4:
                         var forward = random.Next(2) == 0;
-                        var at = end > start ? end : Math.Clamp(caret, 0, text.Length);
+                        var at = end > start ? end : Math.Clamp(caret, 0, size);
                         description = $"Delete({(end > start ? start : at)}, {at}, forward: {forward})";
                         update = engine.Delete(end > start ? start : at, at, forward, selection: end > start);
                         break;
@@ -124,6 +125,11 @@ public class MarkdownEditorEngineFuzzTests
                 continue;
             }
 
+            caret = update.SelectionStart;
+            Assert.True(update.SelectionStart >= 0 && update.SelectionStart <= update.SelectionEnd && update.SelectionEnd <= engine.Length, $"{description} produced selection {update.SelectionStart}-{update.SelectionEnd} outside 0-{engine.Length}\n{log}");
+            AssertStable(engine.Text, description, log);
+            AssertReachable(update, description, log, engine);
+
             if (engine.Text == text && history.Count > 0)
             {
                 engine.Undo();
@@ -141,10 +147,6 @@ public class MarkdownEditorEngineFuzzTests
                 engine.Redo();
                 Assert.True(engine.Text == after, $"{description}: redo produced {Show(engine.Text)} instead of {Show(after)}\n{log}");
             }
-
-            caret = update.SelectionStart;
-            Assert.True(update.SelectionStart >= 0 && update.SelectionStart <= update.SelectionEnd && update.SelectionEnd <= engine.Text.Length, $"{description} produced selection {update.SelectionStart}-{update.SelectionEnd} outside 0-{engine.Text.Length}\n{log}");
-            AssertStable(engine.Text, description, log);
         }
 
         while (history.Count > 0)
@@ -156,6 +158,69 @@ public class MarkdownEditorEngineFuzzTests
         }
 
         Assert.Null(engine.Undo());
+    }
+
+    private static string Dump(MarkdownEditorEngine engine)
+    {
+        var document = typeof(MarkdownEditorEngine).GetField("document", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(engine) as Document;
+        var dump = new StringBuilder();
+
+        void Walk(INode node, int depth)
+        {
+            var label = node switch
+            {
+                Text text => $"Text[{Show(text.Value)}] {text.SourceStart}-{text.SourceEnd}",
+                Inline inline => $"{inline.GetType().Name} {inline.SourceStart}-{inline.SourceEnd}",
+                Block block => $"{block.GetType().Name} {block.SourceStart}-{block.SourceEnd}" + (block.Pristine ? " pristine" : "") + (block is Paragraph { Virtual: true } ? " virtual" : ""),
+                TableCell => "cell",
+                _ => node.GetType().Name
+            };
+            dump.Append(' ', depth * 2).AppendLine(label);
+            IEnumerable<INode> children = node switch
+            {
+                Table table => table.Rows.SelectMany(row => row.Cells),
+                BlockContainer container => container.Children,
+                IBlockInlineContainer content => content.Children,
+                InlineContainer inlineContainer => inlineContainer.Children,
+                _ => []
+            };
+
+            foreach (var child in children)
+            {
+                Walk(child, depth + 1);
+            }
+        }
+
+        if (document != null)
+        {
+            Walk(document, 0);
+        }
+
+        return dump.ToString();
+    }
+
+    private static void AssertReachable(MarkdownEditorUpdate update, string description, StringBuilder log, MarkdownEditorEngine engine)
+    {
+        if (update.Segments == null)
+        {
+            return;
+        }
+
+        var segments = update.Segments.Chunk(3).Select(chunk => (Start: chunk[0], End: chunk[1], Length: chunk[2])).ToList();
+        var position = 0;
+
+        foreach (var segment in segments)
+        {
+            var linear = segment.End - segment.Start == segment.Length;
+            Assert.True(segment.Start >= position && (linear || segment.Start == segment.End || segment.End == segment.Start + 1), $"After {description} the segment {segment.Start}-{segment.End}:{segment.Length} is out of order\nSegments: {string.Join(" ", segments.Select(s => $"{s.Start}-{s.End}:{s.Length}"))}\nModel:\n{Dump(engine)}{log}");
+            position = segment.End;
+        }
+
+        foreach (var offset in new[] { update.SelectionStart, update.SelectionEnd })
+        {
+            var covered = segments.Any(segment => segment.Start <= offset && offset <= segment.End);
+            Assert.True(covered || engine.HostAt(offset) is ThematicBreak, $"After {description} the caret {offset} has no place in the rendered html\nSegments: {string.Join(" ", segments.Select(s => $"{s.Start}-{s.End}:{s.Length}"))}\nModel:\n{Dump(engine)}{log}");
+        }
     }
 
     private static void AssertStable(string text, string description, StringBuilder log)

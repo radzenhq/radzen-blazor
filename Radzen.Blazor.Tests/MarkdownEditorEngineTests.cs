@@ -15,7 +15,7 @@ public class MarkdownEditorEngineTests
 
         foreach (var ch in "one two")
         {
-            engine.InsertText(engine.Text.Length, engine.Text.Length, ch.ToString(), literal: true, key: "insert", merge: !(previous == ' ' && ch != ' '));
+            engine.InsertText(engine.Length, engine.Length, ch.ToString(), literal: true, key: "insert", merge: !(previous == ' ' && ch != ' '));
             previous = ch;
         }
 
@@ -24,7 +24,7 @@ public class MarkdownEditorEngineTests
         var update = engine.Undo();
 
         Assert.Equal("one ", engine.Text);
-        Assert.Equal((4, 4), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal((3, 3), (update!.SelectionStart, update.SelectionEnd));
         Assert.Equal("one ", update.Text);
 
         engine.Undo();
@@ -37,7 +37,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceCoalescesBackwards()
     {
-        var engine = new MarkdownEditorEngine("abc");
+        var engine = new SourceEngine("abc");
 
         engine.Apply(2, 3, "", (2, 2), "delete", merge: true);
         engine.Apply(1, 2, "", (1, 1), "delete", merge: true);
@@ -52,7 +52,7 @@ public class MarkdownEditorEngineTests
     [InlineData("1. not a list", "1\\. not a list")]
     public void LiteralTextIsEscapedAtLineStart(string typed, string expected)
     {
-        var engine = new MarkdownEditorEngine("");
+        var engine = new SourceEngine("");
 
         engine.InsertText(0, 0, typed, literal: true);
 
@@ -79,10 +79,10 @@ public class MarkdownEditorEngineTests
     [InlineData("| a |\n| - |", 11, "| a |\n| - |\n\n", 13)]
     [InlineData("---", 0, "\n\n---", 0)]
     [InlineData("**bold** rest", 6, "**bold**\n\nrest", 10)]
-    [InlineData("a *em*", 3, "a\n\n*em*", 3)]
+    [InlineData("a *em*", 3, "a\n\n*em*", 4)]
     public void EnterInsertsTheBreakForTheContainingBlock(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.InsertParagraph(caret, caret);
 
@@ -91,9 +91,9 @@ public class MarkdownEditorEngineTests
     }
 
     [Theory]
-    [InlineData("para", 4, "para  \n", 7)]
-    [InlineData("> quote", 7, "> quote  \n> ", 12)]
-    [InlineData("- item", 6, "- item  \n  ", 11)]
+    [InlineData("para", 4, "para  \n", 5)]
+    [InlineData("> quote", 5, "> quote  \n> ", 6)]
+    [InlineData("- item", 4, "- item  \n  ", 5)]
     public void ShiftEnterInsertsAHardBreakWithTheContinuationPrefix(string text, int caret, string expected, int expectedCaret)
     {
         var engine = new MarkdownEditorEngine(text);
@@ -105,10 +105,10 @@ public class MarkdownEditorEngineTests
     }
 
     [Theory]
-    [InlineData("**bold** plain", 6, "**bold**  plain", 9)]
-    [InlineData("**bold**", 6, "**bold** ", 9)]
-    [InlineData("a *em*", 5, "a *em* ", 7)]
-    [InlineData("**bold**", 2, "**bold**", 0)]
+    [InlineData("**bold** plain", 4, "**bold**  plain", 5)]
+    [InlineData("**bold**", 4, "**bold** ", 5)]
+    [InlineData("a *em*", 4, "a *em* ", 5)]
+    [InlineData("**bold**", 0, "**bold**", 1)]
     [InlineData("plain", 3, "pla in", 4)]
     public void WhitespaceTypedAtADelimiterEdgeGoesOutsideTheDelimiters(string text, int caret, string expected, int expectedCaret)
     {
@@ -130,7 +130,7 @@ public class MarkdownEditorEngineTests
     [InlineData("ab", 1, 2, "a", 1)]
     public void BackspaceAtAMarkerRemovesTheWholeMarker(string text, int start, int end, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(start, end);
 
@@ -153,7 +153,7 @@ public class MarkdownEditorEngineTests
     [InlineData("```\nc", 5, "```\ncx\n", 6)]
     public void TypingOnAnEmptyLineKeepsTheNeighboringEmptyLines(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.InsertText(caret, caret, "x", literal: true);
 
@@ -166,11 +166,10 @@ public class MarkdownEditorEngineTests
     [InlineData("| a |\n| - |\n\n```\nc\n```", 11, 15)]
     [InlineData("p\n\n```\nc\n```", 1, 7)]
     [InlineData("```\nc\n```", 3, 4)]
-    [InlineData("```\nc\n```", 5, 7)]
     [InlineData("```\nc\n```\n\np", 9, 11)]
     public void DeletingAcrossASealedBlockBoundaryDoesNothing(string text, int start, int end)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Delete(start, end);
 
@@ -180,7 +179,7 @@ public class MarkdownEditorEngineTests
     [Theory]
     [InlineData("**bold**\n\nx", 6, 10, "**bold**x", 6)]
     [InlineData("**bold** text", 4, 11, "**bo**xt", 4)]
-    [InlineData("a **bold** b", 0, 5, "**old** b", 0)]
+    [InlineData("a **bold** b", 0, 5, "**old** b", 2)]
     [InlineData("**bold**", 2, 6, "", 0)]
     [InlineData("x **bold** y", 3, 7, "x **d** y", 2)]
     [InlineData("[text](u) more", 5, 12, "[text](u)re", 5)]
@@ -188,7 +187,7 @@ public class MarkdownEditorEngineTests
     [InlineData("plain text", 2, 5, "pl text", 2)]
     public void DeletingAcrossADelimiterKeepsTheDelimiter(string text, int start, int end, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(start, end);
 
@@ -199,10 +198,10 @@ public class MarkdownEditorEngineTests
     [Theory]
     [InlineData("[link](u) rest", 5, "[link](u)\n\nrest", 11)]
     [InlineData("`code` rest", 5, "`code`\n\nrest", 8)]
-    [InlineData("a [link](u)", 3, "a\n\n[link](u)", 3)]
+    [InlineData("a [link](u)", 3, "a\n\n[link](u)", 4)]
     public void EnterAtTheEdgeOfALinkOrCodeSpanBreaksOutsideIt(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.InsertParagraph(caret, caret);
 
@@ -215,7 +214,7 @@ public class MarkdownEditorEngineTests
     [InlineData("ab", 1, 2, "a", 1)]
     public void ForwardDeleteJoinsInsteadOfRemovingMarkers(string text, int start, int end, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(start, end, forward: true);
 
@@ -230,7 +229,7 @@ public class MarkdownEditorEngineTests
     [InlineData("p\n\n- a\n- b", 1, 10, "p", 1)]
     public void BackspaceAtBlockStartsHandlesMarkersRegardlessOfTheBrowserRange(string text, int start, int end, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(start, end);
 
@@ -241,7 +240,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void UndoOfMergedBackspacesRestoresACollapsedCaret()
     {
-        var engine = new MarkdownEditorEngine("abc");
+        var engine = new SourceEngine("abc");
 
         engine.Delete(2, 3, false, "delete", merge: true);
         engine.Delete(1, 2, false, "delete", merge: true);
@@ -258,7 +257,7 @@ public class MarkdownEditorEngineTests
     [InlineData("ab", 0, 2, "**ab**", 2, 4)]
     public void InlineCommandsApplyPerBlockAndKeepACollapsedCaret(string text, int start, int end, string expected, int selectionStart, int selectionEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(MarkdownEditorCommands.Bold, start, end, null, null);
 
@@ -272,7 +271,7 @@ public class MarkdownEditorEngineTests
     [InlineData("", 0, "---\n\n", 5)]
     public void HorizontalRuleGoesAfterTheCurrentBlock(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(MarkdownEditorCommands.HorizontalRule, caret, caret, null, null);
 
@@ -285,7 +284,7 @@ public class MarkdownEditorEngineTests
     [InlineData("ab", 1, "```\nab\n```", 5, 5)]
     public void CodeBlockWithACollapsedCaretConvertsTheBlock(string text, int caret, string expected, int selectionStart, int selectionEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(MarkdownEditorCommands.CodeBlock, caret, caret, null, null);
 
@@ -302,7 +301,7 @@ public class MarkdownEditorEngineTests
     [InlineData("formatBlock", "ab", 1, "## ab", 4, 4)]
     public void BlockCommandsKeepACollapsedCaretInTheContent(string command, string text, int caret, string expected, int selectionStart, int selectionEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(command, caret, caret, command == "formatBlock" ? "h2" : null, null);
 
@@ -313,7 +312,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BlockCommandOnASelectionSelectsTheContentWithoutTheMarkers()
     {
-        var engine = new MarkdownEditorEngine("ab\ncd");
+        var engine = new SourceEngine("ab\ncd");
 
         var update = engine.Command(MarkdownEditorCommands.Quote, 0, 5, null, null);
 
@@ -324,7 +323,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnAnEmptyItemInTheMiddleOfAListSplitsTheList()
     {
-        var engine = new MarkdownEditorEngine("- a\n- [ ] \n- c");
+        var engine = new SourceEngine("- a\n- [ ] \n- c");
 
         var update = engine.InsertParagraph(10, 10);
 
@@ -335,7 +334,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnAnEmptyLastItemBeforeAParagraphAddsOneEmptyLine()
     {
-        var engine = new MarkdownEditorEngine("- a\n- \n\nP");
+        var engine = new SourceEngine("- a\n- \n\nP");
 
         var update = engine.InsertParagraph(6, 6);
 
@@ -350,7 +349,7 @@ public class MarkdownEditorEngineTests
     [InlineData("unorderedList", "p", "- p")]
     public void ListCommandsUseAnAlternateMarkerNextToAnExistingList(string command, string text, string expected)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
         var paragraph = text.IndexOf('p');
 
         engine.Command(command, paragraph, paragraph, null, null);
@@ -362,7 +361,7 @@ public class MarkdownEditorEngineTests
     public void SelectAllThenBackspaceClearsADocumentWithSealedBlocks()
     {
         var text = "# h\n\n| a |\n| - |\n\n```\nc\n```";
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Delete(2, text.Length);
 
@@ -372,7 +371,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void UndoAfterABlockCommandRestoresTheCollapsedCaret()
     {
-        var engine = new MarkdownEditorEngine("ab cd");
+        var engine = new SourceEngine("ab cd");
 
         engine.Command(MarkdownEditorCommands.Quote, 3, 3, null, null);
         var update = engine.Undo();
@@ -384,7 +383,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TypingAHeadingMarkerEscapesIt()
     {
-        var engine = new MarkdownEditorEngine("Start");
+        var engine = new SourceEngine("Start");
 
         engine.InsertText(0, 0, "#", literal: true);
         Assert.Equal("\\#Start", engine.Text);
@@ -399,7 +398,7 @@ public class MarkdownEditorEngineTests
     [InlineData("-", " ", "", "\\- x")]
     public void TypingAListMarkerEscapesIt(string first, string second, string third, string expected)
     {
-        var engine = new MarkdownEditorEngine("x");
+        var engine = new SourceEngine("x");
 
         var position = 0;
         foreach (var typed in new[] { first, second, third }.Where(t => t.Length > 0))
@@ -414,10 +413,9 @@ public class MarkdownEditorEngineTests
     [Theory]
     [InlineData("| a |\n| - |\n\n```\nc\n```", 12, "| a |\n| - |\n\nx\n\n```\nc\n```", 14)]
     [InlineData("| a |\n| - |\n```\nc\n```", 12, "| a |\n| - |\n\nx\n\n```\nc\n```", 14)]
-    [InlineData("a\n\nb", 2, "a\n\nx\n\nb", 4)]
     public void TypingOnASeparatorLineStartsAParagraphBetweenTheBlocks(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.InsertText(caret, caret, "x", literal: true);
 
@@ -428,7 +426,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfANestedItemOutdentsAndKeepsTheCaretThere()
     {
-        var engine = new MarkdownEditorEngine("- one\n  - nested\n- two");
+        var engine = new SourceEngine("- one\n  - nested\n- two");
 
         var update = engine.Delete(9, 10);
 
@@ -439,7 +437,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TypingAListMarkerInsideAListItemEscapesIt()
     {
-        var engine = new MarkdownEditorEngine("- Undo");
+        var engine = new SourceEngine("- Undo");
 
         engine.InsertText(2, 2, "-", literal: true);
         var update = engine.InsertText(3, 3, " ", literal: true);
@@ -451,7 +449,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void UndoAfterTypingAMarkerRestoresACollapsedCaret()
     {
-        var engine = new MarkdownEditorEngine("Start");
+        var engine = new SourceEngine("Start");
 
         engine.InsertText(0, 0, "#", literal: true);
         engine.InsertText(2, 2, " ", literal: true);
@@ -464,7 +462,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void HorizontalRuleInsideAParagraphSplitsIt()
     {
-        var engine = new MarkdownEditorEngine("ab cd");
+        var engine = new SourceEngine("ab cd");
 
         var update = engine.Command(MarkdownEditorCommands.HorizontalRule, 3, 3, null, null);
 
@@ -475,7 +473,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ConvertingAnItemBackToBulletsRejoinsTheAdjacentList()
     {
-        var engine = new MarkdownEditorEngine("- a\n1. b");
+        var engine = new SourceEngine("- a\n1. b");
 
         engine.Command(MarkdownEditorCommands.UnorderedList, 7, 7, null, null);
 
@@ -485,7 +483,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterTwiceAtTheEndOfACodeBlockExitsIt()
     {
-        var engine = new MarkdownEditorEngine("```\ncode\n```");
+        var engine = new SourceEngine("```\ncode\n```");
 
         engine.InsertParagraph(9, 9);
         Assert.Equal("```\ncode\n\n```", engine.Text);
@@ -503,7 +501,7 @@ public class MarkdownEditorEngineTests
     [InlineData("bold", "a **b** c", 1, "**a** **b** c", 3)]
     public void CollapsedCaretCommandsUseTheWordOrTheEnclosingInline(string command, string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(command, caret, caret, null, null);
 
@@ -514,7 +512,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfAnItemWithChildrenDedentsThem()
     {
-        var engine = new MarkdownEditorEngine("- one\n- two\n    - three");
+        var engine = new SourceEngine("- one\n- two\n    - three");
 
         var update = engine.Delete(7, 8);
 
@@ -525,7 +523,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void OutdentingAnItemMovesItsChildrenWithIt()
     {
-        var engine = new MarkdownEditorEngine("- one\n  - two\n    - three");
+        var engine = new SourceEngine("- one\n  - two\n    - three");
 
         engine.Delete(9, 10);
 
@@ -535,7 +533,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterAtTheEndOfACodeLineAddsOneLine()
     {
-        var engine = new MarkdownEditorEngine("```\ncode\n```");
+        var engine = new SourceEngine("```\ncode\n```");
 
         engine.InsertParagraph(8, 8);
         var update = engine.InsertText(9, 9, "C", literal: true);
@@ -547,7 +545,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void QuoteWithACaretInTheMiddleOfALineDoesNotDrift()
     {
-        var engine = new MarkdownEditorEngine("it round");
+        var engine = new SourceEngine("it round");
 
         var update = engine.Command(MarkdownEditorCommands.Quote, 3, 3, null, null);
 
@@ -558,7 +556,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void PastedLinesBecomeParagraphs()
     {
-        var engine = new MarkdownEditorEngine("p");
+        var engine = new SourceEngine("p");
 
         engine.InsertText(1, 1, "a\nb\n\nc", literal: true, paragraphs: true);
 
@@ -568,7 +566,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterTrimsTrailingSpacesBeforeTheBreak()
     {
-        var engine = new MarkdownEditorEngine("it round");
+        var engine = new SourceEngine("it round");
 
         var update = engine.InsertParagraph(3, 3);
 
@@ -579,7 +577,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void UndoAfterReplacingASelectionRestoresIt()
     {
-        var engine = new MarkdownEditorEngine("abc");
+        var engine = new SourceEngine("abc");
 
         engine.InsertText(0, 3, "T", literal: true, selection: true);
         var update = engine.Undo();
@@ -593,7 +591,7 @@ public class MarkdownEditorEngineTests
     [InlineData("italic", "a *b* c *d* e", 3, 10, "a *b c d* e", 3, 8)]
     public void InlineCommandsAbsorbPartiallySelectedInlines(string command, string text, int start, int end, string expected, int expectedStart, int expectedEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(command, start, end, null, null);
 
@@ -604,7 +602,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ForwardDeleteBeforeATableMovesIntoTheTable()
     {
-        var engine = new MarkdownEditorEngine("> quote\n\n| a |\n| - |\n| b |");
+        var engine = new SourceEngine("> quote\n\n| a |\n| - |\n| b |");
 
         var update = engine.Delete(7, 8, forward: true);
 
@@ -615,7 +613,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnAnEmptyQuoteLineLeavesTheQuote()
     {
-        var engine = new MarkdownEditorEngine("> quote\n>\n> \n\n| a |\n| - |");
+        var engine = new SourceEngine("> quote\n>\n> \n\n| a |\n| - |");
 
         var update = engine.InsertParagraph(12, 12);
 
@@ -626,7 +624,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void CodeBlockCommandInsideACodeBlockConvertsItBack()
     {
-        var engine = new MarkdownEditorEngine("```\nThe quick\n```");
+        var engine = new SourceEngine("```\nThe quick\n```");
 
         var update = engine.Command(MarkdownEditorCommands.CodeBlock, 8, 8, null, null);
 
@@ -637,7 +635,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnTheTrailingEmptyLineOfACodeBlockLeavesIt()
     {
-        var engine = new MarkdownEditorEngine("```\ncode\n\n```");
+        var engine = new SourceEngine("```\ncode\n\n```");
 
         var update = engine.InsertParagraph(9, 9);
 
@@ -648,7 +646,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TypingOverASelectionAndContinuingIsOneUndoStep()
     {
-        var engine = new MarkdownEditorEngine("abc");
+        var engine = new SourceEngine("abc");
 
         engine.InsertText(0, 3, "R", literal: true, key: "insert", merge: false, selection: true);
         engine.InsertText(1, 1, "E", literal: true, key: "insert", merge: true);
@@ -661,7 +659,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfTheFirstItemKeepsTheRestOfTheList()
     {
-        var engine = new MarkdownEditorEngine("1. first\n2. mid\n3. second\n\nEnd.");
+        var engine = new SourceEngine("1. first\n2. mid\n3. second\n\nEnd.");
 
         engine.Delete(2, 3);
 
@@ -673,7 +671,7 @@ public class MarkdownEditorEngineTests
     [InlineData("quote", "- a\n- b", 5, "> - a\n> - b")]
     public void BlockCommandsSeparateTheResultFromNeighbouringListLines(string command, string text, int caret, string expected)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Command(command, caret, caret, null, null);
 
@@ -683,7 +681,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnAnEmptyNestedItemOutdentsIt()
     {
-        var engine = new MarkdownEditorEngine("- one\n  - a\n  - \n- two");
+        var engine = new SourceEngine("- one\n  - a\n  - \n- two");
 
         var update = engine.InsertParagraph(16, 16);
 
@@ -694,7 +692,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterInAnOrderedListRenumbersTheFollowingItems()
     {
-        var engine = new MarkdownEditorEngine("1. first\n2. second\n3. third");
+        var engine = new SourceEngine("1. first\n2. second\n3. third");
 
         engine.InsertParagraph(8, 8);
 
@@ -704,7 +702,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TabIndentsAnItemUnderThePreviousOneAndShiftTabOutdentsIt()
     {
-        var engine = new MarkdownEditorEngine("- one\n- two\n  - three");
+        var engine = new SourceEngine("- one\n- two\n  - three");
 
         var update = engine.Indent(8, 8, outdent: false);
 
@@ -724,7 +722,7 @@ public class MarkdownEditorEngineTests
     [InlineData("italic", "a *b c* d", 4, 6, "a *b* c d", 5, 7)]
     public void RemovingAFormatFromPartOfARunKeepsTheRest(string command, string text, int start, int end, string expected, int expectedStart, int expectedEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(command, start, end, null, null);
 
@@ -735,7 +733,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterInATableCellAddsARowAndEnterOnAnEmptyLastRowLeavesTheTable()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| - | - |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
 
         var update = engine.InsertParagraph(23, 23);
 
@@ -751,7 +749,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterInTheHeaderRowAddsTheRowBelowTheDelimiter()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| - | - |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
 
         engine.InsertParagraph(3, 3);
 
@@ -761,7 +759,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceOnAnEmptyParagraphAfterAQuoteRemovesIt()
     {
-        var engine = new MarkdownEditorEngine("> q\n\n\n\n| a |\n| - |");
+        var engine = new SourceEngine("> q\n\n\n\n| a |\n| - |");
 
         var update = engine.Delete(4, 5);
 
@@ -772,7 +770,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceOnAnEmptyParagraphDoesNotLeaveExtraBlankLines()
     {
-        var engine = new MarkdownEditorEngine("a\n\nb");
+        var engine = new SourceEngine("a\n\nb");
 
         engine.InsertParagraph(1, 1);
         Assert.Equal("a\n\n\n\nb", engine.Text);
@@ -784,7 +782,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void InlineCommandsAreIgnoredInsideCodeBlocks()
     {
-        var engine = new MarkdownEditorEngine("```\nvar x;\n```");
+        var engine = new SourceEngine("```\nvar x;\n```");
 
         Assert.Null(engine.Command(MarkdownEditorCommands.Bold, 6, 6, null, null));
         Assert.Null(engine.Command(MarkdownEditorCommands.Code, 4, 7, null, null));
@@ -793,7 +791,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ConvertingSeveralParagraphsToAListMakesATightList()
     {
-        var engine = new MarkdownEditorEngine("a\n\nb\n\nc");
+        var engine = new SourceEngine("a\n\nb\n\nc");
 
         engine.Command(MarkdownEditorCommands.UnorderedList, 0, 9, null, null);
 
@@ -803,7 +801,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ChangingTheListTypeFromAnItemChangesTheWholeList()
     {
-        var engine = new MarkdownEditorEngine("- a\n- b\n- c");
+        var engine = new SourceEngine("- a\n- b\n- c");
 
         engine.Command(MarkdownEditorCommands.OrderedList, 6, 6, null, null);
         Assert.Equal("1. a\n2. b\n3. c", engine.Text);
@@ -818,7 +816,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TabJoinsThePreviousItemsNestedList()
     {
-        var engine = new MarkdownEditorEngine("1. a\n   - x\n2. b");
+        var engine = new SourceEngine("1. a\n   - x\n2. b");
 
         var update = engine.Indent(13, 13, outdent: false);
 
@@ -829,7 +827,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TabInAnOrderedListStartsTheNestedListAtOne()
     {
-        var engine = new MarkdownEditorEngine("1. a\n2. b\n   c");
+        var engine = new SourceEngine("1. a\n2. b\n   c");
 
         engine.Indent(8, 8, outdent: false);
 
@@ -839,7 +837,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void DeleteMergingOrderedItemsRenumbersTheRest()
     {
-        var engine = new MarkdownEditorEngine("1. first\n2. second\n3. mid");
+        var engine = new SourceEngine("1. first\n2. second\n3. mid");
 
         engine.Delete(8, 12, forward: true);
 
@@ -855,7 +853,7 @@ public class MarkdownEditorEngineTests
     public void EnterInsideAnInlineClosesAndReopensIt(string text, string expected)
     {
         var caret = text.IndexOf('|');
-        var engine = new MarkdownEditorEngine(text.Replace("|", ""));
+        var engine = new SourceEngine(text.Replace("|", ""));
 
         engine.InsertParagraph(caret, caret);
 
@@ -869,7 +867,7 @@ public class MarkdownEditorEngineTests
     [InlineData("bold", "***Design***", 3, 9, "*Design*", 1, 7)]
     public void RemovingAFormatFromANestedRunRemovesOnlyThatFormat(string command, string text, int start, int end, string expected, int expectedStart, int expectedEnd)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(command, start, end, null, null);
 
@@ -880,7 +878,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BoldingTextBetweenTwoBoldRunsMergesThem()
     {
-        var engine = new MarkdownEditorEngine("**di**rect**ly**");
+        var engine = new SourceEngine("**di**rect**ly**");
 
         engine.Command(MarkdownEditorCommands.Bold, 6, 10, null, null);
 
@@ -890,7 +888,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void OutdentingANestedItemJoinsTheParentListWithItsType()
     {
-        var engine = new MarkdownEditorEngine("1. one\n2. two\n   - nested\n3. three");
+        var engine = new SourceEngine("1. one\n2. two\n   - nested\n3. three");
 
         engine.Indent(20, 20, outdent: true);
 
@@ -900,7 +898,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfANestedItemJoinsTheParentListWithItsType()
     {
-        var engine = new MarkdownEditorEngine("1. one\n2. two\n   - nested\n3. three");
+        var engine = new SourceEngine("1. one\n2. two\n   - nested\n3. three");
 
         engine.Delete(18, 19);
 
@@ -910,7 +908,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceMergingAParagraphIntoAListItemKeepsTheListTight()
     {
-        var engine = new MarkdownEditorEngine("- a\n\nb\n\n- c");
+        var engine = new SourceEngine("- a\n\nb\n\n- c");
 
         engine.Delete(3, 5);
 
@@ -923,7 +921,7 @@ public class MarkdownEditorEngineTests
     [InlineData("# Hello", 7, "# Hello\n\n", 9)]
     public void EnterInsideAHeadingKeepsTheTailAHeading(string text, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.InsertParagraph(caret, caret);
 
@@ -934,7 +932,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void RemovingTheListFromTheFirstOrderedItemRenumbersTheRest()
     {
-        var engine = new MarkdownEditorEngine("1. a\n2. b\n3. c");
+        var engine = new SourceEngine("1. a\n2. b\n3. c");
 
         engine.Command(MarkdownEditorCommands.OrderedList, 3, 3, null, null);
 
@@ -944,7 +942,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceOnAnEmptyTableRowRemovesIt()
     {
-        var engine = new MarkdownEditorEngine("| a |\n| - |\n| b |\n|  |");
+        var engine = new SourceEngine("| a |\n| - |\n| b |\n|  |");
 
         var update = engine.Delete(20, 21);
 
@@ -955,7 +953,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfTheParagraphAfterATableMovesIntoTheTable()
     {
-        var engine = new MarkdownEditorEngine("| a |\n| - |\n\nAfter");
+        var engine = new SourceEngine("| a |\n| - |\n\nAfter");
 
         var update = engine.Delete(12, 13);
 
@@ -966,7 +964,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceRemovesOneEmptyParagraphAtATime()
     {
-        var engine = new MarkdownEditorEngine("a\n\nb");
+        var engine = new SourceEngine("a\n\nb");
 
         engine.InsertParagraph(1, 1);
         engine.InsertParagraph(3, 3);
@@ -982,7 +980,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TabRenumbersTheFollowingOrderedItems()
     {
-        var engine = new MarkdownEditorEngine("1. a\n2. b\n3. c");
+        var engine = new SourceEngine("1. a\n2. b\n3. c");
 
         engine.Indent(8, 8, outdent: false);
 
@@ -992,7 +990,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterInATableCellKeepsTheColumn()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| - | - |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
 
         var update = engine.InsertParagraph(27, 27);
 
@@ -1003,7 +1001,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void StateReportsInlineFormatsInsideTableCells()
     {
-        var engine = new MarkdownEditorEngine("| **a** | b |\n| - | - |");
+        var engine = new SourceEngine("| **a** | b |\n| - | - |");
 
         Assert.Contains(MarkdownEditorCommands.Bold, engine.State(5, 5).Formats!);
     }
@@ -1011,7 +1009,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void DeletingASelectionFromAParagraphIntoAListKeepsTheBlankLine()
     {
-        var engine = new MarkdownEditorEngine("toolbar. New\n\n- [x] A task list item\n- [ ] Bold");
+        var engine = new SourceEngine("toolbar. New\n\n- [x] A task list item\n- [ ] Bold");
 
         engine.Delete(8, 22, selection: true);
 
@@ -1021,7 +1019,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfAHeadingBelowAnEmptyParagraphRemovesTheParagraph()
     {
-        var engine = new MarkdownEditorEngine("# Hello");
+        var engine = new SourceEngine("# Hello");
 
         var update = engine.InsertParagraph(2, 2);
         Assert.Equal("\n\n# Hello", engine.Text);
@@ -1035,7 +1033,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfAHeadingAfterAParagraphAndAnEmptyLineRemovesTheEmptyLine()
     {
-        var engine = new MarkdownEditorEngine("a\n\n\n\n# Hello");
+        var engine = new SourceEngine("a\n\n\n\n# Hello");
 
         engine.Delete(6, 7);
 
@@ -1045,7 +1043,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterOnAnEmptyNestedItemRenumbersTheOuterList()
     {
-        var engine = new MarkdownEditorEngine("1. one\n2. two\n   - sub\n   - \n3. three");
+        var engine = new SourceEngine("1. one\n2. two\n   - sub\n   - \n3. three");
 
         engine.InsertParagraph(28, 28);
 
@@ -1055,7 +1053,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void AnEmptyParagraphReportsTheParagraphBlock()
     {
-        var engine = new MarkdownEditorEngine("a\n\n\n\nb");
+        var engine = new SourceEngine("a\n\n\n\nb");
 
         Assert.Equal("p", engine.State(3, 3).Block);
     }
@@ -1063,7 +1061,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BoldingTextThatTouchesABoldRunKeepsTheUserSelection()
     {
-        var engine = new MarkdownEditorEngine("**Design** and **Source**");
+        var engine = new SourceEngine("**Design** and **Source**");
 
         var update = engine.Command(MarkdownEditorCommands.Bold, 10, 15, null, null);
 
@@ -1074,7 +1072,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EnterThenBackspaceBeforeAListRestoresTheText()
     {
-        var engine = new MarkdownEditorEngine("toolbar.\n\n- [x] A task");
+        var engine = new SourceEngine("toolbar.\n\n- [x] A task");
 
         var update = engine.InsertParagraph(8, 8);
         engine.Delete(update!.SelectionStart - 1, update.SelectionStart);
@@ -1085,7 +1083,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ListOnASelectionWithAHeadingIncludesTheHeadingAndTogglesBackExactly()
     {
-        var engine = new MarkdownEditorEngine("# Hello\n\nEdit this\n\n- [x] A");
+        var engine = new SourceEngine("# Hello\n\nEdit this\n\n- [x] A");
 
         var update = engine.Command(MarkdownEditorCommands.OrderedList, 3, 14, null, null);
         Assert.Equal("1. # Hello\n2. Edit this\n\n- [x] A", engine.Text);
@@ -1097,7 +1095,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void HeadingOnTaskItemsDropsTheTaskBox()
     {
-        var engine = new MarkdownEditorEngine("- [ ] A task\n- [x] B");
+        var engine = new SourceEngine("- [ ] A task\n- [x] B");
 
         engine.Command(MarkdownEditorCommands.FormatBlock, 0, 18, "h2", null);
 
@@ -1107,7 +1105,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void EmptyTableCellsRenderAPlaceholderAndEnterPutsTheCaretThere()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| - | - |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
 
         var update = engine.InsertParagraph(27, 27);
 
@@ -1118,7 +1116,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceMergingAParagraphBetweenTwoListsRejoinsThem()
     {
-        var engine = new MarkdownEditorEngine("- a\n\nmid\n\n* b\n* c");
+        var engine = new SourceEngine("- a\n\nmid\n\n* b\n* c");
 
         engine.Delete(3, 5);
 
@@ -1128,7 +1126,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void StateReportsOnlyTheInnermostList()
     {
-        var engine = new MarkdownEditorEngine("1. a\n   - b");
+        var engine = new SourceEngine("1. a\n   - b");
 
         var state = engine.State(10, 10);
 
@@ -1139,7 +1137,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TheParagraphAfterACodeBlockReportsTheParagraphBlock()
     {
-        var engine = new MarkdownEditorEngine("```\nx\n```");
+        var engine = new SourceEngine("```\nx\n```");
 
         Assert.Equal("p", engine.State(9, 9).Block);
     }
@@ -1147,7 +1145,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void TabInTheLastCellAppendsARowWithTheCaretInTheFirstCell()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| - | - |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| - | - |\n| c | d |");
 
         var update = engine.AppendRow(27);
 
@@ -1161,7 +1159,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void UndoAfterAWholeListConversionRestoresACollapsedCaret()
     {
-        var engine = new MarkdownEditorEngine("- a\n- b");
+        var engine = new SourceEngine("- a\n- b");
 
         engine.Command(MarkdownEditorCommands.OrderedList, 6, 6, null, null);
         var update = engine.Undo();
@@ -1172,7 +1170,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void LiftingAMiddleOrderedItemOutRenumbersTheRestFromOne()
     {
-        var engine = new MarkdownEditorEngine("1. a\n2. b\n3. c");
+        var engine = new SourceEngine("1. a\n2. b\n3. c");
 
         engine.Delete(7, 8);
 
@@ -1182,7 +1180,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BoldAcrossAnItalicBoundaryAndIntoABoldRunStaysValid()
     {
-        var engine = new MarkdownEditorEngine("Edit *this text* **directly** now");
+        var engine = new SourceEngine("Edit *this text* **directly** now");
 
         var update = engine.Command(MarkdownEditorCommands.Bold, 11, 21, null, null);
 
@@ -1197,7 +1195,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfAHeadingAfterAHeadingJoinsThem()
     {
-        var engine = new MarkdownEditorEngine("# Hello, Ma\n\n# rkdown");
+        var engine = new SourceEngine("# Hello, Ma\n\n# rkdown");
 
         var update = engine.Delete(14, 15);
 
@@ -1208,7 +1206,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void BackspaceAtTheStartOfAHeadingAfterAListRemovesTheMarker()
     {
-        var engine = new MarkdownEditorEngine("- a\n\n# Hello");
+        var engine = new SourceEngine("- a\n\n# Hello");
 
         engine.Delete(6, 7);
 
@@ -1218,7 +1216,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void JoiningAParagraphIntoANestedItemRejoinsTheOuterListWithContinuedNumbering()
     {
-        var engine = new MarkdownEditorEngine("1. one\n2. two\n   - nb\n\nnew3\n\n1. three");
+        var engine = new SourceEngine("1. one\n2. two\n   - nb\n\nnew3\n\n1. three");
 
         engine.Delete(21, 23);
 
@@ -1228,7 +1226,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ForwardDeleteOfAnEmptyParagraphPutsTheCaretAtTheEndOfThePreviousBlock()
     {
-        var engine = new MarkdownEditorEngine("> q\n\n\n\n| a |\n| - |");
+        var engine = new SourceEngine("> q\n\n\n\n| a |\n| - |");
 
         var update = engine.Delete(5, 6, forward: true);
 
@@ -1243,14 +1241,14 @@ public class MarkdownEditorEngineTests
     [InlineData("taskList", "- [ ] ")]
     public void ListCommandsOnAnEmptyLineInsertTheMarker(string command, string marker)
     {
-        var engine = new MarkdownEditorEngine("a\n\n\n\nb");
+        var engine = new SourceEngine("a\n\n\n\nb");
 
         var update = engine.Command(command, 3, 3, null, null);
 
         Assert.Equal("a\n\n" + marker + "\n\nb", engine.Text);
         Assert.Equal(3 + marker.Length, update!.SelectionStart);
 
-        var empty = new MarkdownEditorEngine("");
+        var empty = new SourceEngine("");
         empty.Command(command, 0, 0, null, null);
         Assert.Equal(marker, empty.Text);
     }
@@ -1261,7 +1259,7 @@ public class MarkdownEditorEngineTests
     [InlineData(MarkdownEditorCommands.Quote, "a\n\n```csharp\nvar x;\n```\n\n> ")]
     public void BlockCommandsOnTheTrailingEmptyLineAfterACodeBlockLeaveTheCodeBlockAlone(string command, string expected)
     {
-        var engine = new MarkdownEditorEngine("a\n\n```csharp\nvar x;\n```");
+        var engine = new SourceEngine("a\n\n```csharp\nvar x;\n```");
 
         var update = engine.Command(command, engine.Text.Length, engine.Text.Length, null, null);
 
@@ -1272,7 +1270,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void OutdentingAPlainItemFromATaskListKeepsItPlain()
     {
-        var engine = new MarkdownEditorEngine("- [x] A\n- [ ] B\n  - C");
+        var engine = new SourceEngine("- [x] A\n- [ ] B\n  - C");
 
         engine.Indent(21, 21, outdent: true);
 
@@ -1282,7 +1280,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void ListCommandOnAnEmptyLineNextToAListUsesTheOtherMarker()
     {
-        var engine = new MarkdownEditorEngine("a\n\n\n\n- [x] b");
+        var engine = new SourceEngine("a\n\n\n\n- [x] b");
 
         engine.Command(MarkdownEditorCommands.UnorderedList, 3, 3, null, null);
 
@@ -1292,7 +1290,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void DeletingInsideACodeBlockWorks()
     {
-        var engine = new MarkdownEditorEngine("```\nabc\n```");
+        var engine = new SourceEngine("```\nabc\n```");
 
         engine.Delete(5, 6);
 
@@ -1302,7 +1300,7 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void CommandsGoThroughTheFormatterAndSelectTheResult()
     {
-        var engine = new MarkdownEditorEngine("hello world");
+        var engine = new SourceEngine("hello world");
 
         var update = engine.Command(MarkdownEditorCommands.Bold, 0, 5, null, null);
 
@@ -1324,7 +1322,7 @@ public class MarkdownEditorEngineTests
     [InlineData("a\n\nb", 2, "", "p")]
     public void StateReflectsTheBlocksAndInlinesAtTheCaret(string text, int caret, string formats, string? block)
     {
-        var state = new MarkdownEditorEngine(text).State(caret, caret);
+        var state = new SourceEngine(text).State(caret, caret);
 
         Assert.Equal(formats, string.Join(",", state.Formats!));
         Assert.Equal(block, state.Block);
@@ -1333,26 +1331,27 @@ public class MarkdownEditorEngineTests
     [Fact]
     public void StateReportsMixedBlocksAsEmpty()
     {
-        var state = new MarkdownEditorEngine("# h\n\np").State(0, 5);
+        var state = new SourceEngine("# h\n\np").State(0, 5);
 
         Assert.Equal("", state.Block);
     }
 
     [Theory]
     [InlineData("", "<p>\u200B</p>", "0-0:1")]
-    [InlineData("a\n\n", "<p>a</p><p>\u200B</p>", "0-1:1 3-3:1")]
-    [InlineData("a\n\n\n", "<p>a</p><p>\u200B</p><p>\u200B</p>", "0-1:1 3-3:1 4-4:1")]
-    [InlineData("a\n\nb", "<p>a</p><p>b</p>", "0-1:1 3-4:1")]
-    [InlineData("a\n\n\n\nb", "<p>a</p><p>\u200B</p><p>b</p>", "0-1:1 3-3:1 5-6:1")]
-    [InlineData("\n\nb", "<p>\u200B</p><p>b</p>", "0-0:1 2-3:1")]
-    [InlineData("- a\n- ", "<ul><li>a</li><li>\u200B</li></ul>", "2-3:1 6-6:1")]
-    [InlineData("> a\n>\n> ", "<blockquote><p>a</p><p>\u200B</p></blockquote>", "2-3:1 8-8:1")]
-    [InlineData("#", "<h1>\u200B</h1>", "1-1:1")]
+    [InlineData("a\n\n", "<p>a</p><p>\u200B</p>", "0-1:1 2-2:1")]
+    [InlineData("a\n\n\n", "<p>a</p><p>\u200B</p><p>\u200B</p>", "0-1:1 2-2:1 3-3:1")]
+    [InlineData("a\n\nb", "<p>a</p><p>b</p>", "0-1:1 2-3:1")]
+    [InlineData("a\n\n\n\nb", "<p>a</p><p>\u200B</p><p>b</p>", "0-1:1 2-2:1 3-4:1")]
+    [InlineData("\n\nb", "<p>\u200B</p><p>b</p>", "0-0:1 1-2:1")]
+    [InlineData("- a\n- ", "<ul><li>a</li><li>\u200B</li></ul>", "0-1:1 2-2:1")]
+    [InlineData("> a\n>\n> ", "<blockquote><p>a</p><p>\u200B</p></blockquote>", "0-1:1 2-2:1")]
+    [InlineData("#", "<h1>\u200B</h1>", "0-0:1")]
     [InlineData("a", "<p>a</p>", "0-1:1")]
-    [InlineData("---", "<p>\u200B</p><hr data-gap=\"0\"><p>\u200B</p>", "0-0:1 3-3:1")]
-    [InlineData("a\n\n```\nc\n```", "<p>a</p><pre data-gap=\"2\"><code>c</code></pre><p>\u200B</p>", "0-1:1 7-8:1 12-12:1")]
-    [InlineData("a\n\n```\nc\n```\n\n", "<p>a</p><pre data-gap=\"2\"><code>c</code></pre><p>\u200B</p>", "0-1:1 7-8:1 14-14:1")]
-    [InlineData("| a |\n| - |", "<p>\u200B</p><table data-gap=\"0\"><thead><tr><th>a</th></tr></thead><tbody></tbody></table><p>\u200B</p>", "0-0:1 2-3:1 11-11:1")]
+    [InlineData("---", "<p>\u200B</p><hr data-gap=\"1\"><p>\u200B</p>", "0-0:1 2-2:1")]
+    [InlineData("a\n\n```\nc\n```", "<p>a</p><pre><code>c</code></pre><p>\u200B</p>", "0-1:1 2-3:1 4-4:1")]
+    [InlineData("a\n\n```\nc\n```\n\n", "<p>a</p><pre><code>c</code></pre><p>\u200B</p>", "0-1:1 2-3:1 4-4:1")]
+    [InlineData("| a |\n| - |", "<p>\u200B</p><table><thead><tr><th>a</th></tr></thead><tbody></tbody></table><p>\u200B</p>", "0-0:1 1-2:1 3-3:1")]
+    [InlineData("| a |\n| - |\n\n```\nc\n```", "<p>\u200B</p><table><thead><tr><th>a</th></tr></thead><tbody></tbody></table><p>\u200B</p><pre><code>c</code></pre><p>\u200B</p>", "0-0:1 1-2:1 3-3:1 4-5:1 6-6:1")]
     public void RenderingPutsAPlaceholderOnEveryBlankLineThatIsNotASeparator(string text, string html, string segments)
     {
         var update = new MarkdownEditorEngine(text).Render(0, 0);
@@ -1370,7 +1369,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData("hello world", 6, 11, "hello ![alt](u.png)", 19)]
     public void InsertingAnImageKeepsTheSurroundingText(string text, int start, int end, string expected, int caret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(MarkdownEditorCommands.Image, start, end, "u.png", "alt");
 
@@ -1383,7 +1382,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData("foo  \nbar", 8, "foo  \n**bar**")]
     public void BoldAtACaretAfterAnAtomFormatsTheWholeWord(string text, int caret, string expected)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Command(MarkdownEditorCommands.Bold, caret, caret, null, null);
 
@@ -1391,15 +1390,15 @@ public class MarkdownEditorEngineReviewRegressionTests
     }
 
     [Theory]
-    [InlineData("a **directly** b", 14, "Z", "a **directly**Z b")]
-    [InlineData("a **directly** b", 12, "Z", "a **directlyZ** b")]
-    [InlineData("a **directly** b", 4, "Z", "a **Zdirectly** b")]
-    [InlineData("a **directly** b", 2, "Z", "a Z**directly** b")]
-    public void TypingAtAMarkerDecidesTheSideByTheCaretPosition(string text, int caret, string typed, string expected)
+    [InlineData("a **directly** b", 10, false, "a **directlyZ** b")]
+    [InlineData("a **directly** b", 10, true, "a **directly**Z b")]
+    [InlineData("a **directly** b", 2, true, "a **Zdirectly** b")]
+    [InlineData("a **directly** b", 2, false, "a Z**directly** b")]
+    public void TypingAtAMarkTakesTheSideOfTheTextNodeTheCaretIsIn(string text, int position, bool right, string expected)
     {
         var engine = new MarkdownEditorEngine(text);
 
-        engine.InsertText(caret, caret, typed, literal: true);
+        engine.InsertText(position, position, "Z", literal: true, preferRight: right);
 
         Assert.Equal(expected, engine.Text);
     }
@@ -1407,7 +1406,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void EmptyingTheParagraphBetweenTwoListsKeepsThemApart()
     {
-        var engine = new MarkdownEditorEngine("- one\n- two\n\nMiddle\n\n- three\n- four");
+        var engine = new SourceEngine("- one\n- two\n\nMiddle\n\n- three\n- four");
 
         engine.Delete(13, 19, selection: true);
 
@@ -1415,14 +1414,14 @@ public class MarkdownEditorEngineReviewRegressionTests
     }
 
     [Fact]
-    public void DeletingTheSpaceAfterALinkKeepsTheCaretOutsideTheLink()
+    public void TypingAtTheEndOfALinkContinuesTheLink()
     {
-        var engine = new MarkdownEditorEngine("a [links](https://x) and");
+        var engine = new SourceEngine("a [links](https://x) and");
 
         var update = engine.Delete(21, 21);
         engine.InsertText(update!.SelectionStart, update.SelectionStart, "Q", literal: true);
 
-        Assert.Equal("a [links](https://x)Qand", engine.Text);
+        Assert.Equal("a [linksQ](https://x)and", engine.Text);
     }
 
     [Theory]
@@ -1430,7 +1429,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData("- item\n\n---\n\nEnd", 6, true, "- item\n\nEnd", 6)]
     public void BackspaceAndDeleteNextToARuleRemoveIt(string text, int caret, bool forward, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(caret, caret, forward);
 
@@ -1443,7 +1442,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData("End\n\n```js\nx\n```", 3, true, 11)]
     public void BackspaceAndDeleteNextToACodeBlockMoveTheCaretIntoIt(string text, int caret, bool forward, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Delete(caret, caret, forward);
 
@@ -1454,7 +1453,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void BackspaceIntoAListLeavesTheFollowingBlocksInPlace()
     {
-        var engine = new MarkdownEditorEngine("- a\n- b\n\nPara\n\n> quote\n\nlast");
+        var engine = new SourceEngine("- a\n- b\n\nPara\n\n> quote\n\nlast");
 
         engine.Delete(9, 9);
 
@@ -1467,7 +1466,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData("say (hi) now", 4, 8, MarkdownEditorCommands.Bold, "say **(hi)** now")]
     public void MarksNextToPunctuationLeaveThePunctuationOutside(string text, int start, int end, string command, string expected)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Command(command, start, end, null, null);
 
@@ -1477,7 +1476,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void BackspaceInAnEmptyCodeBlockRemovesIt()
     {
-        var engine = new MarkdownEditorEngine("> A quote line.\n\n```js\n```\n\n---");
+        var engine = new SourceEngine("> A quote line.\n\n```js\n```\n\n---");
 
         var update = engine.Delete(23, 23);
 
@@ -1488,7 +1487,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void BackspaceAtTheStartOfACodeBlockWithContentDoesNothing()
     {
-        var engine = new MarkdownEditorEngine("End\n\n```js\nx\n```");
+        var engine = new SourceEngine("End\n\n```js\nx\n```");
 
         Assert.Null(engine.Delete(11, 11));
     }
@@ -1496,7 +1495,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void DeletingAcrossTwoListItemsKeepsTheNestedListWithTheMergedItem()
     {
-        var engine = new MarkdownEditorEngine("1. First item\n2. Second item\n   - nested one\n   - nested two\n3. Third item");
+        var engine = new SourceEngine("1. First item\n2. Second item\n   - nested one\n   - nested two\n3. Third item");
 
         engine.Delete(11, 24, selection: true);
 
@@ -1504,21 +1503,9 @@ public class MarkdownEditorEngineReviewRegressionTests
     }
 
     [Fact]
-    public void BoldAfterATrailingSpaceDoesNotEatTheSpace()
-    {
-        var engine = new MarkdownEditorEngine("alpha *gamma* ");
-
-        var update = engine.Command(MarkdownEditorCommands.Bold, 14, 14, null, null);
-
-        Assert.Null(update);
-        engine.InsertText(14, 14, "X", literal: true);
-        Assert.Equal("alpha *gamma* X", engine.Text);
-    }
-
-    [Fact]
     public void QuoteOnASelectionInsideAQuoteUnquotesIt()
     {
-        var engine = new MarkdownEditorEngine("> Quoted one.\n>\n> Quoted two.");
+        var engine = new SourceEngine("> Quoted one.\n>\n> Quoted two.");
 
         engine.Command(MarkdownEditorCommands.Quote, 4, 20, null, null);
 
@@ -1528,7 +1515,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void TabInTheEmptyLastRowAppendsARow()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| --- | --- |\n|  |  |");
+        var engine = new SourceEngine("| a | b |\n| --- | --- |\n|  |  |");
 
         engine.AppendRow(24);
 
@@ -1538,7 +1525,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void LinkingASelectionAcrossParagraphsLinksEachPart()
     {
-        var engine = new MarkdownEditorEngine("one\n\ntwo");
+        var engine = new SourceEngine("one\n\ntwo");
 
         engine.Command(MarkdownEditorCommands.Link, 1, 7, "http://x", "L");
 
@@ -1550,7 +1537,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [InlineData(true, 1, "ab", 1)]
     public void DeletingNextToAnEmojiRemovesTheWholeCodePoint(bool forward, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine("a\U0001F600b");
+        var engine = new SourceEngine("a\U0001F600b");
 
         var update = engine.Delete(caret, caret, forward);
 
@@ -1561,7 +1548,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void EditingNextToAnEmailAutolinkKeepsItAnAutolink()
     {
-        var engine = new MarkdownEditorEngine("<foo@bar.com> x");
+        var engine = new SourceEngine("<foo@bar.com> x");
 
         engine.InsertText(15, 15, "y", literal: true);
 
@@ -1571,7 +1558,7 @@ public class MarkdownEditorEngineReviewRegressionTests
     [Fact]
     public void ALinkDestinationWithALineBreakIsEncoded()
     {
-        var engine = new MarkdownEditorEngine("abc");
+        var engine = new SourceEngine("abc");
 
         engine.Command(MarkdownEditorCommands.Link, 0, 3, "a\nb", null);
 
@@ -1581,6 +1568,23 @@ public class MarkdownEditorEngineReviewRegressionTests
 
 public class MarkdownEditorEngineTableTests
 {
+    [Fact]
+    public void ASpaceTypedAtTheEndOfACellStaysEditable()
+    {
+        var engine = new MarkdownEditorEngine("| a | b |\n| --- | --- |\n| 1 | 2 |");
+
+        var update = engine.InsertText(8, 8, " ", literal: true);
+
+        Assert.Equal("| a | b |\n| --- | --- |\n| 1 | 2  |", engine.Text);
+        Assert.Equal(9, update.SelectionStart);
+        Assert.Contains("<td>2 </td>", update.Html);
+        Assert.Contains(update.Segments!.Chunk(3), segment => segment[0] == 7 && segment[1] == 9 && segment[2] == 2);
+
+        engine.InsertText(9, 9, "x", literal: true);
+
+        Assert.Equal("| a | b |\n| --- | --- |\n| 1 | 2 x |", engine.Text);
+    }
+
     private const string Table = "| a | b |\n| - | - |\n| c | d |";
 
     [Theory]
@@ -1590,7 +1594,7 @@ public class MarkdownEditorEngineTableTests
     [InlineData("ab", 1, null, "ab\n\n|  |  |  |\n| --- | --- | --- |\n|  |  |  |\n|  |  |  |", 6)]
     public void InsertTableAddsAnEmptyTableWithAHeaderRow(string text, int caret, string? size, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         var update = engine.Command(MarkdownEditorCommands.InsertTable, caret, caret, size, null);
 
@@ -1608,7 +1612,7 @@ public class MarkdownEditorEngineTableTests
     [InlineData(MarkdownEditorCommands.TableDeleteColumn, 6, "| a |\n| --- |\n| c |", 2)]
     public void TableCommandsEditRowsAndColumnsAtTheCaret(string command, int caret, string expected, int expectedCaret)
     {
-        var engine = new MarkdownEditorEngine(Table);
+        var engine = new SourceEngine(Table);
 
         var update = engine.Command(command, caret, caret, null, null);
 
@@ -1619,7 +1623,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void TheHeaderRowCannotBeDeleted()
     {
-        var engine = new MarkdownEditorEngine(Table);
+        var engine = new SourceEngine(Table);
 
         Assert.Null(engine.Command(MarkdownEditorCommands.TableDeleteRow, 2, 2, null, null));
         Assert.Equal(Table, engine.Text);
@@ -1628,7 +1632,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void DeletingTheLastColumnDeletesTheTable()
     {
-        var engine = new MarkdownEditorEngine("| a |\n| - |\n| c |");
+        var engine = new SourceEngine("| a |\n| - |\n| c |");
 
         engine.Command(MarkdownEditorCommands.TableDeleteColumn, 2, 2, null, null);
 
@@ -1638,7 +1642,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void DeletingATableMovesTheCaretToTheNextBlock()
     {
-        var engine = new MarkdownEditorEngine("x\n\n" + Table + "\n\ny");
+        var engine = new SourceEngine("x\n\n" + Table + "\n\ny");
 
         var update = engine.Command(MarkdownEditorCommands.TableDelete, 25, 25, null, null);
 
@@ -1649,7 +1653,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void DeletingTheOnlyTableLeavesAnEmptyParagraph()
     {
-        var engine = new MarkdownEditorEngine(Table);
+        var engine = new SourceEngine(Table);
 
         var update = engine.Command(MarkdownEditorCommands.TableDelete, 2, 2, null, null);
 
@@ -1660,7 +1664,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void DeletingATableBeforeACodeBlockMovesTheCaretToThePreviousBlock()
     {
-        var engine = new MarkdownEditorEngine("x\n\n" + Table + "\n\n```\nc\n```");
+        var engine = new SourceEngine("x\n\n" + Table + "\n\n```\nc\n```");
 
         var update = engine.Command(MarkdownEditorCommands.TableDelete, 25, 25, null, null);
 
@@ -1675,7 +1679,7 @@ public class MarkdownEditorEngineTableTests
     [InlineData(Table, 22, "left", "| a | b |\n| :-- | --- |\n| c | d |")]
     public void TableAlignChangesTheColumnAtTheCaret(string text, int caret, string alignment, string expected)
     {
-        var engine = new MarkdownEditorEngine(text);
+        var engine = new SourceEngine(text);
 
         engine.Command(MarkdownEditorCommands.TableAlign, caret, caret, alignment, null);
 
@@ -1685,7 +1689,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void TableCommandsOutsideATableDoNothing()
     {
-        var engine = new MarkdownEditorEngine("text");
+        var engine = new SourceEngine("text");
 
         Assert.Null(engine.Command(MarkdownEditorCommands.TableRowAfter, 2, 2, null, null));
         Assert.Null(engine.Command(MarkdownEditorCommands.TableAlign, 2, 2, "left", null));
@@ -1694,7 +1698,7 @@ public class MarkdownEditorEngineTableTests
     [Fact]
     public void StateReportsTheTablePositionAndAlignment()
     {
-        var engine = new MarkdownEditorEngine("| a | b |\n| :-- | --: |\n| c | d |");
+        var engine = new SourceEngine("| a | b |\n| :-- | --: |\n| c | d |");
 
         var state = engine.State(30, 30);
 
@@ -1704,7 +1708,7 @@ public class MarkdownEditorEngineTableTests
         Assert.Equal(2, state.TableColumns);
         Assert.Equal("right", state.TableAlignment);
 
-        var outside = new MarkdownEditorEngine("text").State(1, 1);
+        var outside = new SourceEngine("text").State(1, 1);
 
         Assert.Equal(-1, outside.TableRow);
         Assert.Equal(-1, outside.TableColumn);

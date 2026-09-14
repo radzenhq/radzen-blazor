@@ -36,8 +36,8 @@ public class HtmlVisitorTests
     [Theory]
     [InlineData("> a\n>\n> ", "<blockquote><p>a</p><p>\u200B</p></blockquote>")]
     [InlineData("- [x] a\n\n- [ ] b", "<ul><li><p><input type=\"checkbox\" checked> a</p></li><li><p><input type=\"checkbox\"> b</p></li></ul>")]
-    [InlineData("a\n\n```\ncode\n```", "<p>a</p><pre data-gap=\"2\"><code>code</code></pre><p>\u200B</p>")]
-    [InlineData("a\n\n```\ncode\n\n```", "<p>a</p><pre data-gap=\"2\"><code>code\n\u200B</code></pre><p>\u200B</p>")]
+    [InlineData("a\n\n```\ncode\n```", "<p>a</p><pre><code>code</code></pre><p>\u200B</p>")]
+    [InlineData("a\n\n```\ncode\n\n```", "<p>a</p><pre><code>code\n\u200B</code></pre><p>\u200B</p>")]
     public void EditingRenderKeepsTrailingEmptyLinesReachable(string markdown, string expected)
     {
         Assert.Equal(expected, HtmlVisitor.Render(markdown).Html);

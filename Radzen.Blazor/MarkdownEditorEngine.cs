@@ -16,17 +16,27 @@ internal sealed class MarkdownEditorEngine
         public (int Start, int End) Before { get; set; }
         public (int Start, int End) After { get; set; }
         public string? Key { get; set; }
+        public bool Design { get; set; }
     }
 
-    private sealed record Cursor(Block Block, IBlockInlineContainer? Content, int Offset, bool AfterMarker = false);
+    private sealed record Cursor(Block Block, IBlockInlineContainer? Content, int Offset);
+
+    private sealed record Host(Block Block, IBlockInlineContainer? Content, int Start, int Length)
+    {
+        public int End => Start + Length;
+    }
 
     private readonly List<Edit> undo = [];
     private readonly List<Edit> redo = [];
     private (int Start, int End) pending;
+    private (int Start, int End) pendingSource;
+    private string source;
+    private Document? document;
 
     public MarkdownEditorEngine(string? text)
     {
         Text = Normalize(text);
+        source = Text;
     }
 
     public string Text { get; private set; }
@@ -42,17 +52,42 @@ internal sealed class MarkdownEditorEngine
     public void Reset(string? text)
     {
         Text = Normalize(text);
+        document = null;
         undo.Clear();
         redo.Clear();
     }
 
+    private Document Model
+    {
+        get
+        {
+            if (document == null)
+            {
+                source = Text;
+                document = Fresh();
+            }
+
+            return document;
+        }
+    }
+
+    private Document Fresh() => BlankLines.Inflate(MarkdownParser.Parse(Text), Text);
+
     public MarkdownEditorUpdate Apply(int start, int end, string inserted, (int Start, int End) after, string? key = null, bool merge = false, (int Start, int End)? before = null)
     {
-        (start, end) = Clamp(start, end);
+        document = null;
+        ApplyEdit(start, end, inserted, after, key, merge, before, design: false);
+        return Render(after.Start, after.End);
+    }
+
+    private void ApplyEdit(int start, int end, string inserted, (int Start, int End) after, string? key, bool merge, (int Start, int End)? before, bool design)
+    {
+        start = Math.Clamp(start, 0, Text.Length);
+        end = Math.Clamp(end, start, Text.Length);
 
         if (Text[start..end] == inserted)
         {
-            return Render(after.Start, after.End);
+            return;
         }
 
         var edit = new Edit
@@ -62,7 +97,8 @@ internal sealed class MarkdownEditorEngine
             Inserted = inserted,
             Before = before ?? (start, end),
             After = after,
-            Key = key
+            Key = key,
+            Design = design
         };
 
         Text = Text[..start] + inserted + Text[end..];
@@ -70,7 +106,7 @@ internal sealed class MarkdownEditorEngine
 
         var last = undo.Count > 0 ? undo[^1] : null;
 
-        if (merge && key != null && last?.Key == key && Merge(last, edit))
+        if (merge && key != null && last?.Key == key && last.Design == design && Merge(last, edit))
         {
             last.After = after;
         }
@@ -83,8 +119,6 @@ internal sealed class MarkdownEditorEngine
                 undo.RemoveAt(0);
             }
         }
-
-        return Render(after.Start, after.End);
     }
 
     private static bool Merge(Edit last, Edit next)
@@ -121,9 +155,11 @@ internal sealed class MarkdownEditorEngine
         var edit = undo[^1];
         undo.RemoveAt(undo.Count - 1);
         Text = Text[..edit.Start] + edit.Removed + Text[(edit.Start + edit.Inserted.Length)..];
+        document = null;
         redo.Add(edit);
+        var (start, end) = Convert(edit.Before, edit.Design);
 
-        return Render(edit.Before.Start, edit.Before.End, includeText: true);
+        return Render(start, end, includeText: true);
     }
 
     public MarkdownEditorUpdate? Redo()
@@ -136,33 +172,47 @@ internal sealed class MarkdownEditorEngine
         var edit = redo[^1];
         redo.RemoveAt(redo.Count - 1);
         Text = Text[..edit.Start] + edit.Inserted + Text[(edit.Start + edit.Removed.Length)..];
+        document = null;
         undo.Add(edit);
+        var (start, end) = Convert(edit.After, edit.Design);
 
-        return Render(edit.After.Start, edit.After.End, includeText: true);
+        return Render(start, end, includeText: true);
     }
 
-    private (int Start, int End) Clamp(int start, int end)
+    private (int Start, int End) Convert((int Start, int End) selection, bool design)
     {
-        start = Math.Clamp(start, 0, Text.Length);
-        end = Math.Clamp(end, start, Text.Length);
-        return (start, end);
+        if (design == RenderHtml)
+        {
+            return selection;
+        }
+
+        return design ? (ToSource(selection.Start), ToSource(selection.End)) : (ToPosition(selection.Start), ToPosition(selection.End));
     }
 
     public MarkdownEditorUpdate Render(int selectionStart, int selectionEnd, bool includeText = false)
     {
-        (selectionStart, selectionEnd) = Clamp(selectionStart, selectionEnd);
+        if (!RenderHtml)
+        {
+            document = null;
+        }
 
-        var document = MarkdownParser.Parse(Text);
-        var rendered = RenderHtml ? HtmlVisitor.Render(document, Text) : null;
+        var current = Model;
+        var hosts = Hosts(current);
+        var limit = RenderHtml ? Size(hosts) : Text.Length;
+        selectionStart = Math.Clamp(selectionStart, 0, limit);
+        selectionEnd = Math.Clamp(selectionEnd, selectionStart, limit);
+        var rendered = RenderHtml ? HtmlVisitor.Render(current) : null;
         var segments = rendered == null ? null : new int[rendered.Segments.Count * 3];
 
         for (var index = 0; rendered != null && index < rendered.Segments.Count; index++)
         {
             var segment = rendered.Segments[index];
-            segments![index * 3] = segment.SourceStart;
-            segments[index * 3 + 1] = segment.SourceEnd;
+            segments![index * 3] = segment.Start;
+            segments[index * 3 + 1] = segment.End;
             segments[index * 3 + 2] = segment.Length;
         }
+
+        var state = RenderHtml ? State(current, hosts, selectionStart, selectionEnd) : State(current, hosts, ToPosition(current, hosts, selectionStart), ToPosition(current, hosts, selectionEnd));
 
         return new MarkdownEditorUpdate
         {
@@ -171,20 +221,38 @@ internal sealed class MarkdownEditorEngine
             Text = includeText ? Text : null,
             SelectionStart = selectionStart,
             SelectionEnd = selectionEnd,
-            State = State(Inflate(document), selectionStart, selectionEnd)
+            State = state
         };
     }
 
     public MarkdownEditorToolState State(int selectionStart, int selectionEnd)
     {
-        (selectionStart, selectionEnd) = Clamp(selectionStart, selectionEnd);
-        return State(Parse(), selectionStart, selectionEnd);
+        var current = Model;
+        var hosts = Hosts(current);
+
+        if (!RenderHtml)
+        {
+            selectionStart = ToPosition(current, hosts, selectionStart);
+            selectionEnd = ToPosition(current, hosts, selectionEnd);
+        }
+
+        (selectionStart, selectionEnd) = Clamp(hosts, selectionStart, selectionEnd);
+        return State(current, hosts, selectionStart, selectionEnd);
     }
 
-    private MarkdownEditorToolState State(Document document, int start, int end)
+    internal int Length => Size(Hosts(Model));
+
+    internal INode HostAt(int position)
+    {
+        var host = HostAt(Hosts(Model), position);
+        return host.Content ?? (INode)host.Block;
+    }
+
+    private MarkdownEditorToolState State(Document document, List<Host> hosts, int start, int end)
     {
         var formats = new List<string>();
-        var chain = Chain(document, start);
+        var cursor = Resolve(hosts, start);
+        var chain = Chain(cursor.Block);
         var innermostItem = chain.OfType<ListItem>().LastOrDefault();
 
         foreach (var block in chain)
@@ -202,8 +270,6 @@ internal sealed class MarkdownEditorEngine
                     break;
             }
         }
-
-        var cursor = Resolve(document, start);
 
         if (cursor.Content != null)
         {
@@ -223,7 +289,7 @@ internal sealed class MarkdownEditorEngine
         string? kind = null;
         var first = true;
 
-        foreach (var candidate in Leaves(document, start, end).Where(leaf => leaf is Paragraph or Heading).Select(Kind))
+        foreach (var candidate in Leaves(hosts, start, end).Select(Kind))
         {
             kind = first ? candidate : kind == candidate ? kind : string.Empty;
             first = false;
@@ -267,28 +333,7 @@ internal sealed class MarkdownEditorEngine
 
     private static string ListKindOf(ListItem item) => item.Checked != null ? MarkdownEditorCommands.TaskList : item.Parent is OrderedList ? MarkdownEditorCommands.OrderedList : MarkdownEditorCommands.UnorderedList;
 
-    private static IEnumerable<Leaf> Leaves(BlockContainer container, int start, int end)
-    {
-        foreach (var block in container.Children)
-        {
-            if (block.SourceEnd < start || block.SourceStart > end)
-            {
-                continue;
-            }
-
-            if (block is Leaf leaf)
-            {
-                yield return leaf;
-            }
-            else if (block is BlockContainer nested)
-            {
-                foreach (var inner in Leaves(nested, start, end))
-                {
-                    yield return inner;
-                }
-            }
-        }
-    }
+    private static IEnumerable<Leaf> Leaves(List<Host> hosts, int start, int end) => hosts.Where(host => host.Start <= end && host.End >= start && host.Content is Paragraph or Heading).Select(host => (Leaf)host.Content!);
 
     private static string? Kind(Leaf leaf) => leaf switch
     {
@@ -297,119 +342,144 @@ internal sealed class MarkdownEditorEngine
         _ => null
     };
 
-    private Document Parse() => Inflate(MarkdownParser.Parse(Text));
-
-    private Document Inflate(Document document)
+    private static List<Host> Hosts(Document document)
     {
-        Inflate(document, document);
-        return document;
-    }
+        var hosts = new List<Host>();
+        var position = 0;
+        Collect(document);
+        return hosts;
 
-    private void Inflate(Document document, BlockContainer container)
-    {
-        var start = container is Document ? 0 : container.SourceStart;
-        var end = container is Document ? Text.Length : container.SourceEnd;
-        var children = container.Children.ToList();
-        var index = 0;
-        var insertAt = 0;
-
-        foreach (var child in children)
+        void Add(Block block, IBlockInlineContainer? content, int length)
         {
-            var placeholders = BlankLines.Placeholders(Text, start, child.SourceStart, index > 0, true);
-
-            if (index == 0 && placeholders.Count == 0 && container is Document && BlankLines.IsSealed(child) && child.SourceStart == 0)
-            {
-                container.Insert(insertAt++, new Paragraph { Virtual = true, SourceStart = 0, SourceEnd = 0 });
-            }
-
-            foreach (var offset in placeholders)
-            {
-                container.Insert(insertAt++, new Paragraph { SourceStart = offset, SourceEnd = offset, Pristine = true });
-            }
-
-            if (container is Document && BlankLines.IsSealed(child) && index > 0 && placeholders.Count == 0 && children[index - 1] is not Paragraph)
-            {
-                var gap = child.SourceStart >= 2 && Text[child.SourceStart - 1] == '\n' && Text[child.SourceStart - 2] == '\n' ? child.SourceStart - 1 : child.SourceStart;
-                container.Insert(insertAt++, new Paragraph { Virtual = true, SourceStart = gap, SourceEnd = gap });
-            }
-
-            insertAt++;
-
-            if (child is BlockContainer nested)
-            {
-                Inflate(document, nested);
-            }
-
-            start = child.SourceEnd;
-            index++;
+            hosts.Add(new Host(block, content, position, length));
+            position += length + 1;
         }
 
-        var trailing = BlankLines.Placeholders(Text, start, end, index > 0, false);
-
-        foreach (var offset in trailing)
+        void Collect(BlockContainer container)
         {
-            container.Insert(insertAt++, new Paragraph { SourceStart = offset, SourceEnd = offset, Pristine = true });
-        }
+            if (container.Children.Count == 0 && container is not Document)
+            {
+                Add(container, null, 0);
+                return;
+            }
 
-        if (trailing.Count == 0 && container is Document && container.LastChild is { } last && BlankLines.IsSealed(last))
-        {
-            container.Insert(insertAt, new Paragraph { Virtual = true, SourceStart = Text.Length, SourceEnd = Text.Length });
+            foreach (var block in container.Children)
+            {
+                switch (block)
+                {
+                    case BlockContainer nested:
+                        Collect(nested);
+                        break;
+                    case Table table:
+                        foreach (var cell in table.Rows.SelectMany(row => row.Cells))
+                        {
+                            Add(table, cell, InlineLength(cell));
+                        }
+
+                        break;
+                    case FencedCodeBlock or IndentedCodeBlock or HtmlBlock:
+                        Add(block, null, HtmlVisitor.CodeLength((Leaf)block));
+                        break;
+                    case Leaf leaf:
+                        Add(leaf, leaf, InlineLength(leaf));
+                        break;
+                    default:
+                        Add(block, null, 0);
+                        break;
+                }
+            }
         }
     }
 
-    private static List<Block> Chain(Document document, int offset)
+    private static int InlineLength(IBlockInlineContainer content) => InlineContent.Length(InlineContent.Flatten(content.Children));
+
+    private static int Size(List<Host> hosts) => hosts.Count == 0 ? 0 : hosts[^1].End;
+
+    private static (int Start, int End) Clamp(List<Host> hosts, int start, int end)
+    {
+        var size = Size(hosts);
+        start = Math.Clamp(start, 0, size);
+        end = Math.Clamp(end, start, size);
+        return (start, end);
+    }
+
+    private (int Start, int End) Incoming(Document document, List<Host> hosts, int start, int end)
+    {
+        pendingSource = (start, end);
+
+        if (!RenderHtml)
+        {
+            start = ToPosition(document, hosts, start);
+            end = ToPosition(document, hosts, end);
+        }
+
+        return Clamp(hosts, start, end);
+    }
+
+    private static Host HostAt(List<Host> hosts, int position)
+    {
+        foreach (var host in hosts)
+        {
+            if (position <= host.End)
+            {
+                return host;
+            }
+        }
+
+        return hosts[^1];
+    }
+
+    private static Cursor Resolve(List<Host> hosts, int position)
+    {
+        var host = HostAt(hosts, position);
+        return new Cursor(host.Block, host.Content, Math.Clamp(position - host.Start, 0, host.Length));
+    }
+
+    private static int Position(List<Host> hosts, INode node, int offset)
+    {
+        Host? host = null;
+
+        foreach (var candidate in hosts)
+        {
+            if (candidate.Content == node || (candidate.Content == null && candidate.Block == node))
+            {
+                host = candidate;
+                break;
+            }
+        }
+
+        host ??= node is Block block ? hosts.FirstOrDefault(candidate => candidate.Block == block || IsAncestor(block, candidate.Block)) : null;
+
+        return host == null ? -1 : host.Start + Math.Clamp(offset, 0, host.Length);
+    }
+
+    private static (int Start, int End) Extent(List<Host> hosts, Block block)
+    {
+        var start = int.MaxValue;
+        var end = -1;
+
+        foreach (var host in hosts)
+        {
+            if (host.Block == block || IsAncestor(block, host.Block))
+            {
+                start = Math.Min(start, host.Start);
+                end = Math.Max(end, host.End);
+            }
+        }
+
+        return end < 0 ? (-1, -1) : (start, end);
+    }
+
+    private static List<Block> Chain(Block block)
     {
         var chain = new List<Block>();
-        BlockContainer container = document;
 
-        while (true)
+        for (Block? current = block; current is not null and not Document; current = current.Parent)
         {
-            var child = Nearest(container.Children, offset);
-
-            if (child == null)
-            {
-                break;
-            }
-
-            chain.Add(child);
-
-            if (child is BlockContainer next)
-            {
-                container = next;
-            }
-            else
-            {
-                break;
-            }
+            chain.Insert(0, current);
         }
 
         return chain;
-    }
-
-    private static Block? Nearest(IReadOnlyList<Block> blocks, int offset)
-    {
-        foreach (var block in blocks)
-        {
-            if (block is Paragraph { Children.Count: 0 } empty && empty.SourceStart == offset)
-            {
-                return block;
-            }
-        }
-
-        foreach (var block in blocks)
-        {
-            if (block is Paragraph { Children.Count: 0 })
-            {
-                continue;
-            }
-
-            if (block.SourceStart <= offset && (offset < block.SourceEnd || (offset == block.SourceEnd && !BlankLines.IsSealed(block))))
-            {
-                return block;
-            }
-        }
-
-        return null;
     }
 
     private static IEnumerable<Block> Blocks(BlockContainer container)
@@ -428,208 +498,206 @@ internal sealed class MarkdownEditorEngine
         }
     }
 
-    private Cursor Resolve(Document document, int offset)
+    internal int ToSource(int position, bool preferNext = false) => ToSource(Fresh(), Text, position, preferNext);
+
+    private static int ToSource(Document parsed, string text, int position, bool preferNext)
     {
-        if (AfterTrailingBreak(document, offset) is { } continued)
+        var hosts = Hosts(parsed);
+        var host = HostAt(hosts, Math.Clamp(position, 0, Size(hosts)));
+        var offset = Math.Clamp(position - host.Start, 0, host.Length);
+        var result = host switch
         {
-            return continued;
-        }
+            { Content: { } content } => ContentSource(text, content, offset, preferNext),
+            { Block: FencedCodeBlock or IndentedCodeBlock or HtmlBlock } => ((Leaf)host.Block).Content.ToSource(offset),
+            { Block: ThematicBreak } => host.Block.SourceStart,
+            _ => LineEnd(text, host.Block.SourceEnd)
+        };
 
-        var chain = Chain(document, offset);
-        var block = chain.LastOrDefault();
-
-        if (block is null or BlockContainer)
-        {
-            var lineEnd = Text.IndexOf('\n', offset) is var newline && newline >= 0 ? newline : Text.Length;
-            var empty = Blocks(document).OfType<BlockContainer>().Where(candidate => candidate.Children.Count == 0 && candidate.SourceEnd < offset && Text[candidate.SourceEnd..lineEnd].Trim().Length == 0).OrderByDescending(candidate => candidate.SourceEnd).FirstOrDefault();
-
-            if (empty != null)
-            {
-                return Resolve(document, empty.SourceEnd);
-            }
-        }
-
-        if (block == null)
-        {
-            var lineStart = offset == 0 ? 0 : Text.LastIndexOf('\n', offset - 1) + 1;
-            var lineEnd = Text.IndexOf('\n', offset) is var newline && newline >= 0 ? newline : Text.Length;
-
-            if (Text[lineStart..lineEnd].Trim().Length == 0)
-            {
-                var index = 0;
-
-                while (index < document.Children.Count && document.Children[index].SourceEnd <= offset && !(document.Children[index] is Paragraph { Children.Count: 0 } && document.Children[index].SourceStart > offset))
-                {
-                    index++;
-                }
-
-                var created = new Paragraph { SourceStart = offset, SourceEnd = offset };
-                document.Insert(index, created);
-                return new Cursor(created, created, 0);
-            }
-
-            var neighbour = Blocks(document).Where(candidate => candidate.SourceEnd <= offset).OrderBy(candidate => offset - candidate.SourceEnd).FirstOrDefault()
-                ?? Blocks(document).OrderBy(candidate => candidate.SourceStart).FirstOrDefault();
-
-            if (neighbour == null)
-            {
-                var paragraph = new Paragraph { SourceStart = 0, SourceEnd = 0 };
-                document.Add(paragraph);
-                return new Cursor(paragraph, paragraph, 0);
-            }
-
-            return neighbour is IBlockInlineContainer content ? new Cursor(neighbour, content, InlineContent.Length(Runs(content))) : new Cursor(neighbour, null, 0);
-        }
-
-        switch (block)
-        {
-            case Paragraph or Heading:
-                var leaf = (Leaf)block;
-                return new Cursor(leaf, leaf, ContentOffset(leaf, offset, out var afterMarker), afterMarker);
-            case Table table:
-                var cells = table.Rows.SelectMany(row => row.Cells).Where(cell => CellRange(cell).Start >= 0).ToList();
-                var hit = cells.FirstOrDefault(cell => CellRange(cell) is var range && offset >= range.Start && offset <= range.End);
-
-                if (hit != null)
-                {
-                    return new Cursor(table, hit, ContentOffset(hit, offset, out var afterCellMarker), afterCellMarker);
-                }
-
-                var nearestCell = cells.OrderBy(cell => Math.Abs(CellRange(cell).Start - offset)).FirstOrDefault();
-                return nearestCell != null ? new Cursor(table, nearestCell, offset >= CellRange(nearestCell).End ? InlineContent.Length(InlineContent.Flatten(nearestCell.Children)) : 0) : new Cursor(table, null, 0);
-            case FencedCodeBlock or IndentedCodeBlock or HtmlBlock:
-                var code = (Leaf)block;
-                return new Cursor(code, null, Math.Clamp(code.Content.ToContent(offset), 0, code.Value.Length));
-            case ListItem { FirstChild: Paragraph or Heading } item:
-                var firstLeaf = (Leaf)item.FirstChild;
-                return new Cursor(firstLeaf, firstLeaf, 0);
-            case ListItem item:
-                return new Cursor(item, null, 0);
-            default:
-                var inner = Blocks(document).Where(candidate => candidate is Paragraph or Heading && candidate.SourceStart <= offset).OrderByDescending(candidate => candidate.SourceStart).FirstOrDefault() as Leaf;
-                return inner != null ? new Cursor(inner, inner, InlineContent.Length(InlineContent.Flatten(inner.Children))) : new Cursor(block, null, 0);
-        }
+        return Math.Clamp(result, 0, text.Length);
     }
 
-    private Cursor? AfterTrailingBreak(Document document, int offset)
+    private static int LineEnd(string text, int offset)
     {
-        var lineStart = offset == 0 ? 0 : Text.LastIndexOf('\n', offset - 1) + 1;
-        var lineEnd = Text.IndexOf('\n', offset) is var newline && newline >= 0 ? newline : Text.Length;
-
-        if (lineStart == 0 || Text[lineStart..lineEnd].Any(ch => ch is not (' ' or '\t' or '>')) || Text[offset..lineEnd].Trim().Length > 0)
+        while (offset < text.Length && text[offset] is ' ' or '\t')
         {
-            return null;
+            offset++;
         }
 
-        var previousEnd = lineStart - 1;
-        var previousStart = previousEnd == 0 ? 0 : Text.LastIndexOf('\n', previousEnd - 1) + 1;
-        var previousLine = Text[previousStart..previousEnd];
-        var backslash = previousLine.EndsWith('\\');
-
-        if (!backslash && !previousLine.EndsWith("  ", StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        var paragraph = Blocks(document).OfType<Paragraph>().LastOrDefault(candidate => candidate.Children.Count > 0 && candidate.SourceEnd >= previousStart && candidate.SourceEnd <= previousEnd);
-
-        if (paragraph == null)
-        {
-            return null;
-        }
-
-        if (backslash && paragraph.Children[^1] is Text text && text.Value.EndsWith('\\'))
-        {
-            text.Value = text.Value[..^1];
-        }
-
-        paragraph.Add(new LineBreak { Backslash = backslash });
-        Touch(paragraph);
-        return new Cursor(paragraph, paragraph, InlineContent.Length(Runs(paragraph)));
+        return offset;
     }
 
-    private List<Run> Runs(IBlockInlineContainer content)
+    private static List<(int Position, Run Run, Inline Node)> Spans(IBlockInlineContainer content)
     {
-        var runs = InlineContent.Flatten(content.Children);
-
-        if (content is Leaf { Pristine: true } leaf && runs.Count > 0 && leaf.Children[^1] is { } last && last.SourceEnd > last.SourceStart && last.SourceEnd <= Text.Length)
-        {
-            var end = last.SourceEnd;
-
-            while (end < Text.Length && Text[end] is ' ' or '\t')
-            {
-                end++;
-            }
-
-            if (end > last.SourceEnd && (end == Text.Length || Text[end] == '\n'))
-            {
-                runs.Add(new Run(Text[last.SourceEnd..end], [], null));
-            }
-        }
-
-        return runs;
-    }
-
-    private int ContentOffset(IBlockInlineContainer content, int offset, out bool afterMarker)
-    {
-        var runs = Runs(content);
+        var spans = new List<(int Position, Run Run, Inline Node)>();
         var position = 0;
-        Inline? previousOrigin = null;
-        afterMarker = false;
 
-        foreach (var run in runs)
+        foreach (var run in InlineContent.Flatten(content.Children))
         {
-            var origin = run.Atom ?? run.Origin;
-            afterMarker = origin != null && previousOrigin != null && previousOrigin.SourceEnd < offset && offset == origin.SourceStart;
-            previousOrigin = origin ?? previousOrigin;
-
-            if (origin == null)
+            if ((run.Atom ?? run.Origin) is { } node)
             {
-                if (run == runs[^1] && run.Origin == null && run.Atom == null)
-                {
-                    var previousEnd = runs.Count > 1 && (runs[^2].Atom ?? runs[^2].Origin) is { } beforeTrailing ? beforeTrailing.SourceEnd : offset;
-                    return position + Math.Clamp(offset - previousEnd, 0, run.Length);
-                }
-
-                position += run.Length;
-                continue;
-            }
-
-            if (offset < origin.SourceStart)
-            {
-                return position;
-            }
-
-            if (offset <= origin.SourceEnd)
-            {
-                if (run.Atom != null)
-                {
-                    return offset < origin.SourceEnd ? position : position + 1;
-                }
-
-                if (origin is Text text)
-                {
-                    return position + MarkdownWriter.ValueOffsetWithin(Text, text, offset - text.SourceStart);
-                }
-
-                if (origin is Code code)
-                {
-                    var ticks = 0;
-
-                    while (code.SourceStart + ticks < code.SourceEnd && Text[code.SourceStart + ticks] == '`')
-                    {
-                        ticks++;
-                    }
-
-                    var padded = code.SourceEnd - code.SourceStart >= code.Value.Length + 2 * ticks + 2 && Text[code.SourceStart + ticks] == ' ';
-                    return position + Math.Clamp(offset - code.SourceStart - ticks - (padded ? 1 : 0), 0, code.Value.Length);
-                }
+                spans.Add((position, run, node));
             }
 
             position += run.Length;
         }
 
-        return position;
+        return spans;
+    }
+
+    private static int EmptySource(IBlockInlineContainer content) => content is TableCell { Content.Segments.Count: > 0 } cell ? cell.Content.Segments[0].SourceStart : content is Block block ? block.SourceEnd : 0;
+
+    private static int ContentSource(string text, IBlockInlineContainer content, int offset, bool preferNext)
+    {
+        var spans = Spans(content);
+
+        if (spans.Count == 0)
+        {
+            return EmptySource(content);
+        }
+
+        for (var index = 0; index < spans.Count; index++)
+        {
+            var (position, run, node) = spans[index];
+            var end = position + run.Length;
+
+            if (offset < end || (offset == end && (!preferNext || index == spans.Count - 1)))
+            {
+                var within = Math.Max(0, offset - position);
+
+                return node switch
+                {
+                    _ when run.Atom != null => within > 0 ? node.SourceEnd : node.SourceStart,
+                    Text value => value.SourceStart + SourceOffsetWithin(text, value, within),
+                    Code code => CodeContentStart(text, code) + within,
+                    _ => node.SourceStart
+                };
+            }
+        }
+
+        return spans[^1].Node.SourceEnd;
+    }
+
+    internal int ToPosition(int offset)
+    {
+        var parsed = Fresh();
+        return ToPosition(parsed, Hosts(parsed), offset);
+    }
+
+    private int ToPosition(Document parsed, List<Host> hosts, int offset)
+    {
+        offset = Math.Clamp(offset, 0, Text.Length);
+        Host? previous = null;
+        var previousEnd = 0;
+
+        foreach (var host in hosts)
+        {
+            var (start, end) = SourceRange(host);
+
+            if (offset < start)
+            {
+                var inside = Chain(host.Block).Any(block => block.SourceStart <= offset && offset <= block.SourceEnd);
+                return !inside && previous != null && offset - previousEnd <= start - offset ? previous.End : host.Start;
+            }
+
+            if (offset <= end)
+            {
+                return host.Start + Within(host, offset);
+            }
+
+            previous = host;
+            previousEnd = end;
+        }
+
+        return Size(hosts);
+    }
+
+    private static (int Start, int End) SourceRange(Host host)
+    {
+        switch (host)
+        {
+            case { Block: FencedCodeBlock or IndentedCodeBlock or HtmlBlock }:
+                var code = (Leaf)host.Block;
+                return (code.Content.ToSource(0), code.Content.ToSourceEnd(host.Length));
+            case { Content: { } content }:
+                var spans = Spans(content);
+                var empty = EmptySource(content);
+                return spans.Count > 0 ? (spans[0].Node.SourceStart, spans[^1].Node.SourceEnd) : (empty, empty);
+            case { Block: ThematicBreak }:
+                return (host.Block.SourceStart, host.Block.SourceStart);
+            default:
+                return (host.Block.SourceEnd, host.Block.SourceEnd);
+        }
+    }
+
+    private int Within(Host host, int offset)
+    {
+        if (host.Content == null)
+        {
+            return host.Block is Leaf code ? Math.Clamp(code.Content.ToContent(offset), 0, host.Length) : 0;
+        }
+
+        foreach (var (position, run, node) in Spans(host.Content))
+        {
+            if (offset < node.SourceStart)
+            {
+                return position;
+            }
+
+            if (offset <= node.SourceEnd)
+            {
+                return node switch
+                {
+                    _ when run.Atom != null => offset < node.SourceEnd ? position : position + 1,
+                    Text text => position + ValueOffsetWithin(Text, text, offset - text.SourceStart),
+                    Code code => position + Math.Clamp(offset - CodeContentStart(Text, code), 0, code.Value.Length),
+                    _ => position
+                };
+            }
+        }
+
+        return host.Length;
+    }
+
+    private static int SourceOffsetWithin(string source, Text text, int valueOffset)
+    {
+        var slice = text.SourceEnd > text.SourceStart && text.SourceEnd <= source.Length ? source[text.SourceStart..text.SourceEnd] : text.Value;
+        var i = 0;
+        var j = 0;
+
+        while (j < valueOffset && i < slice.Length)
+        {
+            i += slice[i] == '\\' && i + 1 < slice.Length && j < text.Value.Length && slice[i + 1] == text.Value[j] ? 2 : 1;
+            j++;
+        }
+
+        return i;
+    }
+
+    private static int ValueOffsetWithin(string source, Text text, int sourceOffset)
+    {
+        var slice = text.SourceEnd > text.SourceStart && text.SourceEnd <= source.Length ? source[text.SourceStart..text.SourceEnd] : text.Value;
+        var i = 0;
+        var j = 0;
+
+        while (i < sourceOffset && i < slice.Length)
+        {
+            i += slice[i] == '\\' && i + 1 < slice.Length && j < text.Value.Length && slice[i + 1] == text.Value[j] ? 2 : 1;
+            j++;
+        }
+
+        return Math.Min(j, text.Value.Length);
+    }
+
+    private static int CodeContentStart(string text, Code code)
+    {
+        var start = code.SourceStart;
+
+        while (start < text.Length && text[start] == '`')
+        {
+            start++;
+        }
+
+        return start < text.Length && text[start] == ' ' && code.Value.Length > 0 && (code.Value[0] != ' ' || code.Value.Trim().Length == 0) ? start + 1 : start;
     }
 
     private static void NormalizeLists(BlockContainer container)
@@ -682,132 +750,53 @@ internal sealed class MarkdownEditorEngine
 
     private MarkdownEditorUpdate CommitAtEnd(Document document, Block block) => block switch
     {
-        FencedCodeBlock or IndentedCodeBlock or HtmlBlock => Commit(document, block, ((Leaf)block).Value.TrimEnd('\n').Length),
-        IBlockInlineContainer content => Commit(document, content, InlineContent.Length(InlineContent.Flatten(content.Children))),
+        FencedCodeBlock or IndentedCodeBlock or HtmlBlock => Commit(document, block, HtmlVisitor.CodeLength((Leaf)block)),
+        IBlockInlineContainer content => Commit(document, content, InlineLength(content)),
         BlockContainer container when LastLeaf(container) is { } leaf => CommitAtEnd(document, leaf),
         _ => Commit(document, block, 0)
     };
 
-    private MarkdownEditorUpdate Commit(Document document, INode caretNode, int caretOffset, INode? endNode = null, int endOffset = 0, string? key = null, bool merge = false, bool afterMarker = false)
+    private MarkdownEditorUpdate Commit(Document document, INode caretNode, int caretOffset, INode? endNode = null, int endOffset = 0, string? key = null, bool merge = false)
     {
         NormalizeLists(document);
-        var writer = MarkdownWriter.Preserve(document, Text);
-        var replacement = writer.Text;
-        var start = Offset(writer, caretNode, caretOffset, preferNext: endNode != null || afterMarker);
-        var end = endNode == null ? start : Offset(writer, endNode, endOffset);
+        BlankLines.Pad(document, int.MaxValue, caretNode);
+        var replacement = MarkdownWriter.Preserve(document, source);
+        var hosts = Hosts(document);
+        var start = Position(hosts, caretNode, caretOffset);
+        start = start < 0 ? Math.Clamp(pending.Start, 0, Size(hosts)) : start;
+        var end = endNode == null ? start : Position(hosts, endNode, endOffset);
+        end = end < 0 ? start : end;
+        var selection = (Math.Min(start, end), Math.Max(start, end));
+        var before = pending;
 
-        if (replacement == Text)
+        if (!RenderHtml)
         {
-            return Render(Math.Min(start, end), Math.Max(start, end));
+            var parsed = BlankLines.Inflate(MarkdownParser.Parse(replacement), replacement);
+            selection = (ToSource(parsed, replacement, selection.Item1, preferNext: selection.Item1 < selection.Item2), ToSource(parsed, replacement, selection.Item2, preferNext: false));
+            before = pendingSource;
         }
 
-        var prefix = 0;
-
-        while (prefix < Text.Length && prefix < replacement.Length && Text[prefix] == replacement[prefix] && prefix < Math.Min(start, end))
+        if (replacement != Text)
         {
-            prefix++;
-        }
+            var prefix = 0;
 
-        var suffix = 0;
-
-        while (suffix < Text.Length - prefix && suffix < replacement.Length - prefix && Text[Text.Length - 1 - suffix] == replacement[replacement.Length - 1 - suffix] && replacement.Length - suffix > Math.Max(start, end))
-        {
-            suffix++;
-        }
-
-        return Apply(prefix, Text.Length - suffix, replacement[prefix..(replacement.Length - suffix)], (Math.Min(start, end), Math.Max(start, end)), key, merge, pending);
-    }
-
-    private int Offset(MarkdownWriter writer, INode node, int offset, bool preferNext = false)
-    {
-        switch (node)
-        {
-            case Text text:
-                return writer.OffsetWithin(text, offset);
-            case Code code:
-                return writer.Positions[code].Start + Math.Clamp(offset, 0, code.Value.Length);
-            case FencedCodeBlock or IndentedCodeBlock or HtmlBlock:
-                return writer.OffsetWithin((Block)node, offset);
-            case IBlockInlineContainer content:
-                return ContentPosition(writer, content, offset, preferNext);
-            default:
-                return writer.Positions.TryGetValue(node, out var position) ? position.Start : 0;
-        }
-    }
-
-    private int ContentPosition(MarkdownWriter writer, IBlockInlineContainer content, int offset, bool preferNext = false)
-    {
-        var runs = InlineContent.Flatten(content.Children);
-
-        if (runs.Count == 0)
-        {
-            return writer.Positions.TryGetValue(content, out var empty) ? empty.Start : Fallback(writer, content is Block block ? block : null, content is Leaf leaf ? leaf.SourceStart : 0);
-        }
-
-        if (offset == 0 && !preferNext && content is Paragraph && writer.Positions.TryGetValue(content, out var blockStart))
-        {
-            return blockStart.Start;
-        }
-
-        var position = 0;
-
-        for (var index = 0; index < runs.Count; index++)
-        {
-            var run = runs[index];
-            var node = run.Atom ?? run.Origin;
-            var runEnd = position + run.Length;
-            var inside = offset < runEnd || (offset == runEnd && (index == runs.Count - 1 || (run.Atom == null && !preferNext)));
-
-            if (offset >= position && inside)
+            while (prefix < Text.Length && prefix < replacement.Length && Text[prefix] == replacement[prefix])
             {
-                if (node == null)
-                {
-                    position += run.Length;
-                    continue;
-                }
-
-                if (writer.Positions.TryGetValue(node, out var located))
-                {
-                    if (run.Atom != null)
-                    {
-                        return offset > position ? located.End : located.Start;
-                    }
-
-                    return node is Text text ? writer.OffsetWithin(text, offset - position) : located.Start + Math.Clamp(offset - position, 0, run.Length);
-                }
-
-                var sourceOffset = node is Text pristine ? pristine.SourceStart + MarkdownWriter.SourceOffsetWithin(Text, pristine, offset - position) : node.SourceStart + (offset - position);
-                return Fallback(writer, content is Block owner ? owner : null, sourceOffset);
+                prefix++;
             }
 
-            position += run.Length;
+            var suffix = 0;
+
+            while (suffix < Text.Length - prefix && suffix < replacement.Length - prefix && Text[Text.Length - 1 - suffix] == replacement[replacement.Length - 1 - suffix])
+            {
+                suffix++;
+            }
+
+            ApplyEdit(prefix, Text.Length - suffix, replacement[prefix..(replacement.Length - suffix)], selection, key, merge, before, design: RenderHtml);
         }
 
-        var last = runs[^1].Atom ?? runs[^1].Origin;
-
-        if (last != null && writer.Positions.TryGetValue(last, out var end))
-        {
-            return end.End;
-        }
-
-        return Fallback(writer, content is Block lastOwner ? lastOwner : null, last?.SourceEnd ?? 0);
-    }
-
-    private int Fallback(MarkdownWriter writer, Block? block, int sourceOffset)
-    {
-        var top = block;
-
-        while (top != null && top.Parent is not Document && top.Parent != null)
-        {
-            top = top.Parent;
-        }
-
-        if (top != null && writer.Positions.TryGetValue(top, out var position) && sourceOffset >= top.SourceStart)
-        {
-            return position.Start + (sourceOffset - top.SourceStart);
-        }
-
-        return Math.Clamp(sourceOffset, 0, writer.Text.Length);
+        this.document = document;
+        return Render(selection.Item1, selection.Item2);
     }
 
     private static int IndexOf<T>(IReadOnlyList<T> items, T item) where T : class
@@ -849,31 +838,33 @@ internal sealed class MarkdownEditorEngine
         }
     }
 
-    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool paragraphs = false, bool selection = false)
+    private static List<Run> Runs(IBlockInlineContainer content) => InlineContent.Flatten(content.Children);
+
+    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool paragraphs = false, bool selection = false, bool preferRight = false)
     {
-        (start, end) = Clamp(start, end);
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Incoming(document, hosts, start, end);
         pending = selection ? (start, end) : (end, end);
 
         if (!literal)
         {
-            var caret = start + text.Length;
-            return Apply(start, end, text, (caret, caret), key, merge);
+            return InsertMarkdown(document, hosts, start, end, text) ?? Render(start, start);
         }
 
-        var document = Parse();
-        var cursor = start < end ? DeleteRange(document, start, end) : Resolve(document, start);
+        var cursor = start < end ? DeleteRange(document, hosts, start, end) : Resolve(hosts, start);
 
         if (cursor == null)
         {
             return Render(start, start);
         }
 
-        return InsertAt(document, cursor, text, paragraphs, key, merge) ?? Render(start, start);
+        return InsertAt(document, cursor, text, paragraphs, key, merge, preferRight) ?? Render(start, start);
     }
 
-    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, bool paragraphs, string? key, bool merge)
+    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, bool paragraphs, string? key, bool merge, bool preferRight)
     {
-        text = text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
+        text = Normalize(text);
 
         if (cursor.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
         {
@@ -908,8 +899,7 @@ internal sealed class MarkdownEditorEngine
             return null;
         }
 
-        var runs = Runs(cursor.Content);
-        SetRuns(cursor.Content, InlineContent.Insert(runs, cursor.Offset, lines[0], preferRight: cursor.AfterMarker));
+        SetRuns(cursor.Content, InlineContent.Insert(Runs(cursor.Content), cursor.Offset, lines[0], preferRight: preferRight));
         INode caretContent = cursor.Content;
         var caretOffset = cursor.Offset + lines[0].Length;
 
@@ -940,22 +930,16 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, caretContent, caretOffset, key: key, merge: merge);
     }
 
-    private Cursor? DeleteRange(Document document, int start, int end)
+    private Cursor? DeleteRange(Document document, List<Host> hosts, int start, int end)
     {
-        var first = Resolve(document, start);
-        var last = Resolve(document, end);
+        var first = Resolve(hosts, start);
+        var last = Resolve(hosts, end);
 
         if (first.Block == last.Block && first.Content == last.Content)
         {
             if (first.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
             {
                 var code = (Leaf)first.Block;
-
-                if (start < code.Content.ToSource(0) || end > code.Content.ToSourceEnd(code.Value.Length))
-                {
-                    return null;
-                }
-
                 code.Value = code.Value[..first.Offset] + code.Value[last.Offset..];
                 Touch(code);
                 return first;
@@ -969,17 +953,19 @@ internal sealed class MarkdownEditorEngine
             return first;
         }
 
-        var firstCovered = first.Block.SourceStart >= start && first.Block.SourceEnd <= end && first.Block is not Paragraph { Children.Count: 0 };
-        var lastCovered = last.Block.SourceStart >= start && last.Block.SourceEnd <= end && last.Block is not Paragraph { Children.Count: 0 };
+        var firstExtent = Extent(hosts, first.Block);
+        var lastExtent = Extent(hosts, last.Block);
+        var firstCovered = firstExtent.Start >= start && firstExtent.End <= end && first.Block is not Paragraph { Children.Count: 0 };
+        var lastCovered = lastExtent.Start >= start && lastExtent.End <= end && last.Block is not Paragraph { Children.Count: 0 };
 
         if ((BlankLines.IsSealed(first.Block) && !firstCovered) || (BlankLines.IsSealed(last.Block) && !lastCovered) || first.Content is TableCell || last.Content is TableCell)
         {
             return null;
         }
 
-        var covered = Blocks(document).Where(block => block != first.Block && block != last.Block && block.SourceStart >= first.Block.SourceStart && block.SourceEnd <= last.Block.SourceEnd && !IsAncestor(block, first.Block) && !IsAncestor(block, last.Block)).ToList();
+        var covered = Blocks(document).Where(block => block != first.Block && block != last.Block && Extent(hosts, block) is var extent && extent.Start >= firstExtent.Start && extent.End <= lastExtent.End && !IsAncestor(block, first.Block) && !IsAncestor(block, last.Block)).ToList();
 
-        if (covered.Any(block => BlankLines.IsSealed(block) && (block.SourceStart < start || block.SourceEnd > end)))
+        if (covered.Any(block => BlankLines.IsSealed(block) && Extent(hosts, block) is var extent && (extent.Start < start || extent.End > end)))
         {
             return null;
         }
@@ -1036,7 +1022,7 @@ internal sealed class MarkdownEditorEngine
             }
         }
 
-        if (target is Heading { Children.Count: 0 } emptyHeading && emptyHeading.Parent != null)
+        if (target is Heading { Children.Count: 0 } emptyHeading && Attached(document, emptyHeading))
         {
             var paragraph = new Paragraph();
             emptyHeading.Parent.Replace(emptyHeading, paragraph);
@@ -1044,12 +1030,12 @@ internal sealed class MarkdownEditorEngine
             return new Cursor(paragraph, paragraph, 0);
         }
 
-        if (target != null && target.Parent != null)
+        if (target != null && Attached(document, target))
         {
             return new Cursor(target, target, first.Offset);
         }
 
-        if (last.Content is Leaf remaining && remaining.Parent != null)
+        if (last.Content is Leaf remaining && Attached(document, remaining))
         {
             return new Cursor(remaining, remaining, 0);
         }
@@ -1062,7 +1048,7 @@ internal sealed class MarkdownEditorEngine
         }
         else
         {
-            var anchor = document.Children.FirstOrDefault(block => block.SourceStart >= start) ?? document.Children[^1];
+            var anchor = document.Children.FirstOrDefault(block => Extent(hosts, block).Start >= start) ?? document.Children[^1];
             InsertBefore(anchor, replacement);
         }
 
@@ -1070,10 +1056,21 @@ internal sealed class MarkdownEditorEngine
         return new Cursor(replacement, replacement, 0);
     }
 
-    private static (int Start, int End) CellRange(TableCell cell)
+    private static bool Attached(Document document, Block block)
     {
-        var start = cell.Children.Count > 0 ? cell.Children[0].SourceStart : cell.Content.Segments.Count > 0 ? cell.Content.Segments[0].SourceStart : -1;
-        return (start, cell.Children.Count > 0 ? cell.Children[^1].SourceEnd : start);
+        Block current = block;
+
+        while (current.Parent is { } parent)
+        {
+            if (!parent.Children.Contains(current))
+            {
+                return false;
+            }
+
+            current = parent;
+        }
+
+        return current == document;
     }
 
     private static bool IsAncestor(Block ancestor, Block block)
@@ -1125,51 +1122,37 @@ internal sealed class MarkdownEditorEngine
         Touch(block);
     }
 
-    private Leaf SplitLeaf(Leaf leaf, int offset)
+    private static Leaf SplitLeaf(Leaf leaf, int offset)
     {
         var runs = InlineContent.Flatten(leaf.Children);
         var head = InlineContent.Split(runs, offset, out var tail);
-        SetRuns(leaf, TrimEnd(head));
+        SetRuns(leaf, Trim(head, start: false));
         Leaf second = leaf is Heading heading ? new AtxHeading { Level = heading.Level } : new Paragraph();
-        second.ReplaceInlines(InlineContent.Rebuild(TrimStart(tail)));
+        second.ReplaceInlines(InlineContent.Rebuild(Trim(tail, start: true)));
         InsertAfter(leaf, second);
         return second;
     }
 
-    private static List<Run> TrimEnd(List<Run> runs)
+    private static List<Run> Trim(List<Run> runs, bool start)
     {
-        while (runs.Count > 0 && runs[^1].Atom == null && runs[^1].Text.TrimEnd().Length < runs[^1].Text.Length)
+        while (runs.Count > 0)
         {
-            var last = runs[^1];
-            var trimmed = last.Text.TrimEnd();
+            var index = start ? 0 : runs.Count - 1;
+            var run = runs[index];
+            var trimmed = run.Atom != null ? run.Text : start ? run.Text.TrimStart() : run.Text.TrimEnd();
+
+            if (trimmed.Length == run.Length)
+            {
+                break;
+            }
 
             if (trimmed.Length == 0)
             {
-                runs.RemoveAt(runs.Count - 1);
+                runs.RemoveAt(index);
                 continue;
             }
 
-            runs[^1] = new Run(trimmed, last.Marks, null);
-            break;
-        }
-
-        return runs;
-    }
-
-    private static List<Run> TrimStart(List<Run> runs)
-    {
-        while (runs.Count > 0 && runs[0].Atom == null && runs[0].Text.TrimStart().Length < runs[0].Text.Length)
-        {
-            var first = runs[0];
-            var trimmed = first.Text.TrimStart();
-
-            if (trimmed.Length == 0)
-            {
-                runs.RemoveAt(0);
-                continue;
-            }
-
-            runs[0] = new Run(trimmed, first.Marks, null);
+            runs[index] = new Run(trimmed, run.Marks, null);
             break;
         }
 
@@ -1178,63 +1161,31 @@ internal sealed class MarkdownEditorEngine
 
     public MarkdownEditorUpdate? Delete(int start, int end, bool forward = false, string? key = null, bool merge = false, bool selection = false)
     {
-        (start, end) = Clamp(start, end);
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Incoming(document, hosts, start, end);
         pending = selection ? (start, end) : forward ? (start, start) : (end, end);
-        var document = Parse();
-
-        if (!selection && end - start > 1)
-        {
-            var from = Resolve(document, start);
-            var to = Resolve(document, end);
-
-            if (from.Block != to.Block && to.Content != null && to.Offset == 0 && (from.Content == null || from.Offset >= InlineContent.Length(Runs(from.Content))))
-            {
-                if (!forward)
-                {
-                    return JoinBackward(document, to.Block, to.Content);
-                }
-
-                if (from.Content != null)
-                {
-                    return JoinForward(document, from.Block, from.Content);
-                }
-            }
-        }
 
         if (selection || end - start > 1)
         {
-            var cursor = DeleteRange(document, start, end);
+            var cursor = DeleteRange(document, hosts, start, end);
             return cursor == null ? null : Commit(document, cursor.Content ?? (INode)cursor.Block, cursor.Offset);
         }
 
-        var caret = Resolve(document, forward ? start : end);
+        var caret = Resolve(hosts, forward ? start : end);
+
+        if (caret.Block is ThematicBreak rule)
+        {
+            return RemoveAndMove(document, rule, forward);
+        }
 
         if (caret.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
         {
             var code = (Leaf)caret.Block;
 
-            if (forward ? caret.Offset >= code.Value.TrimEnd('\n').Length : caret.Offset == 0)
+            if (forward ? caret.Offset >= HtmlVisitor.CodeLength(code) : caret.Offset == 0)
             {
-                if (code.Value.Trim().Length > 0)
-                {
-                    return null;
-                }
-
-                var index = code.Parent.IndexOf(code);
-                var previousBlock = code.Parent.Children.Take(index).LastOrDefault(block => block is not Paragraph { Virtual: true });
-                var nextBlock = code.Parent.Children.Skip(index + 1).FirstOrDefault(block => block is not Paragraph { Virtual: true });
-                var neighbour = forward ? nextBlock ?? previousBlock : previousBlock ?? nextBlock;
-                RemoveBlock(code);
-
-                if (neighbour == null)
-                {
-                    var replacement = new Paragraph();
-                    document.Add(replacement);
-                    Touch(replacement);
-                    return Commit(document, replacement, 0);
-                }
-
-                return neighbour == previousBlock ? CommitAtEnd(document, neighbour) : Commit(document, neighbour is IBlockInlineContainer content ? content : neighbour, 0);
+                return code.Value.Trim().Length > 0 ? null : RemoveAndMove(document, code, forward);
             }
 
             var from = forward ? caret.Offset : caret.Offset - 1;
@@ -1275,10 +1226,30 @@ internal sealed class MarkdownEditorEngine
             deleteEnd++;
         }
 
-        var (deletedRun, within) = InlineContent.Locate(runs, deleteStart + 1);
-        var startsRun = within == 1 && deletedRun > 0 && !runs[deletedRun].Marks.SequenceEqual(runs[deletedRun - 1].Marks);
         SetRuns(caret.Content, InlineContent.Delete(runs, deleteStart, deleteEnd));
-        return Commit(document, caret.Content, deleteStart, key: key, merge: merge, afterMarker: startsRun);
+        return Commit(document, caret.Content, deleteStart, key: key, merge: merge);
+    }
+
+    private MarkdownEditorUpdate RemoveAndMove(Document document, Block block, bool forward)
+    {
+        var parent = block.Parent;
+        var index = parent.IndexOf(block);
+        var previous = parent.Children.Take(index).LastOrDefault(candidate => candidate is not Paragraph { Virtual: true });
+        var next = parent.Children.Skip(index + 1).FirstOrDefault(candidate => candidate is not Paragraph { Virtual: true });
+        RemoveBlock(block);
+
+        foreach (var target in forward ? new[] { next, previous } : [previous, next])
+        {
+            if (target != null && !BlankLines.IsSealed(target))
+            {
+                return target == previous ? CommitAtEnd(document, target) : Commit(document, target, 0);
+            }
+        }
+
+        var replacement = new Paragraph();
+        parent.Insert(previous != null ? parent.IndexOf(previous) + 1 : 0, replacement);
+        Touch(replacement);
+        return Commit(document, replacement, 0);
     }
 
     private MarkdownEditorUpdate? JoinBackward(Document document, Block block, IBlockInlineContainer content)
@@ -1292,7 +1263,7 @@ internal sealed class MarkdownEditorEngine
                 table.RemoveRow(row);
                 Touch(table);
                 var target = table.Rows[rowIndex - 1].Cells[^1];
-                return Commit(document, target, InlineContent.Length(InlineContent.Flatten(target.Children)));
+                return Commit(document, target, InlineLength(target));
             }
 
             return null;
@@ -1307,11 +1278,6 @@ internal sealed class MarkdownEditorEngine
         var index = container.IndexOf(leaf);
         var previous = index > 0 ? container.Children[index - 1] : null;
 
-        if (previous is Paragraph { Virtual: true } && index > 1)
-        {
-            previous = container.Children[index - 2];
-        }
-
         if (previous is Paragraph { Virtual: true })
         {
             return null;
@@ -1325,7 +1291,8 @@ internal sealed class MarkdownEditorEngine
 
         if (previous != null && BlankLines.IsSealed(previous))
         {
-            return Render(EndOf(previous), EndOf(previous));
+            var end = Extent(Hosts(document), previous).End;
+            return Render(end, end);
         }
 
         if (previous is Paragraph { Children.Count: 0 } emptyParagraph)
@@ -1386,7 +1353,7 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, previousLeaf, joinAt);
     }
 
-    private int JoinLeaves(Leaf target, Leaf source)
+    private static int JoinLeaves(Leaf target, Leaf source)
     {
         var runs = InlineContent.Flatten(target.Children);
         var joinAt = InlineContent.Length(runs);
@@ -1467,11 +1434,6 @@ internal sealed class MarkdownEditorEngine
 
         var next = NextBlock(leaf);
 
-        if (next is Paragraph { Virtual: true } skipped)
-        {
-            next = NextBlock(skipped);
-        }
-
         if (leaf.Children.Count == 0 && leaf is Paragraph { Virtual: false })
         {
             var container = leaf.Parent;
@@ -1487,12 +1449,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, next ?? (document.Children.Count > 0 ? document.Children[0] : leaf), 0);
         }
 
-        if (next == null)
-        {
-            return null;
-        }
-
-        if (next is Paragraph { Virtual: true })
+        if (next == null || next is Paragraph { Virtual: true })
         {
             return null;
         }
@@ -1505,7 +1462,8 @@ internal sealed class MarkdownEditorEngine
 
         if (BlankLines.IsSealed(next))
         {
-            return Render(StartOf(next), StartOf(next));
+            var start = Extent(Hosts(document), next).Start;
+            return Render(start, start);
         }
 
         if (next is Paragraph { Children.Count: 0 } empty)
@@ -1601,16 +1559,16 @@ internal sealed class MarkdownEditorEngine
 
     private MarkdownEditorUpdate? InsertBreak(int start, int end, bool paragraph)
     {
-        (start, end) = Clamp(start, end);
-        var document = Parse();
-        var cursor = start < end ? DeleteRange(document, start, end) : Resolve(document, start);
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Incoming(document, hosts, start, end);
+        pending = (start, start);
+        var cursor = start < end ? DeleteRange(document, hosts, start, end) : Resolve(hosts, start);
 
         if (cursor == null)
         {
             return null;
         }
-
-        pending = (start, start);
 
         if (cursor.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
         {
@@ -1650,45 +1608,9 @@ internal sealed class MarkdownEditorEngine
 
         if (!paragraph)
         {
-            var withBreak = new List<Run>();
-            var position = 0;
-            var inserted = false;
-
-            foreach (var run in leafRuns)
-            {
-                if (!inserted && cursor.Offset <= position + run.Length)
-                {
-                    var within = Math.Clamp(cursor.Offset - position, 0, run.Length);
-                    var lineBreak = new Run(new LineBreak { Backslash = false }, run.Marks);
-
-                    if (run.Atom != null)
-                    {
-                        withBreak.Add(within == 0 ? lineBreak : run);
-                        withBreak.Add(within == 0 ? run : lineBreak);
-                    }
-                    else
-                    {
-                        withBreak.Add(run.Slice(0, within));
-                        withBreak.Add(lineBreak);
-                        withBreak.Add(run.Slice(within, run.Length));
-                    }
-
-                    inserted = true;
-                }
-                else
-                {
-                    withBreak.Add(run);
-                }
-
-                position += run.Length;
-            }
-
-            if (!inserted)
-            {
-                withBreak.Add(new Run(new LineBreak { Backslash = false }, []));
-            }
-
-            SetRuns(leaf, withBreak);
+            var head = InlineContent.Split(leafRuns, cursor.Offset, out var tail);
+            var marks = head.Count > 0 ? head[^1].Marks : tail.Count > 0 ? tail[0].Marks : [];
+            SetRuns(leaf, [.. head, new Run(new LineBreak { Backslash = false }, marks), .. tail]);
             return Commit(document, leaf, cursor.Offset + 1);
         }
 
@@ -1761,19 +1683,16 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, SplitLeaf(leaf, cursor.Offset), 0);
     }
 
-    private static int EndOf(Block block) => block switch
+    private static T Fill<T>(T row, int columns, TableRow? like) where T : TableRow
     {
-        Table table => table.Rows.SelectMany(row => row.Cells).Select(cell => CellRange(cell).End).Where(end => end >= 0).DefaultIfEmpty(table.SourceEnd).Max(),
-        Leaf { Value.Length: > 0 } code => code.Content.ToSourceEnd(code.Value.TrimEnd('\n').Length),
-        _ => block.SourceEnd
-    };
+        for (var index = 0; index < columns; index++)
+        {
+            row.Add(string.Empty, like != null && index < like.Cells.Count ? like.Cells[index].Alignment : TableCellAlignment.None);
+            row.Cells[index].Pristine = false;
+        }
 
-    private static int StartOf(Block block) => block switch
-    {
-        Table table => table.Rows.SelectMany(row => row.Cells).Select(cell => CellRange(cell).Start).Where(start => start >= 0).DefaultIfEmpty(table.SourceStart).Min(),
-        Leaf { Value.Length: > 0 } code => code.Content.ToSource(0),
-        _ => block.SourceStart
-    };
+        return row;
+    }
 
     private static (TableRow Row, int RowIndex, int Column) Locate(Table table, TableCell cell)
     {
@@ -1794,14 +1713,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, exit, 0);
         }
 
-        var added = new TableRow();
-
-        for (var index = 0; index < table.Rows[0].Cells.Count; index++)
-        {
-            added.Add(string.Empty, table.Rows[0].Cells[index].Alignment);
-            added.Cells[index].Pristine = false;
-        }
-
+        var added = Fill(new TableRow(), table.Rows[0].Cells.Count, table.Rows[0]);
         table.InsertRow(rowIndex + 1, added);
         Touch(table);
         return Commit(document, added.Cells[sameColumn ? Math.Min(column, added.Cells.Count - 1) : 0], 0);
@@ -1809,19 +1721,40 @@ internal sealed class MarkdownEditorEngine
 
     public MarkdownEditorUpdate? AppendRow(int caret)
     {
-        (caret, _) = Clamp(caret, caret);
-        var document = Parse();
-        var cursor = Resolve(document, caret);
+        var document = Model;
+        var hosts = Hosts(document);
+        (caret, _) = Incoming(document, hosts, caret, caret);
+        var cursor = Resolve(hosts, caret);
         pending = (caret, caret);
         return cursor.Block is Table table && cursor.Content is TableCell cell ? InsertRow(document, table, cell, sameColumn: false) : null;
     }
 
+    public MarkdownEditorUpdate? ToggleCheck(int position)
+    {
+        var document = Model;
+        var hosts = Hosts(document);
+        (position, _) = Incoming(document, hosts, position, position);
+        pending = (position, position);
+        var cursor = Resolve(hosts, position);
+        var item = Chain(cursor.Block).OfType<ListItem>().LastOrDefault(candidate => candidate.Checked != null);
+
+        if (item == null)
+        {
+            return null;
+        }
+
+        item.Checked = !item.Checked;
+        Touch(item);
+        return Commit(document, cursor.Content ?? (INode)cursor.Block, cursor.Offset);
+    }
+
     public MarkdownEditorUpdate? Indent(int start, int end, bool outdent)
     {
-        (start, end) = Clamp(start, end);
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Incoming(document, hosts, start, end);
         pending = (start, end);
-        var document = Parse();
-        var cursor = Resolve(document, start);
+        var cursor = Resolve(hosts, start);
         var item = cursor.Block is ListItem direct ? direct : cursor.Block.Parent as ListItem;
 
         if (item == null)
@@ -1869,8 +1802,9 @@ internal sealed class MarkdownEditorEngine
 
     public MarkdownEditorUpdate? Command(string name, int start, int end, string? value, string? label)
     {
-        (start, end) = Clamp(start, end);
-        var document = Parse();
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Incoming(document, hosts, start, end);
         pending = (start, end);
 
         switch (name)
@@ -1879,26 +1813,26 @@ internal sealed class MarkdownEditorEngine
             case MarkdownEditorCommands.Italic:
             case MarkdownEditorCommands.Strikethrough:
             case MarkdownEditorCommands.Code:
-                return ToggleMark(document, name, start, end);
+                return ToggleMark(document, hosts, name, start, end);
             case MarkdownEditorCommands.FormatBlock:
-                return FormatBlock(document, start, end, value);
+                return FormatBlock(document, hosts, start, end, value);
             case MarkdownEditorCommands.Quote:
-                return ToggleQuote(document, start, end);
+                return ToggleQuote(document, hosts, start, end);
             case MarkdownEditorCommands.UnorderedList:
             case MarkdownEditorCommands.OrderedList:
             case MarkdownEditorCommands.TaskList:
-                return ToggleList(document, name, start, end);
+                return ToggleList(document, hosts, name, start, end);
             case MarkdownEditorCommands.CodeBlock:
-                return ToggleCodeBlock(document, start);
+                return ToggleCodeBlock(document, hosts, start);
             case MarkdownEditorCommands.HorizontalRule:
-                return InsertRule(document, end);
+                return InsertRule(document, hosts, end);
             case MarkdownEditorCommands.Link:
             case MarkdownEditorCommands.Image:
-                return InsertLink(document, name == MarkdownEditorCommands.Image, start, end, value, label);
+                return InsertLink(document, hosts, name == MarkdownEditorCommands.Image, start, end, value, label);
             case MarkdownEditorCommands.InsertText:
-                return InsertMarkdown(document, start, end, value ?? string.Empty);
+                return InsertMarkdown(document, hosts, start, end, value ?? string.Empty);
             case MarkdownEditorCommands.InsertTable:
-                return InsertTable(document, start, value);
+                return InsertTable(document, hosts, start, value);
             case MarkdownEditorCommands.TableRowBefore:
             case MarkdownEditorCommands.TableRowAfter:
             case MarkdownEditorCommands.TableColumnBefore:
@@ -1907,7 +1841,7 @@ internal sealed class MarkdownEditorEngine
             case MarkdownEditorCommands.TableDeleteColumn:
             case MarkdownEditorCommands.TableDelete:
             case MarkdownEditorCommands.TableAlign:
-                return TableCommand(document, name, start, value);
+                return TableCommand(document, hosts, name, start, value);
             default:
                 return null;
         }
@@ -1921,11 +1855,11 @@ internal sealed class MarkdownEditorEngine
         _ => MarkKind.Code
     };
 
-    private MarkdownEditorUpdate? ToggleMark(Document document, string name, int start, int end)
+    private MarkdownEditorUpdate? ToggleMark(Document document, List<Host> hosts, string name, int start, int end)
     {
         var kind = MarkKindOf(name);
-        var first = Resolve(document, start);
-        var last = Resolve(document, end);
+        var first = Resolve(hosts, start);
+        var last = Resolve(hosts, end);
 
         if (first.Content == null || first.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock)
         {
@@ -1946,7 +1880,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, first.Content, first.Offset);
         }
 
-        var targets = Targets(document, start, end, first, last);
+        var targets = Targets(hosts, start, end, first, last);
 
         if (targets.Count == 0)
         {
@@ -1972,7 +1906,7 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, first.Content, first.Offset, last.Content, last.Offset);
     }
 
-    private static List<(IBlockInlineContainer Content, int Start, int End)> Targets(Document document, int start, int end, Cursor first, Cursor last)
+    private static List<(IBlockInlineContainer Content, int Start, int End)> Targets(List<Host> hosts, int start, int end, Cursor first, Cursor last)
     {
         var targets = new List<(IBlockInlineContainer Content, int Start, int End)>();
 
@@ -1982,10 +1916,10 @@ internal sealed class MarkdownEditorEngine
             return targets;
         }
 
-        foreach (var leaf in Leaves(document, start, end).Where(leaf => leaf is Paragraph or Heading))
+        foreach (var leaf in Leaves(hosts, start, end))
         {
             var from = leaf == first.Content ? first.Offset : 0;
-            var to = leaf == last.Content ? last.Offset : InlineContent.Length(InlineContent.Flatten(leaf.Children));
+            var to = leaf == last.Content ? last.Offset : InlineLength(leaf);
 
             if (from < to)
             {
@@ -2042,16 +1976,16 @@ internal sealed class MarkdownEditorEngine
         return (start, end);
     }
 
-    private static List<Block> TopLevelBlocks(Document document, int start, int end)
+    private static List<Block> TopLevelBlocks(Document document, List<Host> hosts, int start, int end)
     {
-        return document.Children.Where(block => block.SourceStart <= end && block.SourceEnd >= start && block is not Paragraph { Virtual: true }).ToList();
+        return document.Children.Where(block => block is not Paragraph { Virtual: true } && Extent(hosts, block) is var extent && extent.Start <= end && extent.End >= start).ToList();
     }
 
-    private MarkdownEditorUpdate? FormatBlock(Document document, int start, int end, string? value)
+    private MarkdownEditorUpdate? FormatBlock(Document document, List<Host> hosts, int start, int end, string? value)
     {
         var level = value is ['h', >= '1' and <= '6'] ? value[1] - '0' : 0;
-        var cursor = Resolve(document, start);
-        var leaves = (start == end ? (cursor.Content is Leaf single ? [single] : new List<Leaf>()) : Leaves(document, start, end).ToList()).Where(leaf => leaf is Paragraph or Heading).ToList();
+        var cursor = Resolve(hosts, start);
+        var leaves = start == end ? (cursor.Content is Paragraph or Heading ? [(Leaf)cursor.Content] : new List<Leaf>()) : Leaves(hosts, start, end).ToList();
         var replacements = new Dictionary<Leaf, Leaf>(ReferenceEqualityComparer.Instance);
 
         foreach (var leaf in leaves)
@@ -2083,7 +2017,7 @@ internal sealed class MarkdownEditorEngine
 
         if (start < end)
         {
-            var last = Resolve(document, end);
+            var last = Resolve(hosts, end);
             var endLeaf = last.Content is Leaf lastOriginal && replacements.TryGetValue(lastOriginal, out var lastReplaced) ? lastReplaced : last.Content as Leaf;
             return Commit(document, caretLeaf, cursor.Content is Leaf ? cursor.Offset : 0, endLeaf, endLeaf != null ? last.Offset : 0);
         }
@@ -2091,22 +2025,21 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, caretLeaf, cursor.Content is Leaf ? cursor.Offset : 0);
     }
 
-    private MarkdownEditorUpdate? ToggleQuote(Document document, int start, int end)
+    private MarkdownEditorUpdate? ToggleQuote(Document document, List<Host> hosts, int start, int end)
     {
-        var cursor = Resolve(document, start);
-        var last = Resolve(document, end);
-        var chain = Chain(document, start);
-        var quote = chain.OfType<BlockQuote>().LastOrDefault();
+        var cursor = Resolve(hosts, start);
+        var last = Resolve(hosts, end);
+        var quote = Chain(cursor.Block).OfType<BlockQuote>().LastOrDefault();
         INode caretNode = cursor.Content ?? (INode)cursor.Block;
 
-        if (quote != null && (start == end || Chain(document, end).Contains(quote)))
+        if (quote != null && (start == end || Chain(last.Block).Contains(quote)))
         {
             Splice(quote.Parent, quote.Parent.IndexOf(quote), quote.Children.ToList());
             RemoveBlock(quote);
             return Commit(document, caretNode, cursor.Offset);
         }
 
-        var blocks = start == end ? [TopLevel(cursor.Block)] : TopLevelBlocks(document, start, end);
+        var blocks = start == end ? [TopLevel(cursor.Block)] : TopLevelBlocks(document, hosts, start, end);
 
         if (blocks.Count == 0)
         {
@@ -2127,12 +2060,11 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, caretNode, cursor.Offset, start < end ? last.Content : null, last.Offset);
     }
 
-    private MarkdownEditorUpdate? ToggleList(Document document, string name, int start, int end)
+    private MarkdownEditorUpdate? ToggleList(Document document, List<Host> hosts, string name, int start, int end)
     {
-        var cursor = Resolve(document, start);
-        var selectionEnd = Resolve(document, end);
-        var chain = Chain(document, start);
-        var item = chain.OfType<ListItem>().LastOrDefault();
+        var cursor = Resolve(hosts, start);
+        var selectionEnd = Resolve(hosts, end);
+        var item = Chain(cursor.Block).OfType<ListItem>().LastOrDefault();
         INode caretNode = cursor.Content ?? (INode)cursor.Block;
 
         if (item != null)
@@ -2149,14 +2081,14 @@ internal sealed class MarkdownEditorEngine
             }
 
             var list = (List)item.Parent;
-            var selected = list.Children.OfType<ListItem>().Where(candidate => candidate.SourceStart <= end && candidate.SourceEnd >= start).ToList();
+            var selected = list.Children.OfType<ListItem>().Where(candidate => Extent(hosts, candidate) is var extent && extent.Start <= end && extent.End >= start).ToList();
             var caretLeaf = cursor.Content as Leaf;
             var endLeaf = selectionEnd.Content as Leaf;
             LiftItems(list, selected);
             return Commit(document, caretLeaf ?? caretNode, cursor.Offset, endLeaf, selectionEnd.Offset);
         }
 
-        var blocks = (start == end ? [TopLevel(cursor.Block)] : TopLevelBlocks(document, start, end)).Where(block => block is not List).ToList();
+        var blocks = (start == end ? [TopLevel(cursor.Block)] : TopLevelBlocks(document, hosts, start, end)).Where(block => block is not List).ToList();
 
         if (blocks.Count == 0)
         {
@@ -2293,9 +2225,9 @@ internal sealed class MarkdownEditorEngine
         }
     }
 
-    private MarkdownEditorUpdate? ToggleCodeBlock(Document document, int start)
+    private MarkdownEditorUpdate? ToggleCodeBlock(Document document, List<Host> hosts, int start)
     {
-        var cursor = Resolve(document, start);
+        var cursor = Resolve(hosts, start);
 
         if (cursor.Block is FencedCodeBlock or IndentedCodeBlock)
         {
@@ -2305,7 +2237,7 @@ internal sealed class MarkdownEditorEngine
             Splice(code.Parent, code.Parent.IndexOf(code), blocks);
             RemoveBlock(code);
             var target = blocks[0] as IBlockInlineContainer;
-            return target != null ? Commit(document, target, Math.Min(cursor.Offset, InlineContent.Length(InlineContent.Flatten(target.Children)))) : Commit(document, blocks[0], 0);
+            return target != null ? Commit(document, target, Math.Min(cursor.Offset, InlineLength(target))) : Commit(document, blocks[0], 0);
         }
 
         if (cursor.Content is not Leaf leaf)
@@ -2313,7 +2245,7 @@ internal sealed class MarkdownEditorEngine
             return null;
         }
 
-        var text = leaf.Pristine && leaf.Children.Count > 0 && leaf.Children[^1].SourceEnd > leaf.Children[0].SourceStart ? Text[leaf.Children[0].SourceStart..leaf.Children[^1].SourceEnd] : InlineContent.PlainText(InlineContent.Flatten(leaf.Children));
+        var text = leaf.Pristine && leaf.Children.Count > 0 && leaf.Children[^1].SourceEnd > leaf.Children[0].SourceStart && leaf.Children[^1].SourceEnd <= source.Length ? source[leaf.Children[0].SourceStart..leaf.Children[^1].SourceEnd] : InlineContent.PlainText(InlineContent.Flatten(leaf.Children));
         var fenced = new FencedCodeBlock { Value = text + "\n", Closed = true };
         leaf.Parent.Replace(leaf, fenced);
         Touch(fenced);
@@ -2355,9 +2287,9 @@ internal sealed class MarkdownEditorEngine
         return block;
     }
 
-    private MarkdownEditorUpdate InsertRule(Document document, int caret)
+    private MarkdownEditorUpdate InsertRule(Document document, List<Host> hosts, int caret)
     {
-        var cursor = Resolve(document, caret);
+        var cursor = Resolve(hosts, caret);
         var rule = new ThematicBreak();
 
         if (cursor.Content is Paragraph { Children.Count: 0 } empty && empty.Parent is Document)
@@ -2367,7 +2299,7 @@ internal sealed class MarkdownEditorEngine
             return Commit(document, empty, 0);
         }
 
-        if (cursor.Content is Paragraph inside && inside.Parent is Document && cursor.Offset > 0 && cursor.Offset < InlineContent.Length(Runs(inside)))
+        if (cursor.Content is Paragraph inside && inside.Parent is Document && cursor.Offset > 0 && cursor.Offset < InlineLength(inside))
         {
             var second = SplitLeaf(inside, cursor.Offset);
             InsertBefore(second, rule);
@@ -2380,9 +2312,9 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, paragraph, 0);
     }
 
-    private MarkdownEditorUpdate? InsertLink(Document document, bool image, int start, int end, string? value, string? label)
+    private MarkdownEditorUpdate? InsertLink(Document document, List<Host> hosts, bool image, int start, int end, string? value, string? label)
     {
-        var cursor = Resolve(document, start);
+        var cursor = Resolve(hosts, start);
 
         if (cursor.Content == null || string.IsNullOrEmpty(value))
         {
@@ -2390,14 +2322,14 @@ internal sealed class MarkdownEditorEngine
         }
 
         var runs = Runs(cursor.Content);
-        var last = Resolve(document, end);
+        var last = Resolve(hosts, end);
         var to = start < end && last.Content == cursor.Content ? last.Offset : cursor.Offset;
 
         if (!image && start < end && last.Content != cursor.Content)
         {
             var mark = new Mark(MarkKind.Link, null, value);
 
-            foreach (var (content, from, until) in Targets(document, start, end, cursor, last))
+            foreach (var (content, from, until) in Targets(hosts, start, end, cursor, last))
             {
                 var linked = InlineContent.ToggleMark(Runs(content), from, until, mark);
                 SetRuns(content, InlineContent.AllHave(linked, from, until, MarkKind.Link) ? linked : InlineContent.ToggleMark(linked, from, until, mark));
@@ -2435,16 +2367,16 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, cursor.Content, cursor.Offset + text.Length);
     }
 
-    private MarkdownEditorUpdate? InsertMarkdown(Document document, int start, int end, string value)
+    private MarkdownEditorUpdate? InsertMarkdown(Document document, List<Host> hosts, int start, int end, string value)
     {
-        var cursor = start < end ? DeleteRange(document, start, end) : Resolve(document, start);
+        var cursor = start < end ? DeleteRange(document, hosts, start, end) : Resolve(hosts, start);
 
         if (cursor == null)
         {
             return null;
         }
 
-        var fragment = MarkdownParser.Parse(value);
+        var fragment = MarkdownParser.Parse(Normalize(value));
 
         if (fragment.Children.Count == 1 && fragment.Children[0] is Paragraph inlineFragment && cursor.Content != null)
         {
@@ -2470,34 +2402,19 @@ internal sealed class MarkdownEditorEngine
         return new Run(run.Text, run.Marks.Select(mark => new Mark(mark.Kind, null, mark.Destination, mark.Title)).ToList(), null);
     }
 
-    private MarkdownEditorUpdate? InsertTable(Document document, int start, string? value)
+    private MarkdownEditorUpdate? InsertTable(Document document, List<Host> hosts, int start, string? value)
     {
         var parts = (value ?? "3x3").Split(['x', ',', ' '], StringSplitOptions.RemoveEmptyEntries);
         var rows = parts.Length > 0 && int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedRows) ? Math.Max(1, parsedRows) : 3;
         var columns = parts.Length > 1 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedColumns) ? Math.Max(1, parsedColumns) : 3;
-        var cursor = Resolve(document, start);
+        var cursor = Resolve(hosts, start);
         var table = new Table();
-        var header = new TableHeaderRow();
-
-        for (var column = 0; column < columns; column++)
-        {
-            header.Add(string.Empty);
-            header.Cells[column].Pristine = false;
-        }
-
+        var header = Fill(new TableHeaderRow(), columns, null);
         table.InsertRow(0, header);
 
         for (var row = 1; row < rows; row++)
         {
-            var added = new TableRow();
-
-            for (var column = 0; column < columns; column++)
-            {
-                added.Add(string.Empty);
-                added.Cells[column].Pristine = false;
-            }
-
-            table.InsertRow(row, added);
+            table.InsertRow(row, Fill(new TableRow(), columns, null));
         }
 
         var top = TopLevel(cursor.Block);
@@ -2515,9 +2432,9 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, header.Cells[0], 0);
     }
 
-    private MarkdownEditorUpdate? TableCommand(Document document, string name, int caret, string? value)
+    private MarkdownEditorUpdate? TableCommand(Document document, List<Host> hosts, string name, int caret, string? value)
     {
-        var cursor = Resolve(document, caret);
+        var cursor = Resolve(hosts, caret);
 
         if (cursor.Block is not Table table || cursor.Content is not TableCell cell)
         {
@@ -2533,14 +2450,7 @@ internal sealed class MarkdownEditorEngine
             case MarkdownEditorCommands.TableRowBefore:
             case MarkdownEditorCommands.TableRowAfter:
                 var at = name == MarkdownEditorCommands.TableRowBefore ? Math.Max(1, rowIndex) : rowIndex + 1;
-                var added = new TableRow();
-
-                for (var index = 0; index < columns; index++)
-                {
-                    added.Add(string.Empty, table.Rows[0].Cells[index].Alignment);
-                    added.Cells[index].Pristine = false;
-                }
-
+                var added = Fill(new TableRow(), columns, table.Rows[0]);
                 table.InsertRow(at, added);
                 return Commit(document, added.Cells[Math.Min(column, columns - 1)], 0);
             case MarkdownEditorCommands.TableColumnBefore:
@@ -2603,28 +2513,5 @@ internal sealed class MarkdownEditorEngine
         }
     }
 
-    private MarkdownEditorUpdate DeleteTable(Document document, Table table)
-    {
-        var parent = table.Parent;
-        var index = parent.IndexOf(table);
-        var next = parent.Children.Skip(index + 1).FirstOrDefault(block => block is not Paragraph { Virtual: true });
-        var previous = parent.Children.Take(index).LastOrDefault(block => block is not Paragraph { Virtual: true });
-        parent.Remove(table);
-        Touch(parent);
-
-        if (next is Leaf nextLeaf and not (FencedCodeBlock or IndentedCodeBlock or HtmlBlock))
-        {
-            return Commit(document, nextLeaf, 0);
-        }
-
-        if (previous is Leaf previousLeaf and not (FencedCodeBlock or IndentedCodeBlock or HtmlBlock))
-        {
-            return CommitAtEnd(document, previousLeaf);
-        }
-
-        var replacement = new Paragraph();
-        parent.Insert(previous != null ? parent.IndexOf(previous) + 1 : 0, replacement);
-        Touch(replacement);
-        return Commit(document, replacement, 0);
-    }
+    private MarkdownEditorUpdate DeleteTable(Document document, Table table) => RemoveAndMove(document, table, forward: true);
 }

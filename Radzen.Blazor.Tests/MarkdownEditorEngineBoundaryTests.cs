@@ -9,8 +9,8 @@ public class MarkdownEditorEngineBoundaryTests
     {
         var caret = from.IndexOf('|', StringComparison.Ordinal);
         var engine = new MarkdownEditorEngine(from.Remove(caret, 1));
-        var update = command(engine, caret);
-        var position = update?.SelectionStart ?? caret;
+        var update = command(engine, engine.ToPosition(caret));
+        var position = update == null ? caret : engine.ToSource(update.SelectionStart);
 
         return engine.Text.Insert(position, "|");
     }
@@ -27,7 +27,7 @@ public class MarkdownEditorEngineBoundaryTests
     [InlineData("1. a\n\n   1. b\n\n   2. |\n\n2. d", "1. a\n\n   1. b\n\n2. |\n\n3. d")]
     [InlineData("- [ ] item 1\n  - [ ] item 1.1|", "- [ ] item 1\n  - [ ] item 1.1\n  - [ ] |")]
     [InlineData("- [ ] item 1\n  - [ ] item 1.1\n    - [ ] item 1.1.1|", "- [ ] item 1\n  - [ ] item 1.1\n    - [ ] item 1.1.1\n    - [ ] |")]
-    public void EnterContinuesMarkupLikeCodeMirror(string from, string to)
+    public void EnterContinuesTheContainingMarkup(string from, string to)
     {
         Assert.Equal(to, Run(from, (engine, caret) => engine.InsertParagraph(caret, caret)));
     }
@@ -36,7 +36,7 @@ public class MarkdownEditorEngineBoundaryTests
     [InlineData("> |", "|")]
     [InlineData("> > |", "> |")]
     [InlineData(" - |", "|")]
-    public void BackspaceDeletesMarkupLikeCodeMirror(string from, string to)
+    public void BackspaceInAnEmptyContainerRemovesItsMarkup(string from, string to)
     {
         Assert.Equal(to, Run(from, (engine, caret) => engine.Delete(caret, caret, forward: false)));
     }
@@ -73,11 +73,5 @@ public class MarkdownEditorEngineBoundaryTests
             var position = engine.InsertLineBreak(caret, caret)!.SelectionStart;
             return engine.InsertText(position, position, "x", literal: true);
         }));
-    }
-
-    [Fact]
-    public void TypingAfterATrailingBackslashBreakContinuesTheParagraph()
-    {
-        Assert.Equal("a\\\nx|", Run("a\\\n|", (engine, caret) => engine.InsertText(caret, caret, "x", literal: true)));
     }
 }

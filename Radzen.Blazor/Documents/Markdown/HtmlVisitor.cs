@@ -11,20 +11,19 @@ public class HtmlVisitor : NodeVisitorBase
 {
     private readonly StringBuilder html = new();
     private readonly List<TextSegment> segments = [];
-    private readonly string? source;
-    private int? gap;
-    private const string Placeholder = "\u200B";
+    private readonly bool editing;
+    private int position;
+    private const string Placeholder = "​";
 
-    private string Gap => gap is { } offset ? " data-gap=\"" + offset.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\"" : string.Empty;
     private bool suppressParagraph;
-    private (string Html, int Offset)? pendingCheckbox;
+    private string? pendingCheckbox;
     private bool inHeaderRow;
 
     /// <summary>Renders <paramref name="document" /> as HTML.</summary>
     public static string ToHtml(Document document)
     {
         ArgumentNullException.ThrowIfNull(document);
-        var visitor = new HtmlVisitor();
+        var visitor = new HtmlVisitor(editing: false);
         document.Accept(visitor);
         return visitor.html.ToString();
     }
@@ -32,83 +31,47 @@ public class HtmlVisitor : NodeVisitorBase
     /// <summary>Parses <paramref name="markdown" /> and renders it as HTML.</summary>
     public static string ToHtml(string markdown) => ToHtml(MarkdownParser.Parse(markdown));
 
-    private HtmlVisitor(string? source = null)
+    private HtmlVisitor(bool editing)
     {
-        this.source = source;
+        this.editing = editing;
     }
 
-    internal static MarkdownHtml Render(string markdown) => Render(MarkdownParser.Parse(markdown), markdown);
+    internal static MarkdownHtml Render(string markdown) => Render(BlankLines.Inflate(MarkdownParser.Parse(markdown), markdown));
 
-    internal static MarkdownHtml Render(Document document, string markdown)
+    internal static MarkdownHtml Render(Document document)
     {
-        var visitor = new HtmlVisitor(markdown);
+        var visitor = new HtmlVisitor(editing: true);
         document.Accept(visitor);
         return new MarkdownHtml(visitor.html.ToString(), visitor.segments);
     }
 
-    private void AppendPlaceholder(int offset)
+    internal static int CodeLength(Leaf code) => code.Value.EndsWith('\n') ? code.Value.Length - 1 : code.Value.Length;
+
+    private void AppendPlaceholder()
     {
         html.Append(Placeholder);
-        segments.Add(new TextSegment(offset, offset, Placeholder.Length));
+        segments.Add(new TextSegment(position, position, Placeholder.Length));
     }
 
-    private void VisitBlocks(BlockContainer container, string placeholderTag)
-    {
-        var start = container is Document ? 0 : container.SourceStart;
-        var end = container is Document ? source?.Length ?? container.SourceEnd : container.SourceEnd;
+    private void EndHost() => position++;
 
-        if (container.Children.Count == 0 && container is ListItem)
+    private void VisitBlocks(BlockContainer container)
+    {
+        if (container.Children.Count == 0 && container is not Document)
         {
-            AppendPlaceholder(end);
+            if (editing)
+            {
+                AppendPlaceholder();
+                EndHost();
+            }
+
             return;
         }
 
-        var index = 0;
-
         foreach (var child in container.Children)
         {
-            var emitted = AppendBlankLines(start, child.SourceStart, index > 0, true, placeholderTag);
-
-            if (index == 0 && !emitted && source != null && container is Document && BlankLines.IsSealed(child) && child.SourceStart == 0)
-            {
-                Wrap(placeholderTag, () => AppendPlaceholder(0));
-            }
-
-            if (source != null && container is Document && BlankLines.IsSealed(child))
-            {
-                gap = child.SourceStart >= 2 && source[child.SourceStart - 1] == '\n' && source[child.SourceStart - 2] == '\n' ? child.SourceStart - 1 : child.SourceStart;
-            }
-
             child.Accept(this);
-            gap = null;
-            start = child.SourceEnd;
-            index++;
         }
-
-        var trailing = AppendBlankLines(start, end, index > 0, false, placeholderTag);
-
-        if (!trailing && container is Document && container.LastChild is { } last && BlankLines.IsSealed(last) && source != null)
-        {
-            Wrap(placeholderTag, () => AppendPlaceholder(source.Length));
-        }
-    }
-
-    private bool AppendBlankLines(int from, int to, bool hasPrevious, bool hasNext, string tag)
-    {
-        if (source == null)
-        {
-            return false;
-        }
-
-        var emitted = false;
-
-        foreach (var offset in BlankLines.Placeholders(source, from, to, hasPrevious, hasNext))
-        {
-            Wrap(tag, () => AppendPlaceholder(offset));
-            emitted = true;
-        }
-
-        return emitted;
     }
 
     private void WrapLeaf(string tag, Leaf leaf, Action visitChildren)
@@ -118,29 +81,73 @@ public class HtmlVisitor : NodeVisitorBase
         if (pendingCheckbox is { } checkbox)
         {
             pendingCheckbox = null;
-            html.Append(checkbox.Html);
-            segments.Add(new TextSegment(checkbox.Offset, checkbox.Offset, 1));
+            html.Append(checkbox);
+            segments.Add(new TextSegment(position, position, 1));
         }
 
-        var length = html.Length;
-        visitChildren();
-
-        if (html.Length == length)
-        {
-            AppendPlaceholder(leaf.Content.ToSource(0));
-        }
-
+        AppendContent(leaf, visitChildren);
         html.Append("</").Append(tag).Append('>');
     }
 
-    private void AppendText(string? value, int sourceStart, int sourceEnd)
+    private bool afterText;
+
+    private bool pendingAtom;
+
+    private void AppendContent(IBlockInlineContainer content, Action visitChildren)
+    {
+        var length = html.Length;
+        afterText = false;
+        pendingAtom = false;
+        visitChildren();
+        FlushAtom();
+
+        if (editing)
+        {
+            if (html.Length == length)
+            {
+                AppendPlaceholder();
+            }
+
+            EndHost();
+        }
+    }
+
+    private void FlushAtom()
+    {
+        if (editing && pendingAtom)
+        {
+            AppendPlaceholder();
+        }
+
+        pendingAtom = false;
+    }
+
+    private void BeforeAtom()
+    {
+        FlushAtom();
+
+        if (editing && !afterText)
+        {
+            AppendPlaceholder();
+        }
+    }
+
+    private void AfterAtom()
+    {
+        afterText = false;
+        position++;
+        pendingAtom = true;
+    }
+
+    private void AppendText(string? value)
     {
         value ??= string.Empty;
         html.Append(Escape(value));
 
         if (value.Length > 0)
         {
-            segments.Add(new TextSegment(sourceStart, sourceEnd, value.Length));
+            segments.Add(new TextSegment(position, position + value.Length, value.Length));
+            position += value.Length;
         }
     }
 
@@ -149,32 +156,34 @@ public class HtmlVisitor : NodeVisitorBase
         var lines = new List<string>(leaf.Value.Split('\n'));
 
         // Chrome skips a <pre> whose text ends with a newline when moving the caret vertically
-        if (source != null && lines.Count > 1 && lines[^1].Length == 0)
+        if (editing && lines.Count > 1 && lines[^1].Length == 0)
         {
             lines.RemoveAt(lines.Count - 1);
         }
-
-        var offset = 0;
 
         for (var index = 0; index < lines.Count; index++)
         {
             var line = lines[index];
 
-            if (line.Length == 0 && index == lines.Count - 1 && source != null && index > 0)
+            if (line.Length == 0 && index == lines.Count - 1 && editing)
             {
-                AppendPlaceholder(leaf.Content.ToSource(offset));
+                AppendPlaceholder();
                 break;
             }
 
-            AppendText(line, leaf.Content.ToSource(offset), leaf.Content.ToSourceEnd(offset + line.Length));
-            offset += line.Length;
+            AppendText(line);
 
             if (index < lines.Count - 1)
             {
                 html.Append('\n');
-                segments.Add(new TextSegment(leaf.Content.ToSource(offset), leaf.Content.ToSourceEnd(offset + 1), 1));
-                offset++;
+                segments.Add(new TextSegment(position, position + 1, 1));
+                position++;
             }
+        }
+
+        if (editing)
+        {
+            EndHost();
         }
     }
 
@@ -206,13 +215,7 @@ public class HtmlVisitor : NodeVisitorBase
         if (suppressParagraph || paragraph.Parent is ListItem { Parent: List { Tight: true } })
         {
             suppressParagraph = false;
-            var length = html.Length;
-            base.VisitParagraph(paragraph);
-
-            if (html.Length == length)
-            {
-                AppendPlaceholder(paragraph.Content.ToSource(0));
-            }
+            AppendContent(paragraph, () => base.VisitParagraph(paragraph));
         }
         else
         {
@@ -233,86 +236,75 @@ public class HtmlVisitor : NodeVisitorBase
     public override void VisitBlockQuote(BlockQuote blockQuote)
     {
         ArgumentNullException.ThrowIfNull(blockQuote);
-        Wrap("blockquote", () => VisitBlocks(blockQuote, "p"));
+        Wrap("blockquote", () => VisitBlocks(blockQuote));
     }
 
     /// <inheritdoc />
     public override void VisitDocument(Document document)
     {
         ArgumentNullException.ThrowIfNull(document);
-        VisitBlocks(document, "p");
+        VisitBlocks(document);
     }
 
     /// <inheritdoc />
     public override void VisitText(Text text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        AppendText(text.Value, text.SourceStart, text.SourceEnd);
+        pendingAtom = text.Value.Length > 0 ? false : pendingAtom;
+        afterText = afterText || text.Value.Length > 0;
+        AppendText(text.Value);
     }
 
     /// <inheritdoc />
     public override void VisitCode(Code code)
     {
         ArgumentNullException.ThrowIfNull(code);
-        var (start, end) = CodeContent(code);
+        pendingAtom = code.Value.Length > 0 ? false : pendingAtom;
+        afterText = afterText || code.Value.Length > 0;
         html.Append("<code>");
-        AppendText(code.Value, start, end);
+        AppendText(code.Value);
         html.Append("</code>");
     }
 
-    private (int Start, int End) CodeContent(Code code)
-    {
-        var start = code.SourceStart;
-        var end = code.SourceEnd;
-
-        if (source == null || end > source.Length)
-        {
-            return (start, end);
-        }
-
-        var ticks = 0;
-
-        while (start + ticks < end && source[start + ticks] == '`')
-        {
-            ticks++;
-        }
-
-        if (end - start < 2 * ticks)
-        {
-            return (start, end);
-        }
-
-        start += ticks;
-        end -= ticks;
-
-        if (end - start == code.Value.Length + 2 && source[start] == ' ' && source[end - 1] == ' ')
-        {
-            start++;
-            end--;
-        }
-
-        return string.CompareOrdinal(source, start, code.Value, 0, end - start) == 0 && end - start == code.Value.Length ? (start, end) : (code.SourceStart, code.SourceEnd);
-    }
-
     /// <inheritdoc />
-    public override void VisitLineBreak(LineBreak lineBreak) => html.Append("<br>");
+    public override void VisitLineBreak(LineBreak lineBreak)
+    {
+        ArgumentNullException.ThrowIfNull(lineBreak);
+        BeforeAtom();
+        html.Append("<br>");
+        AfterAtom();
+    }
 
     /// <inheritdoc />
     public override void VisitSoftLineBreak(SoftLineBreak softLineBreak)
     {
         ArgumentNullException.ThrowIfNull(softLineBreak);
+        pendingAtom = false;
+        afterText = true;
         html.Append(' ');
-        segments.Add(new TextSegment(softLineBreak.SourceStart, softLineBreak.SourceEnd, 1));
+        segments.Add(new TextSegment(position, position + 1, 1));
+        position++;
     }
 
     /// <inheritdoc />
-    public override void VisitThematicBreak(ThematicBreak thematicBreak) => html.Append("<hr").Append(Gap).Append('>');
+    public override void VisitThematicBreak(ThematicBreak thematicBreak)
+    {
+        html.Append("<hr");
+
+        if (editing)
+        {
+            html.Append(" data-gap=\"").Append(position.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append('"');
+            EndHost();
+        }
+
+        html.Append('>');
+    }
 
     /// <inheritdoc />
     public override void VisitUnorderedList(UnorderedList unorderedList)
     {
         ArgumentNullException.ThrowIfNull(unorderedList);
-        Wrap("ul", () => VisitBlocks(unorderedList, "li"));
+        Wrap("ul", () => VisitBlocks(unorderedList));
     }
 
     /// <inheritdoc />
@@ -326,7 +318,7 @@ public class HtmlVisitor : NodeVisitorBase
             html.Append(" start=\"").Append(orderedList.Start).Append('"');
         }
         html.Append('>');
-        VisitBlocks(orderedList, "li");
+        VisitBlocks(orderedList);
         html.Append("</ol>");
     }
 
@@ -342,16 +334,15 @@ public class HtmlVisitor : NodeVisitorBase
         if (listItem.Checked is { } isChecked)
         {
             var checkbox = "<input type=\"checkbox\"" + (isChecked ? " checked" : string.Empty) + "> ";
-            var content = listItem.FirstChild is Leaf leaf ? leaf.Content.ToSource(0) : listItem.SourceStart;
 
             if (!tight && listItem.FirstChild is Paragraph)
             {
-                pendingCheckbox = (checkbox, content);
+                pendingCheckbox = checkbox;
             }
             else
             {
                 html.Append(checkbox);
-                segments.Add(new TextSegment(content, content, 1));
+                segments.Add(new TextSegment(position, position, 1));
             }
         }
 
@@ -360,7 +351,7 @@ public class HtmlVisitor : NodeVisitorBase
             suppressParagraph = true;
         }
 
-        VisitBlocks(listItem, "p");
+        VisitBlocks(listItem);
 
         html.Append("</li>");
     }
@@ -374,6 +365,7 @@ public class HtmlVisitor : NodeVisitorBase
 
         html.Append("<a href=\"").Append(Escape(destination)).Append("\">");
         base.VisitLink(link);
+        FlushAtom();
         html.Append("</a>");
     }
 
@@ -387,7 +379,9 @@ public class HtmlVisitor : NodeVisitorBase
 
         var destination = HtmlSanitizer.IsDangerousUrl(image.Destination ?? string.Empty) ? string.Empty : image.Destination;
 
+        BeforeAtom();
         html.Append("<img src=\"").Append(Escape(destination)).Append("\" alt=\"").Append(Escape(alt.ToString())).Append("\">");
+        AfterAtom();
     }
 
     private static void AppendPlainText(StringBuilder text, IReadOnlyList<Inline> nodes)
@@ -417,7 +411,7 @@ public class HtmlVisitor : NodeVisitorBase
     {
         ArgumentNullException.ThrowIfNull(fencedCodeBlock);
 
-        html.Append("<pre").Append(Gap).Append("><code");
+        html.Append("<pre><code");
         if (!string.IsNullOrEmpty(fencedCodeBlock.Info))
         {
             html.Append(" class=\"language-").Append(Escape(fencedCodeBlock.Info)).Append('"');
@@ -440,7 +434,7 @@ public class HtmlVisitor : NodeVisitorBase
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
         ArgumentNullException.ThrowIfNull(htmlBlock);
-        html.Append("<p").Append(Gap).Append('>');
+        html.Append("<p>");
         AppendLines(htmlBlock);
         html.Append("</p>");
     }
@@ -449,13 +443,22 @@ public class HtmlVisitor : NodeVisitorBase
     public override void VisitHtmlInline(HtmlInline htmlInline)
     {
         ArgumentNullException.ThrowIfNull(htmlInline);
-        AppendText(htmlInline.Value, htmlInline.SourceStart, htmlInline.SourceEnd);
+        var value = htmlInline.Value ?? string.Empty;
+        pendingAtom = value.Length > 0 ? false : pendingAtom;
+        afterText = afterText || value.Length > 0;
+        html.Append(Escape(value));
+
+        if (value.Length > 0)
+        {
+            segments.Add(new TextSegment(position, position + 1, value.Length));
+            position++;
+        }
     }
 
     /// <inheritdoc />
     public override void VisitTable(Table table)
     {
-        html.Append("<table").Append(Gap).Append('>');
+        html.Append("<table>");
         base.VisitTable(table);
         html.Append("</tbody></table>");
     }
@@ -482,16 +485,7 @@ public class HtmlVisitor : NodeVisitorBase
         html.Append('<').Append(tag);
         AppendAlignment(cell.Alignment);
         html.Append('>');
-
-        if (source != null && cell.Children.Count == 0 && cell.Content.Segments.Count > 0)
-        {
-            AppendPlaceholder(cell.Content.Segments[0].SourceStart);
-        }
-        else
-        {
-            base.VisitTableCell(cell);
-        }
-
+        AppendContent(cell, () => base.VisitTableCell(cell));
         html.Append("</").Append(tag).Append('>');
     }
 

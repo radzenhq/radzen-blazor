@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Documents.Markdown;
 
@@ -60,5 +61,78 @@ internal static class BlankLines
         }
 
         return placeholders;
+    }
+
+    public static Document Inflate(Document document, string source)
+    {
+        Inflate((BlockContainer)document, source);
+        Pad(document, source.Length, null);
+        return document;
+    }
+
+    public static void Pad(Document document, int end, INode? keep)
+    {
+        foreach (var stale in document.Children.OfType<Paragraph>().Where(paragraph => paragraph.Virtual && paragraph != keep).ToList())
+        {
+            document.Remove(stale);
+        }
+
+        if (document.Children.Count == 0)
+        {
+            document.Add(new Paragraph());
+        }
+
+        var index = 0;
+
+        while (index < document.Children.Count)
+        {
+            var child = document.Children[index];
+            var previous = index > 0 ? document.Children[index - 1] : null;
+
+            if (IsSealed(child) && (previous == null || IsSealed(previous)))
+            {
+                document.Insert(index, new Paragraph { Virtual = true, SourceStart = child.SourceStart, SourceEnd = child.SourceStart });
+                index++;
+            }
+
+            index++;
+        }
+
+        if (IsSealed(document.LastChild!))
+        {
+            document.Add(new Paragraph { Virtual = true, SourceStart = end, SourceEnd = end });
+        }
+    }
+
+    private static void Inflate(BlockContainer container, string source)
+    {
+        var start = container is Document ? 0 : container.SourceStart;
+        var end = container is Document ? source.Length : container.SourceEnd;
+        var children = container.Children.ToList();
+        var index = 0;
+        var insertAt = 0;
+
+        foreach (var child in children)
+        {
+            foreach (var offset in Placeholders(source, start, child.SourceStart, index > 0, true))
+            {
+                container.Insert(insertAt++, new Paragraph { SourceStart = offset, SourceEnd = offset, Pristine = true });
+            }
+
+            insertAt++;
+
+            if (child is BlockContainer nested)
+            {
+                Inflate(nested, source);
+            }
+
+            start = child.SourceEnd;
+            index++;
+        }
+
+        foreach (var offset in Placeholders(source, start, end, index > 0, false))
+        {
+            container.Insert(insertAt++, new Paragraph { SourceStart = offset, SourceEnd = offset, Pristine = true });
+        }
     }
 }

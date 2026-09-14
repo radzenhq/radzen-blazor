@@ -139,7 +139,7 @@ namespace Radzen.Blazor.Tests
             var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, " *x*", "insertText", 1));
             Assert.Equal("old \\*x\\*", component.Instance.Value);
             Assert.Equal("<p>old *x*</p>", update.Html);
-            Assert.Equal((9, 9), (update.SelectionStart, update.SelectionEnd));
+            Assert.Equal((7, 7), (update.SelectionStart, update.SelectionEnd));
         }
 
         [Fact]
@@ -449,7 +449,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "para\n\n```\ncode\n```"));
             await component.InvokeAsync(() => component.Instance.OnSelectionAsync(2, 2));
             Assert.DoesNotContain("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
-            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(11, 11));
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(7, 7));
             Assert.Contains("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
         }
 
@@ -483,7 +483,7 @@ namespace Radzen.Blazor.Tests
             Assert.True(buttons[5].HasAttribute("disabled"));
             Assert.All(buttons.Where((b, i) => i != 5), b => Assert.False(b.HasAttribute("disabled")));
 
-            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(33, 33));
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(12, 12));
             buttons = component.FindAll(".rz-markdown-editor-tools > button");
             Assert.Equal(1, component.Instance.TableRow);
             Assert.Equal("right", component.Instance.TableAlignment);
