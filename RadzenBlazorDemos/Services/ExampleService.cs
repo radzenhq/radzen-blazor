@@ -2626,6 +2626,24 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "MarkdownEditor",
+                    New = true,
+                    Icon = "\uf552",
+                    Path = "markdown-editor",
+                    Title = "Blazor Markdown Editor | Free UI Components by Radzen",
+                    Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a WYSIWYG Design mode with a Source mode for raw Markdown.",
+                    Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
+                    Related = new [] { "markdown", "html-editor", "textarea" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode - a contenteditable surface kept in sync with the Markdown - with the toolbar and keyboard shortcuts editing the content directly." },
+                        new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
+                        new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
+                    }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Numeric Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Numeric",
                     Path = "numeric",
@@ -3283,39 +3301,6 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
-            Name = "Markdown",
-            Icon = "\uf552",
-            Path = "markdown",
-            Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
-            Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
-            Tags = new[] { "markdown", "text", "content", "render" },
-            Related = new [] { "html-editor", "textarea" },
-            Faq = new []
-            {
-                new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
-                new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
-            }
-        },
-        new Example
-        {
-            Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-            Name = "MarkdownEditor",
-            Icon = "\uf552",
-            Path = "markdown-editor",
-            Title = "Blazor Markdown Editor | Free UI Components by Radzen",
-            Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a WYSIWYG Design mode with a Source mode for raw Markdown.",
-            Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
-            Related = new [] { "markdown", "html-editor", "textarea" },
-            Faq = new []
-            {
-                new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode - a contenteditable surface kept in sync with the Markdown - with the toolbar and keyboard shortcuts editing the content directly." },
-                new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
-                new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
-            }
-        },
-        new Example
-        {
             Name = "Data",
             Icon = "\ue99c",
             Children = new [] {
@@ -3544,6 +3529,22 @@ namespace RadzenBlazorDemos
                     Path = "table",
                     Icon = "\uf101",
                     Tags = new [] { "table", "cells", "row", "grid" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
+                    Name = "Markdown",
+                    Icon = "\uf552",
+                    Path = "markdown",
+                    Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
+                    Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
+                    Tags = new[] { "markdown", "text", "content", "render" },
+                    Related = new [] { "html-editor", "textarea" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
+                        new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
+                    }
                 },
                 new Example
                 {
