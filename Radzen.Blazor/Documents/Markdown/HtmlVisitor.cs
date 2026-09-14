@@ -337,7 +337,7 @@ public class HtmlVisitor : NodeVisitorBase
 
         html.Append("<li>");
 
-        bool tight = listItem is { Parent: List { Tight: true }, Children: [Paragraph] };
+        bool tight = listItem is { Parent: List { Tight: true }, Children: [Paragraph, ..] };
 
         if (listItem.Checked is { } isChecked)
         {

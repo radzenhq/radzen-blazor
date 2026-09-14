@@ -125,7 +125,7 @@ public class MarkdownEditorEngineTests
     [InlineData("**bold** plain", 6, "**bold**  plain", 9)]
     [InlineData("**bold**", 6, "**bold** ", 9)]
     [InlineData("a *em*", 5, "a *em* ", 7)]
-    [InlineData("**bold**", 2, " **bold**", 1)]
+    [InlineData("**bold**", 2, "**bold**", 0)]
     [InlineData("plain", 3, "pla in", 4)]
     public void WhitespaceTypedAtADelimiterEdgeGoesOutsideTheDelimiters(string text, int caret, string expected, int expectedCaret)
     {
@@ -167,7 +167,7 @@ public class MarkdownEditorEngineTests
     [InlineData("---", 3, "---\n\nx", 6)]
     [InlineData("```\nc\n```", 0, "x\n\n```\nc\n```", 1)]
     [InlineData("```\nc\n```\n", 10, "```\nc\n```\n\nx", 12)]
-    [InlineData("```\nc", 5, "```\ncx", 6)]
+    [InlineData("```\nc", 5, "```\ncx\n", 6)]
     public void TypingOnAnEmptyLineKeepsTheNeighboringEmptyLines(string text, int caret, string expected, int expectedCaret)
     {
         var engine = new MarkdownEditorEngine(text);
@@ -1265,6 +1265,30 @@ public class MarkdownEditorEngineTests
         Assert.Equal(marker, empty.Text);
     }
 
+    [Theory]
+    [InlineData(MarkdownEditorCommands.UnorderedList, "a\n\n```csharp\nvar x;\n```\n\n- ")]
+    [InlineData(MarkdownEditorCommands.TaskList, "a\n\n```csharp\nvar x;\n```\n\n- [ ] ")]
+    [InlineData(MarkdownEditorCommands.Quote, "a\n\n```csharp\nvar x;\n```\n\n> ")]
+    public void BlockCommandsOnTheTrailingEmptyLineAfterACodeBlockLeaveTheCodeBlockAlone(string command, string expected)
+    {
+        var engine = new MarkdownEditorEngine("a\n\n```csharp\nvar x;\n```");
+
+        var update = engine.Command(command, engine.Text.Length, engine.Text.Length, null, null);
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expected.Length, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void OutdentingAPlainItemFromATaskListKeepsItPlain()
+    {
+        var engine = new MarkdownEditorEngine("- [x] A\n- [ ] B\n  - C");
+
+        engine.Indent(21, 21, outdent: true);
+
+        Assert.Equal("- [x] A\n- [ ] B\n- C", engine.Text);
+    }
+
     [Fact]
     public void ListCommandOnAnEmptyLineNextToAListUsesTheOtherMarker()
     {
@@ -1405,14 +1429,36 @@ public class MarkdownEditorEngineTableTests
     }
 
     [Fact]
-    public void DeletingATableLeavesAnEmptyLineInItsPlace()
+    public void DeletingATableMovesTheCaretToTheNextBlock()
     {
         var engine = new MarkdownEditorEngine("x\n\n" + Table + "\n\ny");
 
         var update = engine.Command(MarkdownEditorCommands.TableDelete, 25, 25, null, null);
 
-        Assert.Equal("x\n\n\n\ny", engine.Text);
+        Assert.Equal("x\n\ny", engine.Text);
         Assert.Equal(3, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void DeletingTheOnlyTableLeavesAnEmptyParagraph()
+    {
+        var engine = new MarkdownEditorEngine(Table);
+
+        var update = engine.Command(MarkdownEditorCommands.TableDelete, 2, 2, null, null);
+
+        Assert.Equal("", engine.Text);
+        Assert.Equal(0, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void DeletingATableBeforeACodeBlockMovesTheCaretToThePreviousBlock()
+    {
+        var engine = new MarkdownEditorEngine("x\n\n" + Table + "\n\n```\nc\n```");
+
+        var update = engine.Command(MarkdownEditorCommands.TableDelete, 25, 25, null, null);
+
+        Assert.Equal("x\n\n```\nc\n```", engine.Text);
+        Assert.Equal(1, update!.SelectionStart);
     }
 
     [Theory]

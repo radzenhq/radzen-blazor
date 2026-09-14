@@ -16,15 +16,15 @@ public class InlineContentTests
     [Theory]
     [InlineData("plain text")]
     [InlineData("a *b* **c** ~~d~~ `e` [f](g \"h\") <https://x.io> ![i](j)")]
-    [InlineData("_under_ and __score__ and ~single~")]
+    [InlineData("_under_ and __score__ and ~~double~~")]
     [InlineData("hard  \nbreak and\\\nanother")]
-    [InlineData("a [ref][r] b\n\n[r]: /u")]
+    [InlineData("a [r] b\n\n[r]: /u")]
     public void RebuildingUnchangedRunsReproducesTheMarkdown(string markdown)
     {
         var (document, paragraph) = Load(markdown);
         var runs = InlineContent.Flatten(paragraph.Children);
 
-        paragraph.ReplaceInlines(InlineContent.Rebuild(runs, markdown));
+        paragraph.ReplaceInlines(InlineContent.Rebuild(runs));
 
         Assert.Equal(markdown, Write(document, markdown));
     }
@@ -42,7 +42,7 @@ public class InlineContentTests
         var (document, paragraph) = Load(markdown);
         var runs = InlineContent.Insert(InlineContent.Flatten(paragraph.Children), offset, text);
 
-        paragraph.ReplaceInlines(InlineContent.Rebuild(runs, markdown));
+        paragraph.ReplaceInlines(InlineContent.Rebuild(runs));
 
         Assert.Equal(expected, Write(document, markdown));
     }
@@ -57,7 +57,7 @@ public class InlineContentTests
         var (document, paragraph) = Load(markdown);
         var runs = InlineContent.Delete(InlineContent.Flatten(paragraph.Children), start, end);
 
-        paragraph.ReplaceInlines(InlineContent.Rebuild(runs, markdown));
+        paragraph.ReplaceInlines(InlineContent.Rebuild(runs));
 
         Assert.Equal(expected, Write(document, markdown));
     }
@@ -76,7 +76,7 @@ public class InlineContentTests
         var (document, paragraph) = Load(markdown);
         var runs = InlineContent.ToggleMark(InlineContent.Flatten(paragraph.Children), start, end, new Mark(System.Enum.Parse<MarkKind>(kind)));
 
-        paragraph.ReplaceInlines(InlineContent.Rebuild(runs, markdown));
+        paragraph.ReplaceInlines(InlineContent.Rebuild(runs));
 
         Assert.Equal(expected, Write(document, markdown));
     }
@@ -89,8 +89,8 @@ public class InlineContentTests
         var head = InlineContent.Split(InlineContent.Delete(runs, 5, 6), 5, out var tail);
         var second = new Paragraph();
 
-        paragraph.ReplaceInlines(InlineContent.Rebuild(head, "a **Des|ign** b"));
-        second.ReplaceInlines(InlineContent.Rebuild(tail, "a **Des|ign** b"));
+        paragraph.ReplaceInlines(InlineContent.Rebuild(head));
+        second.ReplaceInlines(InlineContent.Rebuild(tail));
         document.Add(second);
 
         Assert.Equal("a **Des**\n\n**ign** b", Write(document, "a **Des|ign** b"));

@@ -57,12 +57,10 @@ internal sealed class MarkdownWriter : INodeVisitor
     private static bool IsPristine(Block block) => block.Pristine && block switch
     {
         BlockContainer container => container.Children.All(IsPristine),
-        Table table => table.Rows.All(row => row.Cells.All(cell => cell.Pristine && cell.Children.All(Verbatim))),
-        Leaf leaf => leaf.Children.All(Verbatim),
+        Table table => table.Rows.All(row => row.Cells.All(cell => cell.Pristine)),
         _ => true
     };
 
-    private readonly Dictionary<Text, bool> escaped = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<Block, string> prefixes = new(ReferenceEqualityComparer.Instance);
 
     public int OffsetWithin(Block block, int valueOffset)
@@ -83,35 +81,65 @@ internal sealed class MarkdownWriter : INodeVisitor
         return start + valueOffset + newlines * prefix.Length;
     }
 
-    public bool Knows(Text text) => positions.ContainsKey(text) || expelled.ContainsKey(text);
+    private sealed class Rendering
+    {
+        public int Leading;
+        public int LeadingAt = -1;
+        public int Trailing;
+        public int TrailingAt = -1;
+        public string Value = string.Empty;
+        public string Escaped = string.Empty;
+    }
+
+    private readonly Dictionary<Text, Rendering> renderings = new(ReferenceEqualityComparer.Instance);
 
     public int OffsetWithin(Text text, int valueOffset)
     {
-        if (expelled.TryGetValue(text, out var expel) && !positions.ContainsKey(text))
-        {
-            var inner = positions[expel.Replacement];
-
-            if (valueOffset < expel.Leading)
-            {
-                return inner.Start - expel.Leading - MarkerLengthBefore(expel.Replacement) + valueOffset;
-            }
-
-            if (valueOffset > expel.Leading + expel.Replacement.Value.Length)
-            {
-                return inner.End + MarkerLengthAfter(expel.Replacement) + (valueOffset - expel.Leading - expel.Replacement.Value.Length);
-            }
-
-            return OffsetWithin(expel.Replacement, valueOffset - expel.Leading);
-        }
-
         var start = positions[text].Start;
 
-        if (escaped.TryGetValue(text, out var lineStart))
+        if (!renderings.TryGetValue(text, out var rendering))
         {
-            return start + EscapedOffset(text.Value, lineStart, Math.Min(valueOffset, text.Value.Length));
+            return start + Math.Clamp(valueOffset, 0, text.Value.Length);
         }
 
-        return start + SourceOffsetWithin(source, text, valueOffset);
+        if (valueOffset < rendering.Leading)
+        {
+            return rendering.LeadingAt >= 0 ? rendering.LeadingAt + valueOffset : start;
+        }
+
+        var bodyLength = text.Value.Length - rendering.Leading - rendering.Trailing;
+
+        if (valueOffset > rendering.Leading + bodyLength)
+        {
+            return rendering.TrailingAt >= 0 ? rendering.TrailingAt + (valueOffset - rendering.Leading - bodyLength) : positions[text].End;
+        }
+
+        return start + EscapedOffset(rendering.Value, rendering.Escaped, valueOffset - rendering.Leading);
+    }
+
+    private static int EscapedOffset(string value, string escaped, int valueOffset)
+    {
+        var i = 0;
+        var j = 0;
+
+        while (i < valueOffset && j < escaped.Length)
+        {
+            if (escaped[j] != value[i])
+            {
+                j++;
+                continue;
+            }
+
+            if (value[i] == '\\' && j + 1 < escaped.Length && escaped[j + 1] == '\\')
+            {
+                j++;
+            }
+
+            i++;
+            j++;
+        }
+
+        return j;
     }
 
     public static int SourceOffsetWithin(string source, Text text, int valueOffset)
@@ -158,6 +186,34 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         return Math.Min(j, text.Value.Length);
+    }
+
+    private int LazySeparator()
+    {
+        if (!tight)
+        {
+            return 2;
+        }
+
+        if (closed is BlockQuote)
+        {
+            EnsureNewLine();
+            output.Append(delimiter).Append(">\n");
+            closed = null;
+            return 1;
+        }
+
+        return closed is List or ListItem && EndsWithParagraph(closed) ? 2 : 1;
+    }
+
+    private static bool EndsWithParagraph(Block block)
+    {
+        while (block is BlockContainer { LastChild: { } last })
+        {
+            block = last;
+        }
+
+        return block is Paragraph { Children.Count: > 0 };
     }
 
     private void FlushClose(int size = 2)
@@ -234,15 +290,14 @@ internal sealed class MarkdownWriter : INodeVisitor
         return start;
     }
 
-    private string Slice(int start, int end) => start >= 0 && end <= source.Length && end > start ? source[start..end] : string.Empty;
-
-    private static bool Verbatim(Inline inline) => inline.Pristine && inline.SourceEnd > inline.SourceStart && (inline is not InlineContainer container || container.Children.All(Verbatim));
+    private bool definitionsFollow;
 
     public void VisitDocument(Document document)
     {
         ArgumentNullException.ThrowIfNull(document);
         Block? previous = null;
         var pending = new List<Paragraph>();
+        definitionsFollow = document.LinkReferenceDefinitions.Count > 0;
 
         foreach (var block in document.Children)
         {
@@ -260,7 +315,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             var verbatim = verbatimBlocks && IsPristine(block) && block.SourceEnd > block.SourceStart;
             var previousVerbatim = previous != null && verbatimBlocks && IsPristine(previous) && previous.SourceEnd > previous.SourceStart && previous.SourceEnd <= block.SourceStart;
 
-            if (verbatim && previousVerbatim && BlankLines.Placeholders(source, previous!.SourceEnd, block.SourceStart, true, true).Count == pending.Count)
+            if (verbatim && previousVerbatim && source.AsSpan(previous!.SourceEnd, block.SourceStart - previous.SourceEnd).IsWhiteSpace() && BlankLines.Placeholders(source, previous.SourceEnd, block.SourceStart, true, true).Count == pending.Count)
             {
                 closed = null;
                 output.Append(source, previous.SourceEnd, block.SourceStart - previous.SourceEnd);
@@ -366,7 +421,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             return;
         }
 
-        FlushClose(tight ? 1 : 2);
+        FlushClose(LazySeparator());
         var start = ContentStart();
         RenderInlines(paragraph.Children);
         positions[paragraph] = (start, output.Length);
@@ -389,13 +444,13 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         if (heading is SetExtHeading && heading.Children.Count > 0)
         {
-            FlushClose(tight ? 1 : 2);
+            FlushClose(LazySeparator());
             var contentStart = ContentStart();
             RenderInlines(heading.Children);
             positions[heading] = (contentStart, output.Length);
-            var lastLine = LastSourceLine(heading);
+            var underline = ((SetExtHeading)heading).Underline ?? string.Empty;
             EnsureNewLine();
-            Write(Regex.IsMatch(lastLine, "^[=-]+$") ? lastLine : new string(heading.Level == 1 ? '=' : '-', 3));
+            Write(Regex.IsMatch(underline, "^[=-]+$") ? underline : new string(heading.Level == 1 ? '=' : '-', 3));
             CloseBlock(heading);
             return;
         }
@@ -406,20 +461,19 @@ internal sealed class MarkdownWriter : INodeVisitor
         RenderInlines(heading.Children);
         inHeading = false;
         positions[heading] = (start, output.Length);
-        CloseBlock(heading);
-    }
 
-    private string LastSourceLine(Block block)
-    {
-        var slice = Slice(block.SourceStart, block.SourceEnd);
-        var line = slice[(slice.LastIndexOf('\n') + 1)..];
-        return line.TrimStart(' ', '\t', '>').TrimEnd();
+        if (output.Length > start && output[^1] == '#')
+        {
+            output.Append(" #");
+        }
+
+        CloseBlock(heading);
     }
 
     public void VisitThematicBreak(ThematicBreak thematicBreak)
     {
         ArgumentNullException.ThrowIfNull(thematicBreak);
-        var line = thematicBreak.Pristine ? Slice(thematicBreak.SourceStart, thematicBreak.SourceEnd).Trim() : string.Empty;
+        var line = thematicBreak.Line ?? string.Empty;
         Write(line.Length > 0 && !line.Contains('\n', StringComparison.Ordinal) ? line : "---");
         positions[thematicBreak] = (output.Length, output.Length);
         CloseBlock(thematicBreak);
@@ -428,7 +482,13 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitBlockQuote(BlockQuote blockQuote)
     {
         ArgumentNullException.ThrowIfNull(blockQuote);
-        WrapBlock("> ", null, blockQuote, () => RenderBlocks(blockQuote.Children));
+        WrapBlock("> ", null, blockQuote, () =>
+        {
+            var previousTight = tight;
+            tight = false;
+            RenderBlocks(blockQuote.Children);
+            tight = previousTight;
+        });
     }
 
     public void VisitUnorderedList(UnorderedList unorderedList)
@@ -472,23 +532,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     {
         if (list is OrderedList ordered)
         {
-            var number = ordered.Start + index;
-
-            if (item.Pristine && list.Pristine && item.SourceStart >= 0)
-            {
-                var digits = 0;
-
-                while (item.SourceStart + digits < source.Length && char.IsDigit(source[item.SourceStart + digits]))
-                {
-                    digits++;
-                }
-
-                if (digits > 0)
-                {
-                    number = int.Parse(source.AsSpan(item.SourceStart, digits), CultureInfo.InvariantCulture);
-                }
-            }
-
+            var number = item.Pristine && list.Pristine && item.Number is { } original ? original : ordered.Start + index;
             return number.ToString(CultureInfo.InvariantCulture) + (ordered.Delimiter ?? ".");
         }
 
@@ -500,6 +544,11 @@ internal sealed class MarkdownWriter : INodeVisitor
         if (item.Checked is { } isChecked)
         {
             output.Append(isChecked ? "[x] " : "[ ] ");
+
+            if (item.Children.Count > 0 && item.Children[0] is not (Paragraph or Heading))
+            {
+                output.Append('\n');
+            }
         }
 
         if (item.Children.Count == 0)
@@ -531,10 +580,11 @@ internal sealed class MarkdownWriter : INodeVisitor
         Write(fence + (fencedCodeBlock.Info ?? string.Empty));
         var start = output.Length + 1 + delimiter.Length;
         prefixes[fencedCodeBlock] = delimiter;
-        WriteLines(fencedCodeBlock.Value);
+        var closed = fencedCodeBlock.Closed || HasFollowing(fencedCodeBlock) || definitionsFollow;
+        WriteLines(fencedCodeBlock.Value, keepTrailing: !closed);
         positions[fencedCodeBlock] = (start, output.Length);
 
-        if (fencedCodeBlock.Closed)
+        if (closed)
         {
             output.Append('\n');
             Write(fence);
@@ -557,7 +607,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         return longest;
     }
 
-    private void WriteLines(string value)
+    private void WriteLines(string value, bool keepTrailing = false)
     {
         if (value.Length == 0)
         {
@@ -565,7 +615,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         var lines = value.Split('\n');
-        var count = lines.Length > 1 && lines[^1].Length == 0 ? lines.Length - 1 : lines.Length;
+        var count = lines.Length > 1 && lines[^1].Length == 0 && !keepTrailing ? lines.Length - 1 : lines.Length;
 
         for (var index = 0; index < count; index++)
         {
@@ -575,7 +625,7 @@ internal sealed class MarkdownWriter : INodeVisitor
             {
                 output.Append(delimiter).Append(lines[index]);
             }
-            else
+            else if (!keepTrailing || index < count - 1)
             {
                 output.Append(delimiter.TrimEnd());
             }
@@ -645,7 +695,7 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitTable(Table table)
     {
         ArgumentNullException.ThrowIfNull(table);
-        FlushClose(tight ? 1 : 2);
+        FlushClose(LazySeparator());
 
         if (table.Rows.Count == 0)
         {
@@ -656,7 +706,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         inTable = true;
         WriteRow(header);
         output.Append('\n').Append(delimiter);
-        var original = DelimiterRow(table);
+        var original = table.DelimiterLine;
 
         if (original != null && header.Cells.All(cell => cell.Pristine) && original.Trim().Trim('|').Split('|').Length == header.Cells.Count)
         {
@@ -686,17 +736,6 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         inTable = false;
         CloseBlock(table);
-    }
-
-    private string? DelimiterRow(Table table)
-    {
-        if (table.SourceEnd <= table.SourceStart || table.SourceEnd > source.Length)
-        {
-            return null;
-        }
-
-        var lines = source[table.SourceStart..table.SourceEnd].Split('\n');
-        return lines.Length > 1 ? lines[1].TrimStart(' ', '\t', '>') : null;
     }
 
     private void WriteRow(TableRow row)
@@ -731,257 +770,348 @@ internal sealed class MarkdownWriter : INodeVisitor
         RenderInlines(cell.Children);
     }
 
-    private readonly HashSet<Text> escapeLineStart = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<Text, int> escapeAt = new(ReferenceEqualityComparer.Instance);
+
+    private readonly HashSet<HtmlInline> escapeHtmlLineStart = new(ReferenceEqualityComparer.Instance);
+
+    private readonly HashSet<Text> bangBeforeLink = new(ReferenceEqualityComparer.Instance);
+
+    private int inlineDepth;
 
     private void RenderInlines(IReadOnlyList<Inline> inlines)
     {
-        MarkLineStarts(inlines);
-        atInlineLineStart = true;
+        inlines = Normalize(inlines);
+
+        if (inlineDepth == 0)
+        {
+            MarkLineStarts(inlines);
+            atInlineLineStart = true;
+        }
+
+        inlineDepth++;
 
         foreach (var inline in inlines)
         {
             inline.Accept(this);
         }
+
+        inlineDepth--;
     }
 
     private void MarkLineStarts(IReadOnlyList<Inline> inlines)
     {
-        var flat = new List<Inline>();
+        var flat = new List<Inline?>();
         Collect(inlines, flat);
         var lineStart = true;
 
         for (var index = 0; index < flat.Count; index++)
         {
+            if (flat[index] == null)
+            {
+                lineStart = false;
+                continue;
+            }
+
+            if (flat[index] is InlineContainer)
+            {
+                continue;
+            }
+
             if (flat[index] is LineBreak or SoftLineBreak)
             {
                 lineStart = true;
                 continue;
             }
 
-            if (!lineStart || flat[index] is not Text first)
+            if (flat[index] is Text bang && bang.Value.EndsWith('!') && index + 1 < flat.Count && flat[index + 1] is Link)
             {
-                lineStart = false;
+                bangBeforeLink.Add(bang);
+            }
+
+            if (!lineStart)
+            {
                 continue;
             }
 
+            lineStart = false;
+
+            if (index > 0 && flat[index] is HtmlInline html && StartsHtmlBlock(html.Value))
+            {
+                escapeHtmlLineStart.Add(html);
+                continue;
+            }
+
+            if (inHeading || flat[index] is not Text _)
+            {
+                continue;
+            }
+
+            var texts = new List<Text>();
             var line = new StringBuilder();
 
-            for (var next = index; next < flat.Count && flat[next] is not (LineBreak or SoftLineBreak); next++)
+            for (var next = index; next < flat.Count && flat[next] is Text current; next++)
             {
-                line.Append(flat[next] is Text text ? text.Value : "x");
+                texts.Add(current);
+                line.Append(current.Value);
             }
 
-            if (!inHeading && LineStart.IsMatch(line.ToString()))
+            var value = line.ToString().TrimStart(' ', '\t');
+            var skipped = line.Length - value.Length;
+
+            if (!LineStart.IsMatch(value) && !Table.DelimiterRegex.IsMatch(value) && !(index > 0 && StartsHtmlBlock(value)))
             {
-                escapeLineStart.Add(first);
+                continue;
             }
 
-            lineStart = false;
+            var digits = Regex.Match(value, @"^\d{1,9}(?=[.)])");
+            var at = skipped + (digits.Success ? digits.Length : 0);
+            var offset = 0;
+
+            foreach (var text in texts)
+            {
+                if (at < offset + text.Value.Length || text == texts[^1])
+                {
+                    escapeAt[text] = at - offset;
+                    break;
+                }
+
+                offset += text.Value.Length;
+            }
         }
     }
 
-    private static void Collect(IReadOnlyList<Inline> inlines, List<Inline> flat)
+    // CommonMark 0.31.2, 4.6 HTML blocks: only start conditions 1 to 6 may interrupt a paragraph
+    private static bool StartsHtmlBlock(string? line) => line != null && Enumerable.Range(1, 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
+
+    private static void Collect(IReadOnlyList<Inline> inlines, List<Inline?> flat)
     {
         foreach (var inline in inlines)
         {
+            flat.Add(inline);
+
             if (inline is InlineContainer container)
             {
                 Collect(container.Children, flat);
-            }
-            else
-            {
-                flat.Add(inline);
+                flat.Add(null);
             }
         }
     }
-
-    private bool afterBreak;
 
     public void VisitText(Text text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        int start;
+        var rendering = RenderingOf(text);
+        var value = text.Value[rendering.Leading..^rendering.Trailing];
 
-        if (Verbatim(text) && !escapeLineStart.Contains(text))
+        if (atInlineLineStart && !inTable && rendering.Leading == 0)
         {
-            var slice = Slice(text.SourceStart, text.SourceEnd);
-
-            if (afterBreak)
-            {
-                var extra = Math.Max(0, SpacesBefore(text.SourceStart) - (delimiter.Length - delimiter.TrimEnd().Length));
-                var indent = new string(' ', extra);
-                start = Emit(indent + (extra < 4 && LineStart.IsMatch(slice) ? "\\" + slice : slice)) + extra;
-            }
-            else
-            {
-                start = Emit(slice);
-            }
-        }
-        else
-        {
-            var lineStart = AtLineStart();
-            escaped[text] = lineStart;
-            start = Emit(Escape(text.Value, lineStart));
+            value = value.TrimStart(' ', '\t');
+            rendering.Leading = text.Value.Length - rendering.Trailing - value.Length;
         }
 
-        afterBreak = false;
+        rendering.Value = value;
+        rendering.Escaped = Escape(value, escapeAt.TryGetValue(text, out var at) ? Math.Max(0, at - rendering.Leading) : -1, bangBeforeLink.Contains(text));
+        var start = Emit(rendering.Escaped);
         atInlineLineStart = false;
         positions[text] = (start, output.Length);
     }
 
-    private int SpacesBefore(int offset)
+    private Rendering RenderingOf(Text text)
     {
-        var count = 0;
-
-        while (offset - count - 1 >= 0 && source[offset - count - 1] is ' ' or '\t')
+        if (!renderings.TryGetValue(text, out var rendering))
         {
-            count++;
+            rendering = new Rendering();
+            renderings[text] = rendering;
         }
 
-        return count;
+        return rendering;
     }
 
     private static readonly Regex LineStart = new(@"^([\-*+](?=[ \t]|$)|>|#{1,6}(?=[ \t]|$)|=+[ \t]*$|(?:[\-*_][ \t]*){3,}$|\d{1,9}[.)](?=[ \t]|$)|(?:`{3,}|~{3,}))", RegexOptions.Compiled);
 
     private bool atInlineLineStart;
 
-    private bool AtLineStart() => atInlineLineStart && !inHeading;
+    private const string Special = "`*\\~[]_<|";
 
-    private static readonly Regex Special = new(@"[`*\\~\[\]_<|]", RegexOptions.Compiled);
-
-    private int EscapedOffset(string value, bool lineStart, int valueOffset)
+    private string Escape(string value, int lineStartAt, bool bangBeforeLink = false)
     {
-        var escaped = Escape(value, lineStart);
-        var i = 0;
-        var j = 0;
+        var escaped = new StringBuilder();
 
-        while (i < valueOffset && j < escaped.Length)
+        for (var index = 0; index < value.Length; index++)
         {
-            if (escaped[j] != value[i])
+            var ch = value[index];
+            var special = Special.Contains(ch, StringComparison.Ordinal)
+                && !(ch == '_' && index > 0 && index + 1 < value.Length && char.IsLetterOrDigit(value[index - 1]) && char.IsLetterOrDigit(value[index + 1]))
+                && !(ch == '|' && !inTable);
+
+            if (special || index == lineStartAt || (ch == '!' && (index + 1 < value.Length ? value[index + 1] == '[' : bangBeforeLink)))
             {
-                j++;
-                continue;
+                escaped.Append('\\');
             }
 
-            if (value[i] == '\\' && j + 1 < escaped.Length && escaped[j + 1] == '\\')
-            {
-                j++;
-            }
-
-            i++;
-            j++;
+            escaped.Append(ch);
         }
 
-        return j;
-    }
-
-    internal string Escape(string value, bool lineStart)
-    {
-        var escaped = Special.Replace(value, match =>
-        {
-            var index = match.Index;
-
-            if (match.Value == "_" && index > 0 && index + 1 < value.Length && char.IsLetterOrDigit(value[index - 1]) && char.IsLetterOrDigit(value[index + 1]))
-            {
-                return match.Value;
-            }
-
-            if (match.Value == "|" && !inTable)
-            {
-                return match.Value;
-            }
-
-            return "\\" + match.Value;
-        });
-
-        if (lineStart && LineStart.IsMatch(escaped))
-        {
-            var digits = Regex.Match(escaped, @"^\d{1,9}(?=[.)])");
-            escaped = digits.Success ? escaped[..digits.Length] + "\\" + escaped[digits.Length..] : "\\" + escaped;
-        }
-
-        afterBreak = false;
-        return escaped;
+        return escaped.ToString();
     }
 
     public void VisitEmphasis(Emphasis emphasis)
     {
         ArgumentNullException.ThrowIfNull(emphasis);
-        RenderMark(emphasis, emphasis.Marker is { } marker ? new string(marker, 1) : DelimiterOf(emphasis, "*", 1));
+        RenderMark(emphasis, new string(emphasis.Marker ?? '*', 1));
     }
 
     public void VisitStrong(Strong strong)
     {
         ArgumentNullException.ThrowIfNull(strong);
-        RenderMark(strong, strong.Marker is { } marker ? new string(marker, 2) : DelimiterOf(strong, "**", 2));
+        RenderMark(strong, new string(strong.Marker ?? '*', 2));
     }
 
     public void VisitStrikethrough(Strikethrough strikethrough)
     {
         ArgumentNullException.ThrowIfNull(strikethrough);
-        var run = strikethrough.Tildes ?? LeadingRun(strikethrough, '~');
-        RenderMark(strikethrough, run is 1 or 2 ? new string('~', run) : "~~");
+        RenderMark(strikethrough, strikethrough.Tildes is 1 or 2 ? new string('~', strikethrough.Tildes.Value) : "~~");
     }
 
-    private string DelimiterOf(InlineContainer inline, string fallback, int length)
-    {
-        if (inline.SourceEnd > inline.SourceStart && inline.SourceStart + length <= source.Length)
-        {
-            var ch = source[inline.SourceStart];
+    private readonly List<Type> openMarks = [];
 
-            if (ch is '*' or '_')
-            {
-                return new string(ch, length);
-            }
-        }
-
-        return fallback;
-    }
-
-    private int LeadingRun(Inline inline, char ch)
-    {
-        var run = 0;
-
-        while (inline.SourceStart >= 0 && inline.SourceStart + run < source.Length && inline.SourceStart + run < inline.SourceEnd && source[inline.SourceStart + run] == ch)
-        {
-            run++;
-        }
-
-        return run;
-    }
-
-    private readonly Dictionary<Text, int> markerBefore = new(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<Text, int> markerAfter = new(ReferenceEqualityComparer.Instance);
-
-    private int MarkerLengthBefore(Text text) => markerBefore.TryGetValue(text, out var length) ? length : 0;
-
-    private int MarkerLengthAfter(Text text) => markerAfter.TryGetValue(text, out var length) ? length : 0;
 
     private void RenderMark(InlineContainer inline, string marker)
     {
-        if (Verbatim(inline) && inline.Children.Count == 0)
+        openMarks.Add(inline.GetType());
+
+        try
         {
-            var start = Emit(Slice(inline.SourceStart, inline.SourceEnd));
-            positions[inline] = (start, output.Length);
-            return;
+            RenderMarkBody(inline, marker);
+        }
+        finally
+        {
+            openMarks.RemoveAt(openMarks.Count - 1);
+        }
+    }
+
+    private readonly Dictionary<Code, List<(Code Original, int Offset)>> mergedCodes = new(ReferenceEqualityComparer.Instance);
+
+    // CommonMark 0.31.2, 6.2 Emphasis and 6.1 Code spans: nested or adjacent runs of one kind cannot be told apart from a longer run, and they render the same as a single node
+    private IReadOnlyList<Inline> Normalize(IReadOnlyList<Inline> inlines)
+    {
+        var result = new List<Inline>();
+
+        foreach (var inline in inlines)
+        {
+            Add(inline);
         }
 
-        if (Verbatim(inline))
+        return result;
+
+        Inline? Last()
         {
-            var (contentStart, contentEnd) = VerbatimContent(inline);
-            Emit(Slice(inline.SourceStart, contentStart));
-            var start = output.Length;
-            RenderInlines(inline.Children);
-            positions[inline] = (start, output.Length);
-            output.Append(Slice(contentEnd, inline.SourceEnd));
-            return;
+            for (var index = result.Count - 1; index >= 0; index--)
+            {
+                if (result[index] is not Text { Value.Length: 0 })
+                {
+                    return result[index];
+                }
+            }
+
+            return null;
         }
 
-        var (leading, body, trailing) = ExpelWhitespace(inline);
+        void Replace(Inline replacement)
+        {
+            var index = result.Count - 1;
+
+            while (result[index] is Text { Value.Length: 0 })
+            {
+                index--;
+            }
+
+            result[index] = replacement;
+        }
+
+        void Add(Inline inline)
+        {
+            if (inline is Emphasis or Strong or Strikethrough && openMarks.Contains(inline.GetType()))
+            {
+                foreach (var child in ((InlineContainer)inline).Children)
+                {
+                    Add(child);
+                }
+
+                return;
+            }
+
+            if (inline is Code code && Last() is Code previous)
+            {
+                var merged = new Code(previous.Value + code.Value) { Ticks = previous.Ticks };
+                var originals = mergedCodes.TryGetValue(previous, out var known) ? known : [(previous, 0)];
+                originals.Add((code, previous.Value.Length));
+                mergedCodes[merged] = originals;
+                Replace(merged);
+                return;
+            }
+
+            if (inline is Emphasis or Strong or Strikethrough && Last() is { } last && last.GetType() == inline.GetType())
+            {
+                var previousMark = (InlineContainer)last;
+                InlineContainer combined = inline switch
+                {
+                    Emphasis emphasis => new Emphasis { Marker = ((Emphasis)previousMark).Marker ?? emphasis.Marker },
+                    Strong strong => new Strong { Marker = ((Strong)previousMark).Marker ?? strong.Marker },
+                    _ => new Strikethrough { Tildes = ((Strikethrough)previousMark).Tildes }
+                };
+
+                foreach (var child in previousMark.Children.Concat(((InlineContainer)inline).Children).ToList())
+                {
+                    combined.Add(child);
+                }
+
+                Replace(combined);
+                return;
+            }
+
+            result.Add(inline);
+        }
+    }
+
+    private void RenderMarkBody(InlineContainer inline, string marker)
+    {
+        var body = inline.Children;
+        var leading = string.Empty;
+        var trailing = string.Empty;
+        Text? first = body.Count > 0 ? body[0] as Text : null;
+        Text? last = body.Count > 0 ? body[^1] as Text : null;
+
+        if (first != null)
+        {
+            leading = first.Value[..(first.Value.Length - first.Value.TrimStart().Length)];
+            RenderingOf(first).Leading = leading.Length;
+        }
+
+        if (last != null)
+        {
+            var remaining = last == first ? last.Value[leading.Length..] : last.Value;
+            trailing = remaining[remaining.TrimEnd().Length..];
+            RenderingOf(last).Trailing = trailing.Length;
+        }
 
         if (leading.Length > 0)
         {
-            Emit(leading);
+            RenderingOf(first!).LeadingAt = Emit(leading);
+        }
+
+        if (body.All(child => child is Text text && text.Value.Length == RenderingOf(text).Leading + RenderingOf(text).Trailing))
+        {
+            positions[inline] = (output.Length, output.Length);
+
+            foreach (var text in body.OfType<Text>())
+            {
+                positions[text] = (output.Length, output.Length);
+                RenderingOf(text).TrailingAt = output.Length;
+            }
+
+            output.Append(trailing);
+            return;
         }
 
         Emit(marker);
@@ -990,72 +1120,20 @@ internal sealed class MarkdownWriter : INodeVisitor
         positions[inline] = (bodyStart, output.Length);
         output.Append(marker);
 
-        if (body.Count > 0 && body[0] is Text firstBody)
+        if (last != null)
         {
-            markerBefore[firstBody] = marker.Length;
+            RenderingOf(last).TrailingAt = output.Length;
         }
 
-        if (body.Count > 0 && body[^1] is Text lastBody)
-        {
-            markerAfter[lastBody] = marker.Length;
-        }
-
-        if (trailing.Length > 0)
-        {
-            output.Append(trailing);
-        }
-    }
-
-    private (int Start, int End) VerbatimContent(InlineContainer inline)
-    {
-        if (inline.Children.Count == 0)
-        {
-            return (inline.SourceStart, inline.SourceEnd);
-        }
-
-        return (inline.Children[0].SourceStart, inline.Children[^1].SourceEnd);
-    }
-
-    private readonly Dictionary<Text, (Text Replacement, int Leading, string Trailing)> expelled = new(ReferenceEqualityComparer.Instance);
-
-    private (string Leading, IReadOnlyList<Inline> Body, string Trailing) ExpelWhitespace(InlineContainer inline)
-    {
-        var leading = string.Empty;
-        var trailing = string.Empty;
-        var body = new List<Inline>(inline.Children);
-
-        if (body.Count > 0 && body[0] is Text first && first.Value.Length > first.Value.TrimStart().Length)
-        {
-            leading = first.Value[..(first.Value.Length - first.Value.TrimStart().Length)];
-            var replacement = new Text(first.Value.TrimStart()) { SourceStart = first.SourceStart + leading.Length, SourceEnd = first.SourceEnd, Pristine = false };
-            body[0] = replacement;
-            expelled[first] = (replacement, leading.Length, string.Empty);
-        }
-
-        if (body.Count > 0 && body[^1] is Text last && last.Value.Length > last.Value.TrimEnd().Length)
-        {
-            trailing = last.Value[last.Value.TrimEnd().Length..];
-            var replacement = new Text(last.Value.TrimEnd()) { SourceStart = last.SourceStart, SourceEnd = last.SourceEnd - trailing.Length, Pristine = false };
-            var existing = expelled.TryGetValue(last, out var earlier) ? earlier : default;
-            body[^1] = replacement;
-            expelled[last] = (replacement, existing.Leading, trailing);
-        }
-
-        return (leading, body, trailing);
+        output.Append(trailing);
     }
 
     public void VisitCode(Code code)
     {
         ArgumentNullException.ThrowIfNull(code);
-        if (Verbatim(code))
-        {
-            var start = Emit(Slice(code.SourceStart, code.SourceEnd));
-            positions[code] = (start, output.Length);
-            return;
-        }
-
-        var ticks = new string('`', Math.Max(code.Ticks ?? 1, LongestRun(code.Value, '`') + 1));
-        var padded = code.Value.Length > 0 && (code.Value[0] == '`' || code.Value[^1] == '`' || (code.Value[0] == ' ' && code.Value[^1] == ' ' && code.Value.Trim().Length > 0));
+        var value = code.Value.Replace('\n', ' ');
+        var ticks = new string('`', Math.Max(code.Ticks ?? 1, LongestRun(value, '`') + 1));
+        var padded = value.Length > 0 && (value[0] == '`' || value[^1] == '`' || (value[0] == ' ' && value[^1] == ' ' && value.Trim().Length > 0));
         Emit(ticks);
 
         if (padded)
@@ -1064,8 +1142,16 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         var contentStart = output.Length;
-        output.Append(code.Value);
+        output.Append(value);
         positions[code] = (contentStart, output.Length);
+
+        if (mergedCodes.TryGetValue(code, out var originals))
+        {
+            foreach (var (original, offset) in originals)
+            {
+                positions[original] = (contentStart + offset, contentStart + offset + original.Value.Length);
+            }
+        }
 
         if (padded)
         {
@@ -1073,57 +1159,58 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         output.Append(ticks);
+        atInlineLineStart = false;
     }
 
     public void VisitLink(Link link)
     {
         ArgumentNullException.ThrowIfNull(link);
-        RenderLink(link, link.Destination, link.Title, image: false);
+        RenderLink(link, link.Destination, link.Title, link.Suffix, image: false);
     }
 
     public void VisitImage(Image image)
     {
         ArgumentNullException.ThrowIfNull(image);
-        RenderLink(image, image.Destination, image.Title, image: true);
+        RenderLink(image, image.Destination, image.Title, image.Suffix, image: true);
     }
 
-    private void RenderLink(InlineContainer inline, string? destination, string? title, bool image)
+    private void RenderLink(InlineContainer inline, string? destination, string? title, string? suffix, bool image)
     {
-        if (Verbatim(inline) && inline.Children.Count == 0)
-        {
-            var wholeStart = Emit(Slice(inline.SourceStart, inline.SourceEnd));
-            positions[inline] = (wholeStart, output.Length);
-            return;
-        }
+        var enclosing = openMarks.ToList();
+        openMarks.Clear();
 
-        if (Verbatim(inline))
+        try
         {
-            var (contentStart, contentEnd) = VerbatimContent(inline);
-            Emit(Slice(inline.SourceStart, contentStart));
-            var verbatimStart = output.Length;
-            RenderInlines(inline.Children);
-            positions[inline] = (verbatimStart, output.Length);
-            output.Append(Slice(contentEnd, inline.SourceEnd));
-            return;
+            RenderLinkBody(inline, destination, title, suffix, image);
         }
-
-        if (!image && inline is Link { Suffix: { } suffix } reference)
+        finally
         {
-            Emit("[");
+            openMarks.AddRange(enclosing);
+        }
+    }
+
+    private void RenderLinkBody(InlineContainer inline, string? destination, string? title, string? suffix, bool image)
+    {
+        atInlineLineStart = false;
+
+        if (suffix != null)
+        {
+            Emit(image ? "![" : "[");
             var referenceStart = output.Length;
-            RenderInlines(reference.Children);
+            RenderInlines(inline.Children);
             positions[inline] = (referenceStart, output.Length);
             output.Append(suffix);
             return;
         }
 
-        if (!image && ((inline is Link { Autolink: true }) || (inline.SourceEnd > inline.SourceStart && inline.SourceStart < source.Length && source[inline.SourceStart] == '<')) && inline.Children is [Text only] && only.Value == destination)
+        if (inline is Link { Autolink: true } && inline.Children is [Text only] && only.Value == destination)
         {
             Emit("<");
             var autolinkStart = output.Length;
             output.Append(destination);
             positions[inline] = (autolinkStart, output.Length);
             output.Append('>');
+            atInlineLineStart = false;
             return;
         }
 
@@ -1141,24 +1228,24 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         output.Append(')');
+        atInlineLineStart = false;
     }
 
     public void VisitHtmlInline(HtmlInline html)
     {
         ArgumentNullException.ThrowIfNull(html);
-        var start = Emit(html.Value ?? string.Empty);
+        var start = Emit((escapeHtmlLineStart.Contains(html) ? "\\" : string.Empty) + (html.Value ?? string.Empty));
         positions[html] = (start, output.Length);
+        atInlineLineStart = false;
     }
 
     public void VisitLineBreak(LineBreak lineBreak)
     {
         ArgumentNullException.ThrowIfNull(lineBreak);
-        var backslash = lineBreak.Backslash ?? (lineBreak.SourceStart >= 0 && lineBreak.SourceStart < lineBreak.SourceEnd && lineBreak.SourceStart < source.Length && source[lineBreak.SourceStart] == '\\');
-        var start = Emit(backslash ? "\\" : "  ");
+        var start = Emit(lineBreak.Backslash == true ? "\\" : "  ");
         output.Append('\n');
         Emit(string.Empty);
         positions[lineBreak] = (start, output.Length);
-        afterBreak = true;
         atInlineLineStart = true;
     }
 
@@ -1167,7 +1254,6 @@ internal sealed class MarkdownWriter : INodeVisitor
         ArgumentNullException.ThrowIfNull(softLineBreak);
         positions[softLineBreak] = (output.Length, output.Length);
         output.Append('\n');
-        afterBreak = true;
         atInlineLineStart = true;
     }
 }

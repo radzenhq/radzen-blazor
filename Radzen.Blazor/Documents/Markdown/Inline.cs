@@ -15,8 +15,6 @@ public abstract class Inline : INode
     /// </summary>
     public int SourceEnd { get; internal set; }
 
-    internal bool Pristine { get; set; }
-
     /// <summary>
     /// Accepts a visitor.
     /// </summary>

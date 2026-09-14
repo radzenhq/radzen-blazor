@@ -7,6 +7,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class SetExtHeading : Heading
 {
+    internal string? Underline { get; set; }
+
     private static readonly Regex HeadingRegex = new (@"^(?:=+|-+)[ \t]*$");
 
     internal static BlockStart Start(BlockParser parser, Block block)

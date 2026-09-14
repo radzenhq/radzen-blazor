@@ -43,16 +43,18 @@ internal sealed class Run
     public Run(string text, IReadOnlyList<Mark> marks, Inline? origin)
     {
         Text = text;
-        Marks = marks.OrderBy(mark => (int)mark.Kind).ToList();
+        Marks = Distinct(marks);
         Origin = origin;
     }
 
     public Run(Inline atom, IReadOnlyList<Mark> marks)
     {
         Text = "￼";
-        Marks = marks.OrderBy(mark => (int)mark.Kind).ToList();
+        Marks = Distinct(marks);
         Atom = atom;
     }
+
+    private static List<Mark> Distinct(IReadOnlyList<Mark> marks) => marks.GroupBy(mark => mark.Kind).Select(group => group.First()).OrderBy(mark => (int)mark.Kind).ToList();
 
     public string Text { get; set; }
 
@@ -120,7 +122,7 @@ internal static class InlineContent
         }
     }
 
-    public static List<Inline> Rebuild(IReadOnlyList<Run> runs, string source)
+    public static List<Inline> Rebuild(IReadOnlyList<Run> runs)
     {
         var merged = Merge(runs);
         var result = new List<Inline>();
@@ -147,12 +149,12 @@ internal static class InlineContent
                     break;
                 }
 
-                var container = CreateContainer(mark, source);
+                var container = CreateContainer(mark);
                 Append(stack, result, container);
                 stack.Add((mark, container));
             }
 
-            Append(stack, result, CreateNode(run, source));
+            Append(stack, result, CreateNode(run));
         }
 
         return result;
@@ -183,15 +185,7 @@ internal static class InlineContent
 
             if (merged.Count > 0 && merged[^1].Atom == null && run.Atom == null && merged[^1].Marks.SequenceEqual(run.Marks))
             {
-                var previous = merged[^1];
-                Inline? origin = null;
-
-                if (previous.Origin is Text left && run.Origin is Text right && left.Pristine && right.Pristine && left.Value == previous.Text && right.Value == run.Text && left.SourceEnd == right.SourceStart)
-                {
-                    origin = new Text(left.Value + right.Value) { SourceStart = left.SourceStart, SourceEnd = right.SourceEnd, Pristine = true };
-                }
-
-                merged[^1] = new Run(previous.Text + run.Text, previous.Marks, origin);
+                merged[^1] = new Run(merged[^1].Text + run.Text, merged[^1].Marks, null);
                 continue;
             }
 
@@ -201,7 +195,7 @@ internal static class InlineContent
         return merged;
     }
 
-    private static Inline CreateNode(Run run, string source)
+    private static Inline CreateNode(Run run)
     {
         if (run.Atom != null)
         {
@@ -216,7 +210,7 @@ internal static class InlineContent
             }
 
             var mark = run.Marks.First(mark => mark.Kind == MarkKind.Code);
-            return new Code(run.Text) { Ticks = mark.Origin is Code original ? TickCount(original, source) : null };
+            return new Code(run.Text) { Ticks = mark.Origin is Code original ? original.Ticks : null };
         }
 
         if (run.Origin is Text text && text.Value == run.Text)
@@ -227,71 +221,27 @@ internal static class InlineContent
         return new Text(run.Text);
     }
 
-    private static int? TickCount(Code code, string source)
-    {
-        if (code.Ticks != null)
-        {
-            return code.Ticks;
-        }
-
-        var count = 0;
-
-        while (code.SourceStart + count < source.Length && code.SourceStart + count < code.SourceEnd && source[code.SourceStart + count] == '`')
-        {
-            count++;
-        }
-
-        return count > 0 ? count : null;
-    }
-
-    private static InlineContainer CreateContainer(Mark mark, string source)
+    private static InlineContainer CreateContainer(Mark mark)
     {
         switch (mark.Kind)
         {
             case MarkKind.Emphasis:
-                return new Emphasis { Marker = mark.Origin is Emphasis emphasis ? emphasis.Marker ?? MarkerAt(emphasis, source) : null };
+                return new Emphasis { Marker = (mark.Origin as Emphasis)?.Marker };
             case MarkKind.Strong:
-                return new Strong { Marker = mark.Origin is Strong strong ? strong.Marker ?? MarkerAt(strong, source) : null };
+                return new Strong { Marker = (mark.Origin as Strong)?.Marker };
             case MarkKind.Strikethrough:
-                return new Strikethrough { Tildes = mark.Origin is Strikethrough strikethrough ? strikethrough.Tildes ?? RunAt(strikethrough, source, '~') : null };
+                return new Strikethrough { Tildes = (mark.Origin as Strikethrough)?.Tildes };
             default:
                 var link = new Link { Destination = mark.Destination, Title = mark.Title };
 
                 if (mark.Origin is Link original)
                 {
-                    link.Suffix = original.Suffix ?? SuffixOf(original, source);
-                    link.Autolink = original.Autolink || (original.SourceEnd > original.SourceStart && original.SourceStart < source.Length && source[original.SourceStart] == '<');
+                    link.Suffix = original.Suffix;
+                    link.Autolink = original.Autolink;
                 }
 
                 return link;
         }
-    }
-
-    private static char? MarkerAt(Inline inline, string source)
-    {
-        return inline.SourceEnd > inline.SourceStart && inline.SourceStart < source.Length && source[inline.SourceStart] is '*' or '_' ? source[inline.SourceStart] : null;
-    }
-
-    private static int? RunAt(Inline inline, string source, char ch)
-    {
-        var count = 0;
-
-        while (inline.SourceStart + count < source.Length && inline.SourceStart + count < inline.SourceEnd && source[inline.SourceStart + count] == ch)
-        {
-            count++;
-        }
-
-        return count > 0 ? count : null;
-    }
-
-    private static string? SuffixOf(InlineContainer link, string source)
-    {
-        if (link.Children.Count == 0 || link.SourceEnd > source.Length || link.SourceEnd <= link.SourceStart || source[link.SourceEnd - 1] != ']')
-        {
-            return null;
-        }
-
-        return source[link.Children[^1].SourceEnd..link.SourceEnd];
     }
 
     public static (int Run, int Offset) Locate(IReadOnlyList<Run> runs, int contentOffset)

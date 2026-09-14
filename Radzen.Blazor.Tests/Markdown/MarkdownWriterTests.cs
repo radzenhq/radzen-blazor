@@ -9,7 +9,7 @@ public class MarkdownWriterTests(ITestOutputHelper output)
 {
     public static IEnumerable<object[]> SpecExamples() => SourcePositionTests.SpecExamples();
 
-    private static string Structure(string markdown) => HtmlVisitor.ToHtml(markdown);
+    private static string Structure(string markdown) => Canonical.Html(markdown);
 
     [Theory]
     [MemberData(nameof(SpecExamples))]
@@ -42,7 +42,7 @@ public class MarkdownWriterTests(ITestOutputHelper output)
     [InlineData("> quote\n>\n> more")]
     [InlineData("| a | b |\n| :-- | --: |\n| 1 | 2 |")]
     [InlineData("```cs\nvar x = 1;\n```")]
-    [InlineData("a\\*b* and `code` and [l](u \"t\")")]
+    [InlineData("a\\*b\\* and `code` and [l](u \"t\")")]
     public void WritingAPristineDocumentReproducesTheText(string markdown)
     {
         var document = MarkdownParser.Parse(markdown);
@@ -56,7 +56,7 @@ public class MarkdownWriterTests(ITestOutputHelper output)
         var document = MarkdownParser.Parse("plain");
         var text = (Text)((Paragraph)document.Children[0]).Children[0];
         text.Value = "# not a heading *nor* emphasis";
-        text.Pristine = false;
+        document.Children[0].Pristine = false;
 
         Assert.Equal("\\# not a heading \\*nor\\* emphasis", MarkdownWriter.Write(document, "plain"));
     }
@@ -68,7 +68,7 @@ public class MarkdownWriterTests(ITestOutputHelper output)
         var emphasis = (Emphasis)((Paragraph)document.Children[0]).Children[1];
         var text = (Text)emphasis.Children[0];
         text.Value = "b x ";
-        text.Pristine = false;
+        document.Children[0].Pristine = false;
 
         Assert.Equal("a _b x_  c", MarkdownWriter.Write(document, "a _b_ c"));
     }

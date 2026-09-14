@@ -77,17 +77,9 @@ class InlineParser
 
             for (var index = 0; index < buffer.Length; index++)
             {
-                var ch = buffer[index];
-
-                if (ch is Backslash && index < buffer.Length - 1 && !buffer[index + 1].IsEscapable())
-                {
-                    continue;
-                }
-                else
-                {
-                    output.Append(ch);
-                }
+                output.Append(buffer[index]);
             }
+
             var value = output.ToString();
             var end = bufferEnd;
 
@@ -358,8 +350,14 @@ class InlineParser
 
         var position = index + 1;
 
+        // CommonMark 0.31.2, 6.5 Autolinks: the URI contains no ASCII control characters, space, < or >
         while (position < text.Length && text[position] is not CloseAngleBracket)
         {
+            if (text[position] is Space or OpenAngleBracket || text[position] < ' ')
+            {
+                return false;
+            }
+
             destination.Append(text[position]);
             position++;
         }
@@ -370,11 +368,6 @@ class InlineParser
         }
 
         var url = destination.ToString();
-
-        if (url.Contains(Space, StringComparison.Ordinal))
-        {
-            return false;
-        }
 
         var content = url;
 
@@ -677,6 +670,12 @@ class InlineParser
             {
                 position++;
                 break;
+            }
+
+            // CommonMark 0.31.2, 6.3 Links: a link destination in angle brackets contains no line endings or unescaped < or > characters
+            if (angleBrackets && (ch is LineFeed or CarrigeReturn || (ch is OpenAngleBracket && prev is not Backslash)))
+            {
+                return false;
             }
 
             if (!angleBrackets)

@@ -13,7 +13,7 @@ public static class MarkdownParser
     public static Document Parse(string markdown)
     {
         var document = BlockParser.Parse(markdown);
-        document.Accept(new PristineMarker());
+        document.Accept(new SourceMarker(markdown));
         return document;
     }
 }

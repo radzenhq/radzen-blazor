@@ -8740,7 +8740,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
       }
     },
     getSelection: function () {
-      return currentSelection(editor);
+      return editor.queue.then(() => currentSelection(editor), () => currentSelection(editor));
     },
     getVersion: function () {
       return editor.version;

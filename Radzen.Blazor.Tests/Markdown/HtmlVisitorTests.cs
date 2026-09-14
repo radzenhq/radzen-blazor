@@ -19,6 +19,7 @@ public class HtmlVisitorTests
     [InlineData("a\\`b", "<p>a`b</p>")]
     [InlineData("3. a", "<ol start=\"3\"><li>a</li></ol>")]
     [InlineData("- [x] done", "<ul><li><input type=\"checkbox\" checked> done</li></ul>")]
+    [InlineData("- [ ] a\n  - b", "<ul><li><input type=\"checkbox\"> a<ul><li>b</li></ul></li></ul>")]
     [InlineData("```csharp\nvar x = 1;\n```", "<pre><code class=\"language-csharp\">var x = 1;\n</code></pre>")]
     [InlineData("---", "<hr>")]
     [InlineData("a  \nb", "<p>a<br>b</p>")]

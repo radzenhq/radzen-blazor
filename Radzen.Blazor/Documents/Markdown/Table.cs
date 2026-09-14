@@ -10,6 +10,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class Table : Leaf
 {
+    internal string? DelimiterLine { get; set; }
+
     private readonly List<TableRow> rows = [];
 
     /// <summary>
@@ -28,7 +30,7 @@ public class Table : Leaf
         visitor.VisitTable(this);
     }
 
-    private static readonly Regex DelimiterRegex = new(@"^\s*(\|?\s*:?-{1,}:?\s*)+(\|+\s*:?-{1,}:?\s*)*\|?\s*$");
+    internal static readonly Regex DelimiterRegex = new(@"^\s*(\|?\s*:?-{1,}:?\s*)+(\|+\s*:?-{1,}:?\s*)*\|?\s*$");
 
     internal override void Close(BlockParser parser)
     {
@@ -59,7 +61,7 @@ public class Table : Leaf
 
                 for (int missingCellIndex = 0; missingCellIndex < header.Cells.Count - cells.Count; missingCellIndex++)
                 {
-                    row.Add("", TableCellAlignment.None);
+                    row.Add("", headerCells[cells.Count + missingCellIndex].Alignment);
                 }
 
                 rows.Add(row);
@@ -88,6 +90,7 @@ public class Table : Leaf
         var cells = new List<CellText>();
         var chars = new StringBuilder();
         var indexes = new List<int>();
+        var starts = new List<int>();
 
         void Flush(int pipe)
         {
@@ -114,9 +117,9 @@ public class Table : Leaf
 
             for (var k = first + 1; k <= last; k++)
             {
-                if (k == last || indexes[k] != indexes[k - 1] + 1)
+                if (k == last || starts[k] != indexes[k - 1] + 1 || starts[k] != indexes[k] || starts[k - 1] != indexes[k - 1])
                 {
-                    var sourceStart = toSource(indexes[runStart]);
+                    var sourceStart = toSource(starts[runStart]);
                     content.Append(k - runStart, sourceStart, toSource(indexes[k - 1] + 1) - sourceStart);
                     runStart = k;
                 }
@@ -125,6 +128,7 @@ public class Table : Leaf
             cells.Add(new CellText(chars.ToString(first, last - first), content));
             chars.Clear();
             indexes.Clear();
+            starts.Clear();
         }
 
         var escaped = false;
@@ -139,10 +143,12 @@ public class Table : Leaf
                 {
                     chars.Append('\\');
                     indexes.Add(i - 1);
+                    starts.Add(i - 1);
                 }
 
                 chars.Append(c);
                 indexes.Add(i);
+                starts.Add(c == '|' ? i - 1 : i);
                 escaped = false;
             }
             else if (c == '\\')
@@ -157,6 +163,7 @@ public class Table : Leaf
             {
                 chars.Append(c);
                 indexes.Add(i);
+                starts.Add(i);
             }
         }
 
@@ -196,11 +203,11 @@ public class Table : Leaf
             // Parse the delimiter row to determine alignments
             var delimiterRow = line.Trim();
 
-            // Parse the header row from the paragraph text
-            var headerLine = paragraph.Value.Trim();
-
-            // Parse header cells and delimiter cells
-            var headerCells = ParseRow(headerLine, index => paragraph.Content.ToSource(paragraph.Value.Length - paragraph.Value.TrimStart().Length + index));
+            var value = paragraph.Value.TrimEnd('\n');
+            var cut = value.LastIndexOf('\n') + 1;
+            var headerLine = value[cut..].Trim();
+            var headerOffset = cut + value[cut..].Length - value[cut..].TrimStart().Length;
+            var headerCells = ParseRow(headerLine, index => paragraph.Content.ToSource(headerOffset + index));
 
             // Parse delimiter cells to determine alignments
             var cleanDelimiterRow = delimiterRow;
@@ -259,6 +266,20 @@ public class Table : Leaf
 
             if (paragraph.Value.Length > 0)
             {
+                value = paragraph.Value.TrimEnd('\n');
+                cut = value.LastIndexOf('\n') + 1;
+
+                if (cut > 0)
+                {
+                    var head = new Paragraph { Value = paragraph.Value[..cut], SourceStart = paragraph.SourceStart, SourceEnd = paragraph.Content.ToSource(cut) };
+                    head.Content.Append(paragraph.Content.Segments);
+                    head.Content.TrimEnd(cut);
+                    head.Range.Start = paragraph.Range.Start;
+                    head.Close(parser);
+                    paragraph.Parent.Insert(paragraph.Parent.IndexOf(paragraph), head);
+                    paragraph.SourceStart = paragraph.Content.ToSource(cut);
+                }
+
                 var table = new Table();
 
                 // Create header row

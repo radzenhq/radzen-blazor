@@ -11,6 +11,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class ListItem : BlockContainer
 {
+    internal int? Number { get; set; }
+
     /// <summary>
     /// For GFM task-list items: <c>true</c> for <c>[x]</c>, <c>false</c> for <c>[ ]</c>, <c>null</c> for a regular list item.
     /// </summary>
