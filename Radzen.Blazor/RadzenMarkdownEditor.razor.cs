@@ -129,10 +129,32 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     public (int Start, int End) Selection => selection;
 
+    /// <summary>
+    /// Whether the caret is inside a table.
+    /// </summary>
+    public bool InTable => toolState.TableRow >= 0;
+
+    /// <summary>
+    /// The index of the table row at the caret (<c>0</c> is the header row), or <c>-1</c> outside a table.
+    /// </summary>
+    public int TableRow => toolState.TableRow;
+
+    /// <summary>
+    /// The index of the table column at the caret, or <c>-1</c> outside a table.
+    /// </summary>
+    public int TableColumn => toolState.TableColumn;
+
+    /// <summary>
+    /// The alignment of the table column at the caret: <c>none</c>, <c>left</c>, <c>center</c> or <c>right</c>. <c>null</c> outside a table.
+    /// </summary>
+    public string? TableAlignment => toolState.TableRow >= 0 ? toolState.TableAlignment : null;
+
     private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
     private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));
     private string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
     private string LinkText => Localize(nameof(RadzenStrings.MarkdownEditorLink_LinkText));
+    private string RowsText => Localize(nameof(RadzenStrings.MarkdownEditorTable_RowsText));
+    private string ColumnsText => Localize(nameof(RadzenStrings.MarkdownEditorTable_ColumnsText));
     private string ImageUrlText => Localize(nameof(RadzenStrings.MarkdownEditorImage_UrlText));
     private string ImageAltText => Localize(nameof(RadzenStrings.MarkdownEditorImage_AltText));
     private string OkText => Localize(nameof(RadzenStrings.HtmlEditorLink_OkText));
@@ -396,7 +418,8 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// Executes a command. Built-in commands (see <see cref="MarkdownEditorCommands" />) modify the text; unknown command names only raise <see cref="Execute" />.
     /// </summary>
     /// <param name="name">The command name.</param>
-    /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialogue is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />.</param>
+    /// <param name="value">The command value: the URL for <see cref="MarkdownEditorCommands.Link" /> and <see cref="MarkdownEditorCommands.Image" /> (a dialogue is opened when <c>null</c>), the text for <see cref="MarkdownEditorCommands.InsertText" />,
+    /// the size as <c>rows x columns</c> for <see cref="MarkdownEditorCommands.InsertTable" /> (a dialogue is opened when <c>null</c>), the alignment for <see cref="MarkdownEditorCommands.TableAlign" />.</param>
     public async Task ExecuteCommandAsync(string name, string? value = null)
     {
         string? label = null;
@@ -415,6 +438,19 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
 
             value = model.Url;
             label = model.Text;
+        }
+
+        if (value == null && name == MarkdownEditorCommands.InsertTable)
+        {
+            TableDialogModel model = new();
+            dynamic? result = await DialogService.OpenAsync(Localize(nameof(RadzenStrings.MarkdownEditorTable_Title)), TableDialog(model));
+
+            if (result is not true)
+            {
+                return;
+            }
+
+            value = FormattableString.Invariant($"{model.Rows}x{model.Columns}");
         }
 
         lastInsertEndedWithWhitespace = true;
@@ -544,6 +580,13 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
         }
 
         GC.SuppressFinalize(this);
+    }
+
+    private class TableDialogModel
+    {
+        public int Rows { get; set; } = 3;
+
+        public int Columns { get; set; } = 3;
     }
 
     private class LinkDialogModel

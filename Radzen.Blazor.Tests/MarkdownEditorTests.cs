@@ -229,7 +229,9 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>();
             var icons = component.FindAll(".rz-markdown-editor-tools > button.rz-button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "format_quote", "code", "code_blocks",
-                                 "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule" }, icons);
+                                 "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule",
+                                 "table_chart", "north", "south", "west", "east", "horizontal_rule", "vertical_align_center", "delete",
+                                 "format_align_left", "format_align_center", "format_align_right" }, icons);
             Assert.Single(component.FindComponents<RadzenMarkdownEditorFormatBlock>());
         }
 
@@ -458,6 +460,62 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(e => e.Value, "title").Add(e => e.Mode, MarkdownEditorMode.Source));
             component.FindComponent<RadzenMarkdownEditorFormatBlock>().FindAll(".rz-dropdown-item")[3].Click();
             Assert.Equal("### title", LastUpdate(module).Text);
+        }
+
+        [Fact]
+        public async Task TableToolsFollowTheCaretIntoAndOutOfATable()
+        {
+            using var ctx = CreateContext();
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "text\n\n| a | b |\n| - | -: |\n| c | d |")
+                .AddChildContent<RadzenMarkdownEditorTableTools>());
+            var buttons = component.FindAll(".rz-markdown-editor-tools > button");
+            Assert.Equal(11, buttons.Count);
+            Assert.False(buttons[0].HasAttribute("disabled"));
+            Assert.All(buttons.Skip(1), b => Assert.True(b.HasAttribute("disabled")));
+
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(8, 8));
+            buttons = component.FindAll(".rz-markdown-editor-tools > button");
+            Assert.True(component.Instance.InTable);
+            Assert.Equal(0, component.Instance.TableRow);
+            Assert.True(buttons[5].HasAttribute("disabled"));
+            Assert.All(buttons.Where((b, i) => i != 5), b => Assert.False(b.HasAttribute("disabled")));
+
+            await component.InvokeAsync(() => component.Instance.OnSelectionAsync(33, 33));
+            buttons = component.FindAll(".rz-markdown-editor-tools > button");
+            Assert.Equal(1, component.Instance.TableRow);
+            Assert.Equal("right", component.Instance.TableAlignment);
+            Assert.False(buttons[5].HasAttribute("disabled"));
+            Assert.Contains("rz-state-active", buttons[10].ClassName);
+            Assert.DoesNotContain("rz-state-active", buttons[8].ClassName);
+        }
+
+        [Fact]
+        public void TableCommandButtonExecutesItsCommandWithItsValue()
+        {
+            using var ctx = CreateContext();
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 2, 2 });
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+                .Add(x => x.Value, "| a | b |\n| - | - |")
+                .Add(x => x.Mode, MarkdownEditorMode.Source)
+                .AddChildContent<RadzenMarkdownEditorTableCommandButton>(b => b
+                    .Add(x => x.TableCommand, MarkdownEditorCommands.TableAlign)
+                    .Add(x => x.Value, "center")));
+            component.InvokeAsync(() => component.Instance.OnSelectionAsync(2, 2)).GetAwaiter().GetResult();
+            component.Find(".rz-markdown-editor-tools > button").Click();
+            Assert.Equal("| a | b |\n| :-: | --- |", LastUpdate(module).Text);
+        }
+
+        [Fact]
+        public void InsertTableWithAValueSkipsTheDialog()
+        {
+            using var ctx = CreateContext();
+            var module = Module(ctx);
+            module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 0 });
+            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Source));
+            component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.InsertTable, "1x2")).GetAwaiter().GetResult();
+            Assert.Equal("|  |  |\n| --- | --- |", LastUpdate(module).Text);
         }
     }
 }

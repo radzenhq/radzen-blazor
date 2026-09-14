@@ -1,0 +1,4 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenMarkdownEditorButtonBase
+
+<EditorButton Title="@Title" Shortcut="@Shortcut" Click="@OnClick" Icon="table_chart" Disabled="@(Editor?.Disabled == true)" />

@@ -2511,4 +2511,43 @@
   <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
     <value>Linea orizzontale</value>
   </data>
+  <data name="MarkdownEditorTable_Title" xml:space="preserve">
+    <value>Inserisci tabella</value>
+  </data>
+  <data name="MarkdownEditorTable_RowsText" xml:space="preserve">
+    <value>Righe</value>
+  </data>
+  <data name="MarkdownEditorTable_ColumnsText" xml:space="preserve">
+    <value>Colonne</value>
+  </data>
+  <data name="MarkdownEditorTableRowBefore_Title" xml:space="preserve">
+    <value>Inserisci riga sopra</value>
+  </data>
+  <data name="MarkdownEditorTableRowAfter_Title" xml:space="preserve">
+    <value>Inserisci riga sotto</value>
+  </data>
+  <data name="MarkdownEditorTableColumnBefore_Title" xml:space="preserve">
+    <value>Inserisci colonna a sinistra</value>
+  </data>
+  <data name="MarkdownEditorTableColumnAfter_Title" xml:space="preserve">
+    <value>Inserisci colonna a destra</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteRow_Title" xml:space="preserve">
+    <value>Elimina riga</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteColumn_Title" xml:space="preserve">
+    <value>Elimina colonna</value>
+  </data>
+  <data name="MarkdownEditorTableDelete_Title" xml:space="preserve">
+    <value>Elimina tabella</value>
+  </data>
+  <data name="MarkdownEditorTableAlignLeft_Title" xml:space="preserve">
+    <value>Allinea colonna a sinistra</value>
+  </data>
+  <data name="MarkdownEditorTableAlignCenter_Title" xml:space="preserve">
+    <value>Allinea colonna al centro</value>
+  </data>
+  <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
+    <value>Allinea colonna a destra</value>
+  </data>
 </root>

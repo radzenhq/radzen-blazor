@@ -1347,3 +1347,113 @@ public class MarkdownEditorEngineTests
         Assert.Equal(segments, string.Join(" ", System.Linq.Enumerable.Range(0, update.Segments!.Length / 3).Select(i => $"{update.Segments[i * 3]}-{update.Segments[i * 3 + 1]}:{update.Segments[i * 3 + 2]}")));
     }
 }
+
+public class MarkdownEditorEngineTableTests
+{
+    private const string Table = "| a | b |\n| - | - |\n| c | d |";
+
+    [Theory]
+    [InlineData("", 0, "2x3", "|  |  |  |\n| --- | --- | --- |\n|  |  |  |", 2)]
+    [InlineData("a\n\nb", 1, "2x2", "a\n\n|  |  |\n| --- | --- |\n|  |  |\n\nb", 5)]
+    [InlineData("a\n\n\n\nb", 3, "1x1", "a\n\n|  |\n| --- |\n\nb", 5)]
+    [InlineData("ab", 1, null, "ab\n\n|  |  |  |\n| --- | --- | --- |\n|  |  |  |\n|  |  |  |", 6)]
+    public void InsertTableAddsAnEmptyTableWithAHeaderRow(string text, int caret, string? size, string expected, int expectedCaret)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        var update = engine.Command(MarkdownEditorCommands.InsertTable, caret, caret, size, null);
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Theory]
+    [InlineData(MarkdownEditorCommands.TableRowAfter, 22, "| a | b |\n| - | - |\n| c | d |\n|  |  |", 32)]
+    [InlineData(MarkdownEditorCommands.TableRowBefore, 22, "| a | b |\n| - | - |\n|  |  |\n| c | d |", 22)]
+    [InlineData(MarkdownEditorCommands.TableRowBefore, 2, "| a | b |\n| - | - |\n|  |  |\n| c | d |", 22)]
+    [InlineData(MarkdownEditorCommands.TableColumnAfter, 2, "| a |  | b |\n| --- | --- | --- |\n| c |  | d |", 6)]
+    [InlineData(MarkdownEditorCommands.TableColumnBefore, 6, "| a |  | b |\n| --- | --- | --- |\n| c |  | d |", 6)]
+    [InlineData(MarkdownEditorCommands.TableDeleteRow, 22, "| a | b |\n| - | - |", 2)]
+    [InlineData(MarkdownEditorCommands.TableDeleteColumn, 6, "| a |\n| --- |\n| c |", 2)]
+    public void TableCommandsEditRowsAndColumnsAtTheCaret(string command, int caret, string expected, int expectedCaret)
+    {
+        var engine = new MarkdownEditorEngine(Table);
+
+        var update = engine.Command(command, caret, caret, null, null);
+
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void TheHeaderRowCannotBeDeleted()
+    {
+        var engine = new MarkdownEditorEngine(Table);
+
+        Assert.Null(engine.Command(MarkdownEditorCommands.TableDeleteRow, 2, 2, null, null));
+        Assert.Equal(Table, engine.Text);
+    }
+
+    [Fact]
+    public void DeletingTheLastColumnDeletesTheTable()
+    {
+        var engine = new MarkdownEditorEngine("| a |\n| - |\n| c |");
+
+        engine.Command(MarkdownEditorCommands.TableDeleteColumn, 2, 2, null, null);
+
+        Assert.Equal("", engine.Text);
+    }
+
+    [Fact]
+    public void DeletingATableLeavesAnEmptyLineInItsPlace()
+    {
+        var engine = new MarkdownEditorEngine("x\n\n" + Table + "\n\ny");
+
+        var update = engine.Command(MarkdownEditorCommands.TableDelete, 25, 25, null, null);
+
+        Assert.Equal("x\n\n\n\ny", engine.Text);
+        Assert.Equal(3, update!.SelectionStart);
+    }
+
+    [Theory]
+    [InlineData(Table, 6, "right", "| a | b |\n| --- | --: |\n| c | d |")]
+    [InlineData("| a | b |\n| :- | -: |\n| c | d |", 2, "center", "| a | b |\n| :-: | --: |\n| c | d |")]
+    [InlineData("| a | b |\n| :- | -: |\n| c | d |", 2, "none", "| a | b |\n| --- | --: |\n| c | d |")]
+    [InlineData(Table, 22, "left", "| a | b |\n| :-- | --- |\n| c | d |")]
+    public void TableAlignChangesTheColumnAtTheCaret(string text, int caret, string alignment, string expected)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        engine.Command(MarkdownEditorCommands.TableAlign, caret, caret, alignment, null);
+
+        Assert.Equal(expected, engine.Text);
+    }
+
+    [Fact]
+    public void TableCommandsOutsideATableDoNothing()
+    {
+        var engine = new MarkdownEditorEngine("text");
+
+        Assert.Null(engine.Command(MarkdownEditorCommands.TableRowAfter, 2, 2, null, null));
+        Assert.Null(engine.Command(MarkdownEditorCommands.TableAlign, 2, 2, "left", null));
+    }
+
+    [Fact]
+    public void StateReportsTheTablePositionAndAlignment()
+    {
+        var engine = new MarkdownEditorEngine("| a | b |\n| :-- | --: |\n| c | d |");
+
+        var state = engine.State(30, 30);
+
+        Assert.Equal(1, state.TableRow);
+        Assert.Equal(1, state.TableColumn);
+        Assert.Equal(2, state.TableRows);
+        Assert.Equal(2, state.TableColumns);
+        Assert.Equal("right", state.TableAlignment);
+
+        var outside = new MarkdownEditorEngine("text").State(1, 1);
+
+        Assert.Equal(-1, outside.TableRow);
+        Assert.Equal(-1, outside.TableColumn);
+    }
+}

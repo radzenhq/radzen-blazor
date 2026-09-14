@@ -2497,8 +2497,7 @@ internal sealed class MarkdownEditorEngine
 
         if (top is Paragraph { Children.Count: 0 } empty)
         {
-            empty.Virtual = false;
-            InsertBefore(empty, table);
+            empty.Parent.Replace(empty, table);
         }
         else
         {

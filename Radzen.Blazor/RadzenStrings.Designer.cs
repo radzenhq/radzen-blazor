@@ -850,5 +850,18 @@ namespace Radzen.Blazor {
         public static string MarkdownEditorImage_UrlText { get { return ResourceManager.GetString("MarkdownEditorImage_UrlText", resourceCulture); } }
         public static string MarkdownEditorImage_AltText { get { return ResourceManager.GetString("MarkdownEditorImage_AltText", resourceCulture); } }
         public static string MarkdownEditorHorizontalRule_Title { get { return ResourceManager.GetString("MarkdownEditorHorizontalRule_Title", resourceCulture); } }
+        public static string MarkdownEditorTable_Title { get { return ResourceManager.GetString("MarkdownEditorTable_Title", resourceCulture); } }
+        public static string MarkdownEditorTable_RowsText { get { return ResourceManager.GetString("MarkdownEditorTable_RowsText", resourceCulture); } }
+        public static string MarkdownEditorTable_ColumnsText { get { return ResourceManager.GetString("MarkdownEditorTable_ColumnsText", resourceCulture); } }
+        public static string MarkdownEditorTableRowBefore_Title { get { return ResourceManager.GetString("MarkdownEditorTableRowBefore_Title", resourceCulture); } }
+        public static string MarkdownEditorTableRowAfter_Title { get { return ResourceManager.GetString("MarkdownEditorTableRowAfter_Title", resourceCulture); } }
+        public static string MarkdownEditorTableColumnBefore_Title { get { return ResourceManager.GetString("MarkdownEditorTableColumnBefore_Title", resourceCulture); } }
+        public static string MarkdownEditorTableColumnAfter_Title { get { return ResourceManager.GetString("MarkdownEditorTableColumnAfter_Title", resourceCulture); } }
+        public static string MarkdownEditorTableDeleteRow_Title { get { return ResourceManager.GetString("MarkdownEditorTableDeleteRow_Title", resourceCulture); } }
+        public static string MarkdownEditorTableDeleteColumn_Title { get { return ResourceManager.GetString("MarkdownEditorTableDeleteColumn_Title", resourceCulture); } }
+        public static string MarkdownEditorTableDelete_Title { get { return ResourceManager.GetString("MarkdownEditorTableDelete_Title", resourceCulture); } }
+        public static string MarkdownEditorTableAlignLeft_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignLeft_Title", resourceCulture); } }
+        public static string MarkdownEditorTableAlignCenter_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignCenter_Title", resourceCulture); } }
+        public static string MarkdownEditorTableAlignRight_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignRight_Title", resourceCulture); } }
     }
 }

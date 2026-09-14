@@ -2511,4 +2511,43 @@
   <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
     <value>Trennlinie</value>
   </data>
+  <data name="MarkdownEditorTable_Title" xml:space="preserve">
+    <value>Tabelle einfügen</value>
+  </data>
+  <data name="MarkdownEditorTable_RowsText" xml:space="preserve">
+    <value>Zeilen</value>
+  </data>
+  <data name="MarkdownEditorTable_ColumnsText" xml:space="preserve">
+    <value>Spalten</value>
+  </data>
+  <data name="MarkdownEditorTableRowBefore_Title" xml:space="preserve">
+    <value>Zeile oberhalb einfügen</value>
+  </data>
+  <data name="MarkdownEditorTableRowAfter_Title" xml:space="preserve">
+    <value>Zeile unterhalb einfügen</value>
+  </data>
+  <data name="MarkdownEditorTableColumnBefore_Title" xml:space="preserve">
+    <value>Spalte links einfügen</value>
+  </data>
+  <data name="MarkdownEditorTableColumnAfter_Title" xml:space="preserve">
+    <value>Spalte rechts einfügen</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteRow_Title" xml:space="preserve">
+    <value>Zeile löschen</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteColumn_Title" xml:space="preserve">
+    <value>Spalte löschen</value>
+  </data>
+  <data name="MarkdownEditorTableDelete_Title" xml:space="preserve">
+    <value>Tabelle löschen</value>
+  </data>
+  <data name="MarkdownEditorTableAlignLeft_Title" xml:space="preserve">
+    <value>Spalte linksbündig ausrichten</value>
+  </data>
+  <data name="MarkdownEditorTableAlignCenter_Title" xml:space="preserve">
+    <value>Spalte zentriert ausrichten</value>
+  </data>
+  <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
+    <value>Spalte rechtsbündig ausrichten</value>
+  </data>
 </root>

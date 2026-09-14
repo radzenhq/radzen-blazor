@@ -658,7 +658,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         output.Append('\n').Append(delimiter);
         var original = DelimiterRow(table);
 
-        if (original != null && header.Cells.All(cell => cell.Pristine))
+        if (original != null && header.Cells.All(cell => cell.Pristine) && original.Trim().Trim('|').Split('|').Length == header.Cells.Count)
         {
             output.Append(original);
         }

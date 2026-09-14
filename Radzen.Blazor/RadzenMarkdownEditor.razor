@@ -45,6 +45,8 @@
                             <RadzenMarkdownEditorLink />
                             <RadzenMarkdownEditorImage />
                             <RadzenMarkdownEditorHorizontalRule />
+                            <RadzenMarkdownEditorSeparator />
+                            <RadzenMarkdownEditorTableTools />
                         }
                     </CascadingValue>
                 </div>
@@ -75,6 +77,24 @@
                     <RadzenTextBox @bind-Value="@model.Text" Style="width: 100%" />
                 </div>
             }
+            <div class="rz-html-editor-dialog-buttons">
+                <RadzenButton Text="@CancelText" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+                <RadzenButton Text="@OkText" ButtonType="ButtonType.Submit" Variant="Variant.Flat" />
+            </div>
+        </RadzenTemplateForm>
+    </div>;
+
+    RenderFragment<DialogService> TableDialog(TableDialogModel model) => ds =>
+    @<div class="rz-html-editor-dialog">
+        <RadzenTemplateForm TItem="TableDialogModel" Data="@model" Submit="() => ds.Close(true)">
+            <div class="rz-html-editor-dialog-item">
+                <label>@RowsText</label>
+                <RadzenNumeric @bind-Value="@model.Rows" Min="1" Max="100" Style="width: 100%" Name="Rows" />
+            </div>
+            <div class="rz-html-editor-dialog-item">
+                <label>@ColumnsText</label>
+                <RadzenNumeric @bind-Value="@model.Columns" Min="1" Max="50" Style="width: 100%" Name="Columns" />
+            </div>
             <div class="rz-html-editor-dialog-buttons">
                 <RadzenButton Text="@CancelText" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
                 <RadzenButton Text="@OkText" ButtonType="ButtonType.Submit" Variant="Variant.Flat" />
