@@ -166,7 +166,6 @@ public class MarkdownEditorEngineTests
     [InlineData("| a |\n| - |\n\n```\nc\n```", 11, 15)]
     [InlineData("p\n\n```\nc\n```", 1, 7)]
     [InlineData("```\nc\n```", 3, 4)]
-    [InlineData("```\nc\n```\n\np", 9, 11)]
     public void DeletingAcrossASealedBlockBoundaryDoesNothing(string text, int start, int end)
     {
         var engine = new SourceEngine(text);
@@ -625,14 +624,22 @@ public class MarkdownEditorEngineTests
         Assert.Equal(5, update!.SelectionStart);
     }
 
-    [Fact]
-    public void PastedLinesBecomeParagraphs()
+    [Theory]
+    [InlineData("p", 1, "**b** and *i*", "p**b** and *i*", 8)]
+    [InlineData("ab", 1, "x\n\n- one\n- two", "ax\n\n- one\n- two\n\nb", 10)]
+    [InlineData("ab", 1, "- one\n\n> q", "a\n\n- one\n\n> q\n\nb", 7)]
+    [InlineData("ab", 1, "x\n\ny", "ax\n\nyb", 4)]
+    [InlineData("", 0, "# h\n\ntext", "# h\n\ntext", 6)]
+    [InlineData("a\n\n```\nc\n```", 2, "**b**", "a\n\n```\n**b**c\n```", 7)]
+    [InlineData("| a |\n| - |", 1, "**b**\n\nc", "| \\*\\*b\\*\\*  ca |\n| --- |", 9)]
+    public void PastedTextIsParsedAsMarkdownExceptInCodeBlocksAndCells(string text, int position, string pasted, string expected, int caret)
     {
-        var engine = new SourceEngine("p");
+        var engine = new MarkdownEditorEngine(text);
 
-        engine.InsertText(1, 1, "a\nb\n\nc", literal: true, paragraphs: true);
+        var update = engine.InsertText(position, position, pasted, literal: false);
 
-        Assert.Equal("pa\n\nb\n\nc", engine.Text);
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(caret, update.SelectionStart);
     }
 
     [Fact]
@@ -672,29 +679,31 @@ public class MarkdownEditorEngineTests
     }
 
     [Fact]
-    public void ForwardDeleteBeforeATableSelectsItAndDeletingTheSelectionRemovesIt()
+    public void ForwardDeleteBeforeATableRemovesIt()
     {
         var engine = new MarkdownEditorEngine("> quote\n\n| a |\n| - |\n| b |");
 
         var update = engine.Delete(5, 5, forward: true);
-
-        Assert.Equal("> quote\n\n| a |\n| - |\n| b |", engine.Text);
-        Assert.Equal((6, 9), (update!.SelectionStart, update.SelectionEnd));
-
-        update = engine.Delete(6, 9, selection: true);
 
         Assert.Equal("> quote", engine.Text);
         Assert.Equal(5, update!.SelectionStart);
     }
 
     [Fact]
-    public void BackspaceAfterACodeBlockSelectsItAndTypingOverTheSelectionReplacesIt()
+    public void BackspaceAfterACodeBlockRemovesIt()
     {
         var engine = new MarkdownEditorEngine("```\ncode\n```\n\nafter");
 
         var update = engine.Delete(6, 6);
 
-        Assert.Equal((1, 5), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal("after", engine.Text);
+        Assert.Equal(0, update!.SelectionStart);
+    }
+
+    [Fact]
+    public void ASelectionCoveringACodeBlockReplacesItWhenTyping()
+    {
+        var engine = new MarkdownEditorEngine("```\ncode\n```\n\nafter");
 
         engine.InsertText(1, 5, "x", literal: true, selection: true);
 
@@ -1042,14 +1051,14 @@ public class MarkdownEditorEngineTests
     }
 
     [Fact]
-    public void BackspaceAtTheStartOfTheParagraphAfterATableSelectsTheTable()
+    public void BackspaceAtTheStartOfTheParagraphAfterATableRemovesTheTable()
     {
         var engine = new MarkdownEditorEngine("| a |\n| - |\n\nAfter");
 
         var update = engine.Delete(3, 3);
 
-        Assert.Equal("| a |\n| - |\n\nAfter", engine.Text);
-        Assert.Equal((1, 2), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal("After", engine.Text);
+        Assert.Equal(0, update!.SelectionStart);
     }
 
     [Fact]
@@ -1421,6 +1430,24 @@ public class MarkdownEditorEngineTests
         Assert.Equal(block, state.Block);
     }
 
+    [Theory]
+    [InlineData("a **b** c", 2, 3, "**b**")]
+    [InlineData("ab\n\ncd", 1, 4, "b\n\nc")]
+    [InlineData("- one\n- two\n\n> q", 0, 9, "- one\n- two\n\n> q")]
+    [InlineData("- [x] one\n- two", 1, 6, "- [x] ne\n- tw")]
+    [InlineData("# h\n\ntext", 0, 6, "# h\n\ntext")]
+    [InlineData("```js\nab\ncd\n```", 2, 5, "```js\nb\nc\n```")]
+    [InlineData("| a | b |\n| - | - |\n| c | d |", 1, 6, "| a | b |\n| --- | --- |\n| c |  |")]
+    [InlineData("a\n\n---\n\nb", 0, 4, "a\n\n---\n\nb")]
+    [InlineData("a [l](u) b", 2, 3, "[l](u)")]
+    public void CopyWritesTheSelectedRangeAsMarkdown(string text, int start, int end, string expected)
+    {
+        var engine = new MarkdownEditorEngine(text);
+
+        Assert.Equal(expected, engine.Copy(start, end));
+        Assert.Equal(text, engine.Text);
+    }
+
     [Fact]
     public void StateReportsMixedBlocksAsEmpty()
     {
@@ -1519,16 +1546,16 @@ public class MarkdownEditorEngineReviewRegressionTests
     }
 
     [Theory]
-    [InlineData("```js\nx\n```\n\nEnd", 3, false, 1, 2)]
-    [InlineData("End\n\n```js\nx\n```", 3, true, 4, 5)]
-    public void BackspaceAndDeleteNextToACodeBlockSelectIt(string text, int caret, bool forward, int expectedStart, int expectedEnd)
+    [InlineData("```js\nx\n```\n\nEnd", 3, false, "End", 0)]
+    [InlineData("End\n\n```js\nx\n```", 3, true, "End", 3)]
+    public void BackspaceAndDeleteNextToACodeBlockRemoveIt(string text, int caret, bool forward, string expected, int expectedCaret)
     {
         var engine = new MarkdownEditorEngine(text);
 
         var update = engine.Delete(caret, caret, forward);
 
-        Assert.Equal(text, engine.Text);
-        Assert.Equal((expectedStart, expectedEnd), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal(expected, engine.Text);
+        Assert.Equal(expectedCaret, update!.SelectionStart);
     }
 
     [Fact]

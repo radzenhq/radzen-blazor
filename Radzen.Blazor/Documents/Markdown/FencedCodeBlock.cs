@@ -11,13 +11,13 @@ public class FencedCodeBlock : Leaf
     /// <summary>
     /// The delimiter used to start and end the code block.
     /// </summary>
-    public string? Delimiter { get; private set; }
+    public string? Delimiter { get; internal set; }
     internal int Indent { get; private set; }
 
     /// <summary>
     /// The info string of the code block. This is the first line of the code block and is used to specify the language of the code block.
     /// </summary>
-    public string? Info { get; private set; }
+    public string? Info { get; internal set; }
 
     internal bool Closed { get; set; }
 

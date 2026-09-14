@@ -76,7 +76,7 @@ public class MarkdownEditorEngineFuzzTests
                         var snippet = Snippets[random.Next(Snippets.Length)];
                         var literal = random.Next(4) != 0;
                         description = $"InsertText({start}, {end}, {Show(snippet)}, literal: {literal})";
-                        update = engine.InsertText(start, end, snippet, literal, paragraphs: snippet.Contains('\n', StringComparison.Ordinal), selection: end > start);
+                        update = engine.InsertText(start, end, snippet, literal, selection: end > start);
                         break;
                     case 3 or 4:
                         var forward = random.Next(2) == 0;

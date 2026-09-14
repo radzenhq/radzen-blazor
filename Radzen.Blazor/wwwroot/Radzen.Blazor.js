@@ -8367,7 +8367,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     if (name === 'OnEditAsync') {
       return (resolved[2] || '').length - (resolved[1] - resolved[0]);
     }
-    return name === 'OnInsertParagraphAsync' || name === 'OnInsertLineBreakAsync' ? 2 : 0;
+    return name === 'OnInsertParagraphAsync' || name === 'OnInsertLineBreakAsync' ? 1 : 0;
   }
 
   function transform(editor, offset, version) {
@@ -8428,14 +8428,14 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
         break;
       }
       case 'insertParagraph':
-        edit(editor, 'OnInsertParagraphAsync', () => range(), 2);
+        edit(editor, 'OnInsertParagraphAsync', () => range(), 1);
         break;
       case 'insertLineBreak':
-        edit(editor, 'OnInsertLineBreakAsync', () => range(), 3);
+        edit(editor, 'OnInsertLineBreakAsync', () => range(), 1);
         break;
       case 'insertFromPaste':
       case 'insertFromDrop': {
-        const text = event.dataTransfer ? event.dataTransfer.getData('text/plain') : '';
+        const text = pastedMarkdown(editor, event.dataTransfer);
         if (text) {
           edit(editor, 'OnEditAsync', () => [...range(), text, kind], text.length - (live[1] - live[0]));
         }
@@ -8465,6 +8465,206 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     }
     const range = selection.getRangeAt(0);
     return range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === 0 && editor.editable.contains(range.startContainer);
+  }
+
+  function pastedMarkdown(editor, dataTransfer) {
+    if (!dataTransfer) {
+      return '';
+    }
+    const plain = dataTransfer.getData('text/plain');
+    if (closestBlock(editor, 0) === 'PRE') {
+      return plain;
+    }
+    const markdown = dataTransfer.getData('text/markdown');
+    if (markdown) {
+      return markdown;
+    }
+    const html = dataTransfer.getData('text/html');
+    if (html) {
+      const converted = htmlToMarkdown(html);
+      if (converted !== null) {
+        return converted;
+      }
+    }
+    return plain;
+  }
+
+  const blockTags = new Set(['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'PRE', 'TABLE', 'HR', 'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'MAIN', 'NAV', 'ASIDE', 'FIGURE', 'FIGCAPTION', 'DL', 'DT', 'DD', 'FORM', 'FIELDSET']);
+
+  function htmlToMarkdown(html) {
+    const body = new DOMParser().parseFromString(html, 'text/html').body;
+    if (!body.querySelector('b,strong,i,em,s,del,strike,code,pre,a[href],img,h1,h2,h3,h4,h5,h6,ul,ol,li,blockquote,table,hr,[style*="font-weight"],[style*="font-style"],[style*="line-through"]')) {
+      return null;
+    }
+    return markdownBlocks(body).replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  function markdownBlocks(container) {
+    const out = [];
+    let run = [];
+    const flush = () => {
+      if (run.length) {
+        const text = markdownInlines(run).trim();
+        if (text) {
+          out.push({ text, list: false });
+        }
+        run = [];
+      }
+    };
+    for (const node of container.childNodes) {
+      if (node.nodeType !== Node.ELEMENT_NODE || !blockTags.has(node.tagName)) {
+        run.push(node);
+        continue;
+      }
+      flush();
+      const block = markdownBlock(node);
+      if (block) {
+        out.push({ text: block, list: node.tagName === 'UL' || node.tagName === 'OL' });
+      }
+    }
+    flush();
+    return out.map((part, index) => (index === 0 ? '' : part.list && container.tagName === 'LI' ? '\n' : '\n\n') + part.text).join('');
+  }
+
+  function hasBlockChildren(el) {
+    return [...el.children].some(child => blockTags.has(child.tagName));
+  }
+
+  function markdownBlock(el) {
+    switch (el.tagName) {
+      case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6':
+        return '#'.repeat(parseInt(el.tagName[1], 10)) + ' ' + markdownInlines(el.childNodes).replace(/\s*\n\s*/g, ' ').trim();
+      case 'BLOCKQUOTE':
+        return markdownBlocks(el).split('\n').map(line => ('> ' + line).trimEnd()).join('\n');
+      case 'PRE': {
+        const code = el.querySelector('code') || el;
+        const language = ((code.className || '').match(/language-([\w#+.-]+)/) || [])[1] || '';
+        const text = code.textContent.replace(/\n$/, '');
+        const fence = '`'.repeat(Math.max(3, ((text.match(/`+/g) || []).reduce((longest, ticks) => Math.max(longest, ticks.length), 0)) + 1));
+        return fence + language + '\n' + text + '\n' + fence;
+      }
+      case 'UL': case 'OL':
+        return markdownList(el);
+      case 'HR':
+        return '---';
+      case 'TABLE':
+        return markdownTable(el);
+      default:
+        return hasBlockChildren(el) ? markdownBlocks(el) : markdownInlines(el.childNodes).trim();
+    }
+  }
+
+  function markdownList(el) {
+    const ordered = el.tagName === 'OL';
+    let number = parseInt(el.getAttribute('start'), 10) || 1;
+    const items = [];
+    for (const li of el.children) {
+      if (li.tagName !== 'LI') {
+        continue;
+      }
+      const marker = ordered ? (number++) + '. ' : '- ';
+      const checkbox = li.querySelector(':scope > input[type="checkbox"], :scope > p:first-child > input[type="checkbox"]');
+      const body = (checkbox ? (checkbox.checked ? '[x] ' : '[ ] ') : '') + markdownBlocks(li);
+      const indent = ' '.repeat(marker.length);
+      items.push(marker + body.split('\n').map((line, index) => index === 0 ? line : line ? indent + line : line).join('\n'));
+    }
+    return items.join('\n');
+  }
+
+  function markdownTable(el) {
+    const rows = [...el.querySelectorAll('tr')].filter(row => row.closest('table') === el);
+    if (!rows.length) {
+      return '';
+    }
+    const cells = row => [...row.children].map(cell => markdownInlines(cell.childNodes).replace(/\s*\n\s*/g, ' ').replace(/\|/g, '\\|').trim());
+    const alignment = cell => {
+      const align = ((cell.style && cell.style.textAlign) || cell.getAttribute('align') || '').toLowerCase();
+      return align === 'left' ? ':--' : align === 'center' ? ':-:' : align === 'right' ? '--:' : '---';
+    };
+    const columns = Math.max(...rows.map(row => row.children.length));
+    const line = values => '| ' + Array.from({ length: columns }, (_, index) => values[index] || '').join(' | ') + ' |';
+    const lines = [line(cells(rows[0])), line([...rows[0].children].map(alignment))];
+    for (const row of rows.slice(1)) {
+      lines.push(line(cells(row)));
+    }
+    return lines.join('\n');
+  }
+
+  function markdownInlines(nodes) {
+    let out = '';
+    for (const node of nodes) {
+      out += markdownInline(node);
+    }
+    return out;
+  }
+
+  function styled(el, property, test) {
+    return !!(el.style && test(String(el.style[property] || '')));
+  }
+
+  function wrapMark(marker, text) {
+    const match = text.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return match[2] ? match[1] + marker + match[2] + marker + match[3] : text;
+  }
+
+  function markdownInline(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent.replace(/\u200B/g, '').replace(/\s+/g, ' ').replace(/([\\`*_{}\[\]()#+\-.!|<>~])/g, '\\$1');
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return '';
+    }
+    if (blockTags.has(node.tagName)) {
+      return '\n' + markdownBlock(node) + '\n';
+    }
+    switch (node.tagName) {
+      case 'BR':
+        return '  \n';
+      case 'INPUT': case 'SCRIPT': case 'STYLE': case 'TEMPLATE':
+        return '';
+      case 'CODE': {
+        const text = node.textContent.replace(/\u200B/g, '');
+        const ticks = '`'.repeat(((text.match(/`+/g) || []).reduce((longest, run) => Math.max(longest, run.length), 0)) + 1);
+        return text ? ticks + (text.startsWith('`') || text.endsWith('`') ? ' ' + text + ' ' : text) + ticks : '';
+      }
+      case 'IMG':
+        return '![' + (node.getAttribute('alt') || '').replace(/[\[\]]/g, '\\$&') + '](' + (node.getAttribute('src') || '') + ')';
+    }
+    let text = markdownInlines(node.childNodes);
+    if (node.tagName === 'A' && node.getAttribute('href')) {
+      return '[' + (text.trim() || node.getAttribute('href')) + '](' + node.getAttribute('href') + ')';
+    }
+    if (node.tagName === 'B' || node.tagName === 'STRONG' || styled(node, 'fontWeight', weight => weight === 'bold' || weight === 'bolder' || parseInt(weight, 10) >= 600)) {
+      text = wrapMark('**', text);
+    }
+    if (node.tagName === 'I' || node.tagName === 'EM' || styled(node, 'fontStyle', style => style === 'italic' || style === 'oblique')) {
+      text = wrapMark('*', text);
+    }
+    if (node.tagName === 'S' || node.tagName === 'DEL' || node.tagName === 'STRIKE' || styled(node, 'textDecoration', decoration => decoration.includes('line-through'))) {
+      text = wrapMark('~~', text);
+    }
+    return text;
+  }
+
+  function onCopy(editor, event, cut) {
+    const selection = window.getSelection();
+    if (!editor.textarea.hidden || !event.clipboardData || !selection.rangeCount || selection.isCollapsed || !editor.editable.contains(selection.anchorNode)) {
+      return;
+    }
+    const [start, end] = currentSelection(editor);
+    const cached = editor.markdown;
+    if (!cached || cached.start !== start || cached.end !== end || !cached.text) {
+      return;
+    }
+    const container = document.createElement('div');
+    container.appendChild(selection.getRangeAt(0).cloneContents());
+    event.clipboardData.setData('text/html', container.innerHTML);
+    event.clipboardData.setData('text/plain', selection.toString());
+    event.clipboardData.setData('text/markdown', cached.text);
+    event.preventDefault();
+    if (cut) {
+      edit(editor, 'OnEditAsync', [start, end, '', 'deleteByCut:selection'], start - end);
+    }
   }
 
   function onCompositionStart(editor) {
@@ -8558,15 +8758,6 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   }
 
   function onKeyDown(editor, event) {
-    if (event.key === 'Backspace' && !event.ctrlKey && !event.metaKey && !event.altKey && editor.textarea.hidden && editor.segments.length) {
-      const [start, end] = currentSelection(editor);
-      const first = editor.segments[0];
-      if (start === end && start > 0 && start === first.start) {
-        event.preventDefault();
-        edit(editor, 'OnEditAsync', [start - 1, start, '', 'deleteContentBackward']);
-        return;
-      }
-    }
     if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && editor.textarea.hidden && editor.pending > 0) {
       const [start, end] = currentSelection(editor);
       if (start === end) {
@@ -8678,7 +8869,9 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     }
     editor.selection = [start, end];
     editor.reported = [start, end];
-    invoke(editor, 'OnSelectionAsync', start, end);
+    invoke(editor, 'OnSelectionAsync', start, end).then(text => {
+      editor.markdown = { start, end, text };
+    });
   }
 
   function onTextareaInput(editor) {
@@ -8712,6 +8905,7 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
     value: textarea.value,
     composing: false,
     reported: null,
+    markdown: null,
     listeners: []
   };
   const on = (target, name, handler) => {
@@ -8724,6 +8918,8 @@ Radzen.createMarkdownEditor = function (editable, textarea, instance, shortcuts)
   on(editable, 'compositionend', e => onCompositionEnd(editor, e));
   on(editable, 'keydown', e => onKeyDown(editor, e));
   on(editable, 'click', e => onClick(editor, e));
+  on(editable, 'copy', e => onCopy(editor, e, false));
+  on(editable, 'cut', e => onCopy(editor, e, true));
   on(editable, 'contextmenu', e => onContextMenu(editor, e));
   on(editable, 'focus', () => {
     const selection = window.getSelection();

@@ -854,7 +854,7 @@ internal sealed class MarkdownEditorEngine
 
     private static List<Run> Runs(IBlockInlineContainer content) => InlineContent.Flatten(content.Children);
 
-    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool paragraphs = false, bool selection = false, bool preferRight = false)
+    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool selection = false, bool preferRight = false)
     {
         var document = Model;
         var hosts = Hosts(document);
@@ -863,7 +863,7 @@ internal sealed class MarkdownEditorEngine
 
         if (!literal)
         {
-            return InsertMarkdown(document, hosts, start, end, text) ?? Render(start, start);
+            return InsertMarkdown(document, hosts, start, end, text, key, merge) ?? Render(start, start);
         }
 
         var marks = stored?.Marks;
@@ -874,10 +874,10 @@ internal sealed class MarkdownEditorEngine
             return Render(start, start);
         }
 
-        return InsertAt(document, cursor, text, paragraphs, key, merge, preferRight, marks) ?? Render(start, start);
+        return InsertAt(document, cursor, text, key, merge, preferRight, marks) ?? Render(start, start);
     }
 
-    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, bool paragraphs, string? key, bool merge, bool preferRight, List<Mark>? marks)
+    private MarkdownEditorUpdate? InsertAt(Document document, Cursor cursor, string text, string? key, bool merge, bool preferRight, List<Mark>? marks)
     {
         text = Normalize(text);
 
@@ -907,42 +907,8 @@ internal sealed class MarkdownEditorEngine
             virtualParagraph.Virtual = false;
         }
 
-        var lines = paragraphs && cursor.Content is Leaf ? text.Split('\n').Where(line => line.Length > 0).ToArray() : [text.Replace('\n', ' ')];
-
-        if (lines.Length == 0)
-        {
-            return null;
-        }
-
-        SetRuns(cursor.Content, InlineContent.Insert(Runs(cursor.Content), cursor.Offset, lines[0], marks, preferRight));
-        INode caretContent = cursor.Content;
-        var caretOffset = cursor.Offset + lines[0].Length;
-
-        if (lines.Length > 1 && cursor.Content is Leaf leaf)
-        {
-            var tail = SplitLeaf(leaf, caretOffset);
-            Block previous = leaf;
-
-            for (var index = 1; index < lines.Length; index++)
-            {
-                var paragraph = new Paragraph();
-                paragraph.Add(new Text(lines[index]));
-                InsertAfter(previous, paragraph);
-                previous = paragraph;
-            }
-
-            caretOffset = lines[^1].Length;
-
-            if (tail.Children.Count > 0 && previous is Paragraph last)
-            {
-                SetRuns(last, InlineContent.Flatten(last.Children).Concat(InlineContent.Flatten(tail.Children)).ToList());
-            }
-
-            RemoveBlock(tail);
-            caretContent = previous;
-        }
-
-        return Commit(document, caretContent, caretOffset, key: key, merge: merge);
+        SetRuns(cursor.Content, InlineContent.Insert(Runs(cursor.Content), cursor.Offset, text.Replace('\n', ' '), marks, preferRight));
+        return Commit(document, cursor.Content, cursor.Offset + text.Length, key: key, merge: merge);
     }
 
     private Cursor? DeleteRange(Document document, List<Host> hosts, int start, int end)
@@ -1250,12 +1216,6 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, caret.Content, deleteStart, key: key, merge: merge);
     }
 
-    private MarkdownEditorUpdate? Select(Document document, Block block)
-    {
-        var (start, end) = Extent(Hosts(document), block);
-        return start < end ? Render(start, end) : null;
-    }
-
     private MarkdownEditorUpdate RemoveAndMove(Document document, Block block, bool forward)
     {
         var parent = block.Parent;
@@ -1317,7 +1277,7 @@ internal sealed class MarkdownEditorEngine
 
         if (previous != null && BlankLines.IsSealed(previous))
         {
-            return Select(document, previous) ?? RemoveAndMove(document, previous, forward: true);
+            return RemoveAndMove(document, previous, forward: true);
         }
 
         if (previous is Paragraph { Children.Count: 0 } emptyParagraph)
@@ -1487,7 +1447,7 @@ internal sealed class MarkdownEditorEngine
 
         if (BlankLines.IsSealed(next))
         {
-            return Select(document, next) ?? RemoveAndMove(document, next, forward: false);
+            return RemoveAndMove(document, next, forward: false);
         }
 
         if (next is Paragraph { Children.Count: 0 } empty)
@@ -1854,7 +1814,7 @@ internal sealed class MarkdownEditorEngine
             case MarkdownEditorCommands.Image:
                 return InsertLink(document, hosts, name == MarkdownEditorCommands.Image, start, end, value, label);
             case MarkdownEditorCommands.InsertText:
-                return InsertMarkdown(document, hosts, start, end, value ?? string.Empty);
+                return InsertMarkdown(document, hosts, start, end, value ?? string.Empty, null, false);
             case MarkdownEditorCommands.InsertTable:
                 return InsertTable(document, hosts, start, value);
             case MarkdownEditorCommands.TableRowBefore:
@@ -1869,6 +1829,114 @@ internal sealed class MarkdownEditorEngine
             default:
                 return null;
         }
+    }
+
+    public string Copy(int start, int end)
+    {
+        var document = Model;
+        var hosts = Hosts(document);
+        (start, end) = Clamp(hosts, start, end);
+
+        if (start >= end)
+        {
+            return string.Empty;
+        }
+
+        var slice = new Document();
+        CopyBlocks(document, slice, hosts, start, end);
+        return MarkdownWriter.Write(slice, string.Empty);
+    }
+
+    private static void CopyBlocks(BlockContainer from, BlockContainer to, List<Host> hosts, int start, int end)
+    {
+        foreach (var block in from.Children)
+        {
+            var (first, last) = Extent(hosts, block);
+            var covered = first == last ? first >= start && first <= end : first < end && last > start;
+
+            if (block is Paragraph { Virtual: true } || !covered)
+            {
+                continue;
+            }
+
+            switch (block)
+            {
+                case BlockContainer container:
+                    var copy = CloneContainer(container);
+                    CopyBlocks(container, copy, hosts, start, end);
+
+                    if (copy.Children.Count > 0 || container is ListItem)
+                    {
+                        to.Add(copy);
+                    }
+
+                    break;
+                case Table table:
+                    to.Add(CopyTable(table, hosts, start, end));
+                    break;
+                case FencedCodeBlock or IndentedCodeBlock or HtmlBlock:
+                    var host = hosts.First(candidate => candidate.Block == block);
+                    var value = ((Leaf)block).Value[Math.Clamp(start - host.Start, 0, host.Length)..Math.Clamp(end - host.Start, 0, host.Length)];
+                    Leaf code = block switch
+                    {
+                        FencedCodeBlock fenced => new FencedCodeBlock { Value = value + "\n", Info = fenced.Info, Delimiter = fenced.Delimiter, Closed = true },
+                        HtmlBlock => new HtmlBlock { Value = value },
+                        _ => new IndentedCodeBlock { Value = value + "\n" }
+                    };
+                    to.Add(code);
+                    break;
+                case Leaf leaf:
+                    Leaf clone = leaf is Heading heading ? new AtxHeading { Level = heading.Level } : new Paragraph();
+                    clone.ReplaceInlines(CopyInlines(leaf, hosts, start, end));
+                    to.Add(clone);
+                    break;
+                case ThematicBreak:
+                    to.Add(new ThematicBreak());
+                    break;
+            }
+        }
+    }
+
+    private static BlockContainer CloneContainer(BlockContainer container) => container switch
+    {
+        ListItem item => new ListItem { Checked = item.Checked },
+        List list => CloneList(list, []),
+        _ => new BlockQuote()
+    };
+
+    private static List<Inline> CopyInlines(IBlockInlineContainer content, List<Host> hosts, int start, int end)
+    {
+        var host = hosts.First(candidate => candidate.Content == content);
+        var from = Math.Clamp(start - host.Start, 0, host.Length);
+        var to = Math.Clamp(end - host.Start, 0, host.Length);
+        InlineContent.Split(Runs(content), from, out var rest);
+        var kept = InlineContent.Split(rest, to - from, out _);
+        return InlineContent.Rebuild(kept.Select(Detach).ToList());
+    }
+
+    private static Table CopyTable(Table table, List<Host> hosts, int start, int end)
+    {
+        var copy = new Table();
+
+        foreach (var row in table.Rows)
+        {
+            if (!row.Cells.Any(cell => hosts.First(candidate => candidate.Content == cell) is { } host && (host.Length == 0 ? host.Start >= start && host.Start <= end : host.Start < end && host.End > start)))
+            {
+                continue;
+            }
+
+            var added = copy.Rows.Count == 0 ? new TableHeaderRow() : new TableRow();
+
+            foreach (var cell in row.Cells)
+            {
+                added.Add(string.Empty, cell.Alignment);
+                added.Cells[^1].ReplaceInlines(CopyInlines(cell, hosts, start, end));
+            }
+
+            copy.InsertRow(copy.Rows.Count, added);
+        }
+
+        return copy;
     }
 
     private static MarkKind MarkKindOf(string name) => name switch
@@ -2398,7 +2466,7 @@ internal sealed class MarkdownEditorEngine
         return Commit(document, cursor.Content, cursor.Offset + text.Length);
     }
 
-    private MarkdownEditorUpdate? InsertMarkdown(Document document, List<Host> hosts, int start, int end, string value)
+    private MarkdownEditorUpdate? InsertMarkdown(Document document, List<Host> hosts, int start, int end, string value, string? key, bool merge)
     {
         var cursor = start < end ? DeleteRange(document, hosts, start, end) : Resolve(hosts, start);
 
@@ -2407,20 +2475,72 @@ internal sealed class MarkdownEditorEngine
             return null;
         }
 
-        var fragment = MarkdownParser.Parse(Normalize(value));
+        value = Normalize(value);
 
-        if (fragment.Children.Count == 1 && fragment.Children[0] is Paragraph inlineFragment && cursor.Content != null)
+        if (cursor.Block is FencedCodeBlock or IndentedCodeBlock or HtmlBlock || cursor.Content is TableCell)
         {
-            var runs = Runs(cursor.Content);
-            var head = InlineContent.Split(runs, cursor.Offset, out var tail);
-            var inserted = InlineContent.Flatten(inlineFragment.Children).Select(Detach).ToList();
-            SetRuns(cursor.Content, head.Concat(inserted).Concat(tail).ToList());
-            return Commit(document, cursor.Content, cursor.Offset + InlineContent.Length(inserted));
+            return InsertAt(document, cursor, value, key, merge, preferRight: false, marks: null);
         }
 
-        var blocks = fragment.Children.ToList();
-        Splice(cursor.Block.Parent, cursor.Block.Parent.IndexOf(cursor.Block) + 1, blocks);
-        return CommitAtEnd(document, blocks.Count > 0 ? blocks[^1] : cursor.Block);
+        if (cursor.Block is ListItem item && cursor.Content == null)
+        {
+            var paragraph = new Paragraph();
+            item.Insert(0, paragraph);
+            Touch(item);
+            cursor = new Cursor(paragraph, paragraph, 0);
+        }
+
+        var blocks = MarkdownParser.Parse(value).Children.ToList();
+
+        if (cursor.Content is not Leaf leaf || blocks.Count == 0)
+        {
+            return null;
+        }
+
+        if (leaf is Paragraph { Virtual: true } virtualParagraph)
+        {
+            virtualParagraph.Virtual = false;
+        }
+
+        if (blocks is [Paragraph single])
+        {
+            var head = InlineContent.Split(Runs(leaf), cursor.Offset, out var rest);
+            var inserted = InlineContent.Flatten(single.Children).Select(Detach).ToList();
+            SetRuns(leaf, head.Concat(inserted).Concat(rest).ToList());
+            return Commit(document, leaf, cursor.Offset + InlineContent.Length(inserted), key: key, merge: merge);
+        }
+
+        var tail = SplitLeaf(leaf, cursor.Offset);
+
+        if (blocks[0] is Paragraph first && leaf.Children.Count > 0)
+        {
+            SetRuns(leaf, Runs(leaf).Concat(InlineContent.Flatten(first.Children).Select(Detach)).ToList());
+            blocks.RemoveAt(0);
+        }
+
+        Splice(leaf.Parent, leaf.Parent.IndexOf(leaf) + 1, blocks);
+        var last = blocks.Count > 0 ? blocks[^1] : leaf;
+
+        if (leaf.Children.Count == 0 && leaf != last)
+        {
+            RemoveBlock(leaf);
+        }
+
+        if (tail.Children.Count == 0)
+        {
+            RemoveBlock(tail);
+            return CommitAtEnd(document, last);
+        }
+
+        if (last is Paragraph lastParagraph)
+        {
+            var at = InlineLength(lastParagraph);
+            SetRuns(lastParagraph, Runs(lastParagraph).Concat(Runs(tail)).ToList());
+            RemoveBlock(tail);
+            return Commit(document, lastParagraph, at);
+        }
+
+        return CommitAtEnd(document, last);
     }
 
     private static Run Detach(Run run)

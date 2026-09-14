@@ -25,8 +25,8 @@ internal sealed class SourceEngine(string? text)
         return update;
     }
 
-    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool paragraphs = false, bool selection = false) =>
-        Back(Engine.InsertText(At(start), At(end), text, literal, key, merge, paragraphs, selection))!;
+    public MarkdownEditorUpdate InsertText(int start, int end, string text, bool literal, string? key = null, bool merge = false, bool selection = false) =>
+        Back(Engine.InsertText(At(start), At(end), text, literal, key, merge, selection))!;
 
     public MarkdownEditorUpdate? Delete(int start, int end, bool forward = false, string? key = null, bool merge = false, bool selection = false) =>
         Back(Engine.Delete(At(start), At(end), forward, key, merge, selection));

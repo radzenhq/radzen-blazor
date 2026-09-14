@@ -14,7 +14,7 @@ namespace Radzen.Blazor;
 /// <remarks>
 /// The Markdown text is the value in both modes. Design mode edits a parsed document and writes it back to Markdown after
 /// every edit; blocks that were not edited are kept as written. Text typed in Design mode is inserted literally:
-/// characters with a Markdown meaning are escaped.
+/// characters with a Markdown meaning are escaped. Pasted text is parsed as Markdown.
 /// </remarks>
 /// <example>
 /// <code>
@@ -272,10 +272,10 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
             return await PublishAsync(engine.Apply(start, end, text, (caret, caret), key, merge), version, raiseInput: true);
         }
 
-        var paragraphs = inputType is "insertFromPaste" or "insertFromDrop";
+        var pasted = inputType is "insertFromPaste" or "insertFromDrop";
         var update = text.Length == 0 && inputType.StartsWith("delete", StringComparison.Ordinal)
             ? engine.Delete(start, end, inputType.Contains("Forward", StringComparison.Ordinal), key, merge, selected)
-            : engine.InsertText(start, end, text, literal: true, key, merge, paragraphs, selected, right);
+            : engine.InsertText(start, end, text, literal: !pasted, key, merge, selected, right);
 
         return update == null ? null : await PublishAsync(update, version, raiseInput: true);
     }
@@ -336,17 +336,17 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     }
 
     /// <summary>
-    /// Invoked from JavaScript when the selection changes.
+    /// Invoked from JavaScript when the selection changes. Returns the selected content as Markdown, which the browser puts on the clipboard when the selection is copied.
     /// </summary>
     [JSInvokable("OnSelectionAsync")]
-    public Task OnSelectionAsync(int start, int end)
+    public Task<string?> OnSelectionAsync(int start, int end)
     {
         selection = (start, end);
         selectionMode = mode;
         toolState = engine.State(start, end);
         ToolStateChanged?.Invoke();
         StateHasChanged();
-        return Task.CompletedTask;
+        return Task.FromResult(mode == MarkdownEditorMode.Design && start < end ? engine.Copy(start, end) : null);
     }
 
     /// <summary>
