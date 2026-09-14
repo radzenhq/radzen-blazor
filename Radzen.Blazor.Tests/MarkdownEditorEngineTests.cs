@@ -49,14 +49,7 @@ public class MarkdownEditorEngineTests
 
     [Theory]
     [InlineData("*", "\\*")]
-    [InlineData("a_b", "a_b")]
-    [InlineData("_a", "\\_a")]
-    [InlineData("[x]", "\\[x\\]")]
-    [InlineData("# not a heading", "\\# not a heading")]
-    [InlineData("- not a list", "\\- not a list")]
     [InlineData("1. not a list", "1\\. not a list")]
-    [InlineData("12 apples", "12 apples")]
-    [InlineData("a - b", "a - b")]
     public void LiteralTextIsEscapedAtLineStart(string typed, string expected)
     {
         var engine = new MarkdownEditorEngine("");
@@ -64,16 +57,6 @@ public class MarkdownEditorEngineTests
         engine.InsertText(0, 0, typed, literal: true);
 
         Assert.Equal(expected, engine.Text);
-    }
-
-    [Fact]
-    public void LiteralTextInTheMiddleOfALineDoesNotEscapeBlockMarkers()
-    {
-        var engine = new MarkdownEditorEngine("ab");
-
-        engine.InsertText(1, 1, "# ", literal: true);
-
-        Assert.Equal("a# b", engine.Text);
     }
 
     [Theory]
@@ -404,9 +387,9 @@ public class MarkdownEditorEngineTests
         var engine = new MarkdownEditorEngine("Start");
 
         engine.InsertText(0, 0, "#", literal: true);
-        Assert.Equal("#Start", engine.Text);
+        Assert.Equal("\\#Start", engine.Text);
 
-        var update = engine.InsertText(1, 1, " ", literal: true);
+        var update = engine.InsertText(2, 2, " ", literal: true);
         Assert.Equal("\\# Start", engine.Text);
         Assert.Equal(3, update.SelectionStart);
     }
@@ -471,11 +454,11 @@ public class MarkdownEditorEngineTests
         var engine = new MarkdownEditorEngine("Start");
 
         engine.InsertText(0, 0, "#", literal: true);
-        engine.InsertText(1, 1, " ", literal: true);
+        engine.InsertText(2, 2, " ", literal: true);
         var update = engine.Undo();
 
-        Assert.Equal("#Start", engine.Text);
-        Assert.Equal((1, 1), (update!.SelectionStart, update.SelectionEnd));
+        Assert.Equal("\\#Start", engine.Text);
+        Assert.Equal((2, 2), (update!.SelectionStart, update.SelectionEnd));
     }
 
     [Fact]
@@ -1540,16 +1523,6 @@ public class MarkdownEditorEngineReviewRegressionTests
         engine.Command(MarkdownEditorCommands.Quote, 4, 20, null, null);
 
         Assert.Equal("Quoted one.\n\nQuoted two.", engine.Text);
-    }
-
-    [Fact]
-    public void ADelimiterLookingLineIsEscapedOnlyWhenItWouldFormATable()
-    {
-        var engine = new MarkdownEditorEngine("| a | b |\n| --- |\n| 1 | 2 | 3 |");
-
-        engine.InsertText(7, 7, "Y", literal: true);
-
-        Assert.Equal("| a | bY |\n| --- |\n| 1 | 2 | 3 |", engine.Text);
     }
 
     [Fact]

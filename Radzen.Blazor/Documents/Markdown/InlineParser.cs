@@ -746,11 +746,16 @@ class InlineParser
 
                     char closingDelimiter = titleDelimiter is OpenParenthesis ? CloseParenthesis : titleDelimiter;
 
-                    while (position < text.Length && (text[position] != closingDelimiter || text[position - 1] is Backslash))
+                    while (position < text.Length && text[position] != closingDelimiter)
                     {
                         if (text[position] is LineFeed && titleBuilder.Length > 0 && titleBuilder[^1] is LineFeed)
                         {
                             return false;
+                        }
+
+                        if (text[position] is Backslash && position + 1 < text.Length && text[position + 1].IsEscapable())
+                        {
+                            position++;
                         }
 
                         titleBuilder.Append(text[position]);

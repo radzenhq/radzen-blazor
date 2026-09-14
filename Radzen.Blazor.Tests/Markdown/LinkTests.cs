@@ -671,7 +671,7 @@ with blank line'
 [foo]
 ", @"<document>
     <paragraph>
-        <link destination=""/url\bar*baz"" title=""foo\&quot;bar\baz"">
+        <link destination=""/url\bar*baz"" title=""foo&quot;bar\baz"">
             <text>foo</text>
         </link>
     </paragraph>

@@ -17,7 +17,7 @@ internal static class BlankLines
 
         var lines = new List<int>();
         var firstNewline = source.IndexOf('\n', from, to - from);
-        var lineStart = from == 0 || source[from - 1] == '\n' ? from : firstNewline < 0 ? -1 : firstNewline + 1;
+        var lineStart = from == 0 || !hasPrevious || source[from - 1] == '\n' ? from : firstNewline < 0 ? -1 : firstNewline + 1;
 
         while (lineStart >= 0 && lineStart <= to)
         {

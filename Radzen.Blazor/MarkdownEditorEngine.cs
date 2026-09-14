@@ -430,8 +430,24 @@ internal sealed class MarkdownEditorEngine
 
     private Cursor Resolve(Document document, int offset)
     {
+        if (AfterTrailingBreak(document, offset) is { } continued)
+        {
+            return continued;
+        }
+
         var chain = Chain(document, offset);
         var block = chain.LastOrDefault();
+
+        if (block is null or BlockContainer)
+        {
+            var lineEnd = Text.IndexOf('\n', offset) is var newline && newline >= 0 ? newline : Text.Length;
+            var empty = Blocks(document).OfType<BlockContainer>().Where(candidate => candidate.Children.Count == 0 && candidate.SourceEnd < offset && Text[candidate.SourceEnd..lineEnd].Trim().Length == 0).OrderByDescending(candidate => candidate.SourceEnd).FirstOrDefault();
+
+            if (empty != null)
+            {
+                return Resolve(document, empty.SourceEnd);
+            }
+        }
 
         if (block == null)
         {
@@ -493,6 +509,43 @@ internal sealed class MarkdownEditorEngine
                 var inner = Blocks(document).Where(candidate => candidate is Paragraph or Heading && candidate.SourceStart <= offset).OrderByDescending(candidate => candidate.SourceStart).FirstOrDefault() as Leaf;
                 return inner != null ? new Cursor(inner, inner, InlineContent.Length(InlineContent.Flatten(inner.Children))) : new Cursor(block, null, 0);
         }
+    }
+
+    private Cursor? AfterTrailingBreak(Document document, int offset)
+    {
+        var lineStart = offset == 0 ? 0 : Text.LastIndexOf('\n', offset - 1) + 1;
+        var lineEnd = Text.IndexOf('\n', offset) is var newline && newline >= 0 ? newline : Text.Length;
+
+        if (lineStart == 0 || Text[lineStart..lineEnd].Any(ch => ch is not (' ' or '\t' or '>')) || Text[offset..lineEnd].Trim().Length > 0)
+        {
+            return null;
+        }
+
+        var previousEnd = lineStart - 1;
+        var previousStart = previousEnd == 0 ? 0 : Text.LastIndexOf('\n', previousEnd - 1) + 1;
+        var previousLine = Text[previousStart..previousEnd];
+        var backslash = previousLine.EndsWith('\\');
+
+        if (!backslash && !previousLine.EndsWith("  ", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var paragraph = Blocks(document).OfType<Paragraph>().LastOrDefault(candidate => candidate.Children.Count > 0 && candidate.SourceEnd >= previousStart && candidate.SourceEnd <= previousEnd);
+
+        if (paragraph == null)
+        {
+            return null;
+        }
+
+        if (backslash && paragraph.Children[^1] is Text text && text.Value.EndsWith('\\'))
+        {
+            text.Value = text.Value[..^1];
+        }
+
+        paragraph.Add(new LineBreak { Backslash = backslash });
+        Touch(paragraph);
+        return new Cursor(paragraph, paragraph, InlineContent.Length(Runs(paragraph)));
     }
 
     private List<Run> Runs(IBlockInlineContainer content)
@@ -1658,6 +1711,7 @@ internal sealed class MarkdownEditorEngine
             quote.Remove(leaf);
             InsertAfter(quote, leaf);
             Touch(quote);
+            Prune(quote);
             return Commit(document, leaf, 0);
         }
 

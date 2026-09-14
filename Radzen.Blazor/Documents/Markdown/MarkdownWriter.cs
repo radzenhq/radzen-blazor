@@ -15,8 +15,6 @@ internal sealed class MarkdownWriter : INodeVisitor
     private string delimiter = string.Empty;
     private Block? closed;
     private bool tight;
-    private bool inTable;
-    private bool inHeading;
 
     private readonly bool verbatimBlocks;
 
@@ -74,11 +72,12 @@ internal sealed class MarkdownWriter : INodeVisitor
     private sealed class Rendering
     {
         public int Leading;
-        public int LeadingAt = -1;
+        public int LeadingAt;
+        public int[]? LeadingMap;
         public int Trailing;
-        public int TrailingAt = -1;
-        public string Value = string.Empty;
-        public string Escaped = string.Empty;
+        public int TrailingAt;
+        public int[]? TrailingMap;
+        public int[]? Map;
     }
 
     private readonly Dictionary<Text, Rendering> renderings = new(ReferenceEqualityComparer.Instance);
@@ -94,42 +93,17 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         if (valueOffset < rendering.Leading)
         {
-            return rendering.LeadingAt >= 0 ? rendering.LeadingAt + valueOffset : start;
+            return rendering.LeadingMap != null ? rendering.LeadingAt + rendering.LeadingMap[valueOffset] : start;
         }
 
         var bodyLength = text.Value.Length - rendering.Leading - rendering.Trailing;
 
         if (valueOffset > rendering.Leading + bodyLength)
         {
-            return rendering.TrailingAt >= 0 ? rendering.TrailingAt + (valueOffset - rendering.Leading - bodyLength) : positions[text].End;
+            return rendering.TrailingMap != null ? rendering.TrailingAt + rendering.TrailingMap[valueOffset - rendering.Leading - bodyLength] : positions[text].End;
         }
 
-        return start + EscapedOffset(rendering.Value, rendering.Escaped, valueOffset - rendering.Leading);
-    }
-
-    private static int EscapedOffset(string value, string escaped, int valueOffset)
-    {
-        var i = 0;
-        var j = 0;
-
-        while (i < valueOffset && j < escaped.Length)
-        {
-            if (escaped[j] != value[i])
-            {
-                j++;
-                continue;
-            }
-
-            if (value[i] == '\\' && j + 1 < escaped.Length && escaped[j + 1] == '\\')
-            {
-                j++;
-            }
-
-            i++;
-            j++;
-        }
-
-        return j;
+        return rendering.Map != null ? start + rendering.Map[valueOffset - rendering.Leading] : start;
     }
 
     public static int SourceOffsetWithin(string source, Text text, int valueOffset)
@@ -413,7 +387,7 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         FlushClose(LazySeparator());
         var start = ContentStart();
-        RenderInlines(paragraph.Children);
+        RenderInlines(paragraph.Children, "\n", lineStart: true, blockEnd: true);
         positions[paragraph] = (start, output.Length);
         CloseBlock(paragraph);
     }
@@ -436,7 +410,7 @@ internal sealed class MarkdownWriter : INodeVisitor
         {
             FlushClose(LazySeparator());
             var contentStart = ContentStart();
-            RenderInlines(heading.Children);
+            RenderInlines(heading.Children, "\n", lineStart: true, blockEnd: true);
             positions[heading] = (contentStart, output.Length);
             var underline = ((SetExtHeading)heading).Underline ?? string.Empty;
             EnsureNewLine();
@@ -447,16 +421,11 @@ internal sealed class MarkdownWriter : INodeVisitor
 
         Write(new string('#', heading.Level) + (heading.Children.Count > 0 ? " " : string.Empty));
         var start = output.Length;
-        inHeading = true;
-        RenderInlines(heading.Children);
-        inHeading = false;
+        var enclosing = constructs;
+        constructs |= Construct.HeadingAtx;
+        RenderInlines(heading.Children, "\n", blockEnd: true);
+        constructs = enclosing;
         positions[heading] = (start, output.Length);
-
-        if (output.Length > start && output[^1] == '#')
-        {
-            output.Append(" #");
-        }
-
         CloseBlock(heading);
     }
 
@@ -534,15 +503,12 @@ internal sealed class MarkdownWriter : INodeVisitor
         if (item.Checked is { } isChecked)
         {
             output.Append(isChecked ? "[x] " : "[ ] ");
-
-            if (item.Children.Count > 0 && item.Children[0] is not (Paragraph or Heading))
-            {
-                output.Append('\n');
-            }
         }
 
-        linePrefix = item.Children.Count > 0 && item.Children[0] is Paragraph { Children.Count: > 0 } ? (item.Checked is { } box ? box ? "[x] " : "[ ] " : string.Empty) : string.Empty;
-        markerPrefix = linePrefix.Length > 0 || (item.Children.Count > 0 && item.Children[0] is Paragraph { Children.Count: > 0 }) ? marker : string.Empty;
+        if (item.Children.Count > 0 && (item.Checked != null ? item.Children[0] is not (Paragraph or Heading) : item.Children[0] is ThematicBreak))
+        {
+            output.Append('\n');
+        }
 
         if (item.Children.Count == 0)
         {
@@ -628,9 +594,20 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitIndentedCodeBlock(IndentedCodeBlock codeBlock)
     {
         ArgumentNullException.ThrowIfNull(codeBlock);
+        var fence = closed is List or ListItem ? new string('`', Math.Max(3, LongestRun(codeBlock.Value, '`') + 1)) : null;
         FlushClose(tight ? 1 : 2);
         var previous = delimiter;
-        delimiter += "    ";
+
+        if (fence != null)
+        {
+            Write(fence);
+            output.Append('\n');
+        }
+        else
+        {
+            delimiter += "    ";
+        }
+
         prefixes[codeBlock] = delimiter;
         var lines = codeBlock.Value.Split('\n');
         var count = lines.Length > 1 && lines[^1].Length == 0 ? lines.Length - 1 : lines.Length;
@@ -656,6 +633,13 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         positions[codeBlock] = (start < 0 ? output.Length : start, output.Length);
+
+        if (fence != null)
+        {
+            output.Append('\n');
+            Write(fence);
+        }
+
         delimiter = previous;
         CloseBlock(codeBlock);
     }
@@ -703,7 +687,6 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
 
         var header = table.Rows[0];
-        inTable = true;
         WriteRow(header);
         output.Append('\n').Append(delimiter);
         var original = table.DelimiterLine;
@@ -734,22 +717,25 @@ internal sealed class MarkdownWriter : INodeVisitor
             WriteRow(row);
         }
 
-        inTable = false;
         CloseBlock(table);
     }
 
     private void WriteRow(TableRow row)
     {
         Emit("|");
+        var enclosing = constructs;
+        constructs |= Construct.TableCell;
 
         foreach (var cell in row.Cells)
         {
             output.Append(' ');
             var start = output.Length;
-            RenderInlines(cell.Children);
+            RenderInlines(cell.Children, " ");
             positions[cell] = (start, output.Length);
             output.Append(" |");
         }
+
+        constructs = enclosing;
     }
 
     public void VisitTableHeaderRow(TableHeaderRow header)
@@ -767,39 +753,94 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitTableCell(TableCell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        RenderInlines(cell.Children);
+        RenderInlines(cell.Children, " ");
     }
-
-    private readonly Dictionary<Text, int> escapeAt = new(ReferenceEqualityComparer.Instance);
-
-    private readonly HashSet<HtmlInline> escapeHtmlLineStart = new(ReferenceEqualityComparer.Instance);
-
-    private readonly HashSet<Text> bangBeforeLink = new(ReferenceEqualityComparer.Instance);
 
     private int inlineDepth;
 
-    private void RenderInlines(IReadOnlyList<Inline> inlines)
+    private void RenderInlines(IReadOnlyList<Inline> inlines, string after = "\n", bool lineStart = false, bool blockEnd = false)
     {
         inlines = Normalize(inlines);
+        var enclosing = constructs;
 
         if (inlineDepth == 0)
         {
-            MarkLineStarts(inlines);
-            atInlineLineStart = true;
+            constructs |= Construct.Phrasing;
+            atInlineLineStart = lineStart;
+            contentAtLineStart = lineStart;
+            lineStartAt = output.Length;
         }
 
         inlineDepth++;
+        var trailing = inlines.Count;
+
+        while (blockEnd && trailing > 0 && inlines[trailing - 1] is LineBreak)
+        {
+            trailing--;
+        }
 
         for (var index = 0; index < inlines.Count; index++)
         {
-            followingChar = index + 1 < inlines.Count && inlines[index + 1] is Text next && next.Value.Length > 0 ? next.Value[0] : '\0';
+            following = Peek(inlines, index + 1, after);
+            endsBlock = blockEnd && index >= trailing - 1;
+
+            if (inlines[index] is Text text && index + 1 < inlines.Count && inlines[index + 1] is SoftLineBreak)
+            {
+                RenderingOf(text).Trailing = text.Value.Length - text.Value.TrimEnd(' ', '\t').Length;
+            }
+
             inlines[index].Accept(this);
         }
 
         inlineDepth--;
+        constructs = enclosing;
     }
 
-    private char followingChar;
+    private string following = "\n";
+
+    private bool endsBlock;
+
+    private static string Peek(IReadOnlyList<Inline> inlines, int index, string after)
+    {
+        for (; index < inlines.Count; index++)
+        {
+            switch (inlines[index])
+            {
+                case Text { Value.Length: > 0 } text:
+                    return text.Value[..1];
+                case Emphasis emphasis:
+                    return Lead(emphasis, emphasis.Marker ?? '*');
+                case Strong strong:
+                    return Lead(strong, strong.Marker ?? '*');
+                case Strikethrough strikethrough:
+                    return Lead(strikethrough, '~');
+                case Code:
+                    return "`";
+                case Link { Autolink: true }:
+                    return "<";
+                case Link:
+                    return "[";
+                case Image:
+                    return "!";
+                case HtmlInline { Value.Length: > 0 } html:
+                    return html.Value[..1];
+                case LineBreak lineBreak:
+                    return lineBreak.Backslash == true ? "\\" : " ";
+                case SoftLineBreak:
+                    return "\n";
+            }
+        }
+
+        return after;
+    }
+
+    private static string Lead(InlineContainer container, char marker) => container.Children is [Text { Value.Length: > 0 } first, ..] && char.IsWhiteSpace(first.Value[0]) ? first.Value[..1] : marker.ToString();
+
+    private int lineStartAt;
+
+    private bool contentAtLineStart;
+
+    private string Before() => (contentAtLineStart ? "\n" : string.Empty) + output.ToString(lineStartAt, output.Length - lineStartAt);
 
     // CommonMark 0.31.2, 6.2 Emphasis: a delimiter run next to punctuation is only flanking when the other side is whitespace or punctuation
     private static bool Flanks(char outside, char inside) => !(IsPunctuation(inside) && !char.IsWhiteSpace(outside) && !IsPunctuation(outside) && outside != '\0');
@@ -807,144 +848,19 @@ internal sealed class MarkdownWriter : INodeVisitor
     // CommonMark 0.31.2, 2.1 Characters and lines: Unicode punctuation is the P categories plus ASCII symbols
     private static bool IsPunctuation(char ch) => char.IsPunctuation(ch) || (ch < 128 && char.IsSymbol(ch));
 
-    private void MarkLineStarts(IReadOnlyList<Inline> inlines)
-    {
-        var flat = new List<Inline?>();
-        Collect(inlines, flat);
-        var lineStart = true;
-        string? previousLine = null;
-        var prefix = linePrefix;
-        var marker = markerPrefix;
-        linePrefix = string.Empty;
-        markerPrefix = string.Empty;
-
-        for (var index = 0; index < flat.Count; index++)
-        {
-            if (flat[index] == null)
-            {
-                lineStart = false;
-                continue;
-            }
-
-            if (flat[index] is InlineContainer)
-            {
-                continue;
-            }
-
-            if (flat[index] is LineBreak or SoftLineBreak)
-            {
-                lineStart = true;
-                continue;
-            }
-
-            if (flat[index] is Text bang && bang.Value.EndsWith('!') && index + 1 < flat.Count && flat[index + 1] is Link)
-            {
-                bangBeforeLink.Add(bang);
-            }
-
-            if (!lineStart)
-            {
-                continue;
-            }
-
-            lineStart = false;
-
-            if (index > 0 && flat[index] is HtmlInline html && StartsHtmlBlock(html.Value))
-            {
-                escapeHtmlLineStart.Add(html);
-                continue;
-            }
-
-            if (inHeading || flat[index] is not Text _)
-            {
-                continue;
-            }
-
-            var texts = new List<Text>();
-            var line = new StringBuilder();
-            var wholeLine = new StringBuilder();
-
-            for (var next = index; next < flat.Count && flat[next] is Text current; next++)
-            {
-                texts.Add(current);
-                line.Append(current.Value);
-            }
-
-            for (var next = index; next < flat.Count && flat[next] is not (LineBreak or SoftLineBreak); next++)
-            {
-                wholeLine.Append(flat[next] is Text part ? part.Value : flat[next] is InlineContainer ? string.Empty : "x");
-            }
-
-            var value = line.ToString().TrimStart(' ', '\t');
-            var skipped = line.Length - value.Length;
-            var delimiterRow = Table.DelimiterRegex.IsMatch(value) && previousLine != null && Cells(previousLine) == Cells(value);
-            var rule = marker.Length > 0 && ThematicBreakLine.IsMatch(marker + prefix + value);
-            previousLine = prefix + wholeLine.ToString().TrimStart(' ', '\t');
-            prefix = string.Empty;
-            marker = string.Empty;
-
-            if (!LineStart.IsMatch(value) && !delimiterRow && !rule && !(index > 0 && StartsHtmlBlock(value)))
-            {
-                continue;
-            }
-
-            var digits = Regex.Match(value, @"^\d{1,9}(?=[.)])");
-            var at = skipped + (digits.Success ? digits.Length : 0);
-            var offset = 0;
-
-            foreach (var text in texts)
-            {
-                if (at < offset + text.Value.Length || text == texts[^1])
-                {
-                    escapeAt[text] = at - offset;
-                    break;
-                }
-
-                offset += text.Value.Length;
-            }
-        }
-    }
-
-    private string linePrefix = string.Empty;
-
-    private string markerPrefix = string.Empty;
-
-    private static readonly Regex ThematicBreakLine = new(@"^(?:[\-*_][ \t]*){3,}$", RegexOptions.Compiled);
-
-    private static int Cells(string line) => Regex.Split(line.Trim().Trim('|'), @"(?<!\\)\|").Length;
-
-    // CommonMark 0.31.2, 4.6 HTML blocks: only start conditions 1 to 6 may interrupt a paragraph
-    private static bool StartsHtmlBlock(string? line) => line != null && Enumerable.Range(1, 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
-
-    private static void Collect(IReadOnlyList<Inline> inlines, List<Inline?> flat)
-    {
-        foreach (var inline in inlines)
-        {
-            flat.Add(inline);
-
-            if (inline is InlineContainer container)
-            {
-                Collect(container.Children, flat);
-                flat.Add(null);
-            }
-        }
-    }
-
     public void VisitText(Text text)
     {
         ArgumentNullException.ThrowIfNull(text);
         var rendering = RenderingOf(text);
         var value = text.Value[rendering.Leading..^rendering.Trailing];
 
-        if (atInlineLineStart && !inTable && rendering.Leading == 0)
+        if (atInlineLineStart && rendering.Leading == 0)
         {
             value = value.TrimStart(' ', '\t');
             rendering.Leading = text.Value.Length - rendering.Trailing - value.Length;
         }
 
-        rendering.Value = value;
-        rendering.Escaped = Escape(value, escapeAt.TryGetValue(text, out var at) ? Math.Max(0, at - rendering.Leading) : -1, bangBeforeLink.Contains(text));
-        var start = Emit(rendering.Escaped);
+        var start = Emit(Safe(value, Before(), following, out rendering.Map));
         atInlineLineStart = false;
         positions[text] = (start, output.Length);
     }
@@ -960,24 +876,103 @@ internal sealed class MarkdownWriter : INodeVisitor
         return rendering;
     }
 
-    private static readonly Regex LineStart = new(@"^([\-*+](?=[ \t]|$)|>|#{1,6}(?=[ \t]|$)|=+[ \t]*$|(?:[\-*_][ \t]*){3,}$|\d{1,9}[.)](?=[ \t]|$)|(?:`{3,}|~{3,}))", RegexOptions.Compiled);
-
     private bool atInlineLineStart;
 
-    private const string Special = "`*\\~[]_<|";
-
-    private string Escape(string value, int lineStartAt, bool bangBeforeLink = false)
+    [Flags]
+    private enum Construct
     {
-        var escaped = new StringBuilder();
+        None = 0,
+        Phrasing = 1,
+        HeadingAtx = 2,
+        TableCell = 4,
+        Label = 8,
+        DestinationLiteral = 16,
+        DestinationRaw = 32,
+        Title = 64
+    }
 
-        for (var index = 0; index < value.Length; index++)
+    private const Construct Spans = Construct.DestinationLiteral | Construct.DestinationRaw | Construct.Title;
+
+    private Construct constructs;
+
+    private sealed record Unsafe(string Character, string? Before = null, string? After = null, bool AtBreak = false, Construct In = Construct.None, Construct NotIn = Construct.None)
+    {
+        public Regex Pattern { get; } = new((AtBreak || Before != null ? "(?<=" + (AtBreak ? @"[\r\n][\t ]*" : string.Empty) + (Before ?? string.Empty) + ")" : string.Empty) + (Character.Length == 1 ? Regex.Escape(Character) : "(?:" + Character + ")") + (After != null ? "(?=" + After + ")" : string.Empty));
+
+        public bool HasBefore => AtBreak || Before != null;
+
+        public bool HasAfter => After != null;
+    }
+
+    // CommonMark 0.31.2 sections 4 to 6 and GFM 0.29-gfm sections 4.10 and 6.5: the characters that start or end a construct in each context
+    private static readonly Unsafe[] Rules =
+    [
+        new("!", After: @"\[", In: Construct.Phrasing, NotIn: Spans),
+        new("\"", In: Construct.Title),
+        new("#", AtBreak: true),
+        new("#", After: @"(?:[\r\n]|$)", In: Construct.HeadingAtx),
+        new("&", After: "[#A-Za-z]", In: Construct.Phrasing),
+        new("(", In: Construct.DestinationRaw),
+        new("(", Before: @"\]", In: Construct.Phrasing, NotIn: Spans),
+        new(")", Before: @"\d+", AtBreak: true),
+        new(")", In: Construct.DestinationRaw),
+        new("*", After: @"[ \t\r\n*]", AtBreak: true),
+        new("*", In: Construct.Phrasing, NotIn: Spans),
+        new("+", After: @"[ \t\r\n]", AtBreak: true),
+        new("-", After: @"[ \t\r\n-]", AtBreak: true),
+        new("-", After: "[:|-]", AtBreak: true),
+        new(".", Before: @"\d+", After: @"(?:[ \t\r\n]|$)", AtBreak: true),
+        new(":", After: "-", AtBreak: true),
+        new("<", After: "[!/?A-Za-z]", AtBreak: true),
+        new("<", After: "[!/?A-Za-z]", In: Construct.Phrasing, NotIn: Spans),
+        new("<", In: Construct.DestinationLiteral),
+        new("=", AtBreak: true),
+        new(">", AtBreak: true),
+        new(">", In: Construct.DestinationLiteral),
+        new("[", AtBreak: true),
+        new("[", In: Construct.Phrasing, NotIn: Spans),
+        new("[", In: Construct.Label),
+        new("\\", After: @"[\r\n]", In: Construct.Phrasing),
+        new("]", In: Construct.Label),
+        new("_", AtBreak: true),
+        new(@"(?<![\p{L}\p{N}]_*)_|_(?!_*[\p{L}\p{N}])", In: Construct.Phrasing, NotIn: Spans),
+        new("`", AtBreak: true),
+        new("`", In: Construct.Phrasing, NotIn: Spans),
+        new("|", After: @"[\t :-]", AtBreak: true),
+        new("|", In: Construct.TableCell),
+        new("~", AtBreak: true),
+        new("~", In: Construct.Phrasing, NotIn: Spans)
+    ];
+
+    private string Safe(string value, string before, string after, out int[] map)
+    {
+        var whole = before + value + after;
+        var infos = new Dictionary<int, (bool Before, bool After)>();
+
+        foreach (var rule in Rules)
         {
-            var ch = value[index];
-            var special = Special.Contains(ch, StringComparison.Ordinal)
-                && !(ch == '_' && index > 0 && index + 1 < value.Length && char.IsLetterOrDigit(value[index - 1]) && char.IsLetterOrDigit(value[index + 1]))
-                && !(ch == '|' && !inTable);
+            if ((rule.In != Construct.None && (constructs & rule.In) == 0) || (constructs & rule.NotIn) != 0)
+            {
+                continue;
+            }
 
-            if (special || index == lineStartAt || (ch == '!' && (index + 1 < value.Length ? value[index + 1] == '[' : bangBeforeLink)))
+            foreach (Match match in rule.Pattern.Matches(whole))
+            {
+                infos[match.Index] = infos.TryGetValue(match.Index, out var info) ? (info.Before && rule.HasBefore, info.After && rule.HasAfter) : (rule.HasBefore, rule.HasAfter);
+            }
+        }
+
+        var escaped = new StringBuilder();
+        var start = before.Length;
+        var end = whole.Length - after.Length;
+        map = new int[value.Length + 1];
+
+        for (var index = start; index < end; index++)
+        {
+            map[index - start] = escaped.Length;
+            var ch = whole[index];
+
+            if (ch.IsEscapable() && ((infos.TryGetValue(index, out var info) && !Skipped(index, info)) || (ch == '\\' && index + 1 < whole.Length && whole[index + 1].IsEscapable())))
             {
                 escaped.Append('\\');
             }
@@ -985,7 +980,12 @@ internal sealed class MarkdownWriter : INodeVisitor
             escaped.Append(ch);
         }
 
+        map[value.Length] = escaped.Length;
         return escaped.ToString();
+
+        bool Skipped(int position, (bool Before, bool After) info) =>
+            (position + 1 < end && info.After && infos.TryGetValue(position + 1, out var next) && !next.Before && !next.After)
+            || (info.Before && infos.TryGetValue(position - 1, out var previous) && !previous.Before && !previous.After);
     }
 
     public void VisitEmphasis(Emphasis emphasis)
@@ -1131,76 +1131,111 @@ internal sealed class MarkdownWriter : INodeVisitor
         return count;
     }
 
+    private static Text? FirstText(IReadOnlyList<Inline> body) => body.Count == 0 ? null : body[0] switch
+    {
+        Text text => text,
+        Emphasis or Strong or Strikethrough => FirstText(((InlineContainer)body[0]).Children),
+        _ => null
+    };
+
+    private static Text? LastText(IReadOnlyList<Inline> body) => body.Count == 0 ? null : body[^1] switch
+    {
+        Text text => text,
+        Emphasis or Strong or Strikethrough => LastText(((InlineContainer)body[^1]).Children),
+        _ => null
+    };
+
+    private bool Blank(IReadOnlyList<Inline> body) => body.All(child => child switch
+    {
+        Text text => text.Value.Length == RenderingOf(text).Leading + RenderingOf(text).Trailing,
+        Emphasis or Strong or Strikethrough => Blank(((InlineContainer)child).Children),
+        _ => false
+    });
+
     private void RenderMarkBody(InlineContainer inline, string marker)
     {
-        var body = inline.Children;
-        var leading = string.Empty;
-        var trailing = string.Empty;
-        Text? first = body.Count > 0 ? body[0] as Text : null;
-        Text? last = body.Count > 0 ? body[^1] as Text : null;
+        var next = following;
+        var last = endsBlock;
+        var body = inline.Children.ToList();
+        var breaks = new List<Inline>();
+
+        while (body.Count > 0 && body[^1] is LineBreak)
+        {
+            breaks.Insert(0, body[^1]);
+            body.RemoveAt(body.Count - 1);
+        }
 
         var before = output.Length > 0 ? output[^1] : '\0';
-        var after = followingChar;
-
-        if (first != null)
-        {
-            var count = first.Value.Length - first.Value.TrimStart().Length;
-
-            if (count == 0 && first.Value.Length > 0 && !Flanks(before, first.Value[0]))
-            {
-                count = PunctuationPrefix(first.Value);
-            }
-
-            leading = first.Value[..count];
-            RenderingOf(first).Leading = leading.Length;
-        }
-
-        if (last != null)
-        {
-            var remaining = last == first ? last.Value[leading.Length..] : last.Value;
-            var count = remaining.Length - remaining.TrimEnd().Length;
-
-            if (count == 0 && remaining.Length > 0 && !Flanks(after, remaining[^1]))
-            {
-                count = PunctuationSuffix(remaining);
-            }
-
-            trailing = remaining[(remaining.Length - count)..];
-            RenderingOf(last).Trailing = trailing.Length;
-        }
+        var after = (breaks.Count > 0 ? Peek(breaks, 0, next) : next)[0];
+        var leading = Expel(FirstText(body), before, leading: true);
+        var trailing = Expel(LastText(body), after, leading: false);
 
         if (leading.Length > 0)
         {
-            RenderingOf(first!).LeadingAt = Emit(Escape(leading, -1));
+            var first = FirstText(body)!;
+            RenderingOf(first).LeadingAt = Emit(Safe(leading, Before(), marker, out RenderingOf(first).LeadingMap));
         }
 
-        if (body.All(child => child is Text text && text.Value.Length == RenderingOf(text).Leading + RenderingOf(text).Trailing))
+        if (Blank(body))
         {
             positions[inline] = (output.Length, output.Length);
 
-            foreach (var text in body.OfType<Text>())
+            foreach (var node in Flatten(body))
             {
-                positions[text] = (output.Length, output.Length);
-                RenderingOf(text).TrailingAt = output.Length;
+                positions[node] = (output.Length, output.Length);
+
+                if (node is Text text)
+                {
+                    RenderingOf(text).TrailingAt = output.Length;
+                }
             }
-
-            output.Append(trailing);
-            return;
         }
-
-        Emit(marker);
-        var bodyStart = output.Length;
-        RenderInlines(body);
-        positions[inline] = (bodyStart, output.Length);
-        output.Append(marker);
-
-        if (last != null)
+        else
         {
-            RenderingOf(last).TrailingAt = output.Length;
+            Emit(marker);
+            var bodyStart = output.Length;
+            RenderInlines(body, marker);
+            positions[inline] = (bodyStart, output.Length);
+            output.Append(marker);
         }
 
-        output.Append(trailing);
+        if (trailing.Length > 0)
+        {
+            var text = LastText(body)!;
+            RenderingOf(text).TrailingAt = output.Length;
+            output.Append(Safe(trailing, Before(), next, out RenderingOf(text).TrailingMap));
+        }
+
+        RenderInlines(breaks, next, blockEnd: last);
     }
+
+    private string Expel(Text? text, char outside, bool leading)
+    {
+        if (text == null)
+        {
+            return string.Empty;
+        }
+
+        var rendering = RenderingOf(text);
+        var remaining = text.Value[rendering.Leading..^rendering.Trailing];
+        var count = remaining.Length - (leading ? remaining.TrimStart() : remaining.TrimEnd()).Length;
+
+        if (count == 0 && remaining.Length > 0 && !Flanks(outside, leading ? remaining[0] : remaining[^1]))
+        {
+            count = leading ? PunctuationPrefix(remaining) : PunctuationSuffix(remaining);
+        }
+
+        if (leading)
+        {
+            rendering.Leading += count;
+            return remaining[..count];
+        }
+
+        rendering.Trailing += count;
+        return remaining[^count..];
+    }
+
+    private static IEnumerable<Inline> Flatten(IReadOnlyList<Inline> inlines) => inlines.SelectMany(inline => inline is InlineContainer container ? Flatten(container.Children).Prepend(inline) : [inline]);
 
     public void VisitCode(Code code)
     {
@@ -1266,14 +1301,17 @@ internal sealed class MarkdownWriter : INodeVisitor
     private void RenderLinkBody(InlineContainer inline, string? destination, string? title, string? suffix, bool image)
     {
         atInlineLineStart = false;
-
         var outerStart = Emit(string.Empty);
+        var enclosing = constructs;
 
         if (suffix != null)
         {
             Emit(image ? "![" : "[");
             var referenceStart = output.Length;
-            RenderInlines(inline.Children);
+            constructs |= Construct.Label;
+            RenderInlines(inline.Children, "]");
+            constructs = enclosing;
+            atInlineLineStart = false;
             positions[inline] = image ? (outerStart, output.Length + suffix.Length) : (referenceStart, output.Length);
             output.Append(suffix);
             return;
@@ -1286,25 +1324,38 @@ internal sealed class MarkdownWriter : INodeVisitor
             output.Append(only.Value);
             positions[inline] = (autolinkStart, output.Length);
             output.Append('>');
-            atInlineLineStart = false;
             return;
         }
 
         Emit(image ? "![" : "[");
         var start = output.Length;
-        RenderInlines(inline.Children);
+        constructs |= Construct.Label;
+        RenderInlines(inline.Children, "](");
+        constructs = enclosing;
+        atInlineLineStart = false;
         positions[inline] = (start, output.Length);
         output.Append("](");
         var target = (destination ?? string.Empty).Replace("\r", "%0D", StringComparison.Ordinal).Replace("\n", "%0A", StringComparison.Ordinal);
-        output.Append(target.Length == 0 || target.Any(ch => ch is ' ' or '(' or ')') ? "<" + target.Replace("<", "\\<", StringComparison.Ordinal).Replace(">", "\\>", StringComparison.Ordinal) + ">" : target);
+
+        if ((target.Length == 0 && !string.IsNullOrEmpty(title)) || Regex.IsMatch(target, @"[\u0000- \u007F]"))
+        {
+            constructs = enclosing | Construct.DestinationLiteral;
+            output.Append('<').Append(Safe(target, "<", ">", out _)).Append('>');
+        }
+        else
+        {
+            constructs = enclosing | Construct.DestinationRaw;
+            output.Append(Safe(target, "(", string.IsNullOrEmpty(title) ? ")" : " ", out _));
+        }
 
         if (!string.IsNullOrEmpty(title))
         {
-            output.Append(" \"").Append(title.Replace("\"", "\\\"", StringComparison.Ordinal)).Append('"');
+            constructs = enclosing | Construct.Title;
+            output.Append(" \"").Append(Safe(title, "\"", "\"", out _)).Append('"');
         }
 
+        constructs = enclosing;
         output.Append(')');
-        atInlineLineStart = false;
 
         if (image)
         {
@@ -1312,10 +1363,15 @@ internal sealed class MarkdownWriter : INodeVisitor
         }
     }
 
+    // CommonMark 0.31.2, 4.6 HTML blocks: only start conditions 1 to 6 may interrupt a paragraph
+    private static bool StartsHtmlBlock(string? line) => line != null && Enumerable.Range(1, 6).Any(type => BlockParser.HtmlBlockOpenRegex[type].IsMatch(line));
+
     public void VisitHtmlInline(HtmlInline html)
     {
         ArgumentNullException.ThrowIfNull(html);
-        var start = Emit((escapeHtmlLineStart.Contains(html) ? "\\" : string.Empty) + (html.Value ?? string.Empty));
+        var value = html.Value ?? string.Empty;
+        // CommonMark 0.31.2, 4.4 Indented code blocks: an indented line cannot interrupt a paragraph
+        var start = Emit((atInlineLineStart && StartsHtmlBlock(value) ? "\\" : string.Empty) + value.Replace("\n", "\n    ", StringComparison.Ordinal));
         positions[html] = (start, output.Length);
         atInlineLineStart = false;
     }
@@ -1323,18 +1379,29 @@ internal sealed class MarkdownWriter : INodeVisitor
     public void VisitLineBreak(LineBreak lineBreak)
     {
         ArgumentNullException.ThrowIfNull(lineBreak);
-        var start = Emit(lineBreak.Backslash == true ? "\\" : "  ");
+        var start = Emit(lineBreak.Backslash == true && !endsBlock ? "\\" : "  ");
         output.Append('\n');
         Emit(string.Empty);
         positions[lineBreak] = (start, output.Length);
         atInlineLineStart = true;
+        contentAtLineStart = true;
+        lineStartAt = output.Length;
     }
 
     public void VisitSoftLineBreak(SoftLineBreak softLineBreak)
     {
         ArgumentNullException.ThrowIfNull(softLineBreak);
+
+        while (output.Length > 0 && output[^1] is ' ' or '\t')
+        {
+            output.Length--;
+        }
+
         positions[softLineBreak] = (output.Length, output.Length);
         output.Append('\n');
+        Emit(string.Empty);
         atInlineLineStart = true;
+        contentAtLineStart = true;
+        lineStartAt = output.Length;
     }
 }
