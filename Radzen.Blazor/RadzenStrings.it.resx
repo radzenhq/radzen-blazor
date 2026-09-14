@@ -2451,11 +2451,8 @@
     <value>Nascondi tastiera</value>
   </data>
   <!-- MarkdownEditor -->
-  <data name="MarkdownEditor_DesignText" xml:space="preserve">
-    <value>Design</value>
-  </data>
-  <data name="MarkdownEditor_SourceText" xml:space="preserve">
-    <value>Sorgente</value>
+  <data name="MarkdownEditorSource_Title" xml:space="preserve">
+    <value>Visualizza sorgente</value>
   </data>
   <data name="MarkdownEditorUndo_Title" xml:space="preserve">
     <value>Annulla</value>

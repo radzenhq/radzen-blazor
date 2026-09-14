@@ -7,17 +7,6 @@
         {
             <div class="rz-toolbar rz-markdown-editor-toolbar">
                 <div class="rz-markdown-editor-tools">
-                    @if (ShowModeSwitch)
-                    {
-                        <div class="rz-markdown-editor-modes">
-                            <RadzenSelectBar TValue="MarkdownEditorMode" Value="@mode" ValueChanged="@SetModeAsync" Size="ButtonSize.Small" Disabled="@Disabled">
-                                <Items>
-                                    <RadzenSelectBarItem Value="MarkdownEditorMode.Source" Icon="markdown" AriaLabel="@SourceText" title="@SourceText"/>
-                                    <RadzenSelectBarItem Value="MarkdownEditorMode.Design" Icon="match_case" AriaLabel="@DesignText" title="@DesignText"/>
-                                </Items>
-                            </RadzenSelectBar>
-                        </div>
-                    }
                     <CascadingValue Value="@this">
                         @if (ChildContent != null)
                         {
@@ -47,6 +36,8 @@
                             <RadzenMarkdownEditorHorizontalRule />
                             <RadzenMarkdownEditorSeparator />
                             <RadzenMarkdownEditorTableTools />
+                            <RadzenMarkdownEditorSeparator />
+                            <RadzenMarkdownEditorSource />
                         }
                     </CascadingValue>
                 </div>

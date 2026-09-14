@@ -2451,11 +2451,8 @@
     <value>Tastatur ausblenden</value>
   </data>
   <!-- MarkdownEditor -->
-  <data name="MarkdownEditor_DesignText" xml:space="preserve">
-    <value>Design</value>
-  </data>
-  <data name="MarkdownEditor_SourceText" xml:space="preserve">
-    <value>Quelltext</value>
+  <data name="MarkdownEditorSource_Title" xml:space="preserve">
+    <value>Quelltext anzeigen</value>
   </data>
   <data name="MarkdownEditorUndo_Title" xml:space="preserve">
     <value>Rückgängig</value>

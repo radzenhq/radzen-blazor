@@ -77,7 +77,7 @@ namespace Radzen.Blazor.Tests
             MarkdownEditorMode? changed = null;
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.ModeChanged, m => changed = m));
-            component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
+            component.Find(".rz-markdown-editor-tools button[title^='View source']").Click();
             Assert.Equal(MarkdownEditorMode.Source, changed);
         }
 
@@ -231,7 +231,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "format_quote", "code", "code_blocks",
                                  "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule",
                                  "table_chart", "north", "south", "west", "east", "horizontal_rule", "vertical_align_center", "delete",
-                                 "format_align_left", "format_align_center", "format_align_right" }, icons);
+                                 "format_align_left", "format_align_center", "format_align_right", "code" }, icons);
             Assert.Single(component.FindComponents<RadzenMarkdownEditorFormatBlock>());
         }
 
@@ -286,7 +286,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Design));
-            component.Find(".rz-markdown-editor-modes button[aria-label='Source']").Click();
+            component.Find(".rz-markdown-editor-tools button[title^='View source']").Click();
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
             Assert.True(component.Find(".rz-markdown-editor-design").HasAttribute("hidden"));
         }

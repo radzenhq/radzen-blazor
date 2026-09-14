@@ -63,12 +63,6 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     public bool ShowToolbar { get; set; } = true;
 
     /// <summary>
-    /// Specifies whether the mode selector is shown. Set to <c>true</c> by default.
-    /// </summary>
-    [Parameter]
-    public bool ShowModeSwitch { get; set; } = true;
-
-    /// <summary>
     /// Custom toolbar content. When set, it replaces the default toolbar tools.
     /// </summary>
     [Parameter]
@@ -149,8 +143,6 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// </summary>
     public string? TableAlignment => toolState.TableRow >= 0 ? toolState.TableAlignment : null;
 
-    private string DesignText => Localize(nameof(RadzenStrings.MarkdownEditor_DesignText));
-    private string SourceText => Localize(nameof(RadzenStrings.MarkdownEditor_SourceText));
     private string UrlText => Localize(nameof(RadzenStrings.MarkdownEditorLink_UrlText));
     private string LinkText => Localize(nameof(RadzenStrings.MarkdownEditorLink_LinkText));
     private string RowsText => Localize(nameof(RadzenStrings.MarkdownEditorTable_RowsText));
@@ -165,12 +157,19 @@ public partial class RadzenMarkdownEditor : FormComponent<string>
     /// <inheritdoc />
     protected override string GetComponentCssClass() => GetClassList("rz-markdown-editor").ToString();
 
-    private async Task SetModeAsync(MarkdownEditorMode value)
+    /// <summary>
+    /// The mode the editor is currently in.
+    /// </summary>
+    public MarkdownEditorMode CurrentMode => mode;
+
+    internal async Task SetModeAsync(MarkdownEditorMode value)
     {
         mode = value;
         modeChanged = true;
         focusOnModeChange = true;
         await ModeChanged.InvokeAsync(value);
+        ToolStateChanged?.Invoke();
+        StateHasChanged();
     }
 
     private async Task<MarkdownEditorUpdate> PublishAsync(MarkdownEditorUpdate update, int version, bool raiseInput)
