@@ -756,9 +756,26 @@ namespace Radzen.Blazor
             }
             else
             {
+                // Nothing changed for a key the grid does not handle, so skip the re-render - holding a key repeats keydown.
+                skipKeyDownRender = !preventKeyDown && !stopKeydownPropagation && !KeyDown.HasDelegate;
+
                 preventKeyDown = false;
                 stopKeydownPropagation = false;
             }
+        }
+
+        bool skipKeyDownRender;
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            if (skipKeyDownRender)
+            {
+                skipKeyDownRender = false;
+                return false;
+            }
+
+            return base.ShouldRender();
         }
 
         /// <summary>
