@@ -618,7 +618,6 @@ public class WorkbookStreamedRowsTests
     {
         using var stream = new FailingWriteStream { FailWrites = failAtBegin };
         var enumerated = false;
-        // A large frame forces buffered XML to reach the destination during Begin.
         var workbook = Framed(built: failAtBegin ? 2_000 : 0);
         var error = await Assert.ThrowsAsync<IOException>(() => workbook.SaveToStreamAsync(stream, Source()));
         Assert.Same(stream.Error, error);

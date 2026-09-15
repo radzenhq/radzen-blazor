@@ -13,7 +13,7 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-partial class XlsxWriter(Workbook sourceWorkbook)
+class XlsxWriter(Workbook sourceWorkbook)
 {
     private const double EmuPerPixel = 9525.0;
 
