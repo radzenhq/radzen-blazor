@@ -87,6 +87,16 @@
     <TimelinePointShadow />
 </RadzenExample>
 
+<RadzenText Anchor="timeline#process-tracker" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Process Tracker
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>LineStyle</code> on an item to style the connector running from it to the next item, so a timeline can show how far a process has got. Mark the step in progress with <code>Current</code>, which draws a ring in the point's own colour and renders it as <code>aria-current="step"</code>. For styling the marker beyond what <code>PointStyle</code> and <code>PointVariant</code> express, <code>PointClass</code> adds your own classes to it. The line runs under the points by default, so a thick one reads as a track behind them; set <code>--rz-timeline-line-gap</code> (to <code>calc(var(--rz-timeline-point-size) / 2)</code> here) to hold it off the points instead, which is what a translucent or tinted point needs.
+</RadzenText>
+<RadzenExample ComponentName="Timeline" Example="TimelineProcessTracker">
+    <TimelineProcessTracker />
+</RadzenExample>
+
 <RadzenText Anchor="timeline#point-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Point Content
 </RadzenText>
