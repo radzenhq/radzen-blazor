@@ -177,9 +177,9 @@ public class Workbook
     /// <para>
     /// The workbook is the frame: its header, widths, frozen panes and tables are written as they are,
     /// and the rows start directly below the last row it holds. They are read once, in order, and none
-    /// is kept, so what the save holds does not grow with the source: the appended rows' text is written
-    /// in each cell rather than in the shared string table, which keeps the frame's text only. A table whose last row is the
-    /// frame's last row, and which has no totals row, is written to cover the appended rows; the
+    /// is kept. Text uses the workbook's shared string table, whose memory grows with distinct strings.
+    /// A table whose last row is the frame's last row, and which has no totals row, is written to
+    /// cover the appended rows; the
     /// workbook's own table is not changed. The <c>dimension</c> element is left out, which readers
     /// accept.
     /// </para>
@@ -189,8 +189,8 @@ public class Workbook
     /// with the quote prefix, as <see cref="Cell.SetValue"/> writes text given a leading apostrophe.
     /// </para>
     /// <para>
-    /// A source that faults, a cancellation, or a limit breached leaves nothing that opens: a seekable
-    /// stream is truncated back to where it started.
+    /// If the source faults, the save is cancelled, or a limit is breached, a seekable stream is
+    /// truncated back to its starting position when supported. Discard any partial output on failure.
     /// </para>
     /// </remarks>
     /// <param name="stream">Destination stream. Not closed by this method.</param>
@@ -200,12 +200,29 @@ public class Workbook
     /// The workbook has more than one sheet, the rows run past the 1,048,576 a worksheet holds, a row
     /// has more than 16,384 cells, or a string is longer than the 32,767 characters a cell holds.
     /// </exception>
-    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default)
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default) =>
+        SaveToStreamAsync(stream, rows, useInlineStrings: false, cancellationToken);
+
+    /// <summary>
+    /// Saves the workbook and appends rows to its only sheet, with a choice of text storage.
+    /// </summary>
+    /// <remarks>
+    /// This has the same row, table and formatting behavior as
+    /// <see cref="SaveToStreamAsync(Stream, IAsyncEnumerable{CellData?[]}, CancellationToken)"/>.
+    /// Inline strings keep the appended text out of the shared string table, so the writer does not
+    /// retain distinct strings from the source. Built cells still use shared strings. The source and
+    /// destination may retain their own data; a <see cref="MemoryStream"/> retains the entire output.
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The rows to append.</param>
+    /// <param name="useInlineStrings">Whether to store appended text in each cell instead of the shared string table.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, bool useInlineStrings, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(rows);
 
-        return new XlsxWriter(this).WriteAsync(stream, XlsxWriter.WithoutFormats(rows, cancellationToken), cancellationToken);
+        return new XlsxWriter(this).WriteAsync(stream, rows, useInlineStrings, cancellationToken);
     }
 
     /// <summary>

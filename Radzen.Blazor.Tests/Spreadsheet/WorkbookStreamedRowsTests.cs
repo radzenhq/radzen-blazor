@@ -51,11 +51,11 @@ public class WorkbookStreamedRowsTests
         return workbook;
     }
 
-    private static async Task<MemoryStream> Save(Workbook workbook, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default)
+    private static async Task<MemoryStream> Save(Workbook workbook, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default, bool useInlineStrings = false)
     {
         var stream = new MemoryStream();
 
-        await workbook.SaveToStreamAsync(stream, rows, cancellationToken);
+        await workbook.SaveToStreamAsync(stream, rows, useInlineStrings, cancellationToken);
 
         stream.Position = 0;
 
@@ -129,7 +129,7 @@ public class WorkbookStreamedRowsTests
     {
         var cell = Row(await Save(Framed(), Rows([CellData.FromString("Alice"), null, null])), 2).Elements(Main + "c").Single();
 
-        Assert.Equal("inlineStr", (string?)cell.Attribute("t"));
+        Assert.Equal("s", (string?)cell.Attribute("t"));
         Assert.Null(cell.Attribute("s"));
     }
 
@@ -409,7 +409,7 @@ public class WorkbookStreamedRowsTests
             .Select(i => new CellData?[] { CellData.FromString($"unique {i}"), null, CellData.FromString($"note {i}") })
             .ToArray();
 
-        var stream = await Save(Framed(), Rows(rows));
+        var stream = await Save(Framed(), Rows(rows), useInlineStrings: true);
 
         var shared = Part(stream, "xl/sharedStrings.xml").Descendants(Main + "si").Select(si => si.Value).ToArray();
 
@@ -429,7 +429,7 @@ public class WorkbookStreamedRowsTests
     [Fact]
     public async Task Inline_text_that_looks_like_a_number_stays_text()
     {
-        var stream = await Save(Framed(), Rows([CellData.FromString("00123"), null, null]));
+        var stream = await Save(Framed(), Rows([CellData.FromString("00123"), null, null]), useInlineStrings: true);
 
         var cell = Row(stream, 2).Elements(Main + "c").Single();
 
@@ -452,18 +452,241 @@ public class WorkbookStreamedRowsTests
 
         var cell = Row(stream, 2).Elements(Main + "c").First();
 
-        Assert.Equal("inlineStr", (string?)cell.Attribute("t"));
-        Assert.Equal("", cell.Value);
+        Assert.Equal("s", (string?)cell.Attribute("t"));
+        Assert.Equal("", Read(stream).Cells[1, 0].Value);
         Assert.Equal("after", Read(stream).Cells[1, 1].Value);
     }
 
     [Fact]
     public async Task Asks_a_reader_to_keep_the_spaces_only_around_text_that_has_them()
     {
-        var stream = await Save(Framed(), Rows([CellData.FromString(" leading"), CellData.FromString("trailing\n"), CellData.FromString("plain"), CellData.FromString("\u00A0no-break")]));
+        var stream = await Save(Framed(), Rows([CellData.FromString(" leading"), CellData.FromString("trailing\n"), CellData.FromString("plain"), CellData.FromString("\u00A0no-break")]), useInlineStrings: true);
 
         var spaces = Row(stream, 2).Descendants(Main + "t").Select(t => (string?)t.Attribute(XNamespace.Xml + "space")).ToArray();
 
         Assert.Equal(new[] { "preserve", "preserve", null, null }, spaces);
     }
+
+    [Fact]
+    public async Task Default_save_shares_text_between_built_and_streamed_cells()
+    {
+        using var stream = new MemoryStream();
+        await Framed().SaveToStreamAsync(stream, Rows(
+            [CellData.FromString("Name"), CellData.FromString("repeated")],
+            [CellData.FromString("repeated"), CellData.FromString("Name")]));
+
+        var shared = Part(stream, "xl/sharedStrings.xml").Descendants(Main + "si").Select(si => si.Value).ToArray();
+        Assert.Equal(new[] { "Name", "Total", "Shipped", "repeated" }, shared);
+        var cells = Part(stream, "xl/worksheets/sheet1.xml").Descendants(Main + "c").ToArray();
+        Assert.All(cells, cell => Assert.Equal("s", (string?)cell.Attribute("t")));
+        Assert.Equal(cells[0].Element(Main + "v")!.Value, cells[3].Element(Main + "v")!.Value);
+        Assert.Equal("repeated", Read(stream).Cells[2, 0].Value);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Text_storage_modes_preserve_empty_whitespace_and_quoted_text(bool useInlineStrings)
+    {
+        using var stream = await Save(Framed(), Rows(
+            [CellData.FromString(""), CellData.FromString("  "), CellData.FromString("00123")],
+            [CellData.FromString(" leading"), CellData.FromString("trailing\n"), CellData.FromString("=SUM(A1:A2)")]),
+            useInlineStrings: useInlineStrings);
+        var sheet = Read(stream);
+        Assert.Equal("", sheet.Cells[1, 0].Value);
+        Assert.Equal("  ", sheet.Cells[1, 1].Value);
+        Assert.Equal("00123", sheet.Cells[1, 2].Value);
+        Assert.Equal(" leading", sheet.Cells[2, 0].Value);
+        Assert.Equal("trailing\n", sheet.Cells[2, 1].Value);
+        Assert.Equal("=SUM(A1:A2)", sheet.Cells[2, 2].Value);
+        Assert.Null(sheet.Cells[2, 2].Formula);
+    }
+
+    [Fact]
+    public void Synchronous_save_finishes_multiple_sheets_and_their_tables()
+    {
+        var workbook = Framed(built: 1);
+        workbook.Sheets[0].AddTable("First", RangeRef.Parse("A1:C2"));
+        var second = workbook.AddSheet("Second", 2, 1);
+        second.Cells[0, 0].SetValue("Name");
+        second.Cells[1, 0].SetValue("other");
+        second.AddTable("SecondTable", RangeRef.Parse("A1:A2"));
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+        var read = Workbook.LoadFromStream(stream);
+        Assert.Equal(2, read.Sheets.Count);
+        Assert.Equal("built 0", read.Sheets[0].Cells[1, 0].Value);
+        Assert.Equal("other", read.Sheets[1].Cells[1, 0].Value);
+        Assert.Equal(RangeRef.Parse("A1:A2"), read.Sheets[1].Tables.Single().Range);
+        Assert.Single(Part(stream, "xl/worksheets/sheet2.xml").Descendants(Main + "dimension"));
+    }
+
+    [Fact]
+    public async Task Awaiting_the_source_keeps_the_session_open_and_disposes_the_enumerator()
+    {
+        var waiting = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var resume = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var disposed = false;
+        using var stream = new MemoryStream();
+        var save = Framed().SaveToStreamAsync(stream, Source());
+        await waiting.Task;
+        Assert.False(save.IsCompleted);
+        resume.SetResult();
+        await save;
+        Assert.True(disposed);
+        Assert.True(stream.CanWrite);
+        Assert.Equal("order 1", Read(stream).Cells[2, 0].Value);
+
+        async IAsyncEnumerable<CellData?[]> Source()
+        {
+            try
+            {
+                yield return Order(0);
+                waiting.SetResult();
+                await resume.Task;
+                yield return Order(1);
+            }
+            finally
+            {
+                disposed = true;
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Failure_restores_the_destination_prefix_and_disposes_the_source()
+    {
+        using var stream = new MemoryStream();
+        stream.Write(new byte[] { 1, 2, 3 });
+        var disposed = false;
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Framed().SaveToStreamAsync(stream, Source()));
+        Assert.Equal(new byte[] { 1, 2, 3 }, stream.ToArray());
+        Assert.Equal(3, stream.Position);
+        Assert.True(disposed);
+        Assert.True(stream.CanWrite);
+
+        async IAsyncEnumerable<CellData?[]> Source()
+        {
+            try
+            {
+                await Task.Yield();
+                yield return Order(0);
+                throw new InvalidOperationException("source");
+            }
+            finally
+            {
+                disposed = true;
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Expected_truncation_failures_preserve_the_source_exception(bool unsupported)
+    {
+        using var stream = new TruncationFailureStream(unsupported);
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => Framed().SaveToStreamAsync(stream, Source()));
+        Assert.Equal("source", error.Message);
+        Assert.True(stream.TruncationAttempted);
+
+        static async IAsyncEnumerable<CellData?[]> Source()
+        {
+            await Task.Yield();
+            yield return Order(0);
+            throw new InvalidOperationException("source");
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Writes_to_a_non_seekable_destination(bool useInlineStrings)
+    {
+        using var destination = new NonSeekableStream();
+        await Framed().SaveToStreamAsync(destination, Rows(Order(0)), useInlineStrings);
+        Assert.True(destination.CanWrite);
+        using var copy = new MemoryStream(destination.ToArray());
+        Assert.Equal("order 0", Read(copy).Cells[1, 0].Value);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Output_failure_during_begin_or_end_discards_partial_output(bool failAtBegin)
+    {
+        using var stream = new FailingWriteStream { FailWrites = failAtBegin };
+        var enumerated = false;
+        // A large frame forces buffered XML to reach the destination during Begin.
+        var workbook = Framed(built: failAtBegin ? 2_000 : 0);
+        var error = await Assert.ThrowsAsync<IOException>(() => workbook.SaveToStreamAsync(stream, Source()));
+        Assert.Same(stream.Error, error);
+        Assert.Equal(!failAtBegin, enumerated);
+        Assert.Equal(0, stream.Length);
+        Assert.True(stream.CanWrite);
+
+        async IAsyncEnumerable<CellData?[]> Source()
+        {
+            await Task.Yield();
+            enumerated = true;
+            yield return Order(0);
+            stream.FailWrites = true;
+        }
+    }
+
+    private sealed class NonSeekableStream : MemoryStream
+    {
+        public override bool CanSeek => false;
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+        public override long Seek(long offset, SeekOrigin loc) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+    }
+
+    private sealed class FailingWriteStream : MemoryStream
+    {
+        public bool FailWrites { get; set; }
+        public IOException Error { get; } = new("output failed");
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            if (FailWrites)
+            {
+                throw Error;
+            }
+
+            base.Write(buffer, offset, count);
+        }
+
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            if (FailWrites)
+            {
+                throw Error;
+            }
+
+            base.Write(buffer);
+        }
+    }
+
+    private sealed class TruncationFailureStream(bool unsupported) : MemoryStream
+    {
+        public bool TruncationAttempted { get; private set; }
+
+        public override void SetLength(long value)
+        {
+            TruncationAttempted = true;
+            if (unsupported)
+            {
+                throw new NotSupportedException();
+            }
+
+            throw new IOException();
+        }
+    }
+
 }
