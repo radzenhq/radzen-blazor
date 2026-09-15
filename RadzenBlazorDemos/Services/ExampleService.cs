@@ -3213,6 +3213,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Streamed Export",
+                    Path = "spreadsheet-streamed-export",
+                    Title = "Stream an Entity Framework Query to Excel in Blazor | Radzen",
+                    Description = "Write an XLSX file directly from an Entity Framework query. Rows are read once and never built as cells. Shared strings reuse repeated text values.",
+                    Tags = new [] { "document", "processing", "export", "xlsx", "excel", "stream", "streaming", "async", "entity", "framework", "queryable", "large", "memory" },
+                    Related = new [] { "document-processing-import-export", "document-processing-spreadsheet" }
+                },
+                new Example
+                {
                     Name = "Localization",
                     Path = "document-processing-localization",
                     Title = "Culture-Aware Excel Processing in Blazor and C# | Radzen",
