@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -165,6 +167,56 @@ public class Workbook
     public void SaveToStream(Stream stream)
     {
         new XlsxWriter(this).Write(stream);
+    }
+
+    /// <summary>
+    /// Saves the workbook as XLSX, appending source rows below the built rows in its only sheet.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Rows are read once and are not retained. Shared-string memory grows with distinct text.
+    /// Tables ending at the last built row extend over appended rows unless they have a totals row.
+    /// The workbook is not mutated.
+    /// </para>
+    /// <para>
+    /// Each array entry represents one column; null entries write no cell.
+    /// Use <see cref="CellData.FromString"/> to preserve numeric-looking text as text.
+    /// </para>
+    /// <para>
+    /// On failure, seekable output is truncated to its starting position when supported.
+    /// Discard any partial output on failure.
+    /// </para>
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The rows to append.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    /// <exception cref="InvalidOperationException">
+    /// The workbook has more than one sheet, the rows run past the 1,048,576 a worksheet holds, a row
+    /// has more than 16,384 cells, or a string is longer than the 32,767 characters a cell holds.
+    /// </exception>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, CancellationToken cancellationToken = default) =>
+        SaveToStreamAsync(stream, rows, useInlineStrings: false, cancellationToken);
+
+    /// <summary>
+    /// Saves the workbook and appends rows to its only sheet, with a choice of text storage.
+    /// </summary>
+    /// <remarks>
+    /// This has the same row, table and formatting behavior as
+    /// <see cref="SaveToStreamAsync(Stream, IAsyncEnumerable{CellData?[]}, CancellationToken)"/>.
+    /// Inline strings keep the appended text out of the shared string table, so the writer does not
+    /// retain distinct strings from the source. Built cells still use shared strings. The source and
+    /// destination may retain their own data; a <see cref="MemoryStream"/> retains the entire output.
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The rows to append.</param>
+    /// <param name="useInlineStrings">Whether to store appended text in each cell instead of the shared string table.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, bool useInlineStrings, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(rows);
+
+        return new XlsxWriter(this).WriteAsync(stream, rows, useInlineStrings, cancellationToken);
     }
 
     /// <summary>

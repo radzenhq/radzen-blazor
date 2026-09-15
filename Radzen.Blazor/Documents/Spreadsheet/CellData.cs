@@ -119,10 +119,18 @@ public class CellData : IComparable, IComparable<CellData>
 
     internal CellData(object? data, CultureInfo culture)
     {
+        Infer(data, culture, out var inferred, out var inferredType);
+
+        Value = inferred;
+        Type = inferredType;
+    }
+
+    internal static void Infer(object? data, CultureInfo culture, out object? value, out CellDataType type)
+    {
         if (data is null)
         {
-            Value = null;
-            Type = CellDataType.Empty;
+            value = null;
+            type = CellDataType.Empty;
             return;
         }
 
@@ -135,19 +143,19 @@ public class CellData : IComparable, IComparable<CellData>
             var converted = TryConvertFromString(data.ToString(), culture, out var convertedData, out var valueType);
             if (converted)
             {
-                Value = convertedData;
-                Type = valueType!.Value;
+                value = convertedData;
+                type = valueType!.Value;
             }
             else
             {
-                Value = data;
-                Type = CellDataType.String;
+                value = data;
+                type = CellDataType.String;
             }
         }
         else
         {
-            Type = GetValueType(data, valType, isNullable, nullableType);
-            Value = (Type == CellDataType.Number) ? Convert.ToDouble(data, CultureInfo.InvariantCulture) : data;
+            type = GetValueType(data, valType, isNullable, nullableType);
+            value = (type == CellDataType.Number) ? Convert.ToDouble(data, CultureInfo.InvariantCulture) : data;
         }
     }
 
