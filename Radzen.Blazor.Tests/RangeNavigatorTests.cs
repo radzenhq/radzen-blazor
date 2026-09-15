@@ -265,7 +265,10 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             var component = RenderNavigatorWithLineSeries(ctx, parameters =>
-                parameters.Add(p => p.TooltipFormatString, "{0:N1}"));
+            {
+                parameters.Add(p => p.TooltipFormatString, "{0:N1}");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
+            });
 
             var points = component.Instance.GetTooltipPoints();
 
