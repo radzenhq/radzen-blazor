@@ -109,22 +109,24 @@
         return workbook;
     }
 
-    static async IAsyncEnumerable<CellData[]> Rows(IAsyncEnumerable<OrderLine> lines)
+    static async IAsyncEnumerable<(CellData Data, Format Format)[]> Rows(IAsyncEnumerable<OrderLine> lines)
     {
-        var row = new CellData[ColumnCount];
+        var row = new (CellData Data, Format Format)[ColumnCount];
+        var dateFormat = new Format { NumberFormat = "yyyy-mm-dd" };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.0000" };
 
         await foreach (var line in lines)
         {
-            row[0] = CellData.FromNumber(line.OrderId);
-            row[1] = CellData.FromDate(line.OrderDate);
-            row[2] = CellData.FromString(line.Customer);
-            row[3] = CellData.FromString(line.Country);
-            row[4] = CellData.FromString(line.Employee);
-            row[5] = CellData.FromString(line.Category);
-            row[6] = CellData.FromString(line.Product);
-            row[7] = CellData.FromNumber(line.Quantity);
-            row[8] = CellData.FromNumber((double)line.UnitPrice);
-            row[9] = CellData.FromNumber((double)line.LineTotal);
+            row[0] = (CellData.FromNumber(line.OrderId), null);
+            row[1] = (CellData.FromDate(line.OrderDate), dateFormat);
+            row[2] = (CellData.FromString(line.Customer), null);
+            row[3] = (CellData.FromString(line.Country), null);
+            row[4] = (CellData.FromString(line.Employee), null);
+            row[5] = (CellData.FromString(line.Category), null);
+            row[6] = (CellData.FromString(line.Product), null);
+            row[7] = (CellData.FromNumber(line.Quantity), null);
+            row[8] = (CellData.FromNumber((double)line.UnitPrice), currencyFormat);
+            row[9] = (CellData.FromNumber((double)line.LineTotal), currencyFormat);
 
             yield return row;
         }

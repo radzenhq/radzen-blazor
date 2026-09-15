@@ -220,6 +220,37 @@ public class Workbook
     }
 
     /// <summary>
+    /// Saves the workbook as XLSX, appending formatted rows to its only sheet.
+    /// </summary>
+    /// <remarks>
+    /// Null formats use type defaults; blank values can carry formatting.
+    /// Reuse formats without changing them or their borders during the save.
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The values and formats to append.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<(CellData? Data, Format? Format)[]> rows, CancellationToken cancellationToken = default) =>
+        SaveToStreamAsync(stream, rows, useInlineStrings: false, cancellationToken);
+
+    /// <summary>
+    /// Saves the workbook as XLSX, appending formatted rows with optional inline strings.
+    /// </summary>
+    /// <remarks>
+    /// Reuse formats without changing them or their borders during the save.
+    /// </remarks>
+    /// <param name="stream">Destination stream. Not closed by this method.</param>
+    /// <param name="rows">The values and formats to append.</param>
+    /// <param name="useInlineStrings">Whether to store appended text in each cell instead of the shared string table.</param>
+    /// <param name="cancellationToken">Cancels the save between rows.</param>
+    public Task SaveToStreamAsync(Stream stream, IAsyncEnumerable<(CellData? Data, Format? Format)[]> rows, bool useInlineStrings, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(rows);
+
+        return new XlsxWriter(this).WriteAsync(stream, rows, useInlineStrings, cancellationToken);
+    }
+
+    /// <summary>
     /// Loads a workbook from the specified stream in the Open XML Spreadsheet format (XLSX).
     /// </summary>
     /// <param name="stream"></param>
