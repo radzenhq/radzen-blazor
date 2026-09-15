@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -38,7 +39,20 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private const int MaxCellCharacters = 32_767;
 
-    private readonly Dictionary<(int Column, CellDataType Type, bool Quoted), int?> streamedStyles = [];
+    private const int MaxStreamedStyles = 4096;
+
+    private readonly Dictionary<(Format Format, CellDataType Type, bool Quoted), int?> streamedStyles = new(StreamedStyleComparer.Instance);
+
+    private sealed class StreamedStyleComparer : IEqualityComparer<(Format Format, CellDataType Type, bool Quoted)>
+    {
+        public static readonly StreamedStyleComparer Instance = new();
+
+        public bool Equals((Format Format, CellDataType Type, bool Quoted) x, (Format Format, CellDataType Type, bool Quoted) y) =>
+            ReferenceEquals(x.Format, y.Format) && x.Type == y.Type && x.Quoted == y.Quoted;
+
+        public int GetHashCode((Format Format, CellDataType Type, bool Quoted) key) =>
+            HashCode.Combine(RuntimeHelpers.GetHashCode(key.Format), key.Type, key.Quoted);
+    }
 
     public void Write(Stream stream)
     {
@@ -46,7 +60,13 @@ class XlsxWriter(Workbook sourceWorkbook)
         End(session);
     }
 
-    public async Task WriteAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, bool useInlineStrings, CancellationToken cancellationToken)
+    public Task WriteAsync(Stream stream, IAsyncEnumerable<CellData?[]> rows, bool useInlineStrings, CancellationToken cancellationToken) =>
+        WriteAsync(stream, rows, static data => (data, null), useInlineStrings, cancellationToken);
+
+    public Task WriteAsync(Stream stream, IAsyncEnumerable<(CellData? Data, Format? Format)[]> rows, bool useInlineStrings, CancellationToken cancellationToken) =>
+        WriteAsync(stream, rows, static cell => cell, useInlineStrings, cancellationToken);
+
+    private async Task WriteAsync<T>(Stream stream, IAsyncEnumerable<T[]> rows, Func<T, (CellData? Data, Format? Format)> getCell, bool useInlineStrings, CancellationToken cancellationToken)
     {
         if (sheets.Count != 1)
         {
@@ -61,7 +81,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         await foreach (var row in rows.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Append(session, row, useInlineStrings);
+            Append(session, row, getCell, useInlineStrings);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -1539,7 +1559,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         }
     }
 
-    private void Append(SaveSession session, CellData?[] line, bool useInlineStrings)
+    private void Append<T>(SaveSession session, T[] line, Func<T, (CellData? Data, Format? Format)> getCell, bool useInlineStrings)
     {
         var saved = session.Sheet!;
         var writer = saved.Writer!;
@@ -1563,7 +1583,9 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         for (var column = 0; column < line.Length; column++)
         {
-            if (line[column]?.Value is not null)
+            var cell = getCell(line[column]);
+
+            if (cell.Data?.Value is not null || cell.Format?.IsDefault == false)
             {
                 if (firstColumn < 0)
                 {
@@ -1578,7 +1600,11 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         for (var column = firstColumn; column >= 0 && column <= lastColumn; column++)
         {
-            if (line[column] is not { Value: { } value, Type: var type })
+            var (data, format) = getCell(line[column]);
+            var value = data?.Value;
+            var type = data?.Type ?? default;
+
+            if (value is null && format?.IsDefault != false)
             {
                 continue;
             }
@@ -1599,16 +1625,28 @@ class XlsxWriter(Workbook sourceWorkbook)
                     && CellData.TryConvertFromString(text, CultureInfo.InvariantCulture, out _, out _);
             }
 
-            if (!streamedStyles.TryGetValue((column, type, quoted), out var style))
+            format ??= DefaultFormat;
+
+            if (!streamedStyles.TryGetValue((format, type, quoted), out var style))
             {
-                style = type == CellDataType.Date || quoted
-                    ? GetOrCreateCellStyle(DefaultFormat, type, quoted, styleTracker)
+                style = !format.IsDefault || type == CellDataType.Date || quoted
+                    ? GetOrCreateCellStyle(format, type, quoted, styleTracker)
                     : null;
 
-                streamedStyles[(column, type, quoted)] = style;
+                if (streamedStyles.Count < MaxStreamedStyles)
+                {
+                    streamedStyles[(format, type, quoted)] = style;
+                }
             }
 
-            if (type == CellDataType.String && useInlineStrings)
+            if (value is null)
+            {
+                if (style is not null)
+                {
+                    WritePlaceholder(writer, address, style);
+                }
+            }
+            else if (type == CellDataType.String && useInlineStrings)
             {
                 WriteInlineStringCell(writer, address, (string)value, style);
             }
