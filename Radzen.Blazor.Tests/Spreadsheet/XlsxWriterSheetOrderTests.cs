@@ -155,7 +155,7 @@ public class XlsxWriterSheetOrderTests
     }
 
     [Fact]
-    public void Save_NumbersAMergeAnchorsStyleWhereItsFirstPlaceholderIsWritten()
+    public void Save_WritesAFormattedEmptyMergeAnchorInTheStyleItsPlaceholdersShare()
     {
         var workbook = new Workbook();
         var sheet = workbook.AddSheet("Sheet1", 4, 4);
@@ -169,8 +169,8 @@ public class XlsxWriterSheetOrderTests
         var cells = Part(workbook, "xl/worksheets/sheet1.xml").Descendants(Main + "c")
             .ToDictionary(c => (string)c.Attribute("r")!, c => int.Parse((string)c.Attribute("s")!, CultureInfo.InvariantCulture));
 
-        Assert.False(cells.ContainsKey("A3"));
-        Assert.True(cells["A1"] < cells["B3"]);
+        Assert.True(cells["A1"] < cells["A3"]);
+        Assert.Equal(cells["A3"], cells["B3"]);
         Assert.Equal(cells["B3"], cells["C3"]);
     }
 

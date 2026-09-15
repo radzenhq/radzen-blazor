@@ -1747,7 +1747,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         }
     }
 
-    private static bool IsWritten(Cell cell) => cell.Value is not null || cell.Formula is not null;
+    private static bool IsWritten(Cell cell) => cell.Value is not null || cell.Formula is not null || HasCellFormatting(cell);
 
     private static List<int> CollectStyledRowIndices(Worksheet sheet)
     {

@@ -727,8 +727,12 @@ static class XlsxReader
         var formulaElem = cellElem.Element(sNs + "f");
         var inlineElem = cellElem.Element(sNs + "is");
 
+        var style = ResolveStyle(cellElem, styleInfo);
+
         if (valueElem is null && formulaElem is null && inlineElem is null)
         {
+            ApplyCellStyle(sheet, address, styleInfo, style);
+
             return;
         }
 
@@ -740,8 +744,6 @@ static class XlsxReader
 
             cellType = "inlineStr";
         }
-
-        var style = ResolveStyle(cellElem, styleInfo);
 
         var formulaValue = formulaElem?.Value;
 
