@@ -778,7 +778,7 @@ namespace Radzen.Blazor
                 return false;
             }
 
-            return base.ShouldRender();
+            return !exporting && base.ShouldRender();
         }
 
         /// <summary>

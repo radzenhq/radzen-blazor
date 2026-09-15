@@ -69,12 +69,6 @@ namespace Radzen.Blazor
             return CreateWorkbookAsync(options, true);
         }
 
-        /// <inheritdoc />
-        protected override bool ShouldRender()
-        {
-            return !exporting && base.ShouldRender();
-        }
-
         private async Task<Workbook> CreateWorkbookAsync(DataGridExportOptions options, bool formattedStrings)
         {
             ValidateOptions(options);
