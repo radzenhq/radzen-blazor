@@ -1170,7 +1170,7 @@ partial class XlsxWriter(Workbook sourceWorkbook)
     {
         var saved = session.Sheet!;
         var writer = saved.Writer!;
-        writer.WriteEndElement(); // sheetData
+        writer.WriteEndElement();
 
         foreach (var element in saved.Document.Root!.Elements().SkipWhile(e => e.Name != SheetDataElement).Skip(1))
         {

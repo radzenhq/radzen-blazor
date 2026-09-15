@@ -1,0 +1,16 @@
+@page "/spreadsheet-streamed-export"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Streamed Export
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Write an XLSX file straight from an Entity Framework query. The rows are read once, in order, and
+    never built as cells. Shared strings retain distinct text values; use the save overload with
+    <code>useInlineStrings: true</code> to avoid retaining the appended text. Here the finished file is
+    held in memory to hand to the browser; write to a file or a response stream to avoid that too.
+    Exported dates and numbers use the writer's default formats.
+</RadzenText>
+
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetStreamedExport">
+    <SpreadsheetStreamedExport />
+</RadzenExample>

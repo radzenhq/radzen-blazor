@@ -170,27 +170,21 @@ public class Workbook
     }
 
     /// <summary>
-    /// Saves the workbook to the specified stream in the Open XML Spreadsheet format (XLSX), appending
-    /// rows read from a source to its only sheet without building a cell for any of them.
+    /// Saves the workbook as XLSX, appending source rows below the built rows in its only sheet.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The workbook is the frame: its header, widths, frozen panes and tables are written as they are,
-    /// and the rows start directly below the last row it holds. They are read once, in order, and none
-    /// is kept. Text uses the workbook's shared string table, whose memory grows with distinct strings.
-    /// A table whose last row is the frame's last row, and which has no totals row, is written to
-    /// cover the appended rows; the
-    /// workbook's own table is not changed. The <c>dimension</c> element is left out, which readers
-    /// accept.
+    /// Rows are read once and are not retained. Shared-string memory grows with distinct text.
+    /// Tables ending at the last built row extend over appended rows unless they have a totals row.
+    /// The workbook is not mutated.
     /// </para>
     /// <para>
-    /// Each row is one <see cref="CellData"/> per column, and a null writes nothing. Use
-    /// <see cref="CellData.FromString"/> to keep text that looks like a number as text: it is written
-    /// with the quote prefix, as <see cref="Cell.SetValue"/> writes text given a leading apostrophe.
+    /// Each array entry represents one column; null entries write no cell.
+    /// Use <see cref="CellData.FromString"/> to preserve numeric-looking text as text.
     /// </para>
     /// <para>
-    /// If the source faults, the save is cancelled, or a limit is breached, a seekable stream is
-    /// truncated back to its starting position when supported. Discard any partial output on failure.
+    /// On failure, seekable output is truncated to its starting position when supported.
+    /// Discard any partial output on failure.
     /// </para>
     /// </remarks>
     /// <param name="stream">Destination stream. Not closed by this method.</param>
