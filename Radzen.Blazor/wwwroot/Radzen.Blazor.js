@@ -6860,7 +6860,9 @@ class Spreadsheet {
     this.dotNetRef = dotNetRef;
     this.shortcuts = shortcuts || {}; // map of key -> isGlobal (true = global, false = grid-only)
     this.rtl = Radzen.isRTL(element);
+    this.pendingKeys = null;
     this.element.addEventListener('keydown', this.onKeyDown);
+    this.element.addEventListener('focusin', this.onFocusIn);
     this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dblclick', this.onDoubleClick);
     this.element.addEventListener('contextmenu', this.onContextMenu);
@@ -6903,6 +6905,8 @@ class Spreadsheet {
 
   onPointerDown = async (e) => {
     if (e.button != 0) return;
+
+    this.pendingKeys = null;
 
     this.rtl = Radzen.isRTL(this.element);
 
@@ -7104,14 +7108,50 @@ class Spreadsheet {
       e.preventDefault();
     }
 
+    const printable = global === undefined && !e.ctrlKey && !e.metaKey && !e.altKey &&
+      e.key.length === 1 && e.target === this.element;
+
     // Prevent default for printable characters when not already editing.
     // Without this, the character gets inserted twice: once by StartEdit and
     // once by the browser's default insertText when the editor receives focus.
-    if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1 && e.target === this.element) {
+    if (printable) {
       e.preventDefault();
     }
 
+    if (printable) {
+      if (this.pendingKeys != null) {
+        this.pendingKeys += e.key;
+        return;
+      }
+
+      this.pendingKeys = '';
+    } else if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      this.pendingKeys = null;
+    }
+
     this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', this.toEventArgs(e), isGridContext);
+  }
+
+  onFocusIn = (e) => {
+    const keys = this.pendingKeys;
+
+    this.pendingKeys = null;
+
+    if (!keys || !e.target.matches('.rz-spreadsheet-editor-input')) {
+      return;
+    }
+
+    e.target.innerText += keys;
+
+    const range = document.createRange();
+    range.selectNodeContents(e.target);
+    range.collapse(false);
+
+    const selection = getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    e.target.dispatchEvent(new Event('input'));
   }
 
   // F6 / Shift+F6 cycle focus between the spreadsheet regions in their visible top-to-bottom order:
@@ -7217,6 +7257,7 @@ class Spreadsheet {
 
   dispose() {
     this.element.removeEventListener('keydown', this.onKeyDown);
+    this.element.removeEventListener('focusin', this.onFocusIn);
     this.element.removeEventListener('pointerdown', this.onPointerDown);
     this.element.removeEventListener('dblclick', this.onDoubleClick);
     this.element.removeEventListener('contextmenu', this.onContextMenu);
