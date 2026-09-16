@@ -7488,13 +7488,30 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
 
   var rtl = Radzen.isRTL(scrollable);
 
-  scrollable.addEventListener('scroll', function () {
+  var inflight = false;
+
+  function notifyScroll() {
     var scrollTop = scrollable.scrollTop;
     // In RTL the native scrollLeft is 0 at the right and negative toward the left;
     // report a non-negative logical scroll so the C# layout math stays direction-agnostic.
     var scrollLeft = rtl ? -scrollable.scrollLeft : scrollable.scrollLeft;
 
-    ref.invokeMethodAsync('OnScroll', scrollLeft, scrollTop);
+    inflight = true;
+
+    ref.invokeMethodAsync('OnScroll', scrollLeft, scrollTop).finally(function () {
+      inflight = false;
+
+      if (scrollTop !== scrollable.scrollTop ||
+          scrollLeft !== (rtl ? -scrollable.scrollLeft : scrollable.scrollLeft)) {
+        notifyScroll();
+      }
+    });
+  }
+
+  scrollable.addEventListener('scroll', function () {
+    if (!inflight) {
+      notifyScroll();
+    }
   });
 
   var observer = new ResizeObserver(function () {
