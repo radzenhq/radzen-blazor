@@ -481,6 +481,29 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Carousel_InitialSelectedIndex_ItemsAddedLater_ScrollsToItemOnceItExists()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.Auto, false);
+                parameters.Add(p => p.SelectedIndex, 6);
+            });
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.scrollCarouselItem");
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Items, TenItems()));
+
+            var items = component.FindAll("li.rz-carousel-item");
+            Assert.Equal("0", items[6].GetAttribute("tabindex"));
+
+            var scroll = Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.scrollCarouselItem"));
+            Assert.Equal(component.FindComponents<RadzenCarouselItem>()[6].Instance.element.Id, Assert.IsType<ElementReference>(scroll.Arguments[0]).Id);
+            Assert.Equal(0, scroll.Arguments[1]);
+        }
+
+        [Fact]
         public void Carousel_InitialSelectedIndex_Zero_DoesNotScroll()
         {
             using var ctx = new TestContext();
