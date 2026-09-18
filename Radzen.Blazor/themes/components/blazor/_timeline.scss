@@ -66,13 +66,21 @@ $timeline-point-sizes: map.merge(
 
     // The line offset is the same whether or not the timeline is reversed; only the content alignment
     // below differs, so these sit above the reverse split rather than being repeated inside it.
-    &.rz-timeline-start,
+    &.rz-timeline-start {
+      .rz-timeline-item:before,
+      .rz-timeline-item:after {inset-inline-start: $rz-timeline-line-position-offset; inset-inline-end: auto;}
+    }
+
+    &.rz-timeline-end {
+      .rz-timeline-item:before,
+      .rz-timeline-item:after {inset-inline-end: $rz-timeline-line-position-offset; inset-inline-start: auto;}
+    }
+
     &.rz-timeline-left {
       .rz-timeline-item:before,
       .rz-timeline-item:after {left: $rz-timeline-line-position-offset; right: auto;}
     }
 
-    &.rz-timeline-end,
     &.rz-timeline-right {
       .rz-timeline-item:before,
       .rz-timeline-item:after {right: $rz-timeline-line-position-offset; left: auto;}
@@ -80,16 +88,16 @@ $timeline-point-sizes: map.merge(
 
     // LinePosition.Center
     .rz-timeline-item {flex-direction: row;}
-    .rz-timeline-content-start {text-align: right;}
-    .rz-timeline-content-end {text-align: left;}
+    .rz-timeline-content-start {text-align: end;}
+    .rz-timeline-content-end {text-align: start;}
 
     // LinePosition.Alternate
     &.rz-timeline-alternate {
       .rz-timeline-item:nth-child(even) {
         flex-direction: row-reverse;
 
-        .rz-timeline-content-start {text-align: left;}
-        .rz-timeline-content-end {text-align: right;}
+        .rz-timeline-content-start {text-align: start;}
+        .rz-timeline-content-end {text-align: end;}
       }
     }
 
@@ -110,6 +118,8 @@ $timeline-point-sizes: map.merge(
     &.rz-timeline-left:not(.rz-timeline-reverse) {
       .rz-timeline-content-start {display: none;}
       .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
+
+      *[dir="rtl"] & .rz-timeline-item {flex-direction: row-reverse;}
     }
 
     // LinePosition.Right
@@ -117,6 +127,8 @@ $timeline-point-sizes: map.merge(
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-content-start {display: none;}
       .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: right;}
+
+      *[dir="rtl"] & .rz-timeline-item {flex-direction: row;}
     }
 
     // Orientation.Vertical Reverse
@@ -124,16 +136,16 @@ $timeline-point-sizes: map.merge(
 
       // LinePosition.Center
       .rz-timeline-item {flex-direction: row-reverse;}
-      .rz-timeline-content-start {text-align: left;}
-      .rz-timeline-content-end {text-align: right;}
+      .rz-timeline-content-start {text-align: start;}
+      .rz-timeline-content-end {text-align: end;}
 
       // LinePosition.Alternate
       &.rz-timeline-alternate {
         .rz-timeline-item:nth-child(even) {
           flex-direction: row;
 
-          .rz-timeline-content-start {text-align: right;}
-          .rz-timeline-content-end {text-align: left;}
+          .rz-timeline-content-start {text-align: end;}
+          .rz-timeline-content-end {text-align: start;}
         }
       }
 
@@ -154,6 +166,8 @@ $timeline-point-sizes: map.merge(
       &.rz-timeline-left {
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
         .rz-timeline-content-end {display: none;}
+
+        *[dir="rtl"] & .rz-timeline-item {flex-direction: row;}
       }
 
       // LinePosition.Right
@@ -161,6 +175,8 @@ $timeline-point-sizes: map.merge(
         .rz-timeline-item {flex-direction: row;}
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: right;}
         .rz-timeline-content-end {display: none;}
+
+        *[dir="rtl"] & .rz-timeline-item {flex-direction: row-reverse;}
       }
     }
   }
@@ -291,8 +307,8 @@ $timeline-point-sizes: map.merge(
   .rz-timeline-column &:before,
   .rz-timeline-column &:after {
     width: var(--rz-timeline-line-width);
-    left: calc(50% - (var(--rz-timeline-line-width) / 2));
-    right: auto;
+    inset-inline-start: calc(50% - (var(--rz-timeline-line-width) / 2));
+    inset-inline-end: auto;
   }
 
   .rz-timeline-column &:before {
@@ -325,25 +341,25 @@ $timeline-point-sizes: map.merge(
   }
 
   .rz-timeline-row &:before {
-    left: 0;
-    right: calc(100% - var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap));
+    inset-inline-start: 0;
+    inset-inline-end: calc(100% - var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap));
   }
 
   .rz-timeline-row &:after {
-    left: calc(var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap));
-    right: 0;
+    inset-inline-start: calc(var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap));
+    inset-inline-end: 0;
   }
 
   .rz-timeline-row &:first-child:after {
-    left: calc(var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap) - (var(--rz-timeline-line-width) / 2));
-    border-top-left-radius: var(--rz-timeline-line-border-radius);
-    border-bottom-left-radius: var(--rz-timeline-line-border-radius);
+    inset-inline-start: calc(var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap) - (var(--rz-timeline-line-width) / 2));
+    border-start-start-radius: var(--rz-timeline-line-border-radius);
+    border-end-start-radius: var(--rz-timeline-line-border-radius);
   }
 
   .rz-timeline-row &:last-child:before {
-    right: calc(100% - var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap) - (var(--rz-timeline-line-width) / 2));
-    border-top-right-radius: var(--rz-timeline-line-border-radius);
-    border-bottom-right-radius: var(--rz-timeline-line-border-radius);
+    inset-inline-end: calc(100% - var(--rz-timeline-point-offset) + var(--rz-timeline-line-gap) - (var(--rz-timeline-line-width) / 2));
+    border-start-end-radius: var(--rz-timeline-line-border-radius);
+    border-end-end-radius: var(--rz-timeline-line-border-radius);
   }
 }
 
