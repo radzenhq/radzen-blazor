@@ -23,6 +23,28 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenDateRangePicker" Path="/daterangepicker" /> - a date range picker component with a two-month calendar, min/max support and drill-down navigation.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenVirtualKeyboard" Path="/virtual-keyboard" /> - an on-screen virtual keyboard that attaches to inputs or renders inline, with custom layouts, numpad mode and locale support.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code>RadzenSchedulerResource</code> - declares a resource type (rooms, people, equipment) of <RadzenLink Text="RadzenScheduler" Path="/scheduler" /> for grouping appointments by resource.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenMarkdownEditor" Path="/markdown-editor" /> - a Markdown editor with a WYSIWYG Design mode, a Source mode for the raw Markdown, a toolbar, keyboard shortcuts, undo and redo and custom tools.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-markdown-editor" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenMarkdownEditor
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Two editing modes selected with the <code>Mode</code> property - <code>MarkdownEditorMode.Design</code> (default) edits the rendered document in place and writes it back to Markdown after every edit; <code>MarkdownEditorMode.Source</code> edits the raw Markdown in a textarea. The built-in mode switcher toggles between them and the Markdown text is the <code>Value</code> in both modes.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Built-in tools for bold, italic, strikethrough, inline code, code blocks, headings and paragraphs (<code>RadzenMarkdownEditorFormatBlock</code>), block quotes, bullet, numbered and task lists, links, images and horizontal rules. Place tools inside the editor to compose a custom toolbar or leave it empty for the default one.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Table authoring with <code>RadzenMarkdownEditorTable</code> and <code>RadzenMarkdownEditorTableTools</code> - insert a table, insert or delete rows and columns and align columns. The same commands open as a context menu on right click inside a table cell.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Undo and redo history shared by both modes, including toolbar actions, with Ctrl+Z and Ctrl+Y shortcuts. Ctrl+B, Ctrl+I and Ctrl+K toggle bold and italic and insert a link.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Paste HTML or plain text as Markdown and copy the selection as Markdown. Emoji shortcodes such as <code>:smile:</code> are replaced while typing in Design mode.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <code>RadzenMarkdownEditorCustomTool</code> adds custom toolbar buttons that raise the <code>Execute</code> event or render arbitrary content through its <code>Template</code>. <code>Immediate</code> and the <code>Input</code> event report changes on every keystroke.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v12-markdown" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenMarkdown
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> GitHub Flavored Markdown strikethrough (<code>~~text~~</code>) and task list items (<code>- [ ]</code> and <code>- [x]</code>) are parsed and rendered. The parser exposes them as the <code>Strikethrough</code> inline node and <code>ListItem.Checked</code>.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> New <code>HtmlVisitor</code> in <code>Radzen.Documents.Markdown</code> renders a parsed document or a Markdown string to an HTML string with <code>HtmlVisitor.ToHtml</code>. Links and images with <code>javascript:</code>, <code>vbscript:</code> and <code>data:</code> URLs are blanked.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> <code>INodeVisitor.VisitStrikethrough</code> has a default implementation so existing visitor implementations keep compiling.</li>
 </ul>
 
 <RadzenText Anchor="changelog#v12-scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
@@ -65,6 +87,7 @@
 </RadzenText>
 <ul>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> The library is now compatible with .NET trimming (<code>PublishTrimmed</code>) and Blazor WebAssembly trimmed publish. Data-bound components preserve the members they access via reflection through <code>DynamicallyAccessedMembers</code> annotations. See <RadzenLink Text="TRIMMING.md" Path="https://github.com/radzenhq/radzen-blazor/blob/master/TRIMMING.md" /> for consumer-facing guidance.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> The shipped <code>LinkerConfig.xml</code> has been replaced with conditional <code>DynamicDependency</code> roots, so only the types an application actually uses are preserved.</li>
 </ul>
 
 <RadzenText Anchor="changelog#v11" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
@@ -118,6 +141,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Address-aware copy, cut, and paste operations.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Drag-to-move support for charts and images.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Data binding support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> <RadzenLink Text="Streamed export" Path="/spreadsheet-streamed-export" /> - <code>Workbook.SaveToStreamAsync</code> appends rows from an <code>IAsyncEnumerable</code> below the workbook's last row as it saves, so exporting large data sets does not hold the rows in memory.</li>
 </ul>
 
 <RadzenText Anchor="changelog#v11-charts" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
