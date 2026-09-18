@@ -192,5 +192,80 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("check", component.Markup);
         }
+
+        [Fact]
+        public void TimelineItem_Appends_PointClass_ToPointElement()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            {
+                parameters.Add(p => p.PointClass, "my-point");
+            });
+
+            Assert.Contains("rz-timeline-point-base my-point", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Renders_Current_AsAriaCurrentStep()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            {
+                parameters.Add(p => p.Current, true);
+            });
+
+            Assert.Contains(@"aria-current=""step""", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Omits_AriaCurrent_WhenNotCurrent()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>();
+
+            Assert.DoesNotContain("aria-current", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Renders_ListItemRole()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>();
+
+            Assert.Contains(@"role=""listitem""", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Renders_LineStyle()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            {
+                parameters.Add(p => p.LineStyle, PointStyle.Success);
+            });
+
+            Assert.Contains("rz-timeline-line-success", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Omits_LineStyleClass_WhenLineStyleNotSet()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>();
+
+            Assert.DoesNotContain("rz-timeline-line-", component.Markup);
+        }
+
+        [Fact]
+        public void TimelineItem_Renders_Current_AsStyleHook()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            {
+                parameters.Add(p => p.Current, true);
+            });
+
+            Assert.Contains("rz-timeline-item-current", component.Markup);
+        }
     }
 }

@@ -1,0 +1,52 @@
+﻿<RadzenTimeline Orientation="Orientation.Horizontal" LinePosition="LinePosition.Top"
+                style="--rz-timeline-line-gap: calc(var(--rz-timeline-point-size) / 2);">
+    <Items>
+        @foreach (var step in steps)
+        {
+            <RadzenTimelineItem PointSize="PointSize.Large"
+                                PointStyle="@PointStyleFor(step)"
+                                PointVariant="@PointVariantFor(step)"
+                                LineStyle="@(step.Status == StepStatus.Complete ? PointStyle.Success : null)"
+                                Current="@(step.Status == StepStatus.Current)">
+                <ChildContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-m-0">@step.Label</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.P" class="rz-m-0 rz-color-base-500">@step.Detail</RadzenText>
+                </ChildContent>
+                <PointContent>
+                    <RadzenIcon Icon="@IconFor(step)" />
+                </PointContent>
+            </RadzenTimelineItem>
+        }
+    </Items>
+</RadzenTimeline>
+
+@code {
+    enum StepStatus { Complete, Current, Pending }
+
+    record Step(string Label, string Detail, StepStatus Status);
+
+    readonly Step[] steps =
+    [
+        new("Ordered", "12 Mar", StepStatus.Complete),
+        new("Packed", "13 Mar", StepStatus.Complete),
+        new("Shipped", "In transit", StepStatus.Current),
+        new("Delivered", "Est. 18 Mar", StepStatus.Pending),
+    ];
+
+    static PointStyle PointStyleFor(Step step) => step.Status switch
+    {
+        StepStatus.Complete => PointStyle.Success,
+        StepStatus.Current => PointStyle.Primary,
+        _ => PointStyle.Base,
+    };
+
+    static Variant PointVariantFor(Step step) =>
+        step.Status == StepStatus.Pending ? Variant.Outlined : Variant.Filled;
+
+    static string IconFor(Step step) => step.Status switch
+    {
+        StepStatus.Complete => "check",
+        StepStatus.Current => "local_shipping",
+        _ => "more_horiz",
+    };
+}
