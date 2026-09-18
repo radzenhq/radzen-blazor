@@ -126,6 +126,39 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-timeline-column", component.Markup);
         }
+
+        [Fact]
+        public void Timeline_Renders_ListRole()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>();
+
+            Assert.Contains(@"role=""list""", component.Markup);
+        }
+
+        [Fact]
+        public void Timeline_Marks_OnlyTheConnectorOwner_WithItsLineStyle()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenTimelineItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenTimelineItem.LineStyle), (PointStyle?)PointStyle.Success);
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenTimelineItem>(3);
+                    builder.CloseComponent();
+                });
+            });
+
+            var items = component.FindAll(".rz-timeline-item");
+
+            // The connector spans both items, but only the item that declares it is marked - the
+            // stylesheet reaches the next item's half through the sibling combinator.
+            Assert.Contains("rz-timeline-line-success", items[0].ClassName);
+            Assert.DoesNotContain("rz-timeline-line", items[1].ClassName);
+        }
+
     }
 }
-

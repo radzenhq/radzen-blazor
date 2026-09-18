@@ -76,10 +76,37 @@ namespace Radzen.Blazor
         [Parameter]
         public int PointShadow { get; set; } = 1;
 
-        private string PointClass => ClassList.Create($"rz-timeline-point")
+        /// <summary>
+        /// Gets or sets additional CSS classes applied to the point element itself, rather than to the item.
+        /// Use it to style the marker beyond what <see cref="PointStyle"/> and <see cref="PointVariant"/> express -
+        /// a focus ring on the active step, a transition, an animation.
+        /// </summary>
+        [Parameter]
+        public string? PointClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the style of the connector running from this item to the next one rendered.
+        /// The last item has no outgoing connector, so its value is ignored. Leave it <c>null</c> to keep the
+        /// theme line colour.
+        /// </summary>
+        [Parameter]
+        public PointStyle? LineStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this item is the step currently in progress. It is marked
+        /// <c>aria-current="step"</c> and its point is drawn with a ring in the point's own colour.
+        /// At most one item in a timeline should set it.
+        /// </summary>
+        [Parameter]
+        public bool Current { get; set; }
+
+        private string? AriaCurrent => Current ? "step" : null;
+
+        private string PointCssClass => ClassList.Create($"rz-timeline-point")
                                 .Add($"rz-timeline-point-{PointVariant.ToString().ToLowerInvariant()}")
                                 .Add($"rz-shadow-{PointShadow.ToString(CultureInfo.InvariantCulture).ToLowerInvariant()}")
                                 .Add($"rz-timeline-point-{PointStyle.ToString().ToLowerInvariant()}")
+                                .Add(PointClass)
                                 .ToString();
 
         /// <inheritdoc />
@@ -100,7 +127,10 @@ namespace Radzen.Blazor
                 pointSizeCSS = "lg";
             }
 
-            return ClassList.Create($"rz-timeline-item rz-timeline-axis-{pointSizeCSS}").ToString();
+            return ClassList.Create($"rz-timeline-item rz-timeline-axis-{pointSizeCSS}")
+                            .Add($"rz-timeline-line-{LineStyle?.ToString().ToLowerInvariant()}", LineStyle != null)
+                            .Add("rz-timeline-item-current", Current)
+                            .ToString();
         }
     }
 }
