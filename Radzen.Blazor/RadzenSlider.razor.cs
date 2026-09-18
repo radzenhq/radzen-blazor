@@ -173,8 +173,8 @@ namespace Radzen.Blazor
 
             try
             {
-                jsRef?.InvokeVoidAsync("dispose");
-                jsRef?.DisposeAsync();
+                jsRef?.InvokeVoid("dispose");
+                jsRef?.DisposeFireAndForget();
             }
             catch (ObjectDisposedException)
             {

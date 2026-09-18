@@ -4214,8 +4214,8 @@ namespace Radzen.Blazor
             _jsRefVersion++;
             var jsRef = _jsRef;
             _jsRef = null;
-            jsRef?.InvokeVoidAsync("dispose");
-            jsRef?.DisposeAsync();
+            jsRef?.InvokeVoid("dispose");
+            jsRef?.DisposeFireAndForget();
 
             if (groups != null)
             {
