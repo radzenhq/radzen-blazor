@@ -582,15 +582,12 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (scrollToSelected && Visible && JSRuntime != null)
+            if (scrollToSelected && Visible && JSRuntime != null && selectedIndex >= 0 && selectedIndex < items.Count)
             {
                 scrollToSelected = false;
 
-                if (selectedIndex >= 0 && selectedIndex < items.Count)
-                {
-                    var duration = animateScrollToSelected ? (AnimationDuration.HasValue ? (object)AnimationDuration.Value : null) : 0;
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, duration);
-                }
+                var duration = animateScrollToSelected ? (AnimationDuration.HasValue ? (object)AnimationDuration.Value : null) : 0;
+                await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, duration);
             }
         }
 
