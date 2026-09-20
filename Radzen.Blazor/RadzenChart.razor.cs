@@ -353,6 +353,15 @@ namespace Radzen.Blazor
         public bool AllowPan { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the chart renders its own scrollbar below the plot when zoomed. Set to <c>false</c> to drive the visible range from
+        /// outside the chart instead, e.g. with a standalone <see cref="RadzenRangeNavigator" /> bound to <see cref="ViewStart" /> and <see cref="ViewEnd" />
+        /// that is shared by several charts. Hiding the scrollbar also releases the space reserved for it. Mouse wheel zoom is not affected.
+        /// </summary>
+        /// <value><c>true</c> to render the scrollbar; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        [Parameter]
+        public bool ShowScrollbar { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the zoom level as a percentage. A value of 100 means no zoom (full range visible).
         /// Higher values zoom in (e.g., 200 shows half the range, 400 shows a quarter).
         /// Set to 100 to reset zoom. Supports two-way binding with <c>@bind-Zoom</c>.
@@ -813,7 +822,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (AllowZoom || AllowPan)
+            if ((AllowZoom || AllowPan) && ShowScrollbar)
             {
                 MarginBottom += 20;
 

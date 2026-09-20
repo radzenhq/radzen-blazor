@@ -28,3 +28,15 @@
 <RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorCompact">
     <RangeNavigatorCompact />
 </RadzenExample>
+
+<RadzenText Anchor="range-navigator#synchronized-charts" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Synchronized Charts
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    One standalone <code>RadzenRangeNavigator</code> can frame several charts: bind its <code>Start</code> and <code>End</code> to the same values as each chart's <code>ViewStart</code> and <code>ViewEnd</code>.
+    Set <code>ShowScrollbar="false"</code> on the charts so they neither draw their own scrollbar nor reserve space for it, and keep <code>AllowZoom</code> so the mouse wheel still zooms - the navigator follows.
+    A shared <code>SyncGroup</code> additionally synchronizes the crosshair and tooltip across the charts.
+</RadzenText>
+<RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorSync">
+    <RangeNavigatorSync />
+</RadzenExample>

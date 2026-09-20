@@ -2028,7 +2028,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" } ],
+                            Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" }, new () { Text = "Synchronized Charts", Anchor = "#synchronized-charts" } ],
                             Name = "Range Navigator",
                             Path = "range-navigator",
                             Description = "Frame the visible window of a chart with a draggable Blazor range navigator overview strip.",
