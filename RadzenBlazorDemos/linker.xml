@@ -11,6 +11,8 @@
 	<!-- The following types are referenced only by demo source compiled at runtime (Edit Source / Playground), so trimming removes members the runtime compiler needs. Preserve them so those demos compile online. -->
 	<assembly fullname="System.Private.CoreLib">
 		<type fullname="System.Math" preserve="all"/>
+		<!-- Interpolated strings with alignment or format specifiers lower to AppendFormatted overloads the prebuilt demos do not all use, so the trimmer drops them and runtime-compiled demos fail to bind. -->
+		<type fullname="System.Runtime.CompilerServices.DefaultInterpolatedStringHandler" preserve="all"/>
 	</assembly>
 	<assembly fullname="System.ComponentModel.Annotations">
 		<type fullname="System.ComponentModel.DataAnnotations.DisplayAttribute" preserve="all"/>

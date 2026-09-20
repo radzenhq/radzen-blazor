@@ -18,6 +18,8 @@
   <ItemGroup>
     <!-- Workaround for .NET 10 antiforgery token issue - https://github.com/dotnet/aspnetcore/issues/64693 -->
     <TrimmerRootDescriptor Include="linker.xml" />
+    <!-- Release publish turns DebuggerSupport off, which makes the trimmer strip parameter names from every framework assembly. The runtime Roslyn compiler behind Edit Source / Playground binds interpolated strings with alignment or format specifiers ({value:F2}) as named AppendFormatted(value, format: "F2") calls, so such demos fail online with "The best overload for 'AppendFormatted' does not have a parameter named 'format'". Keep parameter names so runtime-compiled demos bind the same way they do at build time. -->
+    <_TrimmerKeepMetadata Include="parametername" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Localization/RadzenTranslations.json" />
