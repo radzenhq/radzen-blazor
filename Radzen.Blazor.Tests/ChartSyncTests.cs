@@ -48,5 +48,37 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain("rz-chart-category-tooltip", receiver.Markup);
             Assert.DoesNotContain("rz-active-point", receiver.Markup);
         }
+        [Fact]
+        public async System.Threading.Tasks.Task SyncedHover_DoesNotCrossCircuits()
+        {
+            using var ctx = CreateChartContext();
+            ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
+            ctx.RenderComponent<RadzenChartTooltip>();
+
+            using var otherCtx = CreateChartContext();
+            otherCtx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
+            otherCtx.RenderComponent<RadzenChartTooltip>();
+
+            var group = $"test-{System.Guid.NewGuid():N}";
+            var source = RenderSyncedChart(ctx, group);
+            var receiver = RenderSyncedChart(ctx, group);
+            var foreign = RenderSyncedChart(otherCtx, group);
+
+            await source.InvokeAsync(() => source.Instance.Resize(400, 300));
+            await receiver.InvokeAsync(() => receiver.Instance.Resize(400, 300));
+            await foreign.InvokeAsync(() => foreign.Instance.Resize(400, 300));
+
+            await source.InvokeAsync(() => source.Instance.MouseMove(200, 150));
+
+            Assert.Contains("rz-chart-category-tooltip", source.Markup);
+            Assert.Contains("rz-chart-category-tooltip", receiver.Markup);
+            Assert.DoesNotContain("rz-chart-category-tooltip", foreign.Markup);
+            Assert.DoesNotContain("rz-active-point", foreign.Markup);
+
+            await source.InvokeAsync(() => source.Instance.MouseMove(100, 150));
+
+            Assert.Contains("rz-chart-category-tooltip", source.Markup);
+            Assert.DoesNotContain("rz-chart-category-tooltip", foreign.Markup);
+        }
     }
 }
