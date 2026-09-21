@@ -247,8 +247,8 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            jsRef?.InvokeVoidAsync("dispose");
-            jsRef?.DisposeAsync();
+            jsRef?.InvokeVoid("dispose");
+            jsRef?.DisposeFireAndForget();
             jsRef = null;
 
             GC.SuppressFinalize(this);
