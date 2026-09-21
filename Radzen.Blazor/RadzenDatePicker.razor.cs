@@ -1224,6 +1224,9 @@ namespace Radzen.Blazor
 
         private async Task ParseDate(string inputValue)
         {
+            var wasTyping = immediateText != null;
+            immediateText = null;
+
             DateTime? newValue;
             bool valid = TryParseInput(inputValue, out DateTime value);
 
@@ -1293,6 +1296,10 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, inputValueToSet);
             }
+            else if (wasTyping)
+            {
+                StateHasChanged();
+            }
         }
 
         /// <summary>
@@ -1314,8 +1321,12 @@ namespace Radzen.Blazor
             return ParseDateImmediate(args?.Value?.ToString() ?? string.Empty);
         }
 
+        string? immediateText;
+
         private async Task ParseDateImmediate(string inputValue)
         {
+            immediateText = inputValue;
+
             bool valid = TryParseInput(inputValue, out DateTime value);
 
             if (!valid || DateAttributes(value).Disabled)
@@ -1399,6 +1410,8 @@ namespace Radzen.Blazor
             {
                 return;
             }
+
+            immediateText = null;
 
             if (Multiple)
             {
@@ -1733,6 +1746,8 @@ namespace Radzen.Blazor
 
         async Task OnChange()
         {
+            immediateText = null;
+
             // In Multiple mode we update and raise ValueChanged/Change elsewhere
             if (Multiple)
             {

@@ -1519,6 +1519,70 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(testDate, newValue?.Date);
         }
         [Fact]
+        public void DatePicker_Immediate_KeepsTypedTextWhileTyping()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            DateTime? value = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, args => value = args);
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            inputElement.Input("2026-03");
+            component.SetParametersAndRender(ps => ps.Add(p => p.Value, value));
+
+            Assert.Equal(new DateTime(2026, 3, 1), value);
+            Assert.Equal("2026-03", component.Find(".rz-inputtext").GetAttribute("value"));
+
+            inputElement.Input("2026-03-04");
+            component.SetParametersAndRender(ps => ps.Add(p => p.Value, value));
+
+            Assert.Equal(new DateTime(2026, 3, 4), value);
+            Assert.Equal("2026-03-04", component.Find(".rz-inputtext").GetAttribute("value"));
+
+            inputElement.Change("2026-03-04");
+
+            Assert.Equal(new DateTime(2026, 3, 4), value);
+            Assert.Equal(component.Instance.FormattedValue, component.Find(".rz-inputtext").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void DatePicker_Immediate_ShowsFormattedValue_AfterCalendarSelection()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            DateTime? value = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, args => value = args);
+            });
+
+            component.Find(".rz-inputtext").Input("2026-03");
+            component.SetParametersAndRender(ps => ps.Add(p => p.Value, value));
+
+            Assert.Equal("2026-03", component.Find(".rz-inputtext").GetAttribute("value"));
+
+            component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "20").ParentElement.Click();
+            component.SetParametersAndRender(ps => ps.Add(p => p.Value, value));
+
+            Assert.Equal(new DateTime(2026, 3, 20), value);
+            Assert.Equal(component.Instance.FormattedValue, component.Find(".rz-inputtext").GetAttribute("value"));
+        }
+
+        [Fact]
         public void DatePicker_NonGregorianCalendar_Renders_CorrectDayNumbers()
         {
             using var ctx = new TestContext();
