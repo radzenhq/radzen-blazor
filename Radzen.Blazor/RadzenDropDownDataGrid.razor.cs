@@ -924,7 +924,7 @@ namespace Radzen.Blazor
                             if (grid != null && !isFirstRender && JSRuntime != null)
                             {
                                 InvokeAsync(() => grid.SelectRow(SelectedItem!, false));
-                                JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem!) - 1, null);
+                                JSRuntime.InvokeVoid("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem!) - 1, null);
                             }
                         }
                         catch { }

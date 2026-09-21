@@ -153,7 +153,7 @@ namespace Radzen.Blazor
             {
                 if (e != null && e.Location.EndsWith(GetAnchor(), StringComparison.InvariantCultureIgnoreCase) && JSRuntime != null)
                 {
-                    JSRuntime.InvokeVoidAsync("Element.prototype.scrollIntoView.call", element);
+                    JSRuntime.InvokeVoid("Element.prototype.scrollIntoView.call", element);
                 }
             }
 

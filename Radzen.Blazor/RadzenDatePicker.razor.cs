@@ -1722,7 +1722,7 @@ namespace Radzen.Blazor
             }
             else if (JSRuntime != null)
             {
-                _ = JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                JSRuntime.InvokeVoid("Radzen.closePopup", PopupID);
             }
 
             contentStyle = "display:none;";

@@ -101,7 +101,7 @@ namespace Radzen.Blazor
 
                 try
                 {
-                    _ = JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);
+                    JSRuntime.InvokeVoid("Radzen.mediaQuery", Reference);
                 }
                 catch
                 {
