@@ -465,12 +465,10 @@ namespace Radzen.Blazor.Tests
             var inputElement = component.Find(".rz-inputtext");
 
             // initialize DateTimeValue
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(previousDay.ToShortDateString());
-            inputElement.Change(previousDay.AddDays(-1));
+            inputElement.Change(previousDay.ToShortDateString());
 
             // try to enter disabled date
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(DateTime.Today.ToShortDateString());
-            inputElement.Change(DateTime.Today);
+            inputElement.Change(DateTime.Today.ToShortDateString());
 
             Assert.True(raised);
             Assert.Equal(previousDay, (DateTime)newValue);
@@ -499,12 +497,10 @@ namespace Radzen.Blazor.Tests
             var inputElement = component.Find(".rz-inputtext");
 
             // initialize DateTimeValue
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(previousDay.ToShortDateString());
-            inputElement.Change(previousDay.AddDays(-1));
+            inputElement.Change(previousDay.ToShortDateString());
 
             // try to enter disabled date
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(DateTime.Today.ToShortDateString());
-            inputElement.Change(DateTime.Today);
+            inputElement.Change(DateTime.Today.ToShortDateString());
 
             Assert.True(raised);
             Assert.Null(newValue);
@@ -530,11 +526,11 @@ namespace Radzen.Blazor.Tests
             var inputElement = component.Find(".rz-inputtext");
 
             string input = "3012";
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(input);
             inputElement.Change(input);
 
             Assert.True(raised);
             Assert.Equal(new DateTime(DateTime.Now.Year, 12, 30), newValue);
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, invocation => invocation.Identifier == "Radzen.getInputValue");
         }
 
 
@@ -568,11 +564,38 @@ namespace Radzen.Blazor.Tests
             var inputElement = component.Find(".rz-inputtext");
 
             string input = "3012";
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(input);
             inputElement.Change(input);
 
             Assert.True(raised);
             Assert.Equal(new DateTime(DateTime.Now.Year, 12, 30), newValue);
+        }
+
+        [Fact]
+        public void DatePicker_Updates_ValueBefore_Clearing_InvalidInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var initialDate = new DateTime(2025, 6, 15);
+            var raised = false;
+            DateTime? newValue = initialDate;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.Value, initialDate);
+                parameters.Add(p => p.ValueChanged, args =>
+                {
+                    raised = true;
+                    newValue = args;
+                    Assert.DoesNotContain(ctx.JSInterop.Invocations, invocation => invocation.Identifier == "Radzen.setInputValue");
+                });
+            });
+
+            component.Find(".rz-inputtext").Change("invalid");
+
+            Assert.True(raised);
+            Assert.Null(newValue);
+            Assert.Contains(ctx.JSInterop.Invocations, invocation => invocation.Identifier == "Radzen.setInputValue");
         }
 
 
@@ -746,7 +769,6 @@ namespace Radzen.Blazor.Tests
             // update to new value
             var inputElement = component.Find(".rz-inputtext");
             DateOnly? enteredValue = new DateOnly(2024, 2, 28);
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(enteredValue.Value.ToShortDateString());
             inputElement.Change(enteredValue);
 
             input.GetAttribute("value").MarkupMatches(enteredValue.ToString());
@@ -777,8 +799,7 @@ namespace Radzen.Blazor.Tests
             // update to new value
             var inputElement = component.Find(".rz-inputtext");
             TimeOnly? enteredValue = new TimeOnly(1, 4, 5);
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(enteredValue.Value.ToLongTimeString());
-            inputElement.Change(enteredValue);
+            inputElement.Change(enteredValue.Value.ToLongTimeString());
 
             input.GetAttribute("value").MarkupMatches(enteredValue.ToString());
             Assert.Equal(enteredValue, component.Instance.Value);
@@ -1439,7 +1460,6 @@ namespace Radzen.Blazor.Tests
 
             var inputElement = component.Find(".rz-inputtext");
 
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(testDate.ToShortDateString());
             inputElement.Input(testDate.ToShortDateString());
 
             Assert.True(raised);
@@ -1467,7 +1487,6 @@ namespace Radzen.Blazor.Tests
             var inputElement = component.Find(".rz-inputtext");
 
             // Simulate partial/invalid input
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult("abc");
             inputElement.Input("abc");
 
             // ParseDateImmediate ignores invalid input; ParseDate also reverts to FormattedValue for non-nullable.
@@ -1494,7 +1513,6 @@ namespace Radzen.Blazor.Tests
 
             var inputElement = component.Find(".rz-inputtext");
 
-            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(testDate.ToShortDateString());
             inputElement.Input(testDate.ToShortDateString());
 
             Assert.True(raised);
