@@ -314,7 +314,7 @@ namespace Radzen.Blazor
             var format = HandleLabelFormatString ?? "{0:MM/dd/yyyy}";
             try
             {
-                JSRuntime.InvokeVoidAsync("Radzen.updateRangeNavigatorLabels", Element, isDate, inputStart, inputEnd, format);
+                JSRuntime.InvokeVoid("Radzen.updateRangeNavigatorLabels", Element, isDate, inputStart, inputEnd, format);
             }
             catch
             {
@@ -338,7 +338,7 @@ namespace Radzen.Blazor
 
             try
             {
-                JSRuntime.InvokeVoidAsync("Radzen.updateRangeNavigatorTooltip", Element, ShowTooltip ? GetTooltipPoints() : new List<TooltipPoint>());
+                JSRuntime.InvokeVoid("Radzen.updateRangeNavigatorTooltip", Element, ShowTooltip ? GetTooltipPoints() : new List<TooltipPoint>());
             }
             catch
             {
@@ -487,7 +487,7 @@ namespace Radzen.Blazor
             {
                 try
                 {
-                    JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
+                    JSRuntime!.InvokeVoid("Radzen.disposeElement", Element);
                 }
                 catch
                 {

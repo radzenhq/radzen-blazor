@@ -3,6 +3,7 @@ using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -107,14 +108,22 @@ namespace Radzen.Blazor
         /// Gets or sets the synchronization group of the chart. Charts which share the same group display
         /// a synchronized crosshair and active data points: hovering one chart highlights the same category in the others.
         /// Charts in a group should plot the same kind of category (e.g. the same dates).
+        /// Groups are scoped to the current Blazor circuit, so charts rendered for different users or browser tabs never synchronize with each other even when they use the same group name.
         /// </summary>
         /// <value>The synchronization group. Default is <c>null</c> (not synchronized).</value>
         [Parameter]
         public string? SyncGroup { get; set; }
 
         private static readonly object syncGroupsLock = new object();
-        private static readonly Dictionary<string, List<RadzenChart>> syncGroups = new Dictionary<string, List<RadzenChart>>();
+        private static readonly ConditionalWeakTable<object, Dictionary<string, List<RadzenChart>>> syncScopes = new ConditionalWeakTable<object, Dictionary<string, List<RadzenChart>>>();
+        private static readonly object defaultSyncScope = new object();
+        private Dictionary<string, List<RadzenChart>>? registeredSyncGroups;
         private string? registeredSyncGroup;
+
+        private Dictionary<string, List<RadzenChart>> GetSyncGroups()
+        {
+            return syncScopes.GetValue((object?)JSRuntime ?? defaultSyncScope, _ => new Dictionary<string, List<RadzenChart>>());
+        }
 
         internal double? SyncedPlotX { get; private set; }
 
@@ -129,6 +138,7 @@ namespace Radzen.Blazor
 
             if (SyncGroup != null)
             {
+                var syncGroups = GetSyncGroups();
                 lock (syncGroupsLock)
                 {
                     if (!syncGroups.TryGetValue(SyncGroup, out var charts))
@@ -138,34 +148,36 @@ namespace Radzen.Blazor
                     }
                     charts.Add(this);
                 }
+                registeredSyncGroups = syncGroups;
                 registeredSyncGroup = SyncGroup;
             }
         }
 
         private void UnregisterSyncGroup()
         {
-            if (registeredSyncGroup == null)
+            if (registeredSyncGroup == null || registeredSyncGroups == null)
             {
                 return;
             }
 
             lock (syncGroupsLock)
             {
-                if (syncGroups.TryGetValue(registeredSyncGroup, out var charts))
+                if (registeredSyncGroups.TryGetValue(registeredSyncGroup, out var charts))
                 {
                     charts.Remove(this);
                     if (charts.Count == 0)
                     {
-                        syncGroups.Remove(registeredSyncGroup);
+                        registeredSyncGroups.Remove(registeredSyncGroup);
                     }
                 }
             }
+            registeredSyncGroups = null;
             registeredSyncGroup = null;
         }
 
         private void BroadcastSyncedHover(double x, double y)
         {
-            if (registeredSyncGroup == null)
+            if (registeredSyncGroup == null || registeredSyncGroups == null)
             {
                 return;
             }
@@ -173,7 +185,7 @@ namespace Radzen.Blazor
             List<RadzenChart> targets;
             lock (syncGroupsLock)
             {
-                targets = syncGroups.TryGetValue(registeredSyncGroup, out var charts)
+                targets = registeredSyncGroups.TryGetValue(registeredSyncGroup, out var charts)
                     ? charts.Where(chart => !ReferenceEquals(chart, this)).ToList()
                     : new List<RadzenChart>();
             }
@@ -339,6 +351,15 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public bool AllowPan { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the chart renders its own scrollbar below the plot when zoomed. Set to <c>false</c> to drive the visible range from
+        /// outside the chart instead, e.g. with a standalone <see cref="RadzenRangeNavigator" /> bound to <see cref="ViewStart" /> and <see cref="ViewEnd" />
+        /// that is shared by several charts. Hiding the scrollbar also releases the space reserved for it. Mouse wheel zoom is not affected.
+        /// </summary>
+        /// <value><c>true</c> to render the scrollbar; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        [Parameter]
+        public bool ShowScrollbar { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the zoom level as a percentage. A value of 100 means no zoom (full range visible).
@@ -801,7 +822,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (AllowZoom || AllowPan)
+            if ((AllowZoom || AllowPan) && ShowScrollbar)
             {
                 MarginBottom += 20;
 

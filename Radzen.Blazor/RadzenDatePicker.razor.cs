@@ -1725,8 +1725,19 @@ namespace Radzen.Blazor
                 return;
             }
 
-            DateTime? newValue;
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+            await ParseDate(inputValue);
+        }
+
+        private Task OnInputChange(ChangeEventArgs args)
+        {
+            return ParseDate(args?.Value?.ToString() ?? string.Empty);
+        }
+
+        private async Task ParseDate(string inputValue)
+        {
+            var wasTyping = immediateText != null;
+            immediateText = null;
 
             if (IsRange)
             {
@@ -1741,15 +1752,20 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                    if (JSRuntime != null)
+                    {
+                        await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                    }
                 }
 
                 return;
             }
 
+            DateTime? newValue;
             bool valid = TryParseInput(inputValue, out DateTime value);
 
             var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
+            string? inputValueToSet = null;
 
             if (valid && !DateAttributes(value).Disabled)
             {
@@ -1761,11 +1777,11 @@ namespace Radzen.Blazor
 
                 if (nullable)
                 {
-                    await JSRuntime!.InvokeAsync<string>("Radzen.setInputValue", input, "");
+                    inputValueToSet = string.Empty;
                 }
                 else
                 {
-                    await JSRuntime!.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                    inputValueToSet = FormattedValue;
                 }
 
             }
@@ -1809,6 +1825,15 @@ namespace Radzen.Blazor
                 await Change.InvokeAsync(DateTimeValue);
                 StateHasChanged();
             }
+
+            if (inputValueToSet != null && JSRuntime != null)
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, inputValueToSet);
+            }
+            else if (wasTyping)
+            {
+                StateHasChanged();
+            }
         }
 
         /// <summary>
@@ -1822,6 +1847,19 @@ namespace Radzen.Blazor
             }
 
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+            await ParseDateImmediate(inputValue);
+        }
+
+        private Task OnInputImmediate(ChangeEventArgs args)
+        {
+            return ParseDateImmediate(args?.Value?.ToString() ?? string.Empty);
+        }
+
+        string? immediateText;
+
+        private async Task ParseDateImmediate(string inputValue)
+        {
+            immediateText = inputValue;
 
             if (IsRange)
             {
@@ -1971,6 +2009,8 @@ namespace Radzen.Blazor
             {
                 return;
             }
+
+            immediateText = null;
 
             if (Multiple)
             {
@@ -2282,7 +2322,7 @@ namespace Radzen.Blazor
             }
             else if (JSRuntime != null)
             {
-                _ = JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                JSRuntime.InvokeVoid("Radzen.closePopup", PopupID);
             }
 
             contentStyle = "display:none;";
@@ -2306,6 +2346,8 @@ namespace Radzen.Blazor
 
         async Task OnChange()
         {
+            immediateText = null;
+
             // In Multiple mode we update and raise ValueChanged/Change elsewhere
             if (Multiple)
             {

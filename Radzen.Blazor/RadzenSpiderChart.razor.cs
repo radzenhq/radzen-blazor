@@ -887,7 +887,7 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyResizable", Element);
-                JSRuntime.InvokeVoidAsync("Radzen.disposeElement", Element);
+                JSRuntime.InvokeVoid("Radzen.disposeElement", Element);
             }
 
             base.Dispose();

@@ -143,6 +143,43 @@ public class ChartTests
     }
 
     [Fact]
+    public async Task Chart_ShowScrollbar_False_Hides_Scrollbar_And_Releases_Its_Space()
+    {
+        using var ctx = CreateChartContext();
+
+        IRenderedComponent<RadzenChart> Render(bool showScrollbar) => ctx.RenderComponent<RadzenChart>(parameters => parameters
+            .Add(p => p.AllowZoom, true)
+            .Add(p => p.AllowPan, true)
+            .Add(p => p.ShowScrollbar, showScrollbar)
+            .Add(p => p.ViewStart, 0.25)
+            .Add(p => p.ViewEnd, 0.75)
+            .AddChildContent<RadzenLineSeries<MultiAxisItem>>(series => series
+                .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
+                .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
+                .Add(p => p.Data, TallBarData)));
+
+        var withScrollbar = Render(true);
+        var withoutScrollbar = Render(false);
+
+        await withScrollbar.InvokeAsync(() => withScrollbar.Instance.Resize(600, 300));
+        await withoutScrollbar.InvokeAsync(() => withoutScrollbar.Instance.Resize(600, 300));
+
+        Assert.Contains("rz-chart-scrollbar", withScrollbar.Markup);
+        Assert.DoesNotContain("rz-chart-scrollbar", withoutScrollbar.Markup);
+
+        Assert.Contains("rz-chart-zoomable", withoutScrollbar.Find(".rz-chart").ClassName);
+        Assert.Equal("true", withoutScrollbar.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
+
+        static double PlotBottom(IRenderedComponent<RadzenChart> chart) =>
+            double.Parse(chart.Find(".rz-category-axis .rz-line").GetAttribute("d")!.Split(' ')[2], System.Globalization.CultureInfo.InvariantCulture);
+
+        Assert.Equal(20, PlotBottom(withoutScrollbar) - PlotBottom(withScrollbar));
+
+        withoutScrollbar.SetParametersAndRender(parameters => parameters.Add(p => p.ShowScrollbar, true));
+        Assert.Contains("rz-chart-scrollbar", withoutScrollbar.Markup);
+    }
+
+    [Fact]
     public async Task Chart_ToPng_ReturnsPngData()
     {
         using var ctx = CreateChartContext();

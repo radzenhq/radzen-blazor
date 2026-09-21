@@ -274,7 +274,7 @@ namespace Radzen.Blazor
 
             if (JSRuntime != null)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                JSRuntime.InvokeVoid("Radzen.closePopup", PopupID);
             }
         }
 
