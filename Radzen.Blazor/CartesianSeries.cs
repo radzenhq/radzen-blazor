@@ -953,16 +953,36 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public virtual (object, Point) DataAt(double x, double y)
         {
-            if (Items.Any())
-            {
-                var retObject = Items.Select(item =>
-                {
-                    var distance = Math.Abs(TooltipX(item) - x);
-                    return new { Item = item, Distance = distance };
-                }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
+            var chart = RequireChart();
+            var zoomed = chart.CategoryScale.IsZoomed;
+            var plotWidth = chart.CategoryScale.OutputSize;
 
-                return (retObject!,
-                    new Point() { X = TooltipX(retObject), Y = TooltipY(retObject)});
+            TItem closest = default!;
+            var found = false;
+            var closestDistance = double.MaxValue;
+
+            foreach (var item in Items)
+            {
+                var itemX = TooltipX(item);
+
+                if (zoomed && (itemX < 0 || itemX > plotWidth))
+                {
+                    continue;
+                }
+
+                var distance = Math.Abs(itemX - x);
+
+                if (distance <= closestDistance)
+                {
+                    closestDistance = distance;
+                    closest = item;
+                    found = true;
+                }
+            }
+
+            if (found)
+            {
+                return (closest!, new Point() { X = TooltipX(closest), Y = TooltipY(closest) });
             }
 
             return (default!, new Point());

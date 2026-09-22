@@ -3885,12 +3885,27 @@ window.Radzen = {
     ref.mouseEnterHandler = function () {
         inside = true;
     };
+    function leave() {
+      inside = false;
+      pendingMove = null;
+      if (moveRafId) {
+        cancelAnimationFrame(moveRafId);
+        moveRafId = null;
+      }
+      try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
+    }
+
     ref.mouseLeaveHandler = function (e) {
-        if (e.relatedTarget && (e.relatedTarget.matches('.rz-chart-tooltip') || e.relatedTarget.closest('.rz-chart-tooltip'))) {
+        var tooltip = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.rz-chart-tooltip');
+        if (tooltip) {
+            tooltip.addEventListener('mouseleave', function (te) {
+                if (inside && !(te.relatedTarget && ref.contains(te.relatedTarget))) {
+                    leave();
+                }
+            }, { once: true });
             return;
         }
-        inside = false;
-        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
+        leave();
     };
     ref.clickHandler = function (e) {
       var rect = ref.getBoundingClientRect();
