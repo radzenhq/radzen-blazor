@@ -1088,14 +1088,35 @@ namespace Radzen
         /// <summary>
         /// Debounces the filter.
         /// </summary>
-        async Task DebounceFilter()
+        Task DebounceFilter()
         {
-            if (JSRuntime != null)
+            return DebounceFilter(null);
+        }
+
+        async Task DebounceFilter(string? value)
+        {
+            if (value != null)
+            {
+                searchText = value;
+                await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
+            }
+            else if (JSRuntime != null)
             {
                 searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
                 await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
             }
 
+            await ApplySearchText();
+        }
+
+        /// <inheritdoc />
+        protected override Task OnSearchTextChanged()
+        {
+            return ApplySearchText();
+        }
+
+        async Task ApplySearchText()
+        {
             if (!LoadData.HasDelegate)
             {
                 _view = null;
@@ -1171,7 +1192,7 @@ namespace Radzen
         {
             if (!FilterAsYouType)
             {
-                await DebounceFilter();
+                await DebounceFilter(args?.Value?.ToString());
             }
         }
 

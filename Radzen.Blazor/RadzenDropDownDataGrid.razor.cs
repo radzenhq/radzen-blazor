@@ -1220,9 +1220,19 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task DebounceFilter()
+        Task DebounceFilter()
         {
-            if (JSRuntime != null)
+            return DebounceFilter(null);
+        }
+
+        async Task DebounceFilter(string? value)
+        {
+            if (value != null)
+            {
+                searchText = value;
+                await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
+            }
+            else if (JSRuntime != null)
             {
                 searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
                 await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
@@ -1234,6 +1244,14 @@ namespace Radzen.Blazor
                 _view = null;
                 await InvokeAsync(RefreshAfterFilter);
             }
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnSearchTextChanged()
+        {
+            previousSearch = searchText;
+            _view = null;
+            await RefreshAfterFilter();
         }
 
         async Task CloseOnEscape(KeyboardEventArgs args)
@@ -1317,7 +1335,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected override async Task OnFilter(ChangeEventArgs args)
         {
-            await DebounceFilter();
+            await DebounceFilter(args?.Value?.ToString());
         }
 
         async Task ClearSearchText()
