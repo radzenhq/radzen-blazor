@@ -78,6 +78,36 @@ public class FormulaEvaluationTests
         Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
     }
 
+    [Theory]
+    [InlineData("=1+¤")]
+    [InlineData("=1 ¤ 2")]
+    [InlineData("=SUM(")]
+    public void ShouldSetCellValueToErrorNameIfReferencedFormulaDoesNotParse(string formula)
+    {
+        sheet.Cells["A1"].Formula = formula;
+        sheet.Cells["B1"].Formula = "=A1+1";
+        sheet.Cells["C1"].Formula = "=SUM(A1:A2)";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+        Assert.Equal(CellError.Name, sheet.Cells["B1"].Value);
+        Assert.Equal(CellError.Name, sheet.Cells["C1"].Value);
+    }
+
+    [Theory]
+    [InlineData("=1+¤")]
+    [InlineData("=1 ¤ 2")]
+    [InlineData("=SUM(")]
+    public void ShouldSetCellValueToErrorNameIfReferencedFormulaThatDoesNotParseIsSetLast(string formula)
+    {
+        sheet.Cells["B1"].Formula = "=A1+1";
+        sheet.Cells["C1"].Formula = "=SUM(A1:A2)";
+        sheet.Cells["A1"].Formula = formula;
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+        Assert.Equal(CellError.Name, sheet.Cells["B1"].Value);
+        Assert.Equal(CellError.Name, sheet.Cells["C1"].Value);
+    }
+
     [Fact]
     public void ShouldSetCellValueToEqualsIfOnlyEqualsIsSetAsFormula()
     {

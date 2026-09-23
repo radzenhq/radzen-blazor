@@ -304,6 +304,11 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return cached;
         }
 
+        if (cell.FormulaSyntaxTree.Errors.Count > 0)
+        {
+            return CellData.FromError(CellError.Name);
+        }
+
         if (!evaluationStack.Add(cell))
         {
             return CellData.FromError(CellError.Circular);
