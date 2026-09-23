@@ -436,9 +436,21 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
-        if ((address.Row < 0 || address.Row >= targetSheet.RowCount) || (address.Column < 0 || address.Column >= targetSheet.ColumnCount))
+        if (address.Row < 0 || address.Column < 0)
         {
             value = CellData.FromError(CellError.Ref);
+            return;
+        }
+
+        if (address.Row >= Worksheet.MaxRows || address.Column >= Worksheet.MaxColumns)
+        {
+            value = CellData.FromError(CellError.Name);
+            return;
+        }
+
+        if (address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
+        {
+            value = CellData.Empty;
             return;
         }
 
@@ -698,13 +710,26 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
+        if (start.Row >= Worksheet.MaxRows || end.Row >= Worksheet.MaxRows || start.Column >= Worksheet.MaxColumns || end.Column >= Worksheet.MaxColumns)
+        {
+            value = CellData.FromError(CellError.Name);
+            return;
+        }
+
         var rows = end.Row - start.Row + 1;
         var columns = end.Column - start.Column + 1;
+
+        if ((long)rows * columns > Worksheet.MaxRows)
+        {
+            rows = Math.Clamp(startSheet.RowCount - start.Row, 1, rows);
+            columns = Math.Clamp(startSheet.ColumnCount - start.Column, 1, columns);
+        }
+
         var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet);
 
-        for (var row = start.Row; row <= end.Row; row++)
+        for (var row = start.Row; row < start.Row + rows; row++)
         {
-            for (var column = start.Column; column <= end.Column; column++)
+            for (var column = start.Column; column < start.Column + columns; column++)
             {
                 if (startSheet.IsDeletedRow(row) || startSheet.IsDeletedColumn(column))
                 {
@@ -712,7 +737,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                     return;
                 }
 
-                if (row < 0 || row >= startSheet.RowCount || column < 0 || column >= startSheet.ColumnCount)
+                if (row < 0 || column < 0)
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
@@ -720,7 +745,11 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
 
                 CellData cellValue;
 
-                if (!startSheet.Cells.TryGet(row, column, out var cell))
+                if (row >= startSheet.RowCount || column >= startSheet.ColumnCount)
+                {
+                    cellValue = CellData.Empty;
+                }
+                else if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
                     // Cell is in bounds but not populated - treat as empty
                     cellValue = new CellData(null);

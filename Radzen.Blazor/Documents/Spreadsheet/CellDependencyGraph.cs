@@ -211,19 +211,14 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
         }
 
         var startRow = Math.Min(startAddress.Row, endAddress.Row);
-        var endRow = Math.Max(startAddress.Row, endAddress.Row);
+        var endRow = Math.Min(Math.Max(startAddress.Row, endAddress.Row), targetSheet.RowCount - 1);
         var startCol = Math.Min(startAddress.Column, endAddress.Column);
-        var endCol = Math.Max(startAddress.Column, endAddress.Column);
+        var endCol = Math.Min(Math.Max(startAddress.Column, endAddress.Column), targetSheet.ColumnCount - 1);
 
         for (var row = startRow; row <= endRow; row++)
         {
             for (var col = startCol; col <= endCol; col++)
             {
-                if (row >= targetSheet.RowCount || col >= targetSheet.ColumnCount)
-                {
-                    continue;
-                }
-
                 Dependencies.Add(targetSheet.Cells[new CellRef(row, col)]);
             }
         }

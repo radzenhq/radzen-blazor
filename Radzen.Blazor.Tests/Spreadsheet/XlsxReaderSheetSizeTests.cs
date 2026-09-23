@@ -115,6 +115,30 @@ public class XlsxReaderSheetSizeTests
         Assert.Equal("row150", loaded.Cells[149, 0].Value);
     }
 
+    [Fact]
+    public void Load_UsedRangeDimension_FormulasReadCellsPastItAsEmpty()
+    {
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Sheet1", 200, 10);
+        sheet.Cells["A1"].Value = 1;
+        sheet.Cells["A2"].Value = 2;
+        sheet.Cells["A3"].Value = 3;
+        sheet.Cells["B1"].Formula = "=SUM(A1:A100)";
+        sheet.Cells["B2"].Formula = "=A50";
+        sheet.Cells["B3"].Formula = "=COUNTBLANK(A1:A100)";
+
+        using var ms = Save(wb);
+
+        using var rewritten = RewriteDimension(ms, "A1:B3");
+
+        var loaded = Workbook.LoadFromStream(rewritten).Sheets[0];
+
+        Assert.Equal(3, loaded.RowCount);
+        Assert.Equal(6d, loaded.Cells["B1"].Value);
+        Assert.Equal(0d, loaded.Cells["B2"].Value);
+        Assert.Equal(97d, loaded.Cells["B3"].Value);
+    }
+
     private static MemoryStream RewriteDimension(MemoryStream source, string dimensionRef)
     {
         var result = new MemoryStream();

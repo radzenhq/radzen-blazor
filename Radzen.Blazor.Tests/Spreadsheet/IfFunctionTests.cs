@@ -125,7 +125,7 @@ public class IfFunctionTests
     [Fact]
     public void ShouldPropagateErrorFromCondition()
     {
-        sheet.Cells["A1"].Formula = "=IF(A6,\"True\",\"False\")";
+        sheet.Cells["A1"].Formula = "=IF(#REF!,\"True\",\"False\")";
 
         Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
     }
@@ -134,7 +134,7 @@ public class IfFunctionTests
     public void ShouldPropagateErrorFromTrueValue()
     {
         sheet.Cells["A1"].Value = 1;
-        sheet.Cells["A2"].Formula = "=IF(A1=1,A6,\"False\")";
+        sheet.Cells["A2"].Formula = "=IF(A1=1,#REF!,\"False\")";
 
         Assert.Equal(CellError.Ref, sheet.Cells["A2"].Value);
     }
@@ -143,7 +143,7 @@ public class IfFunctionTests
     public void ShouldPropagateErrorFromFalseValue()
     {
         sheet.Cells["A1"].Value = 0;
-        sheet.Cells["A2"].Formula = "=IF(A1=1,\"True\",A6)";
+        sheet.Cells["A2"].Formula = "=IF(A1=1,\"True\",#REF!)";
 
         Assert.Equal(CellError.Ref, sheet.Cells["A2"].Value);
     }

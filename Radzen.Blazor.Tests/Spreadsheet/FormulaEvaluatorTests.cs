@@ -365,36 +365,52 @@ public class FormulaEvaluationTests
         Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
     }
 
-    [Fact]
-    public void ShouldCreateRefErrorWhenOutOfBounds()
+    [Theory]
+    [InlineData("=A6", 0d)]
+    [InlineData("=F1", 0d)]
+    [InlineData("=A6+A2", 2d)]
+    [InlineData("=SUM(A2:A100)", 14d)]
+    [InlineData("=COUNT(A2:A100)", 4d)]
+    [InlineData("=COUNTA(A2:Z6)", 4d)]
+    [InlineData("=COUNTBLANK(A2:A100)", 95d)]
+    [InlineData("=ROWS(A2:A100)", 99d)]
+    [InlineData("=INDEX(A2:A100,50)", 0d)]
+    [InlineData("=COUNTBLANK(A1:A1048576)", 1048572d)]
+    [InlineData("=SUM(A2:XFD1048576)", 14d)]
+    public void ShouldReadCellsPastTheGridAsEmptyCells(string formula, double expected)
     {
-        sheet.Cells["A1"].Formula = "=A6";
+        sheet.Cells["A2"].Value = 2;
+        sheet.Cells["A3"].Value = 3;
+        sheet.Cells["A4"].Value = 4;
+        sheet.Cells["A5"].Value = 5;
+        sheet.Cells["B1"].Formula = formula;
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
+        Assert.Equal(expected, sheet.Cells["B1"].Value);
+    }
+
+    [Theory]
+    [InlineData("=A1048577")]
+    [InlineData("=XFE1")]
+    [InlineData("=SUM(A1:A1048577)")]
+    public void ShouldSetCellValueToErrorNameForReferencePastTheLastRowOrColumn(string formula)
+    {
+        sheet.Cells["B1"].Formula = formula;
+
+        Assert.Equal(CellError.Name, sheet.Cells["B1"].Value);
     }
 
     [Fact]
-    public void ShouldCreateRefErrorWhenRangeOutOfBounds()
+    public void Evaluator_ShouldReadCellsPastTheGridOfAnotherSheetAsEmptyCells()
     {
-        sheet.Cells["A1"].Formula = "=SUM(A2:A6)";
+        var wb = new Workbook();
+        var s1 = wb.AddSheet("Worksheet1", 5, 5);
+        var s2 = wb.AddSheet("Worksheet2", 3, 3);
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
-    }
+        s2.Cells[0, 0].Value = 7;
 
-    [Fact]
-    public void ShouldCreateRefErrorWhenCountRangeOutOfBounds()
-    {
-        sheet.Cells["A1"].Formula = "=COUNT(A2:A6)";
+        s1.Cells[0, 0].Formula = "=SUM(Worksheet2!A1:A100)+Worksheet2!Z99";
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
-    }
-
-    [Fact]
-    public void ShouldCreateRefErrorWhenCountaRangeOutOfBounds()
-    {
-        sheet.Cells["A1"].Formula = "=COUNTA(A2:A6)";
-
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
+        Assert.Equal(7d, s1.Cells[0, 0].Value);
     }
 
     [Fact]
