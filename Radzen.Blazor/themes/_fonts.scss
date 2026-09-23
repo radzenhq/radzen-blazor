@@ -37,3 +37,13 @@ $fonts-path: '../fonts';
     font-display: swap;
   }
 }
+
+@if $inter == true {
+  @font-face {
+    font-family: 'Inter';
+    src: url('#{$fonts-path}/InterVariable.woff2') format('woff2 supports variations'),
+         url('#{$fonts-path}/InterVariable.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+}
