@@ -6902,6 +6902,15 @@ class Spreadsheet {
     return target == this.element || this.element.contains(target);
   }
 
+  isCellEditorTextEntry = (target) => {
+    if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+      return false;
+    }
+
+    const cellEditor = target.closest('.rz-spreadsheet-cell-editor');
+    return cellEditor != null && this.element.contains(cellEditor);
+  }
+
   copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -7092,6 +7101,11 @@ class Spreadsheet {
   }
 
   onKeyDown = (e) => {
+    if (this.isCellEditorTextEntry(e.target) &&
+        (e.isComposing || (e.key !== 'Enter' && e.key !== 'Escape' && e.key !== 'Tab' && e.key !== 'F6'))) {
+      return;
+    }
+
     let key = '';
 
     if (e.ctrlKey || e.metaKey) {
@@ -7152,21 +7166,31 @@ class Spreadsheet {
 
     this.pendingKeys = null;
 
-    if (!keys || !e.target.matches('.rz-spreadsheet-editor-input')) {
+    const target = e.target;
+
+    if (!keys || !(target.matches('.rz-spreadsheet-editor-input') || this.isCellEditorTextEntry(target))) {
       return;
     }
 
-    e.target.innerText += keys;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      try {
+        target.setRangeText(keys, target.value.length, target.value.length, 'end');
+      } catch {
+        target.value += keys;
+      }
+    } else {
+      target.innerText += keys;
 
-    const range = document.createRange();
-    range.selectNodeContents(e.target);
-    range.collapse(false);
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      range.collapse(false);
 
-    const selection = getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
 
-    e.target.dispatchEvent(new Event('input'));
+    target.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
   // F6 / Shift+F6 cycle focus between the spreadsheet regions in their visible top-to-bottom order:

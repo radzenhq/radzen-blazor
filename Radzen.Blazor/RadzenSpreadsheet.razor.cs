@@ -397,6 +397,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Editor? Editor => ActiveView?.Editor;
 
+    private bool IsEditing => Editor is { Mode: not EditMode.None };
+
     /// <inheritdoc/>
     public async Task<bool> ExecuteAsync(ICommand command)
     {
@@ -1117,10 +1119,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CycleSelectionAsync(int rowOffset, int columnOffset)
     {
-        // The formula bar is a persistent editor, so after Tab/Enter commits there focus stays in it
-        // unless we move it back to the grid (Excel/Sheets parity). The in-cell editor closes on
-        // commit, so it doesn't need this. AcceptAsync resets the mode, so capture it first.
-        var fromFormulaBar = Editor?.Mode == EditMode.Formula;
+        var wasEditing = IsEditing;
 
         if (await AcceptAsync())
         {
@@ -1130,7 +1129,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                 await ScrollToAsync(address);
 
-                if (fromFormulaBar)
+                if (wasEditing)
                 {
                     await Element.FocusAsync();
                 }
@@ -1580,16 +1579,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return -1;
     }
 
-    private Task CancelEditAsync()
+    private async Task CancelEditAsync()
     {
-        if (Editor?.Mode != EditMode.None)
+        if (IsEditing)
         {
-            Editor?.Cancel();
-            return Task.CompletedTask;
+            Editor!.Cancel();
+            await Element.FocusAsync();
+            return;
         }
+
         clipboard.Clear();
-        
-        return Task.CompletedTask;
     }
 
     // A keyboard shortcut: the action to run, and whether it acts regardless of focus context. Global
@@ -1843,7 +1842,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// </summary>
     /// <returns></returns>
     [JSInvokable]
-    public Task OnCopyAsync() => CopySelectionAsync();
+    public Task OnCopyAsync() => IsEditing ? Task.CompletedTask : CopySelectionAsync();
 
     /// <summary>
     /// Invoked by JS interop to paste text from the clipboard into the current selection.
@@ -1851,7 +1850,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnPasteAsync(string text)
     {
-        if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
+        if (IsEditing || !IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
             return;
         }

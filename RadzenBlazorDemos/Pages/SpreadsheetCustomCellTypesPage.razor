@@ -8,6 +8,17 @@
 </RadzenText>
 
 <RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetCustomCellTypes"
-    AdditionalSourceCodePages=@(new [] { "ProgressCellRenderer.razor", "RatingCellRenderer.razor", "RatingCellEditor.razor" })>
+    AdditionalSourceCodePages=@(new [] { "ProgressCellRenderer.razor", "RatingCellRenderer.razor", "RatingCellEditor.razor", "StatusCellEditor.razor" })>
     <SpreadsheetCustomCellTypes />
 </RadzenExample>
+
+<RadzenText Anchor="spreadsheet-custom-cell-types#custom-editors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom Editors
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    A custom editor receives a <code>SpreadsheetCellEditContext</code> parameter named <code>Context</code>. Text editors such as the Status editor
+    focus their input when they open, start from <code>Context.Value</code> and update it as the user types, so the text is committed when the user
+    moves to another cell. Characters typed to start editing are passed on to the input. Call <code>Context.CommitAsync</code> to commit, for example
+    on Enter, as the Status editor does, or when a value is picked, as the Rating editor does. Escape cancels the edit, and other keys, as well as copy
+    and paste, stay inside the editor.
+</RadzenText>
