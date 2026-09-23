@@ -39,6 +39,8 @@ public class AcceptEditCommand(SheetView view) : ICommand
 
     private string? value;
 
+    private Cell? previous;
+
     /// <inheritdoc/>
     public bool Execute()
     {
@@ -57,17 +59,22 @@ public class AcceptEditCommand(SheetView view) : ICommand
             editor.Address = cell;
         }
 
-        value = editor.Cell?.GetValue();
+        previous = editor.Cell?.Clone();
         return editor.Accept();
     }
 
     /// <inheritdoc/>
     public void Unexecute()
     {
-        var currentValue = sheet.Cells[cell].GetValue();
-        sheet.Cells[cell].SetValue(value);
+        var target = sheet.Cells[cell];
+        value = target.GetValue();
+
+        if (previous is not null)
+        {
+            sheet.Batch(() => target.CopyFrom(previous.Clone()));
+        }
+
         sheet.Selection.Select(cell, range);
-        value = currentValue;
     }
 }
 
