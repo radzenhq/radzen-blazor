@@ -318,6 +318,13 @@ internal class FormulaLexer(string expression, bool strict = true)
 
         }
 
+        // Excel allows unquoted sheet names and defined names in any script (入荷実績!A1,
+        // Umsatz_2024): a letter outside ASCII starts an identifier too.
+        if (char.IsLetter(ch))
+        {
+            return ScanIdentifier();
+        }
+
         // Emit unknown token for any unrecognized character to preserve it in the token stream
         var unknown = new FormulaToken(FormulaTokenType.Unknown, Peek().ToString());
         Advance(1);
@@ -819,6 +826,14 @@ internal class FormulaLexer(string expression, bool strict = true)
                     continue;
 
                 default:
+                    if (char.IsLetterOrDigit(Peek()))
+                    {
+                        // Letters and digits outside ASCII (sheet or defined names in any script).
+                        hasLetters = true;
+                        Advance(1);
+                        continue;
+                    }
+
                     throw new InvalidOperationException($"Unexpected character '{Peek()}' at position {position}.");
             }
         }

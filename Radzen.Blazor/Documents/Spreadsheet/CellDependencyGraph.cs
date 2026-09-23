@@ -183,7 +183,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
             return;
         }
 
-        if (address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
+        if (address.Row < 0 || address.Column < 0 || address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
         {
             return;
         }
@@ -210,10 +210,10 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
             return;
         }
 
-        var startRow = Math.Min(startAddress.Row, endAddress.Row);
-        var endRow = Math.Max(startAddress.Row, endAddress.Row);
-        var startCol = Math.Min(startAddress.Column, endAddress.Column);
-        var endCol = Math.Max(startAddress.Column, endAddress.Column);
+        var startRow = Math.Max(0, Math.Min(startAddress.Row, endAddress.Row));
+        var endRow = Math.Min(targetSheet.RowCount - 1, Math.Max(startAddress.Row, endAddress.Row));
+        var startCol = Math.Max(0, Math.Min(startAddress.Column, endAddress.Column));
+        var endCol = Math.Min(targetSheet.ColumnCount - 1, Math.Max(startAddress.Column, endAddress.Column));
 
         for (var row = startRow; row <= endRow; row++)
         {

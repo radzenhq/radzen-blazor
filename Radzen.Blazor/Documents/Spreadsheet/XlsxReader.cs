@@ -32,15 +32,24 @@ static class XlsxReader
 
         ParseDefinedNames(archive, workbook);
 
+        var cachedValues = new List<(Worksheet Sheet, Dictionary<CellRef, CellData> Values)>();
+
         foreach (var sheetInfo in sheetInfos)
         {
-            var sheet = LoadSheet(archive, sheetInfo, styleInfo, sharedStrings);
+            var cached = new Dictionary<CellRef, CellData>();
+            var sheet = LoadSheet(archive, sheetInfo, styleInfo, sharedStrings, cached);
             workbook.AddSheet(sheet);
+            cachedValues.Add((sheet, cached));
         }
 
         foreach (var sheet in workbook.Sheets)
         {
             sheet.EndUpdate();
+        }
+
+        foreach (var (sheet, cached) in cachedValues)
+        {
+            RestoreCachedValues(sheet, cached);
         }
 
         ParseWorkbookProtection(archive, workbook);
@@ -482,7 +491,62 @@ static class XlsxReader
             .ToList();
     }
 
-    private static Worksheet LoadSheet(ZipArchive archive, WorksheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
+    // Excel stores the last calculated result next to every formula. Our evaluator does not
+    // implement every function (OFFSET, INDIRECT, ...) and cannot follow references into
+    // external workbooks, so where it produced an error for a cell whose file result was NOT
+    // an error, show the file's result: that is what the workbook looked like in Excel. The
+    // formula stays, so an edit of a precedent recalculates the cell as usual.
+    private static void RestoreCachedValues(Worksheet sheet, Dictionary<CellRef, CellData> cachedValues)
+    {
+        foreach (var (address, cachedValue) in cachedValues)
+        {
+            if (!sheet.Cells.TryGet(address.Row, address.Column, out var cell) || cell.Formula is null)
+            {
+                continue;
+            }
+
+            if (cell.Data.IsError && !cachedValue.IsError)
+            {
+                cell.Data = cachedValue;
+                cell.OnChanged();
+            }
+        }
+    }
+
+    // ECMA-376 part 1, 18.18.11 (ST_CellType): the cached <v> of a formula cell, typed by t.
+    private static CellData? ReadCachedValue(string cellType, string text, List<string> sharedStrings)
+    {
+        switch (cellType)
+        {
+            case "b":
+                return CellData.FromBoolean(text is "1" || (bool.TryParse(text, out var flag) && flag));
+            case "s":
+                return int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) && index >= 0 && index < sharedStrings.Count
+                    ? CellData.FromString(sharedStrings[index])
+                    : null;
+            case "str":
+            case "inlineStr":
+                return CellData.FromString(text);
+            case "e":
+                return CellData.FromError(ParseCellError(text));
+            default:
+                return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+                    ? CellData.FromNumber(number)
+                    : null;
+        }
+    }
+
+    private static CellError ParseCellError(string text) => text switch
+    {
+        "#DIV/0!" => CellError.Div0,
+        "#REF!" => CellError.Ref,
+        "#NAME?" => CellError.Name,
+        "#NUM!" => CellError.Num,
+        "#N/A" => CellError.NA,
+        _ => CellError.Value,
+    };
+
+    private static Worksheet LoadSheet(ZipArchive archive, WorksheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<CellRef, CellData> cachedValues)
     {
         var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
         if (sheetEntry is null)
@@ -504,7 +568,7 @@ static class XlsxReader
 
         ParseColumnWidths(sheetDoc, sNs, sheet, styleInfo);
 
-        ParseRowsAndCells(sheetDoc, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
+        ParseRowsAndCells(sheetDoc, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, cachedValues);
 
         ParseMergedCells(sheetDoc, sNs, sheet);
 
@@ -669,17 +733,17 @@ static class XlsxReader
         }
     }
 
-    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<CellRef, CellData> cachedValues)
     {
         var sharedFormulas = new Dictionary<string, (string Formula, CellRef Master)>();
 
         foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
         {
-            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, sharedFormulas);
+            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, sharedFormulas, cachedValues);
         }
     }
 
-    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
+    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas, Dictionary<CellRef, CellData> cachedValues)
     {
         var rowIndex = rowElem.Attribute("r")?.Value;
         var rowHeight = rowElem.Attribute("ht")?.Value;
@@ -708,11 +772,11 @@ static class XlsxReader
 
         foreach (var cellElem in rowElem.Elements(sNs + "c"))
         {
-            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings, sharedFormulas);
+            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings, sharedFormulas, cachedValues);
         }
     }
 
-    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
+    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas, Dictionary<CellRef, CellData> cachedValues)
     {
         var cellRef = cellElem.Attribute("r")!;
 
@@ -767,9 +831,26 @@ static class XlsxReader
             {
                 formulaValue = "=" + formulaValue;
             }
-            sheet.Cells[address.Row, address.Column].Formula = formulaValue;
+
+            try
+            {
+                sheet.Cells[address.Row, address.Column].Formula = formulaValue;
+
+                if (valueElem is not null && ReadCachedValue(cellType, valueElem.Value, sharedStrings) is { } cachedValue)
+                {
+                    cachedValues[address] = cachedValue;
+                }
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException)
+            {
+                // A formula the parser or the dependency graph rejects must not abort
+                // the whole load. Keep the value Excel cached for the cell instead.
+                sheet.Cells[address.Row, address.Column].Formula = null;
+                formulaValue = null;
+            }
         }
-        else if (valueElem is not null)
+
+        if (string.IsNullOrEmpty(formulaValue) && valueElem is not null)
         {
             // ECMA-376 part 1, 18.18.11 (t="b"), 22.9.2.19 (ST_Xstring)
             if (cellType == "b")
@@ -1169,14 +1250,29 @@ static class XlsxReader
 
             if (cellRef is not null && relId is not null && relMap.TryGetValue(relId, out var url))
             {
-                var address = CellRef.Parse(cellRef);
-                if (address.Row < sheet.RowCount && address.Column < sheet.ColumnCount)
+                // ECMA-376 part 1, 18.3.1.47: ref is a cell OR a range (a hyperlink can
+                // cover merged or adjacent cells, e.g. ref="J2:O2").
+                var colon = cellRef.IndexOf(':', StringComparison.Ordinal);
+                var startText = colon < 0 ? cellRef : cellRef[..colon];
+                var endText = colon < 0 ? cellRef : cellRef[(colon + 1)..];
+
+                if (!CellRef.TryParse(startText, out var start) || !CellRef.TryParse(endText, out var end))
                 {
-                    sheet.Cells[address.Row, address.Column].Hyperlink = new Hyperlink
+                    continue;
+                }
+
+                (start, end) = CellRef.Swap(start, end);
+
+                for (var row = start.Row; row <= end.Row && row < sheet.RowCount; row++)
+                {
+                    for (var column = start.Column; column <= end.Column && column < sheet.ColumnCount; column++)
                     {
-                        Url = url,
-                        Text = display
-                    };
+                        sheet.Cells[row, column].Hyperlink = new Hyperlink
+                        {
+                            Url = url,
+                            Text = display
+                        };
+                    }
                 }
             }
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -62,7 +61,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             ValueKind.Float => CellData.FromNumber(token.FloatValue),
             ValueKind.Double => CellData.FromNumber(token.DoubleValue),
             ValueKind.Decimal => CellData.FromNumber((double)token.DecimalValue),
-            _ => throw new InvalidOperationException($"Unsupported value kind: {token.ValueKind}")
+            _ => throw new InvalidOperationException($"Unsupported value kind: {token.ValueKind} for token '{token.Value}'")
         };
     }
 
@@ -87,30 +86,108 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
-        var left = (CellData)value!;
+        var leftOperand = value;
         binaryExpressionSyntaxNode.Right.Accept(this);
-        var right = (CellData)value!;
+        var rightOperand = value;
 
+        // A range operand (B6=B$6:B$582, A1:A3*2) applies the operator to every cell,
+        // broadcasting a scalar on the other side, and yields a range of the same shape -
+        // Excel's array arithmetic, which SUMPRODUCT and friends consume.
+        if (leftOperand is RangeList || rightOperand is RangeList)
+        {
+            value = Broadcast(leftOperand, rightOperand, (l, r) => ApplyBinary(binaryExpressionSyntaxNode.Operator, l, r));
+            return;
+        }
+
+        value = ApplyBinary(binaryExpressionSyntaxNode.Operator, ToScalar(leftOperand, currentCell), ToScalar(rightOperand, currentCell));
+    }
+
+    private static object Broadcast(object? leftOperand, object? rightOperand, Func<CellData, CellData, CellData> apply)
+    {
+        var leftRange = leftOperand as RangeList;
+        var rightRange = rightOperand as RangeList;
+        var shape = leftRange ?? rightRange!;
+
+        if (leftRange is not null && rightRange is not null && (leftRange.Rows != rightRange.Rows || leftRange.Columns != rightRange.Columns))
+        {
+            return CellData.FromError(CellError.Value);
+        }
+
+        var result = new RangeList(shape.Rows, shape.Columns, shape.StartRow, shape.StartColumn, shape.Worksheet);
+
+        for (var i = 0; i < shape.Count; i++)
+        {
+            var l = leftRange is not null ? leftRange[i] : (CellData)leftOperand!;
+            var r = rightRange is not null ? rightRange[i] : (CellData)rightOperand!;
+            result.Add(apply(l, r));
+        }
+
+        return result;
+    }
+
+    // The scalar a range collapses to when a formula needs one value (Excel's implicit
+    // intersection): the cell of a single row or column that crosses the formula cell,
+    // a one-cell range's only cell, otherwise #VALUE!.
+    private CellData ToScalar(object? operand, Cell context)
+    {
+        if (operand is CellData data)
+        {
+            return data;
+        }
+
+        if (operand is RangeList range)
+        {
+            if (range.Count == 1)
+            {
+                return range[0];
+            }
+
+            if (range.Worksheet == sheet)
+            {
+                var row = context.Address.Row;
+                var column = context.Address.Column;
+
+                if (range.Rows == 1 && column >= range.StartColumn && column < range.StartColumn + range.Columns)
+                {
+                    return range[column - range.StartColumn];
+                }
+
+                if (range.Columns == 1 && row >= range.StartRow && row < range.StartRow + range.Rows)
+                {
+                    return range[row - range.StartRow];
+                }
+            }
+
+            return CellData.FromError(CellError.Value);
+        }
+
+        if (operand is List<CellData> list)
+        {
+            return list.Count == 1 ? list[0] : CellData.FromError(CellError.Value);
+        }
+
+        return CellData.Empty;
+    }
+
+    private static CellData ApplyBinary(BinaryOperator op, CellData left, CellData right)
+    {
         if (left.IsError)
         {
-            value = left;
-            return;
+            return left;
         }
 
         if (right.IsError)
         {
-            value = right;
-            return;
+            return right;
         }
 
-        if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Concat)
+        if (op == BinaryOperator.Concat)
         {
-            value = CellData.FromString(ToText(left) + ToText(right));
-            return;
+            return CellData.FromString(ToText(left) + ToText(right));
         }
 
         // For comparison operators, we don't need both sides to be numeric
-        var isComparisonOperator = binaryExpressionSyntaxNode.Operator is
+        var isComparisonOperator = op is
             BinaryOperator.Equals or BinaryOperator.NotEquals or
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
@@ -152,44 +229,36 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         {
             if (!TryCoerceOperand(ref left) || !TryCoerceOperand(ref right))
             {
-                value = CellData.FromError(CellError.Value);
-                return;
+                return CellData.FromError(CellError.Value);
             }
         }
 
-        if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
+        if (op == BinaryOperator.Divide)
         {
             var rnum = right.GetValueOrDefault<double>();
 
             if (Math.Abs(rnum) == 0d)
             {
-                value = CellData.FromError(CellError.Div0);
-                return;
+                return CellData.FromError(CellError.Div0);
             }
         }
 
         if (isComparisonOperator)
         {
-            switch (binaryExpressionSyntaxNode.Operator)
+            switch (op)
             {
                 case BinaryOperator.Equals:
-                    value = CellData.FromBoolean(left.IsEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsEqualTo(right));
                 case BinaryOperator.NotEquals:
-                    value = CellData.FromBoolean(!left.IsEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(!left.IsEqualTo(right));
                 case BinaryOperator.LessThan:
-                    value = CellData.FromBoolean(left.IsLessThan(right));
-                    return;
+                    return CellData.FromBoolean(left.IsLessThan(right));
                 case BinaryOperator.LessThanOrEqual:
-                    value = CellData.FromBoolean(left.IsLessThanOrEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsLessThanOrEqualTo(right));
                 case BinaryOperator.GreaterThan:
-                    value = CellData.FromBoolean(left.IsGreaterThan(right));
-                    return;
+                    return CellData.FromBoolean(left.IsGreaterThan(right));
                 case BinaryOperator.GreaterThanOrEqual:
-                    value = CellData.FromBoolean(left.IsGreaterThanOrEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsGreaterThanOrEqualTo(right));
             }
         }
         else
@@ -197,7 +266,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             var l = left.GetValueOrDefault<double>();
             var r = right.GetValueOrDefault<double>();
             double res = 0d;
-            switch (binaryExpressionSyntaxNode.Operator)
+            switch (op)
             {
                 case BinaryOperator.Plus:
                     res = l + r;
@@ -212,25 +281,42 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                     res = l / r;
                     break;
             }
-            value = CellData.FromNumber(res);
+            return CellData.FromNumber(res);
         }
+
+        return CellData.FromError(CellError.Value);
     }
 
     public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
     {
         unaryExpressionSyntaxNode.Operand.Accept(this);
-        var operand = (CellData)value!;
 
-        if (operand.IsError)
+        if (value is RangeList range)
         {
-            value = operand;
+            var result = new RangeList(range.Rows, range.Columns, range.StartRow, range.StartColumn, range.Worksheet);
+
+            foreach (var item in range)
+            {
+                result.Add(ApplyUnary(unaryExpressionSyntaxNode.Operator, item));
+            }
+
+            value = result;
             return;
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        value = ApplyUnary(unaryExpressionSyntaxNode.Operator, ToScalar(value, currentCell));
+    }
+
+    private static CellData ApplyUnary(UnaryOperator op, CellData operand)
+    {
+        if (operand.IsError)
         {
-            value = operand;
-            return;
+            return operand;
+        }
+
+        if (op == UnaryOperator.Plus)
+        {
+            return operand;
         }
 
         if (operand.IsEmpty)
@@ -238,7 +324,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             operand = CellData.FromNumber(0d);
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate)
+        if (op == UnaryOperator.Negate)
         {
             if (operand.Type == CellDataType.Date)
             {
@@ -247,12 +333,13 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
 
             if (!TryCoerceOperand(ref operand))
             {
-                value = CellData.FromError(CellError.Value);
-                return;
+                return CellData.FromError(CellError.Value);
             }
-            value = CellData.FromNumber(-operand.GetValueOrDefault<double>());
-            return;
+
+            return CellData.FromNumber(-operand.GetValueOrDefault<double>());
         }
+
+        return operand;
     }
 
     private static CellData EmptyAs(CellData other)
@@ -304,13 +391,18 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return cached;
         }
 
+        if (cell.FormulaSyntaxTree.Errors.Count > 0)
+        {
+            return CellData.FromError(CellError.Name);
+        }
+
         if (!evaluationStack.Add(cell))
         {
             return CellData.FromError(CellError.Circular);
         }
 
         cell.FormulaSyntaxTree.Root.Accept(this);
-        var result = (CellData)value!;
+        var result = ToScalar(value, cell);
         evaluationStack.Remove(cell);
         evaluated[cell] = result;
         return result;
@@ -378,7 +470,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         node.Accept(this);
 
-        return (CellData)value!;
+        return ToScalar(value, currentCell);
     }
 
 

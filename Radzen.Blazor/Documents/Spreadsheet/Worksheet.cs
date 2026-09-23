@@ -366,6 +366,7 @@ public partial class Worksheet
         if (tree.Errors.Count > 0)
         {
             cell.Data = CellData.FromError(CellError.Name);
+            evaluated[cell] = cell.Data;
         }
         else
         {
@@ -380,6 +381,15 @@ public partial class Worksheet
                     eval = CellData.FromNumber(0d);
                 }
 
+                cell.Data = eval;
+                evaluated[cell] = eval;
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException)
+            {
+                // A formula the evaluator cannot handle (an unsupported construct, an
+                // internal fault) must not take the whole workbook down: Excel shows
+                // #VALUE! for what it cannot compute, so do the same.
+                var eval = CellData.FromError(CellError.Value);
                 cell.Data = eval;
                 evaluated[cell] = eval;
             }
