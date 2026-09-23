@@ -168,6 +168,32 @@ public class FormulaLexerTests
     }
 
     [Theory]
+    [InlineData("入荷実績")]
+    [InlineData("Übersicht")]
+    [InlineData("𠀋表")]
+    public void FormulaLexer_ShouldParseUnquotedSheetReferenceOutsideAscii(string sheetName)
+    {
+        var tokens = FormulaLexer.Scan($"=SUM({sheetName}!$F$3:$F$524)");
+
+        Assert.Equal(FormulaTokenType.CellIdentifier, tokens[3].Type);
+        Assert.Equal(sheetName, tokens[3].Address.Worksheet);
+        Assert.Equal("$F$3", tokens[3].Address.ToString());
+        Assert.Equal(FormulaTokenType.Colon, tokens[4].Type);
+        Assert.Equal(FormulaTokenType.CellIdentifier, tokens[5].Type);
+        Assert.Equal("$F$524", tokens[5].Address.ToString());
+    }
+
+    [Fact]
+    public void FormulaLexer_ShouldParseDefinedNameOutsideAsciiAsIdentifier()
+    {
+        var tokens = FormulaLexer.Scan("=Größe*2");
+
+        Assert.Equal(FormulaTokenType.Identifier, tokens[1].Type);
+        Assert.Equal("Größe", tokens[1].Value);
+        Assert.Equal(FormulaTokenType.Star, tokens[2].Type);
+    }
+
+    [Theory]
     [InlineData("Item #")]
     [InlineData("=A #")]
     [InlineData("#")]

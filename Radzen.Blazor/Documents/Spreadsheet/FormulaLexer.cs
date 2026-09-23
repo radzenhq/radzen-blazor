@@ -318,6 +318,11 @@ internal class FormulaLexer(string expression, bool strict = true)
 
         }
 
+        if (position < expression.Length && Rune.TryGetRuneAt(expression, position, out var rune) && Rune.IsLetter(rune))
+        {
+            return ScanIdentifier();
+        }
+
         // Emit unknown token for any unrecognized character to preserve it in the token stream
         var unknown = new FormulaToken(FormulaTokenType.Unknown, Peek().ToString());
         Advance(1);
@@ -819,6 +824,13 @@ internal class FormulaLexer(string expression, bool strict = true)
                     continue;
 
                 default:
+                    if (Rune.TryGetRuneAt(expression, position, out var rune) && Rune.IsLetterOrDigit(rune))
+                    {
+                        hasLetters = true;
+                        Advance(rune.Utf16SequenceLength);
+                        continue;
+                    }
+
                     throw new InvalidOperationException($"Unexpected character '{Peek()}' at position {position}.");
             }
         }

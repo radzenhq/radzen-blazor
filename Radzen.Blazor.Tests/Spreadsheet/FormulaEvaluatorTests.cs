@@ -544,4 +544,51 @@ public class FormulaEvaluationTests
 
         Assert.Equal(60d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
     }
+
+    [Theory]
+    [InlineData("入荷実績")]
+    [InlineData("Übersicht")]
+    [InlineData("𠀋表")]
+    public void Evaluator_ShouldResolveUnquotedSheetRangeOutsideAscii(string sheetName)
+    {
+        var wb = new Workbook();
+        var data = wb.AddSheet(sheetName, 5, 5);
+        var report = wb.AddSheet("Report", 5, 5);
+
+        data.Cells[0, 0].Value = "A";
+        data.Cells[0, 1].Value = 10;
+        data.Cells[1, 0].Value = "B";
+        data.Cells[1, 1].Value = 20;
+        data.Cells[2, 0].Value = "A";
+        data.Cells[2, 1].Value = 5;
+
+        report.Cells[0, 0].Value = "A";
+        report.Cells[0, 1].Formula = $"=SUMIF({sheetName}!$A$1:$A$3,A1,{sheetName}!$B$1:$B$3)";
+        report.Cells[1, 1].Formula = "=B1*2";
+
+        Assert.Equal(15d, report.Cells[0, 1].Value);
+        Assert.Equal(30d, report.Cells[1, 1].Value);
+    }
+
+    [Fact]
+    public void Evaluator_ShouldResolveUnquotedSheetReferenceOutsideAsciiAfterXlsxRoundTrip()
+    {
+        var wb = new Workbook();
+        var data = wb.AddSheet("入荷実績", 5, 5);
+        var report = wb.AddSheet("Report", 5, 5);
+
+        data.Cells[0, 0].Value = 7;
+        report.Cells[0, 0].Formula = "=入荷実績!A1*2";
+        report.Cells[0, 1].Formula = "=A1+1";
+
+        using var stream = new System.IO.MemoryStream();
+        wb.SaveToStream(stream);
+        stream.Position = 0;
+
+        var loaded = Workbook.LoadFromStream(stream).GetSheet("Report")!;
+
+        Assert.Equal("=入荷実績!A1*2", loaded.Cells[0, 0].Formula);
+        Assert.Equal(14d, loaded.Cells[0, 0].Value);
+        Assert.Equal(15d, loaded.Cells[0, 1].Value);
+    }
 }
