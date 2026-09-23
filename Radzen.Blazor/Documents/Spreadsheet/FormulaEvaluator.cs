@@ -48,7 +48,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     private readonly HashSet<Cell> evaluationStack = [];
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Cell, CellData> evaluated = evaluated ?? [];
-    private readonly Cell currentCell = currentCell;
     private Cell formulaCell = currentCell;
     private bool arrayContext;
 
@@ -477,7 +476,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         node.Accept(this);
 
-        return Intersect(value, currentCell);
+        return Intersect(value, formulaCell);
     }
 
 
@@ -520,7 +519,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         arrayArguments = null;
         var parameterDefinitions = function.Parameters;
-        var functionArguments = new FunctionArguments(currentCell);
+        var functionArguments = new FunctionArguments(formulaCell);
         var argumentIndex = 0;
 
         for (int paramIndex = 0; paramIndex < parameterDefinitions.Length; paramIndex++)

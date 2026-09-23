@@ -36,4 +36,13 @@ public class RowFunctionTests
         sheet.Cells["B2"].Formula = "=ROW(C10:D20)";
         Assert.Equal(CellError.Value, sheet.Cells["B2"].Data.Value);
     }
+
+    [Fact]
+    public void Row_OmittedReference_ReadThroughAnotherCell_ReturnsItsOwnRow()
+    {
+        var sheet = new Worksheet(20, 10);
+        sheet.Cells["B1"].Formula = "=ROW()";
+        sheet.Cells["A5"].Formula = "=B1";
+        Assert.Equal(1d, sheet.Cells["A5"].Data.Value);
+    }
 }
