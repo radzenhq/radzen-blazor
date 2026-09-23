@@ -1169,14 +1169,19 @@ static class XlsxReader
 
             if (cellRef is not null && relId is not null && relMap.TryGetValue(relId, out var url))
             {
-                var address = CellRef.Parse(cellRef);
-                if (address.Row < sheet.RowCount && address.Column < sheet.ColumnCount)
+                // ECMA-376 part 1, 18.18.62 (ST_Ref)
+                var range = RangeRef.Parse(cellRef);
+
+                for (var row = range.Start.Row; row <= range.End.Row && row < sheet.RowCount; row++)
                 {
-                    sheet.Cells[address.Row, address.Column].Hyperlink = new Hyperlink
+                    for (var column = range.Start.Column; column <= range.End.Column && column < sheet.ColumnCount; column++)
                     {
-                        Url = url,
-                        Text = display
-                    };
+                        sheet.Cells[row, column].Hyperlink = new Hyperlink
+                        {
+                            Url = url,
+                            Text = display
+                        };
+                    }
                 }
             }
         }

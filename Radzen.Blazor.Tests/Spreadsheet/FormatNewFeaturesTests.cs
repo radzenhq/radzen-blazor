@@ -1,5 +1,8 @@
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using Xunit;
 
 using Radzen.Documents.Spreadsheet;
@@ -277,6 +280,66 @@ public class FormatNewFeaturesTests
         Assert.NotNull(reimported.Sheets[0].Cells[0, 0].Hyperlink);
         Assert.Equal("https://example.com", reimported.Sheets[0].Cells[0, 0].Hyperlink!.Url);
         Assert.Equal("Click here", reimported.Sheets[0].Cells[0, 0].Hyperlink!.Text);
+    }
+
+    [Fact]
+    public void XlsxLoad_HyperlinkOverRange_AppliesToEveryCellOfTheRange()
+    {
+        var loaded = LoadWithHyperlinkRef("J2:O2");
+
+        for (var column = 9; column <= 14; column++)
+        {
+            Assert.Equal("https://example.com", loaded.Cells[1, column].Hyperlink?.Url);
+            Assert.Equal("Guidance", loaded.Cells[1, column].Hyperlink?.Text);
+        }
+
+        Assert.Null(loaded.Cells[1, 8].Hyperlink);
+        Assert.Null(loaded.Cells[1, 15].Hyperlink);
+        Assert.Null(loaded.Cells[0, 9].Hyperlink);
+    }
+
+    [Fact]
+    public void XlsxLoad_HyperlinkRangePastTheSheet_AppliesToTheCellsInsideTheSheet()
+    {
+        var loaded = LoadWithHyperlinkRef("R2:Z3");
+
+        Assert.Equal(20, loaded.ColumnCount);
+        Assert.Equal("https://example.com", loaded.Cells[1, 17].Hyperlink?.Url);
+        Assert.Equal("https://example.com", loaded.Cells[2, 19].Hyperlink?.Url);
+    }
+
+    private static Worksheet LoadWithHyperlinkRef(string reference)
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Test", 5, 20);
+        sheet.Cells[1, 9].Value = "Guidance";
+        sheet.Cells[1, 9].Hyperlink = new Hyperlink
+        {
+            Url = "https://example.com",
+            Text = "Guidance"
+        };
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+
+        using (var zip = new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen: true))
+        {
+            var entry = zip.GetEntry("xl/worksheets/sheet1.xml")!;
+            XDocument doc;
+            using (var input = entry.Open())
+            {
+                doc = XDocument.Load(input);
+            }
+
+            doc.Descendants(doc.Root!.Name.Namespace + "hyperlink").Single().SetAttributeValue("ref", reference);
+
+            entry.Delete();
+            using var output = zip.CreateEntry("xl/worksheets/sheet1.xml").Open();
+            doc.Save(output);
+        }
+
+        stream.Position = 0;
+        return Workbook.LoadFromStream(stream).Sheets[0];
     }
 
     private static Workbook RoundTrip(Workbook workbook)
