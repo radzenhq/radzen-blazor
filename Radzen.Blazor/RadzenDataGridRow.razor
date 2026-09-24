@@ -5,6 +5,7 @@
     // The cached fragment reads current parameters through this, so it is reusable across renders.
     rowContent ??= @<text>@{
         var rowArgs = Grid?.RowAttributes(Item, Index);
+        var columns = Columns.Any(c => c.disposed) ? Columns.Where(c => !c.disposed).ToList() : Columns;
     }
 @{var firstLevel = Grid?.AllowCompositeDataCells == true ? 0 : (Grid?.deepestChildColumnLevel ?? 0); }
 @for(var i = firstLevel; (Grid?.AllowCompositeDataCells == true ? i <= (Grid?.deepestChildColumnLevel ?? 0) + 1 : i < (Grid?.deepestChildColumnLevel ?? 0) + 1); i++)
@@ -39,7 +40,7 @@
         </td>
     }
 
-        @for (var j = 0; j < Columns.Count; j++)
+        @for (var j = 0; j < columns.Count; j++)
         {
             if (Grid?.rowSpans != null && Grid.rowSpans.ContainsKey(j))
             {
@@ -55,7 +56,7 @@
                 }
             }
 
-            var column = Columns[j];
+            var column = columns[j];
             var cellAttr = Grid?.CellAttributes(Item, column);
 
             object? colspan = null;
@@ -93,7 +94,7 @@
     @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
     {
         <tr role="row" class="rz-expanded-row-content" @onkeydown:stopPropagation>
-            <td role="gridcell" colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+            <td role="gridcell" colspan="@(columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     <CascadingValue Value=@EditContext>
                         <CascadingValue Value=this>
@@ -107,7 +108,7 @@
     else if (Grid.Template != null)
     {
         <tr role="row" class="rz-expanded-row-content" @onkeydown:stopPropagation>
-            <td role="gridcell" colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+            <td role="gridcell" colspan="@(columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     @Grid.Template(Item)
                 </div>

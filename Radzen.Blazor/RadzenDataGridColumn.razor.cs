@@ -2021,9 +2021,12 @@ namespace Radzen.Blazor
         /// </summary>
         public void Dispose()
         {
+            disposed = true;
             Grid?.RemoveColumn(this);
             GC.SuppressFinalize(this);
         }
+
+        internal bool disposed;
 
         /// <summary>
         /// Gets the column sort descriptor index indicating order of applied column sort in case of multiple sorting.
