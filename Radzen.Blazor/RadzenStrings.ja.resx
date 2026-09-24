@@ -1730,6 +1730,16 @@
   <data name="SplitButton_ButtonAriaLabel" xml:space="preserve">
     <value>ボタン</value>
   </data>
+  <!-- Tabs -->
+  <data name="Tabs_MoreAriaLabel" xml:space="preserve">
+    <value>その他のタブ</value>
+  </data>
+  <data name="Tabs_ScrollBackwardAriaLabel" xml:space="preserve">
+    <value>タブを先頭方向にスクロール</value>
+  </data>
+  <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
+    <value>タブを末尾方向にスクロール</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>ポップアップの切り替え</value>

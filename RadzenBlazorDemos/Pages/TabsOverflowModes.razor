@@ -1,0 +1,20 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-pb-6">
+    <RadzenLabel Text="Overflow" Component="TabsOverflow" />
+    <RadzenSelectBar Name="TabsOverflow" @bind-Value="@overflow" TextProperty="Text" ValueProperty="Value" Size="ButtonSize.Small"
+                     Data="@(Enum.GetValues<TabsOverflow>().Select(o => new { Text = $"{o}", Value = o }))" />
+</RadzenStack>
+
+<RadzenTabs Overflow="@overflow">
+    <Tabs>
+        @foreach (var i in Enumerable.Range(1, 20))
+        {
+            <RadzenTabsItem Text="@($"Tab {i}")">
+                Content of tab @i
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    TabsOverflow overflow = TabsOverflow.Collapse;
+}

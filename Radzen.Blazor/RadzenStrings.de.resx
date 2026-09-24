@@ -1730,6 +1730,16 @@
   <data name="SplitButton_ButtonAriaLabel" xml:space="preserve">
     <value>Schaltfläche</value>
   </data>
+  <!-- Tabs -->
+  <data name="Tabs_MoreAriaLabel" xml:space="preserve">
+    <value>Weitere Registerkarten</value>
+  </data>
+  <data name="Tabs_ScrollBackwardAriaLabel" xml:space="preserve">
+    <value>Registerkarten rückwärts scrollen</value>
+  </data>
+  <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
+    <value>Registerkarten vorwärts scrollen</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Popup umschalten</value>

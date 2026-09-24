@@ -592,6 +592,9 @@ namespace Radzen.Blazor {
         public static string Splitter_ResizeAriaLabel { get { return ResourceManager.GetString("Splitter_ResizeAriaLabel", resourceCulture); } }
         public static string Splitter_CollapseAriaLabel { get { return ResourceManager.GetString("Splitter_CollapseAriaLabel", resourceCulture); } }
         public static string Splitter_ExpandAriaLabel { get { return ResourceManager.GetString("Splitter_ExpandAriaLabel", resourceCulture); } }
+        public static string Tabs_MoreAriaLabel { get { return ResourceManager.GetString("Tabs_MoreAriaLabel", resourceCulture); } }
+        public static string Tabs_ScrollBackwardAriaLabel { get { return ResourceManager.GetString("Tabs_ScrollBackwardAriaLabel", resourceCulture); } }
+        public static string Tabs_ScrollForwardAriaLabel { get { return ResourceManager.GetString("Tabs_ScrollForwardAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_TogglePopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_TogglePopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_PopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_PopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_ClearAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_ClearAriaLabel", resourceCulture); } }
