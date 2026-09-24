@@ -2305,6 +2305,23 @@ window.Radzen = {
         }
     }
 
+    if (popup.__contentResizeObserver) {
+        popup.__contentResizeObserver.disconnect();
+        delete popup.__contentResizeObserver;
+    }
+
+    if (!position && parent && disableSmartPosition !== true && !popup.__viewportResizeHandler && typeof ResizeObserver !== 'undefined') {
+        var observedHeight = popup.getBoundingClientRect().height;
+        popup.__contentResizeObserver = new ResizeObserver(function () {
+            if (popup.style.display !== 'block') return;
+            var height = popup.getBoundingClientRect().height;
+            if (height === observedHeight) return;
+            observedHeight = height;
+            Radzen.repositionPopup(parent, id);
+        });
+        popup.__contentResizeObserver.observe(popup);
+    }
+
     var p = parent;
     while (p && p != document.body) {
         if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
@@ -2445,6 +2462,10 @@ window.Radzen = {
         delete popup.__originalWrapperMaxHeight;
         delete popup.__originalPopupTop;
     }
+    if (popup && popup.__contentResizeObserver) {
+        popup.__contentResizeObserver.disconnect();
+        delete popup.__contentResizeObserver;
+    }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
@@ -2516,6 +2537,10 @@ window.Radzen = {
           delete popup.__viewportResizeHandler;
           delete popup.__originalWrapperMaxHeight;
           delete popup.__originalPopupTop;
+      }
+      if (popup.__contentResizeObserver) {
+          popup.__contentResizeObserver.disconnect();
+          delete popup.__contentResizeObserver;
       }
       if (popup.__radzenHome && popup.__radzenHome.isConnected) {
           popup.__radzenHome.appendChild(popup);
