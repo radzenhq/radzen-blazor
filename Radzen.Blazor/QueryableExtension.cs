@@ -1376,7 +1376,7 @@ namespace Radzen
                 ? null
                 : (string)Convert.ChangeType(filterValue is DateTimeOffset ?
                             ((DateTimeOffset)filterValue).UtcDateTime : filterValue is DateOnly ?
-                                ((DateOnly)filterValue).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) :
+                                ((DateOnly)filterValue).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) :
                                     filterValue is Guid ? ((Guid)filterValue).ToString() : 
                                         filterValue!, typeof(string), CultureInfo.InvariantCulture);
 
