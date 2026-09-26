@@ -49,6 +49,25 @@ namespace Radzen.Blazor.Tests
         [Theory]
         [InlineData(TickPlacement.Between)]
         [InlineData(TickPlacement.On)]
+        public void NoCategories_KeepsOneBandDomain(TickPlacement placement)
+        {
+            var scale = OrdinalWith(0, placement);
+
+            Assert.Equal((-0.5, 0.5, 1.0), scale.Ticks(100));
+            Assert.Empty(scale.TickValues(100));
+        }
+
+        [Fact]
+        public void NullData_KeepsOneBandDomain()
+        {
+            var scale = new OrdinalScale();
+
+            Assert.Equal((-0.5, 0.5, 1.0), scale.Ticks(100));
+        }
+
+        [Theory]
+        [InlineData(TickPlacement.Between)]
+        [InlineData(TickPlacement.On)]
         public void TickValues_AlwaysIntegerCategories(TickPlacement placement)
         {
             var scale = OrdinalWith(4, placement);
