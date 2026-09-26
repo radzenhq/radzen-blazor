@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using System.Globalization;
+using System.Linq.Expressions;
 
 namespace Radzen
 {
@@ -304,6 +305,93 @@ namespace Radzen
             uriBuilder.Query = queryString.ToString();
 
             return uriBuilder.Uri;
+        }
+
+        /// <summary>
+        /// Returns <paramref name="uri" /> with the query options of <paramref name="query" /> and, when given, of a RadzenDataGrid's
+        /// <paramref name="args" />. Each option value is escaped once with <see cref="Uri.EscapeDataString(string)" />; an option the query sets
+        /// replaces the option of the same name in <paramref name="uri" />, whose other query parameters are kept.
+        /// The grid's arguments apply last: <c>$filter</c> is <c>(args.Filter) and (query filter)</c> without an empty part, a non-empty
+        /// <c>args.OrderBy</c> replaces the query's ordering, <c>args.Skip</c> and <c>args.Top</c> set <c>$skip</c> and <c>$top</c>, and <c>$count=true</c> is requested.
+        /// <c>args.Filter</c> must be OData: the grid writes OData filters when its Data is an <see cref="ODataEnumerable{T}" />, e.g. the result of
+        /// <see cref="QueryableExtension.AsODataEnumerable{T}(System.Collections.Generic.IEnumerable{T})" />.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the entity set.</typeparam>
+        /// <param name="uri">The URI of the entity set.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="args">The arguments of a RadzenDataGrid LoadData event, or null.</param>
+        /// <returns>The URI with the query options.</returns>
+        public static Uri GetODataUri<T>(this Uri uri, ODataQuery<T> query, LoadDataArgs? args = null)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+            ArgumentNullException.ThrowIfNull(query);
+            return WithOptions(uri, query.State.Options(args));
+        }
+
+        /// <summary>
+        /// Returns <paramref name="uri" /> with the query options of <paramref name="query" />, a query grouped with GroupBy and Select.
+        /// When a RadzenDataGrid's <paramref name="args" /> are given, only <c>args.Filter</c> applies: it joins the filters before the grouping in
+        /// <c>$apply=filter(...)</c>, while the grid's sorting and paging, which are for entities, never apply to the groups.
+        /// Each option value is escaped once with <see cref="Uri.EscapeDataString(string)" />; the other query parameters of <paramref name="uri" /> are kept.
+        /// </summary>
+        /// <typeparam name="TSource">The entity type of the entity set.</typeparam>
+        /// <typeparam name="TResult">The type of the results.</typeparam>
+        /// <param name="uri">The URI of the entity set.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="args">The arguments of a RadzenDataGrid LoadData event, or null.</param>
+        /// <returns>The URI with the query options.</returns>
+        public static Uri GetODataUri<TSource, TResult>(this Uri uri, ODataQuery<TSource, TResult> query, LoadDataArgs? args = null)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+            ArgumentNullException.ThrowIfNull(query);
+            return WithOptions(uri, query.State.Options(args));
+        }
+
+        private static Uri WithOptions(Uri uri, List<KeyValuePair<string, string>> options)
+        {
+            var builder = new UriBuilder(uri);
+            var parameters = builder.Query.TrimStart('?')
+                .Split('&', StringSplitOptions.RemoveEmptyEntries)
+                .Where(parameter => !options.Any(option => string.Equals(option.Key, Uri.UnescapeDataString(parameter.Split('=')[0]), StringComparison.OrdinalIgnoreCase)))
+                .Concat(options.Select(option => $"{option.Key}={Uri.EscapeDataString(option.Value)}"));
+
+            builder.Query = string.Join("&", parameters);
+
+            return builder.Uri;
+        }
+
+        /// <summary>
+        /// Expands a navigation property of the collection that the last Include or ThenInclude expanded, e.g.
+        /// <c>.Include(team =&gt; team.Members).ThenInclude(member =&gt; member.Manager)</c>, translated to <c>Members($expand=Manager)</c>.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the entity set.</typeparam>
+        /// <typeparam name="TPreviousProperty">The item type of the collection expanded last.</typeparam>
+        /// <typeparam name="TProperty">The type of the navigation property.</typeparam>
+        /// <param name="source">The query.</param>
+        /// <param name="navigation">The navigation property of an item of the collection; a collection can be filtered, ordered and paged as in Include.</param>
+        /// <returns>A new query to which ThenInclude adds the next level.</returns>
+        public static IncludableODataQuery<T, TProperty> ThenInclude<T, TPreviousProperty, TProperty>(this IIncludableODataQuery<T, IEnumerable<TPreviousProperty>> source, Expression<Func<TPreviousProperty, TProperty>> navigation)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(navigation);
+            return new(source.Query.State.Include(navigation, true));
+        }
+
+        /// <summary>
+        /// Expands a navigation property of the reference that the last Include or ThenInclude expanded, e.g.
+        /// <c>.Include(ticket =&gt; ticket.Team).ThenInclude(team =&gt; team.Schedule)</c>, translated to <c>Team($expand=Schedule)</c>.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the entity set.</typeparam>
+        /// <typeparam name="TPreviousProperty">The type of the navigation property expanded last.</typeparam>
+        /// <typeparam name="TProperty">The type of the navigation property.</typeparam>
+        /// <param name="source">The query.</param>
+        /// <param name="navigation">The navigation property; a collection can be filtered, ordered and paged as in Include.</param>
+        /// <returns>A new query to which ThenInclude adds the next level.</returns>
+        public static IncludableODataQuery<T, TProperty> ThenInclude<T, TPreviousProperty, TProperty>(this IIncludableODataQuery<T, TPreviousProperty> source, Expression<Func<TPreviousProperty, TProperty>> navigation)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(navigation);
+            return new(source.Query.State.Include(navigation, true));
         }
     }
 }
