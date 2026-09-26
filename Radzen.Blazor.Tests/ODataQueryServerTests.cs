@@ -157,6 +157,8 @@ namespace Radzen.Blazor.Tests
                 ticket => ticket.Priority / 2 == 1,
                 ticket => -ticket.Priority < -3,
                 ticket => ticket.Hours * 2 >= 4,
+                ticket => ticket.Price > ticket.Priority,
+                ticket => ticket.Discount * ticket.Priority > 10,
                 ticket => ticket.Views > 1000000000L,
                 ticket => ticket.Rating >= 3.25f,
                 ticket => Math.Floor(ticket.Hours) == 1,

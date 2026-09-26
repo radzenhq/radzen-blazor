@@ -218,7 +218,7 @@ namespace Radzen
                     return Visit(unary.Operand);
                 case ExpressionType.Convert or ExpressionType.ConvertChecked or ExpressionType.TypeAs when IsOpenProperty(unary.Operand):
                     return Visit(unary.Operand);
-                case ExpressionType.Convert or ExpressionType.ConvertChecked when unary.Method == null && Widens(unary.Operand.Type, unary.Type):
+                case ExpressionType.Convert or ExpressionType.ConvertChecked when IsNumericConversion(unary) && Widens(unary.Operand.Type, unary.Type):
                     return Visit(unary.Operand);
                 case ExpressionType.Convert or ExpressionType.ConvertChecked when unary.Method == null && !unary.Operand.Type.IsValueType && unary.Type.IsAssignableFrom(unary.Operand.Type):
                     return Visit(unary.Operand);
@@ -656,6 +656,11 @@ namespace Radzen
             from = Nullable.GetUnderlyingType(from) ?? from;
             to = Nullable.GetUnderlyingType(to) ?? to;
             return from == to || Type.GetTypeCode(from) >= TypeCode.SByte && Type.GetTypeCode(to) >= Type.GetTypeCode(from) && Type.GetTypeCode(to) <= TypeCode.Decimal;
+        }
+
+        private static bool IsNumericConversion(UnaryExpression convert)
+        {
+            return convert.Method == null || convert.Method.DeclaringType == typeof(decimal) && convert.Method.Name is "op_Implicit" or "op_Explicit";
         }
 
         private static string? DatePart(Type type, string name)
