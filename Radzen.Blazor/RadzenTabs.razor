@@ -4,16 +4,62 @@
 <CascadingValue Value=this>
 @if (Visible)
 {
+    UpdateCollapsedTabs();
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+        @if (Overflow == TabsOverflow.Scroll)
+        {
+            <button type="button" class="rz-tabview-scroll rz-tabview-scroll-prev" tabindex="-1" hidden aria-label="@ScrollBackwardAriaLabel" title="@ScrollBackwardAriaLabel">
+                <span class="notranslate rzi rz-tabview-icon" aria-hidden="true">@(IsVertical ? "keyboard_arrow_up" : "keyboard_arrow_left")</span>
+            </button>
+        }
         <ul @ref=@tablistElement class="rz-tabview-nav"
             role="tablist"
             aria-orientation="@(IsVertical ? "vertical" : "horizontal")"
             aria-label="@AriaLabel"
             aria-labelledby="@AriaLabelledBy"
             aria-activedescendant="@GetActiveDescendantId()"
-            tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
+            tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:stopPropagation="stopKeydownPropagation">
             @Tabs
         </ul>
+        @if (Overflow == TabsOverflow.Scroll)
+        {
+            <button type="button" class="rz-tabview-scroll rz-tabview-scroll-next" tabindex="-1" hidden aria-label="@ScrollForwardAriaLabel" title="@ScrollForwardAriaLabel">
+                <span class="notranslate rzi rz-tabview-icon" aria-hidden="true">@(IsVertical ? "keyboard_arrow_down" : "keyboard_arrow_right")</span>
+            </button>
+        }
+        @if (Overflow == TabsOverflow.Collapse)
+        {
+            <div class="@MoreClass">
+                <button @ref=@moreButtonElement type="button" id="@MoreButtonId" class="rz-tabview-more-button" aria-label="@MoreAriaLabel" title="@MoreAriaLabel"
+                        aria-haspopup="menu" aria-controls="@MorePopupId" aria-expanded="@(moreOpen ? "true" : "false")" @onclick="@ToggleMore">
+                    <span class="notranslate rzi rz-tabview-icon" aria-hidden="true">more_horiz</span>
+                </button>
+                <div id="@MorePopupId" class="rz-tabview-more-popup">
+                    <ul id="@MoreMenuId" class="rz-tabview-more-list" role="menu" aria-orientation="vertical" aria-label="@MoreAriaLabel">
+                        @foreach (var tab in CollapsedTabs())
+                        {
+                            <li role="none">
+                                <button type="button" role="menuitem" id="@MoreItemId(tab)" class="@MoreItemClass(tab)" tabindex="-1"
+                                        disabled="@tab.Disabled" aria-disabled="@(tab.Disabled ? "true" : "false")" @onclick="@(() => SelectCollapsedTab(tab))">
+                                    @if (!string.IsNullOrEmpty(tab.Icon))
+                                    {
+                                        <span class="notranslate rzi rz-tabview-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(tab.IconColor) ? $"color:{tab.IconColor}" : null)">@tab.Icon</span>
+                                    }
+                                    @if (tab.Template != null)
+                                    {
+                                        @tab.Template(tab)
+                                    }
+                                    else
+                                    {
+                                        <span class="rz-tabview-title">@tab.Text</span>
+                                    }
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
         <div class="rz-tabview-panels">
             @if(RenderMode == TabRenderMode.Client)
             {

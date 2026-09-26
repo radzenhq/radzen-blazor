@@ -1730,6 +1730,16 @@
   <data name="SplitButton_ButtonAriaLabel" xml:space="preserve">
     <value>Botón</value>
   </data>
+  <!-- Tabs -->
+  <data name="Tabs_MoreAriaLabel" xml:space="preserve">
+    <value>Más pestañas</value>
+  </data>
+  <data name="Tabs_ScrollBackwardAriaLabel" xml:space="preserve">
+    <value>Desplazar pestañas hacia atrás</value>
+  </data>
+  <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
+    <value>Desplazar pestañas hacia adelante</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Alternar ventana emergente</value>

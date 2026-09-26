@@ -1740,6 +1740,16 @@
   <data name="Splitter_ExpandAriaLabel" xml:space="preserve">
     <value>Expand pane</value>
   </data>
+  <!-- Tabs -->
+  <data name="Tabs_MoreAriaLabel" xml:space="preserve">
+    <value>More tabs</value>
+  </data>
+  <data name="Tabs_ScrollBackwardAriaLabel" xml:space="preserve">
+    <value>Scroll tabs backward</value>
+  </data>
+  <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
+    <value>Scroll tabs forward</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Toggle popup</value>
