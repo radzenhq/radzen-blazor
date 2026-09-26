@@ -125,10 +125,11 @@ namespace Radzen
 
         /// <summary>
         /// Groups the entities by <paramref name="keySelector" /> for a Select of the group keys and aggregates, translated to
-        /// <c>$apply=groupby(...)</c>. Every Where before it becomes a <c>filter(...)</c> transformation that runs before the grouping.
+        /// <c>$apply=groupby(...)</c>, or to <c>$apply=aggregate(...)</c> when the key is a constant such as <c>1</c>, which puts every entity in one group.
+        /// Every Where before it becomes a <c>filter(...)</c> transformation that runs before the grouping.
         /// </summary>
-        /// <typeparam name="TKey">The type of the key: a property path, or an anonymous type or tuple of property paths.</typeparam>
-        /// <param name="keySelector">The key, e.g. <c>license =&gt; license.Currency</c> or <c>license =&gt; new { license.Currency, license.Country }</c>.</param>
+        /// <typeparam name="TKey">The type of the key: a property path, an anonymous type or tuple of property paths, or a constant.</typeparam>
+        /// <param name="keySelector">The key, e.g. <c>license =&gt; license.Currency</c>, <c>license =&gt; new { license.Currency, license.Country }</c> or <c>license =&gt; 1</c>.</param>
         /// <returns>A grouping on which Select sets the result.</returns>
         /// <exception cref="InvalidOperationException">The query has Include, OrderBy, Skip, Take or WithCount, which OData would apply to the groups.</exception>
         /// <exception cref="NotSupportedException">The key is not a property path or a composite of property paths.</exception>
@@ -241,6 +242,8 @@ namespace Radzen
         /// Sets the result of each group, translated to <c>groupby((keys),aggregate(...))</c>. The selector creates a new result and assigns
         /// <c>g.Key</c> or the members of a composite key to members of the same names, and the aggregates <c>g.Sum(x =&gt; ...)</c>, <c>g.Min(x =&gt; ...)</c>,
         /// <c>g.Max(x =&gt; ...)</c>, <c>g.Average(x =&gt; ...)</c>, <c>g.Count()</c> and <c>g.Select(x =&gt; ...).Distinct().Count()</c> to any members.
+        /// An aggregated value can be an expression, e.g. <c>g.Sum(x =&gt; x.UnitPrice * x.Quantity * (1 - x.Discount))</c>, and a conversion to another
+        /// numeric type in it, e.g. <c>g.Sum(x =&gt; (int)x.Quantity)</c>, is sent as <c>cast(Quantity,Edm.Int32)</c>.
         /// </summary>
         /// <typeparam name="TResult">The type of the result, whose members the response properties deserialize into.</typeparam>
         /// <param name="selector">The result, e.g. <c>g =&gt; new LicenseTotal { Currency = g.Key, TotalPrice = g.Sum(license =&gt; license.Price) }</c>.</param>

@@ -26,7 +26,7 @@ namespace Radzen
 
         internal ODataTerm? PreFilter { get; private set; }
 
-        internal string? GroupBy { get; private set; }
+        internal string? Transformation { get; private set; }
 
         internal IReadOnlyDictionary<string, string>? Members { get; private set; }
 
@@ -114,12 +114,12 @@ namespace Radzen
 
         internal ODataQueryState Group(LambdaExpression keySelector, List<(string Component, string Path)> keys, LambdaExpression selector)
         {
-            var (groupBy, members) = ODataAggregate.Translate(keySelector, keys, selector);
+            var (transformation, members) = ODataAggregate.Translate(keySelector, keys, selector);
 
             return new ODataQueryState
             {
                 PreFilter = Filter,
-                GroupBy = groupBy,
+                Transformation = transformation,
                 Members = members,
             };
         }
@@ -128,10 +128,10 @@ namespace Radzen
         {
             var options = new List<KeyValuePair<string, string>>();
 
-            if (GroupBy != null)
+            if (Transformation != null)
             {
                 var filter = Combine(args?.Filter, PreFilter);
-                var apply = (filter == null ? string.Empty : $"filter({filter})/") + GroupBy + (Filter == null ? string.Empty : $"/filter({Filter.Text})");
+                var apply = (filter == null ? string.Empty : $"filter({filter})/") + Transformation + (Filter == null ? string.Empty : $"/filter({Filter.Text})");
                 Add(options, "$apply", apply);
                 Add(options, "$orderby", string.Join(",", OrderBy));
                 Add(options, "$skip", Skip);

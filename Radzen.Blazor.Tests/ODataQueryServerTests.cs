@@ -434,6 +434,74 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(expected.Count(), result.GetProperty("@odata.count").GetInt32());
         }
 
+        private static void AssertClose(double expected, double actual) => Assert.InRange(actual, expected - Math.Abs(expected) * 1e-7, expected + Math.Abs(expected) * 1e-7);
+
+        private static double? Number(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.ValueKind != JsonValueKind.Null ? value.GetDouble() : null;
+
+        [Fact]
+        public async Task ODataQuery_GroupBy_ReturnsTheConstantKeyAggregatesTheSameLambdasReturnInMemory()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .GroupBy(line => 1)
+                .Select(group => new LineTotals
+                {
+                    Amount = group.Sum(line => line.UnitPrice * line.Quantity * (1 - line.Discount)),
+                    TotalQuantity = group.Sum(line => (int)line.Quantity),
+                    AveragePrice = group.Average(line => line.UnitPrice),
+                    AverageDiscount = group.Average(line => line.Discount),
+                    Lines = group.Count(),
+                });
+
+            var totals = (await server.GetAsync(Set("OrderLines").GetODataUri(query))).GetProperty("value").EnumerateArray().Single();
+
+            var lines = HelpdeskSeed.OrderLines;
+            AssertClose(lines.Sum(line => line.UnitPrice * line.Quantity * (1 - line.Discount)).Value, Number(totals, "Amount").Value);
+            Assert.Equal(lines.Sum(line => (int?)line.Quantity), (int?)Number(totals, "TotalQuantity"));
+            Assert.Equal(lines.Average(line => line.UnitPrice).Value, Number(totals, "AveragePrice").Value, 6);
+            Assert.Equal(lines.Average(line => line.Discount).Value, Number(totals, "AverageDiscount").Value, 6);
+            Assert.Equal(lines.Length, (int)Number(totals, "Lines"));
+        }
+
+        [Fact]
+        public async Task ODataQuery_GroupBy_FoldsTheWhereAndTheGridFilterIntoAConstantKeyAggregate()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .Where(line => line.Category != "Seafood")
+                .GroupBy(line => 1)
+                .Select(group => new LineTotals { Amount = group.Sum(line => line.UnitPrice * line.Quantity), Lines = group.Count() });
+
+            var totals = (await server.GetAsync(Set("OrderLines").GetODataUri(query, new LoadDataArgs { Filter = "Quantity gt 5", OrderBy = "UnitPrice", Skip = 1, Top = 1 }))).GetProperty("value").EnumerateArray().Single();
+
+            var lines = HelpdeskSeed.OrderLines.Where(line => line.Quantity > 5 && line.Category != "Seafood").ToList();
+            Assert.Equal(lines.Sum(line => line.UnitPrice * line.Quantity).Value, Number(totals, "Amount").Value, 6);
+            Assert.Equal(lines.Count, (int)Number(totals, "Lines"));
+        }
+
+        [Fact]
+        public async Task ODataQuery_GroupBy_CastsAggregatedValuesTheWayTheSameLambdasDoInMemory()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .GroupBy(line => line.Category)
+                .Select(group => new LineTotals
+                {
+                    Category = group.Key,
+                    TotalQuantity = group.Sum(line => line.Quantity),
+                    LongQuantity = group.Sum(line => (long)line.Quantity),
+                    HighestDiscount = group.Max(line => (double)line.Discount),
+                    Amount = group.Sum(line => line.UnitPrice * line.Quantity),
+                })
+                .OrderBy(totals => totals.Category);
+
+            var actual = (await server.GetAsync(Set("OrderLines").GetODataUri(query))).GetProperty("value").EnumerateArray()
+                .Select(totals => $"{totals.GetProperty("Category").GetString()}:{Number(totals, "TotalQuantity")}:{Number(totals, "LongQuantity")}:{Number(totals, "HighestDiscount"):0.######}:{Number(totals, "Amount"):0.######}");
+
+            var expected = HelpdeskSeed.OrderLines
+                .GroupBy(line => line.Category)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group => $"{group.Key}:{group.Sum(line => line.Quantity)}:{group.Sum(line => (long?)line.Quantity)}:{group.Max(line => (double?)line.Discount):0.######}:{group.Sum(line => line.UnitPrice * line.Quantity):0.######}");
+            Assert.Equal(expected, actual);
+        }
+
         private static decimal? Decimal(JsonElement value) => value.ValueKind == JsonValueKind.Null ? null : value.GetDecimal();
 
         [Fact]

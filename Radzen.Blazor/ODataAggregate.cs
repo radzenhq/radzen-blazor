@@ -22,6 +22,11 @@ namespace Radzen
 
                 if (Component(node, group) is { } component)
                 {
+                    if (keys.Count == 0)
+                    {
+                        throw new NotSupportedException($"ODataQuery cannot select {name} = {value}: a constant key puts every entity in one group and OData returns no value for it; select only aggregates.");
+                    }
+
                     var path = keys.First(key => key.Component == component).Path;
 
                     if (path.Contains('/', StringComparison.Ordinal))
@@ -47,6 +52,13 @@ namespace Radzen
                 }
             }
 
+            if (keys.Count == 0)
+            {
+                return aggregates.Count > 0
+                    ? ($"aggregate({string.Join(",", aggregates)})", members)
+                    : throw new NotSupportedException($"ODataQuery cannot select {selector.Body}: a constant key puts every entity in one group, so select at least one aggregate, e.g. g => new Total {{ Amount = g.Sum(x => x.Price) }}.");
+            }
+
             var groupBy = $"groupby(({string.Join(",", keys.Select(key => key.Path).Distinct())}){(aggregates.Count > 0 ? $",aggregate({string.Join(",", aggregates)})" : string.Empty)})";
 
             return (groupBy, members);
@@ -54,6 +66,11 @@ namespace Radzen
 
         internal static List<(string Component, string Path)> Keys(LambdaExpression keySelector)
         {
+            if (ODataTranslator.IsConstant(keySelector))
+            {
+                return [];
+            }
+
             var body = ODataTranslator.Unconverted(keySelector.Body);
 
             return body switch
@@ -123,9 +140,9 @@ namespace Radzen
                     && source is MethodCallExpression { Method.Name: "Distinct", Arguments: [var distinct] }
                     && ODataTranslator.Unconverted(distinct) is MethodCallExpression { Method.Name: "Select", Arguments: [var items, var selector] }
                     && ODataTranslator.Unconverted(items) == group:
-                    return $"{ODataTranslator.Value(ODataTranslator.Unquote(selector))} with countdistinct";
+                    return $"{ODataTranslator.Aggregated(ODataTranslator.Unquote(selector))} with countdistinct";
                 case "Sum" or "Min" or "Max" or "Average" when arguments.Count == 2 && source == group:
-                    return $"{ODataTranslator.Value(ODataTranslator.Unquote(arguments[1]))} with {call.Method.Name.ToLowerInvariant()}";
+                    return $"{ODataTranslator.Aggregated(ODataTranslator.Unquote(arguments[1]))} with {call.Method.Name.ToLowerInvariant()}";
                 default:
                     return null;
             }

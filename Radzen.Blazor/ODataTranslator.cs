@@ -13,11 +13,13 @@ namespace Radzen
 
         private readonly Dictionary<ParameterExpression, string> scope = [];
         private readonly IReadOnlyDictionary<string, string>? rootMembers;
+        private readonly Expression? aggregated;
 
-        private ODataTranslator(ParameterExpression root, IReadOnlyDictionary<string, string>? rootMembers)
+        private ODataTranslator(ParameterExpression root, IReadOnlyDictionary<string, string>? rootMembers, Expression? aggregated = null)
         {
             scope[root] = string.Empty;
             this.rootMembers = rootMembers;
+            this.aggregated = aggregated;
         }
 
         internal static ODataTerm Translate(LambdaExpression lambda, IReadOnlyDictionary<string, string>? rootMembers = null)
@@ -40,6 +42,23 @@ namespace Radzen
             }
 
             return term.Text;
+        }
+
+        internal static string Aggregated(LambdaExpression selector)
+        {
+            var term = new ODataTranslator(selector.Parameters[0], null, selector.Body).Visit(selector.Body);
+
+            if (term.IsConstant || term.IsRoot)
+            {
+                throw new NotSupportedException($"ODataQuery cannot aggregate {selector.Body}: aggregate a property of {selector.Parameters[0].Type.Name} or an expression of its properties, e.g. {selector.Parameters[0].Name} => {selector.Parameters[0].Name}.Price * {selector.Parameters[0].Name}.Quantity.");
+            }
+
+            return term.Precedence < ODataTerm.Primary ? $"({term.Text})" : term.Text;
+        }
+
+        internal static bool IsConstant(LambdaExpression selector)
+        {
+            return !new ODataTranslator(selector.Parameters[0], null).Uses(selector.Body);
         }
 
         internal static string Path(LambdaExpression selector, Expression body)
@@ -218,6 +237,8 @@ namespace Radzen
                     return Visit(unary.Operand);
                 case ExpressionType.Convert or ExpressionType.ConvertChecked or ExpressionType.TypeAs when IsOpenProperty(unary.Operand):
                     return Visit(unary.Operand);
+                case ExpressionType.Convert or ExpressionType.ConvertChecked when IsNumericConversion(unary) && Cast(unary) is { } edm:
+                    return ODataTerm.Expression($"cast({Render(unary.Operand, Visit(unary.Operand), 0, null, false)},{edm})", ODataTerm.Primary);
                 case ExpressionType.Convert or ExpressionType.ConvertChecked when IsNumericConversion(unary) && Widens(unary.Operand.Type, unary.Type):
                     return Visit(unary.Operand);
                 case ExpressionType.Convert or ExpressionType.ConvertChecked when unary.Method == null && !unary.Operand.Type.IsValueType && unary.Type.IsAssignableFrom(unary.Operand.Type):
@@ -658,10 +679,42 @@ namespace Radzen
             return from == to || Type.GetTypeCode(from) >= TypeCode.SByte && Type.GetTypeCode(to) >= Type.GetTypeCode(from) && Type.GetTypeCode(to) <= TypeCode.Decimal;
         }
 
+        private string? Cast(UnaryExpression convert)
+        {
+            if (aggregated == null)
+            {
+                return null;
+            }
+
+            var from = Nullable.GetUnderlyingType(convert.Operand.Type) ?? convert.Operand.Type;
+            var to = Nullable.GetUnderlyingType(convert.Type) ?? convert.Type;
+            var drops = Nullable.GetUnderlyingType(convert.Operand.Type) != null && Nullable.GetUnderlyingType(convert.Type) == null;
+
+            if (from == to || from.IsEnum || to.IsEnum || !(convert == aggregated || drops || !Widens(from, to)))
+            {
+                return null;
+            }
+
+            return Type.GetTypeCode(to) switch
+            {
+                TypeCode.SByte when IsNumeric(from) => "Edm.SByte",
+                TypeCode.Byte when IsNumeric(from) => "Edm.Byte",
+                TypeCode.Int16 when IsNumeric(from) => "Edm.Int16",
+                TypeCode.Int32 when IsNumeric(from) => "Edm.Int32",
+                TypeCode.Int64 when IsNumeric(from) => "Edm.Int64",
+                TypeCode.Single when IsNumeric(from) => "Edm.Single",
+                TypeCode.Double when IsNumeric(from) => "Edm.Double",
+                TypeCode.Decimal when IsNumeric(from) => "Edm.Decimal",
+                _ => null,
+            };
+        }
+
         private static bool IsNumericConversion(UnaryExpression convert)
         {
             return convert.Method == null || convert.Method.DeclaringType == typeof(decimal) && convert.Method.Name is "op_Implicit" or "op_Explicit";
         }
+
+        private static bool IsNumeric(Type type) => Type.GetTypeCode(type) is >= TypeCode.SByte and <= TypeCode.Decimal;
 
         private static string? DatePart(Type type, string name)
         {

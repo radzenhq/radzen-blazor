@@ -318,6 +318,81 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void ODataQuery_GroupBy_TranslatesAConstantKeyToAggregateWithoutGroupBy()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .GroupBy(line => 1)
+                .Select(group => new LineTotals
+                {
+                    Amount = group.Sum(line => line.UnitPrice * line.Quantity * (1 - line.Discount)),
+                    TotalQuantity = group.Sum(line => (int)line.Quantity),
+                    AveragePrice = group.Average(line => line.UnitPrice),
+                    AverageDiscount = group.Average(line => line.Discount),
+                    Lines = group.Count(),
+                });
+
+            AssertQuery("$apply=aggregate((UnitPrice mul Quantity mul (1 sub Discount)) with sum as Amount,cast(Quantity,Edm.Int32) with sum as TotalQuantity,UnitPrice with average as AveragePrice,Discount with average as AverageDiscount,$count as Lines)", query, "OrderLines");
+        }
+
+        [Fact]
+        public void GetODataUri_FoldsTheWhereAndTheGridFilterIntoAConstantKeyAggregate()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .Where(line => line.Category != "Seafood")
+                .GroupBy(line => 1)
+                .Select(group => new LineTotals { Amount = group.Sum(line => line.UnitPrice * line.Quantity) });
+
+            var uri = new Uri("https://example.com/odata/OrderLines").GetODataUri(query, new LoadDataArgs { Filter = "Quantity gt 5", OrderBy = "UnitPrice", Skip = 1, Top = 2 });
+
+            Assert.Equal("$apply=filter((Quantity gt 5) and (Category ne 'Seafood'))/aggregate((UnitPrice mul Quantity) with sum as Amount)", Uri.UnescapeDataString(uri.Query.TrimStart('?')));
+            ODataParser.AssertQueryParses("OrderLines", uri.Query.TrimStart('?'));
+        }
+
+        [Fact]
+        public void ODataQuery_GroupBy_CastsWhereAnAggregateChangesTheNumericType()
+        {
+            var query = new ODataQuery<OrderLine>()
+                .GroupBy(line => line.Category)
+                .Select(group => new LineTotals
+                {
+                    Category = group.Key,
+                    TotalQuantity = group.Sum(line => line.Quantity),
+                    LongQuantity = group.Sum(line => (long)line.Quantity),
+                    HighestDiscount = group.Max(line => (double)line.Discount),
+                    WholePrices = group.Sum(line => (int)line.UnitPrice),
+                    Amount = group.Sum(line => (int)line.Quantity * 2 + line.UnitPrice),
+                });
+
+            AssertQuery("$apply=groupby((Category),aggregate(cast(Quantity,Edm.Int32) with sum as TotalQuantity,cast(Quantity,Edm.Int64) with sum as LongQuantity,cast(Discount,Edm.Double) with max as HighestDiscount,cast(UnitPrice,Edm.Int32) with sum as WholePrices,(cast(Quantity,Edm.Int32) mul 2 add UnitPrice) with sum as Amount))", query, "OrderLines");
+        }
+
+        [Fact]
+        public void ODataQuery_GroupBy_UnwrapsTheImplicitDecimalConversionAndCastsTheExplicitOne()
+        {
+            var query = new ODataQuery<Ticket>()
+                .GroupBy(ticket => 1)
+                .Select(group => new { Amount = group.Sum(ticket => ticket.Discount * ticket.Priority), Whole = group.Sum(ticket => (int)ticket.Price) });
+
+            AssertQuery("$apply=aggregate((Discount mul Priority) with sum as Amount,cast(Price,Edm.Int32) with sum as Whole)", query, "Tickets");
+        }
+
+        [Fact]
+        public void ODataQuery_Where_KeepsUnwrappingTheConversionsCSharpInsertsOutsideAggregates()
+        {
+            AssertQuery("$filter=Quantity gt 5 and UnitPrice mul Quantity gt 100", new ODataQuery<OrderLine>().Where(line => (int)line.Quantity > 5 && line.UnitPrice * line.Quantity > 100), "OrderLines");
+        }
+
+        [Fact]
+        public void ODataQuery_GroupBy_ThrowsForAConstantKeyWithoutAggregatesOrWithTheKeySelected()
+        {
+            var lines = new ODataQuery<OrderLine>().GroupBy(line => 1);
+
+            Assert.Contains("select only aggregates", Assert.Throws<NotSupportedException>(() => lines.Select(group => new { group.Key, Lines = group.Count() })).Message);
+            Assert.Contains("select at least one aggregate", Assert.Throws<NotSupportedException>(() => lines.Select(group => new LineTotals { })).Message);
+            Assert.Contains("aggregate a property of OrderLine", Assert.Throws<NotSupportedException>(() => lines.Select(group => new LineTotals { Amount = group.Sum(line => 1.5) })).Message);
+        }
+
+        [Fact]
         public void ODataQuery_GroupBy_ThrowsWhereOData()
         {
             var licenses = new ODataQuery<License>();

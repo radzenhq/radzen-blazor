@@ -98,6 +98,10 @@
             .Select(group => new Total { Status = group.Key, Discount = group.Sum(ticket => ticket.Discount), Count = group.Count() })
             .OrderByDescending(total => total.Discount).ToString(),
             "$apply=filter(Urgent)/groupby((Status),aggregate(Discount with sum as Discount,$count as Count))&$orderby=Discount desc");
+        yield return (new ODataQuery<Ticket>()
+            .GroupBy(ticket => 1)
+            .Select(group => new Total { Discount = group.Sum(ticket => ticket.Discount * ticket.Priority), Count = (int)group.Sum(ticket => (long)ticket.Priority) }).ToString(),
+            "$apply=aggregate((Discount mul Priority) with sum as Discount,cast(Priority,Edm.Int64) with sum as Count)");
         yield return (new Uri("https://example.com/odata/Tickets?key=a").GetODataUri(new ODataQuery<Ticket>().Where(ticket => ticket.Subject == "O'Brien & #1"), new LoadDataArgs { Filter = "Priority gt 1", Top = 5 }).AbsoluteUri,
             "https://example.com/odata/Tickets?key=a&$filter=%28Priority%20gt%201%29%20and%20%28Subject%20eq%20%27O%27%27Brien%20%26%20%231%27%29&$top=5&$count=true");
     }

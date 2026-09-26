@@ -78,6 +78,17 @@ namespace Radzen.Blazor.Tests
 
         public static readonly AnalyticsSession[] Sessions = CreateSessions();
 
+        public static readonly OrderLine[] OrderLines =
+        [
+            new() { Id = 1, Category = "Beverages", UnitPrice = 18, Quantity = 12, Discount = 0f },
+            new() { Id = 2, Category = "Beverages", UnitPrice = 19.5, Quantity = 10, Discount = 0.15f },
+            new() { Id = 3, Category = "Condiments", UnitPrice = 10, Quantity = 30000, Discount = 0.05f },
+            new() { Id = 4, Category = "Condiments", UnitPrice = 22.35, Quantity = 30000, Discount = 0.25f },
+            new() { Id = 5, Category = "Condiments", UnitPrice = null, Quantity = 5, Discount = 0.1f },
+            new() { Id = 6, Category = "Seafood", UnitPrice = 31.23, Quantity = null, Discount = null },
+            new() { Id = 7, Category = "Seafood", UnitPrice = 6, Quantity = 40, Discount = 0.2f },
+        ];
+
         private static Ticket[] CreateTickets()
         {
             Ticket[] tickets =
@@ -142,6 +153,7 @@ namespace Radzen.Blazor.Tests
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<License> Licenses => Set<License>();
         public DbSet<Log> Logs => Set<Log>();
+        public DbSet<OrderLine> OrderLines => Set<OrderLine>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -173,6 +185,12 @@ namespace Radzen.Blazor.Tests
         public IQueryable<License> Get() => context.Licenses;
     }
 
+    public class OrderLinesController(HelpdeskContext context) : ODataController
+    {
+        [EnableQuery(MaxNodeCount = 1000)]
+        public IQueryable<OrderLine> Get() => context.OrderLines;
+    }
+
     public class LogsController(HelpdeskContext context) : ODataController
     {
         [EnableQuery]
@@ -201,6 +219,7 @@ namespace Radzen.Blazor.Tests
             builder.EntitySet<Ticket>("MemoryTickets");
             builder.EntitySet<License>("Licenses");
             builder.EntitySet<Log>("Logs");
+            builder.EntitySet<OrderLine>("OrderLines");
             builder.EntitySet<AnalyticsSession>("AnalyticsSessions");
             builder.EntityType<Ticket>().Ignore(ticket => ticket.Grade);
             return builder.GetEdmModel();
@@ -243,6 +262,7 @@ namespace Radzen.Blazor.Tests
                 context.AddRange(HelpdeskSeed.Schedules);
                 context.AddRange(HelpdeskSeed.Licenses);
                 context.AddRange(HelpdeskSeed.Logs);
+                context.AddRange(HelpdeskSeed.OrderLines);
                 await context.SaveChangesAsync();
 
                 foreach (var (team, schedule) in schedules)

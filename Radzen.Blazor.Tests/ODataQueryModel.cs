@@ -120,6 +120,28 @@ namespace Radzen.Blazor.Tests.Helpdesk
         public decimal? Mean { get; set; }
     }
 
+    public class OrderLine
+    {
+        public int Id { get; set; }
+        public string Category { get; set; }
+        public double? UnitPrice { get; set; }
+        public short? Quantity { get; set; }
+        public float? Discount { get; set; }
+    }
+
+    public class LineTotals
+    {
+        public string Category { get; set; }
+        public double? Amount { get; set; }
+        public int? TotalQuantity { get; set; }
+        public long? LongQuantity { get; set; }
+        public double? AveragePrice { get; set; }
+        public double? AverageDiscount { get; set; }
+        public double? HighestDiscount { get; set; }
+        public int? WholePrices { get; set; }
+        public int Lines { get; set; }
+    }
+
     public class Log
     {
         public long Id { get; set; }
