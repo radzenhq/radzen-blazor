@@ -209,9 +209,48 @@ namespace Radzen.Blazor.Tests
             };
         }
 
+        public static TheoryData<Expression<Func<Ticket, bool>>> TextConditions()
+        {
+            var search = "5";
+            var reference = "5d0c";
+            var name = "OPEN";
+            var partial = "OS";
+            var start = "Pend";
+            var missing = "archived";
+
+            return new()
+            {
+                ticket => ticket.Priority.ToString().Contains(search),
+                ticket => ticket.Priority.ToString() == "2",
+                ticket => ticket.Views.ToString().StartsWith("50"),
+                ticket => ticket.Views.ToString().EndsWith("0"),
+                ticket => ticket.Price.ToString().Contains(".5"),
+                ticket => ticket.Price.ToString().StartsWith("1"),
+                ticket => ticket.Reference.ToString().Contains("1111"),
+                ticket => ticket.Reference.ToString().ToLower().StartsWith(reference),
+                ticket => ticket.Urgent.ToString() == "True",
+                ticket => ticket.Urgent.ToString().ToLower().Contains("fal"),
+                ticket => ticket.UnitId.ToString().Contains("2"),
+                ticket => ticket.UnitId.ToString() == "1",
+                ticket => ticket.Status.ToString().ToLower().Contains(partial.ToLower()),
+                ticket => ticket.Status.ToString().ToLower().StartsWith(start.ToLower()),
+                ticket => ticket.Status.ToString().ToLower() == name.ToLower(),
+                ticket => ticket.Status.ToString().ToLower().Equals(name.ToLower()),
+                ticket => ticket.Status.ToString().Equals(name, StringComparison.OrdinalIgnoreCase),
+                ticket => ticket.Status.ToString() != "Open",
+                ticket => ticket.Previous.ToString().ToLower().Contains("o"),
+                ticket => ticket.Previous.ToString() == "",
+                ticket => ticket.Previous.ToString().Contains(""),
+                ticket => ticket.Status.ToString().ToLower().Contains(missing),
+                ticket => ticket.Priority.ToString().Contains(search) || ticket.Status.ToString().ToLower().Contains(search.ToLower()),
+                ticket => ticket.Priority.ToString().Contains(partial) || ticket.Status.ToString().ToLower().Contains(partial.ToLower()),
+            };
+        }
+
         [Theory]
         [MemberData(nameof(Conditions))]
         [MemberData(nameof(NullAndRoundingConditions))]
+        [MemberData(nameof(TextConditions))]
         public async Task ODataQuery_Where_ReturnsFromEntityFrameworkTheTicketsTheSameLambdaReturnsInMemory(Expression<Func<Ticket, bool>> where)
         {
             var expected = HelpdeskSeed.Tickets.Where(where.Compile()).Select(ticket => ticket.Id).Order().ToArray();
@@ -224,6 +263,7 @@ namespace Radzen.Blazor.Tests
         [Theory]
         [MemberData(nameof(Conditions))]
         [MemberData(nameof(TimeOfDayConditions))]
+        [MemberData(nameof(TextConditions))]
         public async Task ODataQuery_Where_ReturnsFromLinqToObjectsTheTicketsTheSameLambdaReturnsInMemory(Expression<Func<Ticket, bool>> where)
         {
             var expected = HelpdeskSeed.Tickets.Where(where.Compile()).Select(ticket => ticket.Id).Order().ToArray();

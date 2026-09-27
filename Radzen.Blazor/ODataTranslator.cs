@@ -9,7 +9,9 @@ namespace Radzen
 {
     internal sealed class ODataTranslator
     {
-        private const string Supported = "ODataQuery translates comparisons, &&, ||, !, null checks, arithmetic, enums and Enum.HasFlag, captured values, the string methods Contains, StartsWith, EndsWith, IndexOf, Substring, ToLower, ToUpper, Trim and Length, Any, All and Count on collections, Contains on a captured list, date parts, Math.Floor, Math.Ceiling and Math.Round with MidpointRounding.AwayFromZero.";
+        private const string Supported = "ODataQuery translates comparisons, &&, ||, !, null checks, arithmetic, enums and Enum.HasFlag, captured values, the string methods Contains, StartsWith, EndsWith, IndexOf, Substring, ToLower, ToUpper, Trim and Length, ToString of numbers, Guids and bools, ToString of an enum compared with a captured value, Any, All and Count on collections, Contains on a captured list, date parts, Math.Floor, Math.Ceiling and Math.Round with MidpointRounding.AwayFromZero.";
+
+        private const string EnumNames = "OData cannot cast an enum to its name, so ODataQuery matches an enum's ToString() against its member names only when it, or its ToLower() or ToUpper(), is compared with a captured value through Contains, StartsWith, EndsWith, Equals, == or !=, e.g. x.Status.ToString().ToLower().Contains(search.ToLower()) or x.Status.ToString() == name.";
 
         private readonly Dictionary<ParameterExpression, string> scope = [];
         private readonly IReadOnlyDictionary<string, string>? rootMembers;
@@ -120,6 +122,11 @@ namespace Radzen
 
         private ODataTerm Binary(BinaryExpression binary)
         {
+            if (binary.NodeType is ExpressionType.Equal or ExpressionType.NotEqual && binary.Left.Type == typeof(string) && MemberNames(binary, binary.Left, binary.Right) is { } names)
+            {
+                return names;
+            }
+
             switch (binary.NodeType)
             {
                 case ExpressionType.AndAlso:
@@ -353,13 +360,110 @@ namespace Radzen
                 return Equality(call, call.Object, Unconverted(call.Arguments[0]));
             }
 
+            if (method.Name == "ToString" && call.Object != null && call.Arguments.Count == 0)
+            {
+                return Text(call);
+            }
+
             throw Unsupported(call, $"{type?.Name}.{method.Name} has no OData equivalent. {Supported}");
+        }
+
+        private ODataTerm Text(MethodCallExpression call)
+        {
+            var value = Formatted(call);
+            var type = Nullable.GetUnderlyingType(value.Type) ?? value.Type;
+
+            if (type.IsEnum)
+            {
+                throw Unsupported(call, EnumNames);
+            }
+
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(DateOnly) || type == typeof(TimeOnly))
+            {
+                throw Unsupported(call, $"{type.Name}.ToString() formats by the current culture, which OData cannot reproduce; compare the value or its parts instead, e.g. x.OpenedAt.Year == 2026 or x.OpenedAt.Date == day.");
+            }
+
+            if (!IsNumeric(type) && type != typeof(Guid) && type != typeof(bool))
+            {
+                throw Unsupported(call, $"OData casts numbers, Guids and bools to Edm.String, not a {type.Name}.");
+            }
+
+            return ODataTerm.Expression($"cast({Render(value, Visit(value), 0, null, false)},Edm.String)", ODataTerm.Primary);
+        }
+
+        private ODataTerm? MemberNames(Expression node, params Expression?[] operands)
+        {
+            var present = operands.OfType<Expression>().ToList();
+            var texts = present.Select(EnumText).OfType<Expression>().ToList();
+
+            if (texts.Count != 1 || present.Any(operand => EnumText(operand) == null && Uses(operand)))
+            {
+                return null;
+            }
+
+            var value = texts[0];
+            var type = Nullable.GetUnderlyingType(value.Type) ?? value.Type;
+
+            if (type.IsDefined(typeof(FlagsAttribute), false))
+            {
+                throw Unsupported(node, $"{type.Name} is a [Flags] enum, and the name of a combined value such as \"A, B\" is no member name; test a member with {value}.HasFlag instead.");
+            }
+
+            var parameter = Expression.Parameter(typeof(object), "value");
+            var matches = Expression.Lambda<Func<object?, bool>>(new Substitution(value, Expression.Convert(parameter, value.Type)).Visit(node)!, parameter).Compile(preferInterpretation: true);
+            var candidates = Enum.GetValues(type).Cast<object?>().Distinct();
+
+            if (Nullable.GetUnderlyingType(value.Type) != null)
+            {
+                candidates = candidates.Append(null);
+            }
+
+            var path = Render(value, Visit(value), ODataTerm.Comparison + 1, null, false);
+            var context = Context(value);
+            var terms = candidates.Where(matches).Select(candidate => $"{path} eq {Literal(candidate, context, false)}").ToList();
+
+            return terms.Count switch
+            {
+                0 => ODataTerm.Constant(false),
+                1 => ODataTerm.Expression(terms[0], ODataTerm.Comparison),
+                _ => ODataTerm.Expression($"({string.Join(" or ", terms)})", ODataTerm.Primary),
+            };
+        }
+
+        private static Expression? EnumText(Expression node)
+        {
+            while (node is MethodCallExpression { Method.Name: "ToLower" or "ToUpper" or "ToLowerInvariant" or "ToUpperInvariant", Object: { } text, Arguments.Count: 0 } casing && casing.Method.DeclaringType == typeof(string))
+            {
+                node = text;
+            }
+
+            if (node is MethodCallExpression { Method.Name: "ToString", Object: not null, Arguments.Count: 0 } call)
+            {
+                var value = Formatted(call);
+
+                if ((Nullable.GetUnderlyingType(value.Type) ?? value.Type).IsEnum)
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private static Expression Formatted(MethodCallExpression call)
+        {
+            return call.Object is UnaryExpression { NodeType: ExpressionType.Convert, Method: null } box && !box.Type.IsValueType ? box.Operand : call.Object!;
         }
 
         private ODataTerm StringCall(MethodCallExpression call)
         {
             var text = call.Object;
             var arguments = call.Arguments;
+
+            if (call.Method.Name is "Contains" or "StartsWith" or "EndsWith" or "Equals" && MemberNames(call, [text, .. arguments]) is { } names)
+            {
+                return names;
+            }
 
             switch (call.Method.Name)
             {
@@ -760,6 +864,11 @@ namespace Radzen
         internal static bool IsIdentifier(string? name)
         {
             return !string.IsNullOrEmpty(name) && (char.IsLetter(name[0]) || name[0] == '_') && name.All(character => char.IsLetterOrDigit(character) || character == '_');
+        }
+
+        private sealed class Substitution(Expression original, Expression replacement) : ExpressionVisitor
+        {
+            public override Expression? Visit(Expression? node) => node == original ? replacement : base.Visit(node);
         }
 
         private sealed class ParameterFinder(Dictionary<ParameterExpression, string> scope) : ExpressionVisitor

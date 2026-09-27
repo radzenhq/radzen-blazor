@@ -225,6 +225,59 @@ namespace Radzen.Blazor.Tests
             ODataParser.AssertParses("Tickets", $"$filter={filter}");
         }
 
+        public static TheoryData<Expression<Func<Ticket, bool>>, string> TextConversions()
+        {
+            var search = "5";
+            var reference = "5D0C";
+            var name = "OPEN";
+
+            return new()
+            {
+                { ticket => ticket.Priority.ToString() == "3", "cast(Priority,Edm.String) eq '3'" },
+                { ticket => ticket.Priority.ToString().Contains(search), "contains(cast(Priority,Edm.String),'5')" },
+                { ticket => ticket.Views.ToString().StartsWith("50"), "startswith(cast(Views,Edm.String),'50')" },
+                { ticket => ticket.Price.ToString().EndsWith(".5"), "endswith(cast(Price,Edm.String),'.5')" },
+                { ticket => ticket.Hours.ToString().Contains("."), "contains(cast(Hours,Edm.String),'.')" },
+                { ticket => ticket.Rating.ToString() == "4.5", "cast(Rating,Edm.String) eq '4.5'" },
+                { ticket => ticket.Reference.ToString().ToUpper().Contains(reference), "contains(toupper(cast(Reference,Edm.String)),'5D0C')" },
+                { ticket => ticket.Urgent.ToString().ToLower() == "true", "tolower(cast(Urgent,Edm.String)) eq 'true'" },
+                { ticket => ticket.Escalated.ToString() == "True", "cast(Escalated,Edm.String) eq 'True'" },
+                { ticket => ticket.UnitId.ToString().Contains("2"), "contains(cast(UnitId,Edm.String),'2')" },
+                { ticket => ticket.Discount.Value.ToString() == "1.5", "cast(Discount,Edm.String) eq '1.5'" },
+                { ticket => (ticket.Priority * 2).ToString() == "6", "cast(Priority mul 2,Edm.String) eq '6'" },
+                { ticket => ticket.Status.ToString() == "Open", "Status eq 'Open'" },
+                { ticket => ticket.Status.ToString() != "Open", "(Status eq 'Closed' or Status eq 'Pending')" },
+                { ticket => ticket.Status.ToString().Contains("en"), "(Status eq 'Open' or Status eq 'Pending')" },
+                { ticket => ticket.Status.ToString().ToLower().Contains(search.ToLower()), "false" },
+                { ticket => ticket.Status.ToString().ToLower().Contains(name.Substring(0, 1).ToLower()), "(Status eq 'Open' or Status eq 'Closed')" },
+                { ticket => ticket.Status.ToString().StartsWith("p"), "false" },
+                { ticket => ticket.Status.ToString().ToUpperInvariant().StartsWith("P"), "Status eq 'Pending'" },
+                { ticket => ticket.Status.ToString().EndsWith("ed"), "Status eq 'Closed'" },
+                { ticket => ticket.Status.ToString().Equals("Closed"), "Status eq 'Closed'" },
+                { ticket => ticket.Status.ToString().Equals("closed", StringComparison.OrdinalIgnoreCase), "Status eq 'Closed'" },
+                { ticket => string.Equals(name, ticket.Status.ToString(), StringComparison.OrdinalIgnoreCase), "Status eq 'Open'" },
+                { ticket => name.ToLower() == ticket.Status.ToString().ToLower(), "Status eq 'Open'" },
+                { ticket => !ticket.Status.ToString().StartsWith("C"), "not (Status eq 'Closed')" },
+                { ticket => ticket.Urgent && ticket.Status.ToString().Contains("en"), "Urgent and (Status eq 'Open' or Status eq 'Pending')" },
+                { ticket => ticket.Urgent || ticket.Status.ToString().Contains("x"), "Urgent" },
+                { ticket => ((TicketStatus)ticket.Priority).ToString() == "Pending", "Priority eq 2" },
+                { ticket => ticket.Previous.ToString().Contains("o"), "Previous eq 'Closed'" },
+                { ticket => ticket.Previous.ToString() == "", "Previous eq null" },
+                { ticket => ticket.Previous.ToString().StartsWith(""), "(Previous eq 'Open' or Previous eq 'Closed' or Previous eq 'Pending' or Previous eq null)" },
+                { ticket => ticket.Previous.Value.ToString() == "Open", "Previous eq 'Open'" },
+                { ticket => ticket.Priority.ToString().Contains(name) || ticket.Status.ToString().ToLower().Contains(name.ToLower()), "contains(cast(Priority,Edm.String),'OPEN') or Status eq 'Open'" },
+                { ticket => ticket.Views.ToString().Contains(search) || ticket.Status.ToString().ToLower().Contains("e"), "contains(cast(Views,Edm.String),'5') or (Status eq 'Open' or Status eq 'Closed' or Status eq 'Pending')" },
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(TextConversions))]
+        public void ODataQuery_Where_CastsToStringOrMatchesEnumMemberNames(Expression<Func<Ticket, bool>> where, string filter)
+        {
+            Assert.Equal(filter, ODataTranslator.Filter(where));
+            ODataParser.AssertParses("Tickets", $"$filter={filter}");
+        }
+
         [Fact]
         public void ODataQuery_Where_RenamesAShadowedLambdaVariable()
         {
@@ -296,6 +349,18 @@ namespace Radzen.Blazor.Tests
                 { ticket => ticket.Comments.Contains(null), "use ticket.Comments.Any(item => item == value)" },
                 { ticket => labels[ticket.Subject] == "x", "Dictionary`2.get_Item has no OData equivalent" },
                 { ticket => ticket.Grade == 'A', "no conversion from Char to Int32" },
+                { ticket => ticket.Status.ToString().Length > 3, "Contains, StartsWith, EndsWith, Equals, == or !=" },
+                { ticket => ticket.Status.ToString().Substring(0, 1) == "O", "Contains, StartsWith, EndsWith, Equals, == or !=" },
+                { ticket => ticket.Status.ToString() == ticket.Subject, "Contains, StartsWith, EndsWith, Equals, == or !=" },
+                { ticket => ticket.Subject.Contains(ticket.Status.ToString()), "Contains, StartsWith, EndsWith, Equals, == or !=" },
+                { ticket => ticket.Previous.ToString().Length == 0, "Contains, StartsWith, EndsWith, Equals, == or !=" },
+                { ticket => ticket.Channels.ToString().Contains("Email"), "[Flags] enum" },
+                { ticket => ticket.OpenedAt.ToString().Contains("2026"), "DateTime.ToString() formats by the current culture" },
+                { ticket => ticket.CreatedAt.ToString().Contains("2026"), "DateTimeOffset.ToString() formats by the current culture" },
+                { ticket => ticket.Due.ToString() == "2026-01-31", "DateOnly.ToString() formats by the current culture" },
+                { ticket => ticket.ClosedAt.ToString().Contains("2026"), "DateTime.ToString() formats by the current culture" },
+                { ticket => ticket.Effort.ToString() == "01:00:00", "casts numbers, Guids and bools to Edm.String, not a TimeSpan" },
+                { ticket => ticket.Price.ToString("0.00") == "3.00", "Decimal.ToString has no OData equivalent" },
             };
         }
 
