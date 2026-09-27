@@ -1,0 +1,42 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid Data="@employees" AllowCompositeDataCells="true" AllowSorting="true" AllowPaging="true" PageSize="4">
+    <Columns>
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="employee">
+                <RadzenImage Path="@employee.Photo" class="rz-gravatar" AlternateText="@($"{employee.FirstName} {employee.LastName}")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Employee" Width="320px">
+            <Template Context="employee">
+                <strong>@employee.FirstName @employee.LastName</strong>
+            </Template>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" />
+                <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" Width="360px">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+                <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+                <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+            </Columns>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+}

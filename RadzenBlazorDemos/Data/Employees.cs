@@ -129,8 +129,8 @@ namespace RadzenBlazorDemos.Data
             new Employee() {
                 EmployeeID = 7,
                 ReportsTo = 5,
-                LastName = "Robert",
-                FirstName = "King",
+                LastName = "King",
+                FirstName = "Robert",
                 Title = "Sales Representative",
                 TitleOfCourtesy = "Mr.",
                 BirthDate = DateTime.Parse("1983-07-02"),

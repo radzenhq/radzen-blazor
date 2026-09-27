@@ -1,0 +1,99 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid Data="@employeeOrders" AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(EmployeeOrders.Employee)" Title="Employee" Frozen="true" Width="200px">
+            <FooterTemplate>
+                <strong>Total</strong>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Q3" Width="240px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.OrdersQ3)" Title="Orders" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.OrdersQ3)</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.FreightQ3)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.FreightQ3).ToString("C")</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Q4" Width="240px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.OrdersQ4)" Title="Orders" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.OrdersQ4)</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.FreightQ4)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.FreightQ4).ToString("C")</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Total" Width="240px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.TotalOrders)" Title="Orders" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.TotalOrders)</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(EmployeeOrders.TotalFreight)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right">
+                    <FooterTemplate>
+                        <strong>@employeeOrders.Sum(e => e.TotalFreight).ToString("C")</strong>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    public class EmployeeOrders
+    {
+        public string Employee { get; set; }
+        public int OrdersQ3 { get; set; }
+        public decimal FreightQ3 { get; set; }
+        public int OrdersQ4 { get; set; }
+        public decimal FreightQ4 { get; set; }
+        public int TotalOrders => OrdersQ3 + OrdersQ4;
+        public decimal TotalFreight => FreightQ3 + FreightQ4;
+    }
+
+    IList<EmployeeOrders> employeeOrders = new List<EmployeeOrders>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var orders = await dbContext.Orders
+            .Include(o => o.Employee)
+            .ToListAsync();
+
+        employeeOrders = orders
+            .GroupBy(o => o.Employee)
+            .Select(g => new EmployeeOrders
+            {
+                Employee = $"{g.Key.FirstName} {g.Key.LastName}",
+                OrdersQ3 = g.Count(o => Quarter(o) == 3),
+                FreightQ3 = g.Where(o => Quarter(o) == 3).Sum(o => o.Freight ?? 0),
+                OrdersQ4 = g.Count(o => Quarter(o) == 4),
+                FreightQ4 = g.Where(o => Quarter(o) == 4).Sum(o => o.Freight ?? 0)
+            })
+            .OrderBy(e => e.Employee)
+            .ToList();
+    }
+
+    static int? Quarter(Order order)
+    {
+        return (order.OrderDate?.Month - 1) / 3 + 1;
+    }
+}
