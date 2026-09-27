@@ -94,12 +94,6 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (Round && end < 0)
-            {
-                end = 0;
-                start += NiceNumber(start / ticks, false);
-            }
-
             var range = end - start;
 
             if (Round)

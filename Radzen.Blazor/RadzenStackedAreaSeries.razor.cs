@@ -273,7 +273,7 @@ namespace Radzen.Blazor
                     var max = sums.Max();
                     var min = Items.Min(Value);
 
-                    scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                    scale.Input.MergeWidth(new ScaleRange { Start = Math.Min(0, min), End = Math.Max(0, max) });
                 }
                 else
                 {

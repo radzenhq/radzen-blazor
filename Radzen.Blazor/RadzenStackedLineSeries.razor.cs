@@ -225,6 +225,8 @@ namespace Radzen.Blazor
                 }
             }
 
+            IncludeZeroInValueScale(scale, false);
+
             return scale;
         }
 

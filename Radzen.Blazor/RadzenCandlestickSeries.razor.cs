@@ -181,6 +181,8 @@ namespace Radzen.Blazor
                 scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
             }
 
+            IncludeZeroInValueScale(scale, false);
+
             return scale;
         }
 

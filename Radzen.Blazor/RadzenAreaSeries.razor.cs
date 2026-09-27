@@ -88,6 +88,16 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        public override ScaleBase TransformValueScale(ScaleBase scale)
+        {
+            var result = base.TransformValueScale(scale);
+
+            IncludeZeroInValueScale(result, true);
+
+            return result;
+        }
+
+        /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
         {
             var style = base.TooltipStyle(item);

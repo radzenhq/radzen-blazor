@@ -402,7 +402,36 @@ namespace Radzen.Blazor
                 }
             }
 
+            IncludeZeroInValueScale(scale, false);
+
             return scale;
+        }
+
+        /// <summary>
+        /// Extends the specified value scale to zero when this series or another series on the same scale requires it: when the
+        /// <see cref="RadzenValueAxis.Range" /> of the value axis is <see cref="ValueAxisRange.IncludeZero" />, or when it is <see cref="ValueAxisRange.Auto" />
+        /// and a series is zero based. Call it after merging the values of this series into the scale. A scale whose values are all equal is not extended
+        /// because its ticks already extend from zero. Logarithmic scales and scales without data are left unchanged.
+        /// </summary>
+        /// <param name="scale">The value scale.</param>
+        /// <param name="zeroBased">Whether this series is filled from a zero baseline, as column, bar and area series are.</param>
+        protected void IncludeZeroInValueScale(ScaleBase scale, bool zeroBased)
+        {
+            ArgumentNullException.ThrowIfNull(scale);
+
+            var range = Chart?.GetValueAxis(ValueAxisName).Range ?? ValueAxisRange.Auto;
+
+            if (range == ValueAxisRange.IncludeZero || (range == ValueAxisRange.Auto && zeroBased))
+            {
+                scale.IncludeZero = true;
+            }
+
+            if (!scale.IncludeZero || scale.IsLogarithmic || !double.IsFinite(scale.Input.Start) || !double.IsFinite(scale.Input.End) || scale.Input.Start == scale.Input.End)
+            {
+                return;
+            }
+
+            scale.Input.MergeWidth(new ScaleRange { Start = 0, End = 0 });
         }
 
         /// <inheritdoc />

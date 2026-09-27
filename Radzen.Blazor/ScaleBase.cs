@@ -237,6 +237,8 @@ namespace Radzen.Blazor
         /// </summary>
         internal bool IsZoomed { get; set; }
 
+        internal bool IncludeZero { get; set; }
+
         /// <summary>
         /// Determines whether the specified scale is equal to the current one.
         /// </summary>

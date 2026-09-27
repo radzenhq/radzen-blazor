@@ -103,7 +103,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformCategoryScale(ScaleBase scale)
         {
-            return base.TransformValueScale(scale);
+            var result = base.TransformValueScale(scale);
+
+            IncludeZeroInValueScale(result, true);
+
+            return result;
         }
 
         /// <inheritdoc />
