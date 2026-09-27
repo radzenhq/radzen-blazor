@@ -285,6 +285,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Toc = [ new () { Text = "Column bands", Anchor = "#column-bands" }, new () { Text = "Composite data cells", Anchor = "#composite-data-cells" } ],
                             Name = "Composite Columns",
                             Path = "datagrid-composite-columns",
                             Related = new [] { "datagrid-column-template", "datagrid-frozen-columns", "datagrid-grouping-api" },
