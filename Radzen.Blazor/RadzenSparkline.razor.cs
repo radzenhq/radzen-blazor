@@ -114,6 +114,9 @@ namespace Radzen.Blazor
                 }
             }
 
+            (MarginLeft, MarginRight) = ClampMargins(MarginLeft, MarginRight, Width ?? 0);
+            (MarginTop, MarginBottom) = ClampMargins(MarginTop, MarginBottom, Height ?? 0);
+
             CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = (Width ?? 0) - MarginRight };
             ValueScale.Output = new ScaleRange { Start = (Height ?? 0) - MarginBottom, End = MarginTop };
 

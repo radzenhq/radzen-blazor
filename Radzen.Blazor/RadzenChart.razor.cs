@@ -754,8 +754,6 @@ namespace Radzen.Blazor
             }
 
             var legendSize = Legend.Measure(this);
-            var valueAxisSize = ValueAxis.Measure(this);
-            var categoryAxisSize = CategoryAxis.Measure(this);
 
             // Measure additional axes for the right margin (top margin when axes are inverted)
             double additionalAxesWidth = 0;
@@ -774,69 +772,33 @@ namespace Radzen.Blazor
 
             if (!ShouldRenderAxes())
             {
-                valueAxisSize = categoryAxisSize = 0;
                 additionalAxesWidth = 0;
                 additionalAxesHeight = 0;
             }
 
-            MarginTop = 32 + additionalAxesHeight;
+            var legendPosition = EffectiveLegendPosition;
+            var legendWidth = Legend.Visible && (legendPosition == LegendPosition.Right || legendPosition == LegendPosition.Left) ? legendSize + 16 : 0;
+            var legendHeight = Legend.Visible && (legendPosition == LegendPosition.Top || legendPosition == LegendPosition.Bottom) ? legendSize + 16 : 0;
 
-            if (IsRTL)
+            CategoryAxis.FitLabels(ValueScale, true, invertAxes && ShouldRenderAxes() ? ((Width ?? 0) - legendWidth - additionalAxesWidth) / 3 : 0);
+
+            var valueAxisSize = ShouldRenderAxes() ? ValueAxis.Measure(this) : 0;
+
+            var availableHeight = (Height ?? 0) - legendHeight - additionalAxesHeight;
+            var fitCategoryLabels = !invertAxes && ShouldRenderAxes() && CategoryAxis.CanFitLabels && availableHeight > 0;
+            var categoryAxisSize = ShouldRenderAxes() && !fitCategoryLabels ? CategoryAxis.Measure(this) : 0;
+
+            var valueAxisLoss = SetTopAndSideMargins(valueAxisSize, legendSize, additionalAxesWidth, additionalAxesHeight);
+
+            if (valueAxisLoss > 0 && invertAxes && CategoryAxis.LabelLayout != null)
             {
-                MarginRight = valueAxisSize;
-                MarginLeft = 32 + additionalAxesWidth;
-            }
-            else
-            {
-                MarginRight = 32 + additionalAxesWidth;
-                MarginLeft = valueAxisSize;
-            }
-
-            MarginBottom = Math.Max(32, categoryAxisSize);
-
-            if (Legend.Visible)
-            {
-                var legendPosition = EffectiveLegendPosition;
-
-                if (legendPosition == LegendPosition.Right || legendPosition == LegendPosition.Left)
-                {
-                    if (legendPosition == LegendPosition.Right)
-                    {
-                        MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
-                    }
-                    else
-                    {
-                        MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
-                    }
-                }
-                else if (legendPosition == LegendPosition.Top || legendPosition == LegendPosition.Bottom)
-                {
-                    if (legendPosition == LegendPosition.Top)
-                    {
-                        MarginTop = legendSize + 16 + additionalAxesHeight;
-                    }
-                    else
-                    {
-                        MarginBottom = legendSize + 16 + categoryAxisSize;
-                    }
-                }
-            }
-
-            if ((AllowZoom || AllowPan) && ShowScrollbar)
-            {
-                MarginBottom += 20;
-
-                scrollbarBottom = 0;
-                if (Legend.Visible && Legend.Position == LegendPosition.Bottom)
-                {
-                    scrollbarBottom = legendSize + 16;
-                }
+                CategoryAxis.FitLabels(ValueScale, true, CategoryAxis.LabelLayout.Band - valueAxisLoss);
+                valueAxisSize = ValueAxis.Measure(this);
+                SetTopAndSideMargins(valueAxisSize, legendSize, additionalAxesWidth, additionalAxesHeight);
             }
 
             var categoryStart = MarginLeft;
             var categoryEnd = Width != null ? Width.Value - MarginRight : 0;
-            var valueStart = Height != null ? Height.Value - MarginBottom : 0;
-            var valueEnd = MarginTop;
 
             var categoryReversed = CategoryAxis.Inverted != IsRTL;
             var valueReversed = ValueAxis.Inverted;
@@ -846,13 +808,7 @@ namespace Radzen.Blazor
                 Start = categoryReversed ? categoryEnd : categoryStart,
                 End = categoryReversed ? categoryStart : categoryEnd
             };
-            ValueScale.Output = new ScaleRange
-            {
-                Start = valueReversed ? valueEnd : valueStart,
-                End = valueReversed ? valueStart : valueEnd
-            };
 
-            ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
 
             // Apply zoom to category scale
@@ -879,6 +835,32 @@ namespace Radzen.Blazor
                 fullCategoryStart = CategoryScale.Input.Start;
                 fullCategoryEnd = CategoryScale.Input.End;
             }
+
+            if (fitCategoryLabels)
+            {
+                CategoryAxis.FitLabels(CategoryScale, false, availableHeight / 3, MarginLeft);
+                categoryAxisSize = CategoryAxis.Measure(this);
+            }
+
+            var categoryAxisLoss = SetBottomMargin(categoryAxisSize, legendSize);
+
+            if (categoryAxisLoss > 0 && fitCategoryLabels && CategoryAxis.LabelLayout != null)
+            {
+                CategoryAxis.FitLabels(CategoryScale, false, CategoryAxis.LabelLayout.Band - categoryAxisLoss, MarginLeft);
+                categoryAxisSize = CategoryAxis.Measure(this);
+                SetBottomMargin(categoryAxisSize, legendSize);
+            }
+
+            var valueStart = Height != null ? Height.Value - MarginBottom : 0;
+            var valueEnd = MarginTop;
+
+            ValueScale.Output = new ScaleRange
+            {
+                Start = valueReversed ? valueEnd : valueStart,
+                End = valueReversed ? valueStart : valueEnd
+            };
+
+            ValueScale.Fit(ValueAxis.TickDistance);
 
             // Set output ranges and fit additional scales
             foreach (var entry in AdditionalValueScales)
@@ -912,6 +894,106 @@ namespace Radzen.Blazor
             }
 
             return stateHasChanged;
+        }
+
+        private const double MinPlotSize = 80;
+
+        internal static (double Start, double End) ClampMargins(double start, double end, double size)
+        {
+            if (!(size > 0))
+            {
+                return (start, end);
+            }
+
+            var available = size - Math.Min(MinPlotSize, size / 2);
+
+            if (start + end <= available)
+            {
+                return (start, end);
+            }
+
+            if (start <= available / 2)
+            {
+                return (start, available - start);
+            }
+
+            if (end <= available / 2)
+            {
+                return (available - end, end);
+            }
+
+            return (available / 2, available / 2);
+        }
+
+        private double SetTopAndSideMargins(double valueAxisSize, double legendSize, double additionalAxesWidth, double additionalAxesHeight)
+        {
+            var legendPosition = EffectiveLegendPosition;
+
+            MarginTop = 32 + additionalAxesHeight;
+
+            if (IsRTL)
+            {
+                MarginRight = valueAxisSize;
+                MarginLeft = 32 + additionalAxesWidth;
+            }
+            else
+            {
+                MarginRight = 32 + additionalAxesWidth;
+                MarginLeft = valueAxisSize;
+            }
+
+            if (Legend.Visible)
+            {
+                if (legendPosition == LegendPosition.Right)
+                {
+                    MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
+                }
+                else if (legendPosition == LegendPosition.Left)
+                {
+                    MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
+                }
+                else if (legendPosition == LegendPosition.Top)
+                {
+                    MarginTop = legendSize + 16 + additionalAxesHeight;
+                }
+            }
+
+            var (left, right) = ClampMargins(MarginLeft, MarginRight, Width ?? 0);
+            var loss = IsRTL ? MarginRight - right : MarginLeft - left;
+
+            MarginLeft = left;
+            MarginRight = right;
+
+            return loss;
+        }
+
+        private double SetBottomMargin(double categoryAxisSize, double legendSize)
+        {
+            MarginBottom = Math.Max(32, categoryAxisSize);
+
+            if (Legend.Visible && EffectiveLegendPosition == LegendPosition.Bottom)
+            {
+                MarginBottom = legendSize + 16 + categoryAxisSize;
+            }
+
+            if ((AllowZoom || AllowPan) && ShowScrollbar)
+            {
+                MarginBottom += 20;
+
+                scrollbarBottom = 0;
+                if (Legend.Visible && Legend.Position == LegendPosition.Bottom)
+                {
+                    scrollbarBottom = legendSize + 16;
+                }
+            }
+
+            var (top, bottom) = ClampMargins(MarginTop, MarginBottom, Height ?? 0);
+            var loss = MarginBottom - bottom;
+
+            MarginTop = top;
+            MarginBottom = bottom;
+
+            return loss;
         }
 
         /// <summary>

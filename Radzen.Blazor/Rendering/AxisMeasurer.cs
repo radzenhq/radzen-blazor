@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace Radzen.Blazor.Rendering
 {
@@ -7,6 +10,12 @@ namespace Radzen.Blazor.Rendering
     /// </summary>
     public static class AxisMeasurer
     {
+        private const double LabelHeight = 16 * 0.875;
+        private const double XAxisLabelSize = LabelHeight + 12;
+        private const double LabelGap = 4;
+        private const double FittedLabelAngle = -45;
+        private const string Ellipsis = "\u2026";
+
         /// <summary>
         /// Calculates the length of the Y axis.
         /// </summary>
@@ -26,15 +35,11 @@ namespace Radzen.Blazor.Rendering
                 return axis.Width.Value;
             }
 
-            var ticks = scale.Ticks(axis.TickDistance);
-
             double length = 0;
 
-            if (HasValidTicks(scale, ticks))
+            if (HasValidTicks(scale, scale.Ticks(axis.TickDistance)))
             {
-                var isLog = scale.IsLogarithmic;
-
-                for (var y = ticks.Start; y <= ticks.End; y = isLog ? y * ticks.Step : y + ticks.Step)
+                foreach (var y in scale.TickValues(axis.TickDistance))
                 {
                     var text = axis.Format(scale, y);
 
@@ -42,14 +47,190 @@ namespace Radzen.Blazor.Rendering
                 }
             }
 
+            return Math.Max(24, length + YAxisPadding(axis, title));
+        }
+
+        private static double YAxisPadding(AxisBase axis, RadzenAxisTitle title)
+        {
+            var padding = 9 + axis.StrokeWidth;
+
             if (!String.IsNullOrEmpty(title.Text))
             {
-                length += title.Size + 32;
+                padding += title.Size + 32;
             }
 
-            length += 9 + axis.StrokeWidth;
+            return padding;
+        }
 
-            return Math.Max(24, length);
+        internal static CategoryAxisLabelLayout? VerticalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize)
+        {
+            if (!HasValidTicks(scale, scale.Ticks(axis.TickDistance)))
+            {
+                return null;
+            }
+
+            var labels = new List<(double Tick, string Text)>();
+
+            foreach (var tick in scale.TickValues(axis.TickDistance))
+            {
+                labels.Add((tick, axis.Format(scale, scale.Value(tick))));
+            }
+
+            var padding = YAxisPadding(axis, title);
+            double size;
+
+            if (axis.Width.HasValue)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(axis.Width.Value, 24);
+                size = axis.Width.Value;
+            }
+            else
+            {
+                var length = labels.Count > 0 ? labels.Max(label => TextMeasurer.TextWidth(label.Text)) : 0;
+                size = Math.Max(24, Math.Min(length + padding, maxSize));
+            }
+
+            var maxLength = size - padding;
+            var displayed = new Dictionary<double, (string Text, string Displayed)>();
+
+            foreach (var label in labels)
+            {
+                displayed[label.Tick] = (label.Text, Shorten(label.Text, maxLength));
+            }
+
+            return new CategoryAxisLabelLayout(displayed, null, size, size);
+        }
+
+        internal static CategoryAxisLabelLayout? HorizontalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize, double plotLeft)
+        {
+            if (!HasValidTicks(scale, scale.Ticks(axis.TickDistance)))
+            {
+                return null;
+            }
+
+            var labels = new List<(double Tick, double X, string Text)>();
+
+            foreach (var tick in scale.TickValues(axis.TickDistance))
+            {
+                labels.Add((tick, scale.Scale(tick, true), axis.Format(scale, scale.Value(tick))));
+            }
+
+            var titleSize = String.IsNullOrEmpty(title.Text) ? 0 : title.Size + 24;
+            var displayed = new Dictionary<double, (string Text, string Displayed)>();
+
+            if (HorizontalLabelsFit(labels))
+            {
+                foreach (var label in labels)
+                {
+                    displayed[label.Tick] = (label.Text, label.Text);
+                }
+
+                return new CategoryAxisLabelLayout(displayed, null, XAxisLabelSize + titleSize, XAxisLabelSize);
+            }
+
+            var alpha = Math.Abs(FittedLabelAngle) * Math.PI / 180;
+            var sin = Math.Sin(alpha);
+            var cos = Math.Cos(alpha);
+            var maxLength = Math.Max(0, (Math.Max(maxSize, XAxisLabelSize) - cos * XAxisLabelSize) / sin);
+            var minDistance = (LabelHeight + LabelGap) / sin;
+            var stride = RotatedLabelStride(labels, minDistance);
+            var last = labels.Count - 1;
+            var lastKept = last - last % stride;
+            var keepLast = lastKept != last && Math.Abs(labels[last].X - labels[lastKept].X) >= minDistance;
+            double length = 0;
+
+            for (var index = 0; index < labels.Count; index++)
+            {
+                var label = labels[index];
+
+                if (index % stride == 0 || (index == last && keepLast))
+                {
+                    var text = Shorten(label.Text, Math.Min(maxLength, Math.Max(0, plotLeft + label.X) / cos));
+                    displayed[label.Tick] = (label.Text, text);
+                    length = Math.Max(length, TextMeasurer.TextWidth(text));
+                }
+                else
+                {
+                    displayed[label.Tick] = (label.Text, String.Empty);
+                }
+            }
+
+            var size = Math.Max(XAxisLabelSize, sin * length + cos * XAxisLabelSize);
+
+            return new CategoryAxisLabelLayout(displayed, FittedLabelAngle, size + titleSize, size);
+        }
+
+        private static bool HorizontalLabelsFit(List<(double Tick, double X, string Text)> labels)
+        {
+            (double X, double Width)? previous = null;
+
+            foreach (var label in labels)
+            {
+                if (String.IsNullOrEmpty(label.Text))
+                {
+                    continue;
+                }
+
+                var width = TextMeasurer.TextWidth(label.Text);
+
+                if (previous != null && Math.Abs(label.X - previous.Value.X) < (width + previous.Value.Width) / 2 + LabelGap)
+                {
+                    return false;
+                }
+
+                previous = (label.X, width);
+            }
+
+            return true;
+        }
+
+        private static int RotatedLabelStride(List<(double Tick, double X, string Text)> labels, double minDistance)
+        {
+            for (var stride = 1; stride < labels.Count; stride++)
+            {
+                var fits = true;
+
+                for (var index = stride; index < labels.Count && fits; index += stride)
+                {
+                    fits = Math.Abs(labels[index].X - labels[index - stride].X) >= minDistance;
+                }
+
+                if (fits)
+                {
+                    return stride;
+                }
+            }
+
+            return Math.Max(1, labels.Count);
+        }
+
+        internal static string Shorten(string text, double maxWidth)
+        {
+            if (TextMeasurer.TextWidth(text) <= maxWidth)
+            {
+                return text;
+            }
+
+            var available = maxWidth - TextMeasurer.TextWidth(Ellipsis);
+            var elements = StringInfo.GetTextElementEnumerator(text);
+            var length = 0;
+            double width = 0;
+
+            while (elements.MoveNext())
+            {
+                var element = elements.GetTextElement();
+
+                width += TextMeasurer.TextWidth(element);
+
+                if (width > available)
+                {
+                    break;
+                }
+
+                length = elements.ElementIndex + element.Length;
+            }
+
+            return text.Substring(0, length).TrimEnd() + Ellipsis;
         }
 
         /// <summary>

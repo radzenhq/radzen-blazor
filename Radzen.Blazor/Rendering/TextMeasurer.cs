@@ -24,6 +24,8 @@ namespace Radzen.Blazor.Rendering
     /// </summary>
     static class TextMeasurer
     {
+        private const double WideCharacterWidth = 16;
+
         /// <summary>
         /// The fonts
         /// </summary>
@@ -317,19 +319,43 @@ namespace Radzen.Blazor.Rendering
             var multiplier = fontSize / 16;
             double result = 0;
 
-            foreach (var ch in text)
+            foreach (var rune in text.EnumerateRunes())
             {
                 var width = font.Average;
 
-                if (font.Chars != null)
+                if (rune.IsBmp && font.Chars != null && font.Chars.TryGetValue((char)rune.Value, out var charWidth))
                 {
-                    font.Chars.TryGetValue(ch, out width);
+                    width = charWidth;
+                }
+                else if (IsWide(rune.Value))
+                {
+                    width = WideCharacterWidth;
                 }
 
                 result += width;
             }
 
             return result * multiplier;
+        }
+
+        // Unicode Standard Annex #11 (East Asian Width): code point ranges whose East_Asian_Width is W (Wide) or F (Fullwidth).
+        private static bool IsWide(int codePoint)
+        {
+            return codePoint is (>= 0x1100 and <= 0x115F)
+                or (>= 0x2E80 and <= 0x303E)
+                or (>= 0x3041 and <= 0x33FF)
+                or (>= 0x3400 and <= 0x4DBF)
+                or (>= 0x4E00 and <= 0x9FFF)
+                or (>= 0xA000 and <= 0xA4CF)
+                or (>= 0xA960 and <= 0xA97F)
+                or (>= 0xAC00 and <= 0xD7A3)
+                or (>= 0xF900 and <= 0xFAFF)
+                or (>= 0xFE10 and <= 0xFE19)
+                or (>= 0xFE30 and <= 0xFE6F)
+                or (>= 0xFF01 and <= 0xFF60)
+                or (>= 0xFFE0 and <= 0xFFE6)
+                or (>= 0x20000 and <= 0x2FFFD)
+                or (>= 0x30000 and <= 0x3FFFD);
         }
     }
 }

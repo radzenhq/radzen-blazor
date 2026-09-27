@@ -149,13 +149,17 @@ namespace Radzen.Blazor
         public object? CrossesAt { get; set; }
 
         /// <summary>
-        /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
+        /// Specifies the label rotation angle in degrees. Applies to horizontal axes. Set to <c>null</c> by default which means no explicit rotation - the
+        /// <see cref="RadzenCategoryAxis.LabelFit" /> of a category axis may rotate its labels. Has higher precedence than <see cref="LabelAutoRotation"/>
+        /// and <see cref="RadzenCategoryAxis.LabelFit" />.
         /// </summary>
         [Parameter]
         public double? LabelRotation { get; set; } = null;
 
         /// <summary>
-        /// Specifies the automatic label rotation angle in degrees. If set RadzenChart will automatically rotate the labels to fit the available space by the specified value. Has lower precedence than <see cref="LabelRotation"/>.
+        /// Specifies the automatic label rotation angle in degrees. Applies to horizontal axes. If set RadzenChart will automatically rotate the labels to fit the available space by the specified value.
+        /// Set to <c>null</c> by default which means no explicit rotation - the <see cref="RadzenCategoryAxis.LabelFit" /> of a category axis may rotate its labels.
+        /// Has lower precedence than <see cref="LabelRotation"/> and higher precedence than <see cref="RadzenCategoryAxis.LabelFit" />.
         /// </summary>
         [Parameter]
         public double? LabelAutoRotation { get; set; } = null;

@@ -28,7 +28,7 @@
     {
         if (chart.ShouldInvertAxes())
         {
-            return AxisMeasurer.YAxis(chart.ValueScale, chart.CategoryAxis, chart.CategoryAxis.Title);
+            return chart.CategoryAxis.LabelLayout?.Size ?? AxisMeasurer.YAxis(chart.ValueScale, chart.CategoryAxis, chart.CategoryAxis.Title);
         }
         else if (Visible == false)
         {
