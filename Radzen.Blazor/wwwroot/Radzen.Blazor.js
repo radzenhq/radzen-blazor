@@ -631,10 +631,360 @@ window.Radzen = {
        el.addEventListener('keydown', preventDefault, false);
     }
   },
+  createTabsOverflow: function (tablist, instance, popupId, moreButtonId) {
+    if (!tablist || !instance) return { dispose: function () { } };
+
+    var vertical = tablist.getAttribute('aria-orientation') === 'vertical';
+    var moreButton = document.getElementById(moreButtonId);
+    var more = moreButton ? moreButton.parentElement : null;
+    var popup = document.getElementById(popupId);
+    var last = null;
+    var frame = null;
+
+    function outerSize(el) {
+      var rect = el.getBoundingClientRect();
+      var style = getComputedStyle(el);
+      return vertical
+        ? rect.height + (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0)
+        : rect.width + (parseFloat(style.marginLeft) || 0) + (parseFloat(style.marginRight) || 0);
+    }
+
+    function measure() {
+      frame = null;
+      if (!tablist.isConnected) return;
+
+      var style = getComputedStyle(tablist);
+      var gap = parseFloat(vertical ? style.rowGap : style.columnGap) || 0;
+      var available = vertical
+        ? tablist.clientHeight - (parseFloat(style.paddingTop) || 0) - (parseFloat(style.paddingBottom) || 0)
+        : tablist.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+      var moreSize = more ? outerSize(more) : 0;
+      if (more && !more.classList.contains('rz-tabview-collapsed')) {
+        available += moreSize;
+      }
+      var items = [];
+
+      for (var i = 0; i < tablist.children.length; i++) {
+        var li = tablist.children[i];
+        var tab = li.querySelector('[role="tab"]');
+        var match = tab && tab.id ? /-tabpanel-(\d+)-label$/.exec(tab.id) : null;
+        if (!match) continue;
+        items.push({ index: parseInt(match[1], 10), size: outerSize(li) + gap, order: parseFloat(getComputedStyle(li).order) || 0, position: i });
+      }
+
+      items.sort(function (a, b) { return a.order - b.order || a.position - b.position; });
+
+      var indexes = [];
+      var sizes = [];
+      for (var j = 0; j < items.length; j++) {
+        indexes.push(items[j].index);
+        sizes.push(Math.round(items[j].size * 100) / 100);
+      }
+
+      available = Math.round((available + gap) * 100) / 100;
+      moreSize = Math.round((moreSize + gap) * 100) / 100;
+
+      var key = available + '|' + moreSize + '|' + indexes.join(',') + '|' + sizes.join(',');
+      if (key === last) return;
+      last = key;
+
+      try { suppressDisposed(instance.invokeMethodAsync('OnTabsOverflow', available, moreSize, indexes, sizes)); } catch (e) { }
+    }
+
+    function schedule() {
+      if (frame === null) frame = requestAnimationFrame(measure);
+    }
+
+    var resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null;
+
+    function observe() {
+      if (!resizeObserver) return;
+      resizeObserver.disconnect();
+      resizeObserver.observe(tablist);
+      if (more) resizeObserver.observe(more);
+      for (var i = 0; i < tablist.children.length; i++) {
+        resizeObserver.observe(tablist.children[i]);
+      }
+    }
+
+    var mutationObserver = typeof MutationObserver !== 'undefined' ? new MutationObserver(function () { observe(); schedule(); }) : null;
+    if (mutationObserver) mutationObserver.observe(tablist, { childList: true });
+
+    function onPopupKeydown(e) {
+      if (e.key === 'Tab' || e.key === 'Escape' || e.key === 'Esc') {
+        Radzen.closePopup(popupId, instance, 'OnMorePopupClose', null, true);
+        if (moreButton) moreButton.focus();
+        if (e.key !== 'Tab') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      var items = Array.prototype.slice.call(popup.querySelectorAll('[role="menuitem"]:not([disabled])'));
+      if (!items.length) return;
+      var current = items.indexOf(document.activeElement);
+      var next = -1;
+
+      if (e.key === 'ArrowDown') {
+        next = current < items.length - 1 ? current + 1 : 0;
+      } else if (e.key === 'ArrowUp') {
+        next = current > 0 ? current - 1 : items.length - 1;
+      } else if (e.key === 'Home') {
+        next = 0;
+      } else if (e.key === 'End') {
+        next = items.length - 1;
+      }
+
+      if (next >= 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        items[next].focus();
+      }
+    }
+
+    function onMoreButtonKeydown(e) {
+      if (!popup || popup.style.display !== 'block') return;
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        e.preventDefault();
+        e.stopPropagation();
+        Radzen.closePopup(popupId, instance, 'OnMorePopupClose', null, true);
+      } else if (e.key === 'ArrowDown') {
+        var first = popup.querySelector('[role="menuitem"]:not([disabled])');
+        if (first) {
+          e.preventDefault();
+          e.stopPropagation();
+          first.focus();
+        }
+      }
+    }
+
+    function onPopupFocusIn(e) {
+      var item = e.target && e.target.closest ? e.target.closest('[role="menuitem"]') : null;
+      if (!item) return;
+      var items = popup.querySelectorAll('[role="menuitem"]');
+      for (var i = 0; i < items.length; i++) {
+        items[i].setAttribute('tabindex', items[i] === item ? '0' : '-1');
+      }
+    }
+
+    if (popup) {
+      popup.addEventListener('keydown', onPopupKeydown);
+      popup.addEventListener('focusin', onPopupFocusIn);
+    }
+    if (moreButton) moreButton.addEventListener('keydown', onMoreButtonKeydown);
+
+    observe();
+    window.addEventListener('resize', schedule);
+    schedule();
+
+    return {
+      dispose: function () {
+        if (frame !== null) {
+          cancelAnimationFrame(frame);
+          frame = null;
+        }
+        if (resizeObserver) resizeObserver.disconnect();
+        if (mutationObserver) mutationObserver.disconnect();
+        window.removeEventListener('resize', schedule);
+        if (popup) {
+          popup.removeEventListener('keydown', onPopupKeydown);
+          popup.removeEventListener('focusin', onPopupFocusIn);
+        }
+        if (moreButton) moreButton.removeEventListener('keydown', onMoreButtonKeydown);
+      }
+    };
+  },
+  createTabsScroll: function (tablist) {
+    if (!tablist) return { dispose: function () { } };
+
+    var vertical = tablist.getAttribute('aria-orientation') === 'vertical';
+    var root = tablist.parentElement;
+    var prev = root ? root.querySelector(':scope > .rz-tabview-scroll-prev') : null;
+    var next = root ? root.querySelector(':scope > .rz-tabview-scroll-next') : null;
+    var frame = null;
+    var revealFrame = null;
+    var lastActive = null;
+    var userScrolled = false;
+    var revealForce = false;
+
+    function isRTL() {
+      return !vertical && getComputedStyle(tablist).direction === 'rtl';
+    }
+
+    function tabs() {
+      return Array.prototype.filter.call(tablist.children, function (li) {
+        return li.querySelector('[role="tab"]') && getComputedStyle(li).display !== 'none';
+      });
+    }
+
+    function bounds() {
+      var rect = tablist.getBoundingClientRect();
+      return vertical ? { start: rect.top, end: rect.bottom } : { start: rect.left, end: rect.right };
+    }
+
+    function update() {
+      frame = null;
+      if (!tablist.isConnected) return;
+      var overflow = vertical ? tablist.scrollHeight - tablist.clientHeight : tablist.scrollWidth - tablist.clientWidth;
+      var scrollable = overflow > 1;
+      var pos = Math.abs(vertical ? tablist.scrollTop : tablist.scrollLeft);
+      var atStart = pos <= 1;
+      var atEnd = pos >= overflow - 1;
+      if (prev) {
+        prev.hidden = !scrollable;
+        prev.setAttribute('aria-disabled', atStart ? 'true' : 'false');
+      }
+      if (next) {
+        next.hidden = !scrollable;
+        next.setAttribute('aria-disabled', atEnd ? 'true' : 'false');
+      }
+    }
+
+    function schedule() {
+      if (frame === null) frame = requestAnimationFrame(update);
+    }
+
+    function reveal(li, behavior) {
+      if (!li) return;
+      var b = bounds();
+      var r = li.getBoundingClientRect();
+      var itemStart = vertical ? r.top : r.left;
+      var itemEnd = vertical ? r.bottom : r.right;
+      var delta = itemStart < b.start ? itemStart - b.start : itemEnd > b.end ? itemEnd - b.end : 0;
+      if (Math.abs(delta) < 1) return;
+      tablist.scrollBy(vertical ? { top: delta, behavior: behavior } : { left: delta, behavior: behavior });
+    }
+
+    function revealActive(behavior, force) {
+      revealFrame = null;
+      var li = tablist.querySelector('li.rz-state-focused') || tablist.querySelector('li.rz-tabview-selected');
+      if (li !== lastActive) {
+        lastActive = li;
+        userScrolled = false;
+      } else if (!force) {
+        return;
+      }
+      if (!userScrolled) reveal(li, behavior);
+    }
+
+    function scheduleReveal(force) {
+      revealForce = revealForce || !!force;
+      if (revealFrame === null) {
+        revealFrame = requestAnimationFrame(function () {
+          var f = revealForce;
+          revealForce = false;
+          revealActive(f ? 'auto' : 'smooth', f);
+        });
+      }
+    }
+
+    function onUserScroll() {
+      userScrolled = true;
+    }
+
+    function step(direction) {
+      var b = bounds();
+      var items = tabs();
+      var visual = !vertical && isRTL() ? items.slice().reverse() : items;
+      var target = null;
+      if (direction > 0) {
+        for (var i = 0; i < visual.length; i++) {
+          var r = visual[i].getBoundingClientRect();
+          if ((vertical ? r.bottom : r.right) > b.end + 1) { target = visual[i]; break; }
+        }
+      } else {
+        for (var j = visual.length - 1; j >= 0; j--) {
+          var q = visual[j].getBoundingClientRect();
+          if ((vertical ? q.top : q.left) < b.start - 1) { target = visual[j]; break; }
+        }
+      }
+      if (target) {
+        reveal(target, 'smooth');
+      }
+    }
+
+    function onPrevClick(e) { e.preventDefault(); userScrolled = true; step(isRTL() ? 1 : -1); }
+    function onNextClick(e) { e.preventDefault(); userScrolled = true; step(isRTL() ? -1 : 1); }
+    function onMousedown(e) { e.preventDefault(); }
+
+    if (prev) {
+      prev.addEventListener('click', onPrevClick);
+      prev.addEventListener('mousedown', onMousedown);
+    }
+    if (next) {
+      next.addEventListener('click', onNextClick);
+      next.addEventListener('mousedown', onMousedown);
+    }
+
+    function onResize() {
+      schedule();
+      scheduleReveal(true);
+    }
+
+    var resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(onResize) : null;
+
+    function observe() {
+      if (!resizeObserver) return;
+      resizeObserver.disconnect();
+      resizeObserver.observe(tablist);
+      for (var i = 0; i < tablist.children.length; i++) {
+        resizeObserver.observe(tablist.children[i]);
+      }
+    }
+
+    var mutationObserver = typeof MutationObserver !== 'undefined' ? new MutationObserver(function (records) {
+      var structural = false;
+      var tabChanged = false;
+      for (var i = 0; i < records.length; i++) {
+        if (records[i].target === tablist) {
+          if (records[i].type === 'childList') structural = true;
+          continue;
+        }
+        tabChanged = true;
+      }
+      if (structural) observe();
+      if (structural || tabChanged) schedule();
+      if (tabChanged) scheduleReveal(false);
+    }) : null;
+    if (mutationObserver) mutationObserver.observe(tablist, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+
+    tablist.addEventListener('scroll', schedule, { passive: true });
+    tablist.addEventListener('wheel', onUserScroll, { passive: true });
+    tablist.addEventListener('touchstart', onUserScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    observe();
+    update();
+    revealActive('auto', true);
+
+    return {
+      dispose: function () {
+        if (frame !== null) { cancelAnimationFrame(frame); frame = null; }
+        if (revealFrame !== null) { cancelAnimationFrame(revealFrame); revealFrame = null; }
+        if (resizeObserver) resizeObserver.disconnect();
+        if (mutationObserver) mutationObserver.disconnect();
+        tablist.removeEventListener('scroll', schedule);
+        tablist.removeEventListener('wheel', onUserScroll);
+        tablist.removeEventListener('touchstart', onUserScroll);
+        window.removeEventListener('resize', onResize);
+        if (prev) {
+          prev.removeEventListener('click', onPrevClick);
+          prev.removeEventListener('mousedown', onMousedown);
+        }
+        if (next) {
+          next.removeEventListener('click', onNextClick);
+          next.removeEventListener('mousedown', onMousedown);
+        }
+      }
+    };
+  },
   selectTab: function (id, index) {
     var el = document.getElementById(id);
     if (el && el.parentNode && el.parentNode.previousElementSibling) {
         var tablist = el.parentNode.previousElementSibling;
+        if (tablist.getAttribute('role') !== 'tablist' && el.parentNode.parentNode) {
+            tablist = el.parentNode.parentNode.querySelector('[role="tablist"]') || tablist;
+        }
         var count = el.parentNode.children.length;
         for (var i = 0; i < count; i++) {
             var content = el.parentNode.children[i];
@@ -7817,3 +8167,15 @@ Radzen.datePickerKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
+Radzen.tabsKeydown = function (e) {
+  var el = e.target;
+  if (!el || !el.classList || !el.classList.contains('rz-tabview-nav') || el.getAttribute('role') !== 'tablist') return;
+  var key = e.code ? e.code : e.key;
+  var vertical = el.getAttribute('aria-orientation') === 'vertical';
+  var previous = vertical ? 'ArrowUp' : 'ArrowLeft';
+  var next = vertical ? 'ArrowDown' : 'ArrowRight';
+  if (key === previous || key === next || key === 'Home' || key === 'End' || key === 'Space' || key === 'Enter') {
+    e.preventDefault();
+  }
+};
+document.addEventListener('keydown', Radzen.tabsKeydown);

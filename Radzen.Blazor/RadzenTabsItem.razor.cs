@@ -85,6 +85,7 @@ namespace Radzen.Blazor
                                  .AddDisabled(Disabled)
                                  .Add("rz-tabview-dragging", Tabs?.draggedTab == this)
                                  .Add("rz-tabview-drag-over", Tabs?.IsDragOver(this) == true)
+                                 .Add("rz-tabview-collapsed", Tabs?.IsCollapsed(this) == true)
                                  .Add(Attributes)
                                  .ToString();
 

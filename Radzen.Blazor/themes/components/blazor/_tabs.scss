@@ -27,6 +27,8 @@ $tabs-tab-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $tabs-icon-font-size: var(--rz-icon-size) !default;
 $tabs-icon-margin-inline: -0.25rem 0.25rem !default;
 $tabs-transition: var(--rz-transition-all) !default;
+$tabs-more-min-width: 10rem !default;
+$tabs-more-max-height: 20rem !default;
 
 .rz-tabview {
   box-sizing: border-box;
@@ -298,11 +300,272 @@ $tabs-transition: var(--rz-transition-all) !default;
   opacity: 0.5;
 }
 
-.rz-tabview-drag-over {
-  box-shadow: inset 2px 0 0 0 var(--rz-tabs-tab-selected-top-border-color);
+.rz-tabview-overflow-wrap > .rz-tabview-nav {
+  flex-wrap: wrap;
+}
 
-  .rz-tabview-left > .rz-tabview-nav &,
-  .rz-tabview-right > .rz-tabview-nav & {
-    box-shadow: inset 0 2px 0 0 var(--rz-tabs-tab-selected-top-border-color);
+.rz-tabview-overflow-scroll,
+.rz-tabview-overflow-collapse {
+  display: grid;
+
+  > .rz-tabview-nav li {
+    flex-shrink: 0;
+  }
+
+  &.rz-tabview-top,
+  &.rz-tabview-bottom {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+
+    > .rz-tabview-nav {
+      contain: inline-size;
+    }
+  }
+
+  &.rz-tabview-top {
+    grid-template-rows: auto minmax(0, 1fr);
+
+    > .rz-tabview-scroll-prev {
+      grid-area: 1 / 1;
+    }
+
+    > .rz-tabview-nav {
+      grid-area: 1 / 2;
+    }
+
+    > .rz-tabview-scroll-next,
+    > .rz-tabview-more {
+      grid-area: 1 / 3;
+    }
+
+    > .rz-tabview-panels {
+      grid-area: 2 / 1 / 3 / 4;
+    }
+  }
+
+  &.rz-tabview-bottom {
+    grid-template-rows: minmax(0, 1fr) auto;
+
+    > .rz-tabview-panels {
+      grid-area: 1 / 1 / 2 / 4;
+    }
+
+    > .rz-tabview-scroll-prev {
+      grid-area: 2 / 1;
+    }
+
+    > .rz-tabview-nav {
+      grid-area: 2 / 2;
+    }
+
+    > .rz-tabview-scroll-next,
+    > .rz-tabview-more {
+      grid-area: 2 / 3;
+    }
+  }
+
+  &.rz-tabview-left,
+  *[dir="rtl"] &.rz-tabview-right {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+
+    > .rz-tabview-scroll-prev {
+      grid-area: 1 / 1;
+    }
+
+    > .rz-tabview-nav {
+      grid-area: 2 / 1;
+    }
+
+    > .rz-tabview-scroll-next,
+    > .rz-tabview-more {
+      grid-area: 3 / 1;
+    }
+
+    > .rz-tabview-panels {
+      grid-area: 1 / 2 / 4 / 3;
+    }
+  }
+
+  &.rz-tabview-right,
+  *[dir="rtl"] &.rz-tabview-left {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+
+    > .rz-tabview-panels {
+      grid-area: 1 / 1 / 4 / 2;
+    }
+
+    > .rz-tabview-scroll-prev {
+      grid-area: 1 / 2;
+    }
+
+    > .rz-tabview-nav {
+      grid-area: 2 / 2;
+    }
+
+    > .rz-tabview-scroll-next,
+    > .rz-tabview-more {
+      grid-area: 3 / 2;
+    }
+  }
+}
+
+.rz-tabview-overflow-scroll {
+  > .rz-tabview-nav {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &.rz-tabview-top > .rz-tabview-nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 1px;
+    margin-bottom: -1px;
+  }
+
+  &.rz-tabview-bottom > .rz-tabview-nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-top: 1px;
+    margin-top: -1px;
+  }
+
+  &.rz-tabview-left > .rz-tabview-nav {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 1px;
+    margin-right: -1px;
+  }
+
+  &.rz-tabview-right > .rz-tabview-nav {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 1px;
+    margin-left: -1px;
+  }
+}
+
+.rz-tabview-overflow-collapse {
+  position: relative;
+
+  > .rz-tabview-nav .rz-tabview-collapsed,
+  > .rz-tabview-more.rz-tabview-collapsed {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  &.rz-tabview-top > .rz-tabview-nav,
+  &.rz-tabview-bottom > .rz-tabview-nav {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  &.rz-tabview-left > .rz-tabview-nav,
+  &.rz-tabview-right > .rz-tabview-nav {
+    overflow-x: visible;
+    overflow-y: clip;
+  }
+}
+
+.rz-tabview-more {
+  display: flex;
+}
+
+.rz-tabview-scroll,
+.rz-tabview-more-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: none;
+  background: none;
+  padding-block: var(--rz-tabs-tab-padding-block);
+  padding-inline: calc(var(--rz-tabs-tab-padding-inline) / 2);
+  color: var(--rz-tabs-tab-color);
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--rz-tabs-tab-hover-color);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--rz-tabs-tab-focus-outline);
+    outline-offset: var(--rz-tabs-tab-focus-outline-offset);
+  }
+
+  &[aria-disabled="true"] {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .rz-tabview-icon {
+    margin-inline: 0;
+  }
+}
+
+.rz-tabview-scroll[hidden] {
+  display: none;
+}
+
+*[dir="rtl"] .rz-tabview-scroll .rz-tabview-icon {
+  transform: scaleX(-1);
+}
+
+.rz-tabview-more-popup {
+  @extend %dropdown-panel;
+  display: none;
+  box-sizing: border-box;
+  min-width: var(--rz-tabs-more-min-width);
+  max-height: var(--rz-tabs-more-max-height);
+  padding: var(--rz-dropdown-panel-padding);
+  overflow-y: auto;
+}
+
+.rz-tabview-more-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--rz-dropdown-items-padding);
+}
+
+.rz-tabview-more-item {
+  @extend %rz-dropdown-item;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--rz-outline-focus);
+    outline-offset: calc(-1 * var(--rz-outline-width));
+  }
+
+  &.rz-state-disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .rz-tabview-icon {
+    margin-inline: 0 0.5rem;
   }
 }

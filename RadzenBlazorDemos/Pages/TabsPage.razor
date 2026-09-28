@@ -48,14 +48,16 @@
     <TabsModify />
 </RadzenExample>
 
-<RadzenText Anchor="tabs#tabs-wrap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Tab items wrap
+<RadzenText Anchor="tabs#tabs-overflow" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tabs overflow
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Demonstrating wrap of the Tab items
+    Use the <code>Overflow</code> property to control what happens when the tabs do not fit in the available space.
+    <code>TabsOverflow.Default</code> shrinks the tabs to their minimum size and lets the tab list overflow, <code>TabsOverflow.Wrap</code> wraps them to additional lines, <code>TabsOverflow.Scroll</code> scrolls the tab list
+    and <code>TabsOverflow.Collapse</code> moves the tabs that do not fit into a dropdown menu opened from a button at the end of the tab list. The selected tab always stays visible.
 </RadzenText>
-<RadzenExample ComponentName="Tabs" Example="TabsWrap">
-    <TabsWrap />
+<RadzenExample ComponentName="Tabs" Example="TabsOverflowModes">
+    <TabsOverflowModes />
 </RadzenExample>
 
 <RadzenText Anchor="tabs#prevent-tab-change" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">

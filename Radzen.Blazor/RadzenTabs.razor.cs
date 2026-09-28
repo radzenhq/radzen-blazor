@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,6 +152,42 @@ namespace Radzen.Blazor
         /// <value>The id of the labelling element. Default is <c>null</c>.</value>
         [Parameter]
         public string? AriaLabelledBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets how tab titles that do not fit in the available space are laid out.
+        /// <see cref="TabsOverflow.Default"/> shrinks the titles to their minimum size and lets the tab list overflow, <see cref="TabsOverflow.Wrap"/> wraps them to additional lines, <see cref="TabsOverflow.Scroll"/> scrolls the tab list
+        /// and <see cref="TabsOverflow.Collapse"/> moves the titles that do not fit into a dropdown menu opened from a button at the end of the tab list. The selected tab always stays visible.
+        /// </summary>
+        /// <value>The overflow mode. Default is <see cref="TabsOverflow.Default"/>.</value>
+        [Parameter]
+        public TabsOverflow Overflow { get; set; } = TabsOverflow.Default;
+
+        string? moreAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible name of the button that opens the menu with the collapsed tabs when <see cref="Overflow"/> is <see cref="TabsOverflow.Collapse"/>.
+        /// </summary>
+        /// <value>The accessible name of the button. Default is the localized "More tabs".</value>
+        [Parameter]
+        public string MoreAriaLabel { get => moreAriaLabel ?? Localize(nameof(RadzenStrings.Tabs_MoreAriaLabel)); set => moreAriaLabel = value; }
+
+        string? scrollBackwardAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible name of the button that scrolls the tab list towards its start when <see cref="Overflow"/> is <see cref="TabsOverflow.Scroll"/>.
+        /// </summary>
+        /// <value>The accessible name of the button. Default is the localized "Scroll tabs backward".</value>
+        [Parameter]
+        public string ScrollBackwardAriaLabel { get => scrollBackwardAriaLabel ?? Localize(nameof(RadzenStrings.Tabs_ScrollBackwardAriaLabel)); set => scrollBackwardAriaLabel = value; }
+
+        string? scrollForwardAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible name of the button that scrolls the tab list towards its end when <see cref="Overflow"/> is <see cref="TabsOverflow.Scroll"/>.
+        /// </summary>
+        /// <value>The accessible name of the button. Default is the localized "Scroll tabs forward".</value>
+        [Parameter]
+        public string ScrollForwardAriaLabel { get => scrollForwardAriaLabel ?? Localize(nameof(RadzenStrings.Tabs_ScrollForwardAriaLabel)); set => scrollForwardAriaLabel = value; }
 
         internal ElementReference tablistElement;
 
@@ -336,7 +373,15 @@ namespace Radzen.Blazor
                 positionCSS = "rz-tabview-bottom rz-tabview-bottom-right";
             }
 
-            return $"rz-tabview {positionCSS}";
+            var overflowCSS = Overflow switch
+            {
+                TabsOverflow.Wrap => " rz-tabview-overflow-wrap",
+                TabsOverflow.Scroll => " rz-tabview-overflow-scroll",
+                TabsOverflow.Collapse => " rz-tabview-overflow-collapse",
+                _ => ""
+            };
+
+            return $"rz-tabview {positionCSS}{overflowCSS}";
         }
 
         /// <inheritdoc />
@@ -377,9 +422,18 @@ namespace Radzen.Blazor
                 selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
             }
 
+            overflowChanged |= parameters.DidParameterChange(nameof(Overflow), Overflow);
+            positionChanged |= parameters.DidParameterChange(nameof(TabPosition), TabPosition);
+            visibleChanged |= parameters.DidParameterChange(nameof(Visible), Visible);
+
             SetFocusedIndex();
 
             await base.SetParametersAsync(parameters);
+
+            if (overflowChanged || positionChanged || (visibleChanged && !Visible))
+            {
+                DisposeOverflow();
+            }
         }
 
 
@@ -397,6 +451,52 @@ namespace Radzen.Blazor
                 catch (JSDisconnectedException)
                 {
                 }
+            }
+
+            if ((Overflow == TabsOverflow.Collapse || Overflow == TabsOverflow.Scroll) && Visible && JSRuntime != null && (firstRender || overflowChanged || positionChanged || visibleChanged))
+            {
+                overflowChanged = false;
+                positionChanged = false;
+                visibleChanged = false;
+
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                try
+                {
+                    if (jsRef != null)
+                    {
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
+                    }
+
+                    if (version == _jsRefVersion)
+                    {
+                        var created = Overflow == TabsOverflow.Collapse
+                            ? await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createTabsOverflow", tablistElement, Reference, MorePopupId, MoreButtonId)
+                            : await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createTabsScroll", tablistElement);
+
+                        if (version == _jsRefVersion)
+                        {
+                            _jsRef = created;
+                        }
+                        else if (created != null)
+                        {
+                            await created.InvokeVoidAsync("dispose");
+                            await created.DisposeAsync();
+                        }
+                    }
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+            }
+            else
+            {
+                overflowChanged = false;
+                positionChanged = false;
+                visibleChanged = false;
             }
 
             await base.OnAfterRenderAsync(firstRender);
@@ -466,6 +566,266 @@ namespace Radzen.Blazor
                 {
                 }
             }
+        }
+
+        internal ElementReference moreButtonElement;
+
+        IJSObjectReference? _jsRef;
+        int _jsRefVersion;
+        bool overflowChanged;
+        bool positionChanged;
+        bool visibleChanged;
+        bool moreOpen;
+
+        double overflowAvailable;
+        double overflowMoreSize;
+        int[] overflowIndexes = Array.Empty<int>();
+        double[] overflowSizes = Array.Empty<double>();
+        readonly HashSet<int> collapsedTabs = new HashSet<int>();
+
+        string MorePopupId => $"popup{GetId()}-more";
+
+        string MoreButtonId => $"{GetId()}-more";
+
+        string MoreMenuId => $"{GetId()}-more-menu";
+
+        string MoreItemId(RadzenTabsItem tab) => $"{GetId()}-more-item-{IndexOf(tab)}";
+
+        string MoreClass => ClassList.Create("rz-tabview-more")
+                                     .Add("rz-tabview-collapsed", collapsedTabs.Count == 0)
+                                     .ToString();
+
+        string MoreItemClass(RadzenTabsItem tab) => ClassList.Create("rz-tabview-more-item")
+                                                             .AddDisabled(tab.Disabled)
+                                                             .ToString();
+
+        internal bool IsCollapsed(RadzenTabsItem tab)
+        {
+            return Overflow == TabsOverflow.Collapse && collapsedTabs.Contains(IndexOf(tab));
+        }
+
+        internal int? GetAriaSetSize()
+        {
+            return Overflow == TabsOverflow.Collapse ? tabs.Count(t => t.Visible) : null;
+        }
+
+        internal int? GetAriaPosInSet(RadzenTabsItem tab)
+        {
+            if (Overflow != TabsOverflow.Collapse)
+            {
+                return null;
+            }
+
+            var position = 0;
+
+            foreach (var item in tabs)
+            {
+                if (item.Visible)
+                {
+                    position++;
+                }
+
+                if (item == tab)
+                {
+                    return item.Visible ? position : null;
+                }
+            }
+
+            return null;
+        }
+
+        IEnumerable<RadzenTabsItem> CollapsedTabs()
+        {
+            foreach (var index in overflowIndexes)
+            {
+                if (collapsedTabs.Contains(index) && index < tabs.Count)
+                {
+                    yield return tabs[index];
+                }
+            }
+        }
+
+        void UpdateCollapsedTabs()
+        {
+            collapsedTabs.Clear();
+
+            if (Overflow != TabsOverflow.Collapse || overflowIndexes.Length == 0)
+            {
+                return;
+            }
+
+            var items = new List<(int Index, double Size)>();
+            var total = 0d;
+
+            for (var i = 0; i < overflowIndexes.Length && i < overflowSizes.Length; i++)
+            {
+                var index = overflowIndexes[i];
+
+                if (index >= 0 && index < tabs.Count && tabs[index].Visible)
+                {
+                    items.Add((index, overflowSizes[i]));
+                    total += overflowSizes[i];
+                }
+            }
+
+            if (total <= overflowAvailable + 1)
+            {
+                return;
+            }
+
+            var focused = NavigableTabs().ElementAtOrDefault(focusedIndex);
+            var focusedTabIndex = focused != null ? IndexOf(focused) : -1;
+
+            bool IsPinned(int index) => index == selectedIndex || index == focusedTabIndex;
+
+            var used = items.Where(item => IsPinned(item.Index)).Sum(item => item.Size);
+            var budget = overflowAvailable - overflowMoreSize + 1;
+            var fits = true;
+
+            foreach (var (index, size) in items)
+            {
+                if (IsPinned(index))
+                {
+                    continue;
+                }
+
+                if (fits && used + size <= budget)
+                {
+                    used += size;
+                }
+                else
+                {
+                    fits = false;
+                    collapsedTabs.Add(index);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Invoked from JavaScript with the size of the tab list and of every tab when <see cref="Overflow"/> is <see cref="TabsOverflow.Collapse"/>.
+        /// </summary>
+        /// <param name="available">The size of the tab list along its main axis.</param>
+        /// <param name="moreSize">The size of the button that opens the menu with the collapsed tabs.</param>
+        /// <param name="indexes">The indexes of the tabs in visual order.</param>
+        /// <param name="sizes">The size of every tab in the order of <paramref name="indexes"/>.</param>
+        [JSInvokable("OnTabsOverflow")]
+        public async Task OnTabsOverflow(double available, double moreSize, int[] indexes, double[] sizes)
+        {
+            overflowAvailable = available;
+            overflowMoreSize = moreSize;
+            overflowIndexes = indexes ?? Array.Empty<int>();
+            overflowSizes = sizes ?? Array.Empty<double>();
+
+            UpdateCollapsedTabs();
+
+            if (moreOpen && collapsedTabs.Count == 0)
+            {
+                await CloseMore(restoreFocus: true);
+            }
+
+            StateHasChanged();
+        }
+
+        /// <summary>
+        /// Invoked from JavaScript when the menu with the collapsed tabs is closed client-side, e.g. by clicking outside of it.
+        /// </summary>
+        [JSInvokable("OnMorePopupClose")]
+        public void OnMorePopupClose()
+        {
+            moreOpen = false;
+            StateHasChanged();
+        }
+
+        async Task ToggleMore()
+        {
+            if (moreOpen)
+            {
+                await CloseMore();
+                return;
+            }
+
+            moreOpen = true;
+
+            if (JSRuntime != null)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.openPopup", moreButtonElement, MorePopupId, false, null, null, null, Reference, nameof(OnMorePopupClose));
+
+                    var first = CollapsedTabs().FirstOrDefault(tab => !tab.Disabled);
+
+                    if (first != null)
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.focusElement", MoreItemId(first));
+                    }
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+            }
+        }
+
+        async Task CloseMore(bool restoreFocus = false)
+        {
+            moreOpen = false;
+
+            if (JSRuntime != null)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", MorePopupId, null, null, null, !restoreFocus);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+            }
+        }
+
+        async Task SelectCollapsedTab(RadzenTabsItem tab)
+        {
+            if (tab.Disabled)
+            {
+                return;
+            }
+
+            await CloseMore();
+
+            await tab.OnClick();
+        }
+
+        void DisposeOverflow()
+        {
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+
+            overflowIndexes = Array.Empty<int>();
+            overflowSizes = Array.Empty<double>();
+            collapsedTabs.Clear();
+
+            if (jsRef == null)
+            {
+                return;
+            }
+
+            jsRef.InvokeVoid("dispose");
+            jsRef.DisposeFireAndForget();
+
+            if (moreOpen)
+            {
+                moreOpen = false;
+                JSRuntime?.InvokeVoid("Radzen.closePopup", MorePopupId);
+            }
+
+            JSRuntime?.InvokeVoid("Radzen.destroyPopup", MorePopupId);
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            DisposeOverflow();
         }
 
         internal RadzenTabsItem? FirstVisibleTab()

@@ -11,6 +11,8 @@
        aria-selected="@(IsSelected ? "true" : "false")"
        aria-controls="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}")"
        aria-disabled="@(Disabled ? "true" : "false")"
+       aria-setsize="@Tabs?.GetAriaSetSize()"
+       aria-posinset="@Tabs?.GetAriaPosInSet(this)"
        tabindex="-1"
        @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
