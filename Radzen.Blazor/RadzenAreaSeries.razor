@@ -97,7 +97,7 @@
             var fillStyle = animate ? $"d: path(\"{area}\");{style}" : style;
             <path @key="@fillKey" class="@($"{fillClass} {(animate ? "rz-path-transition" : null)}".Trim())" style="@fillStyle" d="@area" fill="@fill" stroke="none"></path>
         }
-        <Path @key="@lineKey" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" Transition="@animate" />
+        <Path @key="@lineKey" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" FlatEnds="true" Style="@style" Fill="none" Transition="@animate" />
       }
       <Markers Visible="@Markers.Visible" Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;

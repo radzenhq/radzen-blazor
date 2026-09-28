@@ -111,8 +111,8 @@
                     var fill = FillMode == FillMode.Gradient ? $"url(#{gradientId})" : Fill;
                     <path @key="@area" style="@style" d="@area" fill="@fill" stroke="none"></path>
                 }
-                <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
-                <Path @key="@lowerLine" D="@lowerLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+                <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" FlatEnds="true" Style="@style" Fill="none" />
+                <Path @key="@lowerLine" D="@lowerLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" FlatEnds="true" Style="@style" Fill="none" />
             }
         </g>;
     }
