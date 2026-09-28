@@ -70,6 +70,12 @@
     [Parameter]
     public string Class { get; set;} = string.Empty;
 
+    /// <summary>
+    /// Gets or sets whether a solid line ends flat at its first and last points instead of extending past them with round caps.
+    /// </summary>
+    [Parameter]
+    public bool FlatEnds { get; set; }
+
     private string? StrokeLineCap
     {
         get
@@ -77,8 +83,9 @@
             switch (LineType)
             {
                 case LineType.Dotted:
-                case LineType.Solid:
                 return "round";
+                case LineType.Solid:
+                return FlatEnds ? "butt" : "round";
                 default:
                 return null;
             }
