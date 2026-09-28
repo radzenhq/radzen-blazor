@@ -410,7 +410,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Extends the specified value scale to zero when this series or another series on the same scale requires it: when the
         /// <see cref="RadzenValueAxis.Range" /> of the value axis is <see cref="ValueAxisRange.IncludeZero" />, or when it is <see cref="ValueAxisRange.Auto" />
-        /// and a series is zero based. Call it after merging the values of this series into the scale. A scale whose values are all equal is not extended
+        /// and a series is zero based outside a <see cref="RadzenSparkline" />. Call it after merging the values of this series into the scale. A scale whose values are all equal is not extended
         /// because its ticks already extend from zero. Logarithmic scales and scales without data are left unchanged.
         /// </summary>
         /// <param name="scale">The value scale.</param>
@@ -421,7 +421,7 @@ namespace Radzen.Blazor
 
             var range = Chart?.GetValueAxis(ValueAxisName).Range ?? ValueAxisRange.Auto;
 
-            if (range == ValueAxisRange.IncludeZero || (range == ValueAxisRange.Auto && zeroBased))
+            if (range == ValueAxisRange.IncludeZero || (range == ValueAxisRange.Auto && zeroBased && Chart?.IncludesZeroForBaselineSeries != false))
             {
                 scale.IncludeZero = true;
             }

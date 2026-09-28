@@ -563,6 +563,8 @@ namespace Radzen.Blazor
             return false;
         }
 
+        internal virtual bool IncludesZeroForBaselineSeries => true;
+
         internal bool ShouldInvertAxes()
         {
             return Series.Count > 0 && Series.All(series => series is IChartBarSeries);

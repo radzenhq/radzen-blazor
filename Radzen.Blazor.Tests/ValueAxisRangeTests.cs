@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
             return string.Join("|", chart.FindAll($"{axis} .rz-tick-text").Select(t => t.TextContent.Trim()));
         }
 
-        private static List<(double X, double Y)> Points(IRenderedComponent<RadzenChart> chart, string series, int index)
+        private static List<(double X, double Y)> Points(IRenderedFragment chart, string series, int index)
         {
             var d = chart.FindAll($"{series} path")[index].GetAttribute("d") ?? string.Empty;
 
@@ -642,5 +642,70 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(labels, Labels(chart, LeftValueAxis));
         }
-    }
+    
+        private static IRenderedComponent<RadzenSparkline> RenderSparkline(TestContext ctx, string type, ValueAxisRange? range)
+        {
+            var data = Values(100, 120, 110, 115);
+
+            return ctx.RenderComponent<RadzenSparkline>(p =>
+            {
+                p.Add(x => x.Style, "width: 200px; height: 40px");
+
+                if (type == "area")
+                {
+                    p.AddChildContent<RadzenAreaSeries<DataItem>>(s => s
+                        .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                        .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                        .Add(x => x.Data, data));
+                }
+                else
+                {
+                    p.AddChildContent<RadzenColumnSeries<DataItem>>(s => s
+                        .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                        .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                        .Add(x => x.Data, data));
+                }
+
+                if (range != null)
+                {
+                    p.AddChildContent<RadzenValueAxis>(a => a.Add(x => x.Visible, false).Add(x => x.Range, range.Value));
+                }
+            });
+        }
+
+        [Theory]
+        [InlineData("area", null)]
+        [InlineData("area", ValueAxisRange.Auto)]
+        [InlineData("column", null)]
+        [InlineData("column", ValueAxisRange.Data)]
+        public void Sparkline_FitsItsDataUnlessItsValueAxisIncludesZero(string type, ValueAxisRange? range)
+        {
+            using var ctx = CreateChartContext();
+
+            var sparkline = RenderSparkline(ctx, type, range);
+
+            var input = sparkline.Instance.ValueScale.Input;
+            Assert.True(input.Start >= 90 && input.Start <= 100, $"value axis {input.Start}..{input.End}");
+            Assert.True(input.End >= 120 && input.End <= 130, $"value axis {input.Start}..{input.End}");
+
+            if (type == "area")
+            {
+                var line = Points(sparkline, "g.rz-area-series", 1);
+                var output = sparkline.Instance.ValueScale.Output;
+                Assert.True(line.Max(p => p.Y) - line.Min(p => p.Y) >= Math.Abs(output.Start - output.End) / 2, $"line {line.Min(p => p.Y)}..{line.Max(p => p.Y)} in {output.End}..{output.Start}");
+            }
+        }
+
+        [Theory]
+        [InlineData("area")]
+        [InlineData("column")]
+        public void Sparkline_IncludesZeroWhenItsValueAxisAsksForIt(string type)
+        {
+            using var ctx = CreateChartContext();
+
+            var sparkline = RenderSparkline(ctx, type, ValueAxisRange.IncludeZero);
+
+            Assert.Equal(0, sparkline.Instance.ValueScale.Input.Start);
+        }
+}
 }

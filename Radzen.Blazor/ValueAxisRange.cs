@@ -7,7 +7,8 @@ namespace Radzen.Blazor
     {
         /// <summary>
         /// The axis includes zero when it displays a series filled from a baseline - column, bar, area, their stacked and full-stacked variants,
-        /// and waterfall - and otherwise fits the plotted values. This is the default.
+        /// and waterfall - and otherwise fits the plotted values. A <see cref="RadzenSparkline" /> fits the plotted values as with <see cref="Data" />.
+        /// This is the default.
         /// </summary>
         Auto,
         /// <summary>

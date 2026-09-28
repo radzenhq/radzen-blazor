@@ -19,6 +19,8 @@ namespace Radzen.Blazor
             TooltipTolerance = 5;
         }
 
+        internal override bool IncludesZeroForBaselineSeries => false;
+
         /// <summary>
         /// Updates the scales based on the configuration.
         /// </summary>
