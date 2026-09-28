@@ -120,13 +120,13 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Ticks_WithMin_KeepTheExactStart()
+        public void Ticks_WithMin_KeepTheExactStartAndRoundTheEnd()
         {
             var scale = Scale(214000, 394000, 250);
 
             scale.Resize(100000, null);
 
-            Assert.Equal((100000, 394000, 98000), scale.Ticks(TickDistance));
+            Assert.Equal((100000, 400000, 100000), scale.Ticks(TickDistance));
         }
 
         [Fact]

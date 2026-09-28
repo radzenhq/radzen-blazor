@@ -90,14 +90,16 @@ namespace Radzen.Blazor
         public int? Width { get; set; }
 
         /// <summary>
-        /// Specifies the minimum value of the axis.
+        /// Specifies the minimum value of the axis. The axis starts exactly at this value. Unless <see cref="Max" /> or <see cref="Step" /> is also set
+        /// the other end of the axis is still rounded to a tick and the ticks are placed on multiples of the step.
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]
         public object? Min { get; set; }
 
         /// <summary>
-        /// Specifies the maximum value of the axis.
+        /// Specifies the maximum value of the axis. The axis ends exactly at this value. Unless <see cref="Min" /> or <see cref="Step" /> is also set
+        /// the other end of the axis is still rounded to a tick and the ticks are placed on multiples of the step.
         /// </summary>
         /// <value>The maximum.</value>
         [Parameter]

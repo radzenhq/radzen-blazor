@@ -58,6 +58,30 @@ namespace Radzen.Blazor
             return result;
         }
 
+        private bool ticksFollowStep;
+
+        public override IEnumerable<double> TickValues(int distance)
+        {
+            var (start, end, step) = Ticks(distance);
+
+            if (!ticksFollowStep || step <= 0 || !double.IsFinite(step) || !double.IsFinite(start) || !double.IsFinite(end))
+            {
+                return base.TickValues(distance);
+            }
+
+            return MultiplesOfStep(start, end, step);
+        }
+
+        private static IEnumerable<double> MultiplesOfStep(double start, double end, double step)
+        {
+            var first = (decimal)(Math.Ceiling(Math.Round(start / step, 9)) * step);
+
+            for (var value = first; value <= (decimal)end; value += (decimal)step)
+            {
+                yield return (double)value;
+            }
+        }
+
         protected virtual double CalculateTickCount(int distance)
         {
             return  Math.Max(1, Math.Ceiling(Math.Abs(Output.End - Output.Start) / distance));
@@ -106,9 +130,18 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (Round)
+            if (RoundStart != RoundEnd)
+            {
+                ticksFollowStep = true;
+            }
+
+            if (RoundStart)
             {
                 start = Math.Floor(start / step) * step;
+            }
+
+            if (RoundEnd)
+            {
                 end = Math.Ceiling(end / step) * step;
             }
 
