@@ -146,9 +146,9 @@ namespace Radzen.Blazor.Tests
         [InlineData("negative", ValueAxisRange.Auto, "-20|-15|-10|-5|0", 0, 118)]
         [InlineData("negative", ValueAxisRange.Data, "-20|-15|-10", -236, 0)]
         [InlineData("negative", ValueAxisRange.IncludeZero, "-20|-15|-10|-5|0", 0, 118)]
-        [InlineData("mixed", ValueAxisRange.Auto, "-20|0|20", 118, 177)]
-        [InlineData("mixed", ValueAxisRange.Data, "-20|0|20", 118, 177)]
-        [InlineData("mixed", ValueAxisRange.IncludeZero, "-20|0|20", 118, 177)]
+        [InlineData("mixed", ValueAxisRange.Auto, "-10|0|10|20", 157.333, 236)]
+        [InlineData("mixed", ValueAxisRange.Data, "-10|0|10|20", 157.333, 236)]
+        [InlineData("mixed", ValueAxisRange.IncludeZero, "-10|0|10|20", 157.333, 236)]
         public async Task Column_RangeDeterminesTheAxisAndTheColumnExtent(string sign, ValueAxisRange range, string labels, double top, double bottom)
         {
             using var ctx = CreateChartContext();
@@ -168,9 +168,9 @@ namespace Radzen.Blazor.Tests
         [InlineData("negative", ValueAxisRange.Auto, "-20|-15|-10|-5|0", 144.75, 289.5)]
         [InlineData("negative", ValueAxisRange.Data, "-20|-15|-10", 289.5, 579)]
         [InlineData("negative", ValueAxisRange.IncludeZero, "-20|-15|-10|-5|0", 144.75, 289.5)]
-        [InlineData("mixed", ValueAxisRange.Auto, "-20|0|20", 72.375, 144.75)]
-        [InlineData("mixed", ValueAxisRange.Data, "-20|0|20", 72.375, 144.75)]
-        [InlineData("mixed", ValueAxisRange.IncludeZero, "-20|0|20", 72.375, 144.75)]
+        [InlineData("mixed", ValueAxisRange.Auto, "-10|0|10|20", 0, 96.5)]
+        [InlineData("mixed", ValueAxisRange.Data, "-10|0|10|20", 0, 96.5)]
+        [InlineData("mixed", ValueAxisRange.IncludeZero, "-10|0|10|20", 0, 96.5)]
         public async Task Bar_RangeDeterminesTheAxisAndTheBarExtent(string sign, ValueAxisRange range, string labels, double left, double right)
         {
             using var ctx = CreateChartContext();
@@ -190,9 +190,9 @@ namespace Radzen.Blazor.Tests
         [InlineData("negative", ValueAxisRange.Auto, "-20|-15|-10", 0)]
         [InlineData("negative", ValueAxisRange.Data, "-20|-15|-10", 0)]
         [InlineData("negative", ValueAxisRange.IncludeZero, "-20|-15|-10|-5|0", 118)]
-        [InlineData("mixed", ValueAxisRange.Auto, "-20|0|20", 177)]
-        [InlineData("mixed", ValueAxisRange.Data, "-20|0|20", 177)]
-        [InlineData("mixed", ValueAxisRange.IncludeZero, "-20|0|20", 177)]
+        [InlineData("mixed", ValueAxisRange.Auto, "-10|0|10|20", 236)]
+        [InlineData("mixed", ValueAxisRange.Data, "-10|0|10|20", 236)]
+        [InlineData("mixed", ValueAxisRange.IncludeZero, "-10|0|10|20", 236)]
         public async Task Line_RangeDeterminesTheAxisAndThePointPosition(string sign, ValueAxisRange range, string labels, double firstPointY)
         {
             using var ctx = CreateChartContext();
@@ -298,9 +298,9 @@ namespace Radzen.Blazor.Tests
         [InlineData("negative", ValueAxisRange.Auto, "-20|-15|-10|-5|0", 0, 118)]
         [InlineData("negative", ValueAxisRange.Data, "-20|-15|-10", -236, 0)]
         [InlineData("negative", ValueAxisRange.IncludeZero, "-20|-15|-10|-5|0", 0, 118)]
-        [InlineData("mixed", ValueAxisRange.Auto, "-20|0|20", 118, 177)]
-        [InlineData("mixed", ValueAxisRange.Data, "-20|0|20", 118, 177)]
-        [InlineData("mixed", ValueAxisRange.IncludeZero, "-20|0|20", 118, 177)]
+        [InlineData("mixed", ValueAxisRange.Auto, "-10|0|10|20", 157.333, 236)]
+        [InlineData("mixed", ValueAxisRange.Data, "-10|0|10|20", 157.333, 236)]
+        [InlineData("mixed", ValueAxisRange.IncludeZero, "-10|0|10|20", 157.333, 236)]
         public async Task Area_RangeDeterminesTheAxisAndTheFill(string sign, ValueAxisRange range, string labels, double baselineY, double firstPointY)
         {
             using var ctx = CreateChartContext();
@@ -407,9 +407,9 @@ namespace Radzen.Blazor.Tests
         }
 
         [Theory]
-        [InlineData(ValueAxisRange.Auto, "0|20|40", 177, 236)]
+        [InlineData(ValueAxisRange.Auto, "0|10|20|30", 157.333, 236)]
         [InlineData(ValueAxisRange.Data, "10|15|20|25", 236, 236)]
-        [InlineData(ValueAxisRange.IncludeZero, "0|20|40", 177, 236)]
+        [InlineData(ValueAxisRange.IncludeZero, "0|10|20|30", 157.333, 236)]
         public async Task ColumnAndLineOnOneAxis_FollowTheColumn(ValueAxisRange range, string labels, double top, double bottom)
         {
             using var ctx = CreateChartContext();
@@ -432,14 +432,14 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenColumnSeries<DataItem>>(Column(Values(10, 10, 10)))
                 .AddChildContent<RadzenLineSeries<DataItem>>(Line(Values(15, 25, 20))));
 
-            Assert.Equal("0|20|40", Labels(chart, LeftValueAxis));
-            Assert.Equal((177d, 236d), ColumnExtent(chart, 0));
+            Assert.Equal("0|10|20|30", Labels(chart, LeftValueAxis));
+            Assert.Equal((157.333, 236d), ColumnExtent(chart, 0));
         }
 
         [Theory]
         [InlineData(ValueAxisRange.Auto, "20|25|30|35|40")]
         [InlineData(ValueAxisRange.Data, "20|25|30|35|40")]
-        [InlineData(ValueAxisRange.IncludeZero, "0|20|40")]
+        [InlineData(ValueAxisRange.IncludeZero, "0|10|20|30|40")]
         public async Task ColumnOnPrimaryAxisAndLineOnNamedAxis_EachAxisDecides(ValueAxisRange namedRange, string namedLabels)
         {
             using var ctx = CreateChartContext();
@@ -571,8 +571,8 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenColumnSeries<DataItem>>(Column(Values(10, 200, 450)))
                 .AddChildContent<RadzenValueAxis>(Axis(ValueAxisRange.Data)));
 
-            Assert.Equal("0|200|400|600", Labels(chart, LeftValueAxis));
-            Assert.Equal((232.067, 236d), ColumnExtent(chart, 0));
+            Assert.Equal("0|100|200|300|400|500", Labels(chart, LeftValueAxis));
+            Assert.Equal((231.28, 236d), ColumnExtent(chart, 0));
         }
 
         [Fact]

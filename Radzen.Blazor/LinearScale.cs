@@ -96,11 +96,6 @@ namespace Radzen.Blazor
 
             var range = end - start;
 
-            if (Round)
-            {
-                range = NiceNumber(end - start, false);
-            }
-
             var step = Round ? NiceNumber(range / ticks, true) : Math.Ceiling(range / ticks);
 
             if (Step != null)
