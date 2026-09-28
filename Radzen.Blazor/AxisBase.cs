@@ -161,7 +161,8 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Specifies the automatic label rotation angle in degrees. Applies to horizontal axes. When set the labels are rotated by this angle only when they
-        /// do not fit the available space. Has lower precedence than <see cref="LabelRotation"/>. On a category axis whose <see cref="RadzenCategoryAxis.LabelFit" />
+        /// do not fit the available space - on a category axis whose <see cref="RadzenCategoryAxis.LabelFit" /> is <see cref="CategoryAxisLabelFit.Auto" />,
+        /// only when they still do not fit after labels are skipped. Has lower precedence than <see cref="LabelRotation"/>. On a category axis whose <see cref="RadzenCategoryAxis.LabelFit" />
         /// is <see cref="CategoryAxisLabelFit.Auto" /> it replaces the default angle of -45 degrees - rotated labels that would overlap are still skipped and
         /// labels longer than the available space are still shortened with an ellipsis. Set to <c>null</c> by default which means no explicit rotation.
         /// </summary>

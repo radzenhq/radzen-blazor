@@ -207,7 +207,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = Render(ctx, "width: 400px; height: 300px", NoLegend, Series("column", LongCategories(6)));
+            var data = Categories(Enumerable.Range(1, 6).Select(i => $"Regional-distribution-warehouse-number-{i:00}").ToArray());
+
+            var chart = Render(ctx, "width: 400px; height: 300px", NoLegend, Series("column", data));
 
             var size = chart.Instance.CategoryAxis.Size;
             Assert.InRange(size, 90, 100);
@@ -456,7 +458,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void AreaDemoMonthsWithLabelAutoRotationAreSkippedAtPhoneWidth()
+        public void AreaDemoMonthsWithLabelAutoRotationAreSkippedAndStayFlatAtPhoneWidth()
         {
             using var ctx = CreateChartContext();
             var months = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
@@ -467,10 +469,83 @@ namespace Radzen.Blazor.Tests
                 Axis(a => a.Add(x => x.LabelAutoRotation, -45).Add(x => x.LabelFit, CategoryAxisLabelFit.None)));
 
             var shown = ShownIndices(auto, data);
-            Assert.Equal(0, shown[0]);
             Assert.InRange(shown.Count, 2, 11);
-            Assert.All(RenderedLabels(auto), label => Assert.StartsWith("rotate(-45,", label.Transform, StringComparison.Ordinal));
+            Assert.Equal(Enumerable.Range(0, 12).Where(i => i % shown[1] == 0), shown);
+            Assert.All(RenderedLabels(auto), label => Assert.Null(label.Transform));
             Assert.Equal(months, Labels(none, BottomAxis));
+        }
+
+        [Theory]
+        [InlineData(324, new[] { 0, 3, 6, 9 })]
+        [InlineData(850, new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 })]
+        public async Task AreaDemoMonthsSkipBeforeRotating(double width, int[] expected)
+        {
+            using var ctx = CreateChartContext();
+            var months = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
+            var data = months.Select((month, index) => new DataItem { Category = month, Value = 234000 + index * 10000 }).ToArray();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenAreaSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Title, "2023")
+                    .Add(x => x.Data, data))
+                .AddChildContent<RadzenAreaSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value2))
+                    .Add(x => x.Title, "2024")
+                    .Add(x => x.Data, data))
+                .AddChildContent<RadzenValueAxis>(a => a
+                    .Add(x => x.Formatter, value => ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US")))
+                    .AddChildContent<RadzenAxisTitle>(t => t.Add(x => x.Text, "Revenue in USD"))));
+            await chart.InvokeAsync(() => chart.Instance.Resize(width, 300));
+
+            Assert.Equal(expected, ShownIndices(chart, data));
+            Assert.All(RenderedLabels(chart), label => Assert.Null(label.Transform));
+        }
+
+        [Theory]
+        [InlineData(390, new[] { 0, 2, 4, 6, 8, 10 })]
+        [InlineData(900, new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 })]
+        public void LongLabelsThatDoNotFitFlatAfterSkippingRotate(double width, int[] expected)
+        {
+            using var ctx = CreateChartContext();
+            var data = LongCategories(12);
+
+            var chart = Render(ctx, FormattableString.Invariant($"width: {width}px; height: 360px"), Series("column", data));
+
+            Assert.Equal(expected, ShownIndices(chart, data));
+            Assert.All(RenderedLabels(chart), label => Assert.StartsWith("rotate(-45,", label.Transform, StringComparison.Ordinal));
+        }
+
+        [Theory]
+        [InlineData("Regional distribution warehouse number 01", "Regional distrib", "Regional\u2026")]
+        [InlineData("Regional distribution warehouse number 01", "Regional distribution", "Regional distribution\u2026")]
+        [InlineData("Regional distribution warehouse number 01", "Regional distribution w", "Regional distribution\u2026")]
+        [InlineData("Supercalifragilisticexpialidocious", "Supercalifrag", "Supercalifrag\u2026")]
+        [InlineData("\u4E0A\u6D77\u6D66\u4E1C\u65B0\u533A\u5F20\u6C5F", "\u4E0A\u6D77\u6D66\u4E1C", "\u4E0A\u6D77\u6D66\u4E1C\u2026")]
+        [InlineData("Short", "Short", "Short")]
+        public void ShortenCutsAfterTheLastWholeWordThatFits(string text, string fitting, string expected)
+        {
+            Assert.Equal(expected, AxisMeasurer.Shorten(text, TextMeasurer.TextWidth(fitting == text ? text : fitting + Ellipsis)));
+        }
+
+        [Fact]
+        public void ShortenedBarLabelsEndWithAWholeWord()
+        {
+            using var ctx = CreateChartContext();
+            var data = LongCategories(12);
+
+            var chart = Render(ctx, "width: 390px; height: 360px", Series("bar", data));
+
+            var labels = Labels(chart, LeftAxis);
+            Assert.All(labels, label =>
+            {
+                Assert.EndsWith(Ellipsis, label, StringComparison.Ordinal);
+                var kept = label[..^1];
+                var full = data.Select(d => d.Category).First(category => category.StartsWith(kept, StringComparison.Ordinal));
+                Assert.True(full.Length > kept.Length && char.IsWhiteSpace(full[kept.Length]), $"{label} cuts {full} mid-word");
+            });
         }
 
         [Fact]

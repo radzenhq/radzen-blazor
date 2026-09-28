@@ -118,16 +118,6 @@ namespace Radzen.Blazor.Rendering
             var titleSize = String.IsNullOrEmpty(title.Text) ? 0 : title.Size + 24;
             var displayed = new Dictionary<double, (string Text, string Displayed)>();
 
-            if (axis.LabelRotation == null && HorizontalLabelsFit(labels))
-            {
-                foreach (var label in labels)
-                {
-                    displayed[label.Tick] = (label.Text, label.Text);
-                }
-
-                return new CategoryAxisLabelLayout(displayed, null, XAxisLabelSize + titleSize, XAxisLabelSize);
-            }
-
             var angle = axis.LabelRotation ?? axis.LabelAutoRotation ?? FittedLabelAngle;
             var alpha = angle * Math.PI / 180;
             var sin = Math.Abs(Math.Sin(alpha));
@@ -141,6 +131,34 @@ namespace Radzen.Blazor.Rendering
             if (cos < 1e-9)
             {
                 cos = 0;
+            }
+
+            if (axis.LabelRotation == null)
+            {
+                var flatStride = 1;
+                var keepFlatLast = false;
+
+                if (!HorizontalLabelsFit(labels) && sin > 0)
+                {
+                    bool RotatedSpacing(int first, int second) => Math.Abs(labels[second].X - labels[first].X) * sin >= LabelHeight + LabelGap;
+
+                    flatStride = RotatedLabelStride(labels.Count, RotatedSpacing);
+                    var flatLast = labels.Count - 1;
+                    var flatLastKept = flatLast - flatLast % flatStride;
+                    keepFlatLast = flatLastKept != flatLast && RotatedSpacing(flatLastKept, flatLast);
+                }
+
+                bool Kept(int index) => index % flatStride == 0 || (keepFlatLast && index == labels.Count - 1);
+
+                if (HorizontalLabelsFit(labels.Where((label, index) => Kept(index)).ToList()))
+                {
+                    for (var index = 0; index < labels.Count; index++)
+                    {
+                        displayed[labels[index].Tick] = (labels[index].Text, Kept(index) ? labels[index].Text : String.Empty);
+                    }
+
+                    return new CategoryAxisLabelLayout(displayed, null, XAxisLabelSize + titleSize, XAxisLabelSize);
+                }
             }
 
             var maxLength = sin > 0 ? Math.Max(0, (Math.Max(maxSize, XAxisLabelSize) - cos * XAxisLabelSize) / sin) : double.PositiveInfinity;
@@ -264,6 +282,21 @@ namespace Radzen.Blazor.Rendering
                 }
 
                 length = elements.ElementIndex + element.Length;
+            }
+
+            if (length > 0 && length < text.Length && !Char.IsWhiteSpace(text[length]))
+            {
+                var wordEnd = length;
+
+                while (wordEnd > 0 && !Char.IsWhiteSpace(text[wordEnd - 1]))
+                {
+                    wordEnd--;
+                }
+
+                if (text.Substring(0, wordEnd).Trim().Length > 0)
+                {
+                    length = wordEnd;
+                }
             }
 
             return text.Substring(0, length).TrimEnd() + Ellipsis;
