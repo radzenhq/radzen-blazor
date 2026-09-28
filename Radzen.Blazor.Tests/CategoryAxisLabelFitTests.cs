@@ -340,35 +340,137 @@ namespace Radzen.Blazor.Tests
             }
         }
 
+        private static List<(string Text, string Transform, string Anchor)> RenderedLabels(IRenderedComponent<RadzenChart> chart)
+        {
+            return chart.FindAll($"{BottomAxis} .rz-tick-text").Select(t => (t.TextContent, t.GetAttribute("transform"), t.GetAttribute("text-anchor"))).ToList();
+        }
+
         [Fact]
-        public void LabelRotationTakesPrecedenceOverAuto()
+        public void LabelRotationSetsTheAngleWhileAutoStillSkipsAndShortens()
         {
             using var ctx = CreateChartContext();
             var data = LongCategories(12);
 
             var chart = Render(ctx, "width: 390px; height: 300px", Series("column", data), Axis(a => a.Add(x => x.LabelRotation, 30)));
 
-            var texts = chart.FindAll($"{BottomAxis} .rz-tick-text");
-            Assert.Equal(data.Select(d => d.Category), texts.Select(t => t.TextContent));
-            Assert.All(texts, text => Assert.StartsWith("rotate(30,", text.GetAttribute("transform"), StringComparison.Ordinal));
+            var labels = RenderedLabels(chart);
+            Assert.InRange(labels.Count, 1, 11);
+            Assert.All(labels, label =>
+            {
+                Assert.StartsWith("rotate(30,", label.Transform, StringComparison.Ordinal);
+                Assert.Equal("start", label.Anchor);
+                Assert.EndsWith(Ellipsis, label.Text, StringComparison.Ordinal);
+            });
+            Assert.Equal(labels.Count, Titles(chart, BottomAxis).Count);
+        }
+
+        [Fact]
+        public void LabelRotationRotatesLabelsThatFit()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = Render(ctx, "width: 390px; height: 300px", Series("column", Categories("North", "South", "East", "West")),
+                Axis(a => a.Add(x => x.LabelRotation, -30)));
+
+            var labels = RenderedLabels(chart);
+            Assert.Equal(new[] { "North", "South", "East", "West" }, labels.Select(label => label.Text));
+            Assert.All(labels, label => Assert.StartsWith("rotate(-30,", label.Transform, StringComparison.Ordinal));
             Assert.Empty(Titles(chart, BottomAxis));
         }
 
         [Fact]
-        public void LabelAutoRotationMatchesTheOutputUnderNone()
+        public void PositiveLabelRotationKeepsLabelsInsideTheRightEdgeOfTheChart()
         {
             using var ctx = CreateChartContext();
             var data = LongCategories(12);
 
+            var chart = Render(ctx, "width: 390px; height: 360px", NoLegend, Series("column", data), Axis(a => a.Add(x => x.LabelRotation, 45)));
+
+            var left = Origin(chart).Left;
+            var texts = chart.FindAll($"{BottomAxis} .rz-tick-text");
+            Assert.NotEmpty(texts);
+            Assert.All(texts, text =>
+            {
+                var x = double.Parse(text.GetAttribute("x"), CultureInfo.InvariantCulture);
+                Assert.True(left + x + TextMeasurer.TextWidth(text.TextContent) * Math.Cos(Math.PI / 4) <= 390 + 1e-9, $"{text.TextContent} at {left + x}");
+            });
+        }
+
+        [Fact]
+        public void ZeroLabelRotationSkipsOverlappingHorizontalLabels()
+        {
+            using var ctx = CreateChartContext();
+            var data = Categories(Enumerable.Range(1, 30).Select(i => $"Category {i:00}").ToArray());
+
+            var chart = Render(ctx, "width: 390px; height: 300px", Series("column", data), Axis(a => a.Add(x => x.LabelRotation, 0)));
+
+            var labels = RenderedLabels(chart);
+            Assert.InRange(labels.Count, 2, 29);
+            Assert.All(labels, label =>
+            {
+                Assert.StartsWith("rotate(0,", label.Transform, StringComparison.Ordinal);
+                Assert.Equal("middle", label.Anchor);
+            });
+            var positions = chart.FindAll($"{BottomAxis} .rz-tick-text").Select(t => double.Parse(t.GetAttribute("x"), CultureInfo.InvariantCulture)).ToList();
+            for (var index = 1; index < positions.Count; index++)
+            {
+                Assert.True(positions[index] - positions[index - 1] >= TextMeasurer.TextWidth(labels[index].Text), $"{labels[index - 1].Text} and {labels[index].Text}");
+            }
+        }
+
+        [Fact]
+        public void LabelAutoRotationSetsTheAngleWhileAutoStillSkips()
+        {
+            using var ctx = CreateChartContext();
+            var data = LongCategories(24);
+
             var auto = Render(ctx, "width: 390px; height: 300px", Series("column", data),
-                Axis(a => a.Add(x => x.LabelAutoRotation, -45)));
+                Axis(a => a.Add(x => x.LabelAutoRotation, -60)));
             var none = Render(ctx, "width: 390px; height: 300px", Series("column", data),
+                Axis(a => a.Add(x => x.LabelAutoRotation, -60).Add(x => x.LabelFit, CategoryAxisLabelFit.None)));
+
+            var fitted = RenderedLabels(auto);
+            Assert.InRange(fitted.Count, 1, 23);
+            Assert.All(fitted, label => Assert.StartsWith("rotate(-60,", label.Transform, StringComparison.Ordinal));
+            Assert.Equal(fitted.Count(label => label.Text.EndsWith(Ellipsis, StringComparison.Ordinal)), Titles(auto, BottomAxis).Count);
+
+            var full = RenderedLabels(none);
+            Assert.Equal(data.Select(d => d.Category), full.Select(label => label.Text));
+            Assert.All(full, label => Assert.StartsWith("rotate(-60,", label.Transform, StringComparison.Ordinal));
+            Assert.Empty(Titles(none, BottomAxis));
+        }
+
+        [Fact]
+        public void LabelAutoRotationLeavesLabelsThatFitUnrotated()
+        {
+            using var ctx = CreateChartContext();
+            var data = Categories("North", "South", "East", "West");
+
+            var rotation = Render(ctx, "width: 390px; height: 300px", Series("column", data), Axis(a => a.Add(x => x.LabelAutoRotation, -45)));
+            var plain = Render(ctx, "width: 390px; height: 300px", Series("column", data));
+
+            Assert.Equal(plain.Find(BottomAxis).OuterHtml, rotation.Find(BottomAxis).OuterHtml);
+            Assert.Equal(Origin(plain), Origin(rotation));
+            Assert.Equal(new[] { "North", "South", "East", "West" }, Labels(rotation, BottomAxis));
+            Assert.All(RenderedLabels(rotation), label => Assert.Null(label.Transform));
+        }
+
+        [Fact]
+        public void AreaDemoMonthsWithLabelAutoRotationAreSkippedAtPhoneWidth()
+        {
+            using var ctx = CreateChartContext();
+            var months = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
+            var data = Categories(months);
+
+            var auto = Render(ctx, "width: 324px; height: 300px", Series("column", data), Axis(a => a.Add(x => x.LabelAutoRotation, -45)));
+            var none = Render(ctx, "width: 324px; height: 300px", Series("column", data),
                 Axis(a => a.Add(x => x.LabelAutoRotation, -45).Add(x => x.LabelFit, CategoryAxisLabelFit.None)));
 
-            Assert.Equal(none.Find(BottomAxis).OuterHtml, auto.Find(BottomAxis).OuterHtml);
-            Assert.Equal(none.Find(LeftAxis).OuterHtml, auto.Find(LeftAxis).OuterHtml);
-            Assert.Equal(Origin(none), Origin(auto));
-            Assert.Equal(12, Labels(auto, BottomAxis).Count);
+            var shown = ShownIndices(auto, data);
+            Assert.Equal(0, shown[0]);
+            Assert.InRange(shown.Count, 2, 11);
+            Assert.All(RenderedLabels(auto), label => Assert.StartsWith("rotate(-45,", label.Transform, StringComparison.Ordinal));
+            Assert.Equal(months, Labels(none, BottomAxis));
         }
 
         [Fact]

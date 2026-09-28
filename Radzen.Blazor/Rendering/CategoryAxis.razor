@@ -109,6 +109,11 @@
         labelLayout = Chart.ShouldInvertAxes() ? null : Chart.CategoryAxis.LabelLayout;
         rotate = labelLayout?.Rotate;
 
+        if (labelLayout != null)
+        {
+            return;
+        }
+
         if (XAxis?.LabelRotation != null)
         {
             rotate = XAxis.LabelRotation;

@@ -102,7 +102,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = Render(ctx, 390, 360, "column", VeryLongCategories(12), a => a.Add(x => x.LabelRotation, -45));
+            var chart = Render(ctx, 390, 360, "column", VeryLongCategories(12), a => a.Add(x => x.LabelRotation, -45).Add(x => x.LabelFit, CategoryAxisLabelFit.None));
 
             AssertPlotIsAtLeastTheMinimum(chart, 390, 360);
         }
@@ -142,7 +142,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = Render(ctx, 390, 200, "column", VeryLongCategories(12), a => a.Add(x => x.LabelAutoRotation, -45),
+            var chart = Render(ctx, 390, 200, "column", VeryLongCategories(12), a => a.Add(x => x.LabelAutoRotation, -45).Add(x => x.LabelFit, CategoryAxisLabelFit.None),
                 l => l.Add(x => x.Position, position));
 
             AssertPlotIsAtLeastTheMinimum(chart, 390, 200);

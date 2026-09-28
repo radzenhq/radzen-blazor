@@ -838,7 +838,7 @@ namespace Radzen.Blazor
 
             if (fitCategoryLabels)
             {
-                CategoryAxis.FitLabels(CategoryScale, false, availableHeight / 3, MarginLeft);
+                CategoryAxis.FitLabels(CategoryScale, false, availableHeight / 3, MarginLeft, Width ?? 0);
                 categoryAxisSize = CategoryAxis.Measure(this);
             }
 
@@ -846,7 +846,7 @@ namespace Radzen.Blazor
 
             if (categoryAxisLoss > 0 && fitCategoryLabels && CategoryAxis.LabelLayout != null)
             {
-                CategoryAxis.FitLabels(CategoryScale, false, CategoryAxis.LabelLayout.Band - categoryAxisLoss, MarginLeft);
+                CategoryAxis.FitLabels(CategoryScale, false, CategoryAxis.LabelLayout.Band - categoryAxisLoss, MarginLeft, Width ?? 0);
                 categoryAxisSize = CategoryAxis.Measure(this);
                 SetBottomMargin(categoryAxisSize, legendSize);
             }

@@ -101,7 +101,7 @@ namespace Radzen.Blazor.Rendering
             return new CategoryAxisLabelLayout(displayed, null, size, size);
         }
 
-        internal static CategoryAxisLabelLayout? HorizontalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize, double plotLeft)
+        internal static CategoryAxisLabelLayout? HorizontalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize, double plotLeft, double width = 0)
         {
             if (!HasValidTicks(scale, scale.Ticks(axis.TickDistance)))
             {
@@ -118,7 +118,7 @@ namespace Radzen.Blazor.Rendering
             var titleSize = String.IsNullOrEmpty(title.Text) ? 0 : title.Size + 24;
             var displayed = new Dictionary<double, (string Text, string Displayed)>();
 
-            if (HorizontalLabelsFit(labels))
+            if (axis.LabelRotation == null && HorizontalLabelsFit(labels))
             {
                 foreach (var label in labels)
                 {
@@ -128,15 +128,52 @@ namespace Radzen.Blazor.Rendering
                 return new CategoryAxisLabelLayout(displayed, null, XAxisLabelSize + titleSize, XAxisLabelSize);
             }
 
-            var alpha = Math.Abs(FittedLabelAngle) * Math.PI / 180;
-            var sin = Math.Sin(alpha);
-            var cos = Math.Cos(alpha);
-            var maxLength = Math.Max(0, (Math.Max(maxSize, XAxisLabelSize) - cos * XAxisLabelSize) / sin);
-            var minDistance = (LabelHeight + LabelGap) / sin;
-            var stride = RotatedLabelStride(labels, minDistance);
+            var angle = axis.LabelRotation ?? axis.LabelAutoRotation ?? FittedLabelAngle;
+            var alpha = angle * Math.PI / 180;
+            var sin = Math.Abs(Math.Sin(alpha));
+            var cos = Math.Abs(Math.Cos(alpha));
+
+            if (sin < 1e-9)
+            {
+                sin = 0;
+            }
+
+            if (cos < 1e-9)
+            {
+                cos = 0;
+            }
+
+            var maxLength = sin > 0 ? Math.Max(0, (Math.Max(maxSize, XAxisLabelSize) - cos * XAxisLabelSize) / sin) : double.PositiveInfinity;
+            var extendsLeft = angle < 0 ? Math.Cos(alpha) > 0 : Math.Cos(alpha) < 0;
+            var texts = new string[labels.Count];
+            var lengths = new double[labels.Count];
+
+            for (var index = 0; index < labels.Count; index++)
+            {
+                var label = labels[index];
+                var room = extendsLeft ? plotLeft + label.X : width > 0 ? width - plotLeft - label.X : double.PositiveInfinity;
+                var cap = sin > 0 && cos > 0 ? Math.Min(maxLength, Math.Max(0, room) / cos) : maxLength;
+
+                texts[index] = double.IsPositiveInfinity(cap) ? label.Text : Shorten(label.Text, cap);
+                lengths[index] = TextMeasurer.TextWidth(texts[index]);
+            }
+
+            bool Separated(int first, int second)
+            {
+                var distance = Math.Abs(labels[second].X - labels[first].X);
+
+                if (sin == 0)
+                {
+                    return distance >= (lengths[first] + lengths[second]) / 2 + LabelGap;
+                }
+
+                return distance * sin >= LabelHeight + LabelGap || distance * cos >= Math.Max(lengths[first], lengths[second]) + LabelGap;
+            }
+
+            var stride = RotatedLabelStride(labels.Count, Separated);
             var last = labels.Count - 1;
             var lastKept = last - last % stride;
-            var keepLast = lastKept != last && Math.Abs(labels[last].X - labels[lastKept].X) >= minDistance;
+            var keepLast = lastKept != last && Separated(lastKept, last);
             double length = 0;
 
             for (var index = 0; index < labels.Count; index++)
@@ -145,9 +182,8 @@ namespace Radzen.Blazor.Rendering
 
                 if (index % stride == 0 || (index == last && keepLast))
                 {
-                    var text = Shorten(label.Text, Math.Min(maxLength, Math.Max(0, plotLeft + label.X) / cos));
-                    displayed[label.Tick] = (label.Text, text);
-                    length = Math.Max(length, TextMeasurer.TextWidth(text));
+                    displayed[label.Tick] = (label.Text, texts[index]);
+                    length = Math.Max(length, lengths[index]);
                 }
                 else
                 {
@@ -157,7 +193,7 @@ namespace Radzen.Blazor.Rendering
 
             var size = Math.Max(XAxisLabelSize, sin * length + cos * XAxisLabelSize);
 
-            return new CategoryAxisLabelLayout(displayed, FittedLabelAngle, size + titleSize, size);
+            return new CategoryAxisLabelLayout(displayed, angle, size + titleSize, size);
         }
 
         private static bool HorizontalLabelsFit(List<(double Tick, double X, string Text)> labels)
@@ -184,15 +220,15 @@ namespace Radzen.Blazor.Rendering
             return true;
         }
 
-        private static int RotatedLabelStride(List<(double Tick, double X, string Text)> labels, double minDistance)
+        private static int RotatedLabelStride(int count, Func<int, int, bool> separated)
         {
-            for (var stride = 1; stride < labels.Count; stride++)
+            for (var stride = 1; stride < count; stride++)
             {
                 var fits = true;
 
-                for (var index = stride; index < labels.Count && fits; index += stride)
+                for (var index = stride; index < count && fits; index += stride)
                 {
-                    fits = Math.Abs(labels[index].X - labels[index - stride].X) >= minDistance;
+                    fits = separated(index - stride, index);
                 }
 
                 if (fits)
@@ -201,7 +237,7 @@ namespace Radzen.Blazor.Rendering
                 }
             }
 
-            return Math.Max(1, labels.Count);
+            return Math.Max(1, count);
         }
 
         internal static string Shorten(string text, double maxWidth)
