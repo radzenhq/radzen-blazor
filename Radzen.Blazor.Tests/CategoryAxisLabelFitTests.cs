@@ -530,6 +530,32 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(expected, AxisMeasurer.Shorten(text, TextMeasurer.TextWidth(fitting == text ? text : fitting + Ellipsis)));
         }
 
+        [Theory]
+        [InlineData("Cambodia, Laos and Vietnam", "Cambodia, La", "Cambodia\u2026")]
+        [InlineData("Research - development and testing", "Research - develo", "Research\u2026")]
+        [InlineData("North; South and East", "North; Sou", "North\u2026")]
+        [InlineData("Sales (EU) and exports", "Sales (EU) an", "Sales (EU)\u2026")]
+        [InlineData("Revenue \"net\" of taxes", "Revenue \"net\" o", "Revenue \"net\"\u2026")]
+        [InlineData("Growth 5% in the first quarter", "Growth 5% i", "Growth 5%\u2026")]
+        [InlineData("Sales & marketing", "Sales & mar", "Sales\u2026")]
+        [InlineData(", , , , , ,", ", , ,", ", , ,\u2026")]
+        public void ShortenDropsTrailingPunctuationBeforeTheEllipsis(string text, string fitting, string expected)
+        {
+            Assert.Equal(expected, AxisMeasurer.Shorten(text, TextMeasurer.TextWidth(fitting + Ellipsis)));
+        }
+
+        [Fact]
+        public void ShortenedBarLabelDoesNotEndWithACommaBeforeTheEllipsis()
+        {
+            using var ctx = CreateChartContext();
+            var category = "Cambodia, Myanmar-Thailand border region";
+
+            var chart = Render(ctx, "width: 390px; height: 300px", NoLegend, Series("bar", Categories("North", category, "South")));
+
+            Assert.Equal(new[] { "South", "Cambodia\u2026", "North" }, Labels(chart, LeftAxis));
+            Assert.Equal(new[] { category }, Titles(chart, LeftAxis));
+        }
+
         [Fact]
         public void ShortenedBarLabelsEndWithAWholeWord()
         {

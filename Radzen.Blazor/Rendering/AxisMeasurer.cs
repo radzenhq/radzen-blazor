@@ -311,7 +311,25 @@ namespace Radzen.Blazor.Rendering
                 }
             }
 
-            return text.Substring(0, length).TrimEnd() + Ellipsis;
+            return TrimBeforeEllipsis(text.Substring(0, length)) + Ellipsis;
+        }
+
+        private static string TrimBeforeEllipsis(string text)
+        {
+            var end = text.Length;
+
+            while (end > 0 && (Char.IsWhiteSpace(text[end - 1]) || IsTrailingPunctuation(text[end - 1])))
+            {
+                end--;
+            }
+
+            return end > 0 ? text.Substring(0, end) : text.TrimEnd();
+        }
+
+        private static bool IsTrailingPunctuation(char character)
+        {
+            return Char.GetUnicodeCategory(character) is UnicodeCategory.DashPunctuation or UnicodeCategory.OpenPunctuation or UnicodeCategory.InitialQuotePunctuation
+                || character is ',' or ';' or ':' or '.' or '/' or '&' or '\u3001' or '\u3002' or '\uFF0C' or '\uFF1B' or '\uFF1A';
         }
 
         /// <summary>
