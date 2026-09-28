@@ -68,6 +68,7 @@ namespace Radzen.Blazor.Tests
             {
                 "column" => Series<RadzenColumnSeries<DataItem>>(data),
                 "line" => Series<RadzenLineSeries<DataItem>>(data),
+                "area" => Series<RadzenAreaSeries<DataItem>>(data),
                 "bar" => Series<RadzenBarSeries<DataItem>>(data),
                 _ => throw new ArgumentOutOfRangeException(nameof(type))
             };
@@ -345,6 +346,40 @@ namespace Radzen.Blazor.Tests
         private static List<(string Text, string Transform, string Anchor)> RenderedLabels(IRenderedComponent<RadzenChart> chart)
         {
             return chart.FindAll($"{BottomAxis} .rz-tick-text").Select(t => (t.TextContent, t.GetAttribute("transform"), t.GetAttribute("text-anchor"))).ToList();
+        }
+
+        private static DataItem[] Months()
+        {
+            return CultureInfo.InvariantCulture.DateTimeFormat.AbbreviatedMonthNames.Take(12)
+                .Select((month, index) => new DataItem { Category = month, Value = 40 + 5 * index })
+                .ToArray();
+        }
+
+        [Fact]
+        public void MonthsThatFitFlatInTheBrowserStayFlat()
+        {
+            using var ctx = CreateChartContext();
+            var data = Months();
+
+            var chart = Render(ctx, "width: 417px; height: 300px", NoLegend, Series("area", data));
+
+            var spacing = chart.Instance.CategoryScale.OutputSize / data.Length;
+            Assert.Equal(29.28, spacing, 1);
+            Assert.Equal(data.Select(d => d.Category), Labels(chart, BottomAxis));
+            Assert.All(RenderedLabels(chart), label => Assert.Null(label.Transform));
+        }
+
+        [Fact]
+        public void MonthsCloserThanTheirRenderedWidthsAndGapDoNotStayFlat()
+        {
+            using var ctx = CreateChartContext();
+            var data = Months();
+
+            var chart = Render(ctx, "width: 400px; height: 300px", NoLegend, Series("area", data));
+
+            var spacing = chart.Instance.CategoryScale.OutputSize / data.Length;
+            Assert.True(spacing < (26.14 + 23.08) / 2 + 4, $"spacing {spacing}");
+            Assert.True(Labels(chart, BottomAxis).Count < data.Length || RenderedLabels(chart).All(label => label.Transform != null));
         }
 
         [Fact]

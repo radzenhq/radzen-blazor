@@ -15,6 +15,7 @@ namespace Radzen.Blazor.Rendering
         private const double LabelGap = 4;
         private const double FittedLabelAngle = -45;
         private const double MinimumLabelWidth = 40;
+        private const double RenderedWidthRatio = 0.975;
         private const string Ellipsis = "\u2026";
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace Radzen.Blazor.Rendering
 
                 if (sin == 0)
                 {
-                    return distance >= (lengths[first] + lengths[second]) / 2 + LabelGap;
+                    return distance >= (lengths[first] + lengths[second]) / 2 * RenderedWidthRatio + LabelGap;
                 }
 
                 return distance * sin >= LabelHeight + LabelGap || distance * cos >= Math.Max(lengths[first], lengths[second]) + LabelGap;
@@ -237,7 +238,7 @@ namespace Radzen.Blazor.Rendering
                     continue;
                 }
 
-                var width = TextMeasurer.TextWidth(label.Text);
+                var width = TextMeasurer.TextWidth(label.Text) * RenderedWidthRatio;
 
                 if (previous != null && Math.Abs(label.X - previous.Value.X) < (width + previous.Value.Width) / 2 + LabelGap)
                 {
