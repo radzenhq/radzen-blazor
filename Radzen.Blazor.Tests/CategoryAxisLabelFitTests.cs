@@ -248,8 +248,8 @@ namespace Radzen.Blazor.Tests
             var auto = Render(ctx, "width: 390px; height: 300px", Series(type, data));
             var none = Render(ctx, "width: 390px; height: 300px", Series(type, data), Fit(CategoryAxisLabelFit.None));
 
-            Assert.Equal(none.Find(BottomAxis).OuterHtml, auto.Find(BottomAxis).OuterHtml);
-            Assert.Equal(none.Find(LeftAxis).OuterHtml, auto.Find(LeftAxis).OuterHtml);
+            Assert.Equal(none.Find(BottomAxis).InnerHtml, auto.Find(BottomAxis).InnerHtml);
+            Assert.Equal(none.Find(LeftAxis).InnerHtml, auto.Find(LeftAxis).InnerHtml);
             Assert.Equal(Origin(none), Origin(auto));
             Assert.Equal(new[] { "North", "South", "East", "West" }, Labels(auto, BottomAxis));
         }
@@ -449,7 +449,7 @@ namespace Radzen.Blazor.Tests
             var rotation = Render(ctx, "width: 390px; height: 300px", Series("column", data), Axis(a => a.Add(x => x.LabelAutoRotation, -45)));
             var plain = Render(ctx, "width: 390px; height: 300px", Series("column", data));
 
-            Assert.Equal(plain.Find(BottomAxis).OuterHtml, rotation.Find(BottomAxis).OuterHtml);
+            Assert.Equal(plain.Find(BottomAxis).InnerHtml, rotation.Find(BottomAxis).InnerHtml);
             Assert.Equal(Origin(plain), Origin(rotation));
             Assert.Equal(new[] { "North", "South", "East", "West" }, Labels(rotation, BottomAxis));
             Assert.All(RenderedLabels(rotation), label => Assert.Null(label.Transform));

@@ -2,7 +2,7 @@
 
 @if (XAxis?.Visible == true)
 {
-    <g class="rz-axis rz-category-axis">
+    <g class="rz-axis rz-category-axis" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@y1" X2="@Math.Max(x1, x2)" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
     @foreach (var tick in tickValues)
     {

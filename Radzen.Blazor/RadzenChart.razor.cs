@@ -1632,6 +1632,12 @@ namespace Radzen.Blazor
 
         internal string? ClipPath { get; set; }
 
+        internal string AxisClipPath => $"{ClipPath}-axes";
+
+        internal string AxisClipPathStyle => $"clip-path: url(#{AxisClipPath}); -webkit-clip-path: url(#{AxisClipPath});";
+
+        internal (double X, double Y, double Width, double Height) PlotRelativeBounds => (-MarginLeft, -MarginTop, Width ?? 0, Height ?? 0);
+
         /// <inheritdoc />
         protected override void OnInitialized()
         {

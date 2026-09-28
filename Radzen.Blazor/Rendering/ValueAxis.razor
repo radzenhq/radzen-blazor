@@ -2,7 +2,7 @@
 @inherits RadzenChartComponentBase
 @if (YAxis?.Visible == true && renderHorizontal)
 {
-    <g class="rz-axis rz-value-axis rz-value-axis-top">
+    <g class="rz-axis rz-value-axis rz-value-axis-top" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@axisY" X2="@Math.Max(x1, x2)" Y2="@axisY" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @foreach (var idx in tickValues)
     {
@@ -36,7 +36,7 @@
 }
 else if (YAxis?.Visible == true)
 {
-    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
+    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @foreach (var idx in tickValues)
     {
