@@ -792,7 +792,7 @@ namespace Radzen.Blazor
 
             if (valueAxisLoss > 0 && invertAxes && CategoryAxis.LabelLayout != null)
             {
-                CategoryAxis.FitLabels(ValueScale, true, CategoryAxis.LabelLayout.Band - valueAxisLoss);
+                CategoryAxis.FitLabels(ValueScale, true, CategoryAxis.LabelLayout.Band - valueAxisLoss, readableMinimum: false);
                 valueAxisSize = ValueAxis.Measure(this);
                 SetTopAndSideMargins(valueAxisSize, legendSize, additionalAxesWidth, additionalAxesHeight);
             }

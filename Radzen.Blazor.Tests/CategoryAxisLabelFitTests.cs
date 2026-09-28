@@ -610,6 +610,83 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(data.Select(d => d.Category).Reverse(), Titles(chart, LeftAxis));
         }
 
+        private static readonly string[] CashFlowCategories = { "Revenue", "Services", "COGS", "Gross Profit", "Salaries", "Marketing", "R&D", "Net Income" };
+
+        private static IRenderedComponent<RadzenChart> RenderBarsWithAxisTitle(TestContext ctx, double width, string seriesTitle, bool legend)
+        {
+            return ctx.RenderComponent<RadzenChart>(p =>
+            {
+                p.Add(x => x.Style, FormattableString.Invariant($"width: {width}px; height: 300px"));
+                p.AddChildContent<RadzenBarSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Title, seriesTitle)
+                    .Add(x => x.Data, Categories(CashFlowCategories)));
+                p.AddChildContent<RadzenCategoryAxis>(a => a.AddChildContent<RadzenAxisTitle>(t => t.Add(x => x.Text, "Amount ($)")));
+                p.AddChildContent<RadzenLegend>(l => l.Add(x => x.Visible, legend));
+            });
+        }
+
+        private static double PlotWidth(IRenderedComponent<RadzenChart> chart)
+        {
+            var output = chart.Instance.CategoryScale.Output;
+
+            return Math.Abs(output.End - output.Start);
+        }
+
+        private const double TitledAxisPadding = 10 + 16 * 0.875 + 32;
+
+        [Fact]
+        public void AxisTitleDoesNotTakeTheRoomOfTheBarLabels()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = RenderBarsWithAxisTitle(ctx, 324, "Cash Flow", true);
+
+            var room = Origin(chart).Left - TitledAxisPadding;
+            var legendWidth = chart.Instance.Legend.Measure(chart.Instance) + 16;
+            Assert.Equal((324 - legendWidth) / 3 - 10, room, 6);
+            Assert.True(PlotWidth(chart) >= 80, $"plot width {PlotWidth(chart)}");
+            var labels = Labels(chart, LeftAxis);
+            Assert.Equal(CashFlowCategories.Reverse(), labels.Select(label => CashFlowCategories.First(category => category == label || (label.EndsWith(Ellipsis, StringComparison.Ordinal) && category.StartsWith(label[..^1], StringComparison.Ordinal)))));
+            Assert.All(labels, label =>
+            {
+                Assert.True(TextMeasurer.TextWidth(label) <= room, label);
+                Assert.True(label.TrimEnd(Ellipsis[0]).Length >= 3, label);
+            });
+        }
+
+        [Fact]
+        public void BarLabelsKeepAReadableMinimumWhenAThirdOfTheWidthIsLess()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = RenderBarsWithAxisTitle(ctx, 400, "Operating cash flow of every department", true);
+
+            var legendWidth = chart.Instance.Legend.Measure(chart.Instance) + 16;
+            Assert.True((400 - legendWidth) / 3 - 10 < 40, $"legend width {legendWidth}");
+            Assert.Equal(40, Origin(chart).Left - TitledAxisPadding, 6);
+            Assert.True(PlotWidth(chart) >= 80, $"plot width {PlotWidth(chart)}");
+            Assert.All(Labels(chart, LeftAxis), label =>
+            {
+                Assert.True(TextMeasurer.TextWidth(label) <= 40, label);
+                Assert.True(label.TrimEnd(Ellipsis[0]).Length >= 3, label);
+            });
+        }
+
+        [Fact]
+        public void BarLabelsAreCutBelowTheReadableMinimumOnlyAtThePlotFloor()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = RenderBarsWithAxisTitle(ctx, 180, "Cash Flow", false);
+
+            Assert.Equal(80, PlotWidth(chart), 6);
+            var room = Origin(chart).Left - TitledAxisPadding;
+            Assert.True(room < 40, $"room {room}");
+            Assert.All(Labels(chart, LeftAxis), label => Assert.True(TextMeasurer.TextWidth(label) <= room, label));
+        }
+
         [Fact]
         public void VerticalLabelsKeepFullTextUnderNone()
         {

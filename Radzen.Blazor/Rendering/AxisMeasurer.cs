@@ -14,6 +14,7 @@ namespace Radzen.Blazor.Rendering
         private const double XAxisLabelSize = LabelHeight + 12;
         private const double LabelGap = 4;
         private const double FittedLabelAngle = -45;
+        private const double MinimumLabelWidth = 40;
         private const string Ellipsis = "\u2026";
 
         /// <summary>
@@ -52,17 +53,20 @@ namespace Radzen.Blazor.Rendering
 
         private static double YAxisPadding(AxisBase axis, RadzenAxisTitle title)
         {
-            var padding = 9 + axis.StrokeWidth;
-
-            if (!String.IsNullOrEmpty(title.Text))
-            {
-                padding += title.Size + 32;
-            }
-
-            return padding;
+            return YAxisLabelPadding(axis) + YAxisTitleSize(title);
         }
 
-        internal static CategoryAxisLabelLayout? VerticalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize)
+        private static double YAxisLabelPadding(AxisBase axis)
+        {
+            return 9 + axis.StrokeWidth;
+        }
+
+        private static double YAxisTitleSize(RadzenAxisTitle title)
+        {
+            return String.IsNullOrEmpty(title.Text) ? 0 : title.Size + 32;
+        }
+
+        internal static CategoryAxisLabelLayout? VerticalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize, bool readableMinimum = true)
         {
             if (!HasValidTicks(scale, scale.Ticks(axis.TickDistance)))
             {
@@ -77,6 +81,7 @@ namespace Radzen.Blazor.Rendering
             }
 
             var padding = YAxisPadding(axis, title);
+            var titleSize = YAxisTitleSize(title);
             double size;
 
             if (axis.Width.HasValue)
@@ -87,7 +92,14 @@ namespace Radzen.Blazor.Rendering
             else
             {
                 var length = labels.Count > 0 ? labels.Max(label => TextMeasurer.TextWidth(label.Text)) : 0;
-                size = Math.Max(24, Math.Min(length + padding, maxSize));
+                var room = Math.Max(0, maxSize - YAxisLabelPadding(axis));
+
+                if (readableMinimum)
+                {
+                    room = Math.Max(room, Math.Min(length, MinimumLabelWidth));
+                }
+
+                size = Math.Max(24, Math.Min(length, room) + padding);
             }
 
             var maxLength = size - padding;
@@ -98,7 +110,7 @@ namespace Radzen.Blazor.Rendering
                 displayed[label.Tick] = (label.Text, Shorten(label.Text, maxLength));
             }
 
-            return new CategoryAxisLabelLayout(displayed, null, size, size);
+            return new CategoryAxisLabelLayout(displayed, null, size, size - titleSize);
         }
 
         internal static CategoryAxisLabelLayout? HorizontalCategoryLabels(ScaleBase scale, AxisBase axis, RadzenAxisTitle title, double maxSize, double plotLeft, double width = 0)

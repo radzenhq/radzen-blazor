@@ -30,17 +30,17 @@
 
       internal bool CanFitLabels => LabelFit == CategoryAxisLabelFit.Auto && Ticks.Template == null && Visible;
 
-      internal void FitLabels(ScaleBase scale, bool vertical, double maxSize, double plotLeft = 0, double width = 0)
+      internal void FitLabels(ScaleBase scale, bool vertical, double maxSize, double plotLeft = 0, double width = 0, bool readableMinimum = true)
       {
           LabelLayout = null;
 
-          if (!CanFitLabels || !(maxSize > 0))
+          if (!CanFitLabels || (readableMinimum && !(maxSize > 0)))
           {
               return;
           }
 
           LabelLayout = vertical
-              ? AxisMeasurer.VerticalCategoryLabels(scale, this, Title, maxSize)
+              ? AxisMeasurer.VerticalCategoryLabels(scale, this, Title, maxSize, readableMinimum)
               : AxisMeasurer.HorizontalCategoryLabels(scale, this, Title, maxSize, plotLeft, width);
       }
 
