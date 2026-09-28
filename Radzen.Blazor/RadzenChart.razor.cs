@@ -579,6 +579,58 @@ namespace Radzen.Blazor
             var valueScale = ValueScale;
             var categoryScale = CategoryScale;
 
+            var axisSizes = LayOutScales(null);
+
+            for (var pass = 0; pass < 2; pass++)
+            {
+                var drawnSizes = MeasureDrawnValueAxes(axisSizes);
+
+                if (drawnSizes == axisSizes)
+                {
+                    break;
+                }
+
+                axisSizes = LayOutScales(drawnSizes);
+            }
+
+            return !ValueScale.IsEqualTo(valueScale) || !CategoryScale.IsEqualTo(categoryScale);
+        }
+
+        private (double Value, double AdditionalWidth, double AdditionalHeight) MeasureDrawnValueAxes((double Value, double AdditionalWidth, double AdditionalHeight) axisSizes)
+        {
+            if (!ShouldRenderAxes())
+            {
+                return (0, 0, 0);
+            }
+
+            var invertAxes = ShouldInvertAxes();
+            var (additionalWidth, additionalHeight) = MeasureAdditionalValueAxes(invertAxes);
+
+            return (invertAxes ? axisSizes.Value : ValueAxis.Measure(this), additionalWidth, additionalHeight);
+        }
+
+        private (double Width, double Height) MeasureAdditionalValueAxes(bool invertAxes)
+        {
+            double width = 0;
+            double height = 0;
+
+            foreach (var entry in AdditionalValueAxes)
+            {
+                if (invertAxes)
+                {
+                    height += entry.Value.MeasureHorizontal(GetValueScale(entry.Key));
+                }
+                else
+                {
+                    width += entry.Value.Measure(this, GetValueScale(entry.Key));
+                }
+            }
+
+            return (width, height);
+        }
+
+        private (double Value, double AdditionalWidth, double AdditionalHeight) LayOutScales((double Value, double AdditionalWidth, double AdditionalHeight)? axisSizes)
+        {
             CategoryScale = new LinearScale { Output = CategoryScale.Output };
             ValueScale = ValueAxis.Logarithmic
                 ? new LogarithmicScale { Base = ValueAxis.LogarithmicBase, Output = ValueScale.Output }
@@ -757,25 +809,18 @@ namespace Radzen.Blazor
 
             var legendSize = Legend.Measure(this);
 
-            // Measure additional axes for the right margin (top margin when axes are inverted)
-            double additionalAxesWidth = 0;
-            double additionalAxesHeight = 0;
-            foreach (var entry in AdditionalValueAxes)
-            {
-                if (invertAxes)
-                {
-                    additionalAxesHeight += entry.Value.MeasureHorizontal(GetValueScale(entry.Key));
-                }
-                else
-                {
-                    additionalAxesWidth += entry.Value.Measure(this, GetValueScale(entry.Key));
-                }
-            }
+            var (additionalAxesWidth, additionalAxesHeight) = MeasureAdditionalValueAxes(invertAxes);
 
             if (!ShouldRenderAxes())
             {
                 additionalAxesWidth = 0;
                 additionalAxesHeight = 0;
+            }
+
+            if (axisSizes != null)
+            {
+                additionalAxesWidth = axisSizes.Value.AdditionalWidth;
+                additionalAxesHeight = axisSizes.Value.AdditionalHeight;
             }
 
             var legendPosition = EffectiveLegendPosition;
@@ -785,6 +830,11 @@ namespace Radzen.Blazor
             CategoryAxis.FitLabels(ValueScale, true, invertAxes && ShouldRenderAxes() ? ((Width ?? 0) - legendWidth - additionalAxesWidth) / 3 : 0);
 
             var valueAxisSize = ShouldRenderAxes() ? ValueAxis.Measure(this) : 0;
+
+            if (axisSizes != null && !invertAxes)
+            {
+                valueAxisSize = axisSizes.Value.Value;
+            }
 
             var availableHeight = (Height ?? 0) - legendHeight - additionalAxesHeight;
             var fitCategoryLabels = !invertAxes && ShouldRenderAxes() && CategoryAxis.CanFitLabels && availableHeight > 0;
@@ -888,14 +938,7 @@ namespace Radzen.Blazor
                 entry.Value.Fit(axis.TickDistance);
             }
 
-            var stateHasChanged = !ValueScale.IsEqualTo(valueScale);
-
-            if (!CategoryScale.IsEqualTo(categoryScale))
-            {
-                stateHasChanged = true;
-            }
-
-            return stateHasChanged;
+            return (valueAxisSize, additionalAxesWidth, additionalAxesHeight);
         }
 
         private const double MinPlotSize = 80;
@@ -933,7 +976,9 @@ namespace Radzen.Blazor
 
             MarginTop = 32 + additionalAxesHeight;
 
-            if (IsRTL)
+            var valueAxisRight = CategoryAxis.Inverted != IsRTL;
+
+            if (valueAxisRight)
             {
                 MarginRight = valueAxisSize;
                 MarginLeft = 32 + additionalAxesWidth;
@@ -948,11 +993,11 @@ namespace Radzen.Blazor
             {
                 if (legendPosition == LegendPosition.Right)
                 {
-                    MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
+                    MarginRight = legendSize + 16 + (valueAxisRight ? valueAxisSize : additionalAxesWidth);
                 }
                 else if (legendPosition == LegendPosition.Left)
                 {
-                    MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
+                    MarginLeft = legendSize + 16 + (valueAxisRight ? additionalAxesWidth : valueAxisSize);
                 }
                 else if (legendPosition == LegendPosition.Top)
                 {
@@ -961,7 +1006,7 @@ namespace Radzen.Blazor
             }
 
             var (left, right) = ClampMargins(MarginLeft, MarginRight, Width ?? 0);
-            var loss = IsRTL ? MarginRight - right : MarginLeft - left;
+            var loss = valueAxisRight ? MarginRight - right : MarginLeft - left;
 
             MarginLeft = left;
             MarginRight = right;

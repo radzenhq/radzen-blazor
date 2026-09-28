@@ -16,6 +16,7 @@ namespace Radzen.Blazor.Rendering
         private const double FittedLabelAngle = -45;
         private const double MinimumLabelWidth = 40;
         private const double RenderedWidthRatio = 0.975;
+        private const double RenderedPercentWidth = 12.7;
         private const string Ellipsis = "\u2026";
 
         /// <summary>
@@ -45,11 +46,18 @@ namespace Radzen.Blazor.Rendering
                 {
                     var text = axis.Format(scale, y);
 
-                    length = Math.Max(length, TextMeasurer.TextWidth(text));
+                    length = Math.Max(length, ValueLabelWidth(text));
                 }
             }
 
             return Math.Max(24, length + YAxisPadding(axis, title));
+        }
+
+        internal static double ValueLabelWidth(string text)
+        {
+            var percentSigns = text.Count(character => character == '%');
+
+            return TextMeasurer.TextWidth(text) + percentSigns * (RenderedPercentWidth - TextMeasurer.TextWidth("%"));
         }
 
         private static double YAxisPadding(AxisBase axis, RadzenAxisTitle title)
