@@ -2591,6 +2591,23 @@ window.Radzen = {
         }
     }
 
+    if (popup.__contentResizeObserver) {
+        popup.__contentResizeObserver.disconnect();
+        delete popup.__contentResizeObserver;
+    }
+
+    if (!position && parent && disableSmartPosition !== true && !popup.__viewportResizeHandler && typeof ResizeObserver !== 'undefined') {
+        var observedHeight = popup.getBoundingClientRect().height;
+        popup.__contentResizeObserver = new ResizeObserver(function () {
+            if (popup.style.display !== 'block') return;
+            var height = popup.getBoundingClientRect().height;
+            if (height === observedHeight) return;
+            observedHeight = height;
+            Radzen.repositionPopup(parent, id);
+        });
+        popup.__contentResizeObserver.observe(popup);
+    }
+
     var p = parent;
     while (p && p != document.body) {
         if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
@@ -2731,6 +2748,10 @@ window.Radzen = {
         delete popup.__originalWrapperMaxHeight;
         delete popup.__originalPopupTop;
     }
+    if (popup && popup.__contentResizeObserver) {
+        popup.__contentResizeObserver.disconnect();
+        delete popup.__contentResizeObserver;
+    }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
@@ -2802,6 +2823,10 @@ window.Radzen = {
           delete popup.__viewportResizeHandler;
           delete popup.__originalWrapperMaxHeight;
           delete popup.__originalPopupTop;
+      }
+      if (popup.__contentResizeObserver) {
+          popup.__contentResizeObserver.disconnect();
+          delete popup.__contentResizeObserver;
       }
       if (popup.__radzenHome && popup.__radzenHome.isConnected) {
           popup.__radzenHome.appendChild(popup);
@@ -4171,12 +4196,27 @@ window.Radzen = {
     ref.mouseEnterHandler = function () {
         inside = true;
     };
+    function leave() {
+      inside = false;
+      pendingMove = null;
+      if (moveRafId) {
+        cancelAnimationFrame(moveRafId);
+        moveRafId = null;
+      }
+      try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
+    }
+
     ref.mouseLeaveHandler = function (e) {
-        if (e.relatedTarget && (e.relatedTarget.matches('.rz-chart-tooltip') || e.relatedTarget.closest('.rz-chart-tooltip'))) {
+        var tooltip = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.rz-chart-tooltip');
+        if (tooltip) {
+            tooltip.addEventListener('mouseleave', function (te) {
+                if (inside && !(te.relatedTarget && ref.contains(te.relatedTarget))) {
+                    leave();
+                }
+            }, { once: true });
             return;
         }
-        inside = false;
-        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
+        leave();
     };
     ref.clickHandler = function (e) {
       var rect = ref.getBoundingClientRect();
@@ -7271,6 +7311,15 @@ class Spreadsheet {
     return target == this.element || this.element.contains(target);
   }
 
+  isCellEditorTextEntry = (target) => {
+    if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+      return false;
+    }
+
+    const cellEditor = target.closest('.rz-spreadsheet-cell-editor');
+    return cellEditor != null && this.element.contains(cellEditor);
+  }
+
   copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -7461,6 +7510,11 @@ class Spreadsheet {
   }
 
   onKeyDown = (e) => {
+    if (this.isCellEditorTextEntry(e.target) &&
+        (e.isComposing || (e.key !== 'Enter' && e.key !== 'Escape' && e.key !== 'Tab' && e.key !== 'F6'))) {
+      return;
+    }
+
     let key = '';
 
     if (e.ctrlKey || e.metaKey) {
@@ -7521,21 +7575,31 @@ class Spreadsheet {
 
     this.pendingKeys = null;
 
-    if (!keys || !e.target.matches('.rz-spreadsheet-editor-input')) {
+    const target = e.target;
+
+    if (!keys || !(target.matches('.rz-spreadsheet-editor-input') || this.isCellEditorTextEntry(target))) {
       return;
     }
 
-    e.target.innerText += keys;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      try {
+        target.setRangeText(keys, target.value.length, target.value.length, 'end');
+      } catch {
+        target.value += keys;
+      }
+    } else {
+      target.innerText += keys;
 
-    const range = document.createRange();
-    range.selectNodeContents(e.target);
-    range.collapse(false);
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      range.collapse(false);
 
-    const selection = getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
 
-    e.target.dispatchEvent(new Event('input'));
+    target.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
   // F6 / Shift+F6 cycle focus between the spreadsheet regions in their visible top-to-bottom order:

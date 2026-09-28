@@ -29,6 +29,10 @@ public partial class Worksheet
 
     private bool isEvaluating;
 
+    internal const int MaxRows = 1_048_576;
+
+    internal const int MaxColumns = 16_384;
+
     /// <summary>
     /// Gets the number of rows in the sheet.
     /// </summary>

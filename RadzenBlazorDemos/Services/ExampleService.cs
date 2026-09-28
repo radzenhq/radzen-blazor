@@ -285,16 +285,19 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Toc = [ new () { Text = "Column bands", Anchor = "#column-bands" }, new () { Text = "Composite data cells", Anchor = "#composite-data-cells" } ],
                             Name = "Composite Columns",
                             Path = "datagrid-composite-columns",
                             Related = new [] { "datagrid-column-template", "datagrid-frozen-columns", "datagrid-grouping-api" },
                             Faq = new []
                             {
-                                new FaqItem { Question = "How do I create grouped or multi-level column headers?", Answer = "Nest child columns inside a parent RadzenDataGridColumn; the parent renders as a spanning header above its children." }
+                                new FaqItem { Question = "How do I create grouped or multi-level column headers?", Answer = "Nest child columns inside a parent RadzenDataGridColumn; the parent renders as a spanning header above its children." },
+                                new FaqItem { Question = "Does the DataGrid support banded columns?", Answer = "Yes. A parent RadzenDataGridColumn with only a Title and child Columns is a band header, and the same child columns can repeat under different bands." },
+                                new FaqItem { Question = "How do I show a value in a parent column cell?", Answer = "Set AllowCompositeDataCells to true; a parent column with a Property or Template then renders its value in a data cell that spans its child columns." }
                             },
-                            Title = "Multi-Level Column Headers in a Blazor DataGrid | Free UI Components by Radzen",
-                            Description = "Use RadzenDataGridColumn Columns property to define child columns.",
-                            Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
+                            Title = "Column Bands and Multi-Level Headers in a Blazor DataGrid | Free UI Components by Radzen",
+                            Description = "Group Blazor DataGrid columns under shared band headers by nesting them in the Columns of a parent RadzenDataGridColumn.",
+                            Tags = new [] { "datagrid", "column", "composite", "merged", "complex", "band", "banded", "bands", "group", "grouped", "nested", "header", "multi-level", "stacked", "span" }
                         },
                         new Example
                         {

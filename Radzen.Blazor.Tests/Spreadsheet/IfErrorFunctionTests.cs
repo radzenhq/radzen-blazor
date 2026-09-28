@@ -30,7 +30,7 @@ public class IfErrorFunctionTests
     [Fact]
     public void ShouldEvaluateIfErrorFunctionWithReferenceError()
     {
-        sheet.Cells["A1"].Formula = "=IFERROR(A6, \"Error in calculation\")";
+        sheet.Cells["A1"].Formula = "=IFERROR(#REF!, \"Error in calculation\")";
 
         Assert.Equal("Error in calculation", sheet.Cells["A1"].Value);
     }
@@ -130,7 +130,8 @@ public class IfErrorFunctionTests
     [Fact]
     public void ShouldEvaluateIfErrorFunctionWithSumFunctionError()
     {
-        sheet.Cells["A1"].Formula = "=IFERROR(SUM(A6:A8), \"Error\")";
+        sheet.Cells["A2"].Formula = "=1/0";
+        sheet.Cells["A1"].Formula = "=IFERROR(SUM(A2:A4), \"Error\")";
 
         Assert.Equal("Error", sheet.Cells["A1"].Value);
     }

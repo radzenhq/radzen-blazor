@@ -11,6 +11,12 @@ using Xunit;
 #nullable enable
 namespace Radzen.Blazor.Tests;
 
+[CollectionDefinition(nameof(LocalizerAppAssemblyCollection), DisableParallelization = true)]
+public class LocalizerAppAssemblyCollection
+{
+}
+
+[Collection(nameof(LocalizerAppAssemblyCollection))]
 public class LocalizerTests
 {
     [Fact]

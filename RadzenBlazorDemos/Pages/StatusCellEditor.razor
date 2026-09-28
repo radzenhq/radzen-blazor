@@ -1,0 +1,33 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenTextBox @ref=@textBox Value=@Context.Value ValueChanged=@OnValueChanged Immediate="true" @onkeydown=@OnKeyDown
+    Placeholder="Done, In Progress, Pending" aria-label="Status"
+    Style="width: 100%; height: 100%; border-radius: 0;" />
+
+@code {
+    [Parameter]
+    public SpreadsheetCellEditContext Context { get; set; } = default!;
+
+    RadzenTextBox textBox = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await textBox.FocusAsync();
+        }
+    }
+
+    void OnValueChanged(string value)
+    {
+        Context.Value = value;
+    }
+
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await Context.CommitAsync(Context.Value);
+        }
+    }
+}

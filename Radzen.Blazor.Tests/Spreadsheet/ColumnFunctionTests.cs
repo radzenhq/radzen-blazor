@@ -36,6 +36,13 @@ public class ColumnFunctionTests
         sheet.Cells["B2"].Formula = "=COLUMN(C10:D20)";
         Assert.Equal(CellError.Value, sheet.Cells["B2"].Data.Value);
     }
+
+    [Fact]
+    public void Column_OmittedReference_ReadThroughAnotherCell_ReturnsItsOwnColumn()
+    {
+        var sheet = new Worksheet(20, 10);
+        sheet.Cells["A2"].Formula = "=COLUMN()";
+        sheet.Cells["E1"].Formula = "=A2";
+        Assert.Equal(1d, sheet.Cells["E1"].Data.Value);
+    }
 }
-
-

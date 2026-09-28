@@ -141,11 +141,12 @@ public class CountAllFunctionTests
     }
 
     [Fact]
-    public void ShouldCreateRefErrorWhenCountaRangeOutOfBounds()
+    public void ShouldIgnoreCellsPastTheGridInCounta()
     {
+        sheet.Cells["A2"].Value = "x";
         sheet.Cells["A1"].Formula = "=COUNTA(A2:A6)";
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
+        Assert.Equal(1d, sheet.Cells["A1"].Value);
     }
 }
 

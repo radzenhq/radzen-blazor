@@ -238,15 +238,21 @@ public class Cell
 
     /// <summary>
     /// Sets the value of the cell based on a string input.
-    /// A leading apostrophe escapes the value — the apostrophe is stripped,
+    /// A leading apostrophe escapes the value - the apostrophe is stripped,
     /// the remainder is stored as text, and <see cref="QuotePrefix"/> is set.
-    /// Otherwise, a string starting with '=' is treated as a formula.
+    /// Otherwise, a cell with a text number format - one with a <c>@</c> placeholder and no digit
+    /// or date placeholders, such as <c>@</c> - stores the input as text, including input starting with '='.
+    /// In any other cell a string starting with '=' is treated as a formula.
     /// </summary>
     public void SetValue(string? value)
     {
         if (value is not null && value.StartsWith('\''))
         {
             SetText(value[1..]);
+        }
+        else if (!string.IsNullOrEmpty(value) && NumberFormat.IsTextFormat(format?.NumberFormat))
+        {
+            SetText(value, quotePrefix: false);
         }
         else if (value?.StartsWith('=') == true && value != "=")
         {

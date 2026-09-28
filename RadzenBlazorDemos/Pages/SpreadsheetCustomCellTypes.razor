@@ -9,7 +9,8 @@
     Dictionary<string, SpreadsheetCellType> cellTypes = new()
     {
         ["progress"] = SpreadsheetCellType.Create<ProgressCellRenderer>(),
-        ["rating"] = SpreadsheetCellType.Create<RatingCellRenderer, RatingCellEditor>()
+        ["rating"] = SpreadsheetCellType.Create<RatingCellRenderer, RatingCellEditor>(),
+        ["status"] = new SpreadsheetCellType { EditorType = typeof(StatusCellEditor) }
     };
 
     protected override void OnInitialized()
@@ -63,6 +64,7 @@
         // Assign custom types to ranges
         sheet.Cells.SetCustomType(RangeRef.Parse("C2:C11"), "progress");
         sheet.Cells.SetCustomType(RangeRef.Parse("D2:D11"), "rating");
+        sheet.Cells.SetCustomType(RangeRef.Parse("B2:B11"), "status");
 
         // Freeze header row
         sheet.Rows.Frozen = 1;

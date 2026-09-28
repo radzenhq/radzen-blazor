@@ -1,0 +1,152 @@
+@using System.Linq.Expressions
+@using Radzen
+
+<pre id="odata-query-check">@report</pre>
+
+@code {
+    string report = "";
+
+    public enum TicketStatus { Open, Closed }
+
+    [Flags]
+    public enum Channel { None = 0, Email = 1, Phone = 2, Chat = 4 }
+
+    public class Member
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+    }
+
+    public class Team
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public Member? Owner { get; set; }
+        public List<Member> Members { get; set; } = [];
+    }
+
+    public class Comment
+    {
+        public int Id { get; set; }
+        public int Score { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public Member? Author { get; set; }
+    }
+
+    public class Ticket
+    {
+        public int Id { get; set; }
+        public string Subject { get; set; } = "";
+        public TicketStatus Status { get; set; }
+        public Channel Channels { get; set; }
+        public bool Urgent { get; set; }
+        public int Priority { get; set; }
+        public int TeamId { get; set; }
+        public decimal? Discount { get; set; }
+        public DateTime OpenedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateOnly Due { get; set; }
+        public TimeSpan Effort { get; set; }
+        public Team? Team { get; set; }
+        public List<Comment> Comments { get; set; } = [];
+        public IDictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
+    }
+
+    public class Total
+    {
+        public TicketStatus Status { get; set; }
+        public decimal? Discount { get; set; }
+        public int Count { get; set; }
+    }
+
+    static string Filter(Expression<Func<Ticket, bool>> predicate) => new ODataQuery<Ticket>().Where(predicate).ToString();
+
+    IEnumerable<(string Actual, string Expected)> Cases()
+    {
+        var search = "PRINTER";
+        var status = TicketStatus.Closed;
+        int? teamId = 2;
+        TicketStatus? anyStatus = null;
+        var team = new Team { Name = "Support" };
+        var ids = new List<int> { 1, 3 };
+        var channels = Channel.Email | Channel.Chat;
+        var instant = new DateTimeOffset(2026, 1, 31, 9, 30, 0, TimeSpan.FromHours(2));
+
+        yield return (Filter(ticket => ticket.Subject.ToLower().Contains(search.ToLower())), "$filter=contains(tolower(Subject),'printer')");
+        yield return (Filter(ticket => ticket.Status != status && ticket.Channels == channels), "$filter=Status ne 'Closed' and Channels eq Radzen.Blazor.TrimTest.Channel'Email,Chat'");
+        yield return (Filter(ticket => ticket.Channels.HasFlag(Channel.Phone)), "$filter=Channels has 'Phone'");
+        yield return (Filter(ticket => !teamId.HasValue || ticket.TeamId == teamId.Value), "$filter=TeamId eq 2");
+        yield return (Filter(ticket => (anyStatus == null || ticket.Status == anyStatus.Value) && ticket.Urgent), "$filter=Urgent");
+        yield return (Filter(ticket => ticket.Team!.Name == team.Name && ids.Contains(ticket.Id)), "$filter=Team/Name eq 'Support' and Id in (1,3)");
+        yield return (Filter(ticket => new[] { 2, 4 }.Contains(ticket.Id)), "$filter=Id in (2,4)");
+        yield return (Filter(ticket => ticket.Discount.HasValue && ticket.Discount.Value > 1.5m), "$filter=Discount ne null and Discount gt 1.5");
+        yield return (Filter(ticket => ticket.CreatedAt > instant && ticket.OpenedAt < new DateTime(2026, 1, 31, 9, 30, 15, 500) && ticket.Effort > TimeSpan.FromMinutes(90) && ticket.Due <= new DateOnly(2026, 2, 1)),
+            "$filter=CreatedAt gt 2026-01-31T09:30:00+02:00 and OpenedAt lt 2026-01-31T09:30:15.5Z and Effort gt duration'PT1H30M' and Due le 2026-02-01");
+        yield return (Filter(ticket => ticket.OpenedAt.Date == new DateTime(2026, 9, 26) && Math.Round(ticket.Priority * 1.5, MidpointRounding.AwayFromZero) > 2), "$filter=date(OpenedAt) eq 2026-09-26 and round(Priority mul 1.5) gt 2");
+        yield return (Filter(ticket => ticket.Comments.Any(comment => comment.Score > ticket.Priority) && !ticket.Comments.Any() && ticket.Comments.Count > 1), "$filter=Comments/any(comment:comment/Score gt Priority) and not Comments/any() and Comments/$count gt 1");
+        yield return (Filter(ticket => ticket.Comments.Any(comment => (int)ticket.Data["remaining"] == 15 && (string)ticket.Data["application"] == "Studio")), "$filter=Comments/any(comment:remaining eq 15 and application eq 'Studio')");
+        yield return (new ODataQuery<Ticket>()
+            .Include(ticket => ticket.Team).ThenInclude(team => team!.Owner)
+            .Include(ticket => ticket.Team).ThenInclude(team => team!.Members)
+            .Include(ticket => ticket.Comments.Where(comment => comment.Score > 1).OrderByDescending(comment => comment.CreatedAt).Take(3)).ThenInclude(comment => comment.Author)
+            .OrderBy(ticket => ticket.Team!.Name).ThenByDescending(ticket => ticket.Id)
+            .Skip(10).Take(5).WithCount().ToString(),
+            "$expand=Team($expand=Owner,Members),Comments($filter=Score gt 1;$orderby=CreatedAt desc;$top=3;$expand=Author)&$orderby=Team/Name,Id desc&$skip=10&$top=5&$count=true");
+        yield return (new ODataQuery<Ticket>()
+            .Where(ticket => ticket.Urgent)
+            .GroupBy(ticket => ticket.Status)
+            .Select(group => new Total { Status = group.Key, Discount = group.Sum(ticket => ticket.Discount), Count = group.Count() })
+            .OrderByDescending(total => total.Discount).ToString(),
+            "$apply=filter(Urgent)/groupby((Status),aggregate(Discount with sum as Discount,$count as Count))&$orderby=Discount desc");
+        yield return (new ODataQuery<Ticket>()
+            .GroupBy(ticket => 1)
+            .Select(group => new Total { Discount = group.Sum(ticket => ticket.Discount * ticket.Priority), Count = (int)group.Sum(ticket => (long)ticket.Priority) }).ToString(),
+            "$apply=aggregate((Discount mul Priority) with sum as Discount,cast(Priority,Edm.Int64) with sum as Count)");
+        yield return (new Uri("https://example.com/odata/Tickets?key=a").GetODataUri(new ODataQuery<Ticket>().Where(ticket => ticket.Subject == "O'Brien & #1"), new LoadDataArgs { Filter = "Priority gt 1", Top = 5 }).AbsoluteUri,
+            "https://example.com/odata/Tickets?key=a&$filter=%28Priority%20gt%201%29%20and%20%28Subject%20eq%20%27O%27%27Brien%20%26%20%231%27%29&$top=5&$count=true");
+    }
+
+    protected override void OnInitialized()
+    {
+        var failures = new List<string>();
+        var count = 0;
+
+        foreach (var (actual, expected) in Run())
+        {
+            count++;
+
+            if (actual != expected)
+            {
+                failures.Add($"FAIL\n  expected {expected}\n  actual   {actual}");
+            }
+        }
+
+        report = string.Join("\n", [failures.Count == 0 ? $"ODataQuery passed {count} of {count}" : $"ODataQuery failed {failures.Count} of {count}", .. failures]);
+    }
+
+    IEnumerable<(string Actual, string Expected)> Run()
+    {
+        using var cases = Cases().GetEnumerator();
+
+        while (true)
+        {
+            (string Actual, string Expected) current;
+
+            try
+            {
+                if (!cases.MoveNext())
+                {
+                    yield break;
+                }
+
+                current = cases.Current;
+            }
+            catch (Exception exception)
+            {
+                current = (exception.ToString(), "no exception");
+            }
+
+            yield return current;
+        }
+    }
+}

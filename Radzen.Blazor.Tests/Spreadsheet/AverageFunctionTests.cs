@@ -104,11 +104,13 @@ public class AverageFunctionTests
     }
 
     [Fact]
-    public void ShouldCreateRefErrorWhenAverageRangeOutOfBounds()
+    public void ShouldIgnoreCellsPastTheGridInAverage()
     {
+        sheet.Cells["A2"].Value = 2;
+        sheet.Cells["A3"].Value = 4;
         sheet.Cells["A1"].Formula = "=AVERAGE(A2:A6)";
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
+        Assert.Equal(3d, sheet.Cells["A1"].Value);
     }
 }
 

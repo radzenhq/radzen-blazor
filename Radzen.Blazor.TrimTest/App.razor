@@ -39,6 +39,8 @@
 
         <RadzenButton id="confirm" Text="Confirm" Click="@OpenConfirmAsync" />
         <RadzenButton id="side-dialog" Text="Side dialog" Click="@OpenSideDialog" />
+
+        <ODataQueryCheck />
     </ChildContent>
     <ErrorContent Context="ex">
         <div>@SetError(ex)</div>

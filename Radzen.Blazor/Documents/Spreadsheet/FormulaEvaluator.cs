@@ -48,6 +48,8 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     private readonly HashSet<Cell> evaluationStack = [];
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Cell, CellData> evaluated = evaluated ?? [];
+    private Cell formulaCell = currentCell;
+    private bool arrayContext;
 
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
@@ -87,30 +89,39 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
-        var left = (CellData)value!;
+        var left = value;
         binaryExpressionSyntaxNode.Right.Accept(this);
-        var right = (CellData)value!;
+        var right = value;
+        var op = binaryExpressionSyntaxNode.Operator;
 
+        if (arrayContext && (left is RangeList || right is RangeList))
+        {
+            value = Broadcast([left, right], operands => ApplyBinary(op, operands[0], operands[1]));
+            return;
+        }
+
+        value = ApplyBinary(op, Intersect(left, formulaCell), Intersect(right, formulaCell));
+    }
+
+    private static CellData ApplyBinary(BinaryOperator op, CellData left, CellData right)
+    {
         if (left.IsError)
         {
-            value = left;
-            return;
+            return left;
         }
 
         if (right.IsError)
         {
-            value = right;
-            return;
+            return right;
         }
 
-        if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Concat)
+        if (op == BinaryOperator.Concat)
         {
-            value = CellData.FromString(ToText(left) + ToText(right));
-            return;
+            return CellData.FromString(ToText(left) + ToText(right));
         }
 
         // For comparison operators, we don't need both sides to be numeric
-        var isComparisonOperator = binaryExpressionSyntaxNode.Operator is
+        var isComparisonOperator = op is
             BinaryOperator.Equals or BinaryOperator.NotEquals or
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
@@ -152,44 +163,36 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         {
             if (!TryCoerceOperand(ref left) || !TryCoerceOperand(ref right))
             {
-                value = CellData.FromError(CellError.Value);
-                return;
+                return CellData.FromError(CellError.Value);
             }
         }
 
-        if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
+        if (op == BinaryOperator.Divide)
         {
             var rnum = right.GetValueOrDefault<double>();
 
             if (Math.Abs(rnum) == 0d)
             {
-                value = CellData.FromError(CellError.Div0);
-                return;
+                return CellData.FromError(CellError.Div0);
             }
         }
 
         if (isComparisonOperator)
         {
-            switch (binaryExpressionSyntaxNode.Operator)
+            switch (op)
             {
                 case BinaryOperator.Equals:
-                    value = CellData.FromBoolean(left.IsEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsEqualTo(right));
                 case BinaryOperator.NotEquals:
-                    value = CellData.FromBoolean(!left.IsEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(!left.IsEqualTo(right));
                 case BinaryOperator.LessThan:
-                    value = CellData.FromBoolean(left.IsLessThan(right));
-                    return;
+                    return CellData.FromBoolean(left.IsLessThan(right));
                 case BinaryOperator.LessThanOrEqual:
-                    value = CellData.FromBoolean(left.IsLessThanOrEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsLessThanOrEqualTo(right));
                 case BinaryOperator.GreaterThan:
-                    value = CellData.FromBoolean(left.IsGreaterThan(right));
-                    return;
+                    return CellData.FromBoolean(left.IsGreaterThan(right));
                 case BinaryOperator.GreaterThanOrEqual:
-                    value = CellData.FromBoolean(left.IsGreaterThanOrEqualTo(right));
-                    return;
+                    return CellData.FromBoolean(left.IsGreaterThanOrEqualTo(right));
             }
         }
         else
@@ -197,7 +200,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             var l = left.GetValueOrDefault<double>();
             var r = right.GetValueOrDefault<double>();
             double res = 0d;
-            switch (binaryExpressionSyntaxNode.Operator)
+            switch (op)
             {
                 case BinaryOperator.Plus:
                     res = l + r;
@@ -212,25 +215,37 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                     res = l / r;
                     break;
             }
-            value = CellData.FromNumber(res);
+            return CellData.FromNumber(res);
         }
+
+        return CellData.FromError(CellError.Value);
     }
 
     public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
     {
         unaryExpressionSyntaxNode.Operand.Accept(this);
-        var operand = (CellData)value!;
+        var operand = value;
+        var op = unaryExpressionSyntaxNode.Operator;
 
-        if (operand.IsError)
+        if (arrayContext && operand is RangeList)
         {
-            value = operand;
+            value = Broadcast([operand], operands => ApplyUnary(op, operands[0]));
             return;
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        value = ApplyUnary(op, Intersect(operand, formulaCell));
+    }
+
+    private static CellData ApplyUnary(UnaryOperator op, CellData operand)
+    {
+        if (operand.IsError)
         {
-            value = operand;
-            return;
+            return operand;
+        }
+
+        if (op == UnaryOperator.Plus)
+        {
+            return operand;
         }
 
         if (operand.IsEmpty)
@@ -238,21 +253,91 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             operand = CellData.FromNumber(0d);
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate)
+        if (operand.Type == CellDataType.Date)
         {
-            if (operand.Type == CellDataType.Date)
-            {
-                operand = CellData.FromNumber(operand.GetValueOrDefault<DateTime>().ToNumber());
-            }
-
-            if (!TryCoerceOperand(ref operand))
-            {
-                value = CellData.FromError(CellError.Value);
-                return;
-            }
-            value = CellData.FromNumber(-operand.GetValueOrDefault<double>());
-            return;
+            operand = CellData.FromNumber(operand.GetValueOrDefault<DateTime>().ToNumber());
         }
+
+        if (!TryCoerceOperand(ref operand))
+        {
+            return CellData.FromError(CellError.Value);
+        }
+
+        return CellData.FromNumber(-operand.GetValueOrDefault<double>());
+    }
+
+    private static RangeList Broadcast(IReadOnlyList<object?> operands, Func<CellData[], CellData> apply)
+    {
+        var arrays = operands.OfType<RangeList>().ToList();
+        var rows = arrays.Aggregate(1, (size, array) => BroadcastSize(size, array.Rows));
+        var columns = arrays.Aggregate(1, (size, array) => BroadcastSize(size, array.Columns));
+        var rowSource = arrays.First(array => array.Rows == rows);
+        var columnSource = arrays.First(array => array.Columns == columns);
+        var result = new RangeList(rows, columns, rowSource.StartRow, columnSource.StartColumn, rowSource.Worksheet);
+        var elements = new CellData[operands.Count];
+
+        for (var row = 0; row < rows; row++)
+        {
+            for (var column = 0; column < columns; column++)
+            {
+                for (var i = 0; i < operands.Count; i++)
+                {
+                    elements[i] = ElementAt(operands[i], row, column);
+                }
+
+                result.Add(apply(elements));
+            }
+        }
+
+        return result;
+    }
+
+    private static int BroadcastSize(int size, int other) => size == 1 ? other : other == 1 ? size : Math.Max(size, other);
+
+    private static CellData ElementAt(object? operand, int row, int column)
+    {
+        if (operand is not RangeList array)
+        {
+            return (CellData)operand!;
+        }
+
+        var arrayRow = array.Rows == 1 ? 0 : row;
+        var arrayColumn = array.Columns == 1 ? 0 : column;
+
+        if (arrayRow >= array.Rows || arrayColumn >= array.Columns)
+        {
+            return CellData.FromError(CellError.NA);
+        }
+
+        return array[arrayRow * array.Columns + arrayColumn];
+    }
+
+    private static CellData Intersect(object? operand, Cell cell)
+    {
+        if (operand is not RangeList range)
+        {
+            return (CellData)operand!;
+        }
+
+        if (range.Count == 1)
+        {
+            return range[0];
+        }
+
+        var row = cell.Address.Row;
+        var column = cell.Address.Column;
+
+        if (range.Columns == 1 && row >= range.StartRow && row < range.StartRow + range.Rows)
+        {
+            return range[row - range.StartRow];
+        }
+
+        if (range.Rows == 1 && column >= range.StartColumn && column < range.StartColumn + range.Columns)
+        {
+            return range[column - range.StartColumn];
+        }
+
+        return CellData.FromError(CellError.Value);
     }
 
     private static CellData EmptyAs(CellData other)
@@ -304,13 +389,26 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return cached;
         }
 
+        if (cell.FormulaSyntaxTree.Errors.Count > 0)
+        {
+            return CellData.FromError(CellError.Name);
+        }
+
         if (!evaluationStack.Add(cell))
         {
             return CellData.FromError(CellError.Circular);
         }
 
+        var outerCell = formulaCell;
+        var outerArrayContext = arrayContext;
+        formulaCell = cell;
+        arrayContext = false;
+
         cell.FormulaSyntaxTree.Root.Accept(this);
-        var result = (CellData)value!;
+        var result = Intersect(value, cell);
+
+        formulaCell = outerCell;
+        arrayContext = outerArrayContext;
         evaluationStack.Remove(cell);
         evaluated[cell] = result;
         return result;
@@ -338,9 +436,21 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
-        if ((address.Row < 0 || address.Row >= targetSheet.RowCount) || (address.Column < 0 || address.Column >= targetSheet.ColumnCount))
+        if (address.Row < 0 || address.Column < 0)
         {
             value = CellData.FromError(CellError.Ref);
+            return;
+        }
+
+        if (address.Row >= Worksheet.MaxRows || address.Column >= Worksheet.MaxColumns)
+        {
+            value = CellData.FromError(CellError.Name);
+            return;
+        }
+
+        if (address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
+        {
+            value = CellData.Empty;
             return;
         }
 
@@ -378,7 +488,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         node.Accept(this);
 
-        return (CellData)value!;
+        return Intersect(value, formulaCell);
     }
 
 
@@ -386,20 +496,42 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         var function = sheet.FunctionRegistry.Get(functionSyntaxNode.Name);
 
-        var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments);
+        var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments, out var arrayArguments);
         
         if (functionArguments is null)
         {
             return; // Error already set in ProcessArguments
         }
 
-        value = function.Evaluate(functionArguments);
+        if (arrayArguments is null)
+        {
+            value = function.Evaluate(functionArguments);
+            return;
+        }
+
+        value = Broadcast([.. arrayArguments.Select(argument => argument.Values)], elements => EvaluateElement(function, functionArguments, arrayArguments, elements));
     }
 
-    private FunctionArguments? ProcessArguments(FormulaFunction function, List<FormulaSyntaxNode> argumentNodes)
+    private static CellData EvaluateElement(FormulaFunction function, FunctionArguments functionArguments, List<(string Name, RangeList Values)> arrayArguments, CellData[] elements)
     {
+        for (var i = 0; i < arrayArguments.Count; i++)
+        {
+            if (elements[i].IsError && !function.CanHandleErrors)
+            {
+                return elements[i];
+            }
+
+            functionArguments.Set(arrayArguments[i].Name, elements[i]);
+        }
+
+        return function.Evaluate(functionArguments);
+    }
+
+    private FunctionArguments? ProcessArguments(FormulaFunction function, List<FormulaSyntaxNode> argumentNodes, out List<(string Name, RangeList Values)>? arrayArguments)
+    {
+        arrayArguments = null;
         var parameterDefinitions = function.Parameters;
-        var functionArguments = new FunctionArguments(currentCell);
+        var functionArguments = new FunctionArguments(formulaCell);
         var argumentIndex = 0;
 
         for (int paramIndex = 0; paramIndex < parameterDefinitions.Length; paramIndex++)
@@ -423,7 +555,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                 while (argumentIndex < argumentNodes.Count)
                 {
                     var argumentNode = argumentNodes[argumentIndex];
-                    var argument = ProcessArgument(argumentNode, function);
+                    var argument = ProcessArgument(argumentNode, function, paramDef.Type);
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -455,7 +587,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                 var groups = new List<List<CellData>>();
                 while (argumentIndex < argumentNodes.Count)
                 {
-                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function, paramDef.Type);
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -470,7 +602,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             {
                 if (argumentIndex < argumentNodes.Count)
                 {
-                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function, paramDef.Type);
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -486,6 +618,11 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                     }
                     else
                     {
+                        if (argument is RangeList { Count: > 1 } values)
+                        {
+                            (arrayArguments ??= []).Add((paramDef.Name, values));
+                        }
+
                         functionArguments.Set(paramDef.Name, argument[0]);
                     }
                     argumentIndex++;
@@ -508,9 +645,17 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         return functionArguments;
     }
 
-    private List<CellData>? ProcessArgument(FormulaSyntaxNode argumentNode, FormulaFunction function)
+    private List<CellData>? ProcessArgument(FormulaSyntaxNode argumentNode, FormulaFunction function, ParameterType parameterType)
     {
+        var outerArrayContext = arrayContext;
+        arrayContext = outerArrayContext || parameterType != ParameterType.Single;
         argumentNode.Accept(this);
+        arrayContext = outerArrayContext;
+
+        if (!arrayContext && parameterType == ParameterType.Single && value is RangeList)
+        {
+            value = Intersect(value, formulaCell);
+        }
 
         var hasError = value is CellData cellData && cellData.IsError;
 
@@ -565,13 +710,26 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
+        if (start.Row >= Worksheet.MaxRows || end.Row >= Worksheet.MaxRows || start.Column >= Worksheet.MaxColumns || end.Column >= Worksheet.MaxColumns)
+        {
+            value = CellData.FromError(CellError.Name);
+            return;
+        }
+
         var rows = end.Row - start.Row + 1;
         var columns = end.Column - start.Column + 1;
+
+        if ((long)rows * columns > Worksheet.MaxRows)
+        {
+            rows = Math.Clamp(startSheet.RowCount - start.Row, 1, rows);
+            columns = Math.Clamp(startSheet.ColumnCount - start.Column, 1, columns);
+        }
+
         var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet);
 
-        for (var row = start.Row; row <= end.Row; row++)
+        for (var row = start.Row; row < start.Row + rows; row++)
         {
-            for (var column = start.Column; column <= end.Column; column++)
+            for (var column = start.Column; column < start.Column + columns; column++)
             {
                 if (startSheet.IsDeletedRow(row) || startSheet.IsDeletedColumn(column))
                 {
@@ -579,7 +737,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                     return;
                 }
 
-                if (row < 0 || row >= startSheet.RowCount || column < 0 || column >= startSheet.ColumnCount)
+                if (row < 0 || column < 0)
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
@@ -587,7 +745,11 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
 
                 CellData cellValue;
 
-                if (!startSheet.Cells.TryGet(row, column, out var cell))
+                if (row >= startSheet.RowCount || column >= startSheet.ColumnCount)
+                {
+                    cellValue = CellData.Empty;
+                }
+                else if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
                     // Cell is in bounds but not populated - treat as empty
                     cellValue = new CellData(null);

@@ -129,11 +129,12 @@ public class CountFunctionTests
     }
 
     [Fact]
-    public void ShouldCreateRefErrorWhenCountRangeOutOfBounds()
+    public void ShouldIgnoreCellsPastTheGridInCount()
     {
+        sheet.Cells["A2"].Value = 1;
         sheet.Cells["A1"].Formula = "=COUNT(A2:A6)";
 
-        Assert.Equal(CellError.Ref, sheet.Cells["A1"].Value);
+        Assert.Equal(1d, sheet.Cells["A1"].Value);
     }
 }
 

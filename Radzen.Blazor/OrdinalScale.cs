@@ -49,7 +49,7 @@ namespace Radzen.Blazor
             }
 
             // Between: half a band of slack on each side so categories are centered in their band.
-            return (-0.5, count - 0.5, 1);
+            return (-0.5, Math.Max(count, 1) - 0.5, 1);
         }
 
         public override IEnumerable<double> TickValues(int distance)

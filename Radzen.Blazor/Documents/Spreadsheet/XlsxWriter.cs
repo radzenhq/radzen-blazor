@@ -33,10 +33,6 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private int tableIndex;
 
-    private const int MaxRows = 1_048_576;
-
-    private const int MaxColumns = 16_384;
-
     private const int MaxCellCharacters = 32_767;
 
     private const int MaxStreamedStyles = 4096;
@@ -1567,15 +1563,15 @@ class XlsxWriter(Workbook sourceWorkbook)
         var styleTracker = session.Styles;
         var row = saved.Last + 1;
 
-        if (row == MaxRows)
+        if (row == Worksheet.MaxRows)
         {
-            throw new InvalidOperationException($"Row {row + 1} is past the {MaxRows} rows a worksheet holds.");
+            throw new InvalidOperationException($"Row {row + 1} is past the {Worksheet.MaxRows} rows a worksheet holds.");
         }
 
-        if (line.Length > MaxColumns)
+        if (line.Length > Worksheet.MaxColumns)
         {
             throw new InvalidOperationException(
-                $"Row {row + 1} has {line.Length} cells, and a worksheet holds at most {MaxColumns} columns.");
+                $"Row {row + 1} has {line.Length} cells, and a worksheet holds at most {Worksheet.MaxColumns} columns.");
         }
 
         var firstColumn = -1;

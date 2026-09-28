@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -217,6 +218,79 @@ public static class NumberFormat
         }
 
         return false;
+    }
+
+    private static readonly SearchValues<char> elapsedTimeTokens = SearchValues.Create("hHmMsS");
+
+    internal static bool IsTextFormat(string? formatCode)
+    {
+        if (string.IsNullOrEmpty(formatCode))
+        {
+            return false;
+        }
+
+        var hasTextPlaceholder = false;
+        var inLiteral = false;
+
+        for (var i = 0; i < formatCode.Length; i++)
+        {
+            var c = formatCode[i];
+
+            if (c == '"')
+            {
+                inLiteral = !inLiteral;
+                continue;
+            }
+
+            if (inLiteral)
+            {
+                continue;
+            }
+
+            if (c is '\\' or '_' or '*')
+            {
+                i++;
+                continue;
+            }
+
+            if (c == '[')
+            {
+                var close = formatCode.IndexOf(']', i + 1);
+
+                if (close < 0)
+                {
+                    break;
+                }
+
+                var content = formatCode.AsSpan(i + 1, close - i - 1);
+
+                if (!content.IsEmpty && !content.ContainsAnyExcept(elapsedTimeTokens))
+                {
+                    return false;
+                }
+
+                i = close;
+                continue;
+            }
+
+            if (string.Compare(formatCode, i, "General", 0, 7, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                i += 6;
+                continue;
+            }
+
+            switch (c)
+            {
+                case '@':
+                    hasTextPlaceholder = true;
+                    break;
+                case '0' or '#' or '?':
+                case 'y' or 'Y' or 'm' or 'M' or 'd' or 'D' or 'h' or 'H' or 's' or 'S':
+                    return false;
+            }
+        }
+
+        return hasTextPlaceholder;
     }
 
     private static bool TryGetNumber(object? value, CellDataType type, out double number)
