@@ -228,6 +228,35 @@ public static class PropertyAccess
     }
 
     /// <summary>
+    /// Creates a function that reads a <see cref="DateTime"/>, <see cref="DateTimeOffset"/> or <see cref="DateOnly"/> property, or its nullable,
+    /// as a <see cref="DateTime"/>. A DateOnly is read at midnight and a DateTimeOffset as its clock time, since an expression tree converts neither to DateTime;
+    /// a null nullable throws, as the DateTime getter does.
+    /// </summary>
+    /// <typeparam name="TItem">The owner type.</typeparam>
+    /// <param name="propertyName">Name of the property to return.</param>
+    /// <returns>A function which returns the specified property as a DateTime.</returns>
+    [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
+    internal static Func<TItem, DateTime> DateGetter<TItem>(string propertyName)
+    {
+        var type = GetPropertyType(typeof(TItem), propertyName);
+        var underlying = type == null ? null : Nullable.GetUnderlyingType(type) ?? type;
+
+        if (underlying == typeof(DateOnly))
+        {
+            var getter = Getter<TItem, DateOnly?>(propertyName);
+            return item => getter(item)!.Value.ToDateTime(TimeOnly.MinValue);
+        }
+
+        if (underlying == typeof(DateTimeOffset))
+        {
+            var getter = Getter<TItem, DateTimeOffset?>(propertyName);
+            return item => getter(item)!.Value.DateTime;
+        }
+
+        return Getter<TItem, DateTime>(propertyName);
+    }
+
+    /// <summary>
     /// Converts a DateTime to DateOnly.
     /// </summary>
     /// <param name="source">The source DateTime.</param>

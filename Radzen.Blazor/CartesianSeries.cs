@@ -54,7 +54,7 @@ namespace Radzen.Blazor
 
             if (IsDate(CategoryProperty))
             {
-                var category = PropertyAccess.Getter<TItem, DateTime>(CategoryProperty!);
+                var category = PropertyAccess.DateGetter<TItem>(CategoryProperty!);
                 categoryPropertyCache = (item) => category(item).Ticks;
                 return categoryPropertyCache;
             }
@@ -137,11 +137,12 @@ namespace Radzen.Blazor
                 throw new ArgumentException($"Property {propertyName} does not exist");
             }
 
-            if(PropertyAccess.IsDateOnly(property))
-            {
-                return false;
-            }
             return PropertyAccess.IsDate(property);
+        }
+
+        private bool IsDateOnly(string? propertyName)
+        {
+            return !String.IsNullOrEmpty(propertyName) && PropertyAccess.IsDateOnly(PropertyAccess.GetPropertyType(typeof(TItem), propertyName));
         }
 
         /// <summary>
@@ -348,7 +349,8 @@ namespace Radzen.Blazor
                 return new DateScale
                 {
                     Input = scale.Input,
-                    Output = scale.Output
+                    Output = scale.Output,
+                    WholeDays = IsDateOnly(CategoryProperty) && (scale is not DateScale existing || existing.WholeDays)
                 };
             }
 

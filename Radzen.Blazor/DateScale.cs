@@ -11,6 +11,12 @@ namespace Radzen.Blazor
 
         private bool autoStep;
 
+        /// <summary>
+        /// Gets or sets whether the scale measures whole days, as it does for <see cref="DateOnly"/> categories: automatic ticks
+        /// never fall closer than a day apart and <see cref="Value(double)"/> returns a <see cref="DateOnly"/>.
+        /// </summary>
+        public bool WholeDays { get; set; }
+
         public override object? Step
         {
             get => step;
@@ -73,12 +79,17 @@ namespace Radzen.Blazor
 
             var rawStep = (end - start) / CalculateTickCount(distance);
 
-            return CalendarTicks(FromTicks(start), FromTicks(end), rawStep);
+            return CalendarTicks(FromTicks(start), FromTicks(end), rawStep, WholeDays);
         }
 
-        private static IEnumerable<double> CalendarTicks(DateTime start, DateTime end, double rawStepTicks)
+        private static IEnumerable<double> CalendarTicks(DateTime start, DateTime end, double rawStepTicks, bool wholeDays)
         {
             var sixMonths = TimeSpan.FromDays(183).Ticks;
+
+            if (wholeDays)
+            {
+                rawStepTicks = Math.Max(rawStepTicks, TimeSpan.FromDays(1).Ticks);
+            }
 
             if (rawStepTicks <= TimeSpan.FromDays(14).Ticks)
             {
@@ -159,24 +170,35 @@ namespace Radzen.Blazor
 
         public override object Value(double value)
         {
-            return FromTicks(value);
+            var date = FromTicks(value);
+
+            return WholeDays ? DateOnly.FromDateTime(date) : date;
         }
 
         public override void Resize(object min, object max)
         {
             if (min != null)
             {
-                var minDate = Convert.ToDateTime(min, CultureInfo.InvariantCulture);
-                Input.Start = minDate.Ticks;
+                Input.Start = ToDateTime(min).Ticks;
                 Round = false;
             }
 
             if (max != null)
             {
-                var maxDate = Convert.ToDateTime(max, CultureInfo.InvariantCulture);
-                Input.End = maxDate.Ticks;
+                Input.End = ToDateTime(max).Ticks;
                 Round = false;
             }
+        }
+
+        private static DateTime ToDateTime(object value)
+        {
+            return value switch
+            {
+                DateTime date => date,
+                DateOnly date => date.ToDateTime(TimeOnly.MinValue),
+                DateTimeOffset date => date.DateTime,
+                _ => Convert.ToDateTime(value, CultureInfo.InvariantCulture)
+            };
         }
 
         private DateTime FromTicks(double value)
@@ -188,7 +210,12 @@ namespace Radzen.Blazor
         {
             if (string.IsNullOrEmpty(format))
             {
-                return ((DateTime)value).ToShortDateString();
+                return value switch
+                {
+                    DateOnly date => date.ToShortDateString(),
+                    DateTime date => date.ToShortDateString(),
+                    _ => value.ToString() ?? string.Empty
+                };
             }
 
             return base.FormatTick(format, value);
