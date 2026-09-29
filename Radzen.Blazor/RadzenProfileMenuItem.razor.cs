@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -57,6 +58,29 @@ namespace Radzen.Blazor
         /// <value>The path.</value>
         [Parameter]
         public string? Path { get; set; }
+
+        /// <summary>
+        /// Specifies the form <c>method</c> attribute. Used together with <see cref="Action" />. Defaults to <c>post</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenProfileMenuItem Text="Sign out" Icon="power_settings_new" Method="post" Action="Account/Logout" /&gt;
+        /// </code>
+        /// </example>
+        [Parameter]
+        public string? Method { get; set; }
+
+        /// <summary>
+        /// Specifies the form <c>action</c> attribute. When set the item renders a form with a submit button that submits to the specified URL.
+        /// The form includes the antiforgery token when the application provides one and <see cref="Method" /> is not <c>get</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenProfileMenuItem Text="Sign out" Icon="power_settings_new" Action="Account/Logout" /&gt;
+        /// </code>
+        /// </example>
+        [Parameter]
+        public string? Action { get; set; }
 
         /// <summary>
         /// Gets or sets the navigation link match.
@@ -147,6 +171,23 @@ namespace Radzen.Blazor
 
                     _parent?.AddItem(this);
                 }
+            }
+        }
+
+        ElementReference form;
+
+        string GetMethod()
+        {
+            return string.IsNullOrEmpty(Method) ? "post" : Method;
+        }
+
+        internal async Task Submit()
+        {
+            await OnClick(new MouseEventArgs());
+
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.submit", form);
             }
         }
 

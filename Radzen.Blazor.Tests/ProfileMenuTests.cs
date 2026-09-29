@@ -1,6 +1,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -528,6 +530,62 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@"aria-expanded=""false""", component.Markup);
             Assert.DoesNotContain("rz-navigation-item-active", component.Markup);
+        }
+
+        [Theory]
+        [InlineData("Enter")]
+        [InlineData("Space")]
+        public void ProfileMenu_EnterOrSpaceOnActionItem_SubmitsItsForm(string code)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.Services.AddSingleton<AntiforgeryStateProvider>(new NoAntiforgeryStateProvider());
+
+            RadzenProfileMenuItem clicked = null;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.Add(p => p.Click, item => clicked = item);
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Sign out");
+                    itemParameters.Add(p => p.Action, "Account/Logout");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            toggle.KeyDown(new KeyboardEventArgs { Code = code });
+
+            var submit = Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.submit");
+            Assert.IsType<ElementReference>(Assert.Single(submit.Arguments));
+            Assert.Equal("Sign out", clicked?.Text);
+        }
+
+        [Fact]
+        public void ProfileMenu_EnterOnItemWithoutAction_DoesNotSubmit()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            toggle.KeyDown(new KeyboardEventArgs { Code = "Enter" });
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.submit");
+        }
+
+        class NoAntiforgeryStateProvider : AntiforgeryStateProvider
+        {
+            public override AntiforgeryRequestToken GetAntiforgeryToken() => null;
         }
     }
 }

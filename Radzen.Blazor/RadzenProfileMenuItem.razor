@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Components.Routing
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
 @inherits RadzenComponent
 @if (Visible)
 {
@@ -7,45 +8,48 @@
             @if (Path != null)
             {
                 <NavLink tabindex="-1" target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
-                    @if (!string.IsNullOrEmpty(Icon))
-                    {
-                        <i class="notranslate rzi rz-navigation-item-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
-                    }
-                    @if (!string.IsNullOrEmpty(Image))
-                    {
-                        <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
-                    }
-                    @if (Template != null)
-                    {
-                        @Template
-                    }
-                    else
-                    {
-                        <span class="rz-navigation-item-text">@Text</span>
-                    }
+                    @ItemContent
                 </NavLink>
+            }
+            else if (Action != null)
+            {
+                <form @ref="@form" class="rz-navigation-item-form" action="@Action" method="@GetMethod()">
+                    @if (!string.Equals(GetMethod(), "get", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <AntiforgeryToken />
+                    }
+                    <button type="submit" tabindex="-1" class="rz-navigation-item-link">
+                        @ItemContent
+                    </button>
+                </form>
             }
             else
             {
                 <div class="rz-navigation-item-link" >
-                    @if (!string.IsNullOrEmpty(Icon))
-                    {
-                        <i class="notranslate rzi rz-navigation-item-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
-                    }
-                    @if (!string.IsNullOrEmpty(Image))
-                    {
-                        <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
-                    }
-                    @if (Template != null)
-                    {
-                        @Template
-                    }
-                    else
-                    {
-                        <span class="rz-navigation-item-text">@Text</span>
-                    }
+                    @ItemContent
                 </div>
             }
         </div>
     </li>
+}
+
+@code {
+    RenderFragment ItemContent => @<text>
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="notranslate rzi rz-navigation-item-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    }
+    @if (!string.IsNullOrEmpty(Image))
+    {
+        <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
+    }
+    @if (Template != null)
+    {
+        @Template
+    }
+    else
+    {
+        <span class="rz-navigation-item-text">@Text</span>
+    }
+    </text>;
 }

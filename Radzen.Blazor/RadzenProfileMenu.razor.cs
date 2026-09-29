@@ -251,6 +251,10 @@ namespace Radzen.Blazor
                     {
                         NavigationManager?.NavigateTo(item.Path);
                     }
+                    else if (item.Action != null)
+                    {
+                        await item.Submit();
+                    }
                     else
                     {
                         await item.OnClick(new MouseEventArgs());

@@ -11,6 +11,18 @@
     <ProfileMenuConfig />
 </RadzenExample>
 
+<RadzenText Anchor="profile-menu#form-action" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Form Action
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set the <code>Action</code> and <code>Method</code> properties to make an item submit an HTML form to a URL, for example a sign out endpoint.
+    <code>Method</code> defaults to <code>post</code> and the form includes the antiforgery token, so it works with ASP.NET Core endpoints that validate it.
+    This demo uses <code>Method="get"</code> and reloads the page.
+</RadzenText>
+<RadzenExample ComponentName="ProfileMenu" Example="ProfileMenuAction">
+    <ProfileMenuAction />
+</RadzenExample>
+
 <RadzenText Anchor="profile-menu#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
@@ -25,7 +37,7 @@
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a ProfileMenu." },
         new KeyboardShortcut { Key = "Space or Enter", Action = "Open the ProfileMenu." },
-        new KeyboardShortcut { Key = "Space or Enter on a ProfileMenu item", Action = "Navigate." },
+        new KeyboardShortcut { Key = "Space or Enter on a ProfileMenu item", Action = "Navigate, or submit the form of an item with Action." },
         new KeyboardShortcut { Key = "DownArrow", Action = "Open the menu (focus the first item) when closed, or focus the next item when open." },
         new KeyboardShortcut { Key = "UpArrow", Action = "Open the menu (focus the last item) when closed, or focus the previous item when open." },
         new KeyboardShortcut { Key = "Home", Action = "Open the menu if closed and focus the first item." },

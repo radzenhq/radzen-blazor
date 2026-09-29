@@ -117,3 +117,23 @@ ul.rz-profile-menu {
     }
   }
 }
+
+.rz-profile-menu .rz-navigation-item-form {
+  margin: 0;
+}
+
+.rz-profile-menu button.rz-navigation-item-link {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: start;
+  color: inherit;
+  cursor: pointer;
+}
