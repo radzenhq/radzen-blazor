@@ -5,7 +5,7 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-form-field-content">
-        <CascadingValue Value=@context>
+        <CascadingValue Value=@context IsFixed="true">
         @if (Start != null)
         {
         <div class="rz-form-field-start">
