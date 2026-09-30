@@ -176,9 +176,127 @@
             Service.OnClose -= OnClose;
             Service.OnSideOpen -= OnSideOpen;
             Service.OnSideClose -= OnSideClose;
+            Service.OnRefresh -= RefreshSideDialog;
         }
 
+        UnsubscribeSideDialog();
+
         _ = DisposeSideDialogResizeHandleAsync();
+    }
+
+    private DialogOptions? subscribedSideDialogOptions;
+
+    private void SubscribeSideDialog()
+    {
+        if (sideDialog != null)
+        {
+            sideDialog.PropertyChanged += OnSideDialogPropertyChanged;
+        }
+
+        if (sideDialogOptions != null)
+        {
+            sideDialogOptions.PropertyChanged += OnSideDialogOptionsPropertyChanged;
+        }
+
+        SubscribeSideDialogOptions();
+    }
+
+    private void SubscribeSideDialogOptions()
+    {
+        if (subscribedSideDialogOptions != null)
+        {
+            subscribedSideDialogOptions.PropertyChanged -= OnSideDialogOptionsPropertyChanged;
+        }
+
+        subscribedSideDialogOptions = sideDialog?.Options;
+
+        if (subscribedSideDialogOptions != null)
+        {
+            subscribedSideDialogOptions.PropertyChanged += OnSideDialogOptionsPropertyChanged;
+        }
+    }
+
+    private void UnsubscribeSideDialog()
+    {
+        if (sideDialog != null)
+        {
+            sideDialog.PropertyChanged -= OnSideDialogPropertyChanged;
+        }
+
+        if (sideDialogOptions != null)
+        {
+            sideDialogOptions.PropertyChanged -= OnSideDialogOptionsPropertyChanged;
+        }
+
+        if (subscribedSideDialogOptions != null)
+        {
+            subscribedSideDialogOptions.PropertyChanged -= OnSideDialogOptionsPropertyChanged;
+            subscribedSideDialogOptions = null;
+        }
+    }
+
+    private void OnSideDialogPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Dialog.Options))
+        {
+            SubscribeSideDialogOptions();
+        }
+
+        RefreshSideDialog();
+    }
+
+    private void OnSideDialogOptionsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (sender is DialogOptionsBase source && e.PropertyName != null)
+        {
+            if (ReferenceEquals(source, sideDialog?.Options) && sideDialogOptions != null)
+            {
+                CopySideDialogOption(source, sideDialogOptions, e.PropertyName);
+            }
+            else if (ReferenceEquals(source, sideDialogOptions) && sideDialog?.Options != null)
+            {
+                CopySideDialogOption(source, sideDialog.Options, e.PropertyName);
+
+                if (e.PropertyName == nameof(SideDialogOptions.Title) && sideDialog != null)
+                {
+                    sideDialog.Title = sideDialogOptions.Title;
+                }
+            }
+        }
+
+        RefreshSideDialog();
+    }
+
+    private static void CopySideDialogOption(DialogOptionsBase source, DialogOptionsBase target, string propertyName)
+    {
+        switch (propertyName)
+        {
+            case nameof(DialogOptionsBase.ShowTitle): target.ShowTitle = source.ShowTitle; break;
+            case nameof(DialogOptionsBase.ShowClose): target.ShowClose = source.ShowClose; break;
+            case nameof(DialogOptionsBase.AriaLabel): target.AriaLabel = source.AriaLabel; break;
+            case nameof(DialogOptionsBase.CloseAriaLabel): target.CloseAriaLabel = source.CloseAriaLabel; break;
+            case nameof(DialogOptionsBase.Width): target.Width = source.Width; break;
+            case nameof(DialogOptionsBase.Height): target.Height = source.Height; break;
+            case nameof(DialogOptionsBase.Style): target.Style = source.Style; break;
+            case nameof(DialogOptionsBase.CloseDialogOnOverlayClick): target.CloseDialogOnOverlayClick = source.CloseDialogOnOverlayClick; break;
+            case nameof(DialogOptionsBase.CssClass): target.CssClass = source.CssClass; break;
+            case nameof(DialogOptionsBase.WrapperCssClass): target.WrapperCssClass = source.WrapperCssClass; break;
+            case nameof(DialogOptionsBase.ContentCssClass): target.ContentCssClass = source.ContentCssClass; break;
+            case nameof(DialogOptionsBase.CloseTabIndex): target.CloseTabIndex = source.CloseTabIndex; break;
+            case nameof(DialogOptionsBase.CanClose): target.CanClose = source.CanClose; break;
+            case nameof(DialogOptionsBase.TitleContent): target.TitleContent = source.TitleContent; break;
+            case nameof(DialogOptionsBase.Resizable): target.Resizable = source.Resizable; break;
+        }
+    }
+
+    private void RefreshSideDialog()
+    {
+        if (!isSideDialogOpen)
+        {
+            return;
+        }
+
+        InvokeAsync(StateHasChanged).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -189,10 +307,13 @@
         Service.OnClose += OnClose;
         Service.OnSideOpen += OnSideOpen;
         Service.OnSideClose += OnSideClose;
+        Service.OnRefresh += RefreshSideDialog;
     }
 
     private void OnSideOpen(Type sideComponent, Dictionary<string, object?> parameters, SideDialogOptions options)
     {
+        UnsubscribeSideDialog();
+
         sideDialogOptions = options;
 
         // Create a DialogOptions from SideDialogOptions by copying common properties
@@ -218,6 +339,8 @@
         {
             Title = options.Title, Type = sideComponent, Parameters = parameters, Options = dialogOptions
         };
+
+        SubscribeSideDialog();
 
         // Wrap the content in a CascadingValue to provide the Dialog object to child components
         sideDialogContent = new RenderFragment(builder =>
@@ -268,7 +391,11 @@
         sideDialogClosing = false;
         sideDialogJsOpened = false;
 
+        UnsubscribeSideDialog();
+
         StateHasChanged();
+
+        await DisposeSideDialogResizeHandleAsync();
 
         try
         {
@@ -339,9 +466,16 @@
 
             if (sideDialogOptions is { Resizable: true } && resizeBarElement.HasValue)
             {
-                sideDialogResizeHandleJsModule =
-                    await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSideDialogResizer",
-                        resizeBarElement, sideDialogElement, sideDialogOptions);
+                if (sideDialogResizeHandleJsModule == null)
+                {
+                    sideDialogResizeHandleJsModule =
+                        await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSideDialogResizer",
+                            resizeBarElement, sideDialogElement, sideDialogOptions);
+                }
+            }
+            else
+            {
+                await DisposeSideDialogResizeHandleAsync();
             }
         }
     }

@@ -2,10 +2,16 @@
 
 <div class="rz-p-12 rz-text-align-center">
 	<RadzenButton Text="Update dialog properties" ButtonStyle="ButtonStyle.Secondary" Click=@OpenDialog />
+	<RadzenButton Text="Update side dialog properties" ButtonStyle="ButtonStyle.Secondary" Click=@OpenSideDialog />
 </div>
 @code {
 	private async Task OpenDialog()
 	{
 		await DialogService.OpenAsync<DialogWithCascadingValueImplementation>("Original title text");
+	}
+
+	private async Task OpenSideDialog()
+	{
+		await DialogService.OpenSideAsync<DialogWithCascadingValueImplementation>("Original title text", options: new SideDialogOptions { Resizable = true });
 	}
 }
