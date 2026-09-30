@@ -7173,6 +7173,16 @@ Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) 
     input.removeEventListener('paste', onPaste);
   }};
 };
+Radzen.menuItemActivate = function (e) {
+  var item = e.target;
+  if (!item || item.nodeType !== 1 || item.tagName !== 'LI' || item.getAttribute('role') !== 'menuitem') return;
+  if (item.getAttribute('aria-disabled') === 'true') return;
+  var link = item.querySelector(':scope > .rz-navigation-item-wrapper > .rz-navigation-item-link');
+  if (!link) return;
+  e.stopPropagation();
+  link.dispatchEvent(new MouseEvent('click', e));
+};
+document.addEventListener('click', Radzen.menuItemActivate, true);
 Radzen.menuClick = function (e) {
   var item = e.target.closest('.rz-navigation-item-wrapper');
   if (!item) return;
