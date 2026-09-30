@@ -2338,7 +2338,7 @@ namespace Radzen.Blazor
                     return "";
                 }
 
-                var width = MonthsToDisplay > 1 ? $"width: calc(var(--rz-datepicker-popup-width) * {MonthsToDisplay});" : "";
+                var width = MonthsToDisplay > 1 ? $"--rz-datepicker-months: {MonthsToDisplay};" : "";
 
                 return $"{contentStyle}{width}";
             }

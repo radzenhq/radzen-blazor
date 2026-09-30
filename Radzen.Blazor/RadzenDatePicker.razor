@@ -56,7 +56,10 @@
                             <div class="rz-calendar-title">
                                 @if (NavigationMode == DatePickerNavigationMode.DrillDown)
                                 {
-                                    <button id="@(GetId() + "tb")" type="button" tabindex="@TabIndex" class="rz-calendar-title-button" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">@GetViewTitle()</button>
+                                    <button id="@(GetId() + "tb")" type="button" tabindex="@TabIndex" class="rz-calendar-title-button@(currentView == CalendarViewKind.Years ? " rz-calendar-title-static" : "")" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")"><span class="rz-calendar-title-text">@GetViewTitle()</span>@if (currentView != CalendarViewKind.Years)
+                                    {
+                                        <span class="notranslate rzi rz-calendar-title-icon" aria-hidden="true"></span>
+                                    }</button>
                                 }
                                 else
                                 {
@@ -126,7 +129,7 @@
                                             }
                                             @if (NavigationMode == DatePickerNavigationMode.DrillDown)
                                             {
-                                                <button id="@(GetId() + "tb" + monthIndex)" type="button" tabindex="@TabIndex" class="rz-calendar-month-title rz-calendar-title-button" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">@GetMonthTitle(visibleMonth)</button>
+                                                <button id="@(GetId() + "tb" + monthIndex)" type="button" tabindex="@TabIndex" class="rz-calendar-month-title rz-calendar-title-button" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")"><span class="rz-calendar-title-text">@GetMonthTitle(visibleMonth)</span><span class="notranslate rzi rz-calendar-title-icon" aria-hidden="true"></span></button>
                                             }
                                             else
                                             {
