@@ -1514,7 +1514,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         return groups;
     }
 
-    private static readonly XmlWriterSettings PartXmlSettings = new() { Indent = true };
+    private static readonly XmlWriterSettings PartXmlSettings = new();
 
     private static readonly XName SheetDataElement = XName.Get("sheetData", Main);
 
