@@ -590,7 +590,6 @@ public class WorkbookStreamedRowsTests
         using var content = zip.GetEntry("xl/worksheets/sheet1.xml")!.Open();
         var sheet = XDocument.Load(content, LoadOptions.PreserveWhitespace);
 
-        // Numbers reads whitespace inside <is> as part of the text.
         var inline = sheet.Descendants(Main + "is").Single();
 
         Assert.Equal("Lavender", inline.Value);

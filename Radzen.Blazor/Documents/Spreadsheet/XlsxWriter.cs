@@ -1514,7 +1514,8 @@ class XlsxWriter(Workbook sourceWorkbook)
         return groups;
     }
 
-    private static readonly XmlWriterSettings PartXmlSettings = new();
+    // Apple Numbers reads the indentation whitespace inside <is> as part of the cell text.
+    private static readonly XmlWriterSettings PartXmlSettings = new() { Indent = false };
 
     private static readonly XName SheetDataElement = XName.Get("sheetData", Main);
 
