@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -7,6 +8,8 @@ namespace Radzen.Blazor
     /// </summary>
     public class RadzenTicks : ComponentBase
     {
+        private AxisBase? axis;
+
         /// <summary>
         /// Specifies the color of the ticks lines.
         /// </summary>
@@ -33,6 +36,8 @@ namespace Radzen.Blazor
         {
             set
             {
+                axis = value;
+
                 if (value != null)
                 {
                     value.Ticks = this;
@@ -46,5 +51,18 @@ namespace Radzen.Blazor
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TickTemplateContext>? Template { get; set; }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var hadTemplate = Template != null;
+
+            await base.SetParametersAsync(parameters);
+
+            if (hadTemplate != (Template != null) && axis?.Chart != null)
+            {
+                await axis.Chart.Refresh();
+            }
+        }
     }
 }

@@ -40,18 +40,16 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [CascadingTypeParameter(nameof(TItem))]
-    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2046, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2055, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2060, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
-    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.DataTypePreserved)]
-    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenPivotDataGrid<TItem> : PagedDataBoundComponent<TItem>
+    public partial class RadzenPivotDataGrid<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : PagedDataBoundComponent<TItem>
     {
         private class RowHeaderCell
         {
@@ -645,6 +643,7 @@ namespace Radzen.Blazor
             return root;
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         void BuildColumnHeaderTreeRecursive(ColumnHeaderNode node, IQueryable<TItem> items, int level, List<object> path)
         {
             if (level >= pivotColumns.Count)
@@ -735,6 +734,7 @@ namespace Radzen.Blazor
         /// Keeps the most significant groups when their number exceeds the configured limit and collects the items of the remaining groups.
         /// Groups are ranked by the sorted aggregate or the first aggregate; the kept groups preserve their current order.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private List<GroupResult> ApplyMaxGroups(IEnumerable<GroupResult> groups, int? maxGroups, out List<TItem>? othersItems)
         {
             othersItems = null;
@@ -879,6 +879,7 @@ namespace Radzen.Blazor
             return isOData != null ? isOData.Value : false;
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         internal async Task InvokeLoadData(int start, int top)
         {
             if (LoadData.HasDelegate)
@@ -1044,6 +1045,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Renders pivot rows with real data aggregation and grouping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         protected virtual RenderFragment RenderPivotRows()
         {
             return new RenderFragment(builder =>
@@ -1206,6 +1208,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Renders footer with grand totals for each value column.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         protected RenderFragment RenderFooter()
         {
             return new RenderFragment(builder =>
@@ -1295,6 +1298,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="pivotRow">The pivot row data.</param>
         /// <returns>The items for this row.</returns>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private IQueryable<TItem> GetRowItems(PivotBodyRow pivotRow)
         {
             if (Data == null || pivotRows.Count == 0)
@@ -1406,6 +1410,7 @@ namespace Radzen.Blazor
 
         // Resolves and caches the aggregate property's type and whether it is numeric,
         // avoiding repeated reflection for every aggregated cell.
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private (Type? Type, bool IsNumeric) GetAggregatePropertyInfo(RadzenPivotAggregate<TItem> aggregate)
         {
             var key = aggregate.Property ?? string.Empty;
@@ -1433,6 +1438,7 @@ namespace Radzen.Blazor
         /// <param name="items">The items to aggregate.</param>
         /// <param name="aggregate">The aggregate configuration.</param>
         /// <returns>The aggregated value.</returns>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         public object? GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate)
         {
             ArgumentNullException.ThrowIfNull(aggregate);
@@ -1523,6 +1529,7 @@ namespace Radzen.Blazor
 
             return root;
         }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private void BuildRowHeaderTreeRecursive(RowHeaderNode node, IQueryable<TItem> items, int level, List<object> path)
         {
             if (level >= pivotRows.Count)
@@ -1672,6 +1679,7 @@ namespace Radzen.Blazor
 
         // Computes the value cells for a row by bucketing its items by column leaf in a single pass,
         // then aggregating each bucket - instead of re-filtering the items per cell.
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private void PopulateValueCells(PivotBodyRow row, IList<TItem> rowItems)
         {
             var colLeaves = CachedColumnLeaves;
@@ -1698,6 +1706,7 @@ namespace Radzen.Blazor
 
         // Buckets items by the column leaf they belong to. Each item is assigned to the shortest
         // column-value prefix that is an actual leaf, which handles collapsed (shorter) column paths.
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private Dictionary<string, List<TItem>> GroupItemsByColumnLeaf(IList<TItem> items, List<List<object>> colLeaves)
         {
             var buckets = new Dictionary<string, List<TItem>>();
@@ -1946,6 +1955,7 @@ namespace Radzen.Blazor
             public object? Value { get; set; }
             public string? Title { get; set; }
             public List<RowHeaderNode> Children { get; set; } = new List<RowHeaderNode>();
+            [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
             public IQueryable<TItem> Items { get; set; } = Enumerable.Empty<TItem>().AsQueryable();
             public int Level { get; set; }
             public bool IsCollapsed { get; set; }
@@ -2129,6 +2139,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the filter property type for a field.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private static Type GetFilterPropertyType(RadzenPivotField<TItem> field)
         {
             if (field == null || string.IsNullOrEmpty(field.Property))
@@ -2578,6 +2589,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Override the View property to apply sorting and filtering.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         public override IQueryable<TItem> View
         {
             get
@@ -2616,6 +2628,7 @@ namespace Radzen.Blazor
             AggregateFunction.Max
         };
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         IEnumerable<AggregateFunction> GetAggregates(string propertyName)
         {
             var propertyType = propertyName != null ? PropertyAccess.GetPropertyType(typeof(TItem), propertyName) : null;

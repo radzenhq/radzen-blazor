@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -10,21 +11,23 @@ namespace Radzen
     {
         static readonly ConcurrentDictionary<Type, bool> reliableHashes = new();
 
-        internal static bool HashesReliably(Type type) =>
-            reliableHashes.GetOrAdd(type, static t =>
+        internal static bool HashesReliably(Type type) => reliableHashes.GetOrAdd(type, ComputeHashesReliably);
+
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.EqualityOverridesPreserved)]
+        static bool ComputeHashesReliably(Type t)
+        {
+            if (t.IsPrimitive || t.IsEnum || t == typeof(string))
             {
-                if (t.IsPrimitive || t.IsEnum || t == typeof(string))
-                {
-                    return true;
-                }
+                return true;
+            }
 
-                var equals = t.GetMethod(nameof(object.Equals), new[] { typeof(object) });
-                var hashCode = t.GetMethod(nameof(object.GetHashCode), Type.EmptyTypes);
+            var equals = t.GetMethod(nameof(object.Equals), new[] { typeof(object) });
+            var hashCode = t.GetMethod(nameof(object.GetHashCode), Type.EmptyTypes);
 
-                return equals == null || hashCode == null
-                    || equals.DeclaringType == hashCode.DeclaringType
-                    || !hashCode.DeclaringType!.IsAssignableFrom(equals.DeclaringType);
-            });
+            return equals == null || hashCode == null
+                || equals.DeclaringType == hashCode.DeclaringType
+                || !hashCode.DeclaringType!.IsAssignableFrom(equals.DeclaringType);
+        }
 
         internal static HashSet<object?>? TryCreateSet(IEnumerable values)
         {

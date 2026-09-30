@@ -70,6 +70,40 @@ namespace Radzen.Blazor.Rendering
         }
 
         /// <summary>
+        /// The default opacity at the value tip of column and bar gradients.
+        /// </summary>
+        public const double DefaultStartOpacity = 0.85;
+
+        /// <summary>
+        /// The default opacity at the axis baseline of column and bar gradients.
+        /// </summary>
+        public const double DefaultEndOpacity = 0.4;
+
+        /// <summary>
+        /// The CSS variable a theme can set to change the default opacity at the value tip.
+        /// </summary>
+        public const string StartOpacityVariable = "--rz-chart-gradient-start-opacity";
+
+        /// <summary>
+        /// The CSS variable a theme can set to change the default opacity at the axis baseline.
+        /// </summary>
+        public const string EndOpacityVariable = "--rz-chart-gradient-end-opacity";
+
+        /// <summary>
+        /// Formats a stop opacity. A value left at its default reads the theme CSS variable with the
+        /// default as fallback; any other value was set explicitly and is emitted as is.
+        /// </summary>
+        /// <param name="value">The opacity to emit.</param>
+        /// <param name="defaultValue">The default opacity of the series parameter.</param>
+        /// <param name="variable">The name of the CSS variable that overrides the default.</param>
+        public static string StopOpacity(double value, double defaultValue, string variable)
+        {
+            var text = value.ToInvariantString();
+
+            return value == defaultValue ? $"var({variable}, {text})" : text;
+        }
+
+        /// <summary>
         /// Computes the stop opacity at offset 0 and offset 1 so the value tip is fully colored and
         /// the fill fades out toward the axis baseline, regardless of orientation or value sign.
         /// </summary>
@@ -78,6 +112,20 @@ namespace Radzen.Blazor.Rendering
         /// <param name="startOpacity">The opacity at the value tip.</param>
         /// <param name="endOpacity">The opacity at the axis baseline.</param>
         public static (double Offset0, double Offset1) Stops(bool vertical, int sign, double startOpacity, double endOpacity)
+        {
+            var tipAtOffset0 = vertical ? sign >= 0 : sign < 0;
+
+            return tipAtOffset0 ? (startOpacity, endOpacity) : (endOpacity, startOpacity);
+        }
+
+        /// <summary>
+        /// Orders already formatted stop opacities the same way as the numeric overload.
+        /// </summary>
+        /// <param name="vertical"><c>true</c> for column series (vertical gradient), <c>false</c> for bar series (horizontal).</param>
+        /// <param name="sign">The sign of the value: <c>1</c> for non-negative, <c>-1</c> for negative.</param>
+        /// <param name="startOpacity">The formatted opacity at the value tip.</param>
+        /// <param name="endOpacity">The formatted opacity at the axis baseline.</param>
+        public static (string Offset0, string Offset1) Stops(bool vertical, int sign, string startOpacity, string endOpacity)
         {
             var tipAtOffset0 = vertical ? sign >= 0 : sign < 0;
 

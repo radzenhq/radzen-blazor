@@ -18,6 +18,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.*-*" PrivateAssets="all" />
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+    <!-- Models live in a separate <IsTrimmable> assembly so the trimmer strips members that are only
+         set via initializers and read by Radzen via reflection - the real reflection-over-T scenario. -->
+    <ProjectReference Include="..\Radzen.Blazor.TrimTest.Models\Radzen.Blazor.TrimTest.Models.csproj" />
   </ItemGroup>
 
 </Project>

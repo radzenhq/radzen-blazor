@@ -13,7 +13,7 @@ public class TableCell : INode, IBlockInlineContainer
     /// <summary>
     /// Gets the alignment of the table cell.
     /// </summary>
-    public TableCellAlignment Alignment { get; }
+    public TableCellAlignment Alignment { get; internal set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TableCell"/> class.
@@ -30,6 +30,16 @@ public class TableCell : INode, IBlockInlineContainer
     /// Gets or sets the inline content of the cell.
     /// </summary>
     public string Value { get; set; }
+    
+    internal ContentMap Content { get; } = new();
+
+    internal bool Pristine { get; set; }
+
+    internal void ReplaceInlines(IEnumerable<Inline> inlines)
+    {
+        children.Clear();
+        children.AddRange(inlines);
+    }
 
     /// <summary>
     /// Gets the children of the table cell.

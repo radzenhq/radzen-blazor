@@ -399,6 +399,8 @@
   --rz-datepicker-calendar-selected-background-color: #{$datepicker-calendar-selected-background-color};
   --rz-datepicker-calendar-selected-hover-color: #{$datepicker-calendar-selected-hover-color};
   --rz-datepicker-calendar-selected-hover-background-color: #{$datepicker-calendar-selected-hover-background-color};
+  --rz-datepicker-calendar-range-color: #{$datepicker-calendar-range-color};
+  --rz-datepicker-calendar-range-background-color: #{$datepicker-calendar-range-background-color};
   --rz-datepicker-calendar-border: #{$datepicker-calendar-border};
   --rz-datepicker-calendar-border-radius: #{$datepicker-calendar-border-radius};
   --rz-datepicker-calendar-transition: #{$datepicker-calendar-transition};
@@ -1176,6 +1178,8 @@
   --rz-scheduler-year-slot-title-border-radius: #{$scheduler-year-slot-title-border-radius};
   --rz-scheduler-planner-slot-width: #{$scheduler-planner-slot-width};
   --rz-scheduler-planner-slot-height: #{$scheduler-planner-slot-height};
+  --rz-scheduler-resource-group-height: #{$scheduler-resource-group-height};
+  --rz-scheduler-resource-group-min-width: #{$scheduler-resource-group-min-width};
   --rz-scheduler-focus-outline: #{$scheduler-focus-outline};
   --rz-scheduler-focus-outline-offset: #{$scheduler-focus-outline-offset};
   --rz-scheduler-highlight-background-color: #{$scheduler-highlight-background-color};
@@ -1193,6 +1197,26 @@
   --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
   --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
+
+  /* VirtualKeyboard */
+  --rz-virtual-keyboard-panel-background-color: #{$rz-virtual-keyboard-panel-background-color};
+  --rz-virtual-keyboard-panel-padding: #{$rz-virtual-keyboard-panel-padding};
+  --rz-virtual-keyboard-panel-border-radius: #{$rz-virtual-keyboard-panel-border-radius};
+  --rz-virtual-keyboard-panel-shadow: #{$rz-virtual-keyboard-panel-shadow};
+  --rz-virtual-keyboard-key-gap: #{$rz-virtual-keyboard-key-gap};
+  --rz-virtual-keyboard-key-min-width: #{$rz-virtual-keyboard-key-min-width};
+  --rz-virtual-keyboard-key-height: #{$rz-virtual-keyboard-key-height};
+  --rz-virtual-keyboard-key-border-radius: #{$rz-virtual-keyboard-key-border-radius};
+  --rz-virtual-keyboard-key-shadow: #{$rz-virtual-keyboard-key-shadow};
+  --rz-virtual-keyboard-key-font-size: #{$rz-virtual-keyboard-key-font-size};
+  --rz-virtual-keyboard-key-background-color: #{$rz-virtual-keyboard-key-background-color};
+  --rz-virtual-keyboard-key-color: #{$rz-virtual-keyboard-key-color};
+  --rz-virtual-keyboard-key-hover-background-color: #{$rz-virtual-keyboard-key-hover-background-color};
+  --rz-virtual-keyboard-key-active-background-color: #{$rz-virtual-keyboard-key-active-background-color};
+  --rz-virtual-keyboard-key-action-background-color: #{$rz-virtual-keyboard-key-action-background-color};
+  --rz-virtual-keyboard-key-action-color: #{$rz-virtual-keyboard-key-action-color};
+  --rz-virtual-keyboard-key-selected-background-color: #{$rz-virtual-keyboard-key-selected-background-color};
+  --rz-virtual-keyboard-key-selected-color: #{$rz-virtual-keyboard-key-selected-color};
 
   /* SignaturePad */
   --rz-signature-pad-border: #{$rz-signature-pad-border};

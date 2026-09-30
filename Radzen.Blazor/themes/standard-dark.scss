@@ -584,6 +584,8 @@ $datepicker-calendar-selected-color: var(--rz-on-primary) !default;
 $datepicker-calendar-selected-background-color: var(--rz-primary) !default;
 $datepicker-calendar-selected-hover-color: var(--rz-on-primary-dark) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-primary-dark) !default;
+$datepicker-calendar-range-color: var(--rz-on-primary-lighter) !default;
+$datepicker-calendar-range-background-color: var(--rz-primary-lighter) !default;
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: var(--rz-border-radius) !default;
 $datepicker-calendar-today-color: var(--rz-primary) !default;
@@ -813,6 +815,12 @@ $spreadsheet-cell-border: var(--rz-border-base-700) !default;
 $spreadsheet-header-background-color: var(--rz-base-800) !default;
 $spreadsheet-header-active-background-color: var(--rz-primary-lighter) !default;
 $spreadsheet-splitter-background-color: var(--rz-base-700) !default;
+
+$rz-virtual-keyboard-panel-background-color: var(--rz-base-900) !default;
+$rz-virtual-keyboard-key-background-color: var(--rz-base-600) !default;
+$rz-virtual-keyboard-key-hover-background-color: var(--rz-base-500) !default;
+$rz-virtual-keyboard-key-active-background-color: var(--rz-base-700) !default;
+$rz-virtual-keyboard-key-action-background-color: var(--rz-base-700) !default;
 
 @import 'fonts';
 @import 'components';

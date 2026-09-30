@@ -8,6 +8,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class ThematicBreak : Block
 {
+    internal string? Line { get; set; }
+
     private static readonly Regex ThematicBreakRegex = new (@"^(?:\*[ \t]*){3,}$|^(?:_[ \t]*){3,}$|^(?:-[ \t]*){3,}$");
 
     /// <inheritdoc />

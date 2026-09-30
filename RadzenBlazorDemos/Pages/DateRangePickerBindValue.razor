@@ -1,0 +1,14 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date Range" Component="DateRangePickerBindValue" />
+    <RadzenDateRangePicker @bind-Value=@range DateFormat="dd/MM/yyyy" AllowClear="true" Name="DateRangePickerBindValue" Style="min-width: 260px;" />
+</RadzenStack>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" class="rz-pb-12">
+    <RadzenText TextStyle="TextStyle.Body2">
+        @(range?.Start?.ToString("D") ?? "No start date") - @(range?.End?.ToString("D") ?? "no end date")
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    DateRange range = new DateRange(DateTime.Today, DateTime.Today.AddDays(7));
+}

@@ -16,11 +16,44 @@
           {
               return AxisMeasurer.XAxis(chart.ValueScale, chart.ValueAxis, chart.ValueAxis.Title);
           }
+          else if (LabelLayout != null)
+          {
+              return LabelLayout.Size;
+          }
           else
           {
               return AxisMeasurer.XAxis(chart.CategoryScale, this, Title);
           }
       }
+
+      internal CategoryAxisLabelLayout? LabelLayout { get; private set; }
+
+      internal bool CanFitLabels => LabelFit == CategoryAxisLabelFit.Auto && Ticks.Template == null && Visible;
+
+      internal void FitLabels(ScaleBase scale, bool vertical, double maxSize, double plotLeft = 0, double width = 0, bool readableMinimum = true)
+      {
+          LabelLayout = null;
+
+          if (!CanFitLabels || (readableMinimum && !(maxSize > 0)))
+          {
+              return;
+          }
+
+          LabelLayout = vertical
+              ? AxisMeasurer.VerticalCategoryLabels(scale, this, Title, maxSize, readableMinimum)
+              : AxisMeasurer.HorizontalCategoryLabels(scale, this, Title, maxSize, plotLeft, width);
+      }
+
+      /// <summary>
+      /// Specifies how category labels that do not fit the available space are displayed. A <see cref="RadzenTicks.Template" /> displays every category
+      /// unchanged. <see cref="CategoryAxisLabelFit.Auto" /> fits the labels once the chart knows its size: <see cref="AxisBase.LabelRotation" /> and
+      /// <see cref="AxisBase.LabelAutoRotation" /> only choose the angle of the rotated labels, which are still skipped when they overlap and shortened when they
+      /// are too long. <see cref="CategoryAxisLabelFit.None" /> displays every label in full, rotated only as <see cref="AxisBase.LabelRotation" /> and
+      /// <see cref="AxisBase.LabelAutoRotation" /> specify. Shortened labels keep their full text in the SVG title shown on hover and in the series tooltips.
+      /// </summary>
+      /// <value>Defaults to <see cref="CategoryAxisLabelFit.Auto" />.</value>
+      [Parameter]
+      public CategoryAxisLabelFit LabelFit { get; set; } = CategoryAxisLabelFit.Auto;
 
       [Parameter]
       public double Padding { get; set; }
@@ -36,8 +69,10 @@
       protected override bool ShouldRefreshChart(ParameterView parameters)
       {
           return base.ShouldRefreshChart(parameters)
+              || Chart == null
               || DidParameterChange(parameters, nameof(Padding), Padding)
-              || DidParameterChange(parameters, nameof(TickPlacement), TickPlacement);
+              || DidParameterChange(parameters, nameof(TickPlacement), TickPlacement)
+              || DidParameterChange(parameters, nameof(LabelFit), LabelFit);
       }
 
       internal override double Size

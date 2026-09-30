@@ -7,7 +7,8 @@ namespace Radzen.Blazor
     /// RadzenCheckBoxListItem component.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public partial class RadzenCheckBoxListItem<TValue> : RadzenComponent, IRadzenCheckBoxListItem
+    public partial class RadzenCheckBoxListItem<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TValue> : RadzenComponent, IRadzenCheckBoxListItem
     {
         /// <summary>
         /// Gets or sets the text.

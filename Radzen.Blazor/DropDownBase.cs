@@ -16,7 +16,8 @@ namespace Radzen
     /// Base class of components that display a list of items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DropDownBase<T> : DataBoundFormComponent<T>
+    public class DropDownBase<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T> : DataBoundFormComponent<T>
     {
         /// <summary>
         /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.
@@ -594,6 +595,7 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>The accessible name or <c>null</c>.</returns>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ToStringOverridesPreserved)]
         public string? GetItemAriaLabel(object? item)
         {
             if (item == null)
@@ -1009,7 +1011,7 @@ namespace Radzen
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
                     query)
-                    .Cast(elementType).Cast<dynamic>().ToList();
+                    .Cast(elementType).Cast<object>().ToList();
 
                 if (previousKey != args.Key)
                 {
@@ -1661,9 +1663,9 @@ namespace Radzen
                             else
                             {
                                 // Non-in-memory (e.g. EF): keep the per-value query so the lookup stays server-side.
-                                foreach (object v in values.Cast<dynamic>().ToList())
+                                foreach (object v in values.Cast<object>().ToList())
                                 {
-                                    dynamic item = view.AsQueryable().Where(new FilterDescriptor[]
+                                    object item = view.AsQueryable().Where(new FilterDescriptor[]
                                     {
                                         new FilterDescriptor()
                                         {

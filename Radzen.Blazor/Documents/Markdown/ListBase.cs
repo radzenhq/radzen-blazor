@@ -69,6 +69,7 @@ public abstract class List : BlockContainer
         if (LastChild != null)
         {
             Range.End = LastChild.Range.End;
+            SourceEnd = LastChild.SourceEnd;
         }
     }
 }

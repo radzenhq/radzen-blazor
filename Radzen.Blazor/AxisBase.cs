@@ -90,14 +90,16 @@ namespace Radzen.Blazor
         public int? Width { get; set; }
 
         /// <summary>
-        /// Specifies the minimum value of the axis.
+        /// Specifies the minimum value of the axis. The axis starts exactly at this value. Unless <see cref="Max" /> or <see cref="Step" /> is also set
+        /// the other end of the axis is still rounded to a tick and the ticks are placed on multiples of the step.
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]
         public object? Min { get; set; }
 
         /// <summary>
-        /// Specifies the maximum value of the axis.
+        /// Specifies the maximum value of the axis. The axis ends exactly at this value. Unless <see cref="Min" /> or <see cref="Step" /> is also set
+        /// the other end of the axis is still rounded to a tick and the ticks are placed on multiples of the step.
         /// </summary>
         /// <value>The maximum.</value>
         [Parameter]
@@ -149,13 +151,20 @@ namespace Radzen.Blazor
         public object? CrossesAt { get; set; }
 
         /// <summary>
-        /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
+        /// Specifies the label rotation angle in degrees. Applies to horizontal axes. When set the labels are always rotated by this angle.
+        /// Has higher precedence than <see cref="LabelAutoRotation"/>. On a category axis whose <see cref="RadzenCategoryAxis.LabelFit" /> is
+        /// <see cref="CategoryAxisLabelFit.Auto" /> it only sets the angle - labels that would overlap at this angle are still skipped and labels longer than
+        /// the available space are still shortened with an ellipsis. Set to <c>null</c> by default which means no explicit rotation.
         /// </summary>
         [Parameter]
         public double? LabelRotation { get; set; } = null;
 
         /// <summary>
-        /// Specifies the automatic label rotation angle in degrees. If set RadzenChart will automatically rotate the labels to fit the available space by the specified value. Has lower precedence than <see cref="LabelRotation"/>.
+        /// Specifies the automatic label rotation angle in degrees. Applies to horizontal axes. When set the labels are rotated by this angle only when they
+        /// do not fit the available space - on a category axis whose <see cref="RadzenCategoryAxis.LabelFit" /> is <see cref="CategoryAxisLabelFit.Auto" />,
+        /// only when they still do not fit after labels are skipped. Has lower precedence than <see cref="LabelRotation"/>. On a category axis whose <see cref="RadzenCategoryAxis.LabelFit" />
+        /// is <see cref="CategoryAxisLabelFit.Auto" /> it replaces the default angle of -45 degrees - rotated labels that would overlap are still skipped and
+        /// labels longer than the available space are still shortened with an ellipsis. Set to <c>null</c> by default which means no explicit rotation.
         /// </summary>
         [Parameter]
         public double? LabelAutoRotation { get; set; } = null;

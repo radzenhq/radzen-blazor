@@ -1,0 +1,75 @@
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="RoomBooking" Data="@model" Submit=@OnSubmit>
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Title" Style="width: 6rem;" />
+            <RadzenTextBox @bind-Value="@model.Text" Name="Text" Style="width: 14rem;" />
+            <RadzenRequiredValidator Component="Text" Text="Title is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Rooms" Style="width: 6rem;" />
+            <RadzenDropDown @bind-Value="@roomIds" Data="@Rooms" TextProperty="Name" ValueProperty="Id" Multiple="true" Chips="true" Name="Rooms" Style="width: 14rem;" />
+            <RadzenRequiredValidator Component="Rooms" Text="Select at least one room" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Employee" Style="width: 6rem;" />
+            <RadzenDropDown @bind-Value="@model.StaffId" Data="@Employees" TextProperty="Name" ValueProperty="Id" Name="Employee" Style="width: 14rem;" />
+            <RadzenNumericRangeValidator Component="Employee" Min="1" Text="Employee is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="All day" Style="width: 6rem;" Component="AllDay" />
+            <RadzenSwitch @bind-Value="@model.AllDay" Name="AllDay" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 6rem;" />
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="@(!model.AllDay)" Style="width: 14rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Start is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="End" Style="width: 6rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="@(!model.AllDay)" Style="width: 14rem;" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public RoomBooking Booking { get; set; }
+
+    [Parameter]
+    public IEnumerable<Room> Rooms { get; set; }
+
+    [Parameter]
+    public IEnumerable<Staff> Employees { get; set; }
+
+    RoomBooking model = new RoomBooking();
+    IEnumerable<int> roomIds = Array.Empty<int>();
+
+    protected override void OnParametersSet()
+    {
+        model.Text = Booking.Text;
+        model.Start = Booking.Start;
+        model.End = Booking.End;
+        model.AllDay = Booking.AllDay;
+        model.StaffId = Booking.StaffId;
+        roomIds = Booking.RoomIds.ToArray();
+    }
+
+    void OnSubmit(RoomBooking model)
+    {
+        model.RoomIds = roomIds.ToList();
+
+        if (model.AllDay)
+        {
+            model.Start = model.Start.Date;
+            model.End = model.End.Date > model.Start.Date ? model.End.Date : model.Start.Date.AddDays(1);
+        }
+
+        DialogService.Close(model);
+    }
+}

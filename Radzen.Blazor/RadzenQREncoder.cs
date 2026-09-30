@@ -155,9 +155,6 @@ public static class RadzenQREncoder
                 // Choose best mask and apply
                 int bestMask = ChooseBestMask(m, reserved);
                 ApplyMask(m, reserved, bestMask);
-                WriteFormatInfo(m, reserved, ecc, bestMask);
-
-                ApplyMask(m, reserved, bestMask);
 
                 // Write format info (depends on ECC + mask)
                 WriteFormatInfo(m, reserved, ecc, bestMask);

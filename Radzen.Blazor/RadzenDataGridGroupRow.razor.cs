@@ -6,7 +6,8 @@ namespace Radzen.Blazor
     /// RadzenDataGridGroupRow.
     /// </summary>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenDataGridGroupRow<TItem> where TItem : notnull
+    public partial class RadzenDataGridGroupRow<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> where TItem : notnull
     {
     }
 }

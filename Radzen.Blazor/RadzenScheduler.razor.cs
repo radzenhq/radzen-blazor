@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -52,7 +53,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenScheduler<TItem> : RadzenComponent, IScheduler
+    public partial class RadzenScheduler<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenComponent, IScheduler
     {
         /// <summary>
         /// Gets or sets the child content of the scheduler. Use to specify what views to render.
@@ -167,6 +169,16 @@ namespace Radzen.Blazor
         /// <value>The name of the property. Must be a <c>string</c> property.</value>
         [Parameter]
         public string? TextProperty { get; set; }
+
+        /// <summary>
+        /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.AllDay" />.
+        /// Views with an all-day row display such appointments in it instead of the time grid. When not set an appointment is
+        /// considered all-day when it spans the entire visible day.
+        /// </summary>
+        /// <value>The name of the property. Must be a <c>bool</c> property.</value>
+        [Parameter]
+        public string? AllDayProperty { get; set; }
+
 
         /// <summary>
         /// Specifies whether to Show or Hide the Scheduler Header. Defaults to true />.
@@ -390,6 +402,32 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when the start or end edge of an appointment is dragged to a different time slot in a day, week or multi-day view.
+        /// Commonly used to change the appointment duration. The new boundaries snap to the current <c>MinutesPerSlot</c> of the view.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentResize=@OnAppointmentResize&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   async Task OnAppointmentResize(SchedulerAppointmentResizeEventArgs resized)
+        ///   {
+        ///     var appointment = appointments.SingleOrDefault(x => x == (Appointment)resized.Appointment.Data);
+        ///     if (appointment != null)
+        ///     {
+        ///         appointment.Start = resized.Start;
+        ///         appointment.End = resized.End;
+        ///         await scheduler.Reload();
+        ///     }
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        /// <value></value>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentResizeEventArgs> AppointmentResize { get; set; }
+
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
         /// <summary>
@@ -419,7 +457,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments)
         {
-            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView };
+            return GetSlotAttributes(start, end, getAppointments, null);
+        }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, IDictionary<string, object>? resources)
+        {
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView, Resources = resources, Resource = resources?.Values.LastOrDefault() };
 
             SlotRender?.Invoke(args);
 
@@ -449,7 +493,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
         {
-            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
+            return await SelectSlot(start, end, appointments, null);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, IDictionary<string, object>? resources)
+        {
+            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView, Resources = resources, Resource = resources?.Values.LastOrDefault() };
             await SlotSelect.InvokeAsync(args);
 
             return args.IsDefaultPrevented;
@@ -619,6 +669,7 @@ namespace Radzen.Blazor
         Func<TItem, DateTime>? startGetter;
         Func<TItem, DateTime>? endGetter;
         Func<TItem, string>? textGetter;
+        Func<TItem, bool>? allDayGetter;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -655,6 +706,12 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(TextProperty), TextProperty))
             {
                 textGetter = PropertyAccess.Getter<TItem, string>(parameters.GetValueOrDefault<string>(nameof(TextProperty))!);
+            }
+
+            if (parameters.DidParameterChange(nameof(AllDayProperty), AllDayProperty))
+            {
+                var allDayProperty = parameters.GetValueOrDefault<string>(nameof(AllDayProperty));
+                allDayGetter = string.IsNullOrEmpty(allDayProperty) ? null : PropertyAccess.Getter<TItem, bool>(allDayProperty);
             }
 
             await base.SetParametersAsync(parameters);
@@ -708,7 +765,7 @@ namespace Radzen.Blazor
                                     new FilterDescriptor { Property = StartProperty, FilterValue = end, FilterOperator = FilterOperator.LessThanOrEquals }
                                 ], LogicalFilterOperator.And, FilterCaseSensitivity.Default)
                                .ToList()
-                               .Select(item => new AppointmentData { Start = startGetter!(item), End = endGetter!(item), Text = textGetter!(item), Data = item });
+                               .Select(item => new AppointmentData { Start = startGetter!(item), End = endGetter!(item), Text = textGetter!(item), AllDay = allDayGetter?.Invoke(item) ?? false, Data = item });
 
             return appointments;
         }
@@ -812,6 +869,37 @@ namespace Radzen.Blazor
         bool IScheduler.HasAppointmentMoveDelegate()
         {
             return AppointmentMove.HasDelegate;
+        }
+
+        bool IScheduler.HasAppointmentResizeDelegate()
+        {
+            return AppointmentResize.HasDelegate;
+        }
+
+        IList<RadzenSchedulerResource> resources = new List<RadzenSchedulerResource>();
+
+        /// <summary>
+        /// Gets the resource types of the scheduler in order of declaration. Declared as <see cref="RadzenSchedulerResource" /> child content.
+        /// </summary>
+        public IList<RadzenSchedulerResource> Resources => resources;
+
+        /// <inheritdoc />
+        public Task AddResource(RadzenSchedulerResource resource)
+        {
+            if (!resources.Contains(resource))
+            {
+                resources.Add(resource);
+
+                StateHasChanged();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public void RemoveResource(RadzenSchedulerResource resource)
+        {
+            resources.Remove(resource);
         }
     }
 }

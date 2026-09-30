@@ -2,7 +2,7 @@
 @inherits RadzenChartComponentBase
 @if (YAxis?.Visible == true && renderHorizontal)
 {
-    <g class="rz-axis rz-value-axis rz-value-axis-top">
+    <g class="rz-axis rz-value-axis rz-value-axis-top" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@axisY" X2="@Math.Max(x1, x2)" Y2="@axisY" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @foreach (var idx in tickValues)
     {
@@ -36,13 +36,14 @@
 }
 else if (YAxis?.Visible == true)
 {
-    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
+    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @foreach (var idx in tickValues)
     {
         var value = scale?.Value(idx);
         var y = scale?.Scale(idx) ?? 0;
         var text = value != null && YAxis != null && scale != null ? YAxis.Format(scale, value) : "";
+        var label = labelLayout != null ? labelLayout.Text(idx, text) : text;
 
         if (YAxis?.Ticks?.Template != null)
         {
@@ -52,9 +53,9 @@ else if (YAxis?.Visible == true)
                 @YAxis.Ticks.Template(context)
             </ValueAxisTick>
         }
-        else if (!String.IsNullOrEmpty(text))
+        else if (!String.IsNullOrEmpty(label))
         {
-            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" RightSide="@RenderAsRightSide" />
+            <ValueAxisTick X="@axisX" Y="@y" Text="@label" FullText="@(label != text ? text : null)" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" RightSide="@RenderAsRightSide" />
         }
 
         if (YAxis?.GridLines?.Visible == true && idx > start)
@@ -102,6 +103,7 @@ else if (YAxis?.Visible == true)
     bool isLogarithmic;
     bool isFlippedToRight;
     bool renderHorizontal;
+    CategoryAxisLabelLayout? labelLayout;
     private AxisBase? XAxis { get; set; }
     private AxisBase? YAxis { get; set; }
 
@@ -113,6 +115,7 @@ else if (YAxis?.Visible == true)
         }
 
         renderHorizontal = IsRightSide && Chart.ShouldInvertAxes();
+        labelLayout = !IsRightSide && Chart.ShouldInvertAxes() ? Chart.CategoryAxis.LabelLayout : null;
 
         if (renderHorizontal)
         {

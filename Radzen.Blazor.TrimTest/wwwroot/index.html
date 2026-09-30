@@ -7,6 +7,22 @@
 </head>
 <body>
     <div id="app">Loading...</div>
+
+    <!-- Backstop sink for async / startup failures that the rendered #trim-status cannot capture
+         (e.g. an unawaited reflection throw or a trimming crash before the app renders). The Playwright
+         harness checks both #trim-status and #trim-global-error. -->
+    <div id="trim-global-error" style="display:none"></div>
+    <script>
+        (function () {
+            function record(msg) {
+                var el = document.getElementById('trim-global-error');
+                if (el) { el.textContent = String(msg); el.style.display = 'block'; }
+            }
+            window.addEventListener('error', function (e) { record(e.message || e.error); });
+            window.addEventListener('unhandledrejection', function (e) { record(e.reason); });
+        })();
+    </script>
+
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>

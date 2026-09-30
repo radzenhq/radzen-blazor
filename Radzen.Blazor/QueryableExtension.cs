@@ -249,7 +249,8 @@ namespace Radzen
         /// Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.
         /// </summary>
         [RequiresUnreferencedCode(ReflectionWarning)]
-        public static IQueryable<GroupResult> GroupByMany<T>(this IQueryable<T> source, string[] properties)
+        public static IQueryable<GroupResult> GroupByMany<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(this IQueryable<T> source, string[] properties)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(properties);
@@ -263,7 +264,8 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
-        private static IQueryable<GroupResult> GroupByMany<T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
+        private static IQueryable<GroupResult> GroupByMany<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
         {
             if (index < expressions.Length - 1)
             {
@@ -841,6 +843,10 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
+        [DynamicDependency("Contains", typeof(string))]
+        [DynamicDependency("StartsWith", typeof(string))]
+        [DynamicDependency("EndsWith", typeof(string))]
+        [DynamicDependency("ToLower", typeof(string))]
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type, bool useOrdinalIgnoreCaseStrings = false)
         {
             Type? valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
@@ -2175,7 +2181,8 @@ namespace Radzen
             return result.Concat(result.SelectManyRecursive(selector));
         }
 
-        private static List<RadzenDataGridColumn<T>> GetFilterableColumns<T>(IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
+        private static List<RadzenDataGridColumn<T>> GetFilterableColumns<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
         {
             return columns
                 .Where(c => c.Filterable

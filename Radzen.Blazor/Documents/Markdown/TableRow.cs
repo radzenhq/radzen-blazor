@@ -26,6 +26,19 @@ public class TableRow : INode
         children.Add(cell);
     }
 
+    internal void Add(string value, TableCellAlignment alignment, ContentMap content)
+    {
+        var cell = new TableCell(value, alignment);
+
+        cell.Content.Append(content.Segments);
+
+        children.Add(cell);
+    }
+
+    internal void Insert(int index, TableCell cell) => children.Insert(index, cell);
+
+    internal void RemoveAt(int index) => children.RemoveAt(index);
+
     /// <inheritdoc />
     public virtual void Accept(INodeVisitor visitor)
     {

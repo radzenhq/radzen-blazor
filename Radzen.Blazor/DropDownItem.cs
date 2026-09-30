@@ -11,6 +11,14 @@ namespace Radzen
     public class DropDownItem<TValue>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="DropDownItem{TValue}"/> class.
+        /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DropDownItem<>))]
+        public DropDownItem()
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the display text.
         /// </summary>
         public string? Text { get; set; }

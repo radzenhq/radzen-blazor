@@ -8,7 +8,8 @@ namespace Radzen.Blazor
     /// RadzenPivotAggregate component. Must be placed inside a <see cref="RadzenPivotDataGrid{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the PivotDataGrid item.</typeparam>
-    public partial class RadzenPivotAggregate<TItem> : RadzenPivotField<TItem>, IDisposable
+    public partial class RadzenPivotAggregate<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenPivotField<TItem>, IDisposable
     {
         /// <summary>
         /// Gets or sets the aggregate function.

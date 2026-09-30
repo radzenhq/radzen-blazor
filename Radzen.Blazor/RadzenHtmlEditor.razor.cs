@@ -508,7 +508,8 @@ namespace Radzen.Blazor
         /// <param name="selector">The CSS selector used to target the element.</param>
         /// <param name="attributes">An array of attribute names to retrieve.</param>
         /// <returns>A task that represents the asynchronous operation, returning the attributes as an object of type T.</returns>
-        public ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
+        public ValueTask<T> GetSelectionAttributes<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors)] T>(string selector, string[] attributes)
         {
             if (JSRuntime == null)
             {

@@ -23,6 +23,7 @@ namespace System.Linq.Dynamic.Core
         /// <summary>
         /// Filters using the specified filter descriptors.
         /// </summary>
+        [RequiresUnreferencedCode(TrimMessages.DynamicLinqReflection)]
         public static IQueryable<T> Where<T>(
             this IQueryable<T> source,
             string predicate,
@@ -65,6 +66,7 @@ namespace System.Linq.Dynamic.Core
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
+        [RequiresUnreferencedCode(TrimMessages.DynamicLinqReflection)]
         public static IOrderedQueryable<T> OrderBy<T>(
             this IQueryable<T> source,
             string selector,
@@ -85,6 +87,7 @@ namespace System.Linq.Dynamic.Core
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
+        [RequiresUnreferencedCode(TrimMessages.DynamicLinqReflection)]
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[]? parameters = null)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -111,6 +114,7 @@ namespace System.Linq.Dynamic.Core
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
+        [RequiresUnreferencedCode(TrimMessages.DynamicLinqReflection)]
         public static IQueryable Select(this IQueryable source, string selector, object[]? parameters = null)
         {
             ArgumentNullException.ThrowIfNull(source);

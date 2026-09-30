@@ -13,7 +13,7 @@
     [CascadingParameter]
     public RadzenHtmlEditor? Editor { get; set; }
 
-    private bool IsDisabled => Editor?.Disabled == true || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design);
+    private bool IsDisabled => Disabled || Editor?.Disabled == true || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design);
 
     bool open = false;
 
@@ -50,9 +50,12 @@
     [Parameter]
     public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
 
+    [Parameter]
+    public bool Disabled { get; set; }
+
     async Task Toggle()
     {
-        if (Editor?.Disabled == false && EnabledModes.HasFlag(Editor.GetMode()) && Popup != null)
+        if (!IsDisabled && Popup != null)
         {
             await Popup.ToggleAsync(Element);
         }
@@ -63,6 +66,14 @@
 
     internal EditorDropDownItem? SelectedItem { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (SelectedItem != null && SelectedItem.Value != Value)
+        {
+            SelectedItem = null;
+        }
+    }
+
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
@@ -71,7 +82,7 @@
 
     internal async Task Select(EditorDropDownItem item, bool change)
     {
-        if (SelectedItem != item && Editor?.Disabled == false && EnabledModes.HasFlag(Editor.GetMode()))
+        if (SelectedItem != item && !IsDisabled)
         {
             SelectedItem = item;
 
@@ -87,7 +98,7 @@
     }
 
     string Class => ClassList.Create("rz-dropdown rz-input-sm")
-        .Add("rz-state-disabled", Editor?.Disabled == true || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design))
+        .Add("rz-state-disabled", IsDisabled)
         .Add("rz-dropdown-open", open)
         .ToString();
 }

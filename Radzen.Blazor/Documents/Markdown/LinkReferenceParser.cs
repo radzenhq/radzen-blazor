@@ -16,8 +16,10 @@ class LinkReferenceParser(BlockParser parser) : NodeVisitorBase
         while (paragraph.Value.Peek() == '[' && parser.TryParseLinkReference(paragraph.Value, out var position))
         {
             var removedText = paragraph.Value[..position];
+            parser.RecordLinkReferenceDefinition(removedText);
 
-            paragraph.Value = paragraph.Value[position..];
+            paragraph.TrimContentStart(position);
+            paragraph.SourceStart = paragraph.Content.ToSource(0);
             hasReferenceDefs = true;
 
             var lines = removedText.Split('\n');

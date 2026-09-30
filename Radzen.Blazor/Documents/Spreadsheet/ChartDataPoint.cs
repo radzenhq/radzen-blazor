@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
@@ -5,6 +7,14 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class ChartDataPoint
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChartDataPoint"/> class.
+    /// </summary>
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ChartDataPoint))]
+    public ChartDataPoint()
+    {
+    }
+
     /// <summary>
     /// Gets or sets the category label.
     /// </summary>

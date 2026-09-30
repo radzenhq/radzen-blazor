@@ -4,10 +4,12 @@
     <defs>
         @foreach (var entry in Plan.Entries)
         {
-            var stops = GradientFill.Stops(Vertical, entry.Sign, StartOpacity, EndOpacity);
+            var stops = GradientFill.Stops(Vertical, entry.Sign,
+                GradientFill.StopOpacity(StartOpacity, GradientFill.DefaultStartOpacity, GradientFill.StartOpacityVariable),
+                GradientFill.StopOpacity(EndOpacity, GradientFill.DefaultEndOpacity, GradientFill.EndOpacityVariable));
             <linearGradient id="@Plan.Id(entry.Color, entry.Sign)" x1="0" y1="0" x2="@(Vertical ? "0" : "1")" y2="@(Vertical ? "1" : "0")">
-                <stop offset="0" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset0.ToInvariantString()}")"></stop>
-                <stop offset="1" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset1.ToInvariantString()}")"></stop>
+                <stop offset="0" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset0}")"></stop>
+                <stop offset="1" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset1}")"></stop>
             </linearGradient>
         }
     </defs>

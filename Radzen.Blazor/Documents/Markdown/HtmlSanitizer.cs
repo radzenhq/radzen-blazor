@@ -1,5 +1,6 @@
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -127,7 +128,7 @@ class HtmlSanitizer
             return false;
         }
 
-        var decoded = HtmlDecode(value).Trim().ToLowerInvariant();
+        var decoded = new string(HtmlDecode(value).Where(ch => ch > ' ' && ch != '\x7f').ToArray()).ToLowerInvariant();
 
         return decoded.StartsWith("javascript:", StringComparison.Ordinal) ||
                decoded.StartsWith("vbscript:", StringComparison.Ordinal) ||

@@ -7,7 +7,8 @@ namespace Radzen.Blazor
     /// RadzenPivotColumn component. Must be placed inside a <see cref="RadzenPivotDataGrid{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the PivotDataGrid item.</typeparam>
-    public partial class RadzenPivotColumn<TItem> : RadzenPivotField<TItem>, IDisposable
+    public partial class RadzenPivotColumn<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenPivotField<TItem>, IDisposable
     {
         /// <summary>
         /// Gets or sets the width.

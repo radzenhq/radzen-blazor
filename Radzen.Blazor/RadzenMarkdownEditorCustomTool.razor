@@ -1,0 +1,13 @@
+@using Radzen.Blazor.Rendering
+
+@if (Visible)
+{
+    @if (Template == null)
+    {
+        <EditorButton Title="@Title" Click="@OnClick" Icon="@Icon" IconColor="@IconColor" Selected="@Selected" Disabled="@(Disabled || Editor?.Disabled == true)" />
+    }
+    else if (Editor != null)
+    {
+        <div class="rz-markdown-editor-custom-tool">@Template(Editor)</div>
+    }
+}

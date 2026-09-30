@@ -42,7 +42,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
+    public partial class RadzenSelectBar<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
         /// <summary>
         /// Gets or sets the size of the buttons in the select bar.

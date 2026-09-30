@@ -2,7 +2,7 @@
 
 @if (XAxis?.Visible == true)
 {
-    <g class="rz-axis rz-category-axis">
+    <g class="rz-axis rz-category-axis" style="@Chart?.AxisClipPathStyle">
     <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@y1" X2="@Math.Max(x1, x2)" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
     @foreach (var tick in tickValues)
     {
@@ -11,6 +11,7 @@
         var x = Chart?.CategoryScale?.Scale((double)idx, true) ?? 0;
 
         var text = value != null && XAxis != null && Chart?.CategoryScale != null ? XAxis.Format(Chart.CategoryScale, value) : "";
+        var label = labelLayout != null ? labelLayout.Text(tick, text) : text;
 
         if (XAxis?.Ticks?.Template != null)
         {
@@ -20,9 +21,9 @@
                 @XAxis.Ticks.Template(context)
             </CategoryAxisTick>
         }
-        else if (!String.IsNullOrEmpty(text))
+        else if (!String.IsNullOrEmpty(label))
         {
-            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@text" Stroke="@(XAxis?.Ticks?.Stroke ?? XAxis?.Stroke)" StrokeWidth="@(XAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(XAxis?.Ticks?.LineType ?? LineType.Solid)" TopSide="@isTopSide"/>
+            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@label" FullText="@(label != text ? text : null)" Stroke="@(XAxis?.Ticks?.Stroke ?? XAxis?.Stroke)" StrokeWidth="@(XAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(XAxis?.Ticks?.LineType ?? LineType.Solid)" TopSide="@isTopSide"/>
         }
 
         if (XAxis?.GridLines?.Visible == true && idx > start)
@@ -61,6 +62,7 @@
 
     private double? rotate;
     private bool isTopSide;
+    private CategoryAxisLabelLayout? labelLayout;
 
     protected override void OnParametersSet()
     {
@@ -102,6 +104,14 @@
         {
             var clampedValue = Math.Max(Math.Min(crossesAt.Value, valueTicks.End), valueTicks.Start);
             y1 = Chart.ValueScale.Scale(clampedValue);
+        }
+
+        labelLayout = Chart.ShouldInvertAxes() ? null : Chart.CategoryAxis.LabelLayout;
+        rotate = labelLayout?.Rotate;
+
+        if (labelLayout != null)
+        {
+            return;
         }
 
         if (XAxis?.LabelRotation != null)

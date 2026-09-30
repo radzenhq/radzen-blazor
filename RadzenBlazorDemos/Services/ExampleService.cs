@@ -775,7 +775,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with button",
                             Path="datagrid-custom-header",
-                            Related = new [] { "datagrid-custom-header-columnpicker", "datagrid-column-picker", "export-excel-csv" },
+                            Related = new [] { "datagrid-custom-header-columnpicker", "datagrid-column-picker", "datagrid-export" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I add a toolbar to the DataGrid?", Answer = "Use the HeaderTemplate to render your own toolbar - buttons, search, or any components - above the grid's columns." }
@@ -959,16 +959,19 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Export to Excel and CSV",
-                    Path = "export-excel-csv",
-                    Related = new [] { "datagrid-footer-totals", "datagrid-grouping-api", "datagrid-iqueryable" },
+                    Path = "datagrid-export",
+                    New = true,
+                    Toc = [ new () { Text = "Export", Anchor = "#export" }, new () { Text = "LoadData export", Anchor = "#loaddata" }, new () { Text = "Customization", Anchor = "#customization" } ],
+                    Related = new [] { "datagrid-footer-totals", "datagrid-grouping-api", "datagrid-loaddata" },
                     Faq = new []
                     {
-                        new FaqItem { Question = "How do I export the DataGrid to Excel or CSV?", Answer = "Call the grid's export and choose Excel or CSV; the export uses the current sort, filter, and columns." }
+                        new FaqItem { Question = "How do I export a DataGrid to Excel or CSV?", Answer = "Call ExportToExcelAsync or ExportToCsvAsync on the grid and select the current page or all filtered and sorted rows." },
+                        new FaqItem { Question = "Does the export respect the current sort and filter?", Answer = "Yes. Exports use the grid's view - the current sort, filter, column order, visibility, and format strings." }
                     },
                     Title = "Blazor DataGrid - Excel & CSV Export | Free UI Components by Radzen",
-                    Description = "This example demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.",
+                    Description = "Export a Radzen Blazor DataGrid to Excel and CSV directly in the browser, including chunked LoadData exports.",
                     Icon = "\ue0c3",
-                    Tags = new [] { "export", "excel", "csv" }
+                    Tags = new [] { "export", "excel", "csv", "datagrid" }
                 },
                 new Example
                 {
@@ -2331,7 +2334,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "DatePicker with drill-down navigation", Anchor = "#drill-down-navigation" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DatePicker",
                     Path = "datepicker",
                     Title = "Blazor DatePicker & Calendar Component | Free UI Components by Radzen",
@@ -2345,6 +2348,24 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "How do I let users pick a date and time together?", Answer = "Set ShowTime to true so the picker includes a time selector alongside the calendar; use HourFormat to switch between 12- and 24-hour input." },
                         new FaqItem { Question = "How do I disable specific or past dates?", Answer = "Use the DateRender callback to mark dates as disabled, and set Min and Max to bound the selectable range." },
                         new FaqItem { Question = "Does the DatePicker support DateOnly and TimeOnly?", Answer = "Yes. It binds to DateTime, DateTimeOffset, DateOnly, and TimeOnly values." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of DateRangePicker", Anchor = "#get-set-value" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DateRangePicker navigation mode", Anchor = "#navigation-mode" }, new () { Text = "DateRangePicker as calendar", Anchor = "#calendar" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "DateRangePicker",
+                    Path = "daterangepicker",
+                    Title = "Blazor DateRangePicker Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor DateRangePicker lets users select a start and end date from a popup showing two months side by side with an in-range highlight, hover preview, min/max and disabled dates.",
+                    Icon = "\ue916",
+                    Tags = new [] { "calendar", "range", "form", "edit", "datepicker", "daterangepicker" },
+                    Related = new [] { "datepicker", "timespanpicker", "scheduler" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I get the selected date range?", Answer = "Bind Value to a DateRange instance. The DateRangePicker sets its Start and End dates as the user selects them and raises Change when the selection changes." },
+                        new FaqItem { Question = "How does range selection work in the calendar?", Answer = "The first click selects the start date and the second click selects the end date and closes the popup. Clicking a date before the pending start date restarts the selection from that date." },
+                        new FaqItem { Question = "Can I use the DateRangePicker as an always-visible calendar?", Answer = "Yes. Set Inline to true to render the calendar inline instead of a popup." },
+                        new FaqItem { Question = "How do I restrict the selectable dates?", Answer = "Use Min and Max to bound the selectable range and the DateRender callback to disable specific dates." }
                     }
                 },
                 new Example
@@ -2604,6 +2625,24 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I mask a phone number or date in Blazor?", Answer = "Set the Mask property to a pattern (for example (***) ***-**** ) and the masked textbox enforces it as the user types." },
                         new FaqItem { Question = "Which characters can I use in a mask pattern?", Answer = "Use the placeholder characters (such as * for any character and 9 for digits) together with literal characters that appear as-is in the input." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "MarkdownEditor",
+                    New = true,
+                    Icon = "\uf552",
+                    Path = "markdown-editor",
+                    Title = "Blazor Markdown Editor | Free UI Components by Radzen",
+                    Description = "Edit Markdown in Blazor with RadzenMarkdownEditor - toolbar, keyboard shortcuts, custom tools and a WYSIWYG Design mode with a Source mode for raw Markdown.",
+                    Tags = new[] { "markdown", "editor", "text", "preview", "toolbar" },
+                    Related = new [] { "markdown", "html-editor", "textarea" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I edit Markdown in Blazor?", Answer = "Add RadzenMarkdownEditor and bind its Value property; it opens in a WYSIWYG Design mode - a contenteditable surface kept in sync with the Markdown - with the toolbar and keyboard shortcuts editing the content directly." },
+                        new FaqItem { Question = "Can I edit the raw Markdown instead of the WYSIWYG view?", Answer = "Yes. Bind the Mode property to MarkdownEditorMode.Source, or let users switch between Design and Source with the built-in mode switcher." },
+                        new FaqItem { Question = "How do I add custom buttons to the Markdown Editor?", Answer = "Declare RadzenMarkdownEditorCustomTool inside the editor and handle the Execute callback, or use its Template to render any content." }
                     }
                 },
                 new Example
@@ -2889,6 +2928,25 @@ namespace RadzenBlazorDemos
                     },
                     Icon = "\uf09b",
                     Tags = new [] { "upload", "file"}
+                },
+                new Example
+                {
+                    New = true,
+                    Toc = [ new () { Text = "Attach the keyboard to inputs", Anchor = "#attach-on-focus" }, new () { Text = "Numeric keypad", Anchor = "#numpad" }, new () { Text = "Keyboard placement", Anchor = "#placement" }, new () { Text = "Custom key layout", Anchor = "#custom-layout" }, new () { Text = "Locale-aware layouts", Anchor = "#locale-layouts" }, new () { Text = "Inline keyboard", Anchor = "#inline" } ],
+                    Name = "VirtualKeyboard",
+                    Path = "virtual-keyboard",
+                    Title = "Blazor Virtual Keyboard - On-Screen Touch Keyboard | Free UI Components by Radzen",
+                    Description = "The Blazor Virtual Keyboard displays a theme-consistent on-screen keyboard for touch HMI and kiosk scenarios. It opens automatically when an input gets focus and supports alphanumeric and numpad modes, custom key layouts and locale-aware presets.",
+                    Icon = "\ue312",
+                    Tags = new [] { "keyboard", "virtual", "touch", "kiosk", "hmi", "on-screen", "numpad", "input" },
+                    Related = new [] { "textbox", "numeric", "security-code" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I show an on-screen keyboard for Blazor inputs?", Answer = "Wrap the inputs in a RadzenVirtualKeyboard component. The keyboard opens automatically when one of them gets focus and key presses type in the focused input." },
+                        new FaqItem { Question = "Does the Virtual Keyboard work with @bind-Value?", Answer = "Yes. Key presses raise the native input and change events of the focused input so value binding of RadzenTextBox, RadzenNumeric, RadzenTextArea, RadzenPassword and plain HTML inputs updates as if typed on a physical keyboard." },
+                        new FaqItem { Question = "Can I define my own keys?", Answer = "Yes. Set the Layout property to a VirtualKeyboardLayout created with VirtualKeyboardLayout.FromRows - every token is either literal text inserted in the input (including multi-character keys such as units of measure) or a special key like {backspace}, {enter}, {shift}, {space}, {clear} and {close}." },
+                        new FaqItem { Question = "How do I show a QWERTZ or AZERTY keyboard?", Answer = "Assign one of the built-in presets - VirtualKeyboardLayout.Qwertz or VirtualKeyboardLayout.Azerty - to the Layout property. The {decimal} numpad key inserts the decimal separator of the current culture." }
+                    }
                 },
             },
         },
@@ -3255,22 +3313,6 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
-            Name = "Markdown",
-            Icon = "\uf552",
-            Path = "markdown",
-            Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
-            Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
-            Tags = new[] { "markdown", "text", "content", "render" },
-            Related = new [] { "html-editor", "textarea" },
-            Faq = new []
-            {
-                new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
-                new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
-            }
-        },
-        new Example
-        {
             Name = "Data",
             Icon = "\ue99c",
             Children = new [] {
@@ -3361,7 +3403,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Group appointments by resource", Anchor = "#resources" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Title = "Blazor Scheduler & Calendar Component | Free UI Components by Radzen",
                     Path = "scheduler",
@@ -3370,7 +3412,7 @@ namespace RadzenBlazorDemos
                     Faq = new []
                     {
                         new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
-                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
+                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side. Every view can also group appointments by resource - rooms, people or equipment." },
                         new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." }
                     },
                     Icon = "\ue616",
@@ -3470,6 +3512,24 @@ namespace RadzenBlazorDemos
                             Title = "Blazor Gantt Customization | Free UI Components by Radzen",
                             Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
                             Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
+                        },
+                        new Example
+                        {
+                            Name = "Multi-Year Timescale",
+                            New = true,
+                            Path = "gantt-multi-year",
+                            Title = "Blazor Gantt Multi-Year Timescale | Free UI Components by Radzen",
+                            Description = "Display long-running projects with month-per-cell and quarter-per-cell timescales. Multi-year tasks fit without horizontal scrolling.",
+                            Tags = new[] { "gantt", "year", "years", "quarter", "timescale", "zoom", "multi-year", "long", "range" }
+                        },
+                        new Example
+                        {
+                            Name = "Resource View",
+                            New = true,
+                            Path = "gantt-resource-view",
+                            Title = "Blazor Gantt Resource View | Free UI Components by Radzen",
+                            Description = "Display tasks grouped by resource. Overlapping tasks on the same resource are automatically stacked in lanes. Supports hierarchical resources, an unassigned tasks row and a workload histogram with capacity line.",
+                            Tags = new[] { "gantt", "resource", "view", "lane", "stacking", "overlap", "people", "assignment", "hierarchy", "histogram", "workload", "capacity", "unassigned" }
                         }
                     }
                 },
@@ -3481,6 +3541,22 @@ namespace RadzenBlazorDemos
                     Path = "table",
                     Icon = "\uf101",
                     Tags = new [] { "table", "cells", "row", "grid" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
+                    Name = "Markdown",
+                    Icon = "\uf552",
+                    Path = "markdown",
+                    Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
+                    Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
+                    Tags = new[] { "markdown", "text", "content", "render" },
+                    Related = new [] { "html-editor", "textarea" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
+                        new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
+                    }
                 },
                 new Example
                 {

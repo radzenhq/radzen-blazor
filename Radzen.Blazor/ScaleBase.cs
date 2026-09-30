@@ -117,13 +117,13 @@ namespace Radzen.Blazor
             if (min != null)
             {
                 Input.Start = Convert.ToDouble(min, CultureInfo.InvariantCulture);
-                Round = false;
+                RoundStart = false;
             }
 
             if (max != null)
             {
                 Input.End = Convert.ToDouble(max, CultureInfo.InvariantCulture);
-                Round = false;
+                RoundEnd = false;
             }
         }
 
@@ -225,10 +225,23 @@ namespace Radzen.Blazor
         public abstract string FormatTick(string format, object value);
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="ScaleBase"/> is round.
+        /// Gets or sets a value indicating whether this <see cref="ScaleBase"/> is round. Gets <c>true</c> when either end of the scale is rounded to a tick
+        /// and sets whether both ends are. <see cref="Resize(object, object)" /> stops rounding only the end it sets.
         /// </summary>
         /// <value><c>true</c> if round; otherwise, <c>false</c>.</value>
-        public bool Round { get; set; } = true;
+        public bool Round
+        {
+            get => RoundStart || RoundEnd;
+            set
+            {
+                RoundStart = value;
+                RoundEnd = value;
+            }
+        }
+
+        internal bool RoundStart { get; set; } = true;
+
+        internal bool RoundEnd { get; set; } = true;
 
         /// <summary>
         /// Set when <see cref="Input" /> has been narrowed to a zoomed sub-range of the full domain.
@@ -236,6 +249,8 @@ namespace Radzen.Blazor
         /// constrain their domain and tick values to the visible range.
         /// </summary>
         internal bool IsZoomed { get; set; }
+
+        internal bool IncludeZero { get; set; }
 
         /// <summary>
         /// Determines whether the specified scale is equal to the current one.

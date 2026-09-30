@@ -8,6 +8,17 @@
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate) ?? Enumerable.Empty<AppointmentData>();
 
+        if (HasResourceGroups)
+        {
+            return @<CascadingValue Value=@Scheduler>
+                <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
+                    <ChildContent Context="path">
+                        <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@MaxAppointmentsInSlot MoreText=@MoreText Appointments=@AppointmentsForResources(appointments, path) Resources=@path AppointmentMove=OnAppointmentMove />
+                    </ChildContent>
+                </ResourceGroups>
+            </CascadingValue>;
+        }
+
         return @<CascadingValue Value=@Scheduler>
             <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@MaxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments AppointmentMove=OnAppointmentMove />
         </CascadingValue>;

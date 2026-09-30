@@ -9,11 +9,26 @@
     [Parameter]
     public string? Name { get; set; }
 
+    /// <summary>
+    /// Specifies how the axis range is determined from the plotted series when <see cref="AxisBase.Min" /> and <see cref="AxisBase.Max" /> are not set;
+    /// ignored when <see cref="AxisBase.Logarithmic" /> is <c>true</c>. When all plotted values are equal the axis extends from zero past that value
+    /// in every mode.
+    /// </summary>
+    /// <value>Defaults to <see cref="ValueAxisRange.Auto" />.</value>
+    [Parameter]
+    public ValueAxisRange Range { get; set; } = ValueAxisRange.Auto;
+
+    /// <inheritdoc />
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return base.ShouldRefreshChart(parameters) || DidParameterChange(parameters, nameof(Range), Range);
+    }
+
     internal double Measure(RadzenChart chart)
     {
         if (chart.ShouldInvertAxes())
         {
-            return AxisMeasurer.YAxis(chart.ValueScale, chart.CategoryAxis, chart.CategoryAxis.Title);
+            return chart.CategoryAxis.LabelLayout?.Size ?? AxisMeasurer.YAxis(chart.ValueScale, chart.CategoryAxis, chart.CategoryAxis.Title);
         }
         else if (Visible == false)
         {

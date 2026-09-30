@@ -1,0 +1,63 @@
+@using Microsoft.EntityFrameworkCore
+@using System.IO
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Radzen.Documents.Spreadsheet
+
+@inherits DbContextPage
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" class="rz-mb-4">
+    <RadzenButton Text="Export Excel" Icon="grid_on" ButtonStyle="ButtonStyle.Success" Click="@(() => grid.ExportToExcelAsync("order-totals.xlsx", new DataGridExcelExportOptions { Scope = DataGridExportScope.All, Title = "Order totals" }))" />
+    <RadzenButton Text="Download customized Excel" Icon="edit_document" ButtonStyle="ButtonStyle.Secondary" Click="ExportCustomExcel" />
+</RadzenStack>
+
+<RadzenDataGrid @ref="grid" Data="orderDetails" TItem="OrderDetail" AllowPaging="true" PageSize="5">
+    <Columns>
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price" FormatString="{0:C2}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn Title="Total" TextAlign="TextAlign.Right" FormatString="{0:C2}" ExportValue="@(detail => Total(detail))">
+            <Template Context="detail">@string.Format("{0:C2}", Total(detail))</Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<OrderDetail> grid;
+    List<OrderDetail> orderDetails = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        orderDetails = await dbContext.OrderDetails.Include(detail => detail.Product).ToListAsync();
+    }
+
+    static double Total(OrderDetail detail) => (detail.UnitPrice ?? 0) * (detail.Quantity ?? 0) * (1 - (detail.Discount ?? 0));
+
+    async Task ExportCustomExcel()
+    {
+        var workbook = await grid.ToWorkbookAsync(new DataGridExcelExportOptions
+        {
+            Scope = DataGridExportScope.All,
+            Title = "Order totals"
+        });
+
+        var sheet = workbook.Sheets[0];
+        var lastDataRow = sheet.RowCount;
+        var totalRow = lastDataRow + 1;
+        sheet.Rows.Count = totalRow + 1;
+
+        sheet.Cells[totalRow, 0].Value = "Grand total";
+        sheet.Cells[totalRow, 0].Format.Bold = true;
+        sheet.Cells[totalRow, 3].Formula = $"=SUM(D2:D{lastDataRow})";
+        sheet.Cells[totalRow, 3].Format.Bold = true;
+        sheet.Cells[totalRow, 3].Format.NumberFormat = sheet.Cells[1, 3].Format.NumberFormat;
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "order-totals.xlsx", streamRef, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+}

@@ -1,0 +1,8 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date Range" Component="DateRangePickerMinMax" />
+    <RadzenDateRangePicker @bind-Value=@range Min="DateTime.Today" Max="DateTime.Today.AddMonths(1)" DateFormat="dd/MM/yyyy" Placeholder="Select date range" Name="DateRangePickerMinMax" Style="min-width: 260px;" />
+</RadzenStack>
+
+@code {
+    DateRange range;
+}

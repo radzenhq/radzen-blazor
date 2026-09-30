@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
@@ -189,6 +190,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="files">The file.</param>
         [JSInvokable("RadzenUpload.OnChange")]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(FileInfo))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(PreviewFileInfo))]
         public async System.Threading.Tasks.Task OnChange(IEnumerable<PreviewFileInfo> files)
         {
             if(files == null || !files.Any())

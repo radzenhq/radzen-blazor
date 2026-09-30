@@ -25,7 +25,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenOhlcSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenOhlcSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Gets or sets the name of the property of <typeparamref name="TItem"/> that provides the Open value.
@@ -163,6 +163,8 @@ namespace Radzen.Blazor
 
                 scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
             }
+
+            IncludeZeroInValueScale(scale, false);
 
             return scale;
         }

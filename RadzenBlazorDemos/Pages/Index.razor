@@ -196,7 +196,7 @@
                                 <RadzenBadge Text="@GetPriorityText(task.Priority)" BadgeStyle="BadgeStyle.Base" Shade="@GetPriorityStyle(task.Priority)" />
                               </Template>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="TaskItem" Property="Status" Title="Status" Width="100px">
+                            <RadzenDataGridColumn TItem="TaskItem" Property="Status" Title="Status" Width="130px">
                               <Template Context="task">
                                 <RadzenBadge Text="@task.Status" BadgeStyle="@GetStatusStyle(task.Status)" />
                               </Template>

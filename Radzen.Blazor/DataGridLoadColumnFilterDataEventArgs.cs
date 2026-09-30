@@ -8,7 +8,8 @@ namespace Radzen;
 /// Supplies information about a <see cref="Radzen.Blazor.RadzenDataGrid{TItem}.LoadColumnFilterData" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridLoadColumnFilterDataEventArgs<T> where T : notnull
+public class DataGridLoadColumnFilterDataEventArgs<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] T> where T : notnull
 {
     /// <summary>
     /// Gets or sets the data.

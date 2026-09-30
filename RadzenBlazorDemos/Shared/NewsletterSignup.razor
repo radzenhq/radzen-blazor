@@ -2,42 +2,51 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div id="@containerId" class="rz-text-align-center @(Plain ? "" : "rz-background-color-base")" style="@(Plain ? "" : "padding: 2.5rem 1rem; border-radius: var(--rz-border-radius);")">
-    <div class="rz-mx-auto" style="max-width: 480px;">
-        @if (subscribed)
+<div id="@containerId" class="@(Plain ? "" : "rz-card rz-variant-filled")" style="@(Plain ? "" : "--rz-card-padding: 0;")">
+    <RadzenRow AlignItems="AlignItems.Center" Gap="0" RowGap="1rem">
+        @if (ShowHeader)
         {
-            <RadzenText TextStyle="TextStyle.Body1">
-                Almost done. Check your inbox and confirm your subscription.
-            </RadzenText>
-        }
-        else
-        {
-            @if (ShowHeader)
-            {
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Radzen Blazor Newsletter</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+            <RadzenColumn Size="12" SizeMD="6" class="@columnClass">
+                <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2">Radzen Blazor Newsletter</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0" Style="opacity: 0.8">
                     Get an email when new components and releases ship.
                 </RadzenText>
-            }
-            <RadzenTemplateForm TItem="SubscriptionModel" Data="@model" Submit="@OnSubmit" novalidate>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="0.5rem">
-                    <RadzenStack Gap="0.25rem" Style="flex: 1; max-width: 320px;">
-                        <RadzenTextBox @bind-Value="@model.Email" Name="Email" Placeholder="Your email" aria-label="Email address" Style="width: 100%;" class="rz-border-radius-8" />
-                        <RadzenRequiredValidator Component="Email" Text="Email is required." />
-                        <RadzenEmailValidator Component="Email" Text="Please enter a valid email address." />
-                    </RadzenStack>
-                    <RadzenButton Text="Join the List" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Shade="Shade.Darker" Variant="Variant.Flat" IsBusy="@loading" />
-                </RadzenStack>
-                <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onload" disablerefetchonexpire hidefooter hidelogo style="display:none"></altcha-widget>
-            </RadzenTemplateForm>
-            @if (!string.IsNullOrEmpty(error))
-            {
-                <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" class="rz-mt-2">
-                    @error
-                </RadzenAlert>
-            }
+            </RadzenColumn>
         }
-    </div>
+        <RadzenColumn Size="12" SizeMD="@(ShowHeader ? 6 : 12)" class="@columnClass">
+            @if (subscribed)
+            {
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">
+                    Almost done. Check your inbox and confirm your subscription.
+                </RadzenText>
+            }
+            else
+            {
+                <RadzenTemplateForm TItem="SubscriptionModel" Data="@model" Submit="@OnSubmit" novalidate class="rz-w-100">
+                    <RadzenStack AlignItems="AlignItems.Start" Gap="0.5rem">
+                        <RadzenCard Variant="Variant.Outlined" class="rz-w-100" Style="--rz-card-padding: 0.5rem; border-radius: calc(var(--rz-button-border-radius) + var(--rz-card-padding)); max-width: 500px">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                                <RadzenTextBox @bind-Value="@model.Email" Name="Email" Placeholder="Enter your email" aria-label="Email address" Style="border-radius: var(--rz-button-border-radius); flex: 1" />
+                                <RadzenButton Text="Subscribe" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" IsBusy="@loading" />
+                            </RadzenStack>
+                        </RadzenCard>
+                        <RadzenRequiredValidator Component="Email" Text="* Email is required." />
+                        <RadzenEmailValidator Component="Email" Text="* Provide a valid email address." />
+                    </RadzenStack>
+                    <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onload" disablerefetchonexpire hidefooter hidelogo style="display:none"></altcha-widget>
+                </RadzenTemplateForm>
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" class="rz-mt-2" Style="max-width: 500px">
+                        @error
+                    </RadzenAlert>
+                }
+                <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2 rz-mb-0" Style="opacity: 0.8">
+                    We care about your data. Read our <RadzenLink Text="Privacy Policy" Path="https://www.radzen.com/privacy-policy" Target="_blank" />.
+                </RadzenText>
+            }
+        </RadzenColumn>
+    </RadzenRow>
 </div>
 
 @code {
@@ -49,6 +58,8 @@
     [Parameter] public bool ShowHeader { get; set; } = true;
 
     [Parameter] public bool Plain { get; set; }
+
+    string columnClass => Plain ? "" : "rz-p-6 rz-p-sm-12";
 
     SubscriptionModel model = new();
 

@@ -32,5 +32,9 @@ namespace Radzen.Blazor.Rendering
         /// <summary> Gets or sets the text of the tick. </summary>
         [Parameter]
         public string? Text { get; set; }
+
+        /// <summary> Gets or sets the full text of a tick whose <see cref="Text" /> is shortened. When set, it is rendered as the SVG title of the tick, which browsers display on hover. </summary>
+        [Parameter]
+        public string? FullText { get; set; }
     }
 }

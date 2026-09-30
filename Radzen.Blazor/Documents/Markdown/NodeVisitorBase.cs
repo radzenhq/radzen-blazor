@@ -133,6 +133,15 @@ public abstract class NodeVisitorBase : INodeVisitor
     }
 
     /// <summary>
+    /// Visits a strikethrough by visiting its children.
+    /// </summary>
+    public virtual void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        ArgumentNullException.ThrowIfNull(strikethrough);
+        VisitChildren(strikethrough.Children);
+    }
+
+    /// <summary>
     /// Visits a link by visiting its children.
     /// </summary>
     public virtual void VisitLink(Link link)

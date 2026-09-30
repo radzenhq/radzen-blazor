@@ -186,6 +186,14 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     }
 
     /// <inheritdoc />
+    public override void VisitStrikethrough(Strikethrough strikethrough)
+    {
+        builder.OpenElement(0, "del");
+        VisitChildren(strikethrough.Children);
+        builder.CloseElement();
+    }
+
+    /// <inheritdoc />
     public override void VisitEmphasis(Emphasis emphasis)
     {
         builder.OpenElement(0, "em");
@@ -270,6 +278,17 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     public override void VisitListItem(ListItem listItem)
     {
         builder.OpenElement(0, "li");
+        if (listItem.Checked is bool isChecked)
+        {
+            builder.OpenElement(1, "input");
+            builder.AddAttribute(2, "type", "checkbox");
+            builder.AddAttribute(3, "disabled", true);
+            if (isChecked)
+            {
+                builder.AddAttribute(4, "checked", true);
+            }
+            builder.CloseElement();
+        }
         VisitChildren(listItem.Children);
         builder.CloseElement();
     }

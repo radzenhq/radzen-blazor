@@ -8,7 +8,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
 
 jobs:
   build:
@@ -26,4 +25,137 @@ jobs:
     - name: Build
       run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj
     - name: Test
+      # Includes TrimmingContractTests (TRIMMING_AUDIT.md). These fail until the audit fixes land.
       run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj
+
+    # Runtime trimming gate: publish the console consumer trimmed and run it. Exit 1 until the library
+    # annotates the item-typed component generics with [DynamicallyAccessedMembers]. See e2e/README.md.
+    - name: Trimming runtime gate (console)
+      if: ${{ !cancelled() }}
+      run: |
+        dotnet publish Radzen.Blazor.TrimRuntimeTest/Radzen.Blazor.TrimRuntimeTest.csproj \
+          -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true
+        ./Radzen.Blazor.TrimRuntimeTest/bin/Release/net10.0/linux-x64/publish/Radzen.Blazor.TrimRuntimeTest
+
+    # Note: Native AOT (IL3050) is deliberately not gated. Blazor does not run under Native AOT, and the
+    # IL3050 surface is inherent to dynamic-data binding (it can never reach zero). See the comment in
+    # TrimmingContractTests.cs.
+
+  # Optional: faithful browser repro - publish the WASM app trimmed and drive it with Playwright.
+  # Fails until the DAM fix lands (the drive throws over the trimmed model). See e2e/README.md.
+  trim-wasm-e2e:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish WASM app (trimmed)
+      run: dotnet publish Radzen.Blazor.TrimTest/Radzen.Blazor.TrimTest.csproj -c Release
+    - name: Serve published app
+      run: |
+        dotnet tool install -g dotnet-serve
+        dotnet serve -d Radzen.Blazor.TrimTest/bin/Release/net10.0/publish/wwwroot -p 5050 &
+        sleep 3
+    - name: Run Playwright runtime gate
+      working-directory: e2e
+      env:
+        TRIM_URL: http://localhost:5050
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node trim-smoke.mjs
+
+  # Runs on every CI build: publish the demos with the WASM client member-trimmed (Radzen.Blazor
+  # from local source), serve via the host, crawl high-risk component pages. Catches Radzen-OWN
+  # render/JS-interop trim regressions across the full component surface (complements the synthetic
+  # trim-wasm-e2e gate). Runs on the runner. See e2e/DEMOS_TRIM_FINDINGS.md.
+  demos-trim-crawl:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish demos host (WASM client trimmed, local Radzen)
+      run: |
+        dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \
+          -p:RadzenLocalProject=true -p:TrimWasmClient=true \
+          -p:GenerateLlmsTxt=false -p:CopyDemoPagesToWwwroot=false \
+          -o ${{ runner.temp }}/demos
+        mkdir -p ${{ runner.temp }}/demos/wwwroot/demos ${{ runner.temp }}/demos/wwwroot/images
+    - name: Serve published host
+      working-directory: ${{ runner.temp }}/demos
+      env:
+        ASPNETCORE_URLS: http://localhost:8088
+        ASPNETCORE_ENVIRONMENT: Production
+      run: |
+        dotnet RadzenBlazorDemos.Host.dll &
+        for i in $(seq 1 30); do curl -sf http://localhost:8088/ >/dev/null && break; sleep 2; done
+    - name: Crawl component pages
+      working-directory: e2e
+      env:
+        DEMOS_URL: http://localhost:8088
+        DEMOS_REPORT: ${{ runner.temp }}/demos-crawl.json
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node demos-crawl.mjs
+    - name: Upload crawl report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: demos-crawl-report
+        path: ${{ runner.temp }}/demos-crawl.json
+
+  # Deep-INTERACTION trim crawl: same trimmed publish + serve as demos-trim-crawl, but
+  # instead of only loading each page it DRIVES the trim-risky components (DataGrid
+  # filter/sort/group/enum-filter, DropDown/DropDownDataGrid/AutoComplete filtering,
+  # PivotDataGrid aggregates, Upload, HtmlEditor, Spreadsheet, Chart, Dialog, Scheduler)
+  # through a real interaction and watches for #blazor-error-ui / pageerror / console.error.
+  # Exercises the reflection / dynamic-LINQ / anonymous-object / [JSInvokable] / interop
+  # paths that a load-only crawl never touches. See e2e/DEMOS_DEEP_FINDINGS.md.
+  #
+  # NON-BLOCKING for now (continue-on-error): DOM interactions can be flaky on a cold
+  # runner. Promote to blocking once it has proven stable across a few runs.
+  demos-deep-interaction-crawl:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish demos host (WASM client trimmed, local Radzen)
+      run: |
+        dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \
+          -p:RadzenLocalProject=true -p:TrimWasmClient=true \
+          -p:GenerateLlmsTxt=false -p:CopyDemoPagesToWwwroot=false \
+          -o ${{ runner.temp }}/demos-deep
+        mkdir -p ${{ runner.temp }}/demos-deep/wwwroot/demos ${{ runner.temp }}/demos-deep/wwwroot/images
+    - name: Serve published host
+      working-directory: ${{ runner.temp }}/demos-deep
+      env:
+        ASPNETCORE_URLS: http://localhost:8088
+        ASPNETCORE_ENVIRONMENT: Production
+      run: |
+        dotnet RadzenBlazorDemos.Host.dll &
+        for i in $(seq 1 30); do curl -sf http://localhost:8088/ >/dev/null && break; sleep 2; done
+    - name: Deep-interaction crawl of component pages
+      working-directory: e2e
+      env:
+        DEMOS_URL: http://localhost:8088
+        DEMOS_REPORT: ${{ runner.temp }}/demos-deep-crawl.json
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node demos-deep-crawl.mjs
+    - name: Upload deep-crawl report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: demos-deep-crawl-report
+        path: ${{ runner.temp }}/demos-deep-crawl.json

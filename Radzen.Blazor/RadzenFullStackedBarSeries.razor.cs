@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -11,7 +12,7 @@ namespace Radzen.Blazor
     /// Each category's values are normalized so they total 100%.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    public partial class RadzenFullStackedBarSeries<TItem> : CartesianSeries<TItem>, IChartFullStackedBarSeries
+    public partial class RadzenFullStackedBarSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartFullStackedBarSeries
     {
         /// <summary>
         /// Specifies the fill (background color) of the bar series.

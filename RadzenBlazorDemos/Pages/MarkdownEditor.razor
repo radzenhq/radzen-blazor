@@ -1,0 +1,27 @@
+<RadzenStack Gap="1rem">
+    <RadzenMarkdownEditor @bind-Value=@markdown @bind-Mode=@mode Style="min-height: 300px" />
+    <RadzenText TextStyle="TextStyle.Caption">Mode: @mode</RadzenText>
+    <RadzenTextArea Value=@markdown ReadOnly="true" Style="width: 100%; height: 120px" />
+</RadzenStack>
+
+@code {
+    MarkdownEditorMode mode = MarkdownEditorMode.Design;
+    string markdown = @"# Hello, Markdown
+
+Edit this text **directly** — it round-trips to *markdown*. Toggle ~~WYSIWYG~~ **Design** and **Source** mode in the toolbar.
+
+- [x] A task list item
+- [ ] Bold, italic and `code` via the toolbar or Ctrl+B / Ctrl+I / Ctrl+K
+- Undo and redo with Ctrl+Z / Ctrl+Shift+Z
+
+> Blockquotes, [links](https://blazor.radzen.com) and tables work too:
+
+| Feature | Mode |
+| --- | --- |
+| WYSIWYG | Design |
+| Raw markdown | Source |
+
+```csharp
+var editor = new RadzenMarkdownEditor();
+```";
+}

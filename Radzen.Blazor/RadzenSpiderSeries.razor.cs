@@ -6,7 +6,8 @@ namespace Radzen.Blazor
     /// RadzenSpiderSeries component.
     /// </summary>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenSpiderSeries<TItem>
+    public partial class RadzenSpiderSeries<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem>
     {
     }
 }

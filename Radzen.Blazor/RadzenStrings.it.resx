@@ -1109,6 +1109,12 @@
   <data name="DatePicker_NextMonthAriaLabel" xml:space="preserve">
     <value>Mese successivo</value>
   </data>
+  <data name="DatePicker_PrevYearAriaLabel" xml:space="preserve">
+    <value>Anno precedente</value>
+  </data>
+  <data name="DatePicker_NextYearAriaLabel" xml:space="preserve">
+    <value>Anno successivo</value>
+  </data>
   <data name="DatePicker_ToggleAmPmAriaLabel" xml:space="preserve">
     <value>Attiva/disattiva AM/PM</value>
   </data>
@@ -1244,6 +1250,30 @@
   </data>
   <data name="Gantt_IsNotEmptyText" xml:space="preserve">
     <value>Non è vuoto</value>
+  </data>
+  <data name="Gantt_UnassignedText" xml:space="preserve">
+    <value>Non assegnato</value>
+  </data>
+  <data name="Gantt_HistogramLabel" xml:space="preserve">
+    <value>Carico di lavoro</value>
+  </data>
+  <data name="Gantt_DayViewText" xml:space="preserve">
+    <value>Giorno</value>
+  </data>
+  <data name="Gantt_WeekViewText" xml:space="preserve">
+    <value>Settimana</value>
+  </data>
+  <data name="Gantt_MonthViewText" xml:space="preserve">
+    <value>Mese</value>
+  </data>
+  <data name="Gantt_YearViewText" xml:space="preserve">
+    <value>Anno</value>
+  </data>
+  <data name="Gantt_YearsViewText" xml:space="preserve">
+    <value>Anni</value>
+  </data>
+  <data name="Gantt_QuarterFormat" xml:space="preserve">
+    <value>T{0}</value>
   </data>
   <!-- Gravatar -->
   <data name="Gravatar_AlternateText" xml:space="preserve">
@@ -1698,6 +1728,9 @@
   <data name="Scheduler_PrevText" xml:space="preserve">
     <value>Precedente</value>
   </data>
+  <data name="Scheduler_AllDayText" xml:space="preserve">
+    <value>Tutto il giorno</value>
+  </data>
   <!-- SecurityCode -->
   <data name="SecurityCode_AriaLabel" xml:space="preserve">
     <value>Codice di sicurezza</value>
@@ -2064,6 +2097,12 @@
   <data name="DatePicker_DisabledAriaLabel" xml:space="preserve">
     <value>disabilitato</value>
   </data>
+  <data name="DatePicker_RangeStartAriaLabel" xml:space="preserve">
+    <value>inizio dell'intervallo</value>
+  </data>
+  <data name="DatePicker_RangeEndAriaLabel" xml:space="preserve">
+    <value>fine dell'intervallo</value>
+  </data>
   <data name="HtmlEditorFormatBlock_Placeholder" xml:space="preserve">
     <value>Blocco di formato</value>
   </data>
@@ -2396,5 +2435,126 @@
   </data>
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Grafico a dispersione</value>
+  </data>
+  <data name="VirtualKeyboard_AriaLabel" xml:space="preserve">
+    <value>Tastiera virtuale</value>
+  </data>
+  <data name="VirtualKeyboard_BackspaceAriaLabel" xml:space="preserve">
+    <value>Backspace</value>
+  </data>
+  <data name="VirtualKeyboard_EnterAriaLabel" xml:space="preserve">
+    <value>Invio</value>
+  </data>
+  <data name="VirtualKeyboard_ShiftAriaLabel" xml:space="preserve">
+    <value>Maiusc</value>
+  </data>
+  <data name="VirtualKeyboard_SpaceAriaLabel" xml:space="preserve">
+    <value>Spazio</value>
+  </data>
+  <data name="VirtualKeyboard_TabAriaLabel" xml:space="preserve">
+    <value>Tabulazione</value>
+  </data>
+  <data name="VirtualKeyboard_ClearAriaLabel" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
+    <value>Nascondi tastiera</value>
+  </data>
+  <!-- MarkdownEditor -->
+  <data name="MarkdownEditorSource_Title" xml:space="preserve">
+    <value>Visualizza sorgente</value>
+  </data>
+  <data name="MarkdownEditorUndo_Title" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="MarkdownEditorRedo_Title" xml:space="preserve">
+    <value>Ripeti</value>
+  </data>
+  <data name="MarkdownEditorBold_Title" xml:space="preserve">
+    <value>Grassetto</value>
+  </data>
+  <data name="MarkdownEditorItalic_Title" xml:space="preserve">
+    <value>Corsivo</value>
+  </data>
+  <data name="MarkdownEditorStrikethrough_Title" xml:space="preserve">
+    <value>Barrato</value>
+  </data>
+  <data name="MarkdownEditorQuote_Title" xml:space="preserve">
+    <value>Citazione</value>
+  </data>
+  <data name="MarkdownEditorCode_Title" xml:space="preserve">
+    <value>Codice</value>
+  </data>
+  <data name="MarkdownEditorCodeBlock_Title" xml:space="preserve">
+    <value>Blocco di codice</value>
+  </data>
+  <data name="MarkdownEditorUnorderedList_Title" xml:space="preserve">
+    <value>Elenco puntato</value>
+  </data>
+  <data name="MarkdownEditorOrderedList_Title" xml:space="preserve">
+    <value>Elenco numerato</value>
+  </data>
+  <data name="MarkdownEditorTaskList_Title" xml:space="preserve">
+    <value>Elenco attività</value>
+  </data>
+  <data name="MarkdownEditorLink_Title" xml:space="preserve">
+    <value>Inserisci collegamento</value>
+  </data>
+  <data name="MarkdownEditorLink_UrlText" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="MarkdownEditorLink_LinkText" xml:space="preserve">
+    <value>Testo</value>
+  </data>
+  <data name="MarkdownEditorImage_Title" xml:space="preserve">
+    <value>Inserisci immagine</value>
+  </data>
+  <data name="MarkdownEditorImage_UrlText" xml:space="preserve">
+    <value>URL dell'immagine</value>
+  </data>
+  <data name="MarkdownEditorImage_AltText" xml:space="preserve">
+    <value>Testo alternativo</value>
+  </data>
+  <data name="MarkdownEditorHorizontalRule_Title" xml:space="preserve">
+    <value>Linea orizzontale</value>
+  </data>
+  <data name="MarkdownEditorTable_Title" xml:space="preserve">
+    <value>Inserisci tabella</value>
+  </data>
+  <data name="MarkdownEditorTable_RowsText" xml:space="preserve">
+    <value>Righe</value>
+  </data>
+  <data name="MarkdownEditorTable_ColumnsText" xml:space="preserve">
+    <value>Colonne</value>
+  </data>
+  <data name="MarkdownEditorTableRowBefore_Title" xml:space="preserve">
+    <value>Inserisci riga sopra</value>
+  </data>
+  <data name="MarkdownEditorTableRowAfter_Title" xml:space="preserve">
+    <value>Inserisci riga sotto</value>
+  </data>
+  <data name="MarkdownEditorTableColumnBefore_Title" xml:space="preserve">
+    <value>Inserisci colonna a sinistra</value>
+  </data>
+  <data name="MarkdownEditorTableColumnAfter_Title" xml:space="preserve">
+    <value>Inserisci colonna a destra</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteRow_Title" xml:space="preserve">
+    <value>Elimina riga</value>
+  </data>
+  <data name="MarkdownEditorTableDeleteColumn_Title" xml:space="preserve">
+    <value>Elimina colonna</value>
+  </data>
+  <data name="MarkdownEditorTableDelete_Title" xml:space="preserve">
+    <value>Elimina tabella</value>
+  </data>
+  <data name="MarkdownEditorTableAlignLeft_Title" xml:space="preserve">
+    <value>Allinea colonna a sinistra</value>
+  </data>
+  <data name="MarkdownEditorTableAlignCenter_Title" xml:space="preserve">
+    <value>Allinea colonna al centro</value>
+  </data>
+  <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
+    <value>Allinea colonna a destra</value>
   </data>
 </root>

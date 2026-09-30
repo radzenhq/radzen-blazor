@@ -1,0 +1,4 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenMarkdownEditorButtonBase
+
+<EditorButton Title="@Title" Click="@OnClick" Icon="undo" Disabled="@(Editor?.Disabled == true || Editor?.CanUndo != true)" />

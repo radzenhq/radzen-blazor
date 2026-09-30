@@ -16,7 +16,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the series data.</typeparam>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
-    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
+    public abstract class CartesianSeries<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
@@ -53,7 +54,7 @@ namespace Radzen.Blazor
 
             if (IsDate(CategoryProperty))
             {
-                var category = PropertyAccess.Getter<TItem, DateTime>(CategoryProperty!);
+                var category = PropertyAccess.DateGetter<TItem>(CategoryProperty!);
                 categoryPropertyCache = (item) => category(item).Ticks;
                 return categoryPropertyCache;
             }
@@ -136,11 +137,12 @@ namespace Radzen.Blazor
                 throw new ArgumentException($"Property {propertyName} does not exist");
             }
 
-            if(PropertyAccess.IsDateOnly(property))
-            {
-                return false;
-            }
             return PropertyAccess.IsDate(property);
+        }
+
+        private bool IsDateOnly(string? propertyName)
+        {
+            return !String.IsNullOrEmpty(propertyName) && PropertyAccess.IsDateOnly(PropertyAccess.GetPropertyType(typeof(TItem), propertyName));
         }
 
         /// <summary>
@@ -347,7 +349,8 @@ namespace Radzen.Blazor
                 return new DateScale
                 {
                     Input = scale.Input,
-                    Output = scale.Output
+                    Output = scale.Output,
+                    WholeDays = IsDateOnly(CategoryProperty) && (scale is not DateScale existing || existing.WholeDays)
                 };
             }
 
@@ -401,7 +404,36 @@ namespace Radzen.Blazor
                 }
             }
 
+            IncludeZeroInValueScale(scale, false);
+
             return scale;
+        }
+
+        /// <summary>
+        /// Extends the specified value scale to zero when this series or another series on the same scale requires it: when the
+        /// <see cref="RadzenValueAxis.Range" /> of the value axis is <see cref="ValueAxisRange.IncludeZero" />, or when it is <see cref="ValueAxisRange.Auto" />
+        /// and a series is zero based outside a <see cref="RadzenSparkline" />. Call it after merging the values of this series into the scale. A scale whose values are all equal is not extended
+        /// because its ticks already extend from zero. Logarithmic scales and scales without data are left unchanged.
+        /// </summary>
+        /// <param name="scale">The value scale.</param>
+        /// <param name="zeroBased">Whether this series is filled from a zero baseline, as column, bar and area series are.</param>
+        protected void IncludeZeroInValueScale(ScaleBase scale, bool zeroBased)
+        {
+            ArgumentNullException.ThrowIfNull(scale);
+
+            var range = Chart?.GetValueAxis(ValueAxisName).Range ?? ValueAxisRange.Auto;
+
+            if (range == ValueAxisRange.IncludeZero || (range == ValueAxisRange.Auto && zeroBased && Chart?.IncludesZeroForBaselineSeries != false))
+            {
+                scale.IncludeZero = true;
+            }
+
+            if (!scale.IncludeZero || scale.IsLogarithmic || !double.IsFinite(scale.Input.Start) || !double.IsFinite(scale.Input.End) || scale.Input.Start == scale.Input.End)
+            {
+                return;
+            }
+
+            scale.Input.MergeWidth(new ScaleRange { Start = 0, End = 0 });
         }
 
         /// <inheritdoc />

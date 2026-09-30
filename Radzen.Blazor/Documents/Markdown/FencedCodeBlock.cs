@@ -11,13 +11,15 @@ public class FencedCodeBlock : Leaf
     /// <summary>
     /// The delimiter used to start and end the code block.
     /// </summary>
-    public string? Delimiter { get; private set; }
-    internal int Indent { get; private set; }
+    public string? Delimiter { get; internal set; }
+    internal int Indent { get; set; }
 
     /// <summary>
     /// The info string of the code block. This is the first line of the code block and is used to specify the language of the code block.
     /// </summary>
-    public string? Info { get; private set; }
+    public string? Info { get; internal set; }
+
+    internal bool Closed { get; set; }
 
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
@@ -34,7 +36,12 @@ public class FencedCodeBlock : Leaf
         var newlinePos = Value.IndexOf('\n', StringComparison.Ordinal);
         var firstLine = Value[..newlinePos];
         Info = firstLine.Trim();
-        Value = Value[(newlinePos + 1)..];
+        TrimContentStart(newlinePos + 1);
+
+        if (Content.Segments.Count == 0)
+        {
+            Content.Append(0, Math.Min(parser.OffsetAt(Range.Start.Line + 1, Range.Start.Column - 1), SourceEnd), 0);
+        }
     }
 
     internal override BlockMatch Matches(BlockParser parser)
@@ -49,6 +56,7 @@ public class FencedCodeBlock : Leaf
         {
             // closing fence - we're at end of line, so we can return
             parser.LastLineLength = parser.Offset + indent + match.Length;
+            Closed = true;
             parser.Close(this, parser.LineNumber);
             return BlockMatch.Break;
         }

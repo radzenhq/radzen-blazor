@@ -44,6 +44,20 @@
     <SchedulerMultiDay />
 </RadzenExample>
 
+<RadzenText Anchor="scheduler#resources" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Group appointments by resource
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Declare one <code>&lt;RadzenSchedulerResource&gt;</code> per resource type (rooms, people, equipment) and set <code>GroupByResource</code> on any view.
+    Declaring multiple resource types creates a grouping hierarchy in order of declaration; use <code>GroupBy</code> to group a view by specific resource types
+    and <code>GroupOrientation</code> to render the groups side by side or one below the other. The day view displays the resource combinations as columns with a
+    dedicated all-day row. An appointment may belong to multiple resources of the same type when the property is a collection. Click a slot to book a resource,
+    drag a booking to another resource to reassign it, or click a booking to edit its resources.
+</RadzenText>
+<RadzenExample ComponentName="Scheduler" Example="SchedulerResources" AdditionalSourceCodePages=@(new [] { "/demos/Models/RoomBooking.cs", "EditBookingPage.razor" })>
+    <SchedulerResources />
+</RadzenExample>
+
 <RadzenText Anchor="scheduler#agenda" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Display scheduler as an agenda
 </RadzenText>
@@ -75,6 +89,8 @@
         new KeyboardShortcut { Key = "DownArrow on week/month view or year view selected month", Action = "Focus same day from next week." },
         new KeyboardShortcut { Key = "UpArrow on day view", Action = "Focus previous hour." },
         new KeyboardShortcut { Key = "DownArrow on day view", Action = "Focus next hour." },
+        new KeyboardShortcut { Key = "LeftArrow or RightArrow on day view grouped by resource", Action = "Focus previous or next resource." },
+        new KeyboardShortcut { Key = "UpArrow or DownArrow on day view grouped by resource", Action = "Focus previous or next slot. Focus the all-day row from the first slot." },
         new KeyboardShortcut { Key = "UpArrow on appointment", Action = "Focus previous appointment." },
         new KeyboardShortcut { Key = "DownArrow on appointment", Action = "Focus next appointment." },
         new KeyboardShortcut { Key = "Space on appointment", Action = "Edit appointment." },

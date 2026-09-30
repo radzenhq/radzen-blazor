@@ -11,16 +11,6 @@ public class HeadingTests
         return XmlVisitor.ToXml(document);
     }
 
-    [Fact]
-    public void Parse_BasicAtxHeading()
-    {
-        Assert.Equal(@"<document>
-    <heading level=""1"">
-        <text>foo</text>
-    </heading>
-</document>", ToXml("# foo"));
-    }
-
     [Theory]
     [InlineData(@"# foo
 ## foo
@@ -441,7 +431,8 @@ Baz", @"<document>
     [InlineData(@"\> foo
 ------", @"<document>
     <heading level=""2"">
-        <text>&gt; foo</text>
+        <text>&gt;</text>
+        <text> foo</text>
     </heading>
 </document>")]
     [InlineData(@"Foo

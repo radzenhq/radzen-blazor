@@ -9,16 +9,22 @@
 
     public override string Icon => "calendar_today";
 
-    [Parameter]
-    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttYearView_Text)); set => text = value; }
     private string? text;
+
+    [Parameter]
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.Gantt_YearViewText)); set => text = value; }
 
     public override string Title
     {
         get
         {
             var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
-            return YearStart.ToString("yyyy", culture);
+            var end = EndDate.AddDays(-1);
+            if (StartDate.Year == end.Year)
+            {
+                return StartDate.ToString("yyyy", culture);
+            }
+            return $"{StartDate.ToString("yyyy", culture)} - {end.ToString("yyyy", culture)}";
         }
     }
 
@@ -26,11 +32,29 @@
     {
         get
         {
+            if (Gantt?.ViewStart.HasValue == true)
+            {
+                var start = Gantt.ViewStart.Value.Date;
+                return new DateTime(start.Year, start.Month, 1);
+            }
+
             return YearStart;
         }
     }
 
-    public override DateTime EndDate => YearStart.AddYears(1);
+    public override DateTime EndDate
+    {
+        get
+        {
+            if (Gantt?.ViewEnd.HasValue == true)
+            {
+                var end = Gantt.ViewEnd.Value.Date;
+                return new DateTime(end.Year, end.Month, 1).AddMonths(1);
+            }
+
+            return StartDate.AddYears(1);
+        }
+    }
 
     public override DateTime Next()
     {
@@ -45,7 +69,9 @@
     public override RenderFragment Render()
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
-        var columns = BuildMonthColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 32, Scheduler?.Culture ?? CultureInfo.CurrentCulture);
+        var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+        var quarterFormat = Localize(nameof(RadzenStrings.Gantt_QuarterFormat));
+        var columns = BuildMonthColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture, quarterFormat);
         var timelineWidth = columns.Sum(c => c.WidthPx);
 
         Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
@@ -64,15 +90,19 @@
                                BaselineStartProperty=@(Gantt?.TimelineBaselineStartProperty)
                                BaselineEndProperty=@(Gantt?.TimelineBaselineEndProperty)
                                ShowTodayLine=@(Gantt?.TimelineShowTodayLine ?? true)
-                               ShowWeekends=@(Gantt?.TimelineShowWeekends ?? true)
+                               ShowWeekends="false"
                                NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
                                Markers=@(Gantt?.TimelineMarkers)
                                TaskRender=@(Gantt?.TimelineTaskRender)
+                               LaneByItem=@(Gantt?.LaneByItem)
+                               LaneCountByRow=@(Gantt?.LaneCountByRow)
                                AppointmentMove=OnAppointmentMove />
         </CascadingValue>;
     }
 
-    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildMonthColumns(DateTime start, DateTime end, int dayWidth, CultureInfo culture)
+    internal const double AverageDaysPerMonth = 30.4369;
+
+    internal static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildMonthColumns(DateTime start, DateTime end, int monthWidth, CultureInfo culture, string quarterFormat)
     {
         var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
         var current = new DateTime(start.Year, start.Month, 1);
@@ -86,8 +116,8 @@
                 Start = current,
                 End = next,
                 Label = current.ToString("MMM", culture),
-                GroupLabel = $"Q{quarter} {current.Year}",
-                WidthPx = dayWidth * Math.Max(1, daysInMonth)
+                GroupLabel = $"{string.Format(culture, quarterFormat, quarter)} {current.ToString("yyyy", culture)}",
+                WidthPx = monthWidth * daysInMonth / AverageDaysPerMonth
             });
             current = next;
         }

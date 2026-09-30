@@ -7,7 +7,8 @@ namespace Radzen.Blazor
     /// RadzenPivotRow component. Must be placed inside a <see cref="RadzenPivotDataGrid{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the PivotDataGrid item.</typeparam>
-    public partial class RadzenPivotRow<TItem> : RadzenPivotField<TItem>, IDisposable
+    public partial class RadzenPivotRow<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenPivotField<TItem>, IDisposable
     {
         /// <summary>
         /// Gets or sets the maximum number of row groups to display at this level. When the number of distinct values exceeds this limit

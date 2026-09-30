@@ -139,8 +139,8 @@ namespace Radzen.Blazor.Tests
 
             var markup = await RenderWaterfall(ctx, FillMode.Gradient, data);
 
-            Assert.Matches("offset=\"0\"[^>]*stop-opacity: 0.85", markup);
-            Assert.Matches("offset=\"1\"[^>]*stop-opacity: 0.4", markup);
+            Assert.Matches("offset=\"0\"[^>]*stop-opacity: var\\(--rz-chart-gradient-start-opacity, 0.85\\)", markup);
+            Assert.Matches("offset=\"1\"[^>]*stop-opacity: var\\(--rz-chart-gradient-end-opacity, 0.4\\)", markup);
         }
 
         [Fact]

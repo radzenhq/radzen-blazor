@@ -7,6 +7,8 @@ namespace Radzen.Documents.Markdown;
 /// </summary>
 public class SetExtHeading : Heading
 {
+    internal string? Underline { get; set; }
+
     private static readonly Regex HeadingRegex = new (@"^(?:=+|-+)[ \t]*$");
 
     internal static BlockStart Start(BlockParser parser, Block block)
@@ -27,16 +29,17 @@ public class SetExtHeading : Heading
             // resolve reference links
             while (paragraph.Value.Peek() == '[' && parser.TryParseLinkReference(paragraph.Value,  out var position))
             {
-                paragraph.Value = paragraph.Value[position..];
+                parser.RecordLinkReferenceDefinition(paragraph.Value[..position]);
+                paragraph.TrimContentStart(position);
             }
 
             if (paragraph.Value.Length > 0) 
             {
                 var heading = new SetExtHeading
                 {
-                    Level = match.Value[0] == '=' ? 1 : 2,
-                    Value = paragraph.Value
+                    Level = match.Value[0] == '=' ? 1 : 2
                 };
+                heading.CopyContent(paragraph);
                 paragraph.Parent.Replace(paragraph, heading);
                 parser.Tip = heading;
                 parser.AdvanceOffset(parser.CurrentLine.Length - parser.Offset, false);

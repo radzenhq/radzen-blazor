@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Xunit;
 
 namespace Radzen.Documents.Markdown.Tests;
@@ -112,7 +111,9 @@ bar)", @"<document>
     <paragraph>
         <text>[</text>
         <text>link</text>
-        <text>](&lt;foo&gt;)</text>
+        <text>](&lt;foo</text>
+        <text>&gt;</text>
+        <text>)</text>
     </paragraph>
 </document>")]
     [InlineData(@"[a](<b)c
@@ -499,7 +500,9 @@ bar)", @"<document>
 </document>")]
     [InlineData(@"<foo\+@bar.example.com>", @"<document>
     <paragraph>
-        <text>&lt;foo+@bar.example.com&gt;</text>
+        <text>&lt;foo</text>
+        <text>+</text>
+        <text>@bar.example.com&gt;</text>
     </paragraph>
 </document>")]
     [InlineData(@"<>", @"<document>
@@ -667,7 +670,7 @@ with blank line'
 [foo]
 ", @"<document>
     <paragraph>
-        <link destination=""/url\bar*baz"" title=""foo\&quot;bar\baz"">
+        <link destination=""/url\bar*baz"" title=""foo&quot;bar\baz"">
             <text>foo</text>
         </link>
     </paragraph>

@@ -17,7 +17,8 @@ namespace Radzen.Blazor
     /// RadzenPickList component.
     /// </summary>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenPickList<TItem> : RadzenComponent
+    public partial class RadzenPickList<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenComponent
     {
         /// <summary>
         /// Gets or sets the edit context.

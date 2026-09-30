@@ -1,6 +1,10 @@
 @inherits Tick
 
 <g class="rz-tick">
+@if (!String.IsNullOrEmpty(FullText))
+{
+<title>@FullText</title>
+}
 @if (TopSide)
 {
 <Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@X" Y2="@(Y-6)" />

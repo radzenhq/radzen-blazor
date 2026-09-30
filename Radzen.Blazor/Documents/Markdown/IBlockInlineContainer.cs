@@ -5,7 +5,7 @@ namespace Radzen.Documents.Markdown;
 /// <summary>
 /// Represents a block node that has inline children.
 /// </summary>
-public interface IBlockInlineContainer
+public interface IBlockInlineContainer : INode
 {
     /// <summary>
     /// Gets the inline children of the block.

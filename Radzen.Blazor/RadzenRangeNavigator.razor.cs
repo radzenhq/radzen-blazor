@@ -92,14 +92,14 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the minimum value for the axis. Use when there are no child series to define the range.
-        /// Supports <see cref="DateTime"/> and numeric types.
+        /// Supports <see cref="DateTime"/>, <see cref="DateOnly"/> and numeric types.
         /// </summary>
         [Parameter]
         public object? Min { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum value for the axis. Use when there are no child series to define the range.
-        /// Supports <see cref="DateTime"/> and numeric types.
+        /// Supports <see cref="DateTime"/>, <see cref="DateOnly"/> and numeric types.
         /// </summary>
         [Parameter]
         public object? Max { get; set; }
@@ -157,6 +157,11 @@ namespace Radzen.Blazor
 
         internal void Refresh()
         {
+            if (Width <= 0)
+            {
+                return;
+            }
+
             UpdateScales();
             StateHasChanged();
         }
@@ -179,9 +184,9 @@ namespace Radzen.Blazor
 
             if (NavigatorSeries.Count == 0 && Min != null && Max != null)
             {
-                if (Min is DateTime)
+                if (Min is DateTime or DateOnly or DateTimeOffset)
                 {
-                    CategoryScale = new DateScale();
+                    CategoryScale = new DateScale { WholeDays = Min is DateOnly };
                 }
 
                 CategoryScale.Resize(Min, Max);
@@ -409,7 +414,7 @@ namespace Radzen.Blazor
         {
             if (CategoryScale is DateScale)
             {
-                var date = new DateTime((long)value);
+                var date = CategoryScale.Value(value);
 
                 if (HandleLabelFormatter != null)
                 {

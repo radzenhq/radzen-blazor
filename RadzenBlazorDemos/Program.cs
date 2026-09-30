@@ -20,7 +20,6 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenQueryStringThemeService();
 
 builder.Services.AddScoped<ExampleService>();
-builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 

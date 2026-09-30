@@ -54,6 +54,8 @@ public abstract class BlockContainer : Block
             children[index] = target;
             target.Parent = this;
             target.Range = source.Range;
+            target.SourceStart = source.SourceStart;
+            target.SourceEnd = source.SourceEnd;
         }
     }
 
@@ -65,6 +67,14 @@ public abstract class BlockContainer : Block
     {
         children.Remove(block);
     }
+
+    internal void Insert(int index, Block block)
+    {
+        children.Insert(index, block);
+        block.Parent = this;
+    }
+
+    internal int IndexOf(Block block) => children.IndexOf(block);
 
     /// <summary>
     /// Returns the next sibling of the block.
