@@ -83,7 +83,7 @@
   }
 
   pre {
-    background-color: var(--rz-base-100);
+    background-color: color-mix(in srgb, var(--rz-text-color) 8%, transparent);
     border-radius: var(--rz-border-radius);
     padding: 0.5rem;
     overflow-x: auto;

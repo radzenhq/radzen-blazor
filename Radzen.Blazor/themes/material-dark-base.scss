@@ -1586,5 +1586,11 @@ $spreadsheet-cell-border: var(--rz-border-base-600) !default;
 $spreadsheet-header-background-color: var(--rz-base-background-color) !default;
 $spreadsheet-header-active-background-color: var(--rz-base-600) !default;
 
+$rz-virtual-keyboard-panel-background-color: var(--rz-base-900) !default;
+$rz-virtual-keyboard-key-background-color: var(--rz-base-600) !default;
+$rz-virtual-keyboard-key-hover-background-color: var(--rz-base-500) !default;
+$rz-virtual-keyboard-key-active-background-color: var(--rz-base-700) !default;
+$rz-virtual-keyboard-key-action-background-color: var(--rz-base-700) !default;
+
 @import 'fonts';
 @import 'components';
