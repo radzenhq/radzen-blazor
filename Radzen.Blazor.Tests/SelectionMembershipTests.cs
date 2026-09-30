@@ -620,11 +620,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.False(selection.Contains(null, "a"));
 
-            System.GC.Collect();
-            System.GC.WaitForPendingFinalizers();
-            System.GC.Collect();
-
-            Assert.False(reference.IsAlive, "the memo should not still be holding the previous collection");
+            GarbageCollection.AssertCollected(reference, "the memo should not still be holding the previous collection");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -650,16 +646,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AskingAboutACollectibleCollectionTypeDoesNotRetainIt()
         {
-            var reference = UseCollectibleCollectionType();
-
-            for (var attempt = 0; attempt < 10 && reference.IsAlive; attempt++)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-            }
-
-            Assert.False(reference.IsAlive, "the collectible collection type should have been collected");
+            GarbageCollection.AssertCollected(UseCollectibleCollectionType(), "the collectible collection type should have been collected");
         }
     }
 }

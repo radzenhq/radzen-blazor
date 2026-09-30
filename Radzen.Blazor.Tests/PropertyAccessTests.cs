@@ -243,14 +243,7 @@ namespace Radzen.Blazor.Tests
 
         static void AssertCollected(WeakReference reference)
         {
-            for (var attempt = 0; attempt < 10 && reference.IsAlive; attempt++)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-            }
-
-            Assert.False(reference.IsAlive);
+            GarbageCollection.AssertCollected(reference, "the collectible type should have been collected");
         }
 
         [Fact]
