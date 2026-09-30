@@ -23,6 +23,8 @@
 
         <RadzenDropDown id="item-dropdown" TValue="int" Data="@dropDownItems" TextProperty="Text" ValueProperty="Value" @bind-Value="@selectedItem" />
 
+        <RadzenListBox id="theme-listbox" TValue="string" Data="@Themes.All" TextProperty="Text" ValueProperty="Value" @bind-Value="@selectedTheme" />
+
         <RadzenScheduler TItem="Appt" Data="@appts" StartProperty="Start" EndProperty="End" TextProperty="Text">
             <RadzenMonthView />
         </RadzenScheduler>
@@ -51,6 +53,7 @@
     string status = "running";
     string? selectedText;
     int selectedItem = 1;
+    string? selectedTheme = "material3";
     string html = "<p>Trimmed editor</p>";
 
     Order[] orders =

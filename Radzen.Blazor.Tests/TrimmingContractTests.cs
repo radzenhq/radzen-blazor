@@ -222,6 +222,7 @@ namespace Radzen.Blazor.Tests
             string[] required =
             {
                 "Radzen.DropDownItem`1",
+                "Radzen.Theme",
                 "Radzen.Documents.Spreadsheet.ChartDataPoint",
                 "Radzen.ODataServiceResult`1",
                 "Radzen.ChatCompletionRequest",

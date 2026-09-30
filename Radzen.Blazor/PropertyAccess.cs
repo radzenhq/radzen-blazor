@@ -87,12 +87,12 @@ public static class PropertyAccess
                     throw new InvalidOperationException($"Member '{memberName}' not found on interface '{instance.Type}'.");
                 }
 
-                return Expression.Property(instance, declaringType, memberName);
+                return RequireReadable(Expression.Property(instance, declaringType, memberName));
             }
 
             try
             {
-                return Expression.PropertyOrField(instance, memberName);
+                return RequireReadable(Expression.PropertyOrField(instance, memberName));
             }
             catch (AmbiguousMatchException)
             {
@@ -100,7 +100,7 @@ public static class PropertyAccess
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
                 if (prop != null)
                 {
-                    return Expression.Property(instance, prop);
+                    return RequireReadable(Expression.Property(instance, prop));
                 }
 
                 var field = instance.Type.GetField(memberName,
@@ -112,6 +112,19 @@ public static class PropertyAccess
 
                 throw;
             }
+        }
+
+        static MemberExpression RequireReadable(MemberExpression access)
+        {
+            if (access.Member is PropertyInfo { CanRead: false } property)
+            {
+                throw new InvalidOperationException(
+                    $"Property '{property.Name}' of type '{property.DeclaringType}' has no getter. " +
+                    "A trimmed application removes getters that no code calls directly, so annotate the type with " +
+                    "[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] or preserve it in a linker descriptor.");
+            }
+
+            return access;
         }
 
         Expression AccessWithNullPropagation(Expression instance, string memberName)

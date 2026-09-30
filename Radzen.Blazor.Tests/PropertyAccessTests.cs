@@ -36,6 +36,30 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(1, holder.InnerReads);
         }
 
+        class WriteOnlyHolder
+        {
+            public string Text { set { } }
+            public string Value { get; set; }
+        }
+
+        [Fact]
+        public void Getter_Throws_Descriptive_Error_For_Property_Without_Getter()
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => PropertyAccess.Getter<object, object>(nameof(WriteOnlyHolder.Text), typeof(WriteOnlyHolder)));
+
+            Assert.Contains("'Text'", ex.Message);
+            Assert.Contains(nameof(WriteOnlyHolder), ex.Message);
+            Assert.Contains("DynamicallyAccessedMembers", ex.Message);
+        }
+
+        [Fact]
+        public void Getter_Reads_Property_With_Getter_On_Type_With_WriteOnly_Sibling()
+        {
+            var getter = PropertyAccess.Getter<object, object>(nameof(WriteOnlyHolder.Value), typeof(WriteOnlyHolder));
+
+            Assert.Equal("v", getter(new WriteOnlyHolder { Value = "v" }));
+        }
+
         [Fact]
         public void Getter_With_DifferentTargetType()
         {

@@ -35,8 +35,17 @@ namespace Radzen
     /// <summary>
     /// Theme definition.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
     public class Theme
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Theme"/> class.
+        /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Theme))]
+        public Theme()
+        {
+        }
+
         /// <summary>
         /// Specifies the user-friendly theme name e.g. Material3.
         /// </summary>
