@@ -1,0 +1,37 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenDonutSeries Data="@revenue" CategoryProperty="Category" ValueProperty="Value" Title="Revenue">
+                <RadzenSeriesDataLabels Visible="false" />
+            </RadzenDonutSeries>
+            <RadzenLegend>
+                <ItemTemplate Context="item">
+                    @{ var data = (DataItem)item.Data; }
+                    <div>@item.Text</div>
+                    <div style="margin-top: 0.25rem; font-style: italic; color: var(--rz-text-secondary-color);">
+                        @data.Value.ToString("N0") (@((data.Value / total).ToString("P0")))
+                    </div>
+                </ItemTemplate>
+            </RadzenLegend>
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Category { get; set; }
+        public double Value { get; set; }
+    }
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Category = "Cloud", Value = 4200 },
+        new DataItem { Category = "Licenses", Value = 3100 },
+        new DataItem { Category = "Services", Value = 2300 },
+        new DataItem { Category = "Support", Value = 1500 },
+        new DataItem { Category = "Training", Value = 900 },
+    };
+
+    double total => revenue.Sum(item => item.Value);
+}

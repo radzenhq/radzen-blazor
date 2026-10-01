@@ -247,6 +247,7 @@ namespace Radzen.Blazor
                     builder.AddAttribute(seq++, nameof(Rendering.LegendItem.MarkerSize), MarkerSize);
                     builder.AddAttribute(seq++, nameof(Rendering.LegendItem.Text), FormatRangeLabel(range));
                     builder.AddAttribute(seq++, nameof(Rendering.LegendItem.Clickable), false);
+                    builder.AddAttribute(seq++, nameof(Rendering.LegendItem.ChildContent), RenderLegendItemContent(clickable, FormatRangeLabel(range), range, range.Color));
                     builder.CloseComponent();
                 }
             };

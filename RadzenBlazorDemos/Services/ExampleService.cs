@@ -1122,7 +1122,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
+                            Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" }, new () { Text = "Legend item template", Anchor = "#legend-item-template" } ],
                             Name = "Legend",
                             Path = "chart-legend",
                             Title = "Chart Legend Options in Radzen Blazor | Free UI Components by Radzen",
@@ -1131,7 +1131,8 @@ namespace RadzenBlazorDemos
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I hide the chart legend?", Answer = "Add a legend component with Visible set to false - the chart then renders without the legend." },
-                                new FaqItem { Question = "Can I move the legend?", Answer = "Yes. Set the legend Position to place it on any side of the chart." }
+                                new FaqItem { Question = "Can I move the legend?", Answer = "Yes. Set the legend Position to place it on any side of the chart." },
+                                new FaqItem { Question = "Can I customize the text of the legend items?", Answer = "Yes. Set the legend ItemTemplate to render custom content for every legend item - for example the value and percentage of a pie or donut segment." }
                             },
                             Tags = new [] { "chart", "graph", "legend" }
                         },

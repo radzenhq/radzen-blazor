@@ -14,7 +14,7 @@
             }
         </g>
     </svg>
-    <span class="rz-legend-item-text">@Text</span>
+    <span class="rz-legend-item-text">@if (ChildContent != null) { @ChildContent } else { @Text }</span>
 </span>
 
 @code {
@@ -23,6 +23,9 @@
 
     [Parameter]
     public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public string Class { get; set;} = string.Empty;

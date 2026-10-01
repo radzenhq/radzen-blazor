@@ -349,6 +349,8 @@ namespace Radzen.Blazor
                         builder.AddAttribute(9, nameof(LegendItem.MouseLeave), EventCallback.Factory.Create<MouseEventArgs>(this, args => OnLegendMouseLeave()));
                     }
 
+                    builder.AddAttribute(10, nameof(LegendItem.ChildContent), RenderLegendItemContent(clickable, TooltipTitle(data), data, PickColor(Items.IndexOf(data), Fills)));
+
                     builder.CloseComponent();
                 }
                 ;

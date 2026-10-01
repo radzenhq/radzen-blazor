@@ -182,6 +182,7 @@ namespace Radzen.Blazor
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(index, Fills));
                     builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data!)));
                     builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
+                    builder.AddAttribute(8, nameof(LegendItem.ChildContent), RenderLegendItemContent(clickable, TooltipTitle(data), data, PickColor(index, Fills)));
                     builder.CloseComponent();
                 }
             };

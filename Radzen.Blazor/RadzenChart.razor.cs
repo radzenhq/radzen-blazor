@@ -1116,6 +1116,24 @@ namespace Radzen.Blazor
             }
         }
 
+        internal (double Size, bool Vertical)? MeasuredLegendSize { get; private set; }
+
+        /// <summary>
+        /// Invoked via interop when a legend that uses <see cref="RadzenLegend.ItemTemplate" /> changes its size. Reserves the space the legend needs.
+        /// </summary>
+        /// <param name="size">The width of a legend at the left or right side of the chart or the height of a legend at the top or bottom.</param>
+        /// <param name="vertical">Whether the legend is at the left or right side of the chart.</param>
+        [JSInvokable]
+        public async Task LegendResize(double size, bool vertical)
+        {
+            if (MeasuredLegendSize != (size, vertical))
+            {
+                MeasuredLegendSize = (size, vertical);
+
+                await Refresh();
+            }
+        }
+
         RenderFragment? tooltip;
         object? tooltipData;
         IChartSeries? tooltipSeries;
@@ -1649,6 +1667,8 @@ namespace Radzen.Blazor
 
         private bool widthAndHeightAreSet;
         private bool firstRender = true;
+        private bool chartCreated;
+        private bool legendObserved;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -1666,6 +1686,8 @@ namespace Radzen.Blazor
                     var mouseMoveThrottle = MouseMoveThrottle ?? (JSRuntime is IJSInProcessRuntime ? 0 : 50);
                     var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference, mouseMoveThrottle);
 
+                    chartCreated = true;
+
                     if (!widthAndHeightAreSet)
                     {
                         widthAndHeightAreSet = true;
@@ -1675,6 +1697,38 @@ namespace Radzen.Blazor
                 }
             }
 
+            await ObserveLegend();
+        }
+
+        private async Task ObserveLegend()
+        {
+            if (!Visible)
+            {
+                chartCreated = false;
+                legendObserved = false;
+                MeasuredLegendSize = null;
+
+                return;
+            }
+
+            if (!chartCreated || disposed || JSRuntime == null)
+            {
+                return;
+            }
+
+            var observe = Legend.Visible && Legend.ItemTemplate != null && Width.HasValue && Height.HasValue;
+
+            if (observe != legendObserved)
+            {
+                legendObserved = observe;
+
+                if (!observe)
+                {
+                    MeasuredLegendSize = null;
+                }
+
+                await JSRuntime.InvokeVoidAsync("Radzen.observeChartLegend", Element, observe);
+            }
         }
 
         internal string? ClipPath { get; set; }

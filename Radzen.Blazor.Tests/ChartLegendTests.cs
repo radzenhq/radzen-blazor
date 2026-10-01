@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -137,6 +138,126 @@ namespace Radzen.Blazor.Tests
 
             var line = chart.Find("line.rz-legend-item-line");
             Assert.Equal("#6366f1", line.GetAttribute("stroke"));
+        }
+
+        private static RenderFragment<LegendItemContext> ItemTemplate => item => builder =>
+        {
+            builder.OpenElement(0, "em");
+            builder.AddContent(1, item.Data is DataItem data ? $"{item.Text}: {data.Value}" : $"{item.Text}!");
+            builder.CloseElement();
+        };
+
+        private static RenderFragment TemplatedLegend(LegendPosition position, bool template, bool pie) => builder =>
+        {
+            builder.OpenComponent<RadzenLegend>(0);
+            builder.AddAttribute(1, nameof(RadzenLegend.Position), position);
+
+            if (template)
+            {
+                builder.AddAttribute(2, nameof(RadzenLegend.ItemTemplate), ItemTemplate);
+            }
+
+            builder.CloseComponent();
+
+            if (pie)
+            {
+                builder.OpenComponent<RadzenPieSeries<DataItem>>(3);
+            }
+            else
+            {
+                builder.OpenComponent<RadzenLineSeries<DataItem>>(3);
+            }
+
+            builder.AddAttribute(4, nameof(RadzenLineSeries<DataItem>.CategoryProperty), nameof(DataItem.Category));
+            builder.AddAttribute(5, nameof(RadzenLineSeries<DataItem>.ValueProperty), nameof(DataItem.Value));
+            builder.AddAttribute(6, nameof(RadzenLineSeries<DataItem>.Title), "Series");
+            builder.AddAttribute(7, nameof(RadzenLineSeries<DataItem>.Data), (IEnumerable<DataItem>)SampleData);
+            builder.CloseComponent();
+        };
+
+        [Fact]
+        public async Task ItemTemplate_RendersInsteadOfText_AndKeepsMarker()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, false)));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var item = chart.Find(".rz-legend-item");
+
+            Assert.Equal("<em>Series!</em>", item.QuerySelector(".rz-legend-item-text").InnerHtml);
+            Assert.NotNull(item.QuerySelector("svg"));
+        }
+
+        [Fact]
+        public async Task ItemTemplate_ReceivesDataItem_ForPieSeries()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, true)));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var texts = chart.FindAll(".rz-legend-item-text").Select(e => e.InnerHtml).ToArray();
+
+            Assert.Equal(new[] { "<em>A: 10</em>", "<em>B: 20</em>", "<em>C: 15</em>" }, texts);
+        }
+
+        [Fact]
+        public async Task ItemTemplate_RequestsLegendMeasuring()
+        {
+            using var ctx = CreateChartContext();
+
+            var templated = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            await templated.InvokeAsync(() => templated.Instance.Resize(400, 300));
+
+            var invocation = Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.observeChartLegend");
+            Assert.Equal(true, invocation.Arguments[1]);
+        }
+
+        [Fact]
+        public async Task LegendWithoutItemTemplate_DoesNotRequestLegendMeasuring()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.observeChartLegend");
+        }
+
+        [Fact]
+        public async Task ItemTemplate_ReservesTheMeasuredLegendSize()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var estimated = MarginTopOf(chart.Markup);
+
+            await chart.InvokeAsync(() => chart.Instance.LegendResize(90, false));
+
+            Assert.NotEqual(90, estimated);
+            Assert.Equal(90, MarginTopOf(chart.Markup));
+        }
+
+        [Fact]
+        public async Task MeasuredLegendSize_IsIgnored_ForTheOtherOrientation_AndWithoutItemTemplate()
+        {
+            using var ctx = CreateChartContext();
+
+            var templated = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            await templated.InvokeAsync(() => templated.Instance.Resize(400, 300));
+            var estimated = MarginTopOf(templated.Markup);
+            await templated.InvokeAsync(() => templated.Instance.LegendResize(90, true));
+
+            Assert.Equal(estimated, MarginTopOf(templated.Markup));
+
+            var plain = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
+            await plain.InvokeAsync(() => plain.Instance.Resize(400, 300));
+            await plain.InvokeAsync(() => plain.Instance.LegendResize(90, false));
+
+            Assert.Equal(estimated, MarginTopOf(plain.Markup));
         }
     }
 }

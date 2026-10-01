@@ -741,8 +741,20 @@ namespace Radzen.Blazor
                 builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
                 builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
                 builder.AddAttribute(9, nameof(LegendItem.ShowLine), ShowLineInLegend);
+                builder.AddAttribute(10, nameof(LegendItem.ChildContent), RenderLegendItemContent(clickable, GetTitle(), Data, Color));
                 builder.CloseComponent();
             };
+        }
+
+        /// <summary>
+        /// Renders the content of a legend item via <see cref="RadzenLegend.ItemTemplate" />.
+        /// Returns <c>null</c> when there is no template or the item is not rendered in the legend (e.g. in a shared tooltip).
+        /// </summary>
+        internal RenderFragment? RenderLegendItemContent(bool inLegend, string text, object? data, string? color)
+        {
+            var template = inLegend ? Chart?.Legend?.ItemTemplate : null;
+
+            return template?.Invoke(new LegendItemContext { Text = text, Data = data, Series = this, Color = color });
         }
 
         /// <summary>

@@ -3963,7 +3963,16 @@ window.Radzen = {
       ref._chartRTLObserver.disconnect();
       delete ref._chartRTLObserver;
     }
+    if (ref.observeLegend) {
+      ref.observeLegend(false);
+      delete ref.observeLegend;
+    }
     this.destroyResizable(ref);
+  },
+  observeChartLegend: function (ref, observe) {
+    if (ref && ref.observeLegend) {
+      ref.observeLegend(observe);
+    }
   },
   createRangeNavigator: function (ref, instance) {
     if (!ref) return [0, 0];
@@ -4799,6 +4808,28 @@ window.Radzen = {
     });
     ref._chartRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
     try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
+
+    var legendObserver = null;
+    ref.observeLegend = function (observe) {
+      if (legendObserver) {
+        legendObserver.disconnect();
+        legendObserver = null;
+      }
+      var legend = observe && window.ResizeObserver ? ref.querySelector(':scope > .rz-legend') : null;
+      if (!legend) return;
+      var lastSize = null;
+      var lastVertical = null;
+      legendObserver = new ResizeObserver(function () {
+        var rect = legend.getBoundingClientRect();
+        var vertical = legend.classList.contains('rz-legend-left') || legend.classList.contains('rz-legend-right');
+        var size = Math.ceil(vertical ? rect.width : rect.height);
+        if (size === lastSize && vertical === lastVertical) return;
+        lastSize = size;
+        lastVertical = vertical;
+        try { suppressDisposed(instance.invokeMethodAsync('LegendResize', size, vertical)); } catch { }
+      });
+      legendObserver.observe(legend);
+    };
 
     this.createResizable(ref, instance);
     var self = this;
