@@ -17,7 +17,7 @@ class RowsFunction : FormulaFunction
 
         if (array is RangeList range)
         {
-            return CellData.FromNumber(range.Rows);
+            return CellData.FromNumber(range.LogicalRows);
         }
 
         return CellData.FromError(CellError.Value);

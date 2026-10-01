@@ -304,10 +304,18 @@ internal class CellSyntaxNode(FormulaToken token) : FormulaSyntaxNode(token)
     }
 }
 
-internal class RangeSyntaxNode(FormulaToken token, CellSyntaxNode start, CellSyntaxNode end) : FormulaSyntaxNode(token)
+internal enum RangeKind
+{
+    Cells,
+    Columns,
+    Rows,
+}
+
+internal class RangeSyntaxNode(FormulaToken token, CellSyntaxNode start, CellSyntaxNode end, RangeKind kind = RangeKind.Cells) : FormulaSyntaxNode(token)
 {
     public CellSyntaxNode Start { get; } = start;
     public CellSyntaxNode End { get; } = end;
+    public RangeKind Kind { get; } = kind;
 
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
@@ -504,6 +512,11 @@ internal class FormulaParser
             return start;
         }
 
+        if (token.Type is FormulaTokenType.ColumnIdentifier or FormulaTokenType.RowIdentifier)
+        {
+            return ParseColumnOrRowRange();
+        }
+
         if (token.Type == FormulaTokenType.StringLiteral)
         {
             Advance(1);
@@ -518,6 +531,45 @@ internal class FormulaParser
 
         return ParseNumberLiteral();
     }
+
+    private RangeSyntaxNode ParseColumnOrRowRange()
+    {
+        var startToken = Peek();
+        Advance(1);
+        Expect(FormulaTokenType.Colon);
+        var endToken = Expect(startToken.Type);
+
+        var start = startToken.Address;
+        var end = endToken.Address;
+        var startWorksheet = start.Worksheet ?? end.Worksheet;
+        var endWorksheet = end.Worksheet ?? start.Worksheet;
+
+        if (startToken.Type == FormulaTokenType.ColumnIdentifier)
+        {
+            if (start.Column > end.Column)
+            {
+                (start, end, startWorksheet, endWorksheet) = (end, start, endWorksheet, startWorksheet);
+            }
+
+            return new RangeSyntaxNode(startToken,
+                new CellSyntaxNode(WithAddress(startToken, new CellRef(0, start.Column) { IsColumnAbsolute = start.IsColumnAbsolute, Worksheet = startWorksheet })),
+                new CellSyntaxNode(WithAddress(endToken, new CellRef(Worksheet.MaxRows - 1, end.Column) { IsColumnAbsolute = end.IsColumnAbsolute, Worksheet = endWorksheet })),
+                RangeKind.Columns);
+        }
+
+        if (start.Row > end.Row)
+        {
+            (start, end, startWorksheet, endWorksheet) = (end, start, endWorksheet, startWorksheet);
+        }
+
+        return new RangeSyntaxNode(startToken,
+            new CellSyntaxNode(WithAddress(startToken, new CellRef(start.Row, 0) { IsRowAbsolute = start.IsRowAbsolute, Worksheet = startWorksheet })),
+            new CellSyntaxNode(WithAddress(endToken, new CellRef(end.Row, Worksheet.MaxColumns - 1) { IsRowAbsolute = end.IsRowAbsolute, Worksheet = endWorksheet })),
+            RangeKind.Rows);
+    }
+
+    private static FormulaToken WithAddress(FormulaToken token, CellRef address) =>
+        new(token.Type, token.Value) { Address = address, Start = token.Start, End = token.End };
 
     private FormulaSyntaxNode ParseFunctionCallOrName()
     {

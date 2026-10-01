@@ -8,17 +8,51 @@ internal class CellDependencyGraph
 {
     private readonly Dictionary<Cell, HashSet<Cell>> dependencies = [];
     private readonly Dictionary<Cell, HashSet<Cell>> dependents = [];
+    private readonly Dictionary<Cell, List<AxisDependency>> axisDependencies = [];
+    private readonly Dictionary<Worksheet, List<AxisDependency>> axisDependents = [];
 
     private IEnumerable<Cell> GetDependentCells(Cell cell)
     {
-        if (dependents.TryGetValue(cell, out var cells))
+        dependents.TryGetValue(cell, out var cells);
+
+        if (!axisDependents.TryGetValue(cell.Worksheet, out var axis) || axis.Count == 0)
         {
-            return cells;
+            return cells ?? [];
         }
-        return [];
+
+        var result = cells is null ? new HashSet<Cell>() : new HashSet<Cell>(cells);
+
+        foreach (var dependency in axis)
+        {
+            if (dependency.Contains(cell.Address))
+            {
+                result.Add(dependency.Dependent);
+            }
+        }
+
+        return result;
     }
 
-    public bool HasDependents(Cell cell) => dependents.TryGetValue(cell, out var cells) && cells.Count > 0;
+    public bool HasDependents(Cell cell)
+    {
+        if (dependents.TryGetValue(cell, out var cells) && cells.Count > 0)
+        {
+            return true;
+        }
+
+        if (axisDependents.TryGetValue(cell.Worksheet, out var axis))
+        {
+            foreach (var dependency in axis)
+            {
+                if (dependency.Contains(cell.Address))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     public IEnumerable<Cell> GetTopologicallySortedDependencies(Cell cell) => GetTopologicallySortedDependencies(GetDependentCells(cell));
 
@@ -79,10 +113,20 @@ internal class CellDependencyGraph
     {
         dependencies.Clear();
         dependents.Clear();
+        axisDependencies.Clear();
+        axisDependents.Clear();
     }
 
     public void Remove(Cell cell)
     {
+        if (axisDependencies.Remove(cell, out var oldAxisDependencies))
+        {
+            foreach (var dependency in oldAxisDependencies)
+            {
+                axisDependents[dependency.Worksheet].Remove(dependency);
+            }
+        }
+
         if (!dependencies.Remove(cell, out var oldDependencies))
         {
             return;
@@ -122,8 +166,44 @@ internal class CellDependencyGraph
             }
             dependentCells.Add(cell);
         }
-    }
 
+        if (visitor.AxisRanges.Count == 0)
+        {
+            return;
+        }
+
+        var cellAxisDependencies = new List<AxisDependency>();
+
+        foreach (var (worksheet, kind, start, end) in visitor.AxisRanges)
+        {
+            var dependency = new AxisDependency(worksheet, kind, start, end, cell);
+
+            if (!axisDependents.TryGetValue(worksheet, out var sheetDependents))
+            {
+                sheetDependents = [];
+                axisDependents[worksheet] = sheetDependents;
+            }
+
+            sheetDependents.Add(dependency);
+            cellAxisDependencies.Add(dependency);
+        }
+
+        axisDependencies[cell] = cellAxisDependencies;
+    }
+}
+
+internal sealed class AxisDependency(Worksheet worksheet, RangeKind kind, int start, int end, Cell dependent)
+{
+    public Worksheet Worksheet { get; } = worksheet;
+
+    public Cell Dependent { get; } = dependent;
+
+    public bool Contains(CellRef address)
+    {
+        var index = kind == RangeKind.Columns ? address.Column : address.Row;
+
+        return index >= start && index <= end;
+    }
 }
 
 class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
@@ -131,6 +211,8 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
     private readonly Worksheet sheet = sheet;
 
     public HashSet<Cell> Dependencies { get; } = [];
+
+    public List<(Worksheet Worksheet, RangeKind Kind, int Start, int End)> AxisRanges { get; } = [];
 
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
 
@@ -220,6 +302,18 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
         if (targetSheet is null)
         {
+            return;
+        }
+
+        if (rangeSyntaxNode.Kind == RangeKind.Columns)
+        {
+            AxisRanges.Add((targetSheet, RangeKind.Columns, startAddress.Column, endAddress.Column));
+            return;
+        }
+
+        if (rangeSyntaxNode.Kind == RangeKind.Rows)
+        {
+            AxisRanges.Add((targetSheet, RangeKind.Rows, startAddress.Row, endAddress.Row));
             return;
         }
 

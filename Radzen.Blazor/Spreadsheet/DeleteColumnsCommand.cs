@@ -53,8 +53,8 @@ public class DeleteColumnsCommand : DeleteRangeCommandBase
         {
             var c = col;
             if (tree.Find(node =>
-                    node is CellSyntaxNode cellNode && cellNode.Token.Address.Column == c
-                    || node is RangeSyntaxNode range && range.Start.Token.Address.Column <= c && range.End.Token.Address.Column >= c).Count > 0)
+                    node is CellSyntaxNode { Token.Type: FormulaTokenType.CellIdentifier } cellNode && cellNode.Token.Address.Column == c
+                    || node is RangeSyntaxNode range && range.Kind != RangeKind.Rows && range.Start.Token.Address.Column <= c && range.End.Token.Address.Column >= c).Count > 0)
             {
                 return true;
             }

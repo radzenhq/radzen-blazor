@@ -284,8 +284,25 @@ public class Workbook
         }
     }
 
-    internal void InvalidateFormulasReferencing(Worksheet target, Predicate<CellRef> isInvalidated)
+    internal void InvalidateFormulasReferencing(Worksheet target, RangeKind axis, int index)
     {
+        bool IsInvalidated(CellRef address) => (axis == RangeKind.Rows ? address.Row : address.Column) == index;
+
+        bool RangeContainsInvalidated(RangeSyntaxNode range)
+        {
+            if (range.Kind != RangeKind.Cells && range.Kind != axis)
+            {
+                return false;
+            }
+
+            var start = range.Start.Token.Address;
+            var end = range.End.Token.Address;
+
+            return axis == RangeKind.Rows
+                ? index >= start.Row && index <= end.Row
+                : index >= start.Column && index <= end.Column;
+        }
+
         foreach (var cell in Graph.FormulaCells.ToList())
         {
             var tree = cell.FormulaSyntaxTree;
@@ -296,8 +313,8 @@ public class Workbook
 
             var hasRef = tree.Find(node => node switch
             {
-                CellSyntaxNode c => IsReferenceTo(target, cell, c.Token.Address) && isInvalidated(c.Token.Address),
-                RangeSyntaxNode r => IsReferenceTo(target, cell, r.Start.Token.Address) && RangeContainsInvalidated(r, isInvalidated),
+                CellSyntaxNode c => c.Token.Type == FormulaTokenType.CellIdentifier && IsReferenceTo(target, cell, c.Token.Address) && IsInvalidated(c.Token.Address),
+                RangeSyntaxNode r => IsReferenceTo(target, cell, r.Start.Token.Address) && RangeContainsInvalidated(r),
                 _ => false,
             }).Count > 0;
 
@@ -307,25 +324,43 @@ public class Workbook
             }
 
             var tokens = FormulaLexer.Scan(cell.Formula!, false);
+            var rebuilt = StringBuilderCache.Acquire();
+
             for (var i = 0; i < tokens.Count; i++)
             {
                 var t = tokens[i];
-                if (t.Type == FormulaTokenType.CellIdentifier && IsReferenceTo(target, cell, t.Address) && isInvalidated(t.Address))
-                {
-                    tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
-                }
-            }
 
-            var rebuilt = StringBuilderCache.Acquire();
-            foreach (var t in tokens)
-            {
                 if (t.Type == FormulaTokenType.None)
                 {
                     break;
                 }
 
-                rebuilt.Append(t.Value);
+                if (t.Type == FormulaTokenType.CellIdentifier && IsReferenceTo(target, cell, t.Address) && IsInvalidated(t.Address))
+                {
+                    rebuilt.Append("#REF!");
+                }
+                else if (t.Type is FormulaTokenType.ColumnIdentifier or FormulaTokenType.RowIdentifier && i + 2 < tokens.Count && tokens[i + 2].Type == t.Type)
+                {
+                    var tokenAxis = t.Type == FormulaTokenType.ColumnIdentifier ? RangeKind.Columns : RangeKind.Rows;
+                    var end = tokens[i + 2];
+
+                    if (tokenAxis == axis && IsReferenceTo(target, cell, t.Address) && (IsInvalidated(t.Address) || IsInvalidated(end.Address)))
+                    {
+                        rebuilt.Append("#REF!");
+                    }
+                    else
+                    {
+                        rebuilt.Append(t.Value).Append(tokens[i + 1].Value).Append(end.Value);
+                    }
+
+                    i += 2;
+                }
+                else
+                {
+                    rebuilt.Append(t.Value);
+                }
             }
+
             cell.Formula = StringBuilderCache.GetStringAndRelease(rebuilt);
         }
     }
@@ -341,23 +376,6 @@ public class Workbook
     {
         return owner.Worksheet == target
             || owner.FormulaSyntaxTree!.Find(node => node is CellSyntaxNode c && IsReferenceTo(target, owner, c.Token.Address)).Count > 0;
-    }
-
-    private static bool RangeContainsInvalidated(RangeSyntaxNode range, Predicate<CellRef> isInvalidated)
-    {
-        var start = range.Start.Token.Address;
-        var end = range.End.Token.Address;
-        for (var r = start.Row; r <= end.Row; r++)
-        {
-            for (var c = start.Column; c <= end.Column; c++)
-            {
-                if (isInvalidated(new CellRef(r, c)))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /// <summary>

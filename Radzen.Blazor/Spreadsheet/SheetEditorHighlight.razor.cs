@@ -45,7 +45,7 @@ public partial class SheetEditorHighlight : ComponentBase
                     Style = GetTokenStyle(token.Type, refCount)
                 };
 
-                if (token.Type == FormulaTokenType.CellIdentifier)
+                if (IsReference(token.Type))
                 {
                     refCount++;
                 }
@@ -68,7 +68,7 @@ public partial class SheetEditorHighlight : ComponentBase
         {
             FormulaTokenType.NumericLiteral => "rz-number-highlight",
             FormulaTokenType.StringLiteral => "rz-string-highlight",
-            FormulaTokenType.CellIdentifier => "rz-cell-highlight",
+            FormulaTokenType.CellIdentifier or FormulaTokenType.ColumnIdentifier or FormulaTokenType.RowIdentifier => "rz-cell-highlight",
             FormulaTokenType.Identifier => "rz-function-highlight",
             FormulaTokenType.Plus or FormulaTokenType.Minus or FormulaTokenType.Star or FormulaTokenType.Slash or FormulaTokenType.Ampersand
                 or FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or FormulaTokenType.LessThanGreaterThan
@@ -80,7 +80,7 @@ public partial class SheetEditorHighlight : ComponentBase
 
     private static string? GetTokenStyle(FormulaTokenType tokenType, int refCount)
     {
-        if (tokenType == FormulaTokenType.CellIdentifier)
+        if (IsReference(tokenType))
         {
             var colorIndex = (refCount % 5) + 1;
             return $"color:var(--rz-series-{colorIndex})";
@@ -88,6 +88,9 @@ public partial class SheetEditorHighlight : ComponentBase
 
         return null;
     }
+
+    private static bool IsReference(FormulaTokenType tokenType) =>
+        tokenType is FormulaTokenType.CellIdentifier or FormulaTokenType.ColumnIdentifier or FormulaTokenType.RowIdentifier;
 
     class HighlightToken
     {

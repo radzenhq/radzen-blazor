@@ -319,7 +319,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return (CellData)operand!;
         }
 
-        if (range.Count == 1)
+        if (range.LogicalRows == 1 && range.LogicalColumns == 1 && range.Count == 1)
         {
             return range[0];
         }
@@ -327,14 +327,14 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         var row = cell.Address.Row;
         var column = cell.Address.Column;
 
-        if (range.Columns == 1 && row >= range.StartRow && row < range.StartRow + range.Rows)
+        if (range.LogicalColumns == 1 && row >= range.StartRow && row < range.StartRow + range.LogicalRows)
         {
-            return range[row - range.StartRow];
+            return row - range.StartRow < range.Rows ? range[row - range.StartRow] : CellData.Empty;
         }
 
-        if (range.Rows == 1 && column >= range.StartColumn && column < range.StartColumn + range.Columns)
+        if (range.LogicalRows == 1 && column >= range.StartColumn && column < range.StartColumn + range.LogicalColumns)
         {
-            return range[column - range.StartColumn];
+            return column - range.StartColumn < range.Columns ? range[column - range.StartColumn] : CellData.Empty;
         }
 
         return CellData.FromError(CellError.Value);
@@ -716,22 +716,27 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
-        var rows = end.Row - start.Row + 1;
-        var columns = end.Column - start.Column + 1;
+        var kind = rangeSyntaxNode.Kind;
+        var logicalRows = end.Row - start.Row + 1;
+        var logicalColumns = end.Column - start.Column + 1;
+        var rows = logicalRows;
+        var columns = logicalColumns;
 
-        if ((long)rows * columns > Worksheet.MaxRows)
+        if (kind != RangeKind.Cells || (long)rows * columns > Worksheet.MaxRows)
         {
             rows = Math.Clamp(startSheet.RowCount - start.Row, 1, rows);
             columns = Math.Clamp(startSheet.ColumnCount - start.Column, 1, columns);
         }
 
-        var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet);
+        var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet, logicalRows, logicalColumns);
+        var checkDeletedRows = kind != RangeKind.Columns;
+        var checkDeletedColumns = kind != RangeKind.Rows;
 
         for (var row = start.Row; row < start.Row + rows; row++)
         {
             for (var column = start.Column; column < start.Column + columns; column++)
             {
-                if (startSheet.IsDeletedRow(row) || startSheet.IsDeletedColumn(column))
+                if ((checkDeletedRows && startSheet.IsDeletedRow(row)) || (checkDeletedColumns && startSheet.IsDeletedColumn(column)))
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;

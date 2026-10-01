@@ -616,7 +616,7 @@ public partial class Worksheet
 
         invalidReferenceColumns.Add(columnIndex);
 
-        Workbook.InvalidateFormulasReferencing(this, cellRef => cellRef.Column == columnIndex);
+        Workbook.InvalidateFormulasReferencing(this, RangeKind.Columns, columnIndex);
 
         ColumnCount--;
 
@@ -656,7 +656,7 @@ public partial class Worksheet
 
         invalidReferenceRows.Add(rowIndex);
 
-        Workbook.InvalidateFormulasReferencing(this, cellRef => cellRef.Row == rowIndex);
+        Workbook.InvalidateFormulasReferencing(this, RangeKind.Rows, rowIndex);
 
         RowCount--;
 

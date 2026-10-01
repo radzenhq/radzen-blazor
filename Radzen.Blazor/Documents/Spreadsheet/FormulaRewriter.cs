@@ -137,6 +137,12 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
         var startAdjusted = adjust(startToken);
         var endAdjusted = adjust(endToken);
 
+        if (rangeSyntaxNode.Kind != RangeKind.Cells)
+        {
+            AppendColumnOrRowRange(rangeSyntaxNode.Kind, startToken, endToken, startAdjusted, endAdjusted);
+            return;
+        }
+
         var startCell = startAdjusted;
         var endCell = endAdjusted;
 
@@ -170,6 +176,50 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
             builder.Append('$');
         }
         builder.Append(endCell.Row + 1);
+    }
+
+    private void AppendColumnOrRowRange(RangeKind kind, FormulaToken startToken, FormulaToken endToken, CellRef startAdjusted, CellRef endAdjusted)
+    {
+        var isColumns = kind == RangeKind.Columns;
+        var start = isColumns ? startAdjusted.Column : startAdjusted.Row;
+        var end = isColumns ? endAdjusted.Column : endAdjusted.Row;
+        var max = isColumns ? Worksheet.MaxColumns : Worksheet.MaxRows;
+
+        if (start < 0 || end < 0 || start >= max || end >= max)
+        {
+            builder.Append("#REF!");
+            return;
+        }
+
+        var startAbsolute = isColumns ? startToken.Address.IsColumnAbsolute : startToken.Address.IsRowAbsolute;
+        var endAbsolute = isColumns ? endToken.Address.IsColumnAbsolute : endToken.Address.IsRowAbsolute;
+
+        if (start > end)
+        {
+            (start, end, startAbsolute, endAbsolute) = (end, start, endAbsolute, startAbsolute);
+        }
+
+        AppendWorksheetPrefix(startToken.Address.Worksheet);
+        AppendColumnOrRow(isColumns, start, startAbsolute);
+        builder.Append(':');
+        AppendColumnOrRow(isColumns, end, endAbsolute);
+    }
+
+    private void AppendColumnOrRow(bool isColumn, int index, bool isAbsolute)
+    {
+        if (isAbsolute)
+        {
+            builder.Append('$');
+        }
+
+        if (isColumn)
+        {
+            builder.Append(ColumnRef.ToString(index));
+        }
+        else
+        {
+            builder.Append(index + 1);
+        }
     }
 
     private void AppendWorksheetPrefix(string? worksheet)

@@ -43,8 +43,8 @@ class IndexFunction : FormulaFunction
         int cols;
         if (array is RangeList rl)
         {
-            rows = rl.Rows;
-            cols = rl.Columns;
+            rows = rl.LogicalRows;
+            cols = rl.LogicalColumns;
         }
         else
         {
@@ -117,6 +117,11 @@ class IndexFunction : FormulaFunction
         {
             if (array is RangeList arr)
             {
+                if (cIndex > arr.Columns)
+                {
+                    return CellData.Empty;
+                }
+
                 var startRow = arr.StartRow;
                 var startCol = arr.StartColumn + (cIndex - 1);
                 var result = new RangeList(arr.Rows, 1, startRow, startCol, arr.Worksheet);
@@ -139,6 +144,11 @@ class IndexFunction : FormulaFunction
         {
             if (array is RangeList arr)
             {
+                if (rIndex > arr.Rows)
+                {
+                    return CellData.Empty;
+                }
+
                 var startRow = arr.StartRow + (rIndex - 1);
                 var startCol = arr.StartColumn;
                 var result = new RangeList(1, arr.Columns, startRow, startCol, arr.Worksheet);
@@ -150,6 +160,16 @@ class IndexFunction : FormulaFunction
                 return result.Count > 0 ? result[0] : CellData.FromError(CellError.Ref);
             }
             return CellData.FromError(CellError.Ref);
+        }
+
+        if (array is RangeList materialized)
+        {
+            if (rIndex > materialized.Rows || cIndex > materialized.Columns)
+            {
+                return CellData.Empty;
+            }
+
+            cols = materialized.Columns;
         }
 
         var flatIndex = (rIndex - 1) * cols + (cIndex - 1);

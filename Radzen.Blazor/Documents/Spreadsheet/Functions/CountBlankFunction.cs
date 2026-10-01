@@ -20,7 +20,7 @@ class CountBlankFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var count = 0;
+        var count = range is RangeList rangeList ? (double)rangeList.UnmaterializedCount : 0d;
 
         foreach (var cell in range)
         {
