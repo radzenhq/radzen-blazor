@@ -1156,6 +1156,36 @@ window.Radzen = {
         }); } catch { }
       });
 
+      var lastBounds;
+
+      Radzen[id].instance.addListener('idle', function () {
+        var map = Radzen[id] && Radzen[id].instance;
+        var bounds = map && map.getBounds();
+
+        if (!bounds) {
+          return;
+        }
+
+        var key = bounds.toUrlValue() + '|' + map.getZoom();
+
+        if (key === lastBounds) {
+          return;
+        }
+
+        lastBounds = key;
+
+        var northEast = bounds.getNorthEast();
+        var southWest = bounds.getSouthWest();
+        var mapCenter = map.getCenter();
+
+        try { Radzen[id].invokeMethodAsync('RadzenGoogleMap.OnBoundsChanged', {
+          NorthEast: {Lat: northEast.lat(), Lng: northEast.lng()},
+          SouthWest: {Lat: southWest.lat(), Lng: southWest.lng()},
+          Center: {Lat: mapCenter.lat(), Lng: mapCenter.lng()},
+          Zoom: map.getZoom()
+        }); } catch { }
+      });
+
       Radzen.updateMap(id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
 

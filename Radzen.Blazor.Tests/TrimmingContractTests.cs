@@ -229,6 +229,7 @@ namespace Radzen.Blazor.Tests
                 "Radzen.ChatCompletionMessage",
                 "Radzen.Blazor.GoogleMapMarkerData",
                 "Radzen.GoogleMapPosition",
+                "Radzen.GoogleMapBoundsChangedEventArgs",
                 "Radzen.DialogOptionsBase",
                 "Radzen.DialogOptions",
                 "Radzen.SideDialogOptions",

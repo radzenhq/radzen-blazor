@@ -94,6 +94,7 @@ Type LibraryType(int ns, string name) => library.GetType(libraryNamespace[ns] + 
     (LibraryType(2, "CellEventArgs"), ["Row", "Column", "Pointer"], []),
     (LibraryType(2, "ImageResizeEventArgs"), ["Direction", "Pointer"], []),
     (LibraryType(0, "GoogleMapClickEventArgs"), ["Position"], []),
+    (LibraryType(0, "GoogleMapBoundsChangedEventArgs"), ["NorthEast", "SouthWest", "Center", "Zoom"], []),
     (LibraryType(0, "GoogleMapPosition"), ["Lat", "Lng"], ["Lat", "Lng"]),
     (LibraryType(1, "GoogleMapMarkerData"), [], ["Title", "Label", "Position"]),
     (LibraryType(0, "DialogOptions"), [], ["Width", "Height", "Draggable", "Resizable", "CloseDialogOnEsc", "AutoFocusFirstElement"]),
