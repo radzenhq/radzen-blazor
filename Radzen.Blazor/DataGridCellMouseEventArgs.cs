@@ -18,5 +18,20 @@ public class DataGridCellMouseEventArgs<
     /// Gets the RadzenDataGridColumn which this cells represents.
     /// </summary>
     public RadzenDataGridColumn<T>? Column { get; internal set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the default action has been prevented.
+    /// </summary>
+    public bool IsDefaultPrevented { get; private set; }
+
+    /// <summary>
+    /// Prevents the default action of the DataGrid for the same click. Call it in <see cref="RadzenDataGrid{TItem}.CellClick" /> to stop the DataGrid
+    /// from raising <see cref="RadzenDataGrid{TItem}.RowClick" /> and selecting the row, or in <see cref="RadzenDataGrid{TItem}.CellDoubleClick" />
+    /// to stop it from raising <see cref="RadzenDataGrid{TItem}.RowDoubleClick" />. An asynchronous <see cref="RadzenDataGrid{TItem}.CellClick" /> handler should call it before its first <c>await</c>.
+    /// </summary>
+    public void PreventDefault()
+    {
+        IsDefaultPrevented = true;
+    }
 }
 

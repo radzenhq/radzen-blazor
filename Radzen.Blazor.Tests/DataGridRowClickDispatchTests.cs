@@ -34,6 +34,12 @@ namespace Radzen.Blazor.Tests
             });
         }
 
+        static void DispatchCellThenRowClick(IRenderedComponent<RadzenDataGrid<Item>> cut, int row)
+        {
+            cut.FindAll("td[role=\"gridcell\"]")[row].Click();
+            cut.FindAll("tr.rz-data-row")[row].Click();
+        }
+
         [Fact]
         public void RowClick_FiresFromTheRowElement_WithThatRowsData()
         {
@@ -74,6 +80,118 @@ namespace Radzen.Blazor.Tests
             cut.FindAll("td[role=\"gridcell\"]")[0].Click();
 
             Assert.Equal("Id", column);
+        }
+
+        [Fact]
+        public void CellClick_AlsoRaisesRowClickAndSelection_WhenDefaultIsNotPrevented()
+        {
+            using var ctx = new TestContext();
+            var order = new List<string>();
+            Item? selected = null;
+            var cut = Render(ctx, pb =>
+            {
+                pb.Add(p => p.SelectionMode, DataGridSelectionMode.Single);
+                pb.Add(p => p.CellClick, (DataGridCellMouseEventArgs<Item> _) => order.Add("cell"));
+                pb.Add(p => p.RowClick, (DataGridRowMouseEventArgs<Item> _) => order.Add("row"));
+                pb.Add(p => p.RowSelect, (Item i) => selected = i);
+            });
+
+            DispatchCellThenRowClick(cut, 1);
+
+            Assert.Equal(new[] { "cell", "row" }, order);
+            Assert.Equal(2, selected?.Id);
+        }
+
+        [Fact]
+        public void CellClick_PreventDefault_SuppressesRowClickAndSelection()
+        {
+            using var ctx = new TestContext();
+            var order = new List<string>();
+            Item? selected = null;
+            var cut = Render(ctx, pb =>
+            {
+                pb.Add(p => p.SelectionMode, DataGridSelectionMode.Single);
+                pb.Add(p => p.CellClick, (DataGridCellMouseEventArgs<Item> a) =>
+                {
+                    order.Add("cell");
+                    a.PreventDefault();
+                });
+                pb.Add(p => p.RowClick, (DataGridRowMouseEventArgs<Item> _) => order.Add("row"));
+                pb.Add(p => p.RowSelect, (Item i) => selected = i);
+            });
+
+            DispatchCellThenRowClick(cut, 1);
+
+            Assert.Equal(new[] { "cell" }, order);
+            Assert.Null(selected);
+        }
+
+        [Fact]
+        public void CellClick_PreventDefault_AppliesOnlyToThatClick()
+        {
+            using var ctx = new TestContext();
+            var prevent = true;
+            var rowClicks = new List<int>();
+            var cut = Render(ctx, pb =>
+            {
+                pb.Add(p => p.CellClick, (DataGridCellMouseEventArgs<Item> a) =>
+                {
+                    if (prevent)
+                    {
+                        a.PreventDefault();
+                    }
+                });
+                pb.Add(p => p.RowClick, (DataGridRowMouseEventArgs<Item> a) => rowClicks.Add(a.Data!.Id));
+            });
+
+            DispatchCellThenRowClick(cut, 0);
+            Assert.Empty(rowClicks);
+
+            prevent = false;
+            DispatchCellThenRowClick(cut, 1);
+
+            Assert.Equal(new[] { 2 }, rowClicks);
+        }
+
+        [Fact]
+        public void CellClick_PreventDefault_SuppressesRowClick_RaisedFromTheCell()
+        {
+            using var ctx = new TestContext();
+            var rowClicked = false;
+            var cut = Render(ctx, pb =>
+            {
+                pb.Add(p => p.CellClick, (DataGridCellMouseEventArgs<Item> a) => a.PreventDefault());
+                pb.Add(p => p.RowClick, (DataGridRowMouseEventArgs<Item> _) => rowClicked = true);
+                pb.Add(p => p.RowRender, (RowRenderEventArgs<Item> a) => a.Attributes["onclick"] = "window.probe=true");
+            });
+
+            cut.FindAll("td[role=\"gridcell\"]")[0].Click();
+
+            Assert.False(rowClicked);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void CellDoubleClick_PreventDefault_SuppressesRowDoubleClick(bool prevent, bool expectRowDoubleClick)
+        {
+            using var ctx = new TestContext();
+            var rowDoubleClicked = false;
+            var cut = Render(ctx, pb =>
+            {
+                pb.Add(p => p.CellDoubleClick, (DataGridCellMouseEventArgs<Item> a) =>
+                {
+                    if (prevent)
+                    {
+                        a.PreventDefault();
+                    }
+                });
+                pb.Add(p => p.RowDoubleClick, (DataGridRowMouseEventArgs<Item> _) => rowDoubleClicked = true);
+            });
+
+            cut.FindAll("td[role=\"gridcell\"]")[0].DoubleClick();
+
+            Assert.Equal(expectRowDoubleClick, rowDoubleClicked);
         }
 
         [Fact]

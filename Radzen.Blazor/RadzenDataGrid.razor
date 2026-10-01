@@ -886,6 +886,7 @@
 
     bool clicking;
     bool rowClicking;
+    bool rowClickPrevented;
 
     internal bool RowClickActive => CellClick.HasDelegate || RowClick.HasDelegate
         || RowSelect.HasDelegate || RowDeselect.HasDelegate || ValueChanged.HasDelegate;
@@ -900,7 +901,7 @@
         try
         {
             clicking = true;
-            await OnCellClick(new DataGridCellMouseEventArgs<TItem>
+            var cellArgs = new DataGridCellMouseEventArgs<TItem>
             {
                 Data = Item,
                 AltKey = args.AltKey,
@@ -918,7 +919,10 @@
                 ShiftKey = args.ShiftKey,
                 Type = args.Type,
                 Column = Column
-            });
+            };
+            var cellClick = OnCellClick(cellArgs);
+            rowClickPrevented = cellArgs.IsDefaultPrevented;
+            await cellClick;
         }
         finally
         {
@@ -928,6 +932,12 @@
 
     internal async Task OnRowClickHandler(TItem Item, MouseEventArgs args)
     {
+        if (rowClickPrevented)
+        {
+            rowClickPrevented = false;
+            return;
+        }
+
         if (rowClicking)
         {
             return;
@@ -962,7 +972,7 @@
 
     async Task OnDblClick(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
     {
-        await OnCellDblClick(new DataGridCellMouseEventArgs<TItem>
+        var cellArgs = new DataGridCellMouseEventArgs<TItem>
         {
             Data = Item,
             AltKey = args.AltKey,
@@ -980,7 +990,14 @@
             ShiftKey = args.ShiftKey,
             Type = args.Type,
             Column = Column
-        });
+        };
+
+        await OnCellDblClick(cellArgs);
+
+        if (cellArgs.IsDefaultPrevented)
+        {
+            return;
+        }
 
         await OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
         {
