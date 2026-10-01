@@ -350,4 +350,69 @@ public class CrossSheetRecalculationTests
 
         Assert.Equal(0, evaluations);
     }
+
+    [Fact]
+    public void RemovingSheetDuringItsBatch_FlushesRecalculationQueuedByTheBatch()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet2 = workbook.AddSheet("Sheet2", 10, 10);
+        sheet1.Cells["B1"].Formula = "=A1*2";
+
+        sheet2.BeginUpdate();
+        sheet1.Cells["A1"].Value = 5;
+        sheet1.Cells["C1"].Formula = "=A1+1";
+        workbook.RemoveSheet(sheet2);
+
+        Assert.Equal(10d, sheet1.Cells["B1"].Value);
+        Assert.Equal(6d, sheet1.Cells["C1"].Value);
+
+        sheet1.Cells["A1"].Value = 7;
+
+        Assert.Equal(8d, sheet1.Cells["C1"].Value);
+    }
+
+    [Fact]
+    public void MovingSheetToAnotherWorkbook_MakesReferencesInFormerWorkbookRefError()
+    {
+        var workbook1 = new Workbook();
+        var sheet1 = workbook1.AddSheet("Sheet1", 10, 10);
+        var data = workbook1.AddSheet("Data", 10, 10);
+        data.Cells["A1"].Value = 3;
+        sheet1.Cells["A1"].Formula = "=Data!A1";
+        var workbook2 = new Workbook();
+
+        workbook2.AddSheet(data);
+
+        Assert.DoesNotContain(data, workbook1.Sheets);
+        Assert.Equal(CellError.Ref, sheet1.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void AddingSheetDuringBatch_ResolvesReferencesToItAtEndUpdate()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        sheet1.Cells["A1"].Formula = "=Data!A1";
+        var data = new Worksheet(10, 10) { Name = "Data" };
+        data.Cells["A1"].Value = 5;
+
+        sheet1.BeginUpdate();
+        workbook.AddSheet(data);
+        Assert.Equal(CellError.Ref, sheet1.Cells["A1"].Value);
+        sheet1.EndUpdate();
+
+        Assert.Equal(5d, sheet1.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void AddingSheetTwice_KeepsSingleEntry()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+
+        workbook.AddSheet(sheet);
+
+        Assert.Single(workbook.Sheets);
+    }
 }

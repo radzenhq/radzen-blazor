@@ -98,6 +98,11 @@ public class Workbook
     {
         ArgumentNullException.ThrowIfNull(sheet);
 
+        if (sheets.Contains(sheet))
+        {
+            return;
+        }
+
         if (sheet.CreatedWorkbook is { } previous && previous != this)
         {
             previous.Detach(sheet);
@@ -106,6 +111,7 @@ public class Workbook
         sheets.Add(sheet);
         sheet.Workbook = this;
         RefreshReferencesTo(sheet.Name, GetFormulaCells(sheet));
+        RecalculateIfIdle();
     }
 
     /// <summary>
@@ -140,7 +146,6 @@ public class Workbook
         }
 
         Detach(sheet);
-        RefreshReferencesTo(sheet.Name, []);
         sheet.Workbook = new Workbook(sheet);
 
         return true;
@@ -155,6 +160,17 @@ public class Workbook
         {
             OnFormulaCellRemoved(cell);
         }
+
+        RefreshReferencesTo(sheet.Name, []);
+        RecalculateIfIdle();
+    }
+
+    private void RecalculateIfIdle()
+    {
+        if (!IsUpdating)
+        {
+            Recalculate();
+        }
     }
 
     internal CellDependencyGraph Graph { get; } = new();
@@ -166,6 +182,8 @@ public class Workbook
     private readonly HashSet<Cell> changedDuringUpdate = [];
 
     private readonly HashSet<Cell> pendingFormulaCells = [];
+
+    private readonly HashSet<string> pendingSheetNames = new(StringComparer.OrdinalIgnoreCase);
 
     internal bool IsUpdating
     {
@@ -212,29 +230,27 @@ public class Workbook
 
     private void RefreshReferencesTo(string sheetName, IEnumerable<Cell> cells)
     {
-        var affected = new HashSet<Cell>(cells);
+        pendingFormulaCells.UnionWith(cells);
+        pendingSheetNames.Add(sheetName);
+    }
+
+    private void QueueFormulasReferencingPendingSheetNames()
+    {
+        if (pendingSheetNames.Count == 0)
+        {
+            return;
+        }
 
         foreach (var cell in GetFormulaCells())
         {
             if (cell.FormulaSyntaxTree!.Find(node => node is NameSyntaxNode
-                    || node is CellSyntaxNode c && string.Equals(c.Token.Address.Worksheet, sheetName, StringComparison.OrdinalIgnoreCase)).Count > 0)
+                    || node is CellSyntaxNode c && c.Token.Address.Worksheet is { } name && pendingSheetNames.Contains(name)).Count > 0)
             {
-                affected.Add(cell);
+                pendingFormulaCells.Add(cell);
             }
         }
 
-        if (IsUpdating)
-        {
-            pendingFormulaCells.UnionWith(affected);
-            return;
-        }
-
-        foreach (var cell in affected)
-        {
-            Graph.Add(cell);
-        }
-
-        EvaluateFormulas(Graph.GetTopologicallySortedDependencies(affected));
+        pendingSheetNames.Clear();
     }
 
     private List<Cell> GetFormulaCells() => [.. sheets.SelectMany(GetFormulaCells)];
@@ -347,6 +363,8 @@ public class Workbook
 
     private void Recalculate()
     {
+        QueueFormulasReferencingPendingSheetNames();
+
         foreach (var cell in pendingFormulaCells)
         {
             Graph.Add(cell);
