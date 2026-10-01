@@ -175,4 +175,16 @@ public class SheetRenameTests
 
         Assert.Equal(4d, report.Cells["A1"].Value);
     }
+
+    [Fact]
+    public void RenamingToNameOfAnotherSheet_DoesNotRewriteReferences()
+    {
+        var (_, data, report) = CreateWorkbook();
+        report.Cells["A1"].Formula = "=Data!A1";
+
+        data.Name = "report";
+
+        Assert.Equal("=Data!A1", report.Cells["A1"].Formula);
+        Assert.Equal(CellError.Ref, report.Cells["A1"].Value);
+    }
 }

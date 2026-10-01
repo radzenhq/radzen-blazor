@@ -109,14 +109,6 @@ internal class CellDependencyGraph
         return result;
     }
 
-    public void Clear()
-    {
-        dependencies.Clear();
-        dependents.Clear();
-        axisDependencies.Clear();
-        axisDependents.Clear();
-    }
-
     public void Remove(Cell cell)
     {
         if (axisDependencies.Remove(cell, out var oldAxisDependencies))

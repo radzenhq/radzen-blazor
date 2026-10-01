@@ -236,4 +236,118 @@ public class CrossSheetRecalculationTests
 
         Assert.Equal(42d, sheet1.Cells["A1"].Value);
     }
+
+    [Fact]
+    public void InsertingRowAfterAddingSheetInSameBatch_ShiftsReferencesFromAddedSheet()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        sheet1.Cells["A5"].Value = 9;
+        var sheet2 = new Worksheet(10, 10) { Name = "Sheet2" };
+        sheet2.Cells["B1"].Formula = "=Sheet1!A5";
+
+        sheet1.BeginUpdate();
+        workbook.AddSheet(sheet2);
+        sheet1.InsertRow(0);
+        sheet1.EndUpdate();
+
+        Assert.Equal("=Sheet1!A6", sheet2.Cells["B1"].Formula);
+        Assert.Equal(9d, sheet2.Cells["B1"].Value);
+    }
+
+    [Fact]
+    public void DeletingRowAfterAddingSheetInSameBatch_InvalidatesReferencesFromAddedSheet()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet2 = new Worksheet(10, 10) { Name = "Sheet2" };
+        sheet2.Cells["B1"].Formula = "=Sheet1!A5";
+
+        sheet1.BeginUpdate();
+        workbook.AddSheet(sheet2);
+        sheet1.DeleteRow(4);
+        sheet1.EndUpdate();
+
+        Assert.Equal("=#REF!", sheet2.Cells["B1"].Formula);
+        Assert.Equal(CellError.Ref, sheet2.Cells["B1"].Value);
+    }
+
+    [Fact]
+    public void RemovedSheet_NoLongerFollowsChangesInItsFormerWorkbook()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet2 = workbook.AddSheet("Sheet2", 10, 10);
+        sheet1.Cells["A5"].Value = 1;
+        sheet2.Cells["B1"].Formula = "=Sheet1!A5";
+
+        workbook.RemoveSheet(sheet2);
+        sheet1.Cells["A5"].Value = 2;
+        sheet1.InsertRow(0);
+
+        Assert.NotSame(workbook, sheet2.Workbook);
+        Assert.Equal("=Sheet1!A5", sheet2.Cells["B1"].Formula);
+        Assert.Equal(CellError.Ref, sheet2.Cells["B1"].Value);
+    }
+
+    [Fact]
+    public void ReaddingRemovedSheet_RestoresCrossSheetReferences()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet2 = workbook.AddSheet("Sheet2", 10, 10);
+        sheet2.Cells["A1"].Value = 3;
+        sheet1.Cells["A1"].Formula = "=Sheet2!A1";
+
+        workbook.RemoveSheet(sheet2);
+        Assert.Equal(CellError.Ref, sheet1.Cells["A1"].Value);
+
+        workbook.AddSheet(sheet2);
+        sheet2.Cells["A1"].Value = 4;
+
+        Assert.Equal(4d, sheet1.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void FormulasEnteredDuringBatch_AreRegisteredOnceAtEndUpdate()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.BeginUpdate();
+        sheet.Cells["A1"].Formula = "=B1";
+
+        Assert.Empty(sheet.Workbook.Graph.FormulaCells);
+
+        sheet.EndUpdate();
+
+        Assert.Single(sheet.Workbook.Graph.FormulaCells);
+    }
+
+    [Fact]
+    public void AddingUnrelatedSheet_DoesNotReevaluateExistingFormulas()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        sheet1.Cells["A1"].Formula = "=B1+1";
+        var evaluations = 0;
+        sheet1.Cells["A1"].Changed += _ => evaluations++;
+
+        workbook.AddSheet("Sheet2", 10, 10);
+
+        Assert.Equal(0, evaluations);
+    }
+
+    [Fact]
+    public void RenamingUnreferencedSheet_DoesNotReevaluateExistingFormulas()
+    {
+        var workbook = new Workbook();
+        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet2 = workbook.AddSheet("Sheet2", 10, 10);
+        sheet1.Cells["A1"].Formula = "=B1+1";
+        var evaluations = 0;
+        sheet1.Cells["A1"].Changed += _ => evaluations++;
+
+        sheet2.Name = "Other";
+
+        Assert.Equal(0, evaluations);
+    }
 }

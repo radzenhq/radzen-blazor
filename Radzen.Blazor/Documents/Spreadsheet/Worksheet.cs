@@ -243,6 +243,8 @@ public partial class Worksheet
    
     private Workbook? workbook;
 
+    internal Workbook? CreatedWorkbook => workbook;
+
     /// <summary>
     /// Gets the workbook that contains this sheet.
     /// </summary>
@@ -676,7 +678,7 @@ public partial class Worksheet
         {
             if (cell.Formula is not null && isRemoved(cell))
             {
-                Workbook.Graph.Remove(cell);
+                Workbook.OnFormulaCellRemoved(cell);
             }
         }
     }

@@ -97,9 +97,15 @@ public class Workbook
     public void AddSheet(Worksheet sheet)
     {
         ArgumentNullException.ThrowIfNull(sheet);
+
+        if (sheet.CreatedWorkbook is { } previous && previous != this)
+        {
+            previous.Detach(sheet);
+        }
+
         sheets.Add(sheet);
         sheet.Workbook = this;
-        OnSheetsChanged();
+        RefreshReferencesTo(sheet.Name, GetFormulaCells(sheet));
     }
 
     /// <summary>
@@ -128,25 +134,38 @@ public class Workbook
     {
         ArgumentNullException.ThrowIfNull(sheet);
 
-        if (!sheets.Remove(sheet))
+        if (!sheets.Contains(sheet))
         {
             return false;
         }
 
-        OnSheetsChanged();
+        Detach(sheet);
+        RefreshReferencesTo(sheet.Name, []);
+        sheet.Workbook = new Workbook(sheet);
 
         return true;
+    }
+
+    private void Detach(Worksheet sheet)
+    {
+        sheets.Remove(sheet);
+        updatedSheets.Remove(sheet);
+
+        foreach (var cell in GetFormulaCells(sheet))
+        {
+            OnFormulaCellRemoved(cell);
+        }
     }
 
     internal CellDependencyGraph Graph { get; } = new();
 
     internal bool IsEvaluating { get; set; }
 
-    private bool dependenciesStale;
-
     private readonly HashSet<Worksheet> updatedSheets = [];
 
     private readonly HashSet<Cell> changedDuringUpdate = [];
+
+    private readonly HashSet<Cell> pendingFormulaCells = [];
 
     internal bool IsUpdating
     {
@@ -164,16 +183,6 @@ public class Workbook
         }
     }
 
-    internal void OnSheetsChanged()
-    {
-        dependenciesStale = true;
-
-        if (!IsUpdating)
-        {
-            Recalculate();
-        }
-    }
-
     internal void OnSheetRenamed(Worksheet sheet, string oldName)
     {
         if (!sheets.Contains(sheet))
@@ -181,15 +190,63 @@ public class Workbook
             return;
         }
 
-        dependenciesStale = true;
-        sheet.Batch(() => RenameSheetReferences(oldName, sheet.Name));
+        var collides = sheets.Any(other => other != sheet && string.Equals(other.Name, sheet.Name, StringComparison.OrdinalIgnoreCase));
+
+        sheet.Batch(() =>
+        {
+            if (!collides)
+            {
+                RenameSheetReferences(oldName, sheet.Name);
+            }
+
+            RefreshReferencesTo(oldName, []);
+            RefreshReferencesTo(sheet.Name, []);
+        });
     }
+
+    internal void OnFormulaCellRemoved(Cell cell)
+    {
+        Graph.Remove(cell);
+        pendingFormulaCells.Remove(cell);
+    }
+
+    private void RefreshReferencesTo(string sheetName, IEnumerable<Cell> cells)
+    {
+        var affected = new HashSet<Cell>(cells);
+
+        foreach (var cell in GetFormulaCells())
+        {
+            if (cell.FormulaSyntaxTree!.Find(node => node is NameSyntaxNode
+                    || node is CellSyntaxNode c && string.Equals(c.Token.Address.Worksheet, sheetName, StringComparison.OrdinalIgnoreCase)).Count > 0)
+            {
+                affected.Add(cell);
+            }
+        }
+
+        if (IsUpdating)
+        {
+            pendingFormulaCells.UnionWith(affected);
+            return;
+        }
+
+        foreach (var cell in affected)
+        {
+            Graph.Add(cell);
+        }
+
+        EvaluateFormulas(Graph.GetTopologicallySortedDependencies(affected));
+    }
+
+    private List<Cell> GetFormulaCells() => [.. sheets.SelectMany(GetFormulaCells)];
+
+    private static IEnumerable<Cell> GetFormulaCells(Worksheet sheet) =>
+        sheet.Cells.GetPopulatedCells().Where(cell => cell.FormulaSyntaxTree is not null).ToList();
 
     private void RenameSheetReferences(string oldName, string newName)
     {
         foreach (var sheet in sheets)
         {
-            foreach (var cell in sheet.Cells.GetPopulatedCells().Where(cell => cell.FormulaSyntaxTree is not null).ToList())
+            foreach (var cell in GetFormulaCells(sheet))
             {
                 var renamed = RenameSheetInFormula(cell.Formula!, cell.FormulaSyntaxTree!, oldName, newName);
 
@@ -268,14 +325,13 @@ public class Workbook
 
     internal void OnCellFormulaChanged(Cell cell)
     {
-        Graph.Add(cell);
-
         if (IsUpdating)
         {
-            changedDuringUpdate.Add(cell);
+            pendingFormulaCells.Add(cell);
             return;
         }
 
+        Graph.Add(cell);
         EvaluateFormulas([cell, .. Graph.GetTopologicallySortedDependencies(cell)]);
     }
 
@@ -291,44 +347,28 @@ public class Workbook
 
     private void Recalculate()
     {
-        var roots = new List<Cell>();
-
-        if (dependenciesStale)
+        foreach (var cell in pendingFormulaCells)
         {
-            dependenciesStale = false;
-            RebuildDependencies();
-            roots.AddRange(Graph.FormulaCells);
+            Graph.Add(cell);
         }
-        else
+
+        var roots = new List<Cell>(pendingFormulaCells);
+
+        foreach (var cell in Graph.FormulaCells)
         {
-            foreach (var cell in Graph.FormulaCells)
+            if (updatedSheets.Contains(cell.Worksheet))
             {
-                if (updatedSheets.Contains(cell.Worksheet))
-                {
-                    roots.Add(cell);
-                }
+                roots.Add(cell);
             }
-
-            roots.AddRange(changedDuringUpdate);
         }
 
+        roots.AddRange(changedDuringUpdate);
+
+        pendingFormulaCells.Clear();
         updatedSheets.Clear();
         changedDuringUpdate.Clear();
 
         EvaluateFormulas(Graph.GetTopologicallySortedDependencies(roots));
-    }
-
-    private void RebuildDependencies()
-    {
-        Graph.Clear();
-
-        foreach (var sheet in sheets)
-        {
-            foreach (var cell in sheet.Cells.GetPopulatedCells().Where(cell => cell.Formula is not null).ToList())
-            {
-                Graph.Add(cell);
-            }
-        }
     }
 
     private void EvaluateFormulas(IEnumerable<Cell> cells)
@@ -343,14 +383,14 @@ public class Workbook
 
     internal void AdjustFormulas(Worksheet target, Func<FormulaToken, CellRef> adjust)
     {
-        foreach (var cell in Graph.FormulaCells.ToList())
+        foreach (var cell in GetFormulaCells())
         {
-            if (cell.FormulaSyntaxTree is null || string.IsNullOrEmpty(cell.Formula) || !References(cell, target))
+            if (string.IsNullOrEmpty(cell.Formula) || !References(cell, target))
             {
                 continue;
             }
 
-            var newFormula = FormulaRewriter.Rewrite(cell.Formula, cell.FormulaSyntaxTree,
+            var newFormula = FormulaRewriter.Rewrite(cell.Formula, cell.FormulaSyntaxTree!,
                 token => IsReferenceTo(target, cell, token.Address) ? adjust(token) : token.Address);
 
             if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
@@ -379,13 +419,9 @@ public class Workbook
                 : index >= start.Column && index <= end.Column;
         }
 
-        foreach (var cell in Graph.FormulaCells.ToList())
+        foreach (var cell in GetFormulaCells())
         {
-            var tree = cell.FormulaSyntaxTree;
-            if (tree is null)
-            {
-                continue;
-            }
+            var tree = cell.FormulaSyntaxTree!;
 
             var hasRef = tree.Find(node => node switch
             {
