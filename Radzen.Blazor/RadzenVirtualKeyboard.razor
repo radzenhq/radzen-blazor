@@ -8,7 +8,7 @@
             <div class="rz-virtual-keyboard-sections">
                 @foreach (var section in Sections)
                 {
-                    <div class="rz-virtual-keyboard-section">
+                    <div class="rz-virtual-keyboard-section" style="@GetSectionStyle(section)">
                         @for (var rowIndex = 0; rowIndex < section.Rows.Count; rowIndex++)
                         {
                             <div class="rz-virtual-keyboard-row">

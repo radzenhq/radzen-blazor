@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -140,6 +142,13 @@ namespace Radzen.Blazor
                     }
                 }
             }
+        }
+
+        static string GetSectionStyle(VirtualKeyboardLayout section)
+        {
+            var columns = section.Rows.Select(row => row.Length).DefaultIfEmpty(1).Max();
+
+            return $"--rz-virtual-keyboard-columns:{columns.ToString(CultureInfo.InvariantCulture)}";
         }
 
         class KeyInfo

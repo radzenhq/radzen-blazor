@@ -86,6 +86,27 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void VirtualKeyboard_Renders_SectionColumnCount_FromTheLongestRow()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+                parameters.Add(p => p.Type, VirtualKeyboardType.All));
+
+            var sections = component.FindAll(".rz-virtual-keyboard-section");
+
+            Assert.Equal("--rz-virtual-keyboard-columns:10", sections[0].GetAttribute("style"));
+            Assert.Equal("--rz-virtual-keyboard-columns:3", sections[1].GetAttribute("style"));
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.Type, VirtualKeyboardType.Alphanumeric)
+                .Add(p => p.Layout, VirtualKeyboardLayout.Qwertz));
+
+            Assert.Equal("--rz-virtual-keyboard-columns:11", component.Find(".rz-virtual-keyboard-section").GetAttribute("style"));
+        }
+
+        [Fact]
         public void VirtualKeyboard_Renders_CultureDecimalSeparator()
         {
             using var ctx = new TestContext();
