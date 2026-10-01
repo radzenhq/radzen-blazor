@@ -19,15 +19,12 @@ enum FormulaAdjustment
 /// </summary>
 public partial class Worksheet
 {
-    private readonly CellDependencyGraph graph = new();
     private readonly HashSet<int> invalidReferenceRows = [];
     private readonly HashSet<int> invalidReferenceColumns = [];
 
     private int updateDepth;
 
     internal bool IsUpdating => updateDepth > 0;
-
-    private bool isEvaluating;
 
     internal const int MaxRows = 1_048_576;
 
@@ -88,7 +85,22 @@ public partial class Worksheet
     /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
-    public string Name { get; set; } = "Worksheet1";
+    public string Name
+    {
+        get => name;
+        set
+        {
+            if (string.Equals(name, value, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            name = value;
+            workbook?.OnSheetsChanged();
+        }
+    }
+
+    private string name = "Worksheet1";
     private readonly List<Table> tables = [];
 
     /// <summary>
@@ -348,17 +360,7 @@ public partial class Worksheet
         return new CellRef(Rows.NextVisible(0, 1, 0), Columns.NextVisible(0, 1, 0));
     }
 
-    private void EvaluateFormulas(IEnumerable<Cell> cells)
-    {
-        var evaluated = new Dictionary<Cell, CellData>();
-
-        foreach (var cell in cells)
-        {
-            EvaluateFormula(cell, evaluated);
-        }
-    }
-
-    private void EvaluateFormula(Cell cell, Dictionary<Cell, CellData> evaluated)
+    internal void EvaluateFormula(Cell cell, Dictionary<Cell, CellData> evaluated)
     {
         var tree = cell.FormulaSyntaxTree;
 
@@ -373,7 +375,7 @@ public partial class Worksheet
         }
         else
         {
-            isEvaluating = true;
+            Workbook.IsEvaluating = true;
             try
             {
                 var visitor = new FormulaEvaluator(this, cell, evaluated);
@@ -389,7 +391,7 @@ public partial class Worksheet
             }
             finally
             {
-                isEvaluating = false;
+                Workbook.IsEvaluating = false;
             }
         }
 
@@ -412,29 +414,19 @@ public partial class Worksheet
 
     internal void OnCellValueChanged(Cell cell)
     {
-        if (isEvaluating)
+        if (Workbook.IsEvaluating)
         {
             return;
         }
 
-        // During a batch, EndUpdate recalculates dependent formulas once. The changed cell
-        // itself is not a formula node, so it would never be notified - fire its event here.
-        if (!IsUpdating && graph.HasDependents(cell))
-        {
-            EvaluateFormulas(graph.GetTopologicallySortedDependencies(cell));
-        }
+        Workbook.OnCellValueChanged(cell);
 
         cell.OnChanged();
     }
 
     internal void OnCellFormulaChanged(Cell cell)
     {
-        graph.Add(cell);
-
-        if (!IsUpdating)
-        {
-            EvaluateFormulas([cell, .. graph.GetTopologicallySortedDependencies(cell)]);
-        }
+        Workbook.OnCellFormulaChanged(cell);
     }
 
     internal void RefreshCells(RangeRef range, bool validate = false)
@@ -482,7 +474,7 @@ public partial class Worksheet
             return;
         }
 
-        EvaluateFormulas(graph.GetTopologicallySortedDependencies());
+        Workbook.OnUpdateEnded(this);
 
         Selection.TriggerPendingChange();
     }
@@ -613,6 +605,8 @@ public partial class Worksheet
 
     private void DeleteColumnCore(int columnIndex)
     {
+        RemoveFormulaCells(cell => cell.Address.Column == columnIndex);
+
         // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftColumnsLeft(columnIndex);
 
@@ -622,7 +616,7 @@ public partial class Worksheet
 
         invalidReferenceColumns.Add(columnIndex);
 
-        InvalidateFormulasReferencing(cellRef => cellRef.Column == columnIndex);
+        Workbook.InvalidateFormulasReferencing(this, cellRef => cellRef.Column == columnIndex);
 
         ColumnCount--;
 
@@ -651,6 +645,8 @@ public partial class Worksheet
 
     private void DeleteRowCore(int rowIndex)
     {
+        RemoveFormulaCells(cell => cell.Address.Row == rowIndex);
+
         // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftRowsUp(rowIndex);
 
@@ -660,7 +656,7 @@ public partial class Worksheet
 
         invalidReferenceRows.Add(rowIndex);
 
-        InvalidateFormulasReferencing(cellRef => cellRef.Row == rowIndex);
+        Workbook.InvalidateFormulasReferencing(this, cellRef => cellRef.Row == rowIndex);
 
         RowCount--;
 
@@ -673,21 +669,13 @@ public partial class Worksheet
         }
     }
 
-    private void AdjustFormulas(Func<FormulaToken, CellRef> adjust)
+    private void RemoveFormulaCells(Predicate<Cell> isRemoved)
     {
-        // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
-        foreach (var cell in graph.FormulaCells.ToList())
+        foreach (var cell in Cells.GetPopulatedCells())
         {
-            if (cell.FormulaSyntaxTree is null || string.IsNullOrEmpty(cell.Formula))
+            if (cell.Formula is not null && isRemoved(cell))
             {
-                continue;
-            }
-
-            var newFormula = FormulaRewriter.Rewrite(cell.Formula!, cell.FormulaSyntaxTree!, adjust);
-
-            if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
-            {
-                cell.Formula = newFormula;
+                Workbook.Graph.Remove(cell);
             }
         }
     }
@@ -779,70 +767,6 @@ public partial class Worksheet
         return cells;
     }
 
-    internal void InvalidateFormulasReferencing(Predicate<CellRef> isInvalidated)
-    {
-        // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
-        foreach (var cell in graph.FormulaCells.ToList())
-        {
-            var tree = cell.FormulaSyntaxTree;
-            if (tree is null)
-            {
-                continue;
-            }
-
-            var hasRef = tree.Find(node => node switch
-            {
-                CellSyntaxNode c => isInvalidated(c.Token.Address),
-                RangeSyntaxNode r => RangeContainsInvalidated(r, isInvalidated),
-                _ => false,
-            }).Count > 0;
-
-            if (!hasRef)
-            {
-                continue;
-            }
-
-            var tokens = FormulaLexer.Scan(cell.Formula!, false);
-            for (var i = 0; i < tokens.Count; i++)
-            {
-                var t = tokens[i];
-                if (t.Type == FormulaTokenType.CellIdentifier && isInvalidated(t.Address))
-                {
-                    tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
-                }
-            }
-
-            var rebuilt = StringBuilderCache.Acquire();
-            foreach (var t in tokens)
-            {
-                if (t.Type == FormulaTokenType.None)
-                {
-                    break;
-                }
-
-                rebuilt.Append(t.Value);
-            }
-            cell.Formula = StringBuilderCache.GetStringAndRelease(rebuilt);
-        }
-    }
-
-    private static bool RangeContainsInvalidated(RangeSyntaxNode range, Predicate<CellRef> isInvalidated)
-    {
-        var start = range.Start.Token.Address;
-        var end = range.End.Token.Address;
-        for (var r = start.Row; r <= end.Row; r++)
-        {
-            for (var c = start.Column; c <= end.Column; c++)
-            {
-                if (isInvalidated(new CellRef(r, c)))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /// <summary>
     /// Inserts one or more rows at the specified index and shifts existing cells down. Updates formulas and increases row count.
     /// </summary>
@@ -875,7 +799,7 @@ public partial class Worksheet
 
         MergedCells.ShiftRowsDown(rowIndex, count);
 
-        AdjustFormulas((cellToken) =>
+        Workbook.AdjustFormulas(this, (cellToken) =>
         {
             var a = cellToken.Address;
             var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
@@ -927,7 +851,7 @@ public partial class Worksheet
 
         MergedCells.ShiftColumnsRight(columnIndex, count);
 
-        AdjustFormulas((cellToken) =>
+        Workbook.AdjustFormulas(this, (cellToken) =>
         {
             var a = cellToken.Address;
             var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
@@ -946,234 +870,6 @@ public partial class Worksheet
             Selection.NotifyContentChanged();
         }
     }
-    class FormulaRewriter : FormulaSyntaxNodeVisitorBase
-    {
-        private readonly Func<FormulaToken, CellRef> adjust;
-        private readonly StringBuilder builder = new();
-
-        private FormulaRewriter(Func<FormulaToken, CellRef> adjust)
-        {
-            this.adjust = adjust;
-        }
-
-        public static string Rewrite(string original, FormulaSyntaxTree tree, Func<FormulaToken, CellRef> adjust)
-        {
-            var rewriter = new FormulaRewriter(adjust);
-            rewriter.builder.Append('=');
-            tree.Root.Accept(rewriter);
-            return rewriter.builder.ToString();
-        }
-
-        public override void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
-        {
-            builder.Append(numberLiteralSyntaxNode.Token.Value);
-        }
-
-        public override void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
-        {
-            builder.Append('"');
-            builder.Append(stringLiteralSyntaxNode.Token.Value);
-            builder.Append('"');
-        }
-
-        public override void VisitBooleanLiteral(BooleanLiteralSyntaxNode booleanLiteralSyntaxNode)
-        {
-            builder.Append(booleanLiteralSyntaxNode.Token.Value);
-        }
-
-        public override void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
-        {
-            builder.Append(errorLiteralSyntaxNode.Token.Value);
-        }
-
-        public override void VisitName(NameSyntaxNode nameSyntaxNode)
-        {
-            builder.Append(nameSyntaxNode.Name);
-        }
-
-        public override void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
-        {
-            builder.Append(unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate ? '-' : '+');
-            AppendOperand(unaryExpressionSyntaxNode.Operand, Precedence(unaryExpressionSyntaxNode), wrapEqual: false);
-        }
-
-        public override void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
-        {
-            var precedence = Precedence(binaryExpressionSyntaxNode);
-            AppendOperand(binaryExpressionSyntaxNode.Left, precedence, wrapEqual: false);
-            builder.Append(TokenToOperator(binaryExpressionSyntaxNode.Token));
-            AppendOperand(binaryExpressionSyntaxNode.Right, precedence, wrapEqual: true);
-        }
-
-        private void AppendOperand(FormulaSyntaxNode operand, int parentPrecedence, bool wrapEqual)
-        {
-            var precedence = Precedence(operand);
-            var wrap = precedence < parentPrecedence || (wrapEqual && precedence == parentPrecedence);
-
-            if (wrap)
-            {
-                builder.Append('(');
-            }
-
-            operand.Accept(this);
-
-            if (wrap)
-            {
-                builder.Append(')');
-            }
-        }
-
-        private static int Precedence(FormulaSyntaxNode node)
-        {
-            return node switch
-            {
-                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Multiply or BinaryOperator.Divide } => 4,
-                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Plus or BinaryOperator.Minus } => 3,
-                BinaryExpressionSyntaxNode { Operator: BinaryOperator.Concat } => 2,
-                BinaryExpressionSyntaxNode => 1,
-                UnaryExpressionSyntaxNode => 5,
-                _ => 6
-            };
-        }
-
-        public override void VisitCell(CellSyntaxNode cellSyntaxNode)
-        {
-            var token = cellSyntaxNode.Token;
-            var adjusted = adjust(token);
-
-            AppendWorksheetPrefix(token.Address.Worksheet);
-
-            if (token.Address.IsColumnAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(ColumnRef.ToString(adjusted.Column));
-            if (token.Address.IsRowAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(adjusted.Row + 1);
-        }
-
-        public override void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
-        {
-            builder.Append(functionSyntaxNode.Name);
-            builder.Append('(');
-            for (int i = 0; i < functionSyntaxNode.Arguments.Count; i++)
-            {
-                if (i > 0)
-                {
-                    builder.Append(',');
-                }
-                functionSyntaxNode.Arguments[i].Accept(this);
-            }
-            builder.Append(')');
-        }
-
-        public override void VisitRange(RangeSyntaxNode rangeSyntaxNode)
-        {
-            var startToken = rangeSyntaxNode.Start.Token;
-            var endToken = rangeSyntaxNode.End.Token;
-
-            var startAdjusted = adjust(startToken);
-            var endAdjusted = adjust(endToken);
-
-            // Ensure start <= end after adjustments
-            var startCell = startAdjusted;
-            var endCell = endAdjusted;
-
-            if (startCell.Row > endCell.Row || (startCell.Row == endCell.Row && startCell.Column > endCell.Column))
-            {
-                (startCell, endCell) = CellRef.Swap(startCell, endCell);
-            }
-
-            AppendWorksheetPrefix(startToken.Address.Worksheet);
-
-            if (startToken.Address.IsColumnAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(ColumnRef.ToString(startCell.Column));
-            if (startToken.Address.IsRowAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(startCell.Row + 1);
-
-            builder.Append(':');
-
-            if (endToken.Address.IsColumnAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(ColumnRef.ToString(endCell.Column));
-            if (endToken.Address.IsRowAbsolute)
-            {
-                builder.Append('$');
-            }
-            builder.Append(endCell.Row + 1);
-        }
-
-        private void AppendWorksheetPrefix(string? worksheet)
-        {
-            if (string.IsNullOrEmpty(worksheet))
-            {
-                return;
-            }
-
-            if (NeedsQuoting(worksheet))
-            {
-                builder.Append('\'');
-                builder.Append(worksheet.Replace("'", "''", StringComparison.Ordinal));
-                builder.Append('\'');
-            }
-            else
-            {
-                builder.Append(worksheet);
-            }
-
-            builder.Append('!');
-        }
-
-        private static bool NeedsQuoting(string name)
-        {
-            if (char.IsDigit(name[0]))
-            {
-                return true;
-            }
-
-            foreach (var ch in name)
-            {
-                if (ch == ' ' || ch == '\'')
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static string TokenToOperator(FormulaToken token)
-        {
-            return token.Type switch
-            {
-                FormulaTokenType.Plus => "+",
-                FormulaTokenType.Minus => "-",
-                FormulaTokenType.Star => "*",
-                FormulaTokenType.Slash => "/",
-                FormulaTokenType.Ampersand => "&",
-                FormulaTokenType.Equals => "=",
-                FormulaTokenType.GreaterThan => ">",
-                FormulaTokenType.GreaterThanOrEqual => ">=",
-                FormulaTokenType.LessThan => "<",
-                FormulaTokenType.LessThanOrEqual => "<=",
-                FormulaTokenType.EqualsGreaterThan => ">=",
-                FormulaTokenType.LessThanGreaterThan => "<>",
-                _ => throw new InvalidOperationException($"Unsupported operator token: {token.Type}")
-            };
-        }
-    }
-
     /// <summary>
     /// Checks if all cells in the specified range are editable.
     /// </summary>

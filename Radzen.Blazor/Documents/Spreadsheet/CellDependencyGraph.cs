@@ -26,7 +26,7 @@ internal class CellDependencyGraph
 
     public IEnumerable<Cell> FormulaCells => dependencies.Keys;
 
-    private List<Cell> GetTopologicallySortedDependencies(IEnumerable<Cell> cells)
+    public List<Cell> GetTopologicallySortedDependencies(IEnumerable<Cell> cells)
     {
         var visited = new HashSet<Cell>();
         var result = new List<Cell>();
@@ -75,8 +75,32 @@ internal class CellDependencyGraph
         return result;
     }
 
+    public void Clear()
+    {
+        dependencies.Clear();
+        dependents.Clear();
+    }
+
+    public void Remove(Cell cell)
+    {
+        if (!dependencies.Remove(cell, out var oldDependencies))
+        {
+            return;
+        }
+
+        foreach (var dependency in oldDependencies)
+        {
+            if (dependents.TryGetValue(dependency, out var dependentCells))
+            {
+                dependentCells.Remove(cell);
+            }
+        }
+    }
+
     public void Add(Cell cell)
     {
+        Remove(cell);
+
         if (cell.Formula is null)
         {
             return;
@@ -85,17 +109,6 @@ internal class CellDependencyGraph
         var tree = cell.FormulaSyntaxTree ?? FormulaParser.Parse(cell.Formula);
         var visitor = new DependencyVisitor(cell.Worksheet);
         tree.Root.Accept(visitor);
-
-        if (dependencies.TryGetValue(cell, out var oldDependencies))
-        {
-            foreach (var dependency in oldDependencies)
-            {
-                if (dependents.TryGetValue(dependency, out var dependentCells))
-                {
-                    dependentCells.Remove(cell);
-                }
-            }
-        }
 
         var newDependencies = visitor.Dependencies;
         dependencies[cell] = newDependencies;
@@ -170,7 +183,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
         var target = sheet.Workbook.GetSheet(worksheetName);
 
-        return target?.Name == worksheetName ? target : null;
+        return string.Equals(target?.Name, worksheetName, StringComparison.OrdinalIgnoreCase) ? target : null;
     }
 
     public void VisitCell(CellSyntaxNode cellIdentifierSyntaxNode)

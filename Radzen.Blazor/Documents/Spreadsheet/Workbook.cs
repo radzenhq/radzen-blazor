@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -97,6 +99,7 @@ public class Workbook
         ArgumentNullException.ThrowIfNull(sheet);
         sheets.Add(sheet);
         sheet.Workbook = this;
+        OnSheetsChanged();
     }
 
     /// <summary>
@@ -125,7 +128,236 @@ public class Workbook
     {
         ArgumentNullException.ThrowIfNull(sheet);
 
-        return sheets.Remove(sheet);
+        if (!sheets.Remove(sheet))
+        {
+            return false;
+        }
+
+        OnSheetsChanged();
+
+        return true;
+    }
+
+    internal CellDependencyGraph Graph { get; } = new();
+
+    internal bool IsEvaluating { get; set; }
+
+    private bool dependenciesStale;
+
+    private readonly HashSet<Worksheet> updatedSheets = [];
+
+    private readonly HashSet<Cell> changedDuringUpdate = [];
+
+    internal bool IsUpdating
+    {
+        get
+        {
+            foreach (var sheet in sheets)
+            {
+                if (sheet.IsUpdating)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal void OnSheetsChanged()
+    {
+        dependenciesStale = true;
+
+        if (!IsUpdating)
+        {
+            Recalculate();
+        }
+    }
+
+    internal void OnCellValueChanged(Cell cell)
+    {
+        if (!Graph.HasDependents(cell))
+        {
+            return;
+        }
+
+        if (IsUpdating)
+        {
+            changedDuringUpdate.Add(cell);
+            return;
+        }
+
+        EvaluateFormulas(Graph.GetTopologicallySortedDependencies(cell));
+    }
+
+    internal void OnCellFormulaChanged(Cell cell)
+    {
+        Graph.Add(cell);
+
+        if (IsUpdating)
+        {
+            changedDuringUpdate.Add(cell);
+            return;
+        }
+
+        EvaluateFormulas([cell, .. Graph.GetTopologicallySortedDependencies(cell)]);
+    }
+
+    internal void OnUpdateEnded(Worksheet sheet)
+    {
+        updatedSheets.Add(sheet);
+
+        if (!IsUpdating)
+        {
+            Recalculate();
+        }
+    }
+
+    private void Recalculate()
+    {
+        var roots = new List<Cell>();
+
+        if (dependenciesStale)
+        {
+            dependenciesStale = false;
+            RebuildDependencies();
+            roots.AddRange(Graph.FormulaCells);
+        }
+        else
+        {
+            foreach (var cell in Graph.FormulaCells)
+            {
+                if (updatedSheets.Contains(cell.Worksheet))
+                {
+                    roots.Add(cell);
+                }
+            }
+
+            roots.AddRange(changedDuringUpdate);
+        }
+
+        updatedSheets.Clear();
+        changedDuringUpdate.Clear();
+
+        EvaluateFormulas(Graph.GetTopologicallySortedDependencies(roots));
+    }
+
+    private void RebuildDependencies()
+    {
+        Graph.Clear();
+
+        foreach (var sheet in sheets)
+        {
+            foreach (var cell in sheet.Cells.GetPopulatedCells().Where(cell => cell.Formula is not null).ToList())
+            {
+                Graph.Add(cell);
+            }
+        }
+    }
+
+    private void EvaluateFormulas(IEnumerable<Cell> cells)
+    {
+        var evaluated = new Dictionary<Cell, CellData>();
+
+        foreach (var cell in cells)
+        {
+            cell.Worksheet.EvaluateFormula(cell, evaluated);
+        }
+    }
+
+    internal void AdjustFormulas(Worksheet target, Func<FormulaToken, CellRef> adjust)
+    {
+        foreach (var cell in Graph.FormulaCells.ToList())
+        {
+            if (cell.FormulaSyntaxTree is null || string.IsNullOrEmpty(cell.Formula) || !References(cell, target))
+            {
+                continue;
+            }
+
+            var newFormula = FormulaRewriter.Rewrite(cell.Formula, cell.FormulaSyntaxTree,
+                token => IsReferenceTo(target, cell, token.Address) ? adjust(token) : token.Address);
+
+            if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
+            {
+                cell.Formula = newFormula;
+            }
+        }
+    }
+
+    internal void InvalidateFormulasReferencing(Worksheet target, Predicate<CellRef> isInvalidated)
+    {
+        foreach (var cell in Graph.FormulaCells.ToList())
+        {
+            var tree = cell.FormulaSyntaxTree;
+            if (tree is null)
+            {
+                continue;
+            }
+
+            var hasRef = tree.Find(node => node switch
+            {
+                CellSyntaxNode c => IsReferenceTo(target, cell, c.Token.Address) && isInvalidated(c.Token.Address),
+                RangeSyntaxNode r => IsReferenceTo(target, cell, r.Start.Token.Address) && RangeContainsInvalidated(r, isInvalidated),
+                _ => false,
+            }).Count > 0;
+
+            if (!hasRef)
+            {
+                continue;
+            }
+
+            var tokens = FormulaLexer.Scan(cell.Formula!, false);
+            for (var i = 0; i < tokens.Count; i++)
+            {
+                var t = tokens[i];
+                if (t.Type == FormulaTokenType.CellIdentifier && IsReferenceTo(target, cell, t.Address) && isInvalidated(t.Address))
+                {
+                    tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
+                }
+            }
+
+            var rebuilt = StringBuilderCache.Acquire();
+            foreach (var t in tokens)
+            {
+                if (t.Type == FormulaTokenType.None)
+                {
+                    break;
+                }
+
+                rebuilt.Append(t.Value);
+            }
+            cell.Formula = StringBuilderCache.GetStringAndRelease(rebuilt);
+        }
+    }
+
+    private static bool IsReferenceTo(Worksheet target, Cell owner, CellRef address)
+    {
+        return string.IsNullOrEmpty(address.Worksheet)
+            ? owner.Worksheet == target
+            : string.Equals(address.Worksheet, target.Name, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool References(Cell owner, Worksheet target)
+    {
+        return owner.Worksheet == target
+            || owner.FormulaSyntaxTree!.Find(node => node is CellSyntaxNode c && IsReferenceTo(target, owner, c.Token.Address)).Count > 0;
+    }
+
+    private static bool RangeContainsInvalidated(RangeSyntaxNode range, Predicate<CellRef> isInvalidated)
+    {
+        var start = range.Start.Token.Address;
+        var end = range.End.Token.Address;
+        for (var r = start.Row; r <= end.Row; r++)
+        {
+            for (var c = start.Column; c <= end.Column; c++)
+            {
+                if (isInvalidated(new CellRef(r, c)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /// <summary>
