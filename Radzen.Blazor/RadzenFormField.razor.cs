@@ -202,6 +202,14 @@ namespace Radzen.Blazor
         public bool AllowFloatingLabel { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether clicking the Start content, the End content or the empty area inside the form field border focuses the input.
+        /// Clicks on interactive Start or End content such as buttons and links are not affected.
+        /// </summary>
+        /// <value><c>true</c> if clicking anywhere inside the form field focuses the input; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool FocusOnClick { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the form field. Used to associate the label with a component.
         /// </summary>
         [Parameter]

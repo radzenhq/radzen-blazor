@@ -6,7 +6,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" class="rz-p-sm-12">
-        <RadzenFormField Text="Account" Variant="@variant">
+        <RadzenFormField Text="Account" Variant="@variant" FocusOnClick="true">
             <Start>
                 <RadzenIcon Icon="account_circle" />
             </Start>
@@ -17,7 +17,7 @@
                 <RadzenIcon Icon="add_circle" IconStyle="IconStyle.Secondary" />
             </End>
         </RadzenFormField>
-        <RadzenFormField Text="Credit Card Number" Variant="@variant">
+        <RadzenFormField Text="Credit Card Number" Variant="@variant" FocusOnClick="true">
             <Start>
                 <RadzenIcon Icon="credit_card" />
             </Start>
@@ -25,7 +25,7 @@
                 <RadzenMask Mask="**** **** **** ****" CharacterPattern="[0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" />
             </ChildContent>
         </RadzenFormField>
-        <RadzenFormField Text="Password" Variant="@variant">
+        <RadzenFormField Text="Password" Variant="@variant" FocusOnClick="true">
             <ChildContent>
                 <RadzenTextBox @bind-Value="@passwordValue" Visible="@(!password)" />
                 <RadzenPassword @bind-Value="@passwordValue" Visible="@password" />

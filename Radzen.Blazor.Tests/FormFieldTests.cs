@@ -108,6 +108,44 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void FormField_Renders_FocusOnClick_True()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenFormField>(parameters =>
+            {
+                parameters.Add(p => p.FocusOnClick, true);
+            });
+
+            Assert.Equal("true", component.Find(".rz-form-field").GetAttribute("data-focus-on-click"));
+        }
+
+        [Fact]
+        public void FormField_DoesNotRender_FocusOnClick_ByDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenFormField>();
+
+            Assert.False(component.Find(".rz-form-field").HasAttribute("data-focus-on-click"));
+        }
+
+        [Fact]
+        public void FormField_Removes_FocusOnClick_WhenToggledOff()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenFormField>(parameters =>
+            {
+                parameters.Add(p => p.FocusOnClick, true);
+            });
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.FocusOnClick, false));
+
+            Assert.False(component.Find(".rz-form-field").HasAttribute("data-focus-on-click"));
+        }
+
+        [Fact]
         public void FormField_Renders_Component_Attribute()
         {
             using var ctx = new TestContext();

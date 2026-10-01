@@ -3,7 +3,7 @@
 
 @if (Visible)
 {
-<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" data-focus-on-click="@(FocusOnClick ? "true" : null)">
     <div class="rz-form-field-content">
         <CascadingValue Value=@context IsFixed="true">
         @if (Start != null)

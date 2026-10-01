@@ -8340,11 +8340,35 @@ Radzen.createFormField = function(el) {
   if (!el || typeof el.addEventListener !== 'function') return { dispose: function() {} };
   function onFocusIn() { el.classList.add('rz-state-focused'); }
   function onFocusOut() { el.classList.remove('rz-state-focused'); }
+  function onMouseDown(e) {
+    if (e.button !== 0 || e.defaultPrevented || !el.hasAttribute('data-focus-on-click')) return;
+    var content = el.querySelector('.rz-form-field-content');
+    var target = e.target;
+    if (!content || !target || !target.closest) return;
+    var slots = '.rz-form-field-start, .rz-form-field-end';
+    if (target !== content) {
+      var slot = target.closest(slots);
+      if (!slot || slot.parentNode !== content) return;
+      var interactive = target.closest('a, button, input, select, textarea, label, [tabindex], [contenteditable]');
+      if (interactive && slot.contains(interactive)) return;
+    }
+    var candidates = content.querySelectorAll('input, select, textarea, [tabindex], [contenteditable]');
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = candidates[i];
+      if (candidate.disabled || candidate.type === 'hidden' || candidate.tabIndex < 0) continue;
+      if (candidate.closest(slots) || !candidate.getClientRects().length) continue;
+      e.preventDefault();
+      candidate.focus();
+      return;
+    }
+  }
   el.addEventListener('focusin', onFocusIn);
   el.addEventListener('focusout', onFocusOut);
+  el.addEventListener('mousedown', onMouseDown);
   return { dispose: function() {
     el.removeEventListener('focusin', onFocusIn);
     el.removeEventListener('focusout', onFocusOut);
+    el.removeEventListener('mousedown', onMouseDown);
   }};
 };
 Radzen.createSignaturePad = function(element, ref, strokeColor, strokeWidth, disabled, initialValue) {
