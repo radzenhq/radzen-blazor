@@ -1,11 +1,15 @@
 @using RadzenBlazorDemos.Models
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
 
 @*
     Similar to DataGrid in-cell editing: click a cell to edit it,
-    and changes are saved when you move to another cell.
+    and changes are saved when you move to another cell or leave the task list.
 *@
 
 <RadzenGantt @ref="gantt"
+             id="in-cell-edit-gantt"
              TItem="GanttTask"
              Data="@tasks"
              IdProperty="@nameof(GanttTask.Id)"
@@ -23,6 +27,7 @@
              Sort="@(args => Reset())"
              Filter="@(args => Reset())"
              RowUpdate="@OnUpdateRow"
+             @onfocusout="@OnFocusOut"
              RowHeightPx="42"
              Style="width: 100%; height: 520px;">
     <Columns>
@@ -146,6 +151,41 @@
 
         columnEditing = args.Column.Property;
         await EditRow(args.Data);
+    }
+
+    async Task OnFocusOut()
+    {
+        var task = tasksToUpdate.FirstOrDefault();
+        var column = columnEditing;
+
+        if (task == null) return;
+
+        try
+        {
+            // Editor popups (e.g. RadzenDatePicker) are rendered outside of the Gantt - wait while the user is working in one.
+            do
+            {
+                await Task.Delay(200);
+            }
+            while (IsEditing(column, task) && await Matches(":has(.rz-popup:focus-within), :has(.rz-popup.rz-open):not(:focus-within)"));
+
+            if (await Matches(":has(#in-cell-edit-gantt .rz-data-grid:focus-within)")) return;
+        }
+        catch
+        {
+            // ignore JS interop errors
+            return;
+        }
+
+        if (IsEditing(column, task))
+        {
+            await Update();
+        }
+    }
+
+    async Task<bool> Matches(string selector)
+    {
+        return await JSRuntime.InvokeAsync<bool>("document.body.matches", selector);
     }
 
     void Reset(GanttTask task = null)

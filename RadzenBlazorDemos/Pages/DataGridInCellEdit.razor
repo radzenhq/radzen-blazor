@@ -11,9 +11,9 @@
     The 'CellClick' event handler is used to trigger the column edit mode.
 *@
 
-<RadzenDataGrid @ref=grid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+<RadzenDataGrid @ref=grid id="in-cell-edit-grid" TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
 Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())"
-ColumnWidth="200px" CellClick="@OnCellClick">
+ColumnWidth="200px" CellClick="@OnCellClick" @onfocusout="@OnFocusOut">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
 
@@ -182,6 +182,48 @@ ColumnWidth="200px" CellClick="@OnCellClick">
 
         // This sets the Item to be edited.
         await EditRow(args.Data);
+    }
+
+    /// <summary>
+    /// Handles the focusout event of the RadzenDataGrid and commits the pending edit when the focus leaves the DataGrid.
+    /// </summary>
+    async Task OnFocusOut()
+    {
+        var order = ordersToUpdate.FirstOrDefault();
+        var column = columnEditing;
+
+        if (order == null) return;
+
+        try
+        {
+            // The popups of editors such as RadzenDatePicker and RadzenDropDown are rendered outside of the DataGrid.
+            // Wait while the user is working in such a popup - it has the focus, or it is open and nothing else is focused.
+            do
+            {
+                await Task.Delay(200);
+            }
+            while (IsEditing(column, order) && await Matches(":has(.rz-popup:focus-within), :has(.rz-popup.rz-open):not(:focus-within)"));
+
+            if (await Matches(":has(#in-cell-edit-grid:focus-within)")) return;
+        }
+        catch
+        {
+            return;
+        }
+
+        // The focus is no longer in the DataGrid - commit the pending edit.
+        if (IsEditing(column, order))
+        {
+            await Update();
+        }
+    }
+
+    /// <summary>
+    /// Checks if the document body matches the specified CSS selector.
+    /// </summary>
+    async Task<bool> Matches(string selector)
+    {
+        return await JSRuntime.InvokeAsync<bool>("document.body.matches", selector);
     }
 
     void Reset(Order order = null)
