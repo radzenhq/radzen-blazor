@@ -153,7 +153,11 @@ public class Workbook
 
     private void Detach(Worksheet sheet)
     {
-        sheets.Remove(sheet);
+        if (!sheets.Remove(sheet))
+        {
+            return;
+        }
+
         updatedSheets.Remove(sheet);
 
         foreach (var cell in GetFormulaCells(sheet))
