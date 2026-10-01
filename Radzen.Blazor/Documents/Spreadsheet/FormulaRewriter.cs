@@ -100,7 +100,7 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
         var token = cellSyntaxNode.Token;
         var adjusted = adjust(token);
 
-        AppendWorksheetPrefix(token.Address.Worksheet);
+        AppendWorksheetPrefix(adjusted.Worksheet);
 
         if (token.Address.IsColumnAbsolute)
         {
@@ -151,7 +151,7 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
             (startCell, endCell) = CellRef.Swap(startCell, endCell);
         }
 
-        AppendWorksheetPrefix(startToken.Address.Worksheet);
+        AppendWorksheetPrefix(startAdjusted.Worksheet);
 
         if (startToken.Address.IsColumnAbsolute)
         {
@@ -199,7 +199,7 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
             (start, end, startAbsolute, endAbsolute) = (end, start, endAbsolute, startAbsolute);
         }
 
-        AppendWorksheetPrefix(startToken.Address.Worksheet);
+        AppendWorksheetPrefix(startAdjusted.Worksheet);
         AppendColumnOrRow(isColumns, start, startAbsolute);
         builder.Append(':');
         AppendColumnOrRow(isColumns, end, endAbsolute);
@@ -229,36 +229,8 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
             return;
         }
 
-        if (NeedsQuoting(worksheet))
-        {
-            builder.Append('\'');
-            builder.Append(worksheet.Replace("'", "''", StringComparison.Ordinal));
-            builder.Append('\'');
-        }
-        else
-        {
-            builder.Append(worksheet);
-        }
-
+        builder.Append(SheetNameFormat.Quote(worksheet));
         builder.Append('!');
-    }
-
-    private static bool NeedsQuoting(string name)
-    {
-        if (char.IsDigit(name[0]))
-        {
-            return true;
-        }
-
-        foreach (var ch in name)
-        {
-            if (ch == ' ' || ch == '\'')
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static string TokenToOperator(FormulaToken token)

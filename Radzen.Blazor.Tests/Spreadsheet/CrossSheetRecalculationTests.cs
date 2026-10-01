@@ -161,20 +161,6 @@ public class CrossSheetRecalculationTests
     }
 
     [Fact]
-    public void RenamingReferencedSheet_MakesFormulaRefError()
-    {
-        var workbook = new Workbook();
-        var sheet1 = workbook.AddSheet("Sheet1", 10, 10);
-        var data = workbook.AddSheet("Data", 10, 10);
-        data.Cells["A1"].Value = 3;
-        sheet1.Cells["A1"].Formula = "=Data!A1";
-
-        data.Name = "Other";
-
-        Assert.Equal(CellError.Ref, sheet1.Cells["A1"].Value);
-    }
-
-    [Fact]
     public void AddingSheetWithFormulas_TracksReferencesToExistingSheets()
     {
         var workbook = new Workbook();

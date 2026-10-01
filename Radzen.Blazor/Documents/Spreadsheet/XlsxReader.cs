@@ -495,7 +495,7 @@ static class XlsxReader
         var sNs = sheetDoc.Root!.Name.Namespace;
 
         var (rows, columns) = ComputeSheetSize(sheetDoc, sNs);
-        var sheet = new Worksheet(rows, columns);
+        var sheet = new Worksheet(rows, columns) { Name = sheetInfo.Name };
         sheet.BeginUpdate();
 
         var defaultRowHeight = ParseDefaultRowHeight(sheetDoc, sNs);
@@ -523,7 +523,6 @@ static class XlsxReader
 
         ParseSheetProtection(sheetDoc, sNs, sheet);
 
-        sheet.Name = sheetInfo.Name;
         return sheet;
     }
 

@@ -997,16 +997,22 @@ internal class FormulaLexer(string expression, bool strict = true)
 
         Advance(1);
 
-        var sheetNameStart = position;
-        while (position < expression.Length && Peek() != '\'')
-        {
-            Advance(1);
-        }
+        var sheetName = new StringBuilder();
 
-        var sheetName = expression[sheetNameStart..position];
-
-        if (position < expression.Length && Peek() == '\'')
+        while (position < expression.Length)
         {
+            if (Peek() == '\'')
+            {
+                if (Peek(1) != '\'')
+                {
+                    Advance(1);
+                    break;
+                }
+
+                Advance(1);
+            }
+
+            sheetName.Append(Peek());
             Advance(1);
         }
 
@@ -1033,7 +1039,7 @@ internal class FormulaLexer(string expression, bool strict = true)
             if (CellRef.TryParse(cellRefText, out var cellRef))
             {
                 var fullValue = expression[startOffset..position];
-                cellRef = cellRef with { Worksheet = sheetName };
+                cellRef = cellRef with { Worksheet = sheetName.ToString() };
 
                 return new FormulaToken(FormulaTokenType.CellIdentifier, fullValue)
                 {

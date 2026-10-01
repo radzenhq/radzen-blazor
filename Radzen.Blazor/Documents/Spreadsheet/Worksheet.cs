@@ -95,8 +95,9 @@ public partial class Worksheet
                 return;
             }
 
+            var oldName = name;
             name = value;
-            workbook?.OnSheetsChanged();
+            workbook?.OnSheetRenamed(this, oldName);
         }
     }
 
@@ -803,7 +804,7 @@ public partial class Worksheet
         {
             var a = cellToken.Address;
             var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
-            return new CellRef(newRow, a.Column);
+            return new CellRef(newRow, a.Column) { Worksheet = a.Worksheet };
         });
 
         // Increase the row count last so the axis change event fires after every shift
@@ -855,7 +856,7 @@ public partial class Worksheet
         {
             var a = cellToken.Address;
             var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
-            return new CellRef(a.Row, newCol);
+            return new CellRef(a.Row, newCol) { Worksheet = a.Worksheet };
         });
 
         // Increase the column count last so the axis change event fires after every shift

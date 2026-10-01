@@ -174,6 +174,82 @@ public class Workbook
         }
     }
 
+    internal void OnSheetRenamed(Worksheet sheet, string oldName)
+    {
+        if (!sheets.Contains(sheet))
+        {
+            return;
+        }
+
+        dependenciesStale = true;
+        sheet.Batch(() => RenameSheetReferences(oldName, sheet.Name));
+    }
+
+    private void RenameSheetReferences(string oldName, string newName)
+    {
+        foreach (var sheet in sheets)
+        {
+            foreach (var cell in sheet.Cells.GetPopulatedCells().Where(cell => cell.FormulaSyntaxTree is not null).ToList())
+            {
+                var renamed = RenameSheetInFormula(cell.Formula!, cell.FormulaSyntaxTree!, oldName, newName);
+
+                if (renamed is not null)
+                {
+                    cell.Formula = renamed;
+                }
+            }
+
+            foreach (var series in sheet.Charts.SelectMany(chart => chart.Series))
+            {
+                series.Categories = RenameSheetInReference(series.Categories, oldName, newName);
+                series.Values = RenameSheetInReference(series.Values, oldName, newName);
+            }
+
+            foreach (var rule in sheet.Validation.Ranges.SelectMany(sheet.Validation.GetValidators).OfType<DataValidationRule>())
+            {
+                rule.Formula1 = RenameSheetInReference(rule.Formula1, oldName, newName);
+                rule.Formula2 = RenameSheetInReference(rule.Formula2, oldName, newName);
+            }
+        }
+
+        foreach (var (name, refersTo) in DefinedNames.ToList())
+        {
+            DefinedNames[name] = RenameSheetInReference(refersTo, oldName, newName)!;
+        }
+    }
+
+    private static string? RenameSheetInReference(string? text, string oldName, string newName)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        var hasEquals = text.StartsWith('=');
+        var formula = hasEquals ? text : "=" + text;
+        var renamed = RenameSheetInFormula(formula, FormulaParser.Parse(formula), oldName, newName);
+
+        if (renamed is null)
+        {
+            return text;
+        }
+
+        return hasEquals ? renamed : renamed[1..];
+    }
+
+    private static string? RenameSheetInFormula(string formula, FormulaSyntaxTree tree, string oldName, string newName)
+    {
+        bool IsOldSheet(CellRef address) => string.Equals(address.Worksheet, oldName, StringComparison.OrdinalIgnoreCase);
+
+        if (tree.Errors.Count > 0 || tree.Find(node => node is CellSyntaxNode c && IsOldSheet(c.Token.Address)).Count == 0)
+        {
+            return null;
+        }
+
+        return FormulaRewriter.Rewrite(formula, tree,
+            token => IsOldSheet(token.Address) ? token.Address with { Worksheet = newName } : token.Address);
+    }
+
     internal void OnCellValueChanged(Cell cell)
     {
         if (!Graph.HasDependents(cell))
