@@ -451,6 +451,7 @@ namespace Radzen
     /// <summary>
     /// Service for theme registration and management.
     /// </summary>
+    [method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Blazor.RadzenTheme))]
     public class ThemeService(IJSRuntime jsRuntime, IServiceProvider serviceProvider)
     {
 

@@ -246,6 +246,21 @@ namespace Radzen.Blazor.Tests
                 + "roots their members:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
         }
 
+        [Fact]
+        public void ThemeService_Constructor_Roots_RadzenTheme()
+        {
+            var rooted = typeof(ThemeService)
+                .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .SelectMany(constructor => constructor.GetCustomAttributes<DynamicDependencyAttribute>())
+                .Any(attribute => attribute.Type == typeof(RadzenTheme)
+                    && attribute.MemberTypes.HasFlag(DynamicallyAccessedMemberTypes.All));
+
+            Assert.True(rooted,
+                "RadzenTheme is trimmed from an app that registers ThemeService but never references the component "
+                + "in its own assembly. Add [method: DynamicDependency(DynamicallyAccessedMemberTypes.All, "
+                + "typeof(RadzenTheme))] on the ThemeService primary constructor so the trimmer keeps it.");
+        }
+
         // ----- Test 7b: the DataGrid filter engine resolves System.String filter methods by reflection
         // (typeof(string).GetMethod) for the string operators; trimming strips them unless rooted. They
         // must be kept via [DynamicDependency] on QueryableExtension.GetExpression. Found by the WASM e2e
