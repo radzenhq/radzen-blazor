@@ -33,7 +33,9 @@
                         <GitHubStarLink />
                     </div>
                     <RadzenAppearanceToggle class="rz-mx-2" />
-                    <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
+                    @* Tooltip anchor: 14px above the settings button center, so the tooltip arrow points at the middle of the button in every theme *@
+                    <span @ref="premiumThemeTooltipAnchor" style="position: relative; top: -14px; width: 0; height: 0; margin-inline-start: calc(-1 * var(--rz-gap)); pointer-events: none;"></span>
+                    <RadzenSidebarToggle Icon="settings" Click="@(() => { TooltipService.Close(); configSidebarExpanded = !configSidebarExpanded; })" class="rz-m-0" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
@@ -131,6 +133,8 @@
     RadzenButton rtlInfo;
     RadzenButton freeThemesInfo;
     RadzenButton premiumThemesInfo;
+    ElementReference premiumThemeTooltipAnchor;
+    const string PremiumThemeTooltipKey = "rz-demos-premium-theme-tooltip-dismissed";
     bool sidebarExpanded = true;
     bool configSidebarExpanded = false;
     bool rendered;
@@ -163,11 +167,42 @@
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             rendered = true;
+
+            var theme = Themes.All.FirstOrDefault(t => string.Equals(t.Value, ThemeService.Theme, StringComparison.OrdinalIgnoreCase));
+
+            if (theme?.Premium == true)
+            {
+                try
+                {
+                    if (await JSRuntime.InvokeAsync<string>("localStorage.getItem", PremiumThemeTooltipKey) == null)
+                    {
+                        PremiumThemeTooltip(premiumThemeTooltipAnchor, theme);
+                    }
+                }
+                catch
+                {
+                    // localStorage is not available
+                }
+            }
+        }
+    }
+
+    async Task ClosePremiumThemeTooltip()
+    {
+        TooltipService.Close();
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", PremiumThemeTooltipKey, "true");
+        }
+        catch
+        {
+            // localStorage is not available
         }
     }
 
@@ -200,6 +235,17 @@
         <NavLink class="rz-button rz-button-sm rz-secondary rz-text-align-center" href="/themes">Learn more</NavLink>
     </RadzenStack>
 </div>, options);
+
+    void PremiumThemeTooltip(ElementReference elementReference, Theme theme) => TooltipService.Open(elementReference, ds =>
+@<div Style="position: relative; width: min(320px, calc(100vw - 96px)); white-space: normal; padding: 20px;">
+    <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.ExtraSmall" Click="@ClosePremiumThemeTooltip" aria-label="Close" Style="position: absolute; inset-block-start: 8px; inset-inline-end: 8px; color: currentColor;" />
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor; padding-inline-end: 1rem; text-wrap: balance;">You're viewing the @theme.Text theme</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">@theme.Text is a Premium theme, available with an active Radzen Blazor subscription. Use the <RadzenIcon Icon="settings" Style="font-size: 1.125rem; vertical-align: text-bottom;" /> button to try other themes, including the free ones.</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mt-4">
+        <NavLink class="rz-button rz-button-sm rz-variant-outlined rz-light rz-shade-default rz-text-align-center" href="https://www.radzen.com/pricing" target="_blank">See Pricing</NavLink>
+        <NavLink class="rz-button rz-button-sm rz-variant-text rz-light rz-shade-default rz-text-align-center" href="/themes">Learn more</NavLink>
+    </RadzenStack>
+</div>, new TooltipOptions() { Position = TooltipPosition.Left, Duration = null, CloseTooltipOnDocumentClick = false, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" });
 
     void FreeThemesTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
 @<div Style="width: 200px; white-space: normal; padding: 20px;">
