@@ -985,12 +985,48 @@ sealed class RazorPageGenerator
         return sb.ToString();
     }
 
+    static void AppendMetaDescription(StringBuilder sb, string description)
+    {
+        sb.AppendLine("<HeadContent>");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"    <meta name=\"description\" content=\"{EscapeHtml(description)}\">");
+        sb.AppendLine("</HeadContent>");
+    }
+
+    static string DescribeType(ApiTypeInfo type)
+    {
+        var summary = PlainSummary(type.Summary);
+
+        if (string.IsNullOrEmpty(summary))
+        {
+            return $"API reference for the {type.Name} {type.Kind} in Radzen Blazor Components, with its members, syntax and code examples.";
+        }
+
+        return Truncate($"{type.Name} {type.Kind}: {summary}", 160);
+    }
+
+    static string PlainSummary(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+
+        var plain = Regex.Replace(text, "\x01TYPEREF:[^\x02]*\x02(.*?)\x01/TYPEREF\x02", "$1");
+        return Regex.Replace(plain, "\\s+", " ").Trim();
+    }
+
+    static string Truncate(string text, int maxLength)
+    {
+        if (text.Length <= maxLength) return text;
+
+        var cut = text.LastIndexOf(' ', maxLength - 3);
+        return (cut > 0 ? text[..cut] : text[..(maxLength - 3)]).TrimEnd(',', ';', ':', '.') + "...";
+    }
+
     void GenerateIndexPage()
     {
         var sb = new StringBuilder();
         sb.AppendLine("@page \"/docs/api\"");
         sb.AppendLine();
         sb.AppendLine("<PageTitle>API Reference - Radzen Blazor Components</PageTitle>");
+        AppendMetaDescription(sb, "API reference for Radzen Blazor Components: every component, class, interface and enum with its properties, methods, events and code examples.");
         sb.AppendLine();
         sb.AppendLine("<RadzenStack Gap=\"1rem\" class=\"rz-pt-4\">");
         sb.AppendLine("  <RadzenText TextStyle=\"TextStyle.H3\" TagName=\"TagName.H1\">API Reference</RadzenText>");
@@ -1032,7 +1068,8 @@ sealed class RazorPageGenerator
             var sb = new StringBuilder();
             sb.AppendLine(CultureInfo.InvariantCulture, $"@page \"/docs/api/{ns}\"");
             sb.AppendLine();
-            sb.AppendLine(CultureInfo.InvariantCulture, $"<PageTitle>{ns} Namespace - Radzen Blazor Components</PageTitle>");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"<PageTitle>{ns} Namespace - Radzen Blazor API Reference</PageTitle>");
+            AppendMetaDescription(sb, $"All types in the {ns} namespace of Radzen Blazor Components, with their properties, methods, events and code examples.");
             sb.AppendLine();
             sb.AppendLine("<RadzenStack Gap=\"1rem\" class=\"rz-pt-4\">");
             sb.AppendLine(CultureInfo.InvariantCulture, $"  <RadzenText TextStyle=\"TextStyle.H3\" TagName=\"TagName.H1\" class=\"text-break\">{EscapeHtml(ns)} Namespace</RadzenText>");
@@ -1091,7 +1128,8 @@ sealed class RazorPageGenerator
             var routeName = GetRouteTypeName(type);
             sb.AppendLine(CultureInfo.InvariantCulture, $"@page \"/docs/api/{routeName}\"");
             sb.AppendLine();
-            sb.AppendLine(CultureInfo.InvariantCulture, $"<PageTitle>{EscapeHtml(type.Name)} {type.Kind} - Radzen Blazor Components</PageTitle>");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"<PageTitle>{EscapeHtml(type.Name)} {type.Kind} - Radzen Blazor API Reference</PageTitle>");
+            AppendMetaDescription(sb, DescribeType(type));
             sb.AppendLine();
 
             var tocItems = new List<(string Id, string Text, int Level)>();
