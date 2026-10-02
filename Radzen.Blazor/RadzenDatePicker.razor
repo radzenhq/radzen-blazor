@@ -148,7 +148,7 @@
                                             }
                                         </div>
                                     }
-                                    <div class="rz-calendar-view-container" @onmouseleave="@(IsRange ? (Action)OnCalendarMouseLeave : null!)">
+                                    <div class="rz-calendar-view-container" @onmouseleave="@(IsRange ? EventCallback.Factory.Create<MouseEventArgs>(this, OnCalendarMouseLeave) : default(EventCallback<MouseEventArgs>))">
                                         <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")"
                                                role="grid" aria-label="@GetMonthTitle(visibleMonth)">
                                             <thead>
@@ -205,7 +205,7 @@
                                                                     aria-selected="@(IsDateSelected(date) ? "true" : "false")"
                                                                     aria-disabled="@(dateArgs.Disabled ? "true" : null)"
                                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
-                                                                    @onmouseover="@(IsRange && !cellDisabled ? (Action)(() => OnDayMouseOver(date)) : null!)"
+                                                                    @onmouseover="@(IsRange && !cellDisabled ? EventCallback.Factory.Create<MouseEventArgs>(this, () => OnDayMouseOver(date)) : default(EventCallback<MouseEventArgs>))"
                                                                     @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))"
                                                                     @onkeydown:preventDefault="preventKeyPress"
                                                                     @onkeydown:stopPropagation="stopKeydownPropagation">

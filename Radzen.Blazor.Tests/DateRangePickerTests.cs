@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -141,6 +142,30 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(2, inRange.Count);
             Assert.Equal("11", inRange[0].TextContent);
             Assert.Equal("12", inRange[1].TextContent);
+        }
+
+        [Fact]
+        public void DateRangePicker_Hover_Dispatches_With_Tracing_And_Skips_Disabled_Days()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            Microsoft.AspNetCore.Components.Infrastructure.ComponentsMetricsServiceCollectionExtensions.AddComponentsTracing(ctx.Services);
+
+            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            {
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.Min, new DateTime(2024, 1, 5));
+            });
+
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "10").ParentElement.Click());
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "13").ParentElement.MouseOver());
+            component.InvokeAsync(() => component.Find("div.rz-calendar-view-container").TriggerEvent("onmouseleave", new MouseEventArgs()));
+
+            Assert.Empty(component.FindAll("td span.rz-calendar-range"));
+
+            var disabledDay = component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "2").ParentElement;
+            Assert.False(disabledDay.HasAttribute("blazor:onmouseover"));
         }
 
         [Fact]

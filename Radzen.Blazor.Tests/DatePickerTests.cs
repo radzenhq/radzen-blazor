@@ -2062,5 +2062,20 @@ namespace Radzen.Blazor.Tests
             var wrapper = component.Find("div.rz-calendar-view-container");
             Assert.Null(wrapper.GetAttribute("tabindex"));
         }
+
+        [Fact]
+        public void DatePicker_DoesNotRegister_RangeHoverHandlers_When_NotRange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters => parameters
+                .Add(p => p.Value, new DateTime(2024, 6, 12))
+                .Add(p => p.ShowTime, true));
+
+            Assert.DoesNotContain("blazor:onmouseover", component.Markup);
+            Assert.DoesNotContain("blazor:onmouseleave", component.Markup);
+        }
     }
 }
