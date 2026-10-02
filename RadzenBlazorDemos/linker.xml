@@ -13,6 +13,12 @@
 		<type fullname="System.Math" preserve="all"/>
 		<!-- Interpolated strings with alignment or format specifiers lower to AppendFormatted overloads the prebuilt demos do not all use, so the trimmer drops them and runtime-compiled demos fail to bind. -->
 		<type fullname="System.Runtime.CompilerServices.DefaultInterpolatedStringHandler" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncTaskMethodBuilder" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncVoidMethodBuilder" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1" preserve="all"/>
+			<type fullname="System.Runtime.CompilerServices.AsyncIteratorMethodBuilder" preserve="all"/>
 	</assembly>
 	<assembly fullname="System.ComponentModel.Annotations">
 		<type fullname="System.ComponentModel.DataAnnotations.DisplayAttribute" preserve="all"/>
