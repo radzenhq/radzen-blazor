@@ -25,6 +25,7 @@
 	</assembly>
 	<assembly fullname="Radzen.Blazor">
 		<type fullname="Radzen.Colors" preserve="all"/>
+		<type fullname="Radzen.MarkdownEditorCommands" preserve="all"/>
 	</assembly>
 </linker>
 

@@ -1,0 +1,3 @@
+<linker>
+	<assembly fullname="Radzen.Blazor" preserve="all"/>
+</linker>
