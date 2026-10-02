@@ -203,7 +203,8 @@ if (!app.Environment.IsDevelopment())
 var contentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
 {
     [".txt"] = "text/plain; charset=utf-8",
-    [".md"] = "text/markdown; charset=utf-8"
+    [".md"] = "text/markdown; charset=utf-8",
+    [".xml"] = "application/xml; charset=utf-8"
 });
 
 app.UseLinkHeaders(app.Environment);

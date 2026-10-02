@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 
 namespace RadzenBlazorDemos.Host;
@@ -24,7 +27,7 @@ public static class CanonicalRedirectMiddleware
         ["/docs/guides/components/breadcrumb.html"] = "/breadcrumb",
         ["/docs/guides/components/button.html"] = "/button",
         ["/docs/guides/components/carousel.html"] = "/carousel",
-        ["/docs/guides/components/chart.html"] = "/chart-series",
+        ["/docs/guides/components/chart.html"] = "/charts",
         ["/docs/guides/components/chat.html"] = "/chat",
         ["/docs/guides/components/checkbox.html"] = "/checkbox",
         ["/docs/guides/components/checkboxlist.html"] = "/checkboxlist",
@@ -90,8 +93,16 @@ public static class CanonicalRedirectMiddleware
         ["/docs/guides/components/tooltip.html"] = "/tooltip",
         ["/docs/guides/components/tree.html"] = "/tree",
         ["/docs/guides/components/upload.html"] = "/upload",
-        ["/example-upload"] = "/upload"
+        ["/example-upload"] = "/upload",
+        ["/export-excel-csv"] = "/datagrid-export"
     }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly FrozenSet<string> LowercaseRoutes = typeof(RadzenBlazorDemos.Routes).Assembly
+        .GetTypes()
+        .SelectMany(type => type.GetCustomAttributes<RouteAttribute>())
+        .Select(route => route.Template)
+        .Where(template => !template.Contains('{') && template == template.ToLowerInvariant())
+        .ToFrozenSet(StringComparer.Ordinal);
 
     public static IApplicationBuilder UseCanonicalRedirects(this IApplicationBuilder app)
     {
@@ -132,6 +143,25 @@ public static class CanonicalRedirectMiddleware
 
         if (TryStripApiHtmlExtension(path, out targetPath))
         {
+            return true;
+        }
+
+        if (TryLowercaseRoute(path, out targetPath))
+        {
+            return true;
+        }
+
+        targetPath = string.Empty;
+        return false;
+    }
+
+    private static bool TryLowercaseRoute(string path, out string targetPath)
+    {
+        var lowercase = path.ToLowerInvariant();
+
+        if (lowercase != path && LowercaseRoutes.Contains(lowercase))
+        {
+            targetPath = lowercase;
             return true;
         }
 

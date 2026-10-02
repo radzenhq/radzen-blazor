@@ -21,14 +21,14 @@
     </div>
 }
 
-@if (Example?.Related != null && Example.Related.Any())
+@if (relatedLinks.Any())
 {
     <div class="rz-mt-8">
         <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Related</RadzenText>
         <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem">
-            @foreach (var path in Example.Related)
+            @foreach (var link in relatedLinks)
             {
-                <RadzenLink Path="@($"/{path.TrimStart('/')}")" Text="@ExampleService.NameFor(path)" />
+                <RadzenLink Path="@link.Path" Text="@link.Text" />
             }
         </RadzenStack>
     </div>
@@ -38,9 +38,23 @@
     [Parameter] public Example Example { get; set; }
 
     string scriptHtml;
+    List<(string Path, string Text)> relatedLinks = new();
 
     protected override void OnParametersSet()
     {
+        relatedLinks = new();
+
+        var path = Example?.Path?.TrimStart('/');
+        if (!string.IsNullOrEmpty(path) && ExampleService.GetChartPages().Concat(ExampleService.GetChartConfigPages()).Any(e => e.Path.TrimStart('/') == path))
+        {
+            relatedLinks.Add(("/charts", "All Blazor Charts"));
+        }
+
+        if (Example?.Related != null)
+        {
+            relatedLinks.AddRange(Example.Related.Select(related => ($"/{related.TrimStart('/')}", ExampleService.NameFor(related))));
+        }
+
         // Default JsonSerializer escapes < > & to \uXXXX, so the JSON cannot break out of the
         // script element. Wrapping the whole tag in the MarkupString keeps the type attribute
         // raw (the dynamic-component path otherwise renders it as application/ld&#x2B;json).
