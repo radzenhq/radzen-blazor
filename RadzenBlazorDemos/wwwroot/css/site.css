@@ -583,7 +583,7 @@ svg.illustration {
 .rz-app-loading {
     position: fixed;
     inset: 0;
-    background: var(--rz-base-background-color);
+    background: var(--rz-body-background-color);
     z-index: 1000;
     overflow: hidden;
     display: flex;
