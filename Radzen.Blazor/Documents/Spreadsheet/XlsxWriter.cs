@@ -2377,7 +2377,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         if (quotePrefix)
         {
             xfElement.Add(new XAttribute("quotePrefix", "1"));
-            xfElement.Add(new XAttribute("applyQuotePrefix", "1"));
         }
 
         styleTracker.CellXfsElement.Add(xfElement);

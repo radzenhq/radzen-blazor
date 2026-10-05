@@ -106,6 +106,6 @@ public class XlsxWriterCellFormatTests
         var xf = CellFormat(Save(workbook), "A1");
 
         Assert.Equal("1", (string?)xf.Attribute("quotePrefix"));
-        Assert.Equal("1", (string?)xf.Attribute("applyQuotePrefix"));
+        Assert.Null(xf.Attribute("applyQuotePrefix"));
     }
 }
