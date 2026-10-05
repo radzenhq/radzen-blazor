@@ -47,7 +47,8 @@
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
         var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
-        var columns = BuildHourColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture);
+        var dateFormat = GanttHeaderDateFormat.Resolve(Gantt?.HeaderDateFormat, culture);
+        var columns = BuildHourColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture, dateFormat);
         var timelineWidth = columns.Sum(c => c.WidthPx);
 
         Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
@@ -76,12 +77,12 @@
         </CascadingValue>;
     }
 
-    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildHourColumns(DateTime start, DateTime end, int hourWidth, CultureInfo culture)
+    internal static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildHourColumns(DateTime start, DateTime end, int hourWidth, CultureInfo culture, string dateFormat)
     {
         var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
         for (var d = start.Date; d < end.Date; d = d.AddDays(1))
         {
-            var dayLabel = d.ToString("ddd M/d", culture);
+            var dayLabel = $"{d.ToString("ddd", culture)} {d.ToString(dateFormat, culture)}";
             for (var h = 0; h < 24; h++)
             {
                 var hourStart = d.AddHours(h);

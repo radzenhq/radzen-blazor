@@ -269,10 +269,12 @@ namespace Radzen.Blazor
         public int YearsInView { get; set; } = 3;
 
         /// <summary>
-        /// Date format for header cells.
+        /// Date format for the day labels of the Day zoom and the week range labels of the Month zoom.
+        /// When not set, the short date pattern of <see cref="RadzenComponent.Culture"/> without its year part is used,
+        /// for example <c>M/d</c> for en-US and <c>dd/MM</c> for en-GB.
         /// </summary>
         [Parameter]
-        public string HeaderDateFormat { get; set; } = "dd MMM";
+        public string? HeaderDateFormat { get; set; }
 
         /// <summary>
         /// Raised when a task bar is clicked.
@@ -1662,7 +1664,21 @@ namespace Radzen.Blazor
         internal string GetViewButtonCssClass(ISchedulerView view)
         {
             var isActive = scheduler?.SelectedView == view;
-            return isActive ? " rz-state-active" : string.Empty;
+            var zoomClass = GetZoomForView(view) is GanttZoomLevel zoom ? $"rz-gantt-view-{zoom.ToString().ToLowerInvariant()}" : string.Empty;
+            return isActive ? $"{zoomClass} rz-state-active".Trim() : zoomClass;
+        }
+
+        private GanttZoomLevel? GetZoomForView(ISchedulerView view)
+        {
+            return view switch
+            {
+                _ when view == dayView => GanttZoomLevel.Day,
+                _ when view == weekView => GanttZoomLevel.Week,
+                _ when view == monthView => GanttZoomLevel.Month,
+                _ when view == yearView => GanttZoomLevel.Year,
+                _ when view == yearsView => GanttZoomLevel.Years,
+                _ => null
+            };
         }
 
         internal async Task OnGanttChangeView(ISchedulerView view)
