@@ -69,14 +69,18 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void MinAndMax_AreNotRounded()
+        public void MinAndMax_AreNotRoundedAndDivideTheRangeEvenly()
         {
             var scale = Scale(4210, 13030, 250);
 
             scale.Resize(0, 13030);
 
-            Assert.Equal((0, 13030, 4344), scale.Ticks(TickDistance));
-            Assert.Equal(new double[] { 0, 4344, 8688 }, TickValues(scale));
+            Assert.Equal((0, 13030, 13030 / 3.0), scale.Ticks(TickDistance));
+            Assert.Collection(TickValues(scale),
+                tick => Assert.Equal(0, tick),
+                tick => Assert.Equal(13030 / 3.0, tick, 6),
+                tick => Assert.Equal(2 * 13030 / 3.0, tick, 6),
+                tick => Assert.Equal(13030, tick));
         }
 
         [Fact]
@@ -187,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ColumnWithMinAndMax_KeepsBoth()
         {
-            Assert.Equal("0|4344|8688", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
+            Assert.Equal("0|4343.33333333333|8686.66666666666|13030", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
         }
 
         [Fact]

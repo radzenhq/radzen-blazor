@@ -116,7 +116,7 @@ namespace Radzen.Blazor.Tests
 
             scale.Resize(0, 394000);
 
-            Assert.Equal((0, 394000, 131334), scale.Ticks(TickDistance));
+            Assert.Equal((0, 394000, 394000 / 3.0), scale.Ticks(TickDistance));
         }
 
         [Fact]

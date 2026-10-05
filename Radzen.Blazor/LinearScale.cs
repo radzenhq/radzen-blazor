@@ -120,7 +120,7 @@ namespace Radzen.Blazor
 
             var range = end - start;
 
-            var step = Round ? NiceNumber(range / ticks, true) : Math.Ceiling(range / ticks);
+            var step = Round ? NiceNumber(range / ticks, true) : range / ticks;
 
             if (Step != null)
             {

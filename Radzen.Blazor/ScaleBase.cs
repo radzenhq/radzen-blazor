@@ -72,9 +72,12 @@ namespace Radzen.Blazor
                 yield break;
             }
 
-            for (var value = (decimal)start; value <= (decimal)end; value += (decimal)step)
+            var intervals = Math.Round((end - start) / step, 9);
+            var count = (long)Math.Floor(intervals);
+
+            for (var index = 0L; index <= count; index++)
             {
-                yield return (double)value;
+                yield return index == count && intervals == count ? end : (double)((decimal)start + index * (decimal)step);
             }
         }
 
