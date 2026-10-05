@@ -1392,6 +1392,20 @@ public class SpreadsheetTests
         Assert.Equal(300, sheet.Columns[0]);
     }
 
+    [Fact]
+    public void Dispose_DestroysVirtualItemContainer()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
+
+        Assert.Single(ctx.JSInterop.Invocations["Radzen.createVirtualItemContainer"]);
+        Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.destroyVirtualItemContainer");
+
+        ctx.DisposeComponents();
+
+        Assert.Single(ctx.JSInterop.Invocations["Radzen.destroyVirtualItemContainer"]);
+    }
+
     private static class EventCallbackFactory
     {
         // Bunit doesn't expose Microsoft.AspNetCore.Components.EventCallbackFactory directly,

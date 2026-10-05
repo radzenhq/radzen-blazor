@@ -8347,13 +8347,15 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
   var scrollHeight = scrollable.scrollHeight;
   var scrollWidth = scrollable.scrollWidth;
 
-  content.addEventListener('mousewheel', function (e) {
+  function onWheel(e) {
     scrollable.scrollBy({
       top: e.deltaY,
       left: e.deltaX
     });
     e.preventDefault();
-  });
+  }
+
+  content.addEventListener('mousewheel', onWheel);
 
   var rtl = Radzen.isRTL(scrollable);
 
@@ -8377,22 +8379,36 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
     });
   }
 
-  scrollable.addEventListener('scroll', function () {
+  function onScroll() {
     if (!inflight) {
       notifyScroll();
     }
-  });
+  }
+
+  scrollable.addEventListener('scroll', onScroll);
 
   var observer = new ResizeObserver(function () {
     const height = scrollable.clientHeight;
     const width = scrollable.clientWidth;
 
-    ref.invokeMethodAsync('OnResize', width, height);
+    try { suppressDisposed(ref.invokeMethodAsync('OnResize', width, height)); } catch { }
   });
 
   observer.observe(scrollable);
 
+  scrollable.rzVirtualItemDispose = function () {
+    observer.disconnect();
+    scrollable.removeEventListener('scroll', onScroll);
+    content.removeEventListener('mousewheel', onWheel);
+    delete scrollable.rzVirtualItemDispose;
+  };
+
   return { width, height, scrollHeight, scrollWidth };
+};
+Radzen.destroyVirtualItemContainer = (scrollable) => {
+  if (scrollable && scrollable.rzVirtualItemDispose) {
+    scrollable.rzVirtualItemDispose();
+  }
 };
 Radzen.scrollElementTo = (scrollable, left, top) => {
   scrollable.scrollTo({ top: top, left: Radzen.isRTL(scrollable) ? -left : left });
