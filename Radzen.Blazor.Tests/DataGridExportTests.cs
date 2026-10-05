@@ -300,7 +300,8 @@ public class DataGridExportTests
             "rgb(242, 244, 247)",
             "1px solid rgb(200, 205, 210)",
             "none",
-            "0.875rem"
+            "0.875rem",
+            "ltr"
         });
         var rows = Enumerable.Range(1, 2).Select(index => new ExportRow(index, $"Row {index}", index, new DateTime(2024, 1, index), $"X{index}")).ToArray();
         var component = RenderGrid(context, rows);
@@ -334,6 +335,56 @@ public class DataGridExportTests
         Assert.Null(sheet.Cells[1, 0].Format.BackgroundColor);
         Assert.Null(sheet.Cells[1, 0].Format.BorderBottom);
         Assert.Null(sheet.Cells[1, 0].Format.FontSize);
+    }
+
+    [Fact]
+    public async Task ToWorkbookAsync_FollowsTheRightToLeftDirectionOfTheGrid()
+    {
+        using var context = CreateContext();
+        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { null, null, null, null, null, null, null, null, "rtl" });
+        var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
+
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync());
+
+        Assert.True(workbook.Sheets[0].RightToLeft);
+    }
+
+    [Fact]
+    public async Task ToWorkbookAsync_IsLeftToRightForALeftToRightGrid()
+    {
+        using var context = CreateContext();
+        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { null, null, null, null, null, null, null, null, "ltr" });
+        var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
+
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync());
+
+        Assert.False(workbook.Sheets[0].RightToLeft);
+    }
+
+    [Fact]
+    public async Task ToWorkbookAsync_RightToLeftOptionOverridesTheGridDirection()
+    {
+        using var context = CreateContext();
+        var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
+
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions { RightToLeft = true, UseTheme = false }));
+
+        Assert.True(workbook.Sheets[0].RightToLeft);
+        Assert.Empty(context.JSInterop.Invocations["Radzen.cssVariables"]);
+    }
+
+    [Fact]
+    public async Task ToWorkbookAsync_ReadsOnlyTheDirectionWhenThemeDisabled()
+    {
+        using var context = CreateContext();
+        context.JSInterop.Setup<string[]>("Radzen.cssVariables", _ => true).SetResult(new[] { "rtl" });
+        var component = RenderGrid(context, new[] { new ExportRow(1, "Alpha", 1m, DateTime.Today, "X") });
+
+        var workbook = await component.InvokeAsync(() => component.Instance.ToWorkbookAsync(new DataGridExcelExportOptions { UseTheme = false }));
+
+        Assert.True(workbook.Sheets[0].RightToLeft);
+        var invocation = Assert.Single(context.JSInterop.Invocations["Radzen.cssVariables"]);
+        Assert.Equal(new[] { "direction" }, Assert.IsAssignableFrom<IEnumerable<string>>(invocation.Arguments[1]));
     }
 
     private static TestContext CreateContext()

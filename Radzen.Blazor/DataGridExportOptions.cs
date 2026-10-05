@@ -88,6 +88,10 @@ public class DataGridExportProgress
 /// </summary>
 public class DataGridExcelExportOptions : DataGridExportOptions
 {
+    /// <summary>
+    /// Gets or sets whether the exported worksheet is displayed right to left. When <c>null</c>, the export follows the direction of the rendered grid.
+    /// </summary>
+    public bool? RightToLeft { get; set; }
 }
 
 /// <summary>

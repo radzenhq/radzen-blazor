@@ -1355,6 +1355,11 @@ class XlsxWriter(Workbook sourceWorkbook)
         var sheetView = new XElement(ns + "sheetView",
             new XAttribute("workbookViewId", "0"));
 
+        if (sheet.RightToLeft)
+        {
+            sheetView.Add(new XAttribute("rightToLeft", "1"));
+        }
+
         if (sheet.Columns.Frozen != 0 || sheet.Rows.Frozen != 0)
         {
             sheetView.Add(new XElement(ns + "pane",

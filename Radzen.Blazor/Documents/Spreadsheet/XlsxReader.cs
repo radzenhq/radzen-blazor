@@ -500,7 +500,7 @@ static class XlsxReader
 
         var defaultRowHeight = ParseDefaultRowHeight(sheetDoc, sNs);
 
-        ParseFrozenPanes(sheetDoc, sNs, sheet);
+        ParseSheetView(sheetDoc, sNs, sheet);
 
         ParseColumnWidths(sheetDoc, sNs, sheet, styleInfo);
 
@@ -590,11 +590,14 @@ static class XlsxReader
         return defaultRowHeight;
     }
 
-    private static void ParseFrozenPanes(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
+    private static void ParseSheetView(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
         if (sheetView is not null)
         {
+            var rightToLeft = sheetView.Attribute("rightToLeft")?.Value;
+            sheet.RightToLeft = rightToLeft == "1" || rightToLeft == "true";
+
             var pane = sheetView.Element(sNs + "pane");
             if (pane is not null)
             {

@@ -83,6 +83,10 @@ public partial class Worksheet
     /// </summary>
     public SheetProtection Protection { get; set; } = new();
     /// <summary>
+    /// Gets or sets whether the sheet is displayed right to left, with column A on the right. Saved as the <c>rightToLeft</c> attribute of the xlsx sheet view.
+    /// </summary>
+    public bool RightToLeft { get; set; }
+    /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
     public string Name

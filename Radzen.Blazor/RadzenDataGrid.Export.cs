@@ -74,7 +74,7 @@ namespace Radzen.Blazor
             ValidateOptions(options);
             var escapeFormulas = (options as DataGridCsvExportOptions)?.EscapeFormulas == true;
             var columns = GetExportColumns();
-            var theme = formattedStrings ? null : await GetExportThemeAsync(options);
+            var (theme, rightToLeft) = await GetExportStyleAsync(options);
             var headerBackground = ToHexColor(theme?.HeaderBackground);
             var headerColor = ToHexColor(theme?.HeaderColor);
             var rowBackground = ToHexColor(theme?.RowBackground);
@@ -86,6 +86,7 @@ namespace Radzen.Blazor
             var fontSize = ParseCssLength(theme?.FontSize);
             var workbook = new Workbook { Culture = Culture };
             var sheet = workbook.AddSheet(GetSheetName(options.Title), 1, columns.Count);
+            sheet.RightToLeft = rightToLeft;
             sheet.BeginUpdate();
             try
             {
@@ -343,35 +344,48 @@ namespace Radzen.Blazor
             };
         }
 
-        private async Task<DataGridExportTheme?> GetExportThemeAsync(DataGridExportOptions options)
+        private async Task<(DataGridExportTheme? Theme, bool RightToLeft)> GetExportStyleAsync(DataGridExportOptions options)
         {
-            if (!options.UseTheme || JSRuntime == null)
+            var excelOptions = options as DataGridExcelExportOptions;
+            var rightToLeft = excelOptions?.RightToLeft ?? false;
+            var readTheme = excelOptions != null && options.UseTheme;
+            var readDirection = excelOptions != null && excelOptions.RightToLeft == null;
+            if ((!readTheme && !readDirection) || JSRuntime == null)
             {
-                return null;
+                return (null, rightToLeft);
             }
 
-            var rowBackgroundVariable = AllowAlternatingRows ? "--rz-grid-stripe-odd-background-color" : "--rz-grid-background-color";
-            var alternatingRowBackgroundVariable = AllowAlternatingRows ? "--rz-grid-stripe-background-color" : "--rz-grid-background-color";
+            var names = new List<string>();
+            if (readTheme)
+            {
+                names.Add("--rz-grid-header-background-color");
+                names.Add("--rz-grid-header-color");
+                names.Add(AllowAlternatingRows ? "--rz-grid-stripe-odd-background-color" : "--rz-grid-background-color");
+                names.Add("--rz-grid-cell-color");
+                names.Add(AllowAlternatingRows ? "--rz-grid-stripe-background-color" : "--rz-grid-background-color");
+                names.Add("--rz-grid-bottom-cell-border");
+                names.Add("--rz-grid-right-cell-border");
+                names.Add("--rz-grid-cell-font-size");
+            }
+            if (readDirection)
+            {
+                names.Add("direction");
+            }
+
             try
             {
-                var values = await JSRuntime.InvokeAsync<string?[]?>("Radzen.cssVariables", Element, new[]
+                var values = await JSRuntime.InvokeAsync<string?[]?>("Radzen.cssVariables", Element, names);
+                if (values == null || values.Length < names.Count)
                 {
-                    "--rz-grid-header-background-color",
-                    "--rz-grid-header-color",
-                    rowBackgroundVariable,
-                    "--rz-grid-cell-color",
-                    alternatingRowBackgroundVariable,
-                    "--rz-grid-bottom-cell-border",
-                    "--rz-grid-right-cell-border",
-                    "--rz-grid-cell-font-size"
-                });
-
-                if (values == null || values.Length < 8)
-                {
-                    return null;
+                    return (null, rightToLeft);
                 }
 
-                return new DataGridExportTheme
+                if (readDirection)
+                {
+                    rightToLeft = values[names.Count - 1] == "rtl";
+                }
+
+                var theme = readTheme ? new DataGridExportTheme
                 {
                     HeaderBackground = values[0],
                     HeaderColor = values[1],
@@ -381,11 +395,13 @@ namespace Radzen.Blazor
                     HorizontalBorder = values[5],
                     VerticalBorder = values[6],
                     FontSize = values[7]
-                };
+                } : null;
+
+                return (theme, rightToLeft);
             }
             catch (Exception exception) when (exception is JSException or InvalidOperationException or ArgumentException or JSDisconnectedException or TaskCanceledException)
             {
-                return null;
+                return (null, rightToLeft);
             }
         }
 
