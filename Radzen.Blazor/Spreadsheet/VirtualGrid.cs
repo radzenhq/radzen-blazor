@@ -650,29 +650,12 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         return !anyVisibleColumn;
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    ValueTask IAsyncDisposable.DisposeAsync()
     {
         worksheetBinding.Dispose();
-
-        if (reference != null)
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("Radzen.destroyVirtualItemContainer", scrollable);
-            }
-            catch (JSDisconnectedException)
-            {
-            }
-            catch (InvalidOperationException)
-            {
-            }
-            catch (TaskCanceledException)
-            {
-            }
-        }
-
         reference?.Dispose();
-        reference = null;
+
+        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc/>
