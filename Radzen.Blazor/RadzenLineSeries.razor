@@ -18,7 +18,10 @@
     var valueNullable = IsValueNullable();
     var rawValueGetter = valueNullable ? GetRawValueGetter() : null;
 
-    var data = Items.Select(item =>
+    var chart = RequireChart();
+    var animate = chart.AnimateDataUpdates;
+
+    IList<Point<TItem>> data = Items.Select(item =>
     {
       var x = category(item);
       var y = valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item);
@@ -26,17 +29,20 @@
       return new Point<TItem> { X = x, Y = y, Data = item };
     }).ToList();
 
-    var chart = RequireChart();
+    if (!animate)
+    {
+      data = ClipToPlotRange(data, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
+    }
+
     var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
     var index = chart.Series.IndexOf(this);
     var className = $"rz-line-series rz-series-{index}";
 
     return
     @<g class="@className">
-      @if (Items.Any())
+      @if (data.Count > 0)
       {
         var path = $"M {pathGenerator.Path(data)}";
-        var animate = chart.AnimateDataUpdates;
         var key = animate ? $"animated-{LineType}" : $"{path}-{LineType}";
         <Path @key=@key Style="@style" D="@path" StrokeWidth="@StrokeWidth" Stroke="@Stroke" LineType="@LineType" Fill="none" Transition="@animate" />
       }

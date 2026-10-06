@@ -1287,11 +1287,11 @@ namespace Radzen.Blazor
         /// Invoked via interop when the user scrolls the mouse wheel over the chart. Zooms in or out.
         /// </summary>
         /// <param name="x">The mouse X position relative to the chart element.</param>
-        /// <param name="delta">Positive to zoom out, negative to zoom in.</param>
+        /// <param name="delta">Positive to zoom out, negative to zoom in. Its magnitude is the number of wheel steps to apply at once.</param>
         [JSInvokable]
         public async Task OnWheel(double x, int delta)
         {
-            if (!AllowZoom)
+            if (!AllowZoom || delta == 0)
             {
                 return;
             }
@@ -1303,7 +1303,7 @@ namespace Radzen.Blazor
             }
 
             var fraction = Math.Clamp((x - MarginLeft) / plotWidth, 0, 1);
-            var zoomFactor = delta < 0 ? 0.8 : 1.25;
+            var zoomFactor = Math.Pow(delta < 0 ? 0.8 : 1.25, Math.Abs(delta));
             var range = ZoomEnd - ZoomStart;
             var newRange = Math.Clamp(range * zoomFactor, 0.01, 1.0);
 

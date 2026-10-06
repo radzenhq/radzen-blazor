@@ -4616,6 +4616,46 @@ window.Radzen = {
       }
     };
 
+    var zoomPanBusy = false;
+    var pendingPan = null;
+    var pendingWheelX = 0;
+    var pendingWheelSteps = 0;
+
+    function flushZoomPan() {
+      if (zoomPanBusy) return;
+      var promise;
+      if (pendingWheelSteps !== 0) {
+        var steps = pendingWheelSteps;
+        var wheelX = pendingWheelX;
+        pendingWheelSteps = 0;
+        try { promise = instance.invokeMethodAsync('OnWheel', wheelX, steps); } catch { return; }
+      } else if (pendingPan !== null) {
+        var position = pendingPan;
+        pendingPan = null;
+        try { promise = instance.invokeMethodAsync('OnPan', position); } catch { return; }
+      } else {
+        return;
+      }
+      zoomPanBusy = true;
+      var done = function () { zoomPanBusy = false; flushZoomPan(); };
+      if (promise && typeof promise.then === 'function') {
+        promise.then(done, done);
+      } else {
+        done();
+      }
+    }
+
+    function queuePan(position) {
+      pendingPan = position;
+      flushZoomPan();
+    }
+
+    function queueWheel(x, steps) {
+      pendingWheelX = x;
+      pendingWheelSteps += steps;
+      flushZoomPan();
+    }
+
     ref.wheelHandler = function (e) {
       if (!inside || ref.dataset.allowZoom !== 'true') return;
       var delta = e.deltaY > 0 ? 1 : -1;
@@ -4625,7 +4665,7 @@ window.Radzen = {
       e.preventDefault();
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
-      try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, delta)); } catch {}
+      queueWheel(x, delta);
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
@@ -4706,7 +4746,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      queuePan(position);
     };
     document.addEventListener('mousemove', ref.scrollbarMoveHandler);
 
@@ -4724,7 +4764,7 @@ window.Radzen = {
       var clickX = isChartRTL() ? trackRect.right - e.clientX : e.clientX - trackRect.left;
       var thumbWidth = thumb.offsetWidth;
       var position = Math.max(0, Math.min(1 - thumbWidth / track.offsetWidth, (clickX - thumbWidth / 2) / track.offsetWidth));
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      queuePan(position);
     });
 
     // Touch support for scrollbar drag
@@ -4749,7 +4789,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      queuePan(position);
       e.preventDefault();
     };
     document.addEventListener('touchmove', ref.scrollbarTouchMoveHandler, { passive: false });
@@ -4764,6 +4804,7 @@ window.Radzen = {
     var pinchActive = false;
     var touchPanning = false;
     var touchPanStartX = 0;
+    var touchPanPos = null;
 
     ref.touchStartHandler = function (e) {
       if (e.touches.length === 2) {
@@ -4778,6 +4819,7 @@ window.Radzen = {
         // Single-finger on chart area: pan
         touchPanning = true;
         touchPanStartX = e.touches[0].clientX;
+        touchPanPos = null;
       }
     };
     ref.addEventListener('touchstart', ref.touchStartHandler, { passive: false });
@@ -4794,10 +4836,10 @@ window.Radzen = {
         var x = midX - rect.left;
         var ratio = currentDistance / pinchStartDistance;
         if (ratio > 1.05) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, -1)); } catch {}
+          queueWheel(x, -1);
           pinchStartDistance = currentDistance;
         } else if (ratio < 0.95) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, 1)); } catch {}
+          queueWheel(x, 1);
           pinchStartDistance = currentDistance;
         }
         e.preventDefault();
@@ -4810,12 +4852,14 @@ window.Radzen = {
         var thumb = ref.querySelector('.rz-chart-scrollbar-thumb');
         if (!thumb) return;
         var thumbWidth = parseFloat(thumb.style.width) || 50;
-        var currentPos = getThumbPos(thumb);
+        var currentPos = touchPanPos !== null ? touchPanPos : getThumbPos(thumb);
         // Swipe in reading direction = move view backward, swipe against = move view forward
         var deltaPercent = (isChartRTL() ? dx : -dx) / chartWidth * 100;
         var newPos = Math.max(0, Math.min(100 - thumbWidth, currentPos + deltaPercent));
+        touchPanPos = newPos;
+        setThumbPos(thumb, newPos);
         var position = newPos / 100;
-        try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+        queuePan(position);
         touchPanStartX = e.touches[0].clientX;
         e.preventDefault();
       }

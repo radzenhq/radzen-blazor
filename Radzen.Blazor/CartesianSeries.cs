@@ -95,6 +95,153 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Returns the plot-relative pixel range a scale maps to: <see cref="ScaleBase.Scale(double, bool)"/> yields
+        /// coordinates from 0 to <see cref="ScaleBase.OutputSize"/> regardless of the direction of the scale.
+        /// Returns <c>false</c> when the scale has not been laid out yet and has no pixel extent.
+        /// </summary>
+        /// <param name="scale">The scale to read.</param>
+        /// <param name="start">The smaller pixel coordinate, always 0.</param>
+        /// <param name="end">The larger pixel coordinate.</param>
+        protected static bool TryGetPlotRange(ScaleBase scale, out double start, out double end)
+        {
+            ArgumentNullException.ThrowIfNull(scale);
+
+            start = 0;
+            end = scale.OutputSize;
+
+            return !double.IsNaN(end) && end > 0;
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> when the band <c>[position, position + size]</c> (plus the stroke width on both sides)
+        /// overlaps the pixel range <c>[start, end]</c>, so a column or bar outside the zoomed view can be skipped.
+        /// </summary>
+        protected static bool BandIntersects(double position, double size, double strokeWidth, double start, double end)
+        {
+            var low = Math.Min(position, position + size) - strokeWidth;
+            var high = Math.Max(position, position + size) + strokeWidth;
+
+            return !double.IsNaN(low) && !double.IsNaN(high) && high >= start && low <= end;
+        }
+
+        /// <summary>
+        /// Returns the points a line needs in order to draw the part of it that falls inside the pixel range of
+        /// <paramref name="scale"/>: every point whose segment to its neighbor reaches the range, plus
+        /// <paramref name="neighbors"/> additional points on each side so the curve tangents at the edges do not change.
+        /// Returns the original list when every point is needed.
+        /// </summary>
+        /// <param name="points">The points in series order.</param>
+        /// <param name="scale">The category scale whose <see cref="ScaleBase.Output"/> is the visible pixel range.</param>
+        /// <param name="neighbors">How many extra points to keep beyond the last point whose segment is visible.</param>
+        protected static IList<Point<TItem>> ClipToPlotRange(IList<Point<TItem>> points, ScaleBase scale, int neighbors)
+        {
+            ArgumentNullException.ThrowIfNull(points);
+
+            var count = points.Count;
+
+            if (count == 0 || !TryGetPlotRange(scale, out var start, out var end))
+            {
+                return points;
+            }
+
+            var keep = new bool[count];
+            var kept = 0;
+
+            for (var i = 0; i < count; i++)
+            {
+                var x = points[i].X;
+
+                if (x >= start && x <= end)
+                {
+                    if (!keep[i])
+                    {
+                        keep[i] = true;
+                        kept++;
+                    }
+                }
+
+                if (i > 0)
+                {
+                    var previous = points[i - 1].X;
+
+                    if (Math.Max(previous, x) >= start && Math.Min(previous, x) <= end)
+                    {
+                        if (!keep[i - 1])
+                        {
+                            keep[i - 1] = true;
+                            kept++;
+                        }
+
+                        if (!keep[i])
+                        {
+                            keep[i] = true;
+                            kept++;
+                        }
+                    }
+                }
+            }
+
+            if (neighbors > 0 && kept > 0 && kept < count)
+            {
+                var expanded = new bool[count];
+                var lastKept = int.MinValue;
+
+                for (var i = 0; i < count; i++)
+                {
+                    if (keep[i])
+                    {
+                        lastKept = i;
+                    }
+
+                    expanded[i] = lastKept != int.MinValue && i - lastKept <= neighbors;
+                }
+
+                lastKept = int.MaxValue;
+
+                for (var i = count - 1; i >= 0; i--)
+                {
+                    if (keep[i])
+                    {
+                        lastKept = i;
+                    }
+
+                    if (!expanded[i] && lastKept != int.MaxValue && lastKept - i <= neighbors)
+                    {
+                        expanded[i] = true;
+                    }
+                }
+
+                keep = expanded;
+                kept = 0;
+
+                for (var i = 0; i < count; i++)
+                {
+                    if (keep[i])
+                    {
+                        kept++;
+                    }
+                }
+            }
+
+            if (kept == count)
+            {
+                return points;
+            }
+
+            var result = new List<Point<TItem>>(kept);
+
+            for (var i = 0; i < count; i++)
+            {
+                if (keep[i])
+                {
+                    result.Add(points[i]);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Returns true if the ValueProperty type is nullable.
         /// </summary>
         protected bool IsValueNullable()

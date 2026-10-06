@@ -15,13 +15,20 @@
 
     var pathGenerator = GetPathGenerator();
 
-    var data = Items.Select(item =>
+    var animate = chart.AnimateDataUpdates;
+
+    IList<Point<TItem>> data = Items.Select(item =>
     {
       var x = category(item);
       var y = value(item);
 
       return new Point<TItem> { X = x, Y = y, Data = item };
-    });
+    }).ToList();
+
+    if (!animate)
+    {
+      data = ClipToPlotRange(data, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
+    }
 
     var ticks = chart.CategoryScale.Ticks(chart.CategoryAxis.TickDistance);
     var index = chart.Series.IndexOf(this);
@@ -31,10 +38,10 @@
 
     return
     @<g class="@className">
-      @if (Items.Any())
+      @if (data.Count > 0)
       {
-        var x1 = category(Items.First()).ToInvariantString();
-        var x2 = category(Items.Last()).ToInvariantString();
+        var x1 = data[0].X.ToInvariantString();
+        var x2 = data[data.Count - 1].X.ToInvariantString();
         var vs = chart.GetValueScale(ValueAxisName);
         var va = chart.GetValueAxis(ValueAxisName);
         var valueTicks = vs.Ticks(va.TickDistance);
@@ -51,7 +58,7 @@
             // The StepGenerator's last V command creates a fold at the right edge
             // when the last value is higher than the previous, causing SVG's
             // nonzero winding rule to leave the transition area unfilled.
-            var dataList = data.ToList();
+            var dataList = data;
             var stepPath = new System.Text.StringBuilder();
 
             stepPath.Append($"{dataList[0].X.ToInvariantString()} {dataList[0].Y.ToInvariantString()}");
@@ -86,7 +93,6 @@
                 </linearGradient>
             </defs>
         }
-        var animate = chart.AnimateDataUpdates;
         var lineKey = animate ? $"animated-line-{LineType}" : line;
 
         @if (FillMode != FillMode.None)

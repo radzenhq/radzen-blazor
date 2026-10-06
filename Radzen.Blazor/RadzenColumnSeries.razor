@@ -30,11 +30,19 @@
         var groupStyle = $"--rz-zero-y: {y0.ToInvariantString()}px";
         var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
         var gradient = FillMode == FillMode.Gradient;
+        var cull = TryGetPlotRange(categoryScale, out var plotStart, out var plotEnd);
         return
         @<g class="@className" style="@groupStyle">
-            @foreach(var data in Items)
+            @for (var itemIndex = 0; itemIndex < Items.Count; itemIndex++)
             {
+                var data = Items[itemIndex];
                 var x = category(data) - groupWidth / 2 + index * (width + padding);
+
+                if (cull && !BandIntersects(x, width, StrokeWidth, plotStart, plotEnd))
+                {
+                    continue;
+                }
+
                 var y = value(data);
                 var itemValue = Value(data);
                 var radius = chart.ColumnOptions.Radius;
@@ -51,8 +59,8 @@
                 {
                     path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
+                var fill = PickColor(itemIndex, Fills, Fill, FillRange, itemValue);
+                var stroke = PickColor(itemIndex, Strokes, Stroke, StrokeRange, itemValue);
                 var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", itemValue < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
 
                 <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />

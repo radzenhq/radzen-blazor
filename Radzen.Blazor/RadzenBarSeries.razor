@@ -47,11 +47,19 @@
         var groupStyle = $"--rz-zero-x: {x0.ToInvariantString()}px";
         var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
         var gradient = FillMode == FillMode.Gradient;
+        var cull = TryGetPlotRange(chart.ValueScale, out var plotStart, out var plotEnd);
         return
         @<g class="@className" style="@groupStyle">
-            @foreach (var data in Items)
+            @for (var itemIndex = 0; itemIndex < Items.Count; itemIndex++)
             {
+                var data = Items[itemIndex];
                 var y = category(data) - groupHeight / 2 + index * (height + padding);
+
+                if (cull && !BandIntersects(y, height, StrokeWidth, plotStart, plotEnd))
+                {
+                    continue;
+                }
+
                 var x = value(data);
                 var itemValue = Value(data);
                 var radius = barOptions?.Radius ?? 0;
@@ -70,8 +78,8 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y + radius).ToInvariantString()} L {x.ToInvariantString()} {(y + height - radius).ToInvariantString()} A {r} {r} 0 0 0 {(x + radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y + height).ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
+                var fill = PickColor(itemIndex, Fills, Fill, FillRange, itemValue);
+                var stroke = PickColor(itemIndex, Strokes, Stroke, StrokeRange, itemValue);
                 var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", itemValue < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
 
                 <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
