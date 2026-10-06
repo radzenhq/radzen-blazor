@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 using CellXf = (int FontId, int FillId, int BorderId, Radzen.TextAlign? TextAlign,
@@ -491,10 +492,10 @@ static class XlsxReader
         }
 
         using var sheetStream = sheetEntry.Open();
-        var sheetDoc = XDocument.Load(sheetStream);
+        var (sheetDoc, sheetRows) = ReadSheet(sheetStream);
         var sNs = sheetDoc.Root!.Name.Namespace;
 
-        var (rows, columns) = ComputeSheetSize(sheetDoc, sNs);
+        var (rows, columns) = ComputeSheetSize(sheetDoc, sNs, sheetRows);
         var sheet = new Worksheet(rows, columns) { Name = sheetInfo.Name };
         sheet.BeginUpdate();
 
@@ -504,7 +505,7 @@ static class XlsxReader
 
         ParseColumnWidths(sheetDoc, sNs, sheet, styleInfo);
 
-        ParseRowsAndCells(sheetDoc, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
+        ParseRowsAndCells(sheetRows, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
 
         ParseMergedCells(sheetDoc, sNs, sheet);
 
@@ -526,7 +527,152 @@ static class XlsxReader
         return sheet;
     }
 
-    private static (int Rows, int Columns) ComputeSheetSize(XDocument sheetDoc, XNamespace sNs)
+    private sealed class SheetRow(string? index, string? height)
+    {
+        public string? Index { get; } = index;
+
+        public string? Height { get; } = height;
+
+        public List<SheetCell> Cells { get; } = [];
+    }
+
+    private readonly record struct SheetCell(string? Reference, string? Style, string? Type, string? Value, bool HasFormula, string? Formula, string? SharedIndex, XElement? InlineString);
+
+    private static (XDocument Document, List<SheetRow> Rows) ReadSheet(Stream stream)
+    {
+        var settings = new XmlReaderSettings
+        {
+            IgnoreWhitespace = true,
+            DtdProcessing = DtdProcessing.Parse,
+            MaxCharactersFromEntities = 10_000_000
+        };
+
+        using var reader = XmlReader.Create(stream, settings);
+        var rows = new List<SheetRow>();
+
+        reader.MoveToContent();
+
+        var ns = reader.NamespaceURI;
+        var root = new XElement(XName.Get(reader.LocalName, ns));
+        var document = new XDocument(root);
+
+        if (reader.IsEmptyElement)
+        {
+            return (document, rows);
+        }
+
+        reader.Read();
+
+        while (!reader.EOF && reader.NodeType != XmlNodeType.EndElement)
+        {
+            if (reader.NodeType != XmlNodeType.Element)
+            {
+                reader.Read();
+            }
+            else if (reader.LocalName == "sheetData" && reader.NamespaceURI == ns)
+            {
+                ReadChildren(reader, ns, "row", () => rows.Add(ReadRow(reader, ns)));
+            }
+            else
+            {
+                root.Add(XNode.ReadFrom(reader));
+            }
+        }
+
+        return (document, rows);
+    }
+
+    private static void ReadChildren(XmlReader reader, string ns, string name, Action read)
+    {
+        if (reader.IsEmptyElement)
+        {
+            reader.Read();
+            return;
+        }
+
+        var depth = reader.Depth;
+        reader.Read();
+
+        while (!reader.EOF && !(reader.NodeType == XmlNodeType.EndElement && reader.Depth == depth))
+        {
+            if (reader.NodeType != XmlNodeType.Element)
+            {
+                reader.Read();
+            }
+            else if (reader.LocalName == name && reader.NamespaceURI == ns)
+            {
+                read();
+            }
+            else
+            {
+                reader.Skip();
+            }
+        }
+
+        reader.Read();
+    }
+
+    private static SheetRow ReadRow(XmlReader reader, string ns)
+    {
+        var row = new SheetRow(reader.GetAttribute("r"), reader.GetAttribute("ht"));
+
+        ReadChildren(reader, ns, "c", () => row.Cells.Add(ReadCell(reader, ns)));
+
+        return row;
+    }
+
+    private static SheetCell ReadCell(XmlReader reader, string ns)
+    {
+        var reference = reader.GetAttribute("r");
+        var style = reader.GetAttribute("s");
+        var type = reader.GetAttribute("t");
+        string? value = null;
+        var hasFormula = false;
+        string? formula = null;
+        string? sharedIndex = null;
+        XElement? inlineString = null;
+
+        if (reader.IsEmptyElement)
+        {
+            reader.Read();
+            return new SheetCell(reference, style, type, value, hasFormula, formula, sharedIndex, inlineString);
+        }
+
+        var depth = reader.Depth;
+        reader.Read();
+
+        while (!reader.EOF && !(reader.NodeType == XmlNodeType.EndElement && reader.Depth == depth))
+        {
+            if (reader.NodeType != XmlNodeType.Element)
+            {
+                reader.Read();
+            }
+            else if (reader.NamespaceURI == ns && reader.LocalName == "v" && value is null)
+            {
+                value = reader.ReadElementContentAsString();
+            }
+            else if (reader.NamespaceURI == ns && reader.LocalName == "f" && !hasFormula)
+            {
+                hasFormula = true;
+                sharedIndex = reader.GetAttribute("si");
+                formula = reader.ReadElementContentAsString();
+            }
+            else if (reader.NamespaceURI == ns && reader.LocalName == "is" && inlineString is null)
+            {
+                inlineString = (XElement)XNode.ReadFrom(reader);
+            }
+            else
+            {
+                reader.Skip();
+            }
+        }
+
+        reader.Read();
+
+        return new SheetCell(reference, style, type, value, hasFormula, formula, sharedIndex, inlineString);
+    }
+
+    private static (int Rows, int Columns) ComputeSheetSize(XDocument sheetDoc, XNamespace sNs, List<SheetRow> sheetRows)
     {
         var maxRow = 1;
         var maxColumn = 1;
@@ -552,19 +698,18 @@ static class XlsxReader
 
         // The dimension element is optional and sometimes understated, so cross-check against the
         // actual row and cell references.
-        foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
+        foreach (var row in sheetRows)
         {
-            if (int.TryParse(rowElem.Attribute("r")?.Value, out var r))
+            if (int.TryParse(row.Index, out var r))
             {
                 maxRow = Math.Max(maxRow, r);
             }
 
-            foreach (var cellElem in rowElem.Elements(sNs + "c"))
+            foreach (var cell in row.Cells)
             {
-                var cellRef = cellElem.Attribute("r")?.Value;
-                if (!string.IsNullOrEmpty(cellRef))
+                if (!string.IsNullOrEmpty(cell.Reference))
                 {
-                    var address = CellRef.Parse(cellRef);
+                    var address = CellRef.Parse(cell.Reference);
                     maxRow = Math.Max(maxRow, address.Row + 1);
                     maxColumn = Math.Max(maxColumn, address.Column + 1);
                 }
@@ -671,21 +816,20 @@ static class XlsxReader
         }
     }
 
-    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    private static void ParseRowsAndCells(List<SheetRow> sheetRows, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
     {
         var sharedFormulas = new Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)>();
 
-        foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
+        foreach (var row in sheetRows)
         {
-            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, sharedFormulas);
+            ParseRow(row, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, sharedFormulas);
         }
     }
 
-    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
+    private static void ParseRow(SheetRow row, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
     {
-        var rowIndex = rowElem.Attribute("r")?.Value;
-        var rowHeight = rowElem.Attribute("ht")?.Value;
-        var customHeight = rowElem.Attribute("customHeight")?.Value;
+        var rowIndex = row.Index;
+        var rowHeight = row.Height;
 
         if (rowIndex is not null && int.TryParse(rowIndex, out var rowNum))
         {
@@ -708,49 +852,45 @@ static class XlsxReader
             }
         }
 
-        foreach (var cellElem in rowElem.Elements(sNs + "c"))
+        foreach (var cell in row.Cells)
         {
-            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings, sharedFormulas);
+            ParseCell(cell, sNs, sheet, styleInfo, sharedStrings, sharedFormulas);
         }
     }
 
-    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
+    private static void ParseCell(SheetCell cell, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
     {
-        var cellRef = cellElem.Attribute("r")!;
-
-        if (cellRef is null)
+        if (cell.Reference is null)
         {
             return;
         }
 
-        var address = CellRef.Parse(cellRef.Value);
+        var address = CellRef.Parse(cell.Reference);
 
-        var valueElem = cellElem.Element(sNs + "v");
-        var formulaElem = cellElem.Element(sNs + "f");
-        var inlineElem = cellElem.Element(sNs + "is");
+        var cellValue = cell.Value;
 
-        var style = ResolveStyle(cellElem, styleInfo);
+        var style = ResolveStyle(cell.Style, styleInfo);
 
-        if (valueElem is null && formulaElem is null && inlineElem is null)
+        if (cellValue is null && !cell.HasFormula && cell.InlineString is null)
         {
             ApplyCellStyle(sheet, address, styleInfo, style);
 
             return;
         }
 
-        var cellType = (string?)cellElem.Attribute("t") ?? "n";
+        var cellType = cell.Type ?? "n";
 
-        if (valueElem is null && inlineElem is not null)
+        if (cellValue is null && cell.InlineString is not null)
         {
-            valueElem = new XElement(sNs + "v", RstText(inlineElem, sNs));
+            cellValue = RstText(cell.InlineString, sNs);
 
             cellType = "inlineStr";
         }
 
-        var formulaValue = formulaElem?.Value;
+        var formulaValue = cell.Formula;
 
         // ECMA-376 part 1, 18.3.1.40 (shared formulas)
-        if (formulaElem is not null && formulaElem.Attribute("si")?.Value is string si)
+        if (cell.HasFormula && cell.SharedIndex is string si)
         {
             if (!string.IsNullOrEmpty(formulaValue))
             {
@@ -772,20 +912,20 @@ static class XlsxReader
             }
             sheet.Cells[address.Row, address.Column].Formula = formulaValue;
         }
-        else if (valueElem is not null)
+        else if (cellValue is not null)
         {
             // ECMA-376 part 1, 18.18.11 (t="b"), 22.9.2.19 (ST_Xstring)
             if (cellType == "b")
             {
                 sheet.Cells[address.Row, address.Column].Value =
-                    valueElem.Value is "1" || bool.TryParse(valueElem.Value, out var flag) && flag;
+                    cellValue is "1" || bool.TryParse(cellValue, out var flag) && flag;
             }
             else
             {
                 var value = cellType switch
                 {
-                    "s" => sharedStrings[Convert.ToInt32(valueElem!.Value, CultureInfo.InvariantCulture)],
-                    _ => valueElem!.Value
+                    "s" => sharedStrings[Convert.ToInt32(cellValue, CultureInfo.InvariantCulture)],
+                    _ => cellValue
                 };
 
                 // ECMA-376 part 1, 18.18.11 (ST_CellType) and 18.8.45 (quotePrefix)
@@ -803,8 +943,8 @@ static class XlsxReader
         ApplyCellStyle(sheet, address, styleInfo, style);
     }
 
-    private static CellXf? ResolveStyle(XElement cellElem, StyleInfo styleInfo) =>
-        cellElem.Attribute("s")?.Value is string styleId &&
+    private static CellXf? ResolveStyle(string? styleId, StyleInfo styleInfo) =>
+        styleId is not null &&
         styleInfo.CellStyles.TryGetValue(int.Parse(styleId, CultureInfo.InvariantCulture), out var found)
             ? found
             : null;
