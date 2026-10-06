@@ -39,7 +39,7 @@ public class FunctionArguments(Cell currentCell)
     public CellData? GetSingle(string parameterName)
     {
         var value = Get(parameterName);
-        return value as CellData;
+        return value as CellData ?? (value as LazyArgument)?.Value;
     }
 
     /// <summary>
@@ -52,6 +52,10 @@ public class FunctionArguments(Cell currentCell)
         var value = Get(parameterName);
         return value as List<CellData>;
     }
+
+    internal RangeReference? GetReference(string parameterName) => Get(parameterName) as RangeReference;
+
+    internal List<LazyArgument>? GetLazyGroups(string parameterName) => Get(parameterName) as List<LazyArgument>;
 
     /// <summary>
     /// Gets a sequence of CellData values for the specified parameter name.

@@ -28,6 +28,13 @@ static class CriteriaPairs
         for (var p = 0; p < pairCount; p++)
         {
             ranges[p] = groups[p * 2];
+
+            if (ranges[p] is not RangeList && ranges[p] is [{ IsError: true } rangeError])
+            {
+                error = rangeError;
+                return false;
+            }
+
             var criteriaGroup = groups[p * 2 + 1];
 
             if (criteriaGroup.Count == 0)

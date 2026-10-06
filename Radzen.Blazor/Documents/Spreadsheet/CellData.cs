@@ -635,7 +635,7 @@ public class CellData : IComparable, IComparable<CellData>
         ArgumentNullException.ThrowIfNull(criteria);
         if (criteria.IsError)
         {
-            return false;
+            return IsError && GetValueOrDefault<CellError>() == criteria.GetValueOrDefault<CellError>();
         }
 
         // Empty criteria only matches empty cells.

@@ -11,13 +11,13 @@ class SwitchFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("expression", ParameterType.Single, isRequired: true),
-        new("args", ParameterType.Group, isRequired: true)
+        new("args", ParameterType.Group, isRequired: true) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var expression = arguments.GetSingle("expression");
-        var groups = arguments.GetGroups("args");
+        var groups = arguments.GetLazyGroups("args");
 
         if (expression is null || groups is null || groups.Count == 0)
         {
@@ -33,7 +33,7 @@ class SwitchFunction : FormulaFunction
 
         for (var p = 0; p < pairCount; p++)
         {
-            var value = groups[p * 2].Count > 0 ? groups[p * 2][0] : CellData.FromError(CellError.Value);
+            var value = groups[p * 2].Value;
 
             if (value.IsError)
             {
@@ -42,16 +42,14 @@ class SwitchFunction : FormulaFunction
 
             if (expression.IsEqualTo(value))
             {
-                var result = groups[p * 2 + 1];
-                return result.Count > 0 ? result[0] : CellData.FromError(CellError.Value);
+                return groups[p * 2 + 1].Value;
             }
         }
 
         // An odd trailing argument is the default.
         if (groups.Count % 2 == 1)
         {
-            var defaultResult = groups[^1];
-            return defaultResult.Count > 0 ? defaultResult[0] : CellData.FromError(CellError.Value);
+            return groups[^1].Value;
         }
 
         return CellData.FromError(CellError.NA);

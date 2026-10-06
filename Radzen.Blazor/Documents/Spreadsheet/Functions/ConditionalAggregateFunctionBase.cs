@@ -13,7 +13,7 @@ abstract class ConditionalAggregateFunctionBase : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("value_range", ParameterType.Collection, isRequired: true),
-        new("criteria", ParameterType.Group, isRequired: true)
+        new("criteria", ParameterType.Group, isRequired: true) { AcceptsErrors = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)

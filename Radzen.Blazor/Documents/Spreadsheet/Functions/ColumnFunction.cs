@@ -8,11 +8,21 @@ class ColumnFunction : FormulaFunction
 
     public override FunctionParameter[] Parameters =>
     [
-        new("reference", ParameterType.Collection, isRequired: false)
+        new("reference", ParameterType.Collection, isRequired: false) { IsReference = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
+        if (arguments.GetReference("reference") is { } area)
+        {
+            if (area.Rows > 1 && area.Columns > 1)
+            {
+                return CellData.FromError(CellError.Value);
+            }
+
+            return CellData.FromNumber(area.StartColumn + 1);
+        }
+
         var reference = arguments.GetRange("reference");
 
         if (reference is null)

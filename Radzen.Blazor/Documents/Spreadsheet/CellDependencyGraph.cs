@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -8,30 +7,9 @@ internal class CellDependencyGraph
 {
     private readonly Dictionary<Cell, HashSet<Cell>> dependencies = [];
     private readonly Dictionary<Cell, HashSet<Cell>> dependents = [];
-    private readonly Dictionary<Cell, List<AxisDependency>> axisDependencies = [];
-    private readonly Dictionary<Worksheet, List<AxisDependency>> axisDependents = [];
-
-    private IEnumerable<Cell> GetDependentCells(Cell cell)
-    {
-        dependents.TryGetValue(cell, out var cells);
-
-        if (!axisDependents.TryGetValue(cell.Worksheet, out var axis) || axis.Count == 0)
-        {
-            return cells ?? [];
-        }
-
-        var result = cells is null ? new HashSet<Cell>() : new HashSet<Cell>(cells);
-
-        foreach (var dependency in axis)
-        {
-            if (dependency.Contains(cell.Address))
-            {
-                result.Add(dependency.Dependent);
-            }
-        }
-
-        return result;
-    }
+    private readonly Dictionary<Cell, List<RangeDependency>> rangeDependencies = [];
+    private readonly Dictionary<RangeArea, RangeDependency> ranges = [];
+    private readonly Dictionary<Worksheet, RangeIndex> indexes = [];
 
     public bool HasDependents(Cell cell)
     {
@@ -40,21 +18,30 @@ internal class CellDependencyGraph
             return true;
         }
 
-        if (axisDependents.TryGetValue(cell.Worksheet, out var axis))
+        if (indexes.TryGetValue(cell.Worksheet, out var index))
         {
-            foreach (var dependency in axis)
+            foreach (var _ in index.Find(cell.Address))
             {
-                if (dependency.Contains(cell.Address))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
         return false;
     }
 
-    public IEnumerable<Cell> GetTopologicallySortedDependencies(Cell cell) => GetTopologicallySortedDependencies(GetDependentCells(cell));
+    public IEnumerable<Cell> GetTopologicallySortedDependencies(Cell cell)
+    {
+        var visited = new HashSet<object> { cell };
+        var result = new List<Cell>();
+        var stack = new Stack<(object Node, bool ChildrenExpanded)>();
+
+        PushChildren(stack, visited, cell);
+        Sort(stack, visited, result);
+
+        result.Reverse();
+
+        return result;
+    }
 
     public IEnumerable<Cell> GetTopologicallySortedDependencies() => GetTopologicallySortedDependencies(dependencies.Keys);
 
@@ -62,9 +49,9 @@ internal class CellDependencyGraph
 
     public List<Cell> GetTopologicallySortedDependencies(IEnumerable<Cell> cells)
     {
-        var visited = new HashSet<Cell>();
+        var visited = new HashSet<object>();
         var result = new List<Cell>();
-        var stack = new Stack<(Cell Cell, bool ChildrenExpanded)>();
+        var stack = new Stack<(object Node, bool ChildrenExpanded)>();
 
         foreach (var cell in cells)
         {
@@ -74,34 +61,7 @@ internal class CellDependencyGraph
             }
 
             stack.Push((cell, false));
-
-            while (stack.Count > 0)
-            {
-                var (current, childrenExpanded) = stack.Pop();
-
-                if (childrenExpanded)
-                {
-                    result.Add(current);
-                    continue;
-                }
-
-                if (!visited.Add(current))
-                {
-                    continue;
-                }
-
-                stack.Push((current, true));
-
-                var children = GetDependentCells(current).ToList();
-                for (var i = children.Count - 1; i >= 0; i--)
-                {
-                    var child = children[i];
-                    if (!visited.Contains(child))
-                    {
-                        stack.Push((child, false));
-                    }
-                }
-            }
+            Sort(stack, visited, result);
         }
 
         result.Reverse();
@@ -109,13 +69,84 @@ internal class CellDependencyGraph
         return result;
     }
 
+    private void Sort(Stack<(object Node, bool ChildrenExpanded)> stack, HashSet<object> visited, List<Cell> result)
+    {
+        while (stack.Count > 0)
+        {
+            var (current, childrenExpanded) = stack.Pop();
+
+            if (childrenExpanded)
+            {
+                if (current is Cell cell)
+                {
+                    result.Add(cell);
+                }
+
+                continue;
+            }
+
+            if (!visited.Add(current))
+            {
+                continue;
+            }
+
+            stack.Push((current, true));
+
+            if (current is Cell currentCell)
+            {
+                PushChildren(stack, visited, currentCell);
+            }
+            else
+            {
+                foreach (var dependent in ((RangeDependency)current).Dependents)
+                {
+                    if (!visited.Contains(dependent))
+                    {
+                        stack.Push((dependent, false));
+                    }
+                }
+            }
+        }
+    }
+
+    private void PushChildren(Stack<(object Node, bool ChildrenExpanded)> stack, HashSet<object> visited, Cell cell)
+    {
+        if (indexes.TryGetValue(cell.Worksheet, out var index))
+        {
+            foreach (var range in index.Find(cell.Address))
+            {
+                if (!visited.Contains(range))
+                {
+                    stack.Push((range, false));
+                }
+            }
+        }
+
+        if (dependents.TryGetValue(cell, out var cells))
+        {
+            foreach (var dependent in cells)
+            {
+                if (!visited.Contains(dependent))
+                {
+                    stack.Push((dependent, false));
+                }
+            }
+        }
+    }
+
     public void Remove(Cell cell)
     {
-        if (axisDependencies.Remove(cell, out var oldAxisDependencies))
+        if (rangeDependencies.Remove(cell, out var oldRanges))
         {
-            foreach (var dependency in oldAxisDependencies)
+            foreach (var range in oldRanges)
             {
-                axisDependents[dependency.Worksheet].Remove(dependency);
+                range.Dependents.Remove(cell);
+
+                if (range.Dependents.Count == 0)
+                {
+                    ranges.Remove(range.Area);
+                    indexes[range.Area.Worksheet].Remove(range);
+                }
             }
         }
 
@@ -159,43 +190,129 @@ internal class CellDependencyGraph
             dependentCells.Add(cell);
         }
 
-        if (visitor.AxisRanges.Count == 0)
+        if (visitor.Ranges.Count == 0)
         {
             return;
         }
 
-        var cellAxisDependencies = new List<AxisDependency>();
+        var cellRanges = new List<RangeDependency>();
 
-        foreach (var (worksheet, kind, start, end) in visitor.AxisRanges)
+        foreach (var area in visitor.Ranges)
         {
-            var dependency = new AxisDependency(worksheet, kind, start, end, cell);
-
-            if (!axisDependents.TryGetValue(worksheet, out var sheetDependents))
+            if (!ranges.TryGetValue(area, out var range))
             {
-                sheetDependents = [];
-                axisDependents[worksheet] = sheetDependents;
+                range = new RangeDependency(area);
+                ranges[area] = range;
+
+                if (!indexes.TryGetValue(area.Worksheet, out var index))
+                {
+                    index = new RangeIndex();
+                    indexes[area.Worksheet] = index;
+                }
+
+                index.Add(range);
             }
 
-            sheetDependents.Add(dependency);
-            cellAxisDependencies.Add(dependency);
+            if (range.Dependents.Add(cell))
+            {
+                cellRanges.Add(range);
+            }
         }
 
-        axisDependencies[cell] = cellAxisDependencies;
+        rangeDependencies[cell] = cellRanges;
     }
 }
 
-internal sealed class AxisDependency(Worksheet worksheet, RangeKind kind, int start, int end, Cell dependent)
+internal readonly record struct RangeArea(Worksheet Worksheet, int StartRow, int StartColumn, int EndRow, int EndColumn)
 {
-    public Worksheet Worksheet { get; } = worksheet;
+    public bool Contains(CellRef address) =>
+        address.Row >= StartRow && address.Row <= EndRow && address.Column >= StartColumn && address.Column <= EndColumn;
+}
 
-    public Cell Dependent { get; } = dependent;
+internal sealed class RangeDependency(RangeArea area)
+{
+    public RangeArea Area { get; } = area;
 
-    public bool Contains(CellRef address)
+    public HashSet<Cell> Dependents { get; } = [];
+}
+
+internal sealed class RangeIndex
+{
+    private const int BlockSize = 64;
+    private const int MaxBlocks = 64;
+
+    private readonly Dictionary<int, List<RangeDependency>> blocks = [];
+    private readonly List<RangeDependency> tall = [];
+
+    public void Add(RangeDependency range)
     {
-        var index = kind == RangeKind.Columns ? address.Column : address.Row;
+        var (first, last) = Blocks(range.Area);
 
-        return index >= start && index <= end;
+        if (last - first >= MaxBlocks)
+        {
+            tall.Add(range);
+            return;
+        }
+
+        for (var block = first; block <= last; block++)
+        {
+            if (!blocks.TryGetValue(block, out var list))
+            {
+                list = [];
+                blocks[block] = list;
+            }
+
+            list.Add(range);
+        }
     }
+
+    public void Remove(RangeDependency range)
+    {
+        var (first, last) = Blocks(range.Area);
+
+        if (last - first >= MaxBlocks)
+        {
+            tall.Remove(range);
+            return;
+        }
+
+        for (var block = first; block <= last; block++)
+        {
+            if (blocks.TryGetValue(block, out var list))
+            {
+                list.Remove(range);
+
+                if (list.Count == 0)
+                {
+                    blocks.Remove(block);
+                }
+            }
+        }
+    }
+
+    public IEnumerable<RangeDependency> Find(CellRef address)
+    {
+        if (blocks.TryGetValue(address.Row / BlockSize, out var list))
+        {
+            foreach (var range in list)
+            {
+                if (range.Area.Contains(address))
+                {
+                    yield return range;
+                }
+            }
+        }
+
+        foreach (var range in tall)
+        {
+            if (range.Area.Contains(address))
+            {
+                yield return range;
+            }
+        }
+    }
+
+    private static (int First, int Last) Blocks(RangeArea area) => (area.StartRow / BlockSize, area.EndRow / BlockSize);
 }
 
 class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
@@ -204,7 +321,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
     public HashSet<Cell> Dependencies { get; } = [];
 
-    public List<(Worksheet Worksheet, RangeKind Kind, int Start, int End)> AxisRanges { get; } = [];
+    public List<RangeArea> Ranges { get; } = [];
 
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
 
@@ -299,27 +416,16 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
         if (rangeSyntaxNode.Kind == RangeKind.Columns)
         {
-            AxisRanges.Add((targetSheet, RangeKind.Columns, startAddress.Column, endAddress.Column));
+            Ranges.Add(new RangeArea(targetSheet, 0, Math.Min(startAddress.Column, endAddress.Column), Worksheet.MaxRows - 1, Math.Max(startAddress.Column, endAddress.Column)));
             return;
         }
 
         if (rangeSyntaxNode.Kind == RangeKind.Rows)
         {
-            AxisRanges.Add((targetSheet, RangeKind.Rows, startAddress.Row, endAddress.Row));
+            Ranges.Add(new RangeArea(targetSheet, Math.Min(startAddress.Row, endAddress.Row), 0, Math.Max(startAddress.Row, endAddress.Row), Worksheet.MaxColumns - 1));
             return;
         }
 
-        var startRow = Math.Min(startAddress.Row, endAddress.Row);
-        var endRow = Math.Min(Math.Max(startAddress.Row, endAddress.Row), targetSheet.RowCount - 1);
-        var startCol = Math.Min(startAddress.Column, endAddress.Column);
-        var endCol = Math.Min(Math.Max(startAddress.Column, endAddress.Column), targetSheet.ColumnCount - 1);
-
-        for (var row = startRow; row <= endRow; row++)
-        {
-            for (var col = startCol; col <= endCol; col++)
-            {
-                Dependencies.Add(targetSheet.Cells[new CellRef(row, col)]);
-            }
-        }
+        Ranges.Add(new RangeArea(targetSheet, Math.Min(startAddress.Row, endAddress.Row), Math.Min(startAddress.Column, endAddress.Column), Math.Max(startAddress.Row, endAddress.Row), Math.Max(startAddress.Column, endAddress.Column)));
     }
 }

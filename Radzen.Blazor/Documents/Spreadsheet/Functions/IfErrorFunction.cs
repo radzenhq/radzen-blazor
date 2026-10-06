@@ -11,7 +11,7 @@ class IfErrorFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("value", ParameterType.Single, isRequired: true),
-        new("value_if_error", ParameterType.Single, isRequired: true)
+        new("value_if_error", ParameterType.Single, isRequired: true) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
@@ -23,15 +23,15 @@ class IfErrorFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var valueIfError = arguments.GetSingle("value_if_error");
-
-        if (valueIfError is null)
-        {
-            return CellData.FromError(CellError.Value);
-        }
-
         if (value.IsError)
         {
+            var valueIfError = arguments.GetSingle("value_if_error");
+
+            if (valueIfError is null)
+            {
+                return CellData.FromError(CellError.Value);
+            }
+
             return valueIfError.IsEmpty ? CellData.FromString("") : valueIfError;
         }
 

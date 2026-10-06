@@ -367,13 +367,13 @@ public partial class Worksheet
         return new CellRef(Rows.NextVisible(0, 1, 0), Columns.NextVisible(0, 1, 0));
     }
 
-    internal void EvaluateFormula(Cell cell, Dictionary<Cell, CellData> evaluated)
+    internal IReadOnlyList<Cell> EvaluateFormula(Cell cell, Recalculation recalculation)
     {
         var tree = cell.FormulaSyntaxTree;
 
         if (tree is null)
         {
-            return;
+            return [];
         }
 
         if (tree.Errors.Count > 0)
@@ -385,8 +385,13 @@ public partial class Worksheet
             Workbook.IsEvaluating = true;
             try
             {
-                var visitor = new FormulaEvaluator(this, cell, evaluated);
+                var visitor = new FormulaEvaluator(this, cell, recalculation);
                 var eval = visitor.Evaluate(tree.Root);
+
+                if (visitor.Missing.Count > 0)
+                {
+                    return visitor.Missing;
+                }
 
                 if (eval.IsEmpty)
                 {
@@ -394,7 +399,6 @@ public partial class Worksheet
                 }
 
                 cell.Data = eval;
-                evaluated[cell] = eval;
             }
             finally
             {
@@ -403,6 +407,8 @@ public partial class Worksheet
         }
 
         cell.OnChanged();
+
+        return [];
     }
 
     internal CellData EvaluateExpression(string expression)

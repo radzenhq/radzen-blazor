@@ -1,3 +1,5 @@
+using System;
+
 #nullable enable
 
 namespace Radzen.Documents.Spreadsheet;
@@ -8,7 +10,7 @@ class IndexFunction : FormulaFunction
 
     public override FunctionParameter[] Parameters =>
     [
-        new("array", ParameterType.Collection, isRequired: true),
+        new("array", ParameterType.Collection, isRequired: true) { IsReference = true },
         new("row_num", ParameterType.Single, isRequired: false),
         new("column_num", ParameterType.Single, isRequired: false),
         new("area_num", ParameterType.Single, isRequired: false)
@@ -16,15 +18,31 @@ class IndexFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
+        if (arguments.GetReference("array") is { } reference)
+        {
+            return Evaluate(arguments, reference.Rows, reference.Columns, reference.LogicalRows, reference.LogicalColumns, isRange: true, (row, column) => reference[row, column]);
+        }
+
         var array = arguments.GetRange("array");
-        var rowArg = arguments.GetSingle("row_num");
-        var colArg = arguments.GetSingle("column_num");
-        var areaArg = arguments.GetSingle("area_num");
 
         if (array is null)
         {
             return CellData.FromError(CellError.Value);
         }
+
+        if (array is RangeList range)
+        {
+            return Evaluate(arguments, range.Rows, range.Columns, range.LogicalRows, range.LogicalColumns, isRange: true, (row, column) => range[row * range.Columns + column]);
+        }
+
+        return Evaluate(arguments, array.Count, 1, array.Count, 1, isRange: false, (row, column) => array[row]);
+    }
+
+    private static CellData Evaluate(FunctionArguments arguments, int rows, int columns, int logicalRows, int logicalColumns, bool isRange, Func<int, int, CellData> cellAt)
+    {
+        var rowArg = arguments.GetSingle("row_num");
+        var colArg = arguments.GetSingle("column_num");
+        var areaArg = arguments.GetSingle("area_num");
 
         if (rowArg is not null && rowArg.IsError)
         {
@@ -37,19 +55,6 @@ class IndexFunction : FormulaFunction
         if (areaArg is not null && areaArg.IsError)
         {
             return areaArg;
-        }
-
-        int rows;
-        int cols;
-        if (array is RangeList rl)
-        {
-            rows = rl.LogicalRows;
-            cols = rl.LogicalColumns;
-        }
-        else
-        {
-            rows = array.Count;
-            cols = 1;
         }
 
         // area selection: only area 1 is supported in this implementation
@@ -96,10 +101,12 @@ class IndexFunction : FormulaFunction
         var rIndex = row ?? 1;
         var cIndex = col ?? 1;
 
+        var isEmpty = rows == 0 || columns == 0;
+
         // Support row==0 or col==0 returning entire column/row reference respectively
         if (rIndex == 0 && cIndex == 0)
         {
-            return array.Count > 0 ? array[0] : CellData.FromError(CellError.Ref);
+            return isEmpty ? CellData.FromError(CellError.Ref) : cellAt(0, 0);
         }
 
         if (rIndex < 0 || cIndex < 0)
@@ -107,7 +114,7 @@ class IndexFunction : FormulaFunction
             return CellData.FromError(CellError.Ref);
         }
 
-        if (rIndex > rows || cIndex > cols)
+        if (rIndex > logicalRows || cIndex > logicalColumns)
         {
             return CellData.FromError(CellError.Ref);
         }
@@ -115,64 +122,35 @@ class IndexFunction : FormulaFunction
         // Entire column
         if (rIndex == 0 && cIndex >= 1)
         {
-            if (array is RangeList arr)
+            if (cIndex > columns)
             {
-                if (cIndex > arr.Columns)
-                {
-                    return CellData.Empty;
-                }
+                return CellData.Empty;
+            }
 
-                var startRow = arr.StartRow;
-                var startCol = arr.StartColumn + (cIndex - 1);
-                var result = new RangeList(arr.Rows, 1, startRow, startCol, arr.Worksheet);
-                for (int i = 0; i < arr.Rows; i++)
-                {
-                    var idx = i * arr.Columns + (cIndex - 1);
-                    result.Add(array[idx]);
-                }
-                return result.Count > 0 ? result[0] : CellData.FromError(CellError.Ref);
-            }
-            if (cols == 1 && cIndex == 1)
-            {
-                return array.Count > 0 ? array[0] : CellData.FromError(CellError.Ref);
-            }
-            return CellData.FromError(CellError.Ref);
+            return isEmpty ? CellData.FromError(CellError.Ref) : cellAt(0, cIndex - 1);
         }
 
         // Entire row
         if (cIndex == 0 && rIndex >= 1)
         {
-            if (array is RangeList arr)
+            if (!isRange)
             {
-                if (rIndex > arr.Rows)
-                {
-                    return CellData.Empty;
-                }
-
-                var startRow = arr.StartRow + (rIndex - 1);
-                var startCol = arr.StartColumn;
-                var result = new RangeList(1, arr.Columns, startRow, startCol, arr.Worksheet);
-                for (int j = 0; j < arr.Columns; j++)
-                {
-                    var idx = (rIndex - 1) * arr.Columns + j;
-                    result.Add(array[idx]);
-                }
-                return result.Count > 0 ? result[0] : CellData.FromError(CellError.Ref);
+                return CellData.FromError(CellError.Ref);
             }
-            return CellData.FromError(CellError.Ref);
-        }
 
-        if (array is RangeList materialized)
-        {
-            if (rIndex > materialized.Rows || cIndex > materialized.Columns)
+            if (rIndex > rows)
             {
                 return CellData.Empty;
             }
 
-            cols = materialized.Columns;
+            return isEmpty ? CellData.FromError(CellError.Ref) : cellAt(rIndex - 1, 0);
         }
 
-        var flatIndex = (rIndex - 1) * cols + (cIndex - 1);
-        return array[flatIndex];
+        if (rIndex > rows || cIndex > columns)
+        {
+            return CellData.Empty;
+        }
+
+        return cellAt(rIndex - 1, cIndex - 1);
     }
 }

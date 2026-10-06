@@ -42,14 +42,17 @@ public enum CellError
     Circular // #CIRCULAR - Circular reference
 }
 
-class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellData>? evaluated = null) : IFormulaSyntaxNodeVisitor
+class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalculation = null) : IFormulaSyntaxNodeVisitor
 {
     private object? value;
-    private readonly HashSet<Cell> evaluationStack = [];
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<Cell, CellData> evaluated = evaluated ?? [];
-    private Cell formulaCell = currentCell;
+    private readonly Cell formulaCell = currentCell;
+    private readonly List<Cell> missing = [];
+    private bool deferred;
+    private bool scanning;
     private bool arrayContext;
+
+    public IReadOnlyList<Cell> Missing => missing;
 
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
@@ -89,9 +92,9 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
-        var left = value;
+        var left = Dereference(value);
         binaryExpressionSyntaxNode.Right.Accept(this);
-        var right = value;
+        var right = Dereference(value);
         var op = binaryExpressionSyntaxNode.Operator;
 
         if (arrayContext && (left is RangeList || right is RangeList))
@@ -224,7 +227,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
     {
         unaryExpressionSyntaxNode.Operand.Accept(this);
-        var operand = value;
+        var operand = Dereference(value);
         var op = unaryExpressionSyntaxNode.Operator;
 
         if (arrayContext && operand is RangeList)
@@ -377,41 +380,66 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         };
     }
 
-    private CellData EvaluateCell(Cell cell)
+    internal CellData ReadCell(Cell cell)
     {
-        if (cell.FormulaSyntaxTree is null)
+        if (deferred && !scanning)
+        {
+            return CellData.FromError(CellError.NA);
+        }
+
+        if (recalculation is null || cell.FormulaSyntaxTree is null || !recalculation.IsPending(cell))
         {
             return cell.Data;
         }
 
-        if (evaluated.TryGetValue(cell, out var cached))
-        {
-            return cached;
-        }
-
-        if (cell.FormulaSyntaxTree.Errors.Count > 0)
-        {
-            return CellData.FromError(CellError.Name);
-        }
-
-        if (!evaluationStack.Add(cell))
+        if (cell == formulaCell || recalculation.IsCircular(formulaCell, cell))
         {
             return CellData.FromError(CellError.Circular);
         }
 
-        var outerCell = formulaCell;
-        var outerArrayContext = arrayContext;
-        formulaCell = cell;
-        arrayContext = false;
+        missing.Add(cell);
 
-        cell.FormulaSyntaxTree.Root.Accept(this);
-        var result = Intersect(value, cell);
+        if (!scanning)
+        {
+            deferred = true;
+        }
 
-        formulaCell = outerCell;
-        arrayContext = outerArrayContext;
-        evaluationStack.Remove(cell);
-        evaluated[cell] = result;
-        return result;
+        return CellData.FromError(CellError.NA);
+    }
+
+    private object? Dereference(object? operand)
+    {
+        if (operand is not RangeReference reference)
+        {
+            return operand;
+        }
+
+        if (reference.IsCell)
+        {
+            return reference[0, 0];
+        }
+
+        if (deferred)
+        {
+            return CellData.FromError(CellError.NA);
+        }
+
+        var cells = new RangeList(reference.Rows, reference.Columns, reference.StartRow, reference.StartColumn, reference.Worksheet, reference.LogicalRows, reference.LogicalColumns);
+
+        scanning = true;
+
+        for (var row = 0; row < reference.Rows; row++)
+        {
+            for (var column = 0; column < reference.Columns; column++)
+            {
+                cells.Add(reference[row, column]);
+            }
+        }
+
+        scanning = false;
+        deferred = missing.Count > 0;
+
+        return cells;
     }
 
     public void VisitCell(CellSyntaxNode cellSyntaxNode)
@@ -448,20 +476,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             return;
         }
 
-        if (address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
-        {
-            value = CellData.Empty;
-            return;
-        }
-
-        if (!targetSheet.Cells.TryGet(address.Row, address.Column, out var cell))
-        {
-            // Cell is in bounds but not populated - treat as empty
-            value = new CellData(null);
-            return;
-        }
-
-        value = EvaluateCell(cell);
+        value = new RangeReference(this, targetSheet, address.Row, address.Column, 1, 1, 1, 1, isCell: true);
     }
 
     public void VisitName(NameSyntaxNode nameSyntaxNode)
@@ -488,7 +503,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
     {
         node.Accept(this);
 
-        return Intersect(value, formulaCell);
+        return Intersect(Dereference(value), formulaCell);
     }
 
 
@@ -533,6 +548,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         var parameterDefinitions = function.Parameters;
         var functionArguments = new FunctionArguments(formulaCell);
         var argumentIndex = 0;
+        var lazy = !arrayContext;
 
         for (int paramIndex = 0; paramIndex < parameterDefinitions.Length; paramIndex++)
         {
@@ -555,7 +571,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
                 while (argumentIndex < argumentNodes.Count)
                 {
                     var argumentNode = argumentNodes[argumentIndex];
-                    var argument = ProcessArgument(argumentNode, function, paramDef.Type);
+                    var argument = ProcessArgument(argumentNode, function, paramDef);
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -581,13 +597,41 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             }
             else if (paramDef.Type == ParameterType.Group)
             {
+                if (paramDef.IsLazy)
+                {
+                    var lazyGroups = new List<LazyArgument>();
+                    while (argumentIndex < argumentNodes.Count)
+                    {
+                        var argumentNode = argumentNodes[argumentIndex];
+
+                        if (lazy)
+                        {
+                            lazyGroups.Add(new LazyArgument(() => EvaluateLazyArgument(argumentNode, function, paramDef)));
+                        }
+                        else
+                        {
+                            var argument = ProcessArgument(argumentNode, function, paramDef);
+                            if (argument is null)
+                            {
+                                return null;
+                            }
+
+                            lazyGroups.Add(new LazyArgument(argument));
+                        }
+
+                        argumentIndex++;
+                    }
+                    functionArguments.Set(paramDef.Name, lazyGroups);
+                    continue;
+                }
+
                 // Collect all remaining arguments WITHOUT flattening - each stays its own group so
                 // (range, criteria) pairs and array shapes survive. A single cell is a one-element list
                 // (not a RangeList); consumers use the `as RangeList` / default-1xN convention.
                 var groups = new List<List<CellData>>();
                 while (argumentIndex < argumentNodes.Count)
                 {
-                    var argument = ProcessArgument(argumentNodes[argumentIndex], function, paramDef.Type);
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function, paramDef);
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -602,7 +646,33 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             {
                 if (argumentIndex < argumentNodes.Count)
                 {
-                    var argument = ProcessArgument(argumentNodes[argumentIndex], function, paramDef.Type);
+                    var argumentNode = argumentNodes[argumentIndex];
+
+                    if (paramDef.IsLazy && lazy)
+                    {
+                        functionArguments.Set(paramDef.Name, new LazyArgument(() => EvaluateLazyArgument(argumentNode, function, paramDef)));
+                        argumentIndex++;
+                        continue;
+                    }
+
+                    List<CellData>? argument;
+
+                    if (paramDef.IsReference)
+                    {
+                        if (EvaluateReference(argumentNode) is { } reference)
+                        {
+                            functionArguments.Set(paramDef.Name, reference);
+                            argumentIndex++;
+                            continue;
+                        }
+
+                        argument = ProcessValue(function, paramDef);
+                    }
+                    else
+                    {
+                        argument = ProcessArgument(argumentNode, function, paramDef);
+                    }
+
                     if (argument is null)
                     {
                         return null; // Error already set
@@ -645,14 +715,36 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         return functionArguments;
     }
 
-    private List<CellData>? ProcessArgument(FormulaSyntaxNode argumentNode, FormulaFunction function, ParameterType parameterType)
+    private RangeReference? EvaluateReference(FormulaSyntaxNode argumentNode)
     {
         var outerArrayContext = arrayContext;
-        arrayContext = outerArrayContext || parameterType != ParameterType.Single;
+        arrayContext = true;
         argumentNode.Accept(this);
         arrayContext = outerArrayContext;
 
-        if (!arrayContext && parameterType == ParameterType.Single && value is RangeList)
+        return value as RangeReference;
+    }
+
+    private List<CellData> EvaluateLazyArgument(FormulaSyntaxNode argumentNode, FormulaFunction function, FunctionParameter parameter)
+    {
+        return ProcessArgument(argumentNode, function, parameter) ?? [(CellData)value!];
+    }
+
+    private List<CellData>? ProcessArgument(FormulaSyntaxNode argumentNode, FormulaFunction function, FunctionParameter parameter)
+    {
+        var outerArrayContext = arrayContext;
+        arrayContext = outerArrayContext || parameter.Type != ParameterType.Single;
+        argumentNode.Accept(this);
+        arrayContext = outerArrayContext;
+
+        return ProcessValue(function, parameter);
+    }
+
+    private List<CellData>? ProcessValue(FormulaFunction function, FunctionParameter parameter)
+    {
+        value = Dereference(value);
+
+        if (!arrayContext && parameter.Type == ParameterType.Single && value is RangeList)
         {
             value = Intersect(value, formulaCell);
         }
@@ -660,7 +752,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
         var hasError = value is CellData cellData && cellData.IsError;
 
         // Only short-circuit on errors if the function cannot handle them
-        if (hasError && !function.CanHandleErrors)
+        if (hasError && !function.CanHandleErrors && !parameter.AcceptsErrors)
         {
             return null;
         }
@@ -728,47 +820,36 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Dictionary<Cell, CellD
             columns = Math.Clamp(startSheet.ColumnCount - start.Column, 1, columns);
         }
 
-        var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet, logicalRows, logicalColumns);
-        var checkDeletedRows = kind != RangeKind.Columns;
-        var checkDeletedColumns = kind != RangeKind.Rows;
-
-        for (var row = start.Row; row < start.Row + rows; row++)
+        if (start.Row < 0 || start.Column < 0)
         {
-            for (var column = start.Column; column < start.Column + columns; column++)
+            value = CellData.FromError(CellError.Ref);
+            return;
+        }
+
+        if (kind != RangeKind.Columns)
+        {
+            for (var row = start.Row; row < start.Row + rows; row++)
             {
-                if ((checkDeletedRows && startSheet.IsDeletedRow(row)) || (checkDeletedColumns && startSheet.IsDeletedColumn(column)))
+                if (startSheet.IsDeletedRow(row))
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
                 }
-
-                if (row < 0 || column < 0)
-                {
-                    value = CellData.FromError(CellError.Ref);
-                    return;
-                }
-
-                CellData cellValue;
-
-                if (row >= startSheet.RowCount || column >= startSheet.ColumnCount)
-                {
-                    cellValue = CellData.Empty;
-                }
-                else if (!startSheet.Cells.TryGet(row, column, out var cell))
-                {
-                    // Cell is in bounds but not populated - treat as empty
-                    cellValue = new CellData(null);
-                }
-                else
-                {
-                    cellValue = EvaluateCell(cell);
-                }
-                // Do not short-circuit on errors here; include them in the range so
-                // functions like SUBTOTAL/AGGREGATE can decide how to handle them.
-                cells.Add(cellValue);
             }
         }
 
-        value = cells;
+        if (kind != RangeKind.Rows)
+        {
+            for (var column = start.Column; column < start.Column + columns; column++)
+            {
+                if (startSheet.IsDeletedColumn(column))
+                {
+                    value = CellData.FromError(CellError.Ref);
+                    return;
+                }
+            }
+        }
+
+        value = new RangeReference(this, startSheet, start.Row, start.Column, rows, columns, logicalRows, logicalColumns, isCell: false);
     }
 }

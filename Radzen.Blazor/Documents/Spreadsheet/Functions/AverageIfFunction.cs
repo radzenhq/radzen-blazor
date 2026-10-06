@@ -11,7 +11,7 @@ class AverageIfFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("range", ParameterType.Collection, isRequired: true),
-        new("criteria", ParameterType.Single, isRequired: true),
+        new("criteria", ParameterType.Single, isRequired: true) { AcceptsErrors = true },
         new("average_range", ParameterType.Collection, isRequired: false)
     ];
 

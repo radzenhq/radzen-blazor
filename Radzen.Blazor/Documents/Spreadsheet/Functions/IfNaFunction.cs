@@ -11,21 +11,27 @@ class IfNaFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("value", ParameterType.Single, isRequired: true),
-        new("value_if_na", ParameterType.Single, isRequired: true)
+        new("value_if_na", ParameterType.Single, isRequired: true) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var value = arguments.GetSingle("value");
-        var valueIfNa = arguments.GetSingle("value_if_na");
 
-        if (value is null || valueIfNa is null)
+        if (value is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
         if (value.IsError && value.GetValueOrDefault<CellError>() == CellError.NA)
         {
+            var valueIfNa = arguments.GetSingle("value_if_na");
+
+            if (valueIfNa is null)
+            {
+                return CellData.FromError(CellError.Value);
+            }
+
             return valueIfNa.IsEmpty ? CellData.FromString("") : valueIfNa;
         }
 

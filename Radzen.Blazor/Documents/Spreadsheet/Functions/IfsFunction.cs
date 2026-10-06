@@ -10,12 +10,12 @@ class IfsFunction : FormulaFunction
 
     public override FunctionParameter[] Parameters =>
     [
-        new("args", ParameterType.Group, isRequired: true)
+        new("args", ParameterType.Group, isRequired: true) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var groups = arguments.GetGroups("args");
+        var groups = arguments.GetLazyGroups("args");
 
         if (groups is null || groups.Count == 0 || groups.Count % 2 != 0)
         {
@@ -24,7 +24,7 @@ class IfsFunction : FormulaFunction
 
         for (var i = 0; i < groups.Count; i += 2)
         {
-            var condition = groups[i].Count > 0 ? groups[i][0] : CellData.FromError(CellError.Value);
+            var condition = groups[i].Value;
 
             if (condition.IsError)
             {
@@ -45,7 +45,7 @@ class IfsFunction : FormulaFunction
 
             if (value.Value)
             {
-                return groups[i + 1].Count > 0 ? groups[i + 1][0] : CellData.FromError(CellError.Value);
+                return groups[i + 1].Value;
             }
         }
 

@@ -11,8 +11,8 @@ class IfFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("logical_test", ParameterType.Single, isRequired: true),
-        new("value_if_true", ParameterType.Single, isRequired: true),
-        new("value_if_false", ParameterType.Single, isRequired: false)
+        new("value_if_true", ParameterType.Single, isRequired: true) { IsLazy = true },
+        new("value_if_false", ParameterType.Single, isRequired: false) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
@@ -29,18 +29,9 @@ class IfFunction : FormulaFunction
             return logicalTest;
         }
 
-        var trueValue = arguments.GetSingle("value_if_true");
-
-        if (trueValue is null)
-        {
-            return CellData.FromError(CellError.Value);
-        }
-
-        var falseValue = arguments.GetSingle("value_if_false") ?? CellData.FromBoolean(false);
-
         if (logicalTest.IsEmpty)
         {
-            return falseValue;
+            return arguments.GetSingle("value_if_false") ?? CellData.FromBoolean(false);
         }
 
         var value = logicalTest.GetValueOrDefault<bool?>();
@@ -49,9 +40,12 @@ class IfFunction : FormulaFunction
         {
             return CellData.FromError(CellError.Value);
         }
-        else
+
+        if (value.Value)
         {
-            return value.Value ? trueValue : falseValue;
+            return arguments.GetSingle("value_if_true") ?? CellData.FromError(CellError.Value);
         }
+
+        return arguments.GetSingle("value_if_false") ?? CellData.FromBoolean(false);
     }
 }

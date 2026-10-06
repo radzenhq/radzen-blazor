@@ -278,7 +278,7 @@ public class SumIfFunctionTests
     }
 
     [Fact]
-    public void ShouldPropagateErrorFromCriteria()
+    public void ShouldMatchNoCellsWhenCriteriaIsAnErrorTheRangeDoesNotContain()
     {
         sheet.Cells["A1"].Value = 10;
         sheet.Cells["A2"].Value = 20;
@@ -286,10 +286,9 @@ public class SumIfFunctionTests
         sheet.Cells["B1"].Value = 100;
         sheet.Cells["B2"].Value = 200;
 
-        // criteria references a cell with an error
         sheet.Cells["C1"].Formula = "=1/0";
         sheet.Cells["D1"].Formula = "=SUMIF(A1:A2,C1,B1:B2)";
 
-        Assert.Equal(CellError.Div0, sheet.Cells["D1"].Value);
+        Assert.Equal(0d, sheet.Cells["D1"].Value);
     }
 }

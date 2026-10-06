@@ -10,7 +10,7 @@ class XLookupFunction : FormulaFunction
     [
         new("lookup_value", ParameterType.Single, isRequired: false),
         new("lookup_array", ParameterType.Collection, isRequired: true),
-        new("return_array", ParameterType.Collection, isRequired: true),
+        new("return_array", ParameterType.Collection, isRequired: true) { IsReference = true },
         new("if_not_found", ParameterType.Single, isRequired: false),
         new("match_mode", ParameterType.Single, isRequired: false),
         new("search_mode", ParameterType.Single, isRequired: false)
@@ -20,12 +20,13 @@ class XLookupFunction : FormulaFunction
     {
         var lookupValueArg = arguments.GetSingle("lookup_value");
         var lookupArray = arguments.GetRange("lookup_array");
-        var returnArray = arguments.GetRange("return_array");
+        var returnReference = arguments.GetReference("return_array");
+        var returnArray = returnReference is null ? arguments.GetRange("return_array") : null;
         var ifNotFound = arguments.GetSingle("if_not_found");
         var matchModeArg = arguments.GetSingle("match_mode");
         var searchModeArg = arguments.GetSingle("search_mode");
 
-        if (lookupArray is null || returnArray is null)
+        if (lookupArray is null || (returnReference is null && returnArray is null))
         {
             return CellData.FromError(CellError.Value);
         }
@@ -46,8 +47,13 @@ class XLookupFunction : FormulaFunction
             lookupCols = lrl.Columns;
         }
 
-        int returnRows = 1, returnCols = returnArray.Count;
-        if (returnArray is RangeList rrl)
+        int returnRows = 1, returnCols = returnArray?.Count ?? 0;
+        if (returnReference is not null)
+        {
+            returnRows = returnReference.Rows;
+            returnCols = returnReference.Columns;
+        }
+        else if (returnArray is RangeList rrl)
         {
             returnRows = rrl.Rows;
             returnCols = rrl.Columns;
@@ -108,7 +114,7 @@ class XLookupFunction : FormulaFunction
             return CellData.FromError(CellError.NA);
         }
 
-        var resultCell = returnArray[index];
+        var resultCell = returnReference is not null ? returnReference[index] : returnArray![index];
         return resultCell;
     }
 

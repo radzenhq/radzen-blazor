@@ -55,4 +55,10 @@ public class FunctionParameter(string name, ParameterType type, bool isRequired 
     /// Gets a value indicating whether this parameter is required.
     /// </summary>
     public bool IsRequired { get; } = isRequired;
+
+    internal bool IsReference { get; init; }
+
+    internal bool IsLazy { get; init; }
+
+    internal bool AcceptsErrors { get; init; }
 }

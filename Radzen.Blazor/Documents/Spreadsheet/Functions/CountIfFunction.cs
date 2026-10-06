@@ -9,7 +9,7 @@ class CountIfFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("range", ParameterType.Collection, isRequired: true),
-        new("criteria", ParameterType.Single, isRequired: true)
+        new("criteria", ParameterType.Single, isRequired: true) { AcceptsErrors = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)

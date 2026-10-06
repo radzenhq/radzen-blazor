@@ -11,12 +11,12 @@ class ChooseFunction : FormulaFunction
         new("index_num", ParameterType.Single, isRequired: true),
         // Group (not Sequence) so each value argument stays selectable; flattening would let the index
         // pick a cell out of a range instead of the whole argument.
-        new("value", ParameterType.Group, isRequired: true)
+        new("value", ParameterType.Group, isRequired: true) { IsLazy = true }
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var groups = arguments.GetGroups("value");
+        var groups = arguments.GetLazyGroups("value");
 
         if (groups is null)
         {
@@ -34,8 +34,6 @@ class ChooseFunction : FormulaFunction
         }
 
         // Engine has no array spill; a multi-cell selected argument yields its first cell.
-        var selected = groups[idx - 1];
-
-        return selected.Count > 0 ? selected[0] : CellData.FromError(CellError.Value);
+        return groups[idx - 1].Value;
     }
 }

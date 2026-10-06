@@ -395,12 +395,7 @@ public class Workbook
 
     private void EvaluateFormulas(IEnumerable<Cell> cells)
     {
-        var evaluated = new Dictionary<Cell, CellData>();
-
-        foreach (var cell in cells)
-        {
-            cell.Worksheet.EvaluateFormula(cell, evaluated);
-        }
+        new Recalculation(cells).Run();
     }
 
     internal void AdjustFormulas(Worksheet target, Func<FormulaToken, CellRef> adjust)
