@@ -696,8 +696,11 @@ public partial class Worksheet
 
     internal static string AdjustFormulaForCopy(string formula, int rowDelta, int colDelta)
     {
-        var tree = FormulaParser.Parse(formula);
+        return AdjustParsedFormulaForCopy(formula, FormulaParser.Parse(formula), rowDelta, colDelta);
+    }
 
+    internal static string AdjustParsedFormulaForCopy(string formula, FormulaSyntaxTree tree, int rowDelta, int colDelta)
+    {
         if (tree.Errors.Count > 0)
         {
             return formula;

@@ -10,6 +10,7 @@ internal sealed class Recalculation
     private readonly List<Cell> order = [];
     private readonly HashSet<Cell> waiting = [];
     private readonly Dictionary<Cell, HashSet<Cell>> circular = [];
+    private readonly Dictionary<RangeKey, List<CellData>> rangeValues = [];
 
     public Recalculation(IEnumerable<Cell> cells)
     {
@@ -25,6 +26,10 @@ internal sealed class Recalculation
     public bool IsPending(Cell cell) => pending.Contains(cell);
 
     public bool IsCircular(Cell cell, Cell precedent) => circular.TryGetValue(cell, out var precedents) && precedents.Contains(precedent);
+
+    public bool TryGetRangeValues(RangeKey key, out List<CellData> values) => rangeValues.TryGetValue(key, out values!);
+
+    public void SetRangeValues(RangeKey key, List<CellData> values) => rangeValues[key] = values;
 
     public void Run()
     {

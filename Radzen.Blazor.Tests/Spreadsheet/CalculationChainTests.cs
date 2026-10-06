@@ -181,4 +181,23 @@ public class CalculationChainTests
 
         Assert.Equal(expected, sheet.Cells["D1"].Value);
     }
+
+    [Fact]
+    public void FormulasReadingTheSameRangeSeeFormulaCellsInsideItAfterTheyAreRecalculated()
+    {
+        var sheet = new Worksheet(10, 3);
+
+        sheet.Cells["A1"].Value = 1;
+        sheet.Cells["A2"].Value = 2;
+        sheet.Cells["A3"].Formula = "=A1+A2";
+        sheet.Cells["B1"].Formula = "=SUM(A1:A3)";
+        sheet.Cells["B2"].Formula = "=SUM(A1:A3)";
+        sheet.Cells["B3"].Formula = "=MAX(A1:A3)";
+
+        sheet.Cells["A1"].Value = 10;
+
+        Assert.Equal(24d, sheet.Cells["B1"].Value);
+        Assert.Equal(24d, sheet.Cells["B2"].Value);
+        Assert.Equal(12d, sheet.Cells["B3"].Value);
+    }
 }

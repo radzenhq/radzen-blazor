@@ -2,6 +2,8 @@
 
 namespace Radzen.Documents.Spreadsheet;
 
+internal readonly record struct RangeKey(Worksheet Worksheet, int StartRow, int StartColumn, int Rows, int Columns, int LogicalRows, int LogicalColumns);
+
 internal sealed class RangeReference(FormulaEvaluator evaluator, Worksheet worksheet, int startRow, int startColumn, int rows, int columns, int logicalRows, int logicalColumns, bool isCell)
 {
     public Worksheet Worksheet { get; } = worksheet;
@@ -20,6 +22,8 @@ internal sealed class RangeReference(FormulaEvaluator evaluator, Worksheet works
 
     public bool IsCell { get; } = isCell;
 
+    public RangeKey Key => new(Worksheet, StartRow, StartColumn, Rows, Columns, LogicalRows, LogicalColumns);
+
     public CellData this[int row, int column]
     {
         get
@@ -34,7 +38,7 @@ internal sealed class RangeReference(FormulaEvaluator evaluator, Worksheet works
 
             if (!Worksheet.Cells.TryGet(sheetRow, sheetColumn, out var cell))
             {
-                return new CellData(null);
+                return CellData.Empty;
             }
 
             return evaluator.ReadCell(cell);

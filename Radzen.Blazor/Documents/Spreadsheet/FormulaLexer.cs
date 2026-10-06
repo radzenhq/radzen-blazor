@@ -89,8 +89,11 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     public CellError ErrorValue { get; set; }
 
 
-    public List<FormulaTokenTrivia> LeadingTrivia { get; } = new();
-    public List<FormulaTokenTrivia> TrailingTrivia { get; } = new();
+    private List<FormulaTokenTrivia>? leadingTrivia;
+    private List<FormulaTokenTrivia>? trailingTrivia;
+
+    public List<FormulaTokenTrivia> LeadingTrivia => leadingTrivia ??= [];
+    public List<FormulaTokenTrivia> TrailingTrivia => trailingTrivia ??= [];
 
     // The inclusive start index and exclusive end index of the token
     // including its leading and trailing trivia within the original expression.
@@ -304,10 +307,17 @@ internal class FormulaLexer(string expression, bool strict = true)
                 break;
             }
 
-            token.LeadingTrivia.AddRange(leadingTrivia);
+            if (leadingTrivia.Count > 0)
+            {
+                token.LeadingTrivia.AddRange(leadingTrivia);
+            }
 
             var trailingTrivia = ScanTrivia();
-            token.TrailingTrivia.AddRange(trailingTrivia);
+
+            if (trailingTrivia.Count > 0)
+            {
+                token.TrailingTrivia.AddRange(trailingTrivia);
+            }
 
             token.Start = tokenStart;
             token.End = position;
@@ -323,8 +333,15 @@ internal class FormulaLexer(string expression, bool strict = true)
         yield return endToken;
     }
 
+    private static readonly List<FormulaTokenTrivia> NoTrivia = [];
+
     private List<FormulaTokenTrivia> ScanTrivia()
     {
+        if (!char.IsWhiteSpace(Peek()))
+        {
+            return NoTrivia;
+        }
+
         var trivia = new List<FormulaTokenTrivia>();
         var whitespaceBuffer = new StringBuilder();
 

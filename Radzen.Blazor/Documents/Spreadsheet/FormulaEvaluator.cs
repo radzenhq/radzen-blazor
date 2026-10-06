@@ -50,6 +50,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
     private readonly List<Cell> missing = [];
     private bool deferred;
     private bool scanning;
+    private bool readerSpecific;
     private bool arrayContext;
 
     public IReadOnlyList<Cell> Missing => missing;
@@ -394,6 +395,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
 
         if (cell == formulaCell || recalculation.IsCircular(formulaCell, cell))
         {
+            readerSpecific = true;
             return CellData.FromError(CellError.Circular);
         }
 
@@ -424,9 +426,19 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
             return CellData.FromError(CellError.NA);
         }
 
-        var cells = new RangeList(reference.Rows, reference.Columns, reference.StartRow, reference.StartColumn, reference.Worksheet, reference.LogicalRows, reference.LogicalColumns);
+        var cells = new RangeList(reference.Rows, reference.Columns, reference.StartRow, reference.StartColumn, reference.Worksheet, reference.LogicalRows, reference.LogicalColumns)
+        {
+            Capacity = reference.Rows * reference.Columns
+        };
+
+        if (recalculation is not null && recalculation.TryGetRangeValues(reference.Key, out var cached))
+        {
+            cells.AddRange(cached);
+            return cells;
+        }
 
         scanning = true;
+        readerSpecific = false;
 
         for (var row = 0; row < reference.Rows; row++)
         {
@@ -438,6 +450,11 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
 
         scanning = false;
         deferred = missing.Count > 0;
+
+        if (recalculation is not null && !deferred && !readerSpecific)
+        {
+            recalculation.SetRangeValues(reference.Key, [.. cells]);
+        }
 
         return cells;
     }

@@ -673,7 +673,7 @@ static class XlsxReader
 
     private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
     {
-        var sharedFormulas = new Dictionary<string, (string Formula, CellRef Master)>();
+        var sharedFormulas = new Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)>();
 
         foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
         {
@@ -681,7 +681,7 @@ static class XlsxReader
         }
     }
 
-    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
+    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
     {
         var rowIndex = rowElem.Attribute("r")?.Value;
         var rowHeight = rowElem.Attribute("ht")?.Value;
@@ -714,7 +714,7 @@ static class XlsxReader
         }
     }
 
-    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
+    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, FormulaSyntaxTree Tree, CellRef Master)> sharedFormulas)
     {
         var cellRef = cellElem.Attribute("r")!;
 
@@ -754,11 +754,12 @@ static class XlsxReader
         {
             if (!string.IsNullOrEmpty(formulaValue))
             {
-                sharedFormulas[si] = (formulaValue, address);
+                var sharedFormula = "=" + formulaValue;
+                sharedFormulas[si] = (sharedFormula, FormulaParser.Parse(sharedFormula), address);
             }
             else if (sharedFormulas.TryGetValue(si, out var shared))
             {
-                formulaValue = Worksheet.AdjustFormulaForCopy("=" + shared.Formula,
+                formulaValue = Worksheet.AdjustParsedFormulaForCopy(shared.Formula, shared.Tree,
                     address.Row - shared.Master.Row, address.Column - shared.Master.Column);
             }
         }
