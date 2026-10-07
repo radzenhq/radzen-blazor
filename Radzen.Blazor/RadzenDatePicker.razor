@@ -73,8 +73,6 @@
                             </div>
                         </div>
                         }
-                        @if(ShowDays)
-                        {
                         @if (currentView == CalendarViewKind.Months)
                         {
                         <div class="rz-calendar-view-container">
@@ -102,7 +100,7 @@
                             </div>
                         </div>
                         }
-                        else
+                        else if (ShowDays)
                         {
                         <div class="rz-calendar-views">
                             @{
@@ -221,7 +219,6 @@
                                 </div>
                             }
                         </div>
-                        }
                         }
                         @if (FooterTemplate != null)
                         {

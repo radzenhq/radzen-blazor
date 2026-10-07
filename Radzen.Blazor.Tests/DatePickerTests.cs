@@ -1079,6 +1079,84 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_ShowDaysFalse_DrillDown_Opens_In_Month_Grid()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowDays, false);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 5, 1));
+            });
+
+            var monthCells = component.FindAll(".rz-calendar-month-cell");
+            Assert.Equal(12, monthCells.Count);
+            Assert.Contains("rz-state-active", monthCells[4].ClassName);
+            Assert.Empty(component.FindAll("table[role=grid]"));
+            Assert.Empty(component.FindAll(".rz-calendar-year-cell"));
+            Assert.Contains("2024", component.Find(".rz-calendar-title-button").TextContent);
+        }
+
+        [Fact]
+        public void DatePicker_ShowDaysFalse_DrillDown_Returns_From_Year_Grid_And_Picks_Month()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            DateTime? currentDate = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowDays, false);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 5, 1));
+                parameters.Add(p => p.CurrentDateChanged, args => currentDate = args);
+            });
+
+            component.InvokeAsync(() => component.Find(".rz-calendar-title-button").Click());
+            var yearCells = component.FindAll(".rz-calendar-year-cell");
+            Assert.Equal(12, yearCells.Count);
+            Assert.Empty(component.FindAll(".rz-calendar-month-cell"));
+
+            component.InvokeAsync(() => component.Find(".rz-calendar-title-button").Click());
+            Assert.Equal(12, component.FindAll(".rz-calendar-year-cell").Count);
+
+            component.InvokeAsync(() => component.FindAll(".rz-calendar-year-cell").First(c => c.TextContent == "2025").Click());
+            Assert.Equal(12, component.FindAll(".rz-calendar-month-cell").Count);
+            Assert.Empty(component.FindAll(".rz-calendar-year-cell"));
+            Assert.Contains("2025", component.Find(".rz-calendar-title-button").TextContent);
+
+            component.InvokeAsync(() => component.FindAll(".rz-calendar-month-cell")[2].Click());
+            var monthCells = component.FindAll(".rz-calendar-month-cell");
+            Assert.Equal(12, monthCells.Count);
+            Assert.Contains("rz-state-active", monthCells[2].ClassName);
+            Assert.Empty(component.FindAll("table[role=grid]"));
+            Assert.Equal(new DateTime(2025, 3, 1), currentDate);
+        }
+
+        [Fact]
+        public void DatePicker_ShowDaysFalse_DropDown_Renders_Header_DropDowns_Only()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowDays, false);
+                parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DropDown);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 5, 1));
+            });
+
+            Assert.Single(component.FindAll(".rz-calendar-month-dropdown"));
+            Assert.Single(component.FindAll(".rz-calendar-year-dropdown"));
+            Assert.Empty(component.FindAll(".rz-calendar-month-cell"));
+            Assert.Empty(component.FindAll("table[role=grid]"));
+        }
+
+        [Fact]
         public void DatePicker_Multiple_Selects_IEnumerableDateTime()
         {
             using var ctx = new TestContext();

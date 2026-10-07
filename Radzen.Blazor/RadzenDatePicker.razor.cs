@@ -149,6 +149,8 @@ namespace Radzen.Blazor
 
         internal CalendarViewKind CurrentView => currentView;
 
+        CalendarViewKind DefaultView => ShowDays || NavigationMode != DatePickerNavigationMode.DrillDown ? CalendarViewKind.Days : CalendarViewKind.Months;
+
         const int YearsPerPage = 12;
 
         int YearsPageStart
@@ -194,8 +196,16 @@ namespace Radzen.Blazor
             }
 
             SetMonth(calendarMonth);
-            currentView = CalendarViewKind.Days;
-            shouldFocusDay = true;
+
+            if (ShowDays)
+            {
+                currentView = CalendarViewKind.Days;
+                shouldFocusDay = true;
+            }
+            else
+            {
+                shouldFocusMonthCell = true;
+            }
         }
 
         internal void SelectViewYear(int calendarYear)
@@ -284,7 +294,7 @@ namespace Radzen.Blazor
 
         void ResetView()
         {
-            currentView = CalendarViewKind.Days;
+            currentView = DefaultView;
         }
 
         bool shouldFocusMonthCell;
@@ -2108,7 +2118,9 @@ namespace Radzen.Blazor
         public IFormFieldContext? FormFieldContext { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether days part is shown.
+        /// Gets or sets a value indicating whether days part is shown. When <c>false</c> and <see cref="NavigationMode" /> is
+        /// <see cref="DatePickerNavigationMode.DrillDown" /> the calendar opens in the month grid, the title drills up to the year grid
+        /// and picking a month updates <see cref="CurrentDateChanged" /> without leaving the month grid.
         /// </summary>
         /// <value><c>true</c> if days part is shown; otherwise, <c>false</c>.</value>
         [Parameter]
@@ -2629,7 +2641,15 @@ namespace Radzen.Blazor
 
             var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
+            var shouldResetView = parameters.DidParameterChange(nameof(ShowDays), ShowDays)
+                || parameters.DidParameterChange(nameof(NavigationMode), NavigationMode);
+
             await base.SetParametersAsync(parameters);
+
+            if (shouldResetView)
+            {
+                ResetView();
+            }
 
             if (shouldUpdateYearsAndMonths)
             {
