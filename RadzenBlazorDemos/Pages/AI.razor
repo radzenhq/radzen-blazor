@@ -18,12 +18,16 @@
         <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
             <RadzenText TextStyle="TextStyle.DisplayH3" Text="RadzenAIChat" TagName="TagName.H2"></RadzenText>
             <RadzenText>
-                <strong>RadzenAIChat</strong> is a Blazor-native chat component that integrates with any OpenAI-compatible service (OpenAI, Azure OpenAI, local servers, or third-party providers).
+                <strong>RadzenAIChat</strong> is a Blazor-native chat component built on <strong>Microsoft.Extensions.AI</strong>. It works with any OpenAI-compatible service out of the box and with any <code>IChatClient</code> provider (OpenAI, Azure OpenAI, Ollama, local servers, or third-party providers).
             </RadzenText>
             <RadzenStack Gap="1rem">
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Works with any OpenAI API-compatible endpoint</RadzenText>
+                    <RadzenText>Works with any OpenAI API-compatible endpoint or Microsoft.Extensions.AI IChatClient</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Tool calling with your C# methods, human-in-the-loop approvals and generative UI with Radzen components</RadzenText>
                 </RadzenStack>
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenIcon Icon="task_alt" />

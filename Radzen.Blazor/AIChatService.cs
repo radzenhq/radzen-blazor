@@ -1,30 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System.Linq;
+using System.Net.Http;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Radzen;
 
 /// <summary>
 /// Service for interacting with AI chat models to get completions with conversation memory.
+/// Uses the <see cref="IChatClient"/> registered in the service collection, or an <see cref="OpenAICompatibleChatClient"/> configured from <see cref="AIChatServiceOptions"/> when none is registered.
+/// Tools passed via <see cref="ChatOptions.Tools"/> are invoked automatically with a <see cref="FunctionInvokingChatClient"/>.
 /// </summary>
-[UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
 public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServiceOptions> options) : IAIChatService
 {
     private readonly Dictionary<string, ConversationSession> sessions = new();
     private readonly object sessionsLock = new();
-
-    // Add this static field to cache the JsonSerializerOptions instance
-    private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+    private readonly Dictionary<string, IChatClient> clients = new();
 
     /// <summary>
     /// Gets the configuration options for the chat streaming service.
@@ -32,100 +30,93 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ChatCompletionRequest))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ChatCompletionMessage))]
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
             throw new ArgumentException("User input cannot be null or empty.", nameof(userInput));
         }
 
-        // Get or create session
-        var session = GetOrCreateSession(sessionId);
-
-        // Add user message to conversation history
-        session.AddMessage("user", userInput);
-
-        // Use runtime parameters or fall back to configured options
-        var url = proxy ?? Options.Proxy ?? endpoint ?? Options.Endpoint;
-        var effectiveApiKey = apiKey ?? Options.ApiKey;
-        var effectiveApiKeyHeader = apiKeyHeader ?? Options.ApiKeyHeader;
-
-        // Get formatted messages including conversation history
-        var messages = session.GetFormattedMessages(systemPrompt ?? Options.SystemPrompt);
-
-        var payload = new ChatCompletionRequest
+        var chatOptions = new ChatOptions
         {
-            Model = model ?? Options.Model,
-            Messages = messages,
-            Temperature = temperature ?? Options.Temperature,
-            MaxTokens = maxTokens ?? Options.MaxTokens,
-            Stream = true
+            ModelId = model,
+            Instructions = systemPrompt,
+            Temperature = temperature.HasValue ? (float)temperature.Value : null,
+            MaxOutputTokens = maxTokens
         };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        await foreach (var update in GetStreamingResponseAsync(new ChatMessage(ChatRole.User, userInput), sessionId, chatOptions, endpoint, proxy, apiKey, apiKeyHeader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
         {
-            Content = new StringContent(JsonSerializer.Serialize(payload, CachedJsonSerializerOptions), Encoding.UTF8, "application/json")
-        };
-
-        if (!string.IsNullOrEmpty(effectiveApiKey))
-        {
-            if (string.IsNullOrWhiteSpace(effectiveApiKeyHeader))
-            {
-                throw new InvalidOperationException("API key header must be specified when an API key is provided.");
-            }
-
-            if (string.Equals(effectiveApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", effectiveApiKey);
-            }
-            else
-            {
-                request.Headers.Add(effectiveApiKeyHeader, effectiveApiKey);
-            }
-        }
-
-        var httpClient = serviceProvider.GetRequiredService<HttpClient>();
-        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new HttpRequestException($"Chat stream failed: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}");
-        }
-
-        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using var reader = new StreamReader(stream);
-
-        var assistantResponse = new StringBuilder();
-
-        string? line;
-        while ((line = await reader.ReadLineAsync()) is not null && !cancellationToken.IsCancellationRequested)
-        {
-            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:", StringComparison.Ordinal))
+            if (update.Role != null && update.Role != ChatRole.Assistant)
             {
                 continue;
             }
 
-            var json = line["data:".Length..].Trim();
-
-            if (json == "[DONE]")
+            foreach (var content in update.Contents.OfType<TextContent>())
             {
-                break;
-            }
-
-            var content = ParseStreamingResponse(json);
-            if (!string.IsNullOrEmpty(content))
-            {
-                assistantResponse.Append(content);
-                yield return content;
+                if (!string.IsNullOrEmpty(content.Text))
+                {
+                    yield return content.Text;
+                }
             }
         }
+    }
 
-        // Add assistant response to conversation history
-        if (assistantResponse.Length > 0)
+    /// <inheritdoc />
+    public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        var session = GetOrCreateSession(sessionId);
+
+        options = options == null ? new ChatOptions() : options.Clone();
+        options.ModelId ??= Options.Model;
+        options.Instructions ??= Options.SystemPrompt;
+        options.Temperature ??= (float)Options.Temperature;
+        options.MaxOutputTokens ??= Options.MaxTokens;
+
+        var client = GetChatClient(endpoint, proxy, apiKey, apiKeyHeader);
+
+        var userText = string.Concat(message.Contents.OfType<TextContent>().Select(content => content.Text));
+
+        if (userText.Length > 0)
         {
-            session.AddMessage("assistant", assistantResponse.ToString());
+            session.AddMessage("user", userText);
+        }
+
+        session.AddHistory([message]);
+
+        var updates = new List<ChatResponseUpdate>();
+
+        try
+        {
+            await foreach (var update in client.GetStreamingResponseAsync(session.History, options, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                updates.Add(update);
+
+                yield return update;
+            }
+        }
+        finally
+        {
+            if (updates.Count > 0)
+            {
+                var response = updates.ToChatResponse();
+
+                session.AddHistory(response.Messages);
+
+                var displayMessage = ToDisplayMessage(response);
+
+                if (displayMessage != null)
+                {
+                    MergeToolCalls(session, displayMessage);
+
+                    if (displayMessage.Content.Length > 0 || displayMessage.ToolCalls.Count > 0)
+                    {
+                        session.AddMessage(displayMessage);
+                    }
+                }
+            }
         }
     }
 
@@ -192,71 +183,169 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         }
     }
 
-    private static string ParseStreamingResponse(string json)
+    /// <summary>
+    /// Builds the <see cref="Blazor.ChatMessage"/> shown for a model response: its text and the tool calls it made.
+    /// </summary>
+    /// <param name="response">The response.</param>
+    /// <returns>The message, or <c>null</c> when the response has neither text nor tool calls.</returns>
+    public static Blazor.ChatMessage? ToDisplayMessage(ChatResponse response)
     {
-        if (string.IsNullOrWhiteSpace(json))
+        ArgumentNullException.ThrowIfNull(response);
+
+        var message = new Blazor.ChatMessage
         {
-            return string.Empty;
+            UserId = "assistant",
+            Role = "assistant",
+            IsUser = false,
+            Timestamp = DateTime.Now
+        };
+
+        var text = new StringBuilder();
+
+        foreach (var responseMessage in response.Messages)
+        {
+            foreach (var content in responseMessage.Contents)
+            {
+                ApplyContent(message, content, text);
+            }
         }
 
-        try
+        message.Content = text.ToString();
+
+        return message.Content.Length == 0 && message.ToolCalls.Count == 0 ? null : message;
+    }
+
+    /// <summary>
+    /// Applies a piece of response content to a displayed message: appends text and tracks tool calls, their results and approval requests.
+    /// </summary>
+    /// <param name="message">The displayed message.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="text">The builder that accumulates the message text.</param>
+    public static void ApplyContent(Blazor.ChatMessage message, AIContent content, StringBuilder text)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(text);
+
+        switch (content)
         {
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
+            case TextContent textContent:
+                text.Append(textContent.Text);
+                break;
+            case FunctionCallContent call:
+                message.ToolCalls.Add(new Blazor.ChatToolCall
+                {
+                    CallId = call.CallId,
+                    Name = call.Name,
+                    Arguments = call.Arguments,
+                    Exception = call.Exception,
+                    Status = call.Exception != null ? Blazor.ChatToolCallStatus.Failed : Blazor.ChatToolCallStatus.Pending
+                });
+                break;
+            case FunctionResultContent result:
+                {
+                    var call = message.ToolCalls.FirstOrDefault(toolCall => toolCall.CallId == result.CallId);
 
-            if (!root.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
-            {
-                return string.Empty;
-            }
+                    if (call == null)
+                    {
+                        call = new Blazor.ChatToolCall { CallId = result.CallId };
+                        message.ToolCalls.Add(call);
+                    }
 
-            var firstChoice = choices[0];
+                    call.Result = result.Result;
+                    call.Exception = result.Exception;
+                    call.Status = result.Exception != null ? Blazor.ChatToolCallStatus.Failed : call.Status == Blazor.ChatToolCallStatus.Rejected ? call.Status : Blazor.ChatToolCallStatus.Completed;
+                }
+                break;
+            case ToolApprovalRequestContent approval when approval.ToolCall is FunctionCallContent call:
+                {
+                    var existing = message.ToolCalls.FirstOrDefault(toolCall => toolCall.CallId == call.CallId);
 
-            if (!firstChoice.TryGetProperty("delta", out var delta))
-            {
-                return string.Empty;
-            }
+                    if (existing == null)
+                    {
+                        existing = new Blazor.ChatToolCall { CallId = call.CallId };
+                        message.ToolCalls.Add(existing);
+                    }
 
-            if (delta.TryGetProperty("content", out var contentElement))
-            {
-                return contentElement.GetString() ?? string.Empty;
-            }
+                    existing.Name = call.Name;
+                    existing.Arguments = call.Arguments;
+                    existing.ApprovalRequest = approval;
+                    existing.Status = Blazor.ChatToolCallStatus.AwaitingApproval;
+                }
+                break;
+            case ErrorContent error:
+                if (text.Length > 0)
+                {
+                    text.AppendLine();
+                }
 
-            return string.Empty;
-        }
-        catch (JsonException)
-        {
-            return string.Empty;
-        }
-        catch (FormatException)
-        {
-            return string.Empty;
+                text.Append(error.Message);
+                break;
         }
     }
-}
 
-internal class ChatCompletionMessage
-{
-    [JsonPropertyName("role")]
-    public string? Role { get; set; }
+    private static void MergeToolCalls(ConversationSession session, Blazor.ChatMessage displayMessage)
+    {
+        for (var index = displayMessage.ToolCalls.Count - 1; index >= 0; index--)
+        {
+            var call = displayMessage.ToolCalls[index];
+            var existing = session.Messages.SelectMany(message => message.ToolCalls).FirstOrDefault(toolCall => toolCall.CallId == call.CallId);
 
-    [JsonPropertyName("content")]
-    public string? Content { get; set; }
-}
+            if (existing == null)
+            {
+                continue;
+            }
 
-internal class ChatCompletionRequest
-{
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
+            if (!string.IsNullOrEmpty(call.Name))
+            {
+                existing.Name = call.Name;
+                existing.Arguments = call.Arguments;
+            }
 
-    [JsonPropertyName("messages")]
-    public List<object>? Messages { get; set; }
+            existing.Result = call.Result;
+            existing.Exception = call.Exception;
+            existing.Status = call.Status;
 
-    [JsonPropertyName("temperature")]
-    public double Temperature { get; set; }
+            displayMessage.ToolCalls.RemoveAt(index);
+        }
+    }
 
-    [JsonPropertyName("max_tokens")]
-    public int? MaxTokens { get; set; }
+    private IChatClient GetChatClient(string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
+    {
+        var hasOverrides = endpoint != null || proxy != null || apiKey != null || apiKeyHeader != null;
+        var key = hasOverrides ? string.Join("|", endpoint, proxy, apiKey, apiKeyHeader) : string.Empty;
 
-    [JsonPropertyName("stream")]
-    public bool Stream { get; set; }
+        lock (clients)
+        {
+            if (!clients.TryGetValue(key, out var client))
+            {
+                client = hasOverrides ? CreateOpenAIClient(endpoint, proxy, apiKey, apiKeyHeader) : serviceProvider.GetService<IChatClient>() ?? CreateOpenAIClient(null, null, null, null);
+
+                if (client.GetService<FunctionInvokingChatClient>() == null)
+                {
+                    client = new FunctionInvokingChatClient(client, serviceProvider.GetService<ILoggerFactory>(), serviceProvider);
+                }
+
+                clients[key] = client;
+            }
+
+            return client;
+        }
+    }
+
+    private OpenAICompatibleChatClient CreateOpenAIClient(string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
+    {
+        var url = proxy ?? Options.Proxy ?? endpoint ?? Options.Endpoint;
+        var effectiveApiKey = apiKey ?? Options.ApiKey;
+        var effectiveApiKeyHeader = apiKeyHeader ?? Options.ApiKeyHeader;
+
+        if (!string.IsNullOrEmpty(effectiveApiKey) && string.IsNullOrWhiteSpace(effectiveApiKeyHeader))
+        {
+            throw new InvalidOperationException("API key header must be specified when an API key is provided.");
+        }
+
+        var httpClient = serviceProvider.GetService<HttpClient>() ?? throw new InvalidOperationException("Register an HttpClient or an IChatClient to use the AIChatService.");
+
+        return new OpenAICompatibleChatClient(httpClient, url, effectiveApiKey, effectiveApiKeyHeader, Options.Model);
+    }
 }

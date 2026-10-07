@@ -43,6 +43,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.*" />
   </ItemGroup>
 
   <ItemGroup>

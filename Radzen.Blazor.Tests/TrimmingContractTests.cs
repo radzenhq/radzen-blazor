@@ -225,8 +225,6 @@ namespace Radzen.Blazor.Tests
                 "Radzen.Theme",
                 "Radzen.Documents.Spreadsheet.ChartDataPoint",
                 "Radzen.ODataServiceResult`1",
-                "Radzen.ChatCompletionRequest",
-                "Radzen.ChatCompletionMessage",
                 "Radzen.Blazor.GoogleMapMarkerData",
                 "Radzen.GoogleMapPosition",
                 "Radzen.GoogleMapBoundsChangedEventArgs",

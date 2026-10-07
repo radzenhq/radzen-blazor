@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.AI;
 
 namespace Radzen;
 
@@ -26,6 +27,22 @@ public interface IAIChatService
     IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null);
 
     /// <summary>
+    /// Streams the response of the AI model to a message with conversation memory. Tools in <see cref="ChatOptions.Tools"/> are invoked automatically;
+    /// their calls and results are yielded as <see cref="FunctionCallContent"/> and <see cref="FunctionResultContent"/> and a tool wrapped in
+    /// <see cref="ApprovalRequiredAIFunction"/> yields a <see cref="ToolApprovalRequestContent"/> that must be answered with a message carrying a <see cref="ToolApprovalResponseContent"/>.
+    /// </summary>
+    /// <param name="message">The message to send. Usually a user message with text, or a user message carrying a <see cref="ToolApprovalResponseContent"/>.</param>
+    /// <param name="sessionId">Optional session ID to maintain conversation context. If null, a new session will be created.</param>
+    /// <param name="options">Optional chat options. <see cref="ChatOptions.ModelId"/>, <see cref="ChatOptions.Instructions"/>, <see cref="ChatOptions.Temperature"/> and <see cref="ChatOptions.MaxOutputTokens"/> fall back to the configured <see cref="AIChatServiceOptions"/> when not set.</param>
+    /// <param name="endpoint">Optional endpoint URL to override the configured endpoint. Ignored when an <see cref="IChatClient"/> is registered and no override is specified.</param>
+    /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
+    /// <param name="apiKey">Optional API key to override the configured API key.</param>
+    /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>An async enumerable that yields the streaming response updates of the AI model.</returns>
+    IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets or creates a conversation session.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>
@@ -50,4 +67,3 @@ public interface IAIChatService
     /// <param name="maxAgeHours">Maximum age in hours for sessions to keep.</param>
     void CleanupOldSessions(int maxAgeHours = 24);
 }
-

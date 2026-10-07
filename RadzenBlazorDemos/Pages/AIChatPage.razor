@@ -65,6 +65,81 @@
     <AIChatWithMemory />
 </RadzenExample>
 
+<RadzenText Anchor="aichat#tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tool calling
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Give the model access to your application's data and logic with the <code>Tools</code> parameter. Tools are <code>AIFunction</code> instances from
+    <code>Microsoft.Extensions.AI</code> - create them from any C# method with <code>AIFunctionFactory.Create</code> and describe them with <code>[Description]</code> attributes.
+    The model decides when to call a tool, <strong>AIChat</strong> invokes it, shows the call in the conversation and feeds the result back to the model.
+    The <code>ToolCallCompleted</code> event fires when a tool finishes.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatTools">
+    <AIChatTools />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#generative-ui" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Generative UI
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>ToolCallTemplate</code> to render tool results with Radzen components instead of text. The template receives a <code>ChatToolCall</code> with the tool
+    <code>Name</code>, <code>Arguments</code>, <code>Status</code> and <code>Result</code>; call <code>GetResult&lt;T&gt;()</code> to deserialize the result.
+    Ask for the sales by month to get a chart, or for the orders of a customer to get a data grid, directly in the conversation.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatGenerativeUI">
+    <AIChatGenerativeUI />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#approval" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Human in the loop
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Wrap a tool in <code>ApprovalRequiredAIFunction</code> to ask the user before it runs. <strong>AIChat</strong> renders the call with its arguments and
+    <strong>Approve</strong> / <strong>Reject</strong> buttons, invokes the tool only when approved and tells the model when the call was rejected.
+    Use <code>ToolCallTemplate</code> with <code>ApproveToolCall</code> and <code>RejectToolCall</code> to build your own approval UI.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatApproval">
+    <AIChatApproval />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#providers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI providers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>AIChat</strong> talks to the model through the <code>IChatClient</code> abstraction of <code>Microsoft.Extensions.AI</code>.
+    <code>AddAIChatService</code> configures the built-in <code>OpenAICompatibleChatClient</code>, which works with any OpenAI-compatible chat completions endpoint
+    (OpenAI, Azure OpenAI, Ollama, LM Studio, Cloudflare Workers AI and others) and supports streaming and tool calling.
+</RadzenText>
+<pre>
+<code>
+builder.Services.AddAIChatService(options =>
+{
+    options.Endpoint = "https://api.openai.com/v1/chat/completions";
+    options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
+    options.Model = "gpt-4o-mini";
+});
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    To use a different provider, register its <code>IChatClient</code> and <strong>AIChat</strong> picks it up automatically. Any middleware added with
+    <code>ChatClientBuilder</code> (logging, caching, OpenTelemetry, rate limiting) applies to the chat as well.
+</RadzenText>
+<pre>
+<code>
+// OpenAI (Microsoft.Extensions.AI.OpenAI)
+builder.Services.AddChatClient(new OpenAIClient(apiKey).GetChatClient("gpt-4o-mini").AsIChatClient())
+    .UseLogging();
+
+// Azure OpenAI (Azure.AI.OpenAI + Microsoft.Extensions.AI.OpenAI)
+builder.Services.AddChatClient(new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential()).GetChatClient("gpt-4o-mini").AsIChatClient());
+
+// Ollama (OllamaSharp)
+builder.Services.AddChatClient(new OllamaApiClient(new Uri("http://localhost:11434"), "llama3.2"));
+
+builder.Services.AddAIChatService();
+</code>
+</pre>
+
 <RadzenText Anchor="aichat#configuration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Runtime AI Configuration
 </RadzenText>

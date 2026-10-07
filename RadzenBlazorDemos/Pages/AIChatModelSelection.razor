@@ -87,15 +87,16 @@
     private RadzenAIChat modelChat;
 
     // Default values
-    private const string DefaultModel = "@cf/meta/llama-4-scout-17b-16e-instruct";
+    private const string DefaultModel = "@cf/openai/gpt-oss-120b";
 
     // Configuration parameters
     private string selectedModel = DefaultModel;
     
     private List<string> availableModels = new()
     {
+        "@cf/openai/gpt-oss-120b",
+        "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
         "@cf/meta/llama-4-scout-17b-16e-instruct",
-        "@cf/qwen/qwen3-30b-a3b-fp8",
         "@cf/mistral/mistral-7b-instruct-v0.1"
     };
 

@@ -2202,14 +2202,16 @@ namespace RadzenBlazorDemos
                     Name = "AIChat",
                     Title = "Blazor AI Chat Component | Free Radzen Blazor",
                     Path = "aichat",
-                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants.",
+                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants with tool calling, generative UI and human-in-the-loop approvals.",
                     Related = new [] { "chat", "ai", "speechtotextbutton" },
                     Faq = new []
                     {
-                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." }
+                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." },
+                        new FaqItem { Question = "Can the AI call my application code?", Answer = "Yes. Pass AIFunction tools created with AIFunctionFactory to the Tools parameter. The model calls them, the component invokes them and renders the calls; wrap a tool in ApprovalRequiredAIFunction to ask the user first." },
+                        new FaqItem { Question = "Which AI providers are supported?", Answer = "Any OpenAI-compatible endpoint out of the box, and any Microsoft.Extensions.AI IChatClient (OpenAI, Azure OpenAI, Ollama and others) registered in the service collection." }
                     },
                     Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui" }
                 },
                 new Example
                 {

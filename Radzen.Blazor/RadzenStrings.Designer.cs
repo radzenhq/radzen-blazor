@@ -865,5 +865,15 @@ namespace Radzen.Blazor {
         public static string MarkdownEditorTableAlignLeft_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignLeft_Title", resourceCulture); } }
         public static string MarkdownEditorTableAlignCenter_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignCenter_Title", resourceCulture); } }
         public static string MarkdownEditorTableAlignRight_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignRight_Title", resourceCulture); } }
+        public static string AIChat_ToolApprovalMessage { get { return ResourceManager.GetString("AIChat_ToolApprovalMessage", resourceCulture); } }
+        public static string AIChat_ApproveText { get { return ResourceManager.GetString("AIChat_ApproveText", resourceCulture); } }
+        public static string AIChat_RejectText { get { return ResourceManager.GetString("AIChat_RejectText", resourceCulture); } }
+        public static string AIChat_ToolCallPending { get { return ResourceManager.GetString("AIChat_ToolCallPending", resourceCulture); } }
+        public static string AIChat_ToolCallCompleted { get { return ResourceManager.GetString("AIChat_ToolCallCompleted", resourceCulture); } }
+        public static string AIChat_ToolCallFailed { get { return ResourceManager.GetString("AIChat_ToolCallFailed", resourceCulture); } }
+        public static string AIChat_ToolCallAwaitingApproval { get { return ResourceManager.GetString("AIChat_ToolCallAwaitingApproval", resourceCulture); } }
+        public static string AIChat_ToolCallRejected { get { return ResourceManager.GetString("AIChat_ToolCallRejected", resourceCulture); } }
+        public static string AIChat_ToolCallArguments { get { return ResourceManager.GetString("AIChat_ToolCallArguments", resourceCulture); } }
+        public static string AIChat_ToolCallResult { get { return ResourceManager.GetString("AIChat_ToolCallResult", resourceCulture); } }
     }
 }

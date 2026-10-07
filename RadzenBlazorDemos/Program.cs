@@ -26,7 +26,7 @@ builder.Services.AddSingleton<GitHubService>();
 builder.Services.AddAIChatService(options =>
 {
     options.Proxy = "api/chat/completions";
-    options.Model = "@cf/meta/llama-4-scout-17b-16e-instruct";
+    options.Model = "@cf/openai/gpt-oss-120b";
     options.SystemPrompt = "You are a helpful AI code assistant.";
     options.Temperature = 0.7;
 });

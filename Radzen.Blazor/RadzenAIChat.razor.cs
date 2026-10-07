@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.AI;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -133,6 +135,39 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string? ApiKeyHeader { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tools the model can call. Create them with <see cref="AIFunctionFactory"/>; wrap a tool in <see cref="ApprovalRequiredAIFunction"/> to ask the user before it runs.
+        /// Tools are invoked automatically and rendered in the assistant message; use <see cref="ToolCallTemplate"/> to customize how.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<AITool>? Tools { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the model may call several tools in one response. <c>null</c> (the default) leaves it to the provider.
+        /// Set to <c>false</c> when using tools that require approval so that each call is approved on its own.
+        /// </summary>
+        [Parameter]
+        public bool? AllowMultipleToolCalls { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether tool calls are rendered in assistant messages. Default is <c>true</c>.
+        /// </summary>
+        [Parameter]
+        public bool ShowToolCalls { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the template used to render a tool call. The template is responsible for rendering approval UI for calls in the
+        /// <see cref="ChatToolCallStatus.AwaitingApproval"/> state; call <see cref="ApproveToolCall"/> or <see cref="RejectToolCall"/> to answer them.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<ChatToolCall>? ToolCallTemplate { get; set; }
+
+        /// <summary>
+        /// Event callback that is invoked when a tool call completes, fails or is rejected.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChatToolCall> ToolCallCompleted { get; set; }
 
         /// <summary>
         /// Gets or sets whether to show the clear chat button.
@@ -353,6 +388,57 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Approves a tool call that is awaiting the user's approval. The tool is invoked and the model continues its response.
+        /// When the same message holds other calls that still await approval the answer is sent once all of them are answered.
+        /// </summary>
+        /// <param name="call">The tool call.</param>
+        public Task ApproveToolCall(ChatToolCall call) => RespondToToolApproval(call, true);
+
+        /// <summary>
+        /// Rejects a tool call that is awaiting the user's approval. The model is told the call was rejected and continues its response.
+        /// </summary>
+        /// <param name="call">The tool call.</param>
+        public Task RejectToolCall(ChatToolCall call) => RespondToToolApproval(call, false);
+
+        private async Task RespondToToolApproval(ChatToolCall call, bool approved)
+        {
+            ArgumentNullException.ThrowIfNull(call);
+
+            if (call.Status != ChatToolCallStatus.AwaitingApproval || call.ApprovalRequest == null || Disabled || IsLoading)
+            {
+                return;
+            }
+
+            call.Status = approved ? ChatToolCallStatus.Pending : ChatToolCallStatus.Rejected;
+            call.ApprovalResponse = call.ApprovalRequest.CreateResponse(approved);
+
+            if (!approved)
+            {
+                await ToolCallCompleted.InvokeAsync(call);
+            }
+
+            var message = Messages.FirstOrDefault(m => m.ToolCalls.Contains(call));
+            var siblings = message?.ToolCalls ?? [call];
+
+            if (siblings.Any(sibling => sibling.Status == ChatToolCallStatus.AwaitingApproval))
+            {
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            await InvokeAsync(StateHasChanged);
+
+            var responses = siblings.Where(sibling => sibling.ApprovalResponse != null).Select(sibling => (AIContent)sibling.ApprovalResponse!).ToList();
+
+            foreach (var sibling in siblings)
+            {
+                sibling.ApprovalResponse = null;
+            }
+
+            await GetAIResponse(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, responses), Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader);
+        }
+
+        /// <summary>
         /// Loads conversation history from the AI service session.
         /// </summary>
         public async Task LoadConversationHistory()
@@ -367,22 +453,28 @@ namespace Radzen.Blazor
             // Clear current messages
             Messages.Clear();
             
-            // Add messages from session history
             foreach (var message in session.Messages)
             {
-                AddMessage(message.Content, message.IsUser);
+                var copy = AddMessage(message.Content, message.IsUser);
+                copy.Timestamp = message.Timestamp;
+                copy.ToolCalls = message.ToolCalls;
             }
             
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
+        private Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
             {
-                return;
+                return Task.CompletedTask;
             }
 
+            return GetAIResponse(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, userInput), model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
+        }
+
+        private async Task GetAIResponse(Microsoft.Extensions.AI.ChatMessage request, string? model, string? systemPrompt, double? temperature, int? maxTokens, string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
+        {
             IsLoading = true;
             var previousCts = cts;
 #if NET8_0_OR_GREATER
@@ -393,29 +485,49 @@ namespace Radzen.Blazor
             previousCts.Dispose();
             cts = new CancellationTokenSource();
 
-            // Ensure we have a session ID
             if (string.IsNullOrEmpty(currentSessionId))
             {
                 currentSessionId = SessionId ?? Guid.NewGuid().ToString();
                 await SessionIdChanged.InvokeAsync(currentSessionId);
             }
 
-            // Add assistant message placeholder
             var assistantMessage = AddMessage("", false);
             assistantMessage.IsStreaming = true;
 
+            var options = new ChatOptions
+            {
+                ModelId = model,
+                Instructions = systemPrompt,
+                Temperature = temperature.HasValue ? (float)temperature.Value : null,
+                MaxOutputTokens = maxTokens,
+                Tools = Tools?.ToList(),
+                AllowMultipleToolCalls = AllowMultipleToolCalls
+            };
+
+            var text = new StringBuilder();
+            var completedCalls = new List<ChatToolCall>();
+
             try
             {
-                var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader))
+                await foreach (var update in ChatService.GetStreamingResponseAsync(request, currentSessionId, options, endpoint, proxy, apiKey, apiKeyHeader, cts.Token))
                 {
-                    response += token;
-                    assistantMessage.Content = response;
+                    foreach (var content in update.Contents)
+                    {
+                        ApplyContent(assistantMessage, content, text, completedCalls);
+                    }
+
+                    assistantMessage.Content = text.ToString();
                     await InvokeAsync(StateHasChanged);
                 }
 
                 assistantMessage.IsStreaming = false;
-                await ResponseReceived.InvokeAsync(response);
+
+                foreach (var call in completedCalls)
+                {
+                    await ToolCallCompleted.InvokeAsync(call);
+                }
+
+                await ResponseReceived.InvokeAsync(assistantMessage.Content);
                 await MessageAdded.InvokeAsync(assistantMessage);
             }
             catch (Exception ex)
@@ -427,8 +539,97 @@ namespace Radzen.Blazor
             finally
             {
                 IsLoading = false;
+
+                if (assistantMessage.Content.Length == 0 && assistantMessage.ToolCalls.Count == 0)
+                {
+                    Messages.Remove(assistantMessage);
+                }
+
                 await InvokeAsync(StateHasChanged);
             }
+        }
+
+        private void ApplyContent(ChatMessage message, AIContent content, StringBuilder text, List<ChatToolCall> completedCalls)
+        {
+            if (content is FunctionCallContent functionCall)
+            {
+                var existing = FindToolCall(functionCall.CallId);
+
+                if (existing != null)
+                {
+                    existing.Name = functionCall.Name;
+                    existing.Arguments = functionCall.Arguments;
+
+                    if (existing.Status == ChatToolCallStatus.AwaitingApproval)
+                    {
+                        existing.Status = ChatToolCallStatus.Pending;
+                    }
+
+                    return;
+                }
+            }
+
+            if (content is FunctionResultContent result)
+            {
+                var call = FindToolCall(result.CallId);
+
+                if (call != null)
+                {
+                    call.Result = result.Result;
+                    call.Exception = result.Exception;
+
+                    if (call.Status != ChatToolCallStatus.Rejected)
+                    {
+                        call.Status = result.Exception != null ? ChatToolCallStatus.Failed : ChatToolCallStatus.Completed;
+                        completedCalls.Add(call);
+                    }
+
+                    return;
+                }
+            }
+
+            AIChatService.ApplyContent(message, content, text);
+        }
+
+        private ChatToolCall? FindToolCall(string callId)
+        {
+            for (var index = Messages.Count - 1; index >= 0; index--)
+            {
+                var call = Messages[index].ToolCalls.FirstOrDefault(toolCall => toolCall.CallId == callId);
+
+                if (call != null)
+                {
+                    return call;
+                }
+            }
+
+            return null;
+        }
+
+        private static string GetToolCallIcon(ChatToolCall call)
+        {
+            return call.Status switch
+            {
+                ChatToolCallStatus.Pending => "progress_activity",
+                ChatToolCallStatus.AwaitingApproval => "help",
+                ChatToolCallStatus.Completed => "check_circle",
+                ChatToolCallStatus.Failed => "error",
+                ChatToolCallStatus.Rejected => "block",
+                _ => "build"
+            };
+        }
+
+        private string GetToolCallStatusText(ChatToolCall call)
+        {
+            return call.Status switch
+            {
+                ChatToolCallStatus.Pending => Localize(nameof(RadzenStrings.AIChat_ToolCallPending)),
+                ChatToolCallStatus.AwaitingApproval => Localize(nameof(RadzenStrings.AIChat_ToolCallAwaitingApproval)),
+                ChatToolCallStatus.Completed => Localize(nameof(RadzenStrings.AIChat_ToolCallCompleted)),
+                ChatToolCallStatus.Failed => Localize(nameof(RadzenStrings.AIChat_ToolCallFailed)),
+                ChatToolCallStatus.Rejected => Localize(nameof(RadzenStrings.AIChat_ToolCallRejected)),
+                _ => string.Empty
+            };
         }
 
         /// <inheritdoc />

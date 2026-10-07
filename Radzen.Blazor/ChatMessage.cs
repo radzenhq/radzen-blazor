@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor;
 
@@ -36,8 +37,14 @@ public class ChatMessage
     /// Gets or sets whether this message is currently streaming.
     /// </summary>
     public bool IsStreaming { get; set; }
+
     /// <summary>
     /// Gets or sets the role associated with the message (e.g., "user", "assistant").
     /// </summary>
     public string? Role { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tool calls the assistant made while producing this message.
+    /// </summary>
+    public List<ChatToolCall> ToolCalls { get; set; } = new();
 }

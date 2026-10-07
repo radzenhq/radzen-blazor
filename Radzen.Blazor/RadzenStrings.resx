@@ -2567,4 +2567,34 @@
   <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
     <value>Align column right</value>
   </data>
+  <data name="AIChat_ToolApprovalMessage" xml:space="preserve">
+    <value>The assistant wants to run {0}.</value>
+  </data>
+  <data name="AIChat_ApproveText" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="AIChat_RejectText" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="AIChat_ToolCallPending" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="AIChat_ToolCallCompleted" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="AIChat_ToolCallFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="AIChat_ToolCallAwaitingApproval" xml:space="preserve">
+    <value>Needs approval</value>
+  </data>
+  <data name="AIChat_ToolCallRejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="AIChat_ToolCallArguments" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="AIChat_ToolCallResult" xml:space="preserve">
+    <value>Result</value>
+  </data>
 </root>

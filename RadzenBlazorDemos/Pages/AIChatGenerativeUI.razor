@@ -1,0 +1,87 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@inherits DbContextPage
+
+<RadzenAIChat Title="Sales assistant"
+              Placeholder="Try: Show me the 2023 sales by month. List the orders of QUICK from 2023."
+              SystemPrompt="You are a sales assistant for the Northwind trading company. Call GetSalesByMonth for revenue questions and GetOrders for order questions. The results are shown to the user as a chart or a table, so do not repeat the numbers; add a one sentence summary instead."
+              Tools="@tools"
+              Style="height: 600px">
+    <ToolCallTemplate Context="call">
+        @if (call.Status == ChatToolCallStatus.Completed && call.Name == nameof(GetSalesByMonth))
+        {
+            var sales = call.GetResult<List<MonthlySales>>();
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-2 rz-my-2" Style="width: 100%">
+                <RadzenChart Style="height: 240px">
+                    <RadzenColumnSeries Data="@sales" CategoryProperty="Month" ValueProperty="Revenue" Title="@($"Revenue {call.Arguments?["year"]}")" />
+                    <RadzenValueAxis Formatter="@(value => ((double)value).ToString("C0"))">
+                        <RadzenGridLines Visible="true" />
+                    </RadzenValueAxis>
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        }
+        else if (call.Status == ChatToolCallStatus.Completed && call.Name == nameof(GetOrders))
+        {
+            var orders = call.GetResult<List<OrderInfo>>();
+            <RadzenDataGrid Data="@orders" TItem="OrderInfo" AllowSorting="true" Density="Density.Compact" class="rz-my-2" Style="width: 100%">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(OrderInfo.OrderId)" Title="Order" Width="90px" />
+                    <RadzenDataGridColumn Property="@nameof(OrderInfo.OrderDate)" Title="Date" FormatString="{0:d}" />
+                    <RadzenDataGridColumn Property="@nameof(OrderInfo.ShipCountry)" Title="Ship to" />
+                    <RadzenDataGridColumn Property="@nameof(OrderInfo.Freight)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right" />
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else
+        {
+            <RadzenBadge BadgeStyle="@(call.Status == ChatToolCallStatus.Failed ? BadgeStyle.Danger : BadgeStyle.Secondary)" Shade="Shade.Lighter" Text="@($"{call.Name} · {call.Status}")" />
+        }
+    </ToolCallTemplate>
+</RadzenAIChat>
+
+@code {
+    IEnumerable<AITool> tools;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        tools =
+        [
+            AIFunctionFactory.Create(GetSalesByMonth),
+            AIFunctionFactory.Create(GetOrders)
+        ];
+    }
+
+    public record MonthlySales(string Month, double Revenue);
+    public record OrderInfo(int OrderId, DateTime? OrderDate, string ShipCountry, decimal? Freight);
+
+    [Description("Gets the total revenue per month for a year.")]
+    List<MonthlySales> GetSalesByMonth([Description("The year, for example 2023.")] int year)
+    {
+        return dbContext.OrderDetails
+            .Include(d => d.Order)
+            .Where(d => d.Order.OrderDate.HasValue && d.Order.OrderDate.Value.Year == year)
+            .AsEnumerable()
+            .GroupBy(d => d.Order.OrderDate.Value.Month)
+            .OrderBy(g => g.Key)
+            .Select(g => new MonthlySales(new DateTime(year, g.Key, 1).ToString("MMM"), g.Sum(d => (d.UnitPrice ?? 0) * (d.Quantity ?? 0) * (1 - (d.Discount ?? 0)))))
+            .ToList();
+    }
+
+    [Description("Gets the orders of a customer, optionally for a given year. Returns up to 20 orders.")]
+    List<OrderInfo> GetOrders(
+        [Description("The customer id, for example QUICK or ERNSH.")] string customerId,
+        [Description("Optional year, for example 2023. Use 0 for all years.")] int year = 0)
+    {
+        return dbContext.Orders
+            .Where(o => o.CustomerID == customerId && (year == 0 || (o.OrderDate.HasValue && o.OrderDate.Value.Year == year)))
+            .OrderByDescending(o => o.OrderDate)
+            .Take(20)
+            .Select(o => new OrderInfo(o.OrderID, o.OrderDate, o.ShipCountry, o.Freight))
+            .ToList();
+    }
+}

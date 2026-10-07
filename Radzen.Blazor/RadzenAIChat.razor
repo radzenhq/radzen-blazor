@@ -85,16 +85,79 @@
                                     @message.Timestamp.ToString(TimestampFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                                 </div>
                             </RadzenStack>
-                            <div class="rz-chat-message-text">
-                                @if (message.IsStreaming)
-                                {
-                                    @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
-                                }
-                                else
-                                {
-                                    <RadzenMarkdown Text=@message.Content />
-                                }
-                            </div>
+                            @if (ShowToolCalls && message.ToolCalls.Count > 0)
+                            {
+                                <div class="rz-chat-tool-calls">
+                                    @foreach (var call in message.ToolCalls)
+                                    {
+                                        if (ToolCallTemplate != null)
+                                        {
+                                            @ToolCallTemplate(call)
+                                        }
+                                        else
+                                        {
+                                            <details class="rz-chat-tool-call rz-chat-tool-call-@(call.Status.ToString().ToLowerInvariant())" open="@(call.Status == ChatToolCallStatus.AwaitingApproval)">
+                                                <summary class="rz-chat-tool-call-summary">
+                                                    <RadzenIcon Icon="@GetToolCallIcon(call)" class="rz-chat-tool-call-icon" />
+                                                    <span class="rz-chat-tool-call-name">@call.Name</span>
+                                                    @if (call.Arguments != null && call.Arguments.Count > 0)
+                                                    {
+                                                        <span class="rz-chat-tool-call-arguments">@call.FormattedArguments</span>
+                                                    }
+                                                    <span class="rz-chat-tool-call-status">@GetToolCallStatusText(call)</span>
+                                                    <RadzenIcon Icon="expand_more" class="rz-chat-tool-call-toggle" />
+                                                </summary>
+                                                <div class="rz-chat-tool-call-details">
+                                                    @if (call.Status == ChatToolCallStatus.AwaitingApproval)
+                                                    {
+                                                        <div class="rz-chat-tool-approval">
+                                                            <span>@string.Format(Culture ?? System.Globalization.CultureInfo.CurrentCulture, Localize(nameof(RadzenStrings.AIChat_ToolApprovalMessage)), call.Name)</span>
+                                                            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                                                <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_ApproveText))" Icon="check" Size="ButtonSize.Small" Disabled="@(IsLoading || Disabled)" Click="@(() => ApproveToolCall(call))" class="rz-chat-tool-approve" />
+                                                                <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_RejectText))" Icon="close" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Disabled="@(IsLoading || Disabled)" Click="@(() => RejectToolCall(call))" class="rz-chat-tool-reject" />
+                                                            </RadzenStack>
+                                                        </div>
+                                                    }
+                                                    @if (call.Arguments != null && call.Arguments.Count > 0)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallArguments))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.FormattedArgumentsJson</pre>
+                                                        </div>
+                                                    }
+                                                    @if (call.Exception != null)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallFailed))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.Exception.Message</pre>
+                                                        </div>
+                                                    }
+                                                    else if (call.Result != null)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallResult))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.FormattedResult</pre>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </details>
+                                        }
+                                    }
+                                </div>
+                            }
+                            @if (message.IsStreaming || !string.IsNullOrEmpty(message.Content))
+                            {
+                                <div class="rz-chat-message-text">
+                                    @if (message.IsStreaming)
+                                    {
+                                        @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenMarkdown Text=@message.Content />
+                                    }
+                                </div>
+                            }
                         </RadzenStack>
                     </div>
                     }

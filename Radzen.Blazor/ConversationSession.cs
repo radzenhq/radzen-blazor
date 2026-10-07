@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Radzen.Blazor;
+using System.Linq;
+using Microsoft.Extensions.AI;
+using ChatMessage = Radzen.Blazor.ChatMessage;
 
 namespace Radzen;
 
@@ -15,9 +17,14 @@ public class ConversationSession
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
-    /// Gets or sets the list of messages in the conversation.
+    /// Gets or sets the list of messages in the conversation as displayed by <see cref="Blazor.RadzenAIChat"/>.
     /// </summary>
     public List<ChatMessage> Messages { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the conversation history sent to the model, including tool calls and tool results.
+    /// </summary>
+    public List<Microsoft.Extensions.AI.ChatMessage> History { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the timestamp when the conversation was created.
@@ -41,7 +48,7 @@ public class ConversationSession
     /// <param name="content">The message content.</param>
     public void AddMessage(string role, string content)
     {
-        Messages.Add(new ChatMessage
+        AddMessage(new ChatMessage
         {
             UserId = role,
             Role = role,
@@ -49,13 +56,48 @@ public class ConversationSession
             Content = content,
             Timestamp = DateTime.Now
         });
+    }
+
+    /// <summary>
+    /// Adds a message to the conversation and manages memory limits.
+    /// </summary>
+    /// <param name="message">The message.</param>
+    public void AddMessage(ChatMessage message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        Messages.Add(message);
 
         LastUpdated = DateTime.Now;
 
-        // Remove oldest messages if we exceed the limit
         while (Messages.Count > MaxMessages)
         {
             Messages.RemoveAt(0);
+        }
+    }
+
+    /// <summary>
+    /// Adds messages to the history sent to the model and manages memory limits. Tool calls and their results are kept together.
+    /// </summary>
+    /// <param name="messages">The messages.</param>
+    public void AddHistory(IEnumerable<Microsoft.Extensions.AI.ChatMessage> messages)
+    {
+        ArgumentNullException.ThrowIfNull(messages);
+
+        History.AddRange(messages);
+
+        LastUpdated = DateTime.Now;
+
+        if (History.Count <= MaxMessages)
+        {
+            return;
+        }
+
+        History.RemoveRange(0, History.Count - MaxMessages);
+
+        while (History.Count > 0 && !(History[0].Role == ChatRole.User && History[0].Contents.OfType<TextContent>().Any()))
+        {
+            History.RemoveAt(0);
         }
     }
 
@@ -65,28 +107,7 @@ public class ConversationSession
     public void Clear()
     {
         Messages.Clear();
+        History.Clear();
         LastUpdated = DateTime.Now;
     }
-
-    /// <summary>
-    /// Gets the conversation messages formatted for the AI API.
-    /// </summary>
-    /// <param name="systemPrompt">The system prompt to include.</param>
-    /// <returns>A list of message objects for the AI API.</returns>
-    public List<object> GetFormattedMessages(string systemPrompt)
-    {
-        var messages = new List<object>();
-
-        // Add system message
-        messages.Add(new ChatCompletionMessage { Role = "system", Content = systemPrompt });
-
-        // Add conversation messages
-        foreach (var message in Messages)
-        {
-            messages.Add(new ChatCompletionMessage { Role = message.Role, Content = message.Content });
-        }
-
-        return messages;
-    }
 }
-
