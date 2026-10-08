@@ -2238,7 +2238,17 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "Does the Blazor Chat support multiple participants?", Answer = "Yes. It renders messages from distinct users with their own identity and supports real-time, multi-participant conversations." }
                     },
                     Icon = "\uefd1",
-                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
+                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" },
+                    Toc =
+                    [
+                        new () { Text = "Multi-participant support", Anchor = "#users" },
+                        new () { Text = "Customization options", Anchor = "#customization" },
+                        new () { Text = "Events and interactions", Anchor = "#events" },
+                        new () { Text = "Date separator", Anchor = "#date-separator" },
+                        new () { Text = "Compact chat", Anchor = "#compact" },
+                        new () { Text = "RenderFragment as Title", Anchor = "#title" },
+                        new () { Text = "Mention users", Anchor = "#mention" }
+                    ]
                 },
                 new Example
                 {
