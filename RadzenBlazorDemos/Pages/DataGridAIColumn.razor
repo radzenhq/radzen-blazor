@@ -87,7 +87,7 @@
                 "Respond with a JSON object of the form {\"taglines\":[{\"productId\":number,\"text\":string}]} and nothing else. Products:\n" +
                 string.Join("\n", missing.Select(p => $"- productId {p.ProductID}: {p.ProductName} ({p.Category?.CategoryName}, {p.QuantityPerUnit})"));
 
-            var response = await client.GetResponseAsync(prompt, new ChatOptions { Temperature = 0.8f, ResponseFormat = ChatResponseFormat.Json });
+            var response = await client.GetResponseAsync(prompt, new ChatOptions { Temperature = 0.8f, MaxOutputTokens = 1024, ResponseFormat = ChatResponseFormat.Json });
 
             var json = response.Text;
             var start = json.IndexOf('{');

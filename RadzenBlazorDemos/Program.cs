@@ -31,6 +31,7 @@ builder.Services.AddAIChatService(options =>
     options.Model = "@cf/openai/gpt-oss-120b";
     options.SystemPrompt = "You are a helpful AI code assistant.";
     options.Temperature = 0.7;
+    options.MaxTokens = 2048;
 });
 
 await builder.Build().RunAsync();
