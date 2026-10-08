@@ -58,8 +58,11 @@
     AI Chat with Memory
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The <strong>AIChat</strong> component supports conversation memory that remembers previous questions and maintains context across multiple interactions. 
-    Use <code>SessionId</code> to maintain conversation state and <code>SessionIdChanged</code> to track session changes.
+    The <strong>AIChat</strong> component supports conversation memory that remembers previous questions and maintains context across multiple interactions.
+    Use <code>SessionId</code> to maintain conversation state, <code>UserId</code> to tell whose conversation it is and <code>SessionIdChanged</code> to track session changes.
+    Conversations are kept in an <code>IConversationStore</code>: the default <code>InMemoryConversationStore</code> keeps them for the lifetime of the application, and <code>AddConversationStore&lt;TStore&gt;()</code>
+    plugs in your own - this demo uses one backed by Entity Framework that serializes each conversation with <code>ConversationSessionSerializer</code>, including tool calls, attachments and reasoning.
+    The service saves the conversation after every answer and <code>GetSessionsAsync</code>, <code>GetOrCreateSessionAsync</code> and <code>DeleteSessionAsync</code> manage the saved ones.
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatWithMemory">
     <AIChatWithMemory />

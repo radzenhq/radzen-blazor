@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.AI;
 
 namespace Radzen;
@@ -38,9 +39,44 @@ public interface IAIChatService
     /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
     /// <param name="apiKey">Optional API key to override the configured API key.</param>
     /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
+    /// <param name="userId">The user the session belongs to, used when the session is created.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
     /// <returns>An async enumerable that yields the streaming response updates of the AI model.</returns>
-    IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, string? userId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the store the conversations are kept in.
+    /// </summary>
+    IConversationStore Store { get; }
+
+    /// <summary>
+    /// Gets a conversation session from the store, or creates it. The session is cached for the lifetime of the service and saved to the store after every response.
+    /// </summary>
+    /// <param name="sessionId">The session ID. If null, a new session will be created.</param>
+    /// <param name="userId">The user the session belongs to, used when it is created.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task<ConversationSession> GetOrCreateSessionAsync(string? sessionId = null, string? userId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the conversations in the store, most recently updated first.
+    /// </summary>
+    /// <param name="userId">When specified only the conversations of that user are returned.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task<IReadOnlyList<ConversationSession>> GetSessionsAsync(string? userId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Clears the messages of a conversation and saves it.
+    /// </summary>
+    /// <param name="sessionId">The session ID.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task ClearSessionAsync(string sessionId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a conversation from the store.
+    /// </summary>
+    /// <param name="sessionId">The session ID.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the <see cref="IChatClient"/> the service sends requests with: the one registered in the service collection or an <see cref="OpenAICompatibleChatClient"/>
@@ -59,26 +95,26 @@ public interface IAIChatService
     IEmbeddingGenerator<string, Embedding<float>> GetEmbeddingGenerator();
 
     /// <summary>
-    /// Gets or creates a conversation session.
+    /// Gets or creates a conversation session in the cache of this service instance without consulting the store. Prefer <see cref="GetOrCreateSessionAsync"/>.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>
     /// <returns>The conversation session.</returns>
     ConversationSession GetOrCreateSession(string? sessionId = null);
 
     /// <summary>
-    /// Clears the conversation history for a specific session.
+    /// Clears the conversation history for a specific session in the cache of this service instance. Prefer <see cref="ClearSessionAsync"/>.
     /// </summary>
     /// <param name="sessionId">The session ID to clear.</param>
     void ClearSession(string sessionId);
 
     /// <summary>
-    /// Gets all active conversation sessions.
+    /// Gets the conversation sessions cached by this service instance. Prefer <see cref="GetSessionsAsync"/>, which lists the store.
     /// </summary>
     /// <returns>A list of active conversation sessions.</returns>
     IEnumerable<ConversationSession> GetActiveSessions();
 
     /// <summary>
-    /// Removes old conversation sessions based on age.
+    /// Removes old conversation sessions from the cache of this service instance based on age.
     /// </summary>
     /// <param name="maxAgeHours">Maximum age in hours for sessions to keep.</param>
     void CleanupOldSessions(int maxAgeHours = 24);

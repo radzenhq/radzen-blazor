@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.AI;
 
 namespace Radzen.Blazor;
@@ -65,6 +66,7 @@ public class ChatToolCall
     /// <summary>
     /// Gets or sets the exception thrown by the tool, if any.
     /// </summary>
+    [JsonIgnore]
     public Exception? Exception { get; set; }
 
     /// <summary>
@@ -75,21 +77,25 @@ public class ChatToolCall
     /// <summary>
     /// Gets or sets the approval request when the tool is an <see cref="ApprovalRequiredAIFunction"/>.
     /// </summary>
+    [JsonIgnore]
     public ToolApprovalRequestContent? ApprovalRequest { get; set; }
 
     /// <summary>
     /// Gets or sets the user's answer to <see cref="ApprovalRequest"/>.
     /// </summary>
+    [JsonIgnore]
     public ToolApprovalResponseContent? ApprovalResponse { get; set; }
 
     /// <summary>
     /// Gets the arguments formatted as <c>name: value</c> pairs for display.
     /// </summary>
+    [JsonIgnore]
     public string FormattedArguments => Arguments == null ? string.Empty : string.Join(", ", Arguments.Select(argument => $"{argument.Key}: {FormatValue(argument.Value)}"));
 
     /// <summary>
     /// Gets the arguments formatted as indented JSON for display.
     /// </summary>
+    [JsonIgnore]
     public string FormattedArgumentsJson
     {
         get
@@ -121,6 +127,7 @@ public class ChatToolCall
     /// <summary>
     /// Gets the result formatted for display: indented JSON for structured results, the text itself for strings.
     /// </summary>
+    [JsonIgnore]
     public string FormattedResult
     {
         get

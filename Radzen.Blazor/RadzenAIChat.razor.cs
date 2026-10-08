@@ -45,6 +45,12 @@ namespace Radzen.Blazor
         public EventCallback<string> SessionIdChanged { get; set; }
 
         /// <summary>
+        /// Gets or sets the user the conversation belongs to. Stored in <see cref="ConversationSession.UserId"/> so that <see cref="IConversationStore"/> implementations can list the conversations of a user.
+        /// </summary>
+        [Parameter]
+        public string? UserId { get; set; }
+
+        /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         /// <value>The attributes.</value>
@@ -442,13 +448,12 @@ namespace Radzen.Blazor
         public async Task ClearChat()
         {
             Messages.Clear();
-            
-            // Clear the session in the AI service
+
             if (!string.IsNullOrEmpty(currentSessionId))
             {
-                ChatService.ClearSession(currentSessionId);
+                await ChatService.ClearSessionAsync(currentSessionId);
             }
-            
+
             await ChatCleared.InvokeAsync();
             await InvokeAsync(StateHasChanged);
         }
@@ -564,18 +569,20 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var session = ChatService.GetOrCreateSession(currentSessionId);
-            
-            // Clear current messages
+            var session = await ChatService.GetOrCreateSessionAsync(currentSessionId, UserId);
+
             Messages.Clear();
-            
+
             foreach (var message in session.Messages)
             {
                 var copy = AddMessage(message.Content, message.IsUser);
                 copy.Timestamp = message.Timestamp;
                 copy.ToolCalls = message.ToolCalls;
+                copy.Attachments = message.Attachments;
+                copy.Reasoning = message.Reasoning;
+                copy.Usage = message.Usage;
             }
-            
+
             await InvokeAsync(StateHasChanged);
         }
 
@@ -625,7 +632,7 @@ namespace Radzen.Blazor
 
             try
             {
-                await foreach (var update in ChatService.GetStreamingResponseAsync(request, currentSessionId, options, endpoint, proxy, apiKey, apiKeyHeader, cts.Token))
+                await foreach (var update in ChatService.GetStreamingResponseAsync(request, currentSessionId, options, endpoint, proxy, apiKey, apiKeyHeader, UserId, cts.Token))
                 {
                     foreach (var content in update.Contents)
                     {
@@ -762,12 +769,16 @@ namespace Radzen.Blazor
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            
-            // Initialize session ID
+
             currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+
             if (currentSessionId != SessionId)
             {
                 await SessionIdChanged.InvokeAsync(currentSessionId);
+            }
+            else
+            {
+                await LoadConversationHistory();
             }
         }
 
@@ -775,13 +786,13 @@ namespace Radzen.Blazor
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
-            
+
             // Update session ID if it changed
             if (!string.IsNullOrEmpty(SessionId) && SessionId != currentSessionId)
             {
                 currentSessionId = SessionId;
                 await SessionIdChanged.InvokeAsync(currentSessionId);
-                
+
                 // Load conversation history for the new session
                 await LoadConversationHistory();
             }
@@ -837,7 +848,7 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
-            
+
             cts?.Cancel();
             cts?.Dispose();
 

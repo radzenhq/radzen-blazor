@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.AI;
 
 namespace Radzen.Blazor;
@@ -28,11 +29,13 @@ public class ChatAttachment
     /// <summary>
     /// Gets whether the attachment is an image.
     /// </summary>
+    [JsonIgnore]
     public bool IsImage => MediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets the content as a data URI, usable as an image source.
     /// </summary>
+    [JsonIgnore]
     public string Url => url ??= $"data:{MediaType};base64,{Convert.ToBase64String(Data.Span)}";
 
     /// <summary>

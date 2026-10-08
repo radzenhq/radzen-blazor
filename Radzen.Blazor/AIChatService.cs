@@ -22,6 +22,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 {
     private readonly Dictionary<string, ConversationSession> sessions = new();
     private readonly object sessionsLock = new();
+    private IConversationStore? store;
     private readonly Dictionary<string, IChatClient> clients = new();
     private IEmbeddingGenerator<string, Embedding<float>>? embeddingGenerator;
 
@@ -29,6 +30,68 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     /// Gets the configuration options for the chat streaming service.
     /// </summary>
     public AIChatServiceOptions Options => options.Value;
+
+    /// <inheritdoc />
+    public IConversationStore Store => store ??= serviceProvider.GetService<IConversationStore>() ?? new InMemoryConversationStore();
+
+    /// <inheritdoc />
+    public async Task<ConversationSession> GetOrCreateSessionAsync(string? sessionId = null, string? userId = null, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(sessionId))
+        {
+            var created = GetOrCreateSession(null);
+            created.UserId = userId;
+            return created;
+        }
+
+        lock (sessionsLock)
+        {
+            if (sessions.TryGetValue(sessionId, out var cached))
+            {
+                return cached;
+            }
+        }
+
+        var loaded = await Store.LoadAsync(sessionId, cancellationToken).ConfigureAwait(false);
+
+        lock (sessionsLock)
+        {
+            if (sessions.TryGetValue(sessionId, out var cached))
+            {
+                return cached;
+            }
+
+            loaded ??= new ConversationSession { Id = sessionId, MaxMessages = Options.MaxMessages, UserId = userId };
+            sessions[sessionId] = loaded;
+            return loaded;
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<ConversationSession>> GetSessionsAsync(string? userId = null, CancellationToken cancellationToken = default) => Store.ListAsync(userId, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task ClearSessionAsync(string sessionId, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(sessionId);
+
+        var session = await GetOrCreateSessionAsync(sessionId, null, cancellationToken).ConfigureAwait(false);
+        session.Clear();
+        await Store.SaveAsync(session, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(sessionId);
+
+        lock (sessionsLock)
+        {
+            sessions.Remove(sessionId);
+        }
+
+        await Store.DeleteAsync(sessionId, cancellationToken).ConfigureAwait(false);
+    }
 
     /// <inheritdoc />
     public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
@@ -46,7 +109,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             MaxOutputTokens = maxTokens
         };
 
-        await foreach (var update in GetStreamingResponseAsync(new ChatMessage(ChatRole.User, userInput), sessionId, chatOptions, endpoint, proxy, apiKey, apiKeyHeader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+        await foreach (var update in GetStreamingResponseAsync(new ChatMessage(ChatRole.User, userInput), sessionId, chatOptions, endpoint, proxy, apiKey, apiKeyHeader, null, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             if (update.Role != null && update.Role != ChatRole.Assistant)
             {
@@ -64,11 +127,11 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     }
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, string? userId = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var session = GetOrCreateSession(sessionId);
+        var session = await GetOrCreateSessionAsync(sessionId, userId, cancellationToken).ConfigureAwait(false);
 
         options = options == null ? new ChatOptions() : options.Clone();
         options.ModelId ??= Options.Model;
@@ -128,6 +191,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
                     }
                 }
             }
+
+            await Store.SaveAsync(session, CancellationToken.None).ConfigureAwait(false);
         }
     }
 

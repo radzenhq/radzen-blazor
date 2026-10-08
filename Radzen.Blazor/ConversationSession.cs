@@ -17,6 +17,16 @@ public class ConversationSession
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
+    /// Gets or sets the user the conversation belongs to. Set through <see cref="Blazor.RadzenAIChat.UserId"/> or <see cref="IAIChatService.GetOrCreateSessionAsync"/>; <see cref="IConversationStore.ListAsync"/> filters by it.
+    /// </summary>
+    public string? UserId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the title of the conversation. Defaults to the beginning of the first user message.
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
     /// Gets or sets the list of messages in the conversation as displayed by <see cref="Blazor.RadzenAIChat"/>.
     /// </summary>
     public List<ChatMessage> Messages { get; set; } = new();
@@ -68,6 +78,12 @@ public class ConversationSession
 
         Messages.Add(message);
 
+        if (string.IsNullOrEmpty(Title) && message.IsUser && !string.IsNullOrWhiteSpace(message.Content))
+        {
+            var text = message.Content.Trim();
+            Title = text.Length > 60 ? text.Substring(0, 60).TrimEnd() + "…" : text;
+        }
+
         LastUpdated = DateTime.Now;
 
         while (Messages.Count > MaxMessages)
@@ -108,6 +124,7 @@ public class ConversationSession
     {
         Messages.Clear();
         History.Clear();
+        Title = null;
         LastUpdated = DateTime.Now;
     }
 }
