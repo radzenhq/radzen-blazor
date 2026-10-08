@@ -31,6 +31,31 @@ public class AIChatServiceOptions
     public string? Model { get; set; }
 
     /// <summary>
+    /// Gets or sets the embeddings endpoint URL. When not set it is derived from <see cref="Endpoint"/> by replacing <c>chat/completions</c> with <c>embeddings</c>.
+    /// </summary>
+    public string? EmbeddingsEndpoint { get; set; }
+
+    /// <summary>
+    /// Gets or sets the proxy URL for embeddings requests, if any. When not set and <see cref="Proxy"/> is set it is derived from it by replacing <c>chat/completions</c> with <c>embeddings</c>.
+    /// </summary>
+    public string? EmbeddingsProxy { get; set; }
+
+    /// <summary>
+    /// Gets or sets the embeddings model name (e.g., 'text-embedding-3-small').
+    /// </summary>
+    public string? EmbeddingsModel { get; set; }
+
+    /// <summary>
+    /// Gets the effective embeddings endpoint: <see cref="EmbeddingsEndpoint"/> or the one derived from <see cref="Endpoint"/>.
+    /// </summary>
+    public string GetEmbeddingsEndpoint() => !string.IsNullOrEmpty(EmbeddingsEndpoint) ? EmbeddingsEndpoint : Endpoint.Replace("chat/completions", "embeddings", System.StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets the effective embeddings proxy: <see cref="EmbeddingsProxy"/> or the one derived from <see cref="Proxy"/>, or <c>null</c>.
+    /// </summary>
+    public string? GetEmbeddingsProxy() => !string.IsNullOrEmpty(EmbeddingsProxy) ? EmbeddingsProxy : Proxy?.Replace("chat/completions", "embeddings", System.StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
     /// Gets or sets the system prompt for the AI assistant.
     /// </summary>
     public string SystemPrompt { get; set; } = "You are a helpful AI code assistant.";

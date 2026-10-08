@@ -128,6 +128,7 @@ builder.Services.AddAIChatService(options =>
     options.Endpoint = "https://api.openai.com/v1/chat/completions";
     options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
     options.Model = "gpt-4o-mini";
+    options.EmbeddingsModel = "text-embedding-3-small";
 });
 </code>
 </pre>

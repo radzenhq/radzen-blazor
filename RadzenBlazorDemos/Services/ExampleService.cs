@@ -468,6 +468,20 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             New = true,
+                            Name = "Semantic Search",
+                            Path = "datagrid-semantic-search",
+                            Title = "Blazor DataGrid Semantic Search - Find Rows by Meaning | Free Radzen Blazor",
+                            Description = "Search a Blazor DataGrid by meaning instead of exact words: rows and the query are embedded with an AI model and ranked by similarity.",
+                            Tags = new [] { "ai", "semantic", "search", "embeddings", "similarity", "grid", "datagrid" },
+                            Related = new [] { "datagrid-ai-assistant", "datagrid-ai-column", "datagrid-filter-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does semantic search work in the DataGrid?", Answer = "Each row is turned into a short text and embedded once with IAIChatService.GetEmbeddingGenerator(). A query is embedded the same way and the rows are ranked by cosine similarity, so 'something to drink' finds beverages." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
                             Name = "AI Column",
                             Path = "datagrid-ai-column",
                             Title = "Blazor DataGrid AI Column - Generated Cell Values | Free Radzen Blazor",

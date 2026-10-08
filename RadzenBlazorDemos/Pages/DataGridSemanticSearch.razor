@@ -1,0 +1,108 @@
+@using Microsoft.Extensions.AI
+@using System.Numerics.Tensors
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@inherits DbContextPage
+@inject IAIChatService ChatService
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenTextBox @bind-Value="@query" Placeholder="Try: something to drink, Italian cheese, spicy sauce, breakfast" Style="flex: 1; min-width: 260px" @onkeyup="@OnKeyUp" />
+        <RadzenButton Text="Semantic search" Icon="manage_search" Click="@Search" IsBusy="@busy" />
+        <RadzenButton Text="Clear" Icon="close" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@Clear" Disabled="@(results == null)" />
+    </RadzenStack>
+    @if (error != null)
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">@error</RadzenAlert>
+    }
+    <RadzenDataGrid Data="@(results ?? all)" TItem="ProductMatch" AllowPaging="true" PageSize="8" AllowSorting="true" Density="Density.Compact">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(ProductMatch.Score)" Title="Match" Width="140px" Visible="@(results != null)" SortOrder="SortOrder.Descending">
+                <Template Context="match">
+                    <RadzenProgressBar Value="@(Math.Round(match.Score * 100))" ShowValue="true" Style="height: 1.25rem" ProgressBarStyle="@(match.Score > 0.6 ? ProgressBarStyle.Success : ProgressBarStyle.Secondary)" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+            <RadzenDataGridColumn Property="Product.Category.CategoryName" Title="Category" Width="160px" />
+            <RadzenDataGridColumn Property="Product.QuantityPerUnit" Title="Package" Width="180px" />
+            <RadzenDataGridColumn Property="Product.UnitPrice" Title="Price" FormatString="{0:C}" TextAlign="TextAlign.Right" Width="100px" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    public class ProductMatch
+    {
+        public Product Product { get; set; }
+        public double Score { get; set; }
+    }
+
+    List<ProductMatch> all = new();
+    List<ProductMatch> results;
+    Dictionary<int, ReadOnlyMemory<float>> vectors;
+    string query;
+    string error;
+    bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        all = dbContext.Products.Include(p => p.Category).OrderBy(p => p.ProductName).Select(p => new ProductMatch { Product = p }).ToList();
+    }
+
+    static string Describe(Product product) => $"{product.ProductName}. Category: {product.Category?.CategoryName}. Sold as {product.QuantityPerUnit}.";
+
+    async Task OnKeyUp(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await Search();
+        }
+    }
+
+    async Task Search()
+    {
+        if (string.IsNullOrWhiteSpace(query) || busy)
+        {
+            return;
+        }
+
+        busy = true;
+        error = null;
+
+        try
+        {
+            var generator = ChatService.GetEmbeddingGenerator();
+
+            if (vectors == null)
+            {
+                var embeddings = await generator.GenerateAsync(all.Select(match => Describe(match.Product)));
+                vectors = all.Select((match, index) => (match.Product.ProductID, embeddings[index].Vector)).ToDictionary(pair => pair.ProductID, pair => pair.Vector);
+            }
+
+            var queryVector = (await generator.GenerateAsync([query]))[0].Vector;
+
+            foreach (var match in all)
+            {
+                match.Score = TensorPrimitives.CosineSimilarity(queryVector.Span, vectors[match.Product.ProductID].Span);
+            }
+
+            results = all.OrderByDescending(match => match.Score).Take(10).ToList();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    void Clear()
+    {
+        results = null;
+        query = null;
+    }
+}

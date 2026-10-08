@@ -53,6 +53,12 @@ public interface IAIChatService
     IChatClient GetChatClient(string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null);
 
     /// <summary>
+    /// Gets the <see cref="IEmbeddingGenerator{TInput, TEmbedding}"/> used for semantic search and similar scenarios: the one registered in the service collection or an
+    /// <see cref="OpenAICompatibleEmbeddingGenerator"/> configured from <see cref="AIChatServiceOptions"/>.
+    /// </summary>
+    IEmbeddingGenerator<string, Embedding<float>> GetEmbeddingGenerator();
+
+    /// <summary>
     /// Gets or creates a conversation session.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>

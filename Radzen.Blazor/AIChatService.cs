@@ -23,6 +23,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     private readonly Dictionary<string, ConversationSession> sessions = new();
     private readonly object sessionsLock = new();
     private readonly Dictionary<string, IChatClient> clients = new();
+    private IEmbeddingGenerator<string, Embedding<float>>? embeddingGenerator;
 
     /// <summary>
     /// Gets the configuration options for the chat streaming service.
@@ -330,6 +331,34 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
             return client;
         }
+    }
+
+    /// <inheritdoc />
+    public IEmbeddingGenerator<string, Embedding<float>> GetEmbeddingGenerator()
+    {
+        lock (clients)
+        {
+            return embeddingGenerator ??= serviceProvider.GetService<IEmbeddingGenerator<string, Embedding<float>>>() ?? CreateEmbeddingGenerator();
+        }
+    }
+
+    private OpenAICompatibleEmbeddingGenerator CreateEmbeddingGenerator()
+    {
+        var url = Options.GetEmbeddingsProxy() ?? Options.GetEmbeddingsEndpoint();
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            throw new InvalidOperationException("Set AIChatServiceOptions.EmbeddingsEndpoint or register an IEmbeddingGenerator to generate embeddings.");
+        }
+
+        if (!string.IsNullOrEmpty(Options.ApiKey) && string.IsNullOrWhiteSpace(Options.ApiKeyHeader))
+        {
+            throw new InvalidOperationException("API key header must be specified when an API key is provided.");
+        }
+
+        var httpClient = serviceProvider.GetService<HttpClient>() ?? throw new InvalidOperationException("Register an HttpClient or an IEmbeddingGenerator to use the AIChatService.");
+
+        return new OpenAICompatibleEmbeddingGenerator(httpClient, url, Options.ApiKey, Options.ApiKeyHeader, Options.EmbeddingsModel);
     }
 
     private IChatClient BuildPipeline(IChatClient inner)

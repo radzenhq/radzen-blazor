@@ -26,6 +26,8 @@ builder.Services.AddSingleton<GitHubService>();
 builder.Services.AddAIChatService(options =>
 {
     options.Proxy = "api/chat/completions";
+    options.EmbeddingsProxy = "api/chat/embeddings";
+    options.EmbeddingsModel = "@cf/baai/bge-base-en-v1.5";
     options.Model = "@cf/openai/gpt-oss-120b";
     options.SystemPrompt = "You are a helpful AI code assistant.";
     options.Temperature = 0.7;
