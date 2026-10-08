@@ -1,0 +1,34 @@
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+    @if (!string.IsNullOrWhiteSpace(Text))
+    {
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-base-200 rz-p-3" Style="max-height: 8rem; overflow: auto;">
+            <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-color-secondary">@(Selection ? "Selected text" : "Document")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0" Style="white-space: pre-wrap;">@Text</RadzenText>
+        </RadzenCard>
+    }
+    <RadzenAIPrompt Context="@Text"
+                    SystemPrompt="@SystemPrompt"
+                    Suggestions="@(new[] { "Fix grammar and spelling", "Make it more concise", "Rewrite in a friendly tone", "Expand with more detail" })"
+                    Commands="@(new[] { new AIPromptCommand { Text = "Shorter", Icon = "compress", Prompt = "Make it shorter." }, new AIPromptCommand { Text = "Formal", Icon = "work", Prompt = "Rewrite in a formal tone." }, new AIPromptCommand { Text = "German", Icon = "translate", Prompt = "Translate to German." } })"
+                    Placeholder="What should I do with the text?"
+                    @bind-Output="@output" />
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@(() => DialogService.Close(null))" />
+        <RadzenButton Text="@(Selection ? "Replace selection" : "Replace document")" Icon="check" Disabled="@(string.IsNullOrWhiteSpace(output))" Click="@(() => DialogService.Close(output))" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public bool Selection { get; set; }
+
+    [Parameter]
+    public string SystemPrompt { get; set; }
+
+    string output;
+}

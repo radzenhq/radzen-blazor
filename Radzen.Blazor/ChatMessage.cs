@@ -47,4 +47,9 @@ public class ChatMessage
     /// Gets or sets the tool calls the assistant made while producing this message.
     /// </summary>
     public List<ChatToolCall> ToolCalls { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the reasoning the model produced before answering, when the model exposes it.
+    /// </summary>
+    public string? Reasoning { get; set; }
 }

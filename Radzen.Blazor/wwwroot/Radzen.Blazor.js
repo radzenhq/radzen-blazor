@@ -7528,6 +7528,16 @@ Radzen.copyToClipboard = async function(text) {
     return false;
   }
 };
+Radzen.getSelectedText = function(element) {
+  var field = element && (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') ? element : element ? element.querySelector('textarea, input[type=text]') : null;
+  if (field && field.selectionStart != null && field.selectionEnd > field.selectionStart && (field === element || field.offsetParent !== null)) {
+    return field.value.substring(field.selectionStart, field.selectionEnd);
+  }
+  var selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return '';
+  if (element && !element.contains(selection.anchorNode)) return '';
+  return selection.toString();
+};
 Radzen.readClipboardText = async function() {
   try {
     return await navigator.clipboard.readText();

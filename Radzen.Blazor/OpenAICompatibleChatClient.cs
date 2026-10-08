@@ -187,6 +187,16 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                             }
                         }
 
+                        if ((delta.TryGetProperty("reasoning", out var reasoning) || delta.TryGetProperty("reasoning_content", out reasoning)) && reasoning.ValueKind == JsonValueKind.String)
+                        {
+                            var thought = reasoning.GetString();
+
+                            if (!string.IsNullOrEmpty(thought))
+                            {
+                                yield return CreateUpdate(responseId, modelId, createdAt, new TextReasoningContent(thought));
+                            }
+                        }
+
                         if (delta.TryGetProperty("tool_calls", out var deltaToolCalls) && deltaToolCalls.ValueKind == JsonValueKind.Array)
                         {
                             foreach (var toolCall in deltaToolCalls.EnumerateArray())

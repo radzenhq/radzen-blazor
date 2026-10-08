@@ -875,6 +875,7 @@ namespace Radzen.Blazor {
         public static string AIChat_ToolCallRejected { get { return ResourceManager.GetString("AIChat_ToolCallRejected", resourceCulture); } }
         public static string AIChat_ToolCallArguments { get { return ResourceManager.GetString("AIChat_ToolCallArguments", resourceCulture); } }
         public static string AIChat_ToolCallResult { get { return ResourceManager.GetString("AIChat_ToolCallResult", resourceCulture); } }
+        public static string AIChat_Reasoning { get { return ResourceManager.GetString("AIChat_Reasoning", resourceCulture); } }
         public static string SmartPasteButton_Text { get { return ResourceManager.GetString("SmartPasteButton_Text", resourceCulture); } }
         public static string SmartPasteButton_Title { get { return ResourceManager.GetString("SmartPasteButton_Title", resourceCulture); } }
         public static string AIPrompt_Placeholder { get { return ResourceManager.GetString("AIPrompt_Placeholder", resourceCulture); } }

@@ -151,6 +151,12 @@ namespace Radzen.Blazor
         public bool? AllowMultipleToolCalls { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the reasoning of models that expose it is rendered as a collapsible block in assistant messages. Default is <c>true</c>.
+        /// </summary>
+        [Parameter]
+        public bool ShowReasoning { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets whether tool calls are rendered in assistant messages. Default is <c>true</c>.
         /// </summary>
         [Parameter]

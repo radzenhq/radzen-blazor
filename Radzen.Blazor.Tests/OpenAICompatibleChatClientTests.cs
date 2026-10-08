@@ -92,6 +92,26 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async Task YieldsReasoningDeltasAsTextReasoningContent()
+        {
+            var (client, _) = CreateClient((_, _) => Sse(
+                """{"id":"resp-r","choices":[{"index":0,"delta":{"role":"assistant","reasoning":"Let me think"}}]}""",
+                """{"id":"resp-r","choices":[{"index":0,"delta":{"reasoning_content":" harder."}}]}""",
+                """{"id":"resp-r","choices":[{"index":0,"delta":{"content":"42"},"finish_reason":"stop"}]}"""));
+
+            var updates = new List<ChatResponseUpdate>();
+
+            await foreach (var update in client.GetStreamingResponseAsync([new ChatMessage(ChatRole.User, "?")]))
+            {
+                updates.Add(update);
+            }
+
+            var reasoning = string.Concat(updates.SelectMany(update => update.Contents.OfType<TextReasoningContent>()).Select(content => content.Text));
+            Assert.Equal("Let me think harder.", reasoning);
+            Assert.Equal("42", updates.ToChatResponse().Text);
+        }
+
+        [Fact]
         public async Task FlushesToolCallsWithoutFinishReason()
         {
             var (client, _) = CreateClient((_, _) => Sse(

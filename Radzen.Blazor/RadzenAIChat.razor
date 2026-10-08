@@ -85,6 +85,21 @@
                                     @message.Timestamp.ToString(TimestampFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                                 </div>
                             </RadzenStack>
+                            @if (ShowReasoning && !string.IsNullOrEmpty(message.Reasoning))
+                            {
+                                <details class="rz-chat-reasoning" open="@(message.IsStreaming && string.IsNullOrEmpty(message.Content))">
+                                    <summary class="rz-chat-reasoning-summary">
+                                        <RadzenIcon Icon="psychology" class="rz-chat-reasoning-icon" />
+                                        <span class="rz-chat-reasoning-title">@Localize(nameof(RadzenStrings.AIChat_Reasoning))</span>
+                                        @if (message.IsStreaming && string.IsNullOrEmpty(message.Content))
+                                        {
+                                            <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
+                                        }
+                                        <RadzenIcon Icon="expand_more" class="rz-chat-reasoning-toggle" />
+                                    </summary>
+                                    <div class="rz-chat-reasoning-content">@message.Reasoning</div>
+                                </details>
+                            }
                             @if (ShowToolCalls && message.ToolCalls.Count > 0)
                             {
                                 <div class="rz-chat-tool-calls">

@@ -274,6 +274,9 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
                     existing.Status = Blazor.ChatToolCallStatus.AwaitingApproval;
                 }
                 break;
+            case TextReasoningContent reasoning:
+                message.Reasoning += reasoning.Text;
+                break;
             case ErrorContent error:
                 if (text.Length > 0)
                 {

@@ -468,6 +468,20 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             New = true,
+                            Name = "AI Highlight",
+                            Path = "datagrid-ai-highlight",
+                            Title = "Blazor DataGrid AI Highlight - Mark Rows by a Natural Language Condition | Free Radzen Blazor",
+                            Description = "Describe a condition in plain words and let the AI model highlight the matching rows of a Blazor DataGrid in place.",
+                            Tags = new [] { "ai", "highlight", "condition", "natural language", "rowrender", "grid", "datagrid" },
+                            Related = new [] { "datagrid-ai-assistant", "datagrid-semantic-search", "datagrid-conditional-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does AI highlight work?", Answer = "The rows and the condition are sent to the model, which returns the matching ids; a RowRender handler styles those rows while the grid keeps its paging and sorting." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
                             Name = "Semantic Search",
                             Path = "datagrid-semantic-search",
                             Title = "Blazor DataGrid Semantic Search - Find Rows by Meaning | Free Radzen Blazor",
@@ -2682,7 +2696,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Updated = true,
+                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "AI assistant", Anchor = "#ai" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name="HtmlEditor",
                     Icon = "\ue3c9",
                     Children = new [] {
@@ -2750,7 +2765,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Updated = true,
+                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "AI assistant", Anchor = "#ai" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "MarkdownEditor",
                     New = true,
                     Icon = "\uf552",

@@ -53,6 +53,11 @@ namespace Radzen.Blazor.Tests
                     yield break;
                 }
 
+                if (options?.Instructions == "reason")
+                {
+                    yield return new ChatResponseUpdate(ChatRole.Assistant, [new TextReasoningContent("Thinking about it")]) { ResponseId = "r0", MessageId = "r0" };
+                }
+
                 yield return new ChatResponseUpdate(ChatRole.Assistant, "Hello there") { ResponseId = "r0", MessageId = "r0" };
             }
 
@@ -314,6 +319,28 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain("rz-chat-tool-call", component.Markup);
             Assert.Equal("Be terse.", client.Options.Single()!.Instructions);
             Assert.Equal(ChatRole.User, client.Requests.Single().Single().Role);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_RendersReasoningBlock()
+        {
+            var (ctx, _) = CreateContext();
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason"));
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("Hi"));
+            component.WaitForAssertion(() => Assert.Contains("Hello there", component.Markup));
+
+            Assert.Contains("rz-chat-reasoning", component.Markup);
+            Assert.Contains("Thinking about it", component.Markup);
+            Assert.Equal("Thinking about it", component.Instance.GetMessages()[1].Reasoning);
+            Assert.Equal("Hello there", component.Instance.GetMessages()[1].Content);
+
+            var hidden = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason").Add(p => p.ShowReasoning, false));
+            await hidden.InvokeAsync(() => hidden.Instance.SendMessage("Hi"));
+            hidden.WaitForAssertion(() => Assert.Contains("Hello there", hidden.Markup));
+            Assert.DoesNotContain("rz-chat-reasoning", hidden.Markup);
         }
 
         [Fact]

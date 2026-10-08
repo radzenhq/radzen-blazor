@@ -1,0 +1,55 @@
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<RadzenHtmlEditor @ref="editor" @bind-Value="@html" style="height: 320px;">
+    <RadzenHtmlEditorUndo />
+    <RadzenHtmlEditorRedo />
+    <RadzenHtmlEditorSeparator />
+    <RadzenHtmlEditorBold />
+    <RadzenHtmlEditorItalic />
+    <RadzenHtmlEditorUnderline />
+    <RadzenHtmlEditorSeparator />
+    <RadzenHtmlEditorFormatBlock />
+    <RadzenHtmlEditorUnorderedList />
+    <RadzenHtmlEditorOrderedList />
+    <RadzenHtmlEditorSeparator />
+    <RadzenHtmlEditorCustomTool>
+        <Template Context="editor">
+            <RadzenButton Icon="auto_awesome" Text="AI" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Title="Rewrite, summarize or translate the selection with AI" Click="@(() => OpenAI(editor))" class="rz-html-editor-ai" />
+        </Template>
+    </RadzenHtmlEditorCustomTool>
+</RadzenHtmlEditor>
+
+@code {
+    RadzenHtmlEditor editor;
+
+    string html = "<h3>Radzen Blazor</h3><p>radzen blazor is a set of 145+ free native blazor ui components. it has datagrid, scheduler, charts and alot more.</p><p>The components work in Blazor Server, WebAssembly and Auto render mode and come with themes like Material and Fluent.</p>";
+
+    async Task OpenAI(RadzenHtmlEditor editor)
+    {
+        await editor.SaveSelectionAsync();
+
+        var selected = await JSRuntime.InvokeAsync<string>("Radzen.getSelectedText", editor.Element);
+        var hasSelection = !string.IsNullOrWhiteSpace(selected);
+
+        var result = await DialogService.OpenAsync<EditorAIDialog>("AI assistant", new Dictionary<string, object>
+        {
+            ["Text"] = hasSelection ? selected : html,
+            ["Selection"] = hasSelection,
+            ["SystemPrompt"] = "You are a writing assistant inside an HTML editor. Keep the meaning of the text. Respond with an HTML fragment only (p, strong, em, ul, ol, li, h1-h6 tags), without markdown, code fences or explanations."
+        }, new DialogOptions { Width = "720px" });
+
+        if (result is string output && !string.IsNullOrWhiteSpace(output))
+        {
+            if (hasSelection)
+            {
+                await editor.RestoreSelectionAsync();
+                await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, output);
+            }
+            else
+            {
+                html = output;
+            }
+        }
+    }
+}

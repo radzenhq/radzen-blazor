@@ -2618,4 +2618,7 @@
   <data name="AIPrompt_RetryTitle" xml:space="preserve">
     <value>Regenerate</value>
   </data>
+  <data name="AIChat_Reasoning" xml:space="preserve">
+    <value>Reasoning</value>
+  </data>
 </root>
