@@ -38,6 +38,18 @@ const reportPath = process.env.DEMOS_REPORT || null;
 // generic resource-load 404s.
 const benign = /Content Security Policy|img-src|favicon|net::ERR_|Failed to load resource|\bdefine is not defined\b|monaco|requirejs|the server responded with a status/i;
 
+// Page errors thrown by third-party embeds (the LinkedIn FollowCompany widget on the
+// demo pages throws "Cannot read properties of undefined (reading 'substring')" in its
+// cross-domain handshake at random times) are not Radzen breakage. An error is
+// third-party when the top frame of its stack lives on another origin; a trim break
+// surfaces from our origin (_framework, Radzen.Blazor.js) or without a URL at all.
+const baseHost = new URL(base).host;
+function isThirdPartyError(error) {
+  const stack = String(error && error.stack ? error.stack : '');
+  const match = /https?:\/\/([^/\s)]+)/.exec(stack);
+  return !!match && match[1] !== baseHost;
+}
+
 const browser = await chromium.launch();
 const results = [];
 
@@ -51,7 +63,7 @@ async function drive(name, route, fn) {
   const consoleErrors = [];
   const pageErrors = [];
   page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
-  page.on('pageerror', (e) => pageErrors.push(String(e)));
+  page.on('pageerror', (e) => { if (!isThirdPartyError(e)) pageErrors.push(String(e)); });
 
   let status = 'PASS';
   const notes = [];
