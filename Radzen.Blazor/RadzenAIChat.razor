@@ -84,7 +84,27 @@
                                 <div class="rz-chat-message-time">
                                     @message.Timestamp.ToString(TimestampFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                                 </div>
+                                @if (ShowUsage && !message.IsUser && message.Usage != null)
+                                {
+                                    <span class="rz-chat-message-usage">@FormatUsage(message)</span>
+                                }
                             </RadzenStack>
+                            @if (message.Attachments.Count > 0)
+                            {
+                                <div class="rz-chat-message-attachments">
+                                    @foreach (var attachment in message.Attachments)
+                                    {
+                                        if (attachment.IsImage)
+                                        {
+                                            <img src="@attachment.Url" alt="@attachment.Name" title="@attachment.Name" class="rz-chat-message-attachment-image" />
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-chat-attachment"><RadzenIcon Icon="attach_file" /><span class="rz-chat-attachment-name">@attachment.Name</span></span>
+                                        }
+                                    }
+                                </div>
+                            }
                             @if (ShowReasoning && !string.IsNullOrEmpty(message.Reasoning))
                             {
                                 <details class="rz-chat-reasoning" open="@(message.IsStreaming && string.IsNullOrEmpty(message.Content))">
@@ -182,6 +202,26 @@
 
         <!-- Chat Input -->
         <div class="rz-chat-input">
+            @if (pendingAttachments.Count > 0)
+            {
+                <div class="rz-chat-attachments">
+                    @foreach (var attachment in pendingAttachments)
+                    {
+                        <span class="rz-chat-attachment" @key="attachment">
+                            @if (attachment.IsImage)
+                            {
+                                <img src="@attachment.Url" alt="@attachment.Name" class="rz-chat-attachment-thumb" />
+                            }
+                            else
+                            {
+                                <RadzenIcon Icon="attach_file" />
+                            }
+                            <span class="rz-chat-attachment-name" title="@attachment.Name">@attachment.Name</span>
+                            <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Title="@Localize(nameof(RadzenStrings.AIChat_RemoveAttachmentTitle))" Disabled="@(Disabled || IsLoading)" Click="@(() => RemoveAttachment(attachment))" class="rz-chat-attachment-remove" />
+                        </span>
+                    }
+                </div>
+            }
             <div class="rz-chat-input-inner">
                 <textarea @ref="inputElement" 
                           value="@CurrentInput"
@@ -194,13 +234,38 @@
                           readonly="@ReadOnly"
                           rows="1"
                           @attributes="@InputAttributes"></textarea>
-                    <RadzenButton Icon="send"
-                                ButtonStyle="ButtonStyle.Primary" 
-                                Variant="Variant.Text"
-                                Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
-                                Click="@OnSendMessage"
-                                Title="@Localize(nameof(RadzenStrings.AIChat_SendTitle))"
-                                class="rz-chat-send-btn" />
+                <div class="rz-chat-input-actions">
+                    @if (AllowAttachments)
+                    {
+                        <InputFile id="@attachInputId" OnChange="@OnFilesSelected" multiple accept="@AcceptedAttachmentTypes" style="display: none" />
+                        <RadzenButton Icon="attach_file"
+                                      ButtonStyle="ButtonStyle.Base"
+                                      Variant="Variant.Text"
+                                      Disabled="@(IsLoading || Disabled || ReadOnly)"
+                                      Click="@OnAttachClick"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_AttachTitle))"
+                                      class="rz-chat-attach-btn" />
+                    }
+                    @if (IsLoading)
+                    {
+                        <RadzenButton Icon="stop_circle"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Variant="Variant.Text"
+                                      Click="@Stop"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_StopTitle))"
+                                      class="rz-chat-stop-btn" />
+                    }
+                    else
+                    {
+                        <RadzenButton Icon="send"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Variant="Variant.Text"
+                                      Disabled="@((string.IsNullOrWhiteSpace(CurrentInput) && pendingAttachments.Count == 0) || Disabled)"
+                                      Click="@OnSendMessage"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_SendTitle))"
+                                      class="rz-chat-send-btn" />
+                    }
+                </div>
             </div>
         </div>
     </div>

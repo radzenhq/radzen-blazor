@@ -2621,4 +2621,16 @@
   <data name="AIChat_Reasoning" xml:space="preserve">
     <value>Reasoning</value>
   </data>
+  <data name="AIChat_StopTitle" xml:space="preserve">
+    <value>Stop generating</value>
+  </data>
+  <data name="AIChat_AttachTitle" xml:space="preserve">
+    <value>Attach image</value>
+  </data>
+  <data name="AIChat_RemoveAttachmentTitle" xml:space="preserve">
+    <value>Remove attachment</value>
+  </data>
+  <data name="AIChat_UsageFormat" xml:space="preserve">
+    <value>{0} tokens</value>
+  </data>
 </root>

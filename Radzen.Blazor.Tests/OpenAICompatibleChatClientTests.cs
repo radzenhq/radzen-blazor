@@ -112,6 +112,57 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async Task SumsUsageAcrossChunksAndSendsImagesAsContentParts()
+        {
+            var (client, handler) = CreateClient((_, _) => Sse(
+                """{"id":"resp-u","choices":[{"index":0,"delta":{"content":"Hi"}}],"usage":{"prompt_tokens":10,"completion_tokens":0,"total_tokens":10}}""",
+                """{"id":"resp-u","choices":[{"index":0,"delta":{"content":" there"},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":2,"total_tokens":2}}"""));
+
+            var image = new DataContent(new byte[] { 1, 2, 3 }, "image/png") { Name = "pixel.png" };
+            var response = await client.GetResponseAsync([new ChatMessage(ChatRole.User, [new TextContent("What is this?"), image])]);
+
+            Assert.Equal("Hi there", response.Text);
+            Assert.Equal(10, response.Usage!.InputTokenCount);
+            Assert.Equal(2, response.Usage.OutputTokenCount);
+            Assert.Equal(12, response.Usage.TotalTokenCount);
+
+            var root = handler.Requests.Single().Body.RootElement;
+            Assert.True(root.GetProperty("stream_options").GetProperty("include_usage").GetBoolean());
+            var message = root.GetProperty("messages").EnumerateArray().Single();
+            Assert.Equal("user", message.GetProperty("role").GetString());
+            var parts = message.GetProperty("content").EnumerateArray().ToList();
+            Assert.Equal("text", parts[0].GetProperty("type").GetString());
+            Assert.Equal("What is this?", parts[0].GetProperty("text").GetString());
+            Assert.Equal("image_url", parts[1].GetProperty("type").GetString());
+            Assert.StartsWith("data:image/png;base64,", parts[1].GetProperty("image_url").GetProperty("url").GetString());
+        }
+
+        [Fact]
+        public async Task SendsTextFilesInlineAndPdfAsFilePart()
+        {
+            var (client, handler) = CreateClient((_, _) => Sse("""{"id":"resp-f","choices":[{"index":0,"delta":{"content":"ok"},"finish_reason":"stop"}]}"""));
+
+            var csv = new DataContent(Encoding.UTF8.GetBytes("a,b\n1,2"), "text/csv") { Name = "data.csv" };
+            var pdf = new DataContent(new byte[] { 0x25, 0x50, 0x44, 0x46 }, "application/pdf") { Name = "doc.pdf" };
+            var zip = new DataContent(new byte[] { 1 }, "application/zip") { Name = "archive.zip" };
+
+            await client.GetResponseAsync([new ChatMessage(ChatRole.User, [new TextContent("Summarize"), csv, pdf, zip])]);
+
+            var parts = handler.Requests.Single().Body.RootElement.GetProperty("messages").EnumerateArray().Single().GetProperty("content").EnumerateArray().ToList();
+            Assert.Equal(4, parts.Count);
+            Assert.Equal("Summarize", parts[0].GetProperty("text").GetString());
+            Assert.Equal("text", parts[1].GetProperty("type").GetString());
+            Assert.Contains("Attached file data.csv (text/csv):\na,b\n1,2", parts[1].GetProperty("text").GetString());
+            Assert.Equal("file", parts[2].GetProperty("type").GetString());
+            Assert.Equal("doc.pdf", parts[2].GetProperty("file").GetProperty("filename").GetString());
+            Assert.StartsWith("data:application/pdf;base64,", parts[2].GetProperty("file").GetProperty("file_data").GetString());
+            Assert.Contains("archive.zip", parts[3].GetProperty("text").GetString());
+            Assert.Equal("application/pdf", ChatAttachment.GetMediaType("x.PDF"));
+            Assert.Equal("text/csv", ChatAttachment.GetMediaType("orders.csv"));
+            Assert.Equal("application/octet-stream", ChatAttachment.GetMediaType("x.bin"));
+        }
+
+        [Fact]
         public async Task FlushesToolCallsWithoutFinishReason()
         {
             var (client, _) = CreateClient((_, _) => Sse(

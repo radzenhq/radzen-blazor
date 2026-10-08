@@ -53,6 +53,25 @@ namespace Radzen.Blazor.Tests
                     yield break;
                 }
 
+                if (options?.Instructions == "slow")
+                {
+                    for (var i = 0; i < 50; i++)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await Task.Delay(20, cancellationToken);
+                        yield return new ChatResponseUpdate(ChatRole.Assistant, "word ") { ResponseId = "r0", MessageId = "r0" };
+                    }
+
+                    yield break;
+                }
+
+                if (options?.Instructions == "usage")
+                {
+                    yield return new ChatResponseUpdate(ChatRole.Assistant, "Hello there") { ResponseId = "r0", MessageId = "r0" };
+                    yield return new ChatResponseUpdate(ChatRole.Assistant, [new UsageContent(new UsageDetails { InputTokenCount = 5, OutputTokenCount = 7, TotalTokenCount = 12 })]) { ResponseId = "r0", MessageId = "r0" };
+                    yield break;
+                }
+
                 if (options?.Instructions == "reason")
                 {
                     yield return new ChatResponseUpdate(ChatRole.Assistant, [new TextReasoningContent("Thinking about it")]) { ResponseId = "r0", MessageId = "r0" };
@@ -341,6 +360,69 @@ namespace Radzen.Blazor.Tests
             await hidden.InvokeAsync(() => hidden.Instance.SendMessage("Hi"));
             hidden.WaitForAssertion(() => Assert.Contains("Hello there", hidden.Markup));
             Assert.DoesNotContain("rz-chat-reasoning", hidden.Markup);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_StopKeepsPartialResponse()
+        {
+            var (ctx, _) = CreateContext();
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+
+            var send = component.InvokeAsync(() => component.Instance.SendMessage("Go"));
+
+            component.WaitForAssertion(() => Assert.Contains("rz-chat-stop-btn", component.Markup));
+            component.WaitForAssertion(() => Assert.Contains("word word", component.Instance.GetMessages()[1].Content));
+
+            await component.InvokeAsync(() => component.Instance.Stop());
+            await send;
+
+            var message = component.Instance.GetMessages()[1];
+            Assert.False(message.IsStreaming);
+            Assert.StartsWith("word ", message.Content);
+            Assert.DoesNotContain("Sorry, I encountered an error", message.Content);
+            Assert.DoesNotContain("rz-chat-stop-btn", component.Markup);
+            Assert.Contains("rz-chat-send-btn", component.Markup);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_SendsAttachmentsAndShowsUsage()
+        {
+            var (ctx, client) = CreateContext();
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.SystemPrompt, "usage")
+                .Add(p => p.AllowAttachments, true)
+                .Add(p => p.ShowUsage, true));
+
+            Assert.Contains("rz-chat-attach-btn", component.Markup);
+
+            await component.InvokeAsync(() => component.Instance.AddAttachment(new ChatAttachment { Name = "pixel.png", MediaType = "image/png", Data = new byte[] { 1, 2, 3 } }));
+
+            component.WaitForAssertion(() => Assert.Contains("rz-chat-attachment-thumb", component.Markup));
+            Assert.Single(component.Instance.PendingAttachments);
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("What is this?"));
+            component.WaitForAssertion(() => Assert.Contains("Hello there", component.Markup));
+
+            var request = client.Requests.Single().Single();
+            Assert.Equal(ChatRole.User, request.Role);
+            Assert.Equal("What is this?", request.Text);
+            var data = Assert.Single(request.Contents.OfType<DataContent>());
+            Assert.Equal("image/png", data.MediaType);
+            Assert.Equal("pixel.png", data.Name);
+
+            Assert.Empty(component.Instance.PendingAttachments);
+            var messages = component.Instance.GetMessages();
+            Assert.Single(messages[0].Attachments);
+            Assert.Contains("rz-chat-message-attachment-image", component.Markup);
+            Assert.Equal(12, messages[1].Usage!.TotalTokenCount);
+            Assert.Contains("12 tokens", component.Markup);
+
+            var session = ctx.Services.GetRequiredService<IAIChatService>().GetOrCreateSession(component.Instance.GetSessionId());
+            Assert.Single(session.Messages[0].Attachments);
         }
 
         [Fact]

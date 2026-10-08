@@ -107,6 +107,7 @@ public sealed class OpenAICompatibleChatClient : IChatClient
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
         var toolCalls = new SortedDictionary<int, PendingToolCall>();
+        UsageDetails? usage = null;
         var flushed = false;
         string? responseId = null;
         string? modelId = null;
@@ -168,6 +169,14 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                     createdAt = DateTimeOffset.FromUnixTimeSeconds(created);
                 }
 
+                if (root.TryGetProperty("usage", out var usageElement) && usageElement.ValueKind == JsonValueKind.Object)
+                {
+                    usage ??= new UsageDetails();
+                    usage.InputTokenCount = (usage.InputTokenCount ?? 0) + ReadTokens(usageElement, "prompt_tokens");
+                    usage.OutputTokenCount = (usage.OutputTokenCount ?? 0) + ReadTokens(usageElement, "completion_tokens");
+                    usage.TotalTokenCount = (usage.TotalTokenCount ?? 0) + ReadTokens(usageElement, "total_tokens");
+                }
+
                 if (!root.TryGetProperty("choices", out var choices) || choices.ValueKind != JsonValueKind.Array)
                 {
                     continue;
@@ -226,6 +235,16 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                 yield return CreateUpdate(responseId, modelId, createdAt, functionCall, finishReason: ChatFinishReason.ToolCalls);
             }
         }
+
+        if (usage != null && usage.TotalTokenCount > 0)
+        {
+            yield return CreateUpdate(responseId, modelId, createdAt, new UsageContent(usage));
+        }
+    }
+
+    private static long ReadTokens(JsonElement usage, string name)
+    {
+        return usage.TryGetProperty(name, out var element) && element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var value) ? value : 0;
     }
 
     /// <inheritdoc />
@@ -323,6 +342,10 @@ public sealed class OpenAICompatibleChatClient : IChatClient
             }
 
             writer.WriteBoolean("stream", true);
+            writer.WritePropertyName("stream_options");
+            writer.WriteStartObject();
+            writer.WriteBoolean("include_usage", true);
+            writer.WriteEndObject();
 
             writer.WritePropertyName("messages");
             writer.WriteStartArray();
@@ -532,12 +555,105 @@ public sealed class OpenAICompatibleChatClient : IChatClient
             return;
         }
 
-        if (text.Length == 0)
+        var files = message.Role == ChatRole.User ? message.Contents.Where(content => content is DataContent || (content is UriContent uri && uri.HasTopLevelMediaType("image"))).ToList() : [];
+
+        if (text.Length == 0 && files.Count == 0)
         {
             return;
         }
 
-        WriteTextMessage(writer, message.Role == ChatRole.System ? "system" : "user", text);
+        if (files.Count == 0)
+        {
+            WriteTextMessage(writer, message.Role == ChatRole.System ? "system" : "user", text);
+            return;
+        }
+
+        writer.WriteStartObject();
+        writer.WriteString("role", "user");
+        writer.WritePropertyName("content");
+        writer.WriteStartArray();
+
+        if (text.Length > 0)
+        {
+            WriteTextPart(writer, text);
+        }
+
+        foreach (var file in files)
+        {
+            if (file is UriContent uri)
+            {
+                if (uri.HasTopLevelMediaType("image"))
+                {
+                    WriteImagePart(writer, uri.Uri.ToString());
+                }
+
+                continue;
+            }
+
+            var data = (DataContent)file;
+
+            if (data.HasTopLevelMediaType("image"))
+            {
+                WriteImagePart(writer, data.Uri);
+            }
+            else if (IsTextMediaType(data.MediaType))
+            {
+                WriteTextPart(writer, $"Attached file {data.Name ?? "file"} ({data.MediaType}):\n{Encoding.UTF8.GetString(data.Data.Span)}");
+            }
+            else if (string.Equals(data.MediaType, "application/pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                writer.WriteStartObject();
+                writer.WriteString("type", "file");
+                writer.WritePropertyName("file");
+                writer.WriteStartObject();
+                writer.WriteString("filename", data.Name ?? "document.pdf");
+                writer.WriteString("file_data", data.Uri);
+                writer.WriteEndObject();
+                writer.WriteEndObject();
+            }
+            else
+            {
+                WriteTextPart(writer, $"The user attached the file {data.Name ?? "file"} ({data.MediaType}, {data.Data.Length} bytes), which cannot be read by the model.");
+            }
+        }
+
+        writer.WriteEndArray();
+        writer.WriteEndObject();
+    }
+
+    private static bool IsTextMediaType(string mediaType)
+    {
+        if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var type = mediaType.Split(';')[0].Trim();
+
+        return type.EndsWith("/json", StringComparison.OrdinalIgnoreCase) || type.EndsWith("+json", StringComparison.OrdinalIgnoreCase)
+            || type.EndsWith("/xml", StringComparison.OrdinalIgnoreCase) || type.EndsWith("+xml", StringComparison.OrdinalIgnoreCase)
+            || type.Equals("application/csv", StringComparison.OrdinalIgnoreCase) || type.Equals("application/javascript", StringComparison.OrdinalIgnoreCase)
+            || type.Equals("application/x-ndjson", StringComparison.OrdinalIgnoreCase) || type.Equals("application/sql", StringComparison.OrdinalIgnoreCase)
+            || type.Equals("application/x-yaml", StringComparison.OrdinalIgnoreCase) || type.Equals("application/yaml", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void WriteTextPart(Utf8JsonWriter writer, string text)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("type", "text");
+        writer.WriteString("text", text);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteImagePart(Utf8JsonWriter writer, string url)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("type", "image_url");
+        writer.WritePropertyName("image_url");
+        writer.WriteStartObject();
+        writer.WriteString("url", url);
+        writer.WriteEndObject();
+        writer.WriteEndObject();
     }
 
     private static void WriteTextMessage(Utf8JsonWriter writer, string role, string text)

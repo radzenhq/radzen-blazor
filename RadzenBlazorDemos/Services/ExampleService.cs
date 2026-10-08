@@ -2296,6 +2296,7 @@ namespace RadzenBlazorDemos
                         new () { Text = "Generative UI", Anchor = "#generative-ui" },
                         new () { Text = "Human in the loop", Anchor = "#approval" },
                         new () { Text = "Voice input", Anchor = "#voice" },
+                        new () { Text = "Image attachments", Anchor = "#attachments" },
                         new () { Text = "AI providers", Anchor = "#providers" },
                         new () { Text = "Runtime configuration", Anchor = "#configuration" }
                     ]

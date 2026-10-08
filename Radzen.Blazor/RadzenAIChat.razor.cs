@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.AI;
 using Microsoft.JSInterop;
@@ -149,6 +150,121 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public bool? AllowMultipleToolCalls { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the user can attach files to messages. Images are sent to the model as image content and need a multimodal model;
+        /// text files (txt, csv, md, json, xml and similar) are sent as text, PDF files as file content for providers that support it. Default is <c>false</c>.
+        /// </summary>
+        [Parameter]
+        public bool AllowAttachments { get; set; }
+
+        /// <summary>
+        /// Gets or sets the accepted attachment types as an <c>accept</c> attribute value, for example <c>image/*,.txt,.csv,.pdf</c>. Default is <c>image/*</c>.
+        /// </summary>
+        [Parameter]
+        public string AcceptedAttachmentTypes { get; set; } = "image/*";
+
+        /// <summary>
+        /// Gets or sets the maximum size of an attachment in bytes. Default is 4 MB.
+        /// </summary>
+        [Parameter]
+        public long MaxAttachmentSize { get; set; } = 4 * 1024 * 1024;
+
+        /// <summary>
+        /// Gets or sets whether the token usage reported by the model is shown next to the time of assistant messages. Default is <c>false</c>.
+        /// </summary>
+        [Parameter]
+        public bool ShowUsage { get; set; }
+
+        /// <summary>
+        /// Event callback that is invoked when an attachment cannot be read, for example because it exceeds <see cref="MaxAttachmentSize"/>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<Exception> Error { get; set; }
+
+        private readonly List<ChatAttachment> pendingAttachments = new();
+        private readonly string attachInputId = $"rz-chat-attach-{Guid.NewGuid():N}";
+
+        /// <summary>
+        /// Gets the attachments that will be sent with the next message.
+        /// </summary>
+        public IReadOnlyList<ChatAttachment> PendingAttachments => pendingAttachments;
+
+        /// <summary>
+        /// Adds an attachment to the next message.
+        /// </summary>
+        /// <param name="attachment">The attachment.</param>
+        public void AddAttachment(ChatAttachment attachment)
+        {
+            ArgumentNullException.ThrowIfNull(attachment);
+            pendingAttachments.Add(attachment);
+            InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Removes an attachment from the next message.
+        /// </summary>
+        /// <param name="attachment">The attachment.</param>
+        public void RemoveAttachment(ChatAttachment attachment)
+        {
+            pendingAttachments.Remove(attachment);
+            InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Removes all pending attachments.
+        /// </summary>
+        public void ClearAttachments()
+        {
+            pendingAttachments.Clear();
+            InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Stops the response that is being generated. The text received so far is kept.
+        /// </summary>
+        public void Stop()
+        {
+            if (IsLoading)
+            {
+                cts.Cancel();
+            }
+        }
+
+        private async Task OnFilesSelected(InputFileChangeEventArgs args)
+        {
+            foreach (var file in args.GetMultipleFiles())
+            {
+                try
+                {
+                    using var stream = file.OpenReadStream(MaxAttachmentSize);
+                    using var memory = new System.IO.MemoryStream();
+                    await stream.CopyToAsync(memory);
+                    pendingAttachments.Add(new ChatAttachment { Name = file.Name, MediaType = string.IsNullOrEmpty(file.ContentType) ? ChatAttachment.GetMediaType(file.Name) : file.ContentType, Data = memory.ToArray() });
+                }
+                catch (Exception exception) when (exception is System.IO.IOException or InvalidOperationException)
+                {
+                    await Error.InvokeAsync(exception);
+                }
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task OnAttachClick()
+        {
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.clickElement", attachInputId);
+            }
+        }
+
+        private string FormatUsage(ChatMessage message)
+        {
+            var total = message.Usage?.TotalTokenCount ?? ((message.Usage?.InputTokenCount ?? 0) + (message.Usage?.OutputTokenCount ?? 0));
+
+            return string.Format(Culture ?? System.Globalization.CultureInfo.CurrentCulture, Localize(nameof(RadzenStrings.AIChat_UsageFormat)), total);
+        }
 
         /// <summary>
         /// Gets or sets whether the reasoning of models that expose it is rendered as a collapsible block in assistant messages. Default is <c>true</c>.
@@ -341,25 +457,7 @@ namespace Radzen.Blazor
         /// Sends a message programmatically.
         /// </summary>
         /// <param name="content">The message content to send.</param>
-        public async Task SendMessage(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
-            {
-                return;
-            }
-
-            // Add user message
-            var userMessage = AddMessage(content, true);
-            await MessageAdded.InvokeAsync(userMessage);
-            await MessageSent.InvokeAsync(content);
-
-            // Clear input
-            CurrentInput = string.Empty;
-            await InvokeAsync(StateHasChanged);
-
-            // Get AI response
-            await GetAIResponse(content, Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader);
-        }
+        public Task SendMessage(string content) => SendMessage(content, Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader);
 
         /// <summary>
         /// Sends a message programmatically with custom AI parameters.
@@ -375,22 +473,34 @@ namespace Radzen.Blazor
         /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
         public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
-            if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            if ((string.IsNullOrWhiteSpace(content) && pendingAttachments.Count == 0) || Disabled || IsLoading)
             {
                 return;
             }
 
-            // Add user message
+            content ??= string.Empty;
+
+            var attachments = pendingAttachments.ToList();
+            pendingAttachments.Clear();
+
             var userMessage = AddMessage(content, true);
+            userMessage.Attachments = attachments;
             await MessageAdded.InvokeAsync(userMessage);
             await MessageSent.InvokeAsync(content);
 
-            // Clear input
             CurrentInput = string.Empty;
             await InvokeAsync(StateHasChanged);
 
-            // Get AI response with custom parameters
-            await GetAIResponse(content, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
+            var contents = new List<AIContent>();
+
+            if (content.Length > 0)
+            {
+                contents.Add(new TextContent(content));
+            }
+
+            contents.AddRange(attachments.Select(attachment => (AIContent)attachment.ToDataContent()));
+
+            await GetAIResponse(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, contents), model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
         }
 
         /// <summary>
@@ -535,6 +645,16 @@ namespace Radzen.Blazor
 
                 await ResponseReceived.InvokeAsync(assistantMessage.Content);
                 await MessageAdded.InvokeAsync(assistantMessage);
+            }
+            catch (OperationCanceledException)
+            {
+                assistantMessage.IsStreaming = false;
+
+                if (assistantMessage.Content.Length > 0 || assistantMessage.ToolCalls.Count > 0)
+                {
+                    await ResponseReceived.InvokeAsync(assistantMessage.Content);
+                    await MessageAdded.InvokeAsync(assistantMessage);
+                }
             }
             catch (Exception ex)
             {
@@ -686,7 +806,7 @@ namespace Radzen.Blazor
 
         private async Task OnSendMessage()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentInput))
+            if (!string.IsNullOrWhiteSpace(CurrentInput) || pendingAttachments.Count > 0)
             {
                 await SendMessage(CurrentInput);
             }

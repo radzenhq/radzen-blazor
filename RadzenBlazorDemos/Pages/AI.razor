@@ -282,6 +282,7 @@ builder.Services.AddAIChatService();
         new("Human in the loop", "/aichat#approval", "verified_user", "Wrap a tool in ApprovalRequiredAIFunction and the chat asks the user before it runs.", true),
         new("Voice input", "/aichat#voice", "mic", "Talk to the assistant with RadzenSpeechToTextButton and the browser's speech recognition.", true),
         new("Reasoning", "/aichat#tools", "psychology", "Models that expose their reasoning show it as a collapsible block above the answer.", true),
+        new("Image attachments", "/aichat#attachments", "image", "Attach images to a message and ask a multimodal model about them, with token usage and a stop button.", true),
         new("Editor AI assistant", "/html-editor#ai", "edit_note", "Rewrite, summarize or translate the selection in the HtmlEditor and MarkdownEditor.", true)
     ];
 

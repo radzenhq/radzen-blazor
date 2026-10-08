@@ -7538,6 +7538,10 @@ Radzen.getSelectedText = function(element) {
   if (element && !element.contains(selection.anchorNode)) return '';
   return selection.toString();
 };
+Radzen.clickElement = function(id) {
+  var element = typeof id === 'string' ? document.getElementById(id) : id;
+  if (element) element.click();
+};
 Radzen.readClipboardText = async function() {
   try {
     return await navigator.clipboard.readText();

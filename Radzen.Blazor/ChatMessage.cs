@@ -52,4 +52,14 @@ public class ChatMessage
     /// Gets or sets the reasoning the model produced before answering, when the model exposes it.
     /// </summary>
     public string? Reasoning { get; set; }
+
+    /// <summary>
+    /// Gets or sets the files attached to the message.
+    /// </summary>
+    public List<ChatAttachment> Attachments { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the token usage reported by the model for this response, when the provider reports it.
+    /// </summary>
+    public Microsoft.Extensions.AI.UsageDetails? Usage { get; set; }
 }

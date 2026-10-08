@@ -80,9 +80,19 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
         var userText = string.Concat(message.Contents.OfType<TextContent>().Select(content => content.Text));
 
-        if (userText.Length > 0)
+        var attachments = message.Contents.OfType<DataContent>().Select(Blazor.ChatAttachment.FromDataContent).ToList();
+
+        if (userText.Length > 0 || attachments.Count > 0)
         {
-            session.AddMessage("user", userText);
+            session.AddMessage(new Blazor.ChatMessage
+            {
+                UserId = "user",
+                Role = "user",
+                IsUser = true,
+                Content = userText,
+                Timestamp = DateTime.Now,
+                Attachments = attachments
+            });
         }
 
         session.AddHistory([message]);
@@ -276,6 +286,9 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
                 break;
             case TextReasoningContent reasoning:
                 message.Reasoning += reasoning.Text;
+                break;
+            case UsageContent usage:
+                message.Usage = usage.Details;
                 break;
             case ErrorContent error:
                 if (text.Length > 0)
