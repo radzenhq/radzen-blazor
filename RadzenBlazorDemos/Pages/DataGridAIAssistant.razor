@@ -1,0 +1,177 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+@using System.Globalization
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@inherits DbContextPage
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="8">
+        <RadzenDataGrid @ref="grid" Data="@orders" TItem="Order" AllowFiltering="true" AllowSorting="true" AllowGrouping="true" AllowPaging="true" PageSize="8"
+                        FilterMode="FilterMode.Simple" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact" Style="height: 560px">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Order.OrderID)" Title="Order" Width="90px" Visible="@IsVisible(nameof(Order.OrderID))" />
+                <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Visible="@IsVisible("Customer.CompanyName")" />
+                <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="120px" Visible="@IsVisible("Employee.LastName")" />
+                <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order date" FormatString="{0:d}" Width="130px" Visible="@IsVisible(nameof(Order.OrderDate))" />
+                <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right" Width="110px" Visible="@IsVisible(nameof(Order.Freight))" />
+                <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship country" Width="130px" Visible="@IsVisible(nameof(Order.ShipCountry))" />
+                <RadzenDataGridColumn Property="@nameof(Order.ShipCity)" Title="Ship city" Width="130px" Visible="@IsVisible(nameof(Order.ShipCity))" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenAIChat Title="Grid assistant"
+                      Placeholder="Try: Show orders shipped to Germany sorted by freight. Group by employee. Hide the city column."
+                      SystemPrompt="@systemPrompt"
+                      Tools="@tools"
+                      AllowMultipleToolCalls="false"
+                      Style="height: 560px" />
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    RadzenDataGrid<Order> grid;
+    IQueryable<Order> orders;
+    IEnumerable<AITool> tools;
+    HashSet<string> hiddenColumns = new();
+
+    const string systemPrompt = "You control a data grid of Northwind orders for the user. Columns: Order (number), Customer (text), Employee (text), Order date (date), Freight (number), Ship country (text), Ship city (text). " +
+        "Translate the user's request into calls of the grid tools: filter, sort, group, show or hide columns, or clear. Call one tool at a time and chain calls when a request needs several. " +
+        "Use GetGridState when the user asks what is applied. Answer with one short sentence describing what you did; the grid itself shows the data.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include(o => o.Customer).Include(o => o.Employee).OrderBy(o => o.OrderID);
+
+        tools =
+        [
+            AIFunctionFactory.Create(FilterColumn),
+            AIFunctionFactory.Create(ClearFilters),
+            AIFunctionFactory.Create(SortByColumn),
+            AIFunctionFactory.Create(GroupByColumn),
+            AIFunctionFactory.Create(SetColumnVisibility),
+            AIFunctionFactory.Create(GetGridState)
+        ];
+    }
+
+    bool IsVisible(string property) => !hiddenColumns.Contains(property);
+
+    RadzenDataGridColumn<Order> FindColumn(string column)
+    {
+        return grid.ColumnsCollection.FirstOrDefault(c => string.Equals(c.Title, column, StringComparison.OrdinalIgnoreCase) || string.Equals(c.Property, column, StringComparison.OrdinalIgnoreCase))
+            ?? grid.ColumnsCollection.FirstOrDefault(c => c.Title.Contains(column, StringComparison.OrdinalIgnoreCase) || c.Property.Contains(column, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"There is no column '{column}'. Available columns: {string.Join(", ", grid.ColumnsCollection.Select(c => c.Title))}.");
+    }
+
+    [Description("Filters the grid by a column. Replaces the current filter of that column; other column filters stay.")]
+    async Task<string> FilterColumn(
+        [Description("The column title, for example Ship country.")] string column,
+        [Description("One of: Equals, NotEquals, Contains, DoesNotContain, StartsWith, EndsWith, GreaterThan, GreaterThanOrEquals, LessThan, LessThanOrEquals.")] string @operator,
+        [Description("The value to compare with. Dates as yyyy-MM-dd, numbers without units.")] string value)
+    {
+        var target = FindColumn(column);
+
+        if (!Enum.TryParse<FilterOperator>(@operator, true, out var filterOperator))
+        {
+            filterOperator = FilterOperator.Contains;
+        }
+
+        var type = Nullable.GetUnderlyingType(target.FilterPropertyType) ?? target.FilterPropertyType;
+
+        object converted = type == typeof(string) ? value
+            : type == typeof(DateTime) ? DateTime.Parse(value, CultureInfo.InvariantCulture)
+            : Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
+
+        if (type == typeof(string) && filterOperator is FilterOperator.GreaterThan or FilterOperator.LessThan or FilterOperator.GreaterThanOrEquals or FilterOperator.LessThanOrEquals)
+        {
+            filterOperator = FilterOperator.Contains;
+        }
+
+        target.SetFilterOperator(filterOperator);
+        target.SetFilterValue(converted);
+        await grid.Reload();
+
+        return $"Filtered {target.Title} {filterOperator} {value}. {grid.View.Count()} orders match.";
+    }
+
+    [Description("Removes all column filters.")]
+    async Task<string> ClearFilters()
+    {
+        foreach (var column in grid.ColumnsCollection)
+        {
+            column.ClearFilters();
+        }
+
+        await grid.Reload();
+
+        return $"Filters cleared. {grid.View.Count()} orders.";
+    }
+
+    [Description("Sorts the grid by a column.")]
+    async Task<string> SortByColumn([Description("The column title.")] string column, [Description("True for descending order.")] bool descending = false)
+    {
+        var target = FindColumn(column);
+
+        if (descending)
+        {
+            grid.OrderByDescending(target.Property);
+        }
+        else
+        {
+            grid.OrderBy(target.Property);
+        }
+
+        await InvokeAsync(StateHasChanged);
+
+        return $"Sorted by {target.Title} {(descending ? "descending" : "ascending")}.";
+    }
+
+    [Description("Groups the grid rows by a column. Pass an empty column to remove grouping.")]
+    async Task<string> GroupByColumn([Description("The column title, or empty to remove grouping.")] string column = "")
+    {
+        grid.Groups.Clear();
+
+        if (!string.IsNullOrWhiteSpace(column))
+        {
+            var target = FindColumn(column);
+            grid.Groups.Add(new GroupDescriptor { Property = target.Property, Title = target.Title });
+            await grid.Reload();
+            return $"Grouped by {target.Title}.";
+        }
+
+        await grid.Reload();
+        return "Grouping removed.";
+    }
+
+    [Description("Shows or hides a column.")]
+    async Task<string> SetColumnVisibility([Description("The column title.")] string column, [Description("True to show the column, false to hide it.")] bool visible)
+    {
+        var target = FindColumn(column);
+
+        if (visible)
+        {
+            hiddenColumns.Remove(target.Property);
+        }
+        else
+        {
+            hiddenColumns.Add(target.Property);
+        }
+
+        await InvokeAsync(StateHasChanged);
+
+        return $"{target.Title} column is now {(visible ? "visible" : "hidden")}.";
+    }
+
+    [Description("Describes the filters, sorting, grouping and hidden columns currently applied to the grid.")]
+    string GetGridState()
+    {
+        var filters = grid.ColumnsCollection.Where(c => c.GetFilterValue() != null).Select(c => $"{c.Title} {c.GetFilterOperator()} {c.GetFilterValue()}").ToList();
+        var sorts = grid.ColumnsCollection.Where(c => c.GetSortOrder() != null).Select(c => $"{c.Title} {c.GetSortOrder()}").ToList();
+        var groups = grid.Groups.Select(g => g.Title).ToList();
+
+        return $"Filters: {(filters.Count > 0 ? string.Join("; ", filters) : "none")}. Sorting: {(sorts.Count > 0 ? string.Join("; ", sorts) : "none")}. Grouping: {(groups.Count > 0 ? string.Join(", ", groups) : "none")}. Hidden columns: {(hiddenColumns.Count > 0 ? string.Join(", ", hiddenColumns) : "none")}. Rows: {grid.View.Count()}.";
+    }
+}

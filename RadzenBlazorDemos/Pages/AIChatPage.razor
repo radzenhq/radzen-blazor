@@ -102,6 +102,17 @@
     <AIChatApproval />
 </RadzenExample>
 
+<RadzenText Anchor="aichat#voice" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Voice input
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Combine <strong>AIChat</strong> with <strong>RadzenSpeechToTextButton</strong> to let users talk to the assistant: the button captures speech with the browser's speech recognition
+    and its <code>Change</code> event passes the transcript to <code>SendMessage</code>.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatVoice">
+    <AIChatVoice />
+</RadzenExample>
+
 <RadzenText Anchor="aichat#providers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     AI providers
 </RadzenText>

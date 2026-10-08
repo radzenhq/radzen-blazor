@@ -310,7 +310,10 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         }
     }
 
-    private IChatClient GetChatClient(string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
+    /// <inheritdoc />
+    /// <remarks>The returned pipeline applies the configured <see cref="AIChatServiceOptions.Model"/>, <see cref="AIChatServiceOptions.MaxTokens"/> and <see cref="AIChatServiceOptions.Temperature"/> to requests that do not set them.</remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The pipelines are cached for the lifetime of the service and are never disposed: disposing one would dispose the IChatClient the application registered.")]
+    public IChatClient GetChatClient(string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
     {
         var hasOverrides = endpoint != null || proxy != null || apiKey != null || apiKeyHeader != null;
         var key = hasOverrides ? string.Join("|", endpoint, proxy, apiKey, apiKeyHeader) : string.Empty;
@@ -320,17 +323,34 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             if (!clients.TryGetValue(key, out var client))
             {
                 client = hasOverrides ? CreateOpenAIClient(endpoint, proxy, apiKey, apiKeyHeader) : serviceProvider.GetService<IChatClient>() ?? CreateOpenAIClient(null, null, null, null);
-
-                if (client.GetService<FunctionInvokingChatClient>() == null)
-                {
-                    client = new FunctionInvokingChatClient(client, serviceProvider.GetService<ILoggerFactory>(), serviceProvider);
-                }
+                client = BuildPipeline(client);
 
                 clients[key] = client;
             }
 
             return client;
         }
+    }
+
+    private IChatClient BuildPipeline(IChatClient inner)
+    {
+        var builder = new ChatClientBuilder(inner);
+
+        if (inner.GetService<FunctionInvokingChatClient>() == null)
+        {
+            builder.UseFunctionInvocation(serviceProvider.GetService<ILoggerFactory>());
+        }
+
+        builder.ConfigureOptions(ApplyDefaults);
+
+        return builder.Build(serviceProvider);
+    }
+
+    private void ApplyDefaults(ChatOptions options)
+    {
+        options.ModelId ??= Options.Model;
+        options.MaxOutputTokens ??= Options.MaxTokens;
+        options.Temperature ??= (float)Options.Temperature;
     }
 
     private OpenAICompatibleChatClient CreateOpenAIClient(string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)

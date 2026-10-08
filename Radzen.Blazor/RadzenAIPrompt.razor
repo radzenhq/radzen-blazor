@@ -1,0 +1,59 @@
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        <div class="rz-aiprompt-input">
+            <textarea class="rz-textarea rz-aiprompt-textarea" placeholder="@Placeholder" value="@Value" rows="2" disabled="@Disabled"
+                      @oninput="@OnInput" @onkeydown="@OnKeyDown" @onkeydown:preventDefault="@preventDefault" @attributes="@InputAttributes"></textarea>
+            @if (IsGenerating)
+            {
+                <RadzenButton Icon="stop" Text="@StopText" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@Stop" class="rz-aiprompt-stop" />
+            }
+            else
+            {
+                <RadzenButton Icon="auto_awesome" Text="@GenerateText" Disabled="@(Disabled || string.IsNullOrWhiteSpace(Value))" Click="@(() => Generate())" class="rz-aiprompt-generate" />
+            }
+        </div>
+        @if (Suggestions != null && Suggestions.Any())
+        {
+            <div class="rz-aiprompt-suggestions">
+                @foreach (var suggestion in Suggestions)
+                {
+                    <RadzenButton Text="@suggestion" Icon="lightbulb" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Size="ButtonSize.Small" Disabled="@(Disabled || IsGenerating)" Click="@(() => Generate(suggestion))" class="rz-aiprompt-suggestion" />
+                }
+            </div>
+        }
+        @if (ShowOutput && (IsGenerating || !string.IsNullOrEmpty(Output)))
+        {
+            <div class="rz-aiprompt-output">
+                <div class="rz-aiprompt-output-content">
+                    @if (IsGenerating)
+                    {
+                        <span class="rz-aiprompt-output-text">@Output</span><RadzenIcon Icon="more_horiz" class="rz-aiprompt-streaming-icon" />
+                    }
+                    else if (OutputTemplate != null)
+                    {
+                        @OutputTemplate(Output)
+                    }
+                    else
+                    {
+                        <RadzenMarkdown Text="@Output" />
+                    }
+                </div>
+                <div class="rz-aiprompt-toolbar">
+                    @if (Commands != null)
+                    {
+                        @foreach (var command in Commands)
+                        {
+                            <RadzenButton Text="@command.Text" Icon="@command.Icon" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Disabled="@(Disabled || IsGenerating)" Click="@(() => ExecuteCommand(command))" class="rz-aiprompt-command" />
+                        }
+                    }
+                    <span class="rz-aiprompt-toolbar-spacer"></span>
+                    <RadzenButton Icon="refresh" Title="@RetryTitle" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Disabled="@(Disabled || IsGenerating || lastPrompt == null)" Click="@Retry" class="rz-aiprompt-retry" />
+                    <RadzenButton Icon="content_copy" Title="@CopyTitle" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Disabled="@(IsGenerating || string.IsNullOrEmpty(Output))" Click="@Copy" class="rz-aiprompt-copy" />
+                </div>
+            </div>
+        }
+    </div>
+}

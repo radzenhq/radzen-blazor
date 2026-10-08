@@ -2597,4 +2597,25 @@
   <data name="AIChat_ToolCallResult" xml:space="preserve">
     <value>Result</value>
   </data>
+  <data name="SmartPasteButton_Text" xml:space="preserve">
+    <value>Smart paste</value>
+  </data>
+  <data name="SmartPasteButton_Title" xml:space="preserve">
+    <value>Fill the form from the clipboard</value>
+  </data>
+  <data name="AIPrompt_Placeholder" xml:space="preserve">
+    <value>Ask AI...</value>
+  </data>
+  <data name="AIPrompt_GenerateText" xml:space="preserve">
+    <value>Generate</value>
+  </data>
+  <data name="AIPrompt_StopText" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="AIPrompt_CopyTitle" xml:space="preserve">
+    <value>Copy output</value>
+  </data>
+  <data name="AIPrompt_RetryTitle" xml:space="preserve">
+    <value>Regenerate</value>
+  </data>
 </root>

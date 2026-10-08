@@ -43,6 +43,16 @@ public interface IAIChatService
     IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets the <see cref="IChatClient"/> the service sends requests with: the one registered in the service collection or an <see cref="OpenAICompatibleChatClient"/>
+    /// configured from <see cref="AIChatServiceOptions"/>, wrapped in a <see cref="FunctionInvokingChatClient"/>. Use it for one-off completions outside of a conversation.
+    /// </summary>
+    /// <param name="endpoint">Optional endpoint URL to override the configured endpoint. Any override selects the built-in OpenAI-compatible client.</param>
+    /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
+    /// <param name="apiKey">Optional API key to override the configured API key.</param>
+    /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
+    IChatClient GetChatClient(string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null);
+
+    /// <summary>
     /// Gets or creates a conversation session.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>

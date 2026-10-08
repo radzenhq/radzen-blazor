@@ -1,24 +1,52 @@
 @page "/ai"
 
-<PageTitle>Blazor AI Components — Chat, MCP Server & IDE Integration</PageTitle>
+<PageTitle>Blazor AI Components — Chat, Agents, Smart Paste, MCP Server & IDE Integration</PageTitle>
 
 <HeadContent>
-    <meta name="description" content="Add AI to your Blazor apps with RadzenAIChat and Radzen Blazor MCP. Built-in chat UI and a cloud-hosted MCP server for Cursor, Claude Code, GitHub Copilot, JetBrains, and other MCP-capable IDEs.">
+    <meta name="description" content="Add AI to your Blazor apps with RadzenAIChat, RadzenAIPrompt, RadzenSmartPasteButton, AI-powered DataGrid, Scheduler and Chart demos and Radzen Blazor MCP. Built on Microsoft.Extensions.AI with tool calling, approvals and generative UI.">
 </HeadContent>
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Blazor AI Components
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Radzen.Blazor includes built-in AI capabilities, and we also provide a cloud-hosted MCP server that gives AI coding assistants access to Radzen Blazor documentation and templates.
+    Radzen.Blazor includes AI components built on Microsoft.Extensions.AI - chat with tool calling and approvals, a prompt box, smart paste and AI-powered DataGrid, Scheduler and Chart scenarios - and a cloud-hosted MCP server that gives AI coding assistants access to Radzen Blazor documentation and templates.
 </RadzenText>
 <RadzenStack Gap="3rem">
+<RadzenStack Gap="1rem" class="rz-my-6">
+    <RadzenText TextStyle="TextStyle.DisplayH3" Text="AI components and demos" TagName="TagName.H2"></RadzenText>
+    <RadzenText>
+        Everything below talks to the model through the <code>IChatClient</code> abstraction of <strong>Microsoft.Extensions.AI</strong>: bring any OpenAI-compatible endpoint or register the <code>IChatClient</code> of your provider (OpenAI, Azure OpenAI, Ollama and others) and all components use it.
+    </RadzenText>
+    <RadzenRow Gap="1rem">
+        @foreach (var demo in aiDemos)
+        {
+            <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
+                <RadzenLink Path="@demo.Path" Style="text-decoration: none; display: block; height: 100%">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                        <RadzenStack Gap="0.5rem">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                <RadzenIcon Icon="@demo.Icon" class="rz-color-primary" />
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@demo.Title</RadzenText>
+                                @if (demo.IsNew)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                }
+                            </RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-color-secondary">@demo.Description</RadzenText>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenLink>
+            </RadzenColumn>
+        }
+    </RadzenRow>
+</RadzenStack>
 <RadzenRow AlignItems="AlignItems.Center" class="rz-my-6">
     <RadzenColumn Size="12" SizeLG="6" Order="2">
         <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
             <RadzenText TextStyle="TextStyle.DisplayH3" Text="RadzenAIChat" TagName="TagName.H2"></RadzenText>
             <RadzenText>
-                <strong>RadzenAIChat</strong> is a Blazor-native chat component built on <strong>Microsoft.Extensions.AI</strong>. It works with any OpenAI-compatible service out of the box and with any <code>IChatClient</code> provider (OpenAI, Azure OpenAI, Ollama, local servers, or third-party providers).
+                <strong>RadzenAIChat</strong> is a Blazor-native chat component built on <strong>Microsoft.Extensions.AI</strong>. It works with any OpenAI-compatible service out of the box and with any <code>IChatClient</code> provider (OpenAI, Azure OpenAI, Ollama, local servers, or third-party providers). Because it is built on <code>IChatClient</code>, an AG-UI agent backend plugs in through the AG-UI .NET SDK without changes to the UI.
             </RadzenText>
             <RadzenStack Gap="1rem">
                 <RadzenStack Orientation="Orientation.Horizontal">
@@ -81,3 +109,23 @@
     </RadzenColumn>
 </RadzenRow>
 </RadzenStack>
+
+@code {
+    record AIDemo(string Title, string Path, string Icon, string Description, bool IsNew);
+
+    AIDemo[] aiDemos =
+    [
+        new("AIChat", "/aichat", "chat", "Streaming chat with conversation memory, Markdown rendering and runtime model configuration.", false),
+        new("Tool calling", "/aichat#tools", "build", "The model calls your C# methods; every call is shown as a card with arguments, status and result.", true),
+        new("Generative UI", "/aichat#generative-ui", "dashboard", "Render tool results with Radzen components - a chart or a data grid inside the conversation.", true),
+        new("Human in the loop", "/aichat#approval", "verified_user", "Wrap a tool in ApprovalRequiredAIFunction and the chat asks the user before it runs.", true),
+        new("AIPrompt", "/aiprompt", "auto_awesome", "A prompt box with suggestions, a streaming output and commands such as summarize, rewrite and translate.", true),
+        new("SmartPasteButton", "/smartpastebutton", "content_paste_go", "Fill a form from the clipboard - the model extracts the fields of your form model from any text.", true),
+        new("DataGrid AI assistant", "/datagrid-ai-assistant", "table_view", "Filter, sort, group and arrange a DataGrid in natural language through grid API tools.", true),
+        new("DataGrid AI column", "/datagrid-ai-column", "view_column", "A column with values generated by the model for the rows of the current page in one request.", true),
+        new("Scheduler AI assistant", "/scheduler#ai-assistant", "event", "Read, add, move and delete appointments by chatting, with approval for every change.", true),
+        new("Chart AI insights", "/chart-ai-insights", "insights", "Ask questions about a chart - AIPrompt gets the series as context and answers with the numbers.", true),
+        new("Voice input", "/aichat#voice", "mic", "Talk to the assistant with RadzenSpeechToTextButton and the browser's speech recognition.", true),
+        new("AI UI Blocks", "/ui-blocks-ai", "widgets", "Ready-made welcome screens, prompt suggestions and ask bars built around RadzenAIChat.", false)
+    ];
+}

@@ -1,0 +1,52 @@
+@using System.Text.Json
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="7">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenChart Style="height: 320px">
+                <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023" />
+                <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024" />
+                <RadzenColumnOptions Radius="5" />
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Revenue in USD" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="5">
+        <RadzenAIPrompt Context="@ChartData"
+                        SystemPrompt="You are a business analyst. The text is the data of a chart as JSON. Answer with short markdown, use the actual numbers and name the quarters."
+                        Suggestions="@(new[] { "Summarize the trend", "Which quarter grew the most year over year?", "Forecast Q1 2025" })"
+                        Commands="@(new[] { new AIPromptCommand { Text = "Shorter", Icon = "compress", Prompt = "Rewrite in at most two sentences." }, new AIPromptCommand { Text = "Bullet points", Icon = "format_list_bulleted", Prompt = "Rewrite as three bullet points." } })"
+                        Placeholder="Ask about the chart..." />
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    DataItem[] revenue2023 =
+    [
+        new DataItem { Quarter = "Q1", Revenue = 234000 },
+        new DataItem { Quarter = "Q2", Revenue = 269000 },
+        new DataItem { Quarter = "Q3", Revenue = 233000 },
+        new DataItem { Quarter = "Q4", Revenue = 244000 }
+    ];
+
+    DataItem[] revenue2024 =
+    [
+        new DataItem { Quarter = "Q1", Revenue = 254000 },
+        new DataItem { Quarter = "Q2", Revenue = 324000 },
+        new DataItem { Quarter = "Q3", Revenue = 283000 },
+        new DataItem { Quarter = "Q4", Revenue = 349000 }
+    ];
+
+    string ChartData => JsonSerializer.Serialize(new { title = "Revenue in USD by quarter", series = new { year2023 = revenue2023, year2024 = revenue2024 } });
+
+    string FormatAsUSD(object value) => ((double)value).ToString("C0");
+}

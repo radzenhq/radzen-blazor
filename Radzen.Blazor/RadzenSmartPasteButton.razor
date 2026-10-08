@@ -1,0 +1,5 @@
+@typeparam TModel
+@inherits RadzenComponent
+
+<RadzenButton Visible="@Visible" id="@GetId()" title="@Title" ButtonStyle="@ButtonStyle" Variant="@Variant" Shade="@Shade" Size="@Size" Icon="@Icon" IconColor="@IconColor" Text="@Text"
+              IsBusy="@IsBusy" BusyText="@BusyText" Disabled="@(Disabled || IsBusy)" style="@Style" @attributes="Attributes" class="@GetCssClass()" Click="@OnClick" />

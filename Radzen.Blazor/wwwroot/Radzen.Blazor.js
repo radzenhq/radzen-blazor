@@ -7520,6 +7520,21 @@ Radzen.invokeRadzenCallback = function(key) {
   var fn = Radzen[key];
   if (typeof fn === 'function') fn();
 };
+Radzen.copyToClipboard = async function(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+};
+Radzen.readClipboardText = async function() {
+  try {
+    return await navigator.clipboard.readText();
+  } catch {
+    return null;
+  }
+};
 Radzen.chatScrollAfterRender = function(selector, delay) {
   setTimeout(function() {
     var container = document.querySelector(selector);

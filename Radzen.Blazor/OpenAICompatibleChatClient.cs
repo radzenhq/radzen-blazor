@@ -374,11 +374,32 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                     writer.WriteEndArray();
                 }
 
-                if (options.ResponseFormat is ChatResponseFormatJson)
+                if (options.ResponseFormat is ChatResponseFormatJson json)
                 {
                     writer.WritePropertyName("response_format");
                     writer.WriteStartObject();
-                    writer.WriteString("type", "json_object");
+
+                    if (json.Schema is JsonElement schema)
+                    {
+                        writer.WriteString("type", "json_schema");
+                        writer.WritePropertyName("json_schema");
+                        writer.WriteStartObject();
+                        writer.WriteString("name", string.IsNullOrEmpty(json.SchemaName) ? "response" : json.SchemaName);
+
+                        if (!string.IsNullOrEmpty(json.SchemaDescription))
+                        {
+                            writer.WriteString("description", json.SchemaDescription);
+                        }
+
+                        writer.WritePropertyName("schema");
+                        schema.WriteTo(writer);
+                        writer.WriteEndObject();
+                    }
+                    else
+                    {
+                        writer.WriteString("type", "json_object");
+                    }
+
                     writer.WriteEndObject();
                 }
 

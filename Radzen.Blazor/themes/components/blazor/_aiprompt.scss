@@ -1,0 +1,72 @@
+.rz-aiprompt {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: var(--rz-border-normal);
+    border-radius: var(--rz-border-radius);
+    background-color: var(--rz-base-background-color);
+
+    .rz-aiprompt-input {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+
+    .rz-aiprompt-textarea {
+        flex: 1 1 auto;
+        min-width: 0;
+        resize: none;
+        field-sizing: content;
+        max-height: 12rem;
+    }
+
+    .rz-aiprompt-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .rz-aiprompt-output {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: var(--rz-border-radius);
+        background-color: var(--rz-base-200);
+    }
+
+    .rz-aiprompt-output-content {
+        white-space: pre-wrap;
+        word-break: break-word;
+        --rz-text-h1-margin-block-end: 0;
+        --rz-text-h2-margin-block-end: 0;
+        --rz-text-h3-margin-block-end: 0;
+        --rz-text-body1-margin-block-end: 0;
+        --rz-text-body2-margin-block-end: 0;
+
+        .rz-markdown {
+            white-space: normal;
+        }
+    }
+
+    .rz-aiprompt-streaming-icon {
+        animation: rz-pulse 1.5s infinite;
+        vertical-align: middle;
+    }
+
+    .rz-aiprompt-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .rz-aiprompt-toolbar-spacer {
+        flex: 1 1 auto;
+    }
+
+    &.rz-state-disabled {
+        opacity: 0.6;
+    }
+}

@@ -1,0 +1,44 @@
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Text to work on</RadzenText>
+            <RadzenTextArea @bind-Value="@text" Rows="12" Style="width: 100%" />
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenAIPrompt Context="@text"
+                        SystemPrompt="You are a writing assistant. Keep the meaning of the text and return only the rewritten text in markdown."
+                        Suggestions="@(new[] { "Summarize in one paragraph", "Fix grammar and spelling", "Turn into bullet points" })"
+                        Commands="@commands"
+                        Generated="@OnGenerated"
+                        Placeholder="What should I do with the text?" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" class="rz-mt-3">
+            <RadzenButton Text="Replace text with output" Icon="swap_horiz" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Disabled="@(string.IsNullOrEmpty(output))" Click="@(() => text = output)" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<EventConsole @ref="console" Style="min-height: 120px;" />
+
+@code {
+    EventConsole console;
+    string output;
+
+    string text = "radzen blazor is a set of 145+ free native blazor ui components. it has datagrid, scheduler, charts and alot more. " +
+        "the components works in blazor server, webassembly and auto render mode and comes with themes like material and fluent. " +
+        "there is also a pro version with premium themes, and the radzen blazor studio ide for building apps fast.";
+
+    AIPromptCommand[] commands =
+    [
+        new AIPromptCommand { Text = "Shorter", Icon = "compress", Prompt = "Make it shorter." },
+        new AIPromptCommand { Text = "Longer", Icon = "expand", Prompt = "Expand it with more detail." },
+        new AIPromptCommand { Text = "Formal", Icon = "work", Prompt = "Rewrite in a formal tone." },
+        new AIPromptCommand { Text = "German", Icon = "translate", Prompt = "Translate to German." }
+    ];
+
+    void OnGenerated(AIPromptGeneratedEventArgs args)
+    {
+        output = args.Output;
+        console.Log($"{(args.Command != null ? "Command " + args.Command.Text : "Prompt \"" + args.Prompt + "\"")} produced {args.Output.Length} characters.");
+    }
+}

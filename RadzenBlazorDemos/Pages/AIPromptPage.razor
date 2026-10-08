@@ -1,0 +1,22 @@
+@page "/aiprompt"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor AIPrompt
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Blazor AIPrompt component is a prompt box for one-shot AI tasks: suggested prompts, a streaming output panel and commands that refine the result - summarize, rewrite, translate - optionally applied to a piece of text.
+</RadzenText>
+
+<RadzenExample ComponentName="AIPrompt" Example="AIPromptConfig">
+    <AIPromptConfig />
+</RadzenExample>
+
+<RadzenText Anchor="aiprompt#usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>Suggestions</code> are prompts offered as buttons under the input. <code>Commands</code> appear under the output and send the current output with their <code>Prompt</code> to the model, replacing the output with the result.
+    Set <code>Context</code> to the text the prompts should apply to, for example the content or the selection of an editor; without it the prompt is sent on its own.
+    Bind <code>Output</code> or handle <code>Generated</code> to use the result in your application, and set <code>ShowOutput="false"</code> to render it elsewhere.
+    The component streams through the <code>IChatClient</code> configured for <code>IAIChatService</code>; <code>SystemPrompt</code>, <code>ModelId</code>, <code>Temperature</code> and <code>MaxTokens</code> tune the request.
+</RadzenText>

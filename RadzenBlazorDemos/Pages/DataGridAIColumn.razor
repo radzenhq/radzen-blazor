@@ -1,0 +1,128 @@
+@using Microsoft.Extensions.AI
+@using System.Text.Json
+@using RadzenBlazorDemos.Models.Northwind
+@inherits DbContextPage
+@inject IAIChatService ChatService
+
+<RadzenDataGrid @ref="grid" Data="@products" TItem="Product" AllowPaging="true" PageSize="6" Page="@OnPage" Density="Density.Compact">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Product.ProductName)" Title="Product" Width="200px" />
+        <RadzenDataGridColumn Property="Category.CategoryName" Title="Category" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(Product.UnitPrice)" Title="Price" FormatString="{0:C}" TextAlign="TextAlign.Right" Width="100px" />
+        <RadzenDataGridColumn Title="AI tagline" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                    <RadzenIcon Icon="auto_awesome" Style="font-size: 1rem" />
+                    <span>AI tagline</span>
+                </RadzenStack>
+            </HeaderTemplate>
+            <Template Context="product">
+                @if (taglines.TryGetValue(product.ProductID, out var tagline))
+                {
+                    <span>@tagline</span>
+                }
+                else if (error != null)
+                {
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@error</RadzenText>
+                }
+                else
+                {
+                    <RadzenSkeleton Style="width: 80%" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Product> grid;
+    IQueryable<Product> products;
+    Dictionary<int, string> taglines = new();
+    HashSet<int> requested = new();
+    string error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products.OrderBy(p => p.ProductName);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await LoadTaglines(grid.PagedView.ToList());
+        }
+    }
+
+    void OnPage(PagerEventArgs args)
+    {
+        _ = LoadTaglines(products.Skip(args.PageIndex * grid.PageSize).Take(grid.PageSize).ToList());
+    }
+
+    async Task LoadTaglines(List<Product> pageProducts)
+    {
+        var missing = pageProducts.Where(p => !requested.Contains(p.ProductID)).ToList();
+
+        if (missing.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var product in missing)
+        {
+            requested.Add(product.ProductID);
+        }
+
+        error = null;
+
+        try
+        {
+            var client = ChatService.GetChatClient();
+
+            var prompt = "Write a marketing tagline of at most eight words for each product. " +
+                "Respond with a JSON object of the form {\"taglines\":[{\"productId\":number,\"text\":string}]} and nothing else. Products:\n" +
+                string.Join("\n", missing.Select(p => $"- productId {p.ProductID}: {p.ProductName} ({p.Category?.CategoryName}, {p.QuantityPerUnit})"));
+
+            var response = await client.GetResponseAsync(prompt, new ChatOptions { Temperature = 0.8f, ResponseFormat = ChatResponseFormat.Json });
+
+            var json = response.Text;
+            var start = json.IndexOf('{');
+            var end = json.LastIndexOf('}');
+
+            if (start < 0 || end <= start)
+            {
+                error = "The model did not return taglines.";
+                return;
+            }
+
+            using var document = JsonDocument.Parse(json.Substring(start, end - start + 1));
+
+            if (document.RootElement.TryGetProperty("taglines", out var items) && items.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in items.EnumerateArray())
+                {
+                    if (item.TryGetProperty("productId", out var id) && item.TryGetProperty("text", out var text) && id.TryGetInt32(out var productId))
+                    {
+                        taglines[productId] = text.GetString();
+                    }
+                }
+            }
+            else
+            {
+                error = "The model did not return taglines.";
+            }
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}
