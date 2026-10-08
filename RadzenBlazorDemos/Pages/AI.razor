@@ -25,7 +25,7 @@
                         <RadzenLink Path="/aichat#providers" Text="Connect your provider" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
                     </RadzenStack>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
-                        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-color-secondary">Works with</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">Works with</RadzenText>
                         @foreach (var provider in providers)
                         {
                             <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Outlined" Shade="Shade.Darker" Text="@provider" />
@@ -45,13 +45,13 @@
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem" class="rz-border-radius-1 rz-px-2 rz-py-1" Style="border: var(--rz-border-normal); font-size: 0.8125rem;">
                                 <RadzenIcon Icon="check_circle" class="rz-color-success" Style="font-size: 1rem" />
                                 <span Style="font-family: monospace; font-weight: 600;">GetProduct</span>
-                                <span class="rz-color-secondary">name: Chai</span>
+                                <span class="rz-text-secondary-color">name: Chai</span>
                             </RadzenStack>
                             <RadzenStack Gap="0.5rem" class="rz-border-radius-1 rz-p-3" Style="border: var(--rz-border-normal); font-size: 0.8125rem; width: 100%;">
                                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem">
                                     <RadzenIcon Icon="help" class="rz-color-warning" Style="font-size: 1rem" />
                                     <span Style="font-family: monospace; font-weight: 600;">UpdateProductPrice</span>
-                                    <span class="rz-color-secondary">productId: 1, newPrice: 19.8</span>
+                                    <span class="rz-text-secondary-color">productId: 1, newPrice: 19.8</span>
                                 </RadzenStack>
                                 <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">The assistant wants to run UpdateProductPrice.</RadzenText>
                                 <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
@@ -69,7 +69,7 @@
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
             <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Components</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-color-secondary">Drop them into any page. They share the same <code>IChatClient</code>, so configuring the provider once is enough.</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">Drop them into any page. They share the same <code>IChatClient</code>, so configuring the provider once is enough.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
             @foreach (var item in components)
@@ -89,7 +89,7 @@
                                             <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
                                         }
                                     </RadzenStack>
-                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-color-secondary">@item.Tagline</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@item.Tagline</RadzenText>
                                 </RadzenStack>
                             </RadzenStack>
                             <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">@item.Description</RadzenText>
@@ -113,27 +113,26 @@
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
             <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Agentic chat</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-color-secondary">RadzenAIChat goes beyond text. The model acts in your application and the user stays in control.</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">RadzenAIChat goes beyond text. The model acts in your application and the user stays in control.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
             @foreach (var item in agentic)
             {
                 <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
-                    <RadzenLink Path="@item.Path" Style="text-decoration: none; display: block; height: 100%; color: inherit;">
-                        <RadzenCard Variant="Variant.Filled" class="rz-h-100 rz-p-5">
-                            <RadzenStack Gap="0.75rem">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                                    <RadzenIcon Icon="@item.Icon" class="rz-color-primary" />
-                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
-                                    @if (item.IsNew)
-                                    {
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
-                                    }
-                                </RadzenStack>
-                                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-color-secondary">@item.Description</RadzenText>
+                    <RadzenCard Variant="Variant.Filled" class="rz-h-100 rz-p-5">
+                        <RadzenStack Gap="0.75rem" AlignItems="AlignItems.Start" class="rz-h-100">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                <RadzenIcon Icon="@item.Icon" class="rz-color-primary" />
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
+                                @if (item.IsNew)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                }
                             </RadzenStack>
-                        </RadzenCard>
-                    </RadzenLink>
+                            <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
+                            <RadzenLink Path="@item.Path" Text="View demo" Icon="arrow_forward" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;" />
+                        </RadzenStack>
+                    </RadzenCard>
                 </RadzenColumn>
             }
         </RadzenRow>
@@ -142,31 +141,30 @@
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
             <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">AI inside your data components</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-color-secondary">The same tools and prompts work with the DataGrid, Scheduler and Chart you already use.</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">The same tools and prompts work with the DataGrid, Scheduler and Chart you already use.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
             @foreach (var item in dataDemos)
             {
                 <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
-                    <RadzenLink Path="@item.Path" Style="text-decoration: none; display: block; height: 100%; color: inherit;">
-                        <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-5">
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="1rem">
-                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-info-lighter rz-color-info" Style="width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; flex-shrink: 0;">
-                                    <RadzenIcon Icon="@item.Icon" Style="font-size: 1.375rem" />
-                                </RadzenStack>
-                                <RadzenStack Gap="0.5rem">
-                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
-                                        @if (item.IsNew)
-                                        {
-                                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
-                                        }
-                                    </RadzenStack>
-                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-color-secondary">@item.Description</RadzenText>
-                                </RadzenStack>
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-5">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="1rem" class="rz-h-100">
+                            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-info-lighter rz-color-info" Style="width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; flex-shrink: 0;">
+                                <RadzenIcon Icon="@item.Icon" Style="font-size: 1.375rem" />
                             </RadzenStack>
-                        </RadzenCard>
-                    </RadzenLink>
+                            <RadzenStack Gap="0.5rem" AlignItems="AlignItems.Start" Style="flex: 1 1 auto; min-width: 0;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
+                                    @if (item.IsNew)
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                    }
+                                </RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
+                                <RadzenLink Path="@item.Path" Text="View demo" Icon="arrow_forward" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
                 </RadzenColumn>
             }
         </RadzenRow>
@@ -189,7 +187,7 @@
                                 <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-primary rz-color-on-primary" Style="width: 1.75rem; height: 1.75rem; border-radius: 50%; flex-shrink: 0; font-weight: 600; font-size: 0.875rem;">@step.Number</RadzenStack>
                                 <RadzenStack Gap="0.125rem">
                                     <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">@step.Title</RadzenText>
-                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-color-secondary">@step.Description</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color">@step.Description</RadzenText>
                                 </RadzenStack>
                             </RadzenStack>
                         }
@@ -282,7 +280,7 @@ builder.Services.AddAIChatService();
         new("Human in the loop", "/aichat#approval", "verified_user", "Wrap a tool in ApprovalRequiredAIFunction and the chat asks the user before it runs.", true),
         new("Voice input", "/aichat#voice", "mic", "Talk to the assistant with RadzenSpeechToTextButton and the browser's speech recognition.", true),
         new("Reasoning", "/aichat#tools", "psychology", "Models that expose their reasoning show it as a collapsible block above the answer.", true),
-        new("Image attachments", "/aichat#attachments", "image", "Attach images to a message and ask a multimodal model about them, with token usage and a stop button.", true),
+        new("File attachments", "/aichat#attachments", "attach_file", "Attach images, text files or PDFs to a message: images go to a multimodal model, text files are read by any model.", true),
         new("Editor AI assistant", "/html-editor#ai", "edit_note", "Rewrite, summarize or translate the selection in the HtmlEditor and MarkdownEditor.", true)
     ];
 

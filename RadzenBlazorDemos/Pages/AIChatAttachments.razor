@@ -4,7 +4,7 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
         <RadzenButton Text="Attach sample screenshot" Icon="add_photo_alternate" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@AttachSample" IsBusy="@loading" />
         <RadzenButton Text="Attach sample CSV" Icon="table_view" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@AttachCsv" />
-        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-color-secondary">or use the paperclip to pick an image, a text or a PDF file, then ask a question about it</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-text-secondary-color">or use the paperclip to pick an image, a text or a PDF file, then ask a question about it</RadzenText>
     </RadzenStack>
     <RadzenAIChat @ref="chat"
                   Title="Vision assistant"

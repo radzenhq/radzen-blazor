@@ -4,7 +4,7 @@
     @if (!string.IsNullOrWhiteSpace(Text))
     {
         <RadzenCard Variant="Variant.Flat" class="rz-background-color-base-200 rz-p-3" Style="max-height: 8rem; overflow: auto;">
-            <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-color-secondary">@(Selection ? "Selected text" : "Document")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@(Selection ? "Selected text" : "Document")</RadzenText>
             <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0" Style="white-space: pre-wrap;">@Text</RadzenText>
         </RadzenCard>
     }
