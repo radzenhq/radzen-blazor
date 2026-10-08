@@ -378,7 +378,9 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the callback invoked when the visible range changes due to zoom or pan.
-        /// Provides the current zoom level and visible range fractions.
+        /// Provides the current zoom level and visible range fractions. A handler may re-anchor the range by assigning new values
+        /// to the variables bound to <see cref="ViewStart" /> and <see cref="ViewEnd" />; the chart adopts the values it receives
+        /// once the handler completes, e.g. <c>start = 1 - (args.ViewEnd - args.ViewStart); end = 1;</c> keeps the latest data in view while zooming.
         /// </summary>
         [Parameter]
         public EventCallback<ChartViewChangeEventArgs> ViewChange { get; set; }
@@ -460,6 +462,23 @@ namespace Radzen.Blazor
                 ViewStart = ZoomStart,
                 ViewEnd = ZoomEnd
             });
+
+            if (ViewStart != ZoomStart || ViewEnd != ZoomEnd)
+            {
+                ZoomStart = Math.Clamp(Math.Min(ViewStart, ViewEnd), 0, 1);
+                ZoomEnd = Math.Clamp(Math.Max(ViewStart, ViewEnd), 0, 1);
+                ViewStart = ZoomStart;
+                ViewEnd = ZoomEnd;
+
+                range = ZoomEnd - ZoomStart;
+                var adoptedZoom = range > 0 ? Math.Round(100.0 / range) : 100;
+
+                if (adoptedZoom != Zoom)
+                {
+                    Zoom = adoptedZoom;
+                    await ZoomChanged.InvokeAsync(adoptedZoom);
+                }
+            }
         }
 
         /// <summary>
