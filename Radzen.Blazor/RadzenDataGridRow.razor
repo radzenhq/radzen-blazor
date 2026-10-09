@@ -89,7 +89,7 @@
 </tr>
 }
 
-@if (Grid != null && Grid.expandedItems.Keys.Contains(Item))
+@if (Grid != null && Grid.IsRowExpanded(Item))
 {
     @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
     {

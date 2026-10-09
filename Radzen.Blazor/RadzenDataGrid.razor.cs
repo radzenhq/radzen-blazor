@@ -2215,7 +2215,7 @@ namespace Radzen.Blazor
             {
                 var item = viewList.ElementAtOrDefault(i);
 
-                if (item != null && childData.TryGetValue(item, out var childDataValue))
+                if (item != null && TryGetChildData(item, out var childDataValue))
                 {
                     var level = 1;
                     var parentChildData = childDataValue.ParentChildData;
@@ -3353,13 +3353,56 @@ namespace Radzen.Blazor
 
         private async Task CollapseItem(TItem item)
         {
-            expandedItems.Remove(item);
+            expandedItems.Remove(FindItemKey(expandedItems.Keys, item));
             await RowCollapse.InvokeAsync(item);
 
-            if (childData.Remove(item))
+            if (childData.Remove(FindItemKey(childData.Keys, item)))
             {
                 _view = null;
             }
+        }
+
+        bool TryGetChildData(TItem item, [NotNullWhen(true)] out DataGridChildData<TItem>? value)
+        {
+            if (childData.TryGetValue(item, out value))
+            {
+                return true;
+            }
+
+            if (keyPropertyGetter == null)
+            {
+                return false;
+            }
+
+            var key = FindItemKey(childData.Keys, item);
+
+            if (!childData.TryGetValue(key, out value))
+            {
+                return false;
+            }
+
+            childData.Remove(key);
+            childData[item] = value;
+
+            return true;
+        }
+
+        TItem FindItemKey(IEnumerable<TItem> keys, TItem item)
+        {
+            if (keyPropertyGetter == null)
+            {
+                return item;
+            }
+
+            foreach (var key in keys)
+            {
+                if (ItemEquals(key, item))
+                {
+                    return key;
+                }
+            }
+
+            return item;
         }
 
         internal async System.Threading.Tasks.Task ExpandItem(TItem item)
@@ -3372,7 +3415,7 @@ namespace Radzen.Blazor
                     expandedItems.Remove(itemToCollapse);
                     await RowCollapse.InvokeAsync(itemToCollapse);
 
-                    if (object.Equals(item, itemToCollapse))
+                    if (ItemEquals(item, itemToCollapse))
                     {
                         return;
                     }
