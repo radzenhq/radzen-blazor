@@ -50,7 +50,7 @@ namespace RadzenBlazorDemos
                         new () { Text = "Any provider", Anchor = "#providers" },
                         new () { Text = "Radzen Blazor MCP", Anchor = "#radzen-blazor-mcp" }
                     ],
-                    Name = "AIOverview",
+                    Name = "AI Overview",
                     Path = "/ai",
                     Title = "AI and Radzen Blazor | Free Radzen Blazor",
                     Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",

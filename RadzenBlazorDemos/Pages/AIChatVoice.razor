@@ -1,6 +1,6 @@
 <RadzenStack Gap="0.5rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenSpeechToTextButton Change="@OnSpeech" Title="Ask by voice" />
+        <RadzenSpeechToTextButton Change="@OnSpeech" Title="Ask by voice" ButtonStyle="ButtonStyle.Primary" />
         <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-text-secondary-color">@(string.IsNullOrEmpty(lastTranscript) ? "Click the microphone and ask a question" : $"Heard: {lastTranscript}")</RadzenText>
     </RadzenStack>
     <RadzenAIChat @ref="chat" Title="Voice assistant" Placeholder="Type or use the microphone..." Style="height: 420px" />
