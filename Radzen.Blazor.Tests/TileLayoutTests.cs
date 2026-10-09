@@ -302,5 +302,158 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(10, changedCol);
         }
+
+        private static IRenderedComponent<RadzenTileLayout> RenderTwoTiles(TestContext ctx, bool allowOverlap,
+            int colA, int rowA, int colSpanA, int rowSpanA, int colB, int rowB, int colSpanB, int rowSpanB,
+            System.Action<RadzenTileLayoutItem> changed = null)
+        {
+            return ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            {
+                parameters.Add(p => p.Columns, 12);
+                parameters.Add(p => p.RowHeight, 80);
+                parameters.Add(p => p.EditMode, true);
+                parameters.Add(p => p.AllowOverlap, allowOverlap);
+                parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenTileLayoutItem>(ctx, i => changed?.Invoke(i)));
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
+                {
+                    item.Add(i => i.Title, "A");
+                    item.Add(i => i.Col, colA);
+                    item.Add(i => i.Row, rowA);
+                    item.Add(i => i.ColSpan, colSpanA);
+                    item.Add(i => i.RowSpan, rowSpanA);
+                });
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
+                {
+                    item.Add(i => i.Title, "B");
+                    item.Add(i => i.Col, colB);
+                    item.Add(i => i.Row, rowB);
+                    item.Add(i => i.ColSpan, colSpanB);
+                    item.Add(i => i.RowSpan, rowSpanB);
+                });
+            });
+        }
+
+        private static void Drag(IRenderedComponent<RadzenTileLayout> component, string handleSelector, double dx, double dy)
+        {
+            var handle = component.FindAll(handleSelector)[0];
+            handle.TriggerEvent("onpointerdown", new PointerEventArgs { ClientX = 100, ClientY = 100, PointerId = 1, Buttons = 1 });
+
+            var cells = component.Find(".rz-tile-layout-cells");
+            cells.TriggerEvent("onpointermove", new PointerEventArgs { ClientX = 100 + dx, ClientY = 100 + dy, PointerId = 1, Buttons = 1 });
+            cells.TriggerEvent("onpointerup", new PointerEventArgs { ClientX = 100 + dx, ClientY = 100 + dy, PointerId = 1, Buttons = 0 });
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapFalse_BlocksMoveOntoAnotherTile()
+        {
+            using var ctx = CreateContext();
+
+            RadzenTileLayoutItem changedItem = null;
+
+            var component = RenderTwoTiles(ctx, allowOverlap: false, 1, 1, 3, 1, 4, 1, 1, 1, i => changedItem = i);
+
+            Drag(component, ".rz-tile-layout-item-header", 101, 0);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(1, tile.Col);
+            Assert.Null(changedItem);
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapDefault_MovesOntoAnotherTile()
+        {
+            using var ctx = CreateContext();
+
+            RadzenTileLayoutItem changedItem = null;
+
+            var component = RenderTwoTiles(ctx, allowOverlap: true, 1, 1, 3, 1, 4, 1, 1, 1, i => changedItem = i);
+
+            Drag(component, ".rz-tile-layout-item-header", 101, 0);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(2, tile.Col);
+            Assert.Same(tile, changedItem);
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapFalse_SlidesAlongBlockedAxis()
+        {
+            using var ctx = CreateContext();
+
+            var component = RenderTwoTiles(ctx, allowOverlap: false, 1, 1, 1, 1, 2, 1, 1, 2);
+
+            Drag(component, ".rz-tile-layout-item-header", 101, 88);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(1, tile.Col);
+            Assert.Equal(2, tile.Row);
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapFalse_BlocksResizeOverAnotherTile()
+        {
+            using var ctx = CreateContext();
+
+            var component = RenderTwoTiles(ctx, allowOverlap: false, 1, 1, 1, 1, 2, 1, 1, 1);
+
+            Drag(component, ".rz-tile-layout-item-resize-handle", 101, 88);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(1, tile.ColSpan);
+            Assert.Equal(2, tile.RowSpan);
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapFalse_LetsOverlappingTilesMoveApart()
+        {
+            using var ctx = CreateContext();
+
+            RadzenTileLayoutItem changedItem = null;
+
+            var component = RenderTwoTiles(ctx, allowOverlap: false, 1, 1, 2, 1, 2, 1, 2, 1, i => changedItem = i);
+
+            Drag(component, ".rz-tile-layout-item-header", 101, 0);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(2, tile.Col);
+            Assert.Same(tile, changedItem);
+        }
+
+        [Fact]
+        public void TileLayout_AllowOverlapFalse_IgnoresHiddenTiles()
+        {
+            using var ctx = CreateContext();
+
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            {
+                parameters.Add(p => p.Columns, 12);
+                parameters.Add(p => p.EditMode, true);
+                parameters.Add(p => p.AllowOverlap, false);
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
+                {
+                    item.Add(i => i.Title, "A");
+                    item.Add(i => i.Col, 1);
+                    item.Add(i => i.Row, 1);
+                });
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
+                {
+                    item.Add(i => i.Title, "B");
+                    item.Add(i => i.Col, 2);
+                    item.Add(i => i.Row, 1);
+                    item.Add(i => i.Visible, false);
+                });
+            });
+
+            Drag(component, ".rz-tile-layout-item-header", 101, 0);
+
+            var tile = component.FindComponents<RadzenTileLayoutItem>()[0].Instance;
+
+            Assert.Equal(2, tile.Col);
+        }
     }
 }

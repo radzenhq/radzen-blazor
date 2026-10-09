@@ -88,6 +88,15 @@ namespace Radzen.Blazor
         public bool AllowResize { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether a tile can be moved or resized over another tile while in <see cref="EditMode" />.
+        /// When <c>false</c> a move or resize that would make the tile intersect another visible tile is blocked and the tile
+        /// stays at its last valid position. Tiles that already overlap can still be dragged apart.
+        /// </summary>
+        /// <value><c>true</c> to allow overlapping tiles; otherwise <c>false</c>. Default is <c>true</c>.</value>
+        [Parameter]
+        public bool AllowOverlap { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether to render a grid overlay.
         /// </summary>
         /// <value><c>true</c> to show the overlay; otherwise <c>false</c>. Default is <c>false</c>.</value>
@@ -116,6 +125,7 @@ namespace Radzen.Blazor
         private double strideX;
         private double strideY;
         private long pointerId;
+        private readonly HashSet<RadzenTileLayoutItem> initialOverlaps = new();
 
         internal bool CanMove => EditMode && AllowMove;
 
@@ -202,6 +212,19 @@ namespace Radzen.Blazor
             startRowSpan = item.CurrentRowSpan;
             pointerId = (long)args.PointerId;
 
+            initialOverlaps.Clear();
+
+            if (!AllowOverlap)
+            {
+                foreach (var other in items)
+                {
+                    if (other != item && other.Visible && Intersects(item.CurrentCol, item.CurrentRow, item.CurrentColSpan, item.CurrentRowSpan, other))
+                    {
+                        initialOverlaps.Add(other);
+                    }
+                }
+            }
+
             item.SetDragging(true);
 
             var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", cellsElement);
@@ -241,6 +264,27 @@ namespace Radzen.Blazor
                     rowSpan = Math.Min(rowSpan, Math.Max(1, Rows - activeItem.CurrentRow + 1));
                 }
 
+                if (colSpan == activeItem.CurrentColSpan && rowSpan == activeItem.CurrentRowSpan)
+                {
+                    return;
+                }
+
+                if (!AllowOverlap && IsBlocked(activeItem.CurrentCol, activeItem.CurrentRow, colSpan, rowSpan))
+                {
+                    if (!IsBlocked(activeItem.CurrentCol, activeItem.CurrentRow, colSpan, activeItem.CurrentRowSpan))
+                    {
+                        rowSpan = activeItem.CurrentRowSpan;
+                    }
+                    else if (!IsBlocked(activeItem.CurrentCol, activeItem.CurrentRow, activeItem.CurrentColSpan, rowSpan))
+                    {
+                        colSpan = activeItem.CurrentColSpan;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
                 if (colSpan != activeItem.CurrentColSpan || rowSpan != activeItem.CurrentRowSpan)
                 {
                     activeItem.SetSpan(colSpan, rowSpan);
@@ -259,6 +303,27 @@ namespace Radzen.Blazor
                     row = Math.Max(1, Math.Min(row, Rows - activeItem.CurrentRowSpan + 1));
                 }
 
+                if (col == activeItem.CurrentCol && row == activeItem.CurrentRow)
+                {
+                    return;
+                }
+
+                if (!AllowOverlap && IsBlocked(col, row, activeItem.CurrentColSpan, activeItem.CurrentRowSpan))
+                {
+                    if (!IsBlocked(col, activeItem.CurrentRow, activeItem.CurrentColSpan, activeItem.CurrentRowSpan))
+                    {
+                        row = activeItem.CurrentRow;
+                    }
+                    else if (!IsBlocked(activeItem.CurrentCol, row, activeItem.CurrentColSpan, activeItem.CurrentRowSpan))
+                    {
+                        col = activeItem.CurrentCol;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
                 if (col != activeItem.CurrentCol || row != activeItem.CurrentRow)
                 {
                     activeItem.SetPosition(col, row);
@@ -272,6 +337,30 @@ namespace Radzen.Blazor
             return EndDrag();
         }
 
+        private bool IsBlocked(int col, int row, int colSpan, int rowSpan)
+        {
+            foreach (var other in items)
+            {
+                if (other == activeItem || !other.Visible || initialOverlaps.Contains(other))
+                {
+                    continue;
+                }
+
+                if (Intersects(col, row, colSpan, rowSpan, other))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool Intersects(int col, int row, int colSpan, int rowSpan, RadzenTileLayoutItem other)
+        {
+            return col < other.CurrentCol + other.CurrentColSpan && other.CurrentCol < col + colSpan
+                && row < other.CurrentRow + other.CurrentRowSpan && other.CurrentRow < row + rowSpan;
+        }
+
         private async Task EndDrag()
         {
             if (activeItem == null)
@@ -281,6 +370,7 @@ namespace Radzen.Blazor
 
             var item = activeItem;
             activeItem = null;
+            initialOverlaps.Clear();
             item.SetDragging(false);
 
             if (JSRuntime != null)

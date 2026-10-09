@@ -6,10 +6,13 @@
 
     <RadzenSwitch @bind-Value=@showGrid Name="ShowGrid" />
     <RadzenLabel Text="Show grid" Component="ShowGrid" />
+
+    <RadzenSwitch @bind-Value=@allowOverlap Name="AllowOverlap" />
+    <RadzenLabel Text="Allow overlap" Component="AllowOverlap" />
 </RadzenStack>
 
 <RadzenTileLayout Columns="12" Rows="6" RowHeight="80" Gap="8"
-                  EditMode=@editMode ShowGrid=@showGrid Change=@OnChange
+                  EditMode=@editMode ShowGrid=@showGrid AllowOverlap=@allowOverlap Change=@OnChange
                   Style="height: 560px; border: var(--rz-card-border); border-radius: var(--rz-card-border-radius);">
     @foreach (var tile in tiles)
     {
@@ -39,6 +42,7 @@
 @code {
     bool editMode = true;
     bool showGrid = true;
+    bool allowOverlap = false;
 
     EventConsole console;
 
