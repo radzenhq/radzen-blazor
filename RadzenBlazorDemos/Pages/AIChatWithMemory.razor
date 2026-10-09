@@ -106,7 +106,9 @@
     void ReloadPage()
     {
         var uri = new Uri(NavigationManager.Uri);
-        NavigationManager.NavigateTo($"{uri.GetLeftPart(UriPartial.Path)}?session={Uri.EscapeDataString(currentSessionId)}#memory", forceLoad: true);
+        var query = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries).Where(pair => !pair.StartsWith("session=")).Append($"session={Uri.EscapeDataString(currentSessionId)}");
+
+        NavigationManager.NavigateTo($"{uri.GetLeftPart(UriPartial.Path)}?{string.Join("&", query)}#memory", forceLoad: true);
     }
 
     async Task RefreshSessions()

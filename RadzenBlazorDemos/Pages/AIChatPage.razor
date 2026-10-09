@@ -62,6 +62,7 @@
     Use <code>SessionId</code> to maintain conversation state, <code>UserId</code> to tell whose conversation it is and <code>SessionIdChanged</code> to track session changes.
     Conversations are kept in an <code>IConversationStore</code>: the default <code>InMemoryConversationStore</code> keeps them for the lifetime of the application, and <code>AddConversationStore&lt;TStore&gt;()</code>
     plugs in your own - this demo uses one backed by Entity Framework that serializes each conversation with <code>ConversationSessionSerializer</code>, including tool calls, attachments and reasoning.
+    The store must live where the data survives a reload: on Blazor Server it runs in the server process, while the WebAssembly demo registers a store that calls a small API on the host, because the browser process restarts with every reload.
     The service saves the conversation after every answer and <code>GetSessionsAsync</code>, <code>GetOrCreateSessionAsync</code> and <code>DeleteSessionAsync</code> manage the saved ones.
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatWithMemory">

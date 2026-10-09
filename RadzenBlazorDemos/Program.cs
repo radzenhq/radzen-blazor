@@ -14,7 +14,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddDbContextFactory<NorthwindContext>();
-builder.Services.AddDbContextFactory<RadzenBlazorDemos.Data.ConversationContext>();
 
 builder.Services.AddScoped<ILocalizer, DemoLocalizer>();
 builder.Services.AddRadzenComponents();
@@ -34,6 +33,6 @@ builder.Services.AddAIChatService(options =>
     options.Temperature = 0.7;
     options.MaxTokens = 2048;
 });
-builder.Services.AddConversationStore<RadzenBlazorDemos.Services.EfConversationStore>();
+builder.Services.AddConversationStore<RadzenBlazorDemos.Services.HttpConversationStore>();
 
 await builder.Build().RunAsync();
