@@ -2284,7 +2284,7 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "Which AI providers are supported?", Answer = "Any OpenAI-compatible endpoint out of the box, and any Microsoft.Extensions.AI IChatClient (OpenAI, Azure OpenAI, Ollama and others) registered in the service collection." }
                     },
                     Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui" },
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui", "citations", "sources", "rag" },
                     Toc =
                     [
                         new () { Text = "Custom styling", Anchor = "#custom-styling" },
@@ -2297,6 +2297,7 @@ namespace RadzenBlazorDemos
                         new () { Text = "Human in the loop", Anchor = "#approval" },
                         new () { Text = "Voice input", Anchor = "#voice" },
                         new () { Text = "File attachments", Anchor = "#attachments" },
+                        new () { Text = "Citations", Anchor = "#citations" },
                         new () { Text = "AI providers", Anchor = "#providers" },
                         new () { Text = "Runtime configuration", Anchor = "#configuration" }
                     ]

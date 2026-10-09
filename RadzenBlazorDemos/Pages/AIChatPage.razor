@@ -129,6 +129,19 @@
     <AIChatAttachments />
 </RadzenExample>
 
+<RadzenText Anchor="aichat#citations" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Citations
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Answers can show the sources they are based on. A tool that returns <code>ChatCitation</code> instances (title, URL, snippet) sends them to the model as its result and the chat lists them under the answer as numbered links,
+    so the model can cite them as [1], [2] in the text. Providers that annotate their responses - OpenAI web search, Perplexity, Azure AI Search and others - arrive the same way: the client maps their annotations to
+    <code>CitationAnnotation</code> of <code>Microsoft.Extensions.AI</code> and the chat collects them in <code>ChatMessage.Citations</code>. <code>ShowCitations</code> hides the list and <code>CitationTemplate</code> renders a source your way.
+    This demo searches a small documentation index with a tool; replace it with your search service or vector store.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatCitations">
+    <AIChatCitations />
+</RadzenExample>
+
 <RadzenText Anchor="aichat#providers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     AI providers
 </RadzenText>

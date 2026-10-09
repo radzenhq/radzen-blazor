@@ -566,6 +566,60 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     }
 }
 
+.rz-chat-citations {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 100%;
+    font-size: 0.75rem;
+    color: var(--rz-text-secondary-color);
+
+    .rz-chat-citations-label {
+        font-weight: 600;
+        margin-inline-end: 0.125rem;
+    }
+
+    .rz-chat-citation {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        max-width: 18rem;
+        padding: 0.125rem 0.5rem 0.125rem 0.25rem;
+        border-radius: 1rem;
+        border: var(--rz-chat-tool-call-border);
+        background-color: var(--rz-chat-tool-call-background-color);
+        color: inherit;
+        text-decoration: none;
+        line-height: 1.25rem;
+
+        &:is(a):hover {
+            color: var(--rz-link-color);
+            border-color: var(--rz-link-color);
+        }
+    }
+
+    .rz-chat-citation-index {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1rem;
+        height: 1rem;
+        padding: 0 0.25rem;
+        border-radius: 0.5rem;
+        background-color: var(--rz-info);
+        color: var(--rz-on-info);
+        font-size: 0.6875rem;
+        font-weight: 600;
+    }
+
+    .rz-chat-citation-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
 .rz-chat-tool-call-pending .rz-chat-tool-call-icon {
     animation: rz-rotate 1s linear infinite;
 }

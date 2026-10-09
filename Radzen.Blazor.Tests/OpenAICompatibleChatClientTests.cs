@@ -286,5 +286,30 @@ namespace Radzen.Blazor.Tests
             var toolMessage = secondBody.GetProperty("messages").EnumerateArray().Single(message => message.GetProperty("role").GetString() == "tool");
             Assert.Equal("Sunny in Sofia", toolMessage.GetProperty("content").GetString());
         }
+
+        [Fact]
+        public async Task YieldsCitationAnnotationsFromDeltaAnnotationsAndSearchResults()
+        {
+            var (client, _) = CreateClient((_, _) => Sse(
+                """{"id":"resp-c","choices":[{"index":0,"delta":{"role":"assistant","content":"Radzen"}}]}""",
+                """{"id":"resp-c","choices":[{"index":0,"delta":{"content":" rocks","annotations":[{"type":"url_citation","url_citation":{"url":"https://blazor.radzen.com","title":"Radzen Blazor","start_index":0,"end_index":6}}]}}]}""",
+                """{"id":"resp-c","citations":["https://blazor.radzen.com","https://www.radzen.com/blazor-studio/"],"choices":[{"index":0,"delta":{"content":"."}}]}""",
+                """{"id":"resp-c","search_results":[{"title":"Radzen Studio","url":"https://www.radzen.com/blazor-studio/","snippet":"Low-code"},{"title":"Docs","url":"https://www.radzen.com/documentation/"}],"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}"""));
+
+            var response = await client.GetResponseAsync([new ChatMessage(ChatRole.User, "?")]);
+
+            Assert.Equal("Radzen rocks.", response.Text);
+
+            var citations = response.Messages.SelectMany(message => message.Contents).SelectMany(content => content.Annotations ?? []).OfType<CitationAnnotation>().ToList();
+            Assert.Equal(3, citations.Count);
+            Assert.Equal("Radzen Blazor", citations[0].Title);
+            Assert.Equal(new Uri("https://blazor.radzen.com"), citations[0].Url);
+            var region = Assert.IsType<TextSpanAnnotatedRegion>(Assert.Single(citations[0].AnnotatedRegions!));
+            Assert.Equal(0, region.StartIndex);
+            Assert.Equal(6, region.EndIndex);
+            Assert.Equal(new Uri("https://www.radzen.com/blazor-studio/"), citations[1].Url);
+            Assert.Null(citations[1].Title);
+            Assert.Equal("Docs", citations[2].Title);
+        }
     }
 }

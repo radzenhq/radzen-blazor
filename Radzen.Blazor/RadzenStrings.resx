@@ -2633,4 +2633,7 @@
   <data name="AIChat_UsageFormat" xml:space="preserve">
     <value>{0} tokens</value>
   </data>
+  <data name="AIChat_Sources" xml:space="preserve">
+    <value>Sources</value>
+  </data>
 </root>

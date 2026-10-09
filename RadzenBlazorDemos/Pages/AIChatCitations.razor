@@ -1,0 +1,62 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+
+<RadzenAIChat Title="Documentation assistant"
+              Placeholder="Try: How do I load DataGrid data on demand? How do I validate a form? Which themes are available?"
+              SystemPrompt="You answer questions about Radzen Blazor Components using only the search_docs tool. Call it once with the key terms of the question, answer in two or three sentences based on the results and cite each result you used with a plain [1] or [2] marker in the order the tool returned them; never use 【】 markers or line references. If the results do not answer the question, say so instead of searching again."
+              Tools="@tools"
+              ToolCallCompleted="@OnToolCallCompleted"
+              Style="height: 500px" />
+
+<EventConsole @ref="console" Style="min-height: 120px;" />
+
+@code {
+    EventConsole console;
+    IEnumerable<AITool> tools;
+
+    protected override void OnInitialized()
+    {
+        tools = [AIFunctionFactory.Create(SearchDocs, "search_docs")];
+    }
+
+    static readonly ChatCitation[] docs =
+    [
+        new() { Title = "DataGrid LoadData", Url = "https://blazor.radzen.com/datagrid-loaddata", Snippet = "Use the LoadData event to fetch data on demand: the event arguments carry Filter, OrderBy, Skip and Top; set Count and Data from the result. Set AllowPaging, AllowSorting and AllowFiltering so the grid raises LoadData for each change." },
+        new() { Title = "DataGrid virtualization", Url = "https://blazor.radzen.com/datagrid-virtualization", Snippet = "Set AllowVirtualization to render only the visible rows. Combine it with LoadData to virtualize data that lives on the server." },
+        new() { Title = "DataGrid in-line editing", Url = "https://blazor.radzen.com/datagrid-inline-edit", Snippet = "Call EditRow to put a row in edit mode, render an editor in the EditTemplate of each column and call UpdateRow or CancelEditRow to leave edit mode." },
+        new() { Title = "Form validation", Url = "https://blazor.radzen.com/validator", Snippet = "Put the inputs inside a RadzenTemplateForm and add RadzenRequiredValidator, RadzenLengthValidator, RadzenEmailValidator or RadzenCustomValidator with the Component set to the input Name. Submit fires only when the form is valid." },
+        new() { Title = "Themes", Url = "https://blazor.radzen.com/themes", Snippet = "Radzen Blazor ships Material, Standard, Default, Dark, Humanistic, Software and their premium variants Fluent and Material 3. Switch at runtime with ThemeService.SetTheme or add RadzenAppearanceToggle." },
+        new() { Title = "Dialog", Url = "https://blazor.radzen.com/dialog", Snippet = "Inject DialogService and call OpenAsync with a component type and parameters; the result is what the component passes to Close. Confirm and Alert show simple prompts." },
+        new() { Title = "Notification", Url = "https://blazor.radzen.com/notification", Snippet = "Inject NotificationService and call Notify with a NotificationMessage; add RadzenNotification to the layout once." },
+        new() { Title = "Chart", Url = "https://blazor.radzen.com/chart", Snippet = "RadzenChart renders line, column, bar, area, pie, donut and stacked series from any collection; set CategoryProperty and ValueProperty on each series and add RadzenLegend or axis components to customize." },
+        new() { Title = "Scheduler", Url = "https://blazor.radzen.com/scheduler", Snippet = "RadzenScheduler shows appointments in day, week, month and year views; handle SlotSelect and AppointmentSelect to add or edit appointments, and AppointmentMove to drag them." },
+        new() { Title = "Getting started", Url = "https://blazor.radzen.com/getting-started", Snippet = "Install the Radzen.Blazor NuGet package, add the theme CSS and Radzen.Blazor.js to the host page, call AddRadzenComponents in Program.cs and put RadzenComponents in the layout." }
+    ];
+
+    static readonly HashSet<string> stopWords = new(StringComparer.OrdinalIgnoreCase) { "radzen", "blazor", "component", "components", "documentation", "docs", "example", "how", "the", "and", "with", "for", "can", "use", "using" };
+
+    [Description("Searches the Radzen Blazor documentation. Returns the matching pages with title, url and the relevant snippet.")]
+    List<ChatCitation> SearchDocs([Description("Key terms to search for, for example: datagrid load data on demand.")] string query)
+    {
+        var words = (query ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(word => word.Length > 2 && !stopWords.Contains(word))
+            .ToList();
+
+        var scored = docs
+            .Select(doc => (doc, score: words.Sum(word => (doc.Title.Contains(word, StringComparison.OrdinalIgnoreCase) ? 2 : 0) + (doc.Snippet.Contains(word, StringComparison.OrdinalIgnoreCase) ? 1 : 0))))
+            .Where(item => item.score > 0)
+            .OrderByDescending(item => item.score)
+            .ToList();
+
+        var best = scored.FirstOrDefault().score;
+
+        return scored.Where(item => item.score * 2 >= best).Take(3).Select(item => item.doc).ToList();
+    }
+
+    void OnToolCallCompleted(ChatToolCall call)
+    {
+        var results = call.GetResult<List<ChatCitation>>();
+
+        console.Log($"{call.Name}({call.FormattedArguments}) → {results?.Count ?? 0} results", AlertStyle.Info);
+    }
+}

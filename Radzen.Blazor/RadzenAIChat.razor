@@ -193,6 +193,34 @@
                                     }
                                 </div>
                             }
+                            @if (ShowCitations && message.Citations.Count > 0)
+                            {
+                                <div class="rz-chat-citations">
+                                    <span class="rz-chat-citations-label">@Localize(nameof(RadzenStrings.AIChat_Sources))</span>
+                                    @for (var index = 0; index < message.Citations.Count; index++)
+                                    {
+                                        var citation = message.Citations[index];
+                                        if (CitationTemplate != null)
+                                        {
+                                            @CitationTemplate(citation)
+                                        }
+                                        else if (!string.IsNullOrEmpty(citation.Url))
+                                        {
+                                            <a class="rz-chat-citation" href="@citation.Url" target="_blank" rel="noopener noreferrer" title="@(citation.Snippet ?? citation.Url)">
+                                                <span class="rz-chat-citation-index">@(index + 1)</span>
+                                                <span class="rz-chat-citation-title">@(string.IsNullOrEmpty(citation.Title) ? citation.Url : citation.Title)</span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-chat-citation" title="@citation.Snippet">
+                                                <span class="rz-chat-citation-index">@(index + 1)</span>
+                                                <span class="rz-chat-citation-title">@(citation.Title ?? citation.FileId)</span>
+                                            </span>
+                                        }
+                                    }
+                                </div>
+                            }
                         </RadzenStack>
                     </div>
                     }

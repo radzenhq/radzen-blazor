@@ -285,6 +285,19 @@ namespace Radzen.Blazor
         public bool ShowToolCalls { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets whether the sources of an answer are rendered under it. Default is <c>true</c>.
+        /// Sources are the <see cref="CitationAnnotation"/> annotations the provider attaches to the response and the <see cref="ChatCitation"/> instances tools return.
+        /// </summary>
+        [Parameter]
+        public bool ShowCitations { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the template used to render a source. The default renders a numbered link with the title and the snippet as tooltip.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<ChatCitation>? CitationTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the template used to render a tool call. The template is responsible for rendering approval UI for calls in the
         /// <see cref="ChatToolCallStatus.AwaitingApproval"/> state; call <see cref="ApproveToolCall"/> or <see cref="RejectToolCall"/> to answer them.
         /// </summary>
@@ -581,6 +594,7 @@ namespace Radzen.Blazor
                 copy.Attachments = message.Attachments;
                 copy.Reasoning = message.Reasoning;
                 copy.Usage = message.Usage;
+                copy.Citations = message.Citations;
             }
 
             await InvokeAsync(StateHasChanged);
@@ -643,6 +657,7 @@ namespace Radzen.Blazor
                     await InvokeAsync(StateHasChanged);
                 }
 
+                assistantMessage.Content = ChatCitation.NormalizeMarkers(assistantMessage.Content);
                 assistantMessage.IsStreaming = false;
 
                 foreach (var call in completedCalls)
@@ -708,6 +723,8 @@ namespace Radzen.Blazor
 
                 if (call != null)
                 {
+                    AIChatService.ApplyCitations(message, content);
+
                     call.Result = result.Result;
                     call.Exception = result.Exception;
 

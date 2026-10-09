@@ -108,6 +108,7 @@ public sealed class OpenAICompatibleChatClient : IChatClient
 
         var toolCalls = new SortedDictionary<int, PendingToolCall>();
         UsageDetails? usage = null;
+        var citedUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var flushed = false;
         string? responseId = null;
         string? modelId = null;
@@ -177,6 +178,16 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                     usage.TotalTokenCount = (usage.TotalTokenCount ?? 0) + ReadTokens(usageElement, "total_tokens");
                 }
 
+                if ((root.TryGetProperty("search_results", out var searchResults) || root.TryGetProperty("citations", out searchResults)) && searchResults.ValueKind == JsonValueKind.Array)
+                {
+                    var citations = ReadSearchResults(searchResults, citedUrls);
+
+                    if (citations.Count > 0)
+                    {
+                        yield return CreateUpdate(responseId, modelId, createdAt, new TextContent(string.Empty) { Annotations = citations });
+                    }
+                }
+
                 if (!root.TryGetProperty("choices", out var choices) || choices.ValueKind != JsonValueKind.Array)
                 {
                     continue;
@@ -203,6 +214,16 @@ public sealed class OpenAICompatibleChatClient : IChatClient
                             if (!string.IsNullOrEmpty(thought))
                             {
                                 yield return CreateUpdate(responseId, modelId, createdAt, new TextReasoningContent(thought));
+                            }
+                        }
+
+                        if (delta.TryGetProperty("annotations", out var annotations) && annotations.ValueKind == JsonValueKind.Array)
+                        {
+                            var citations = ReadAnnotations(annotations, citedUrls);
+
+                            if (citations.Count > 0)
+                            {
+                                yield return CreateUpdate(responseId, modelId, createdAt, new TextContent(string.Empty) { Annotations = citations });
                             }
                         }
 
@@ -685,6 +706,91 @@ public sealed class OpenAICompatibleChatClient : IChatClient
         }
 
         return Encoding.UTF8.GetString(buffer.WrittenSpan);
+    }
+
+    private static List<AIAnnotation> ReadAnnotations(JsonElement annotations, HashSet<string> citedUrls)
+    {
+        var result = new List<AIAnnotation>();
+
+        foreach (var annotation in annotations.EnumerateArray())
+        {
+            if (annotation.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
+            var citation = annotation.TryGetProperty("url_citation", out var urlCitation) && urlCitation.ValueKind == JsonValueKind.Object ? urlCitation : annotation;
+            var url = ReadString(citation, "url");
+            var title = ReadString(citation, "title");
+
+            if (url == null && title == null)
+            {
+                continue;
+            }
+
+            if (url != null && !citedUrls.Add(url))
+            {
+                continue;
+            }
+
+            var item = new CitationAnnotation
+            {
+                Title = title,
+                Url = Uri.TryCreate(url, UriKind.Absolute, out var uri) ? uri : null,
+                Snippet = ReadString(citation, "snippet") ?? ReadString(citation, "quote"),
+                FileId = ReadString(citation, "file_id")
+            };
+
+            if (citation.TryGetProperty("start_index", out var start) && start.ValueKind == JsonValueKind.Number && citation.TryGetProperty("end_index", out var end) && end.ValueKind == JsonValueKind.Number)
+            {
+                item.AnnotatedRegions = [new TextSpanAnnotatedRegion { StartIndex = start.GetInt32(), EndIndex = end.GetInt32() }];
+            }
+
+            result.Add(item);
+        }
+
+        return result;
+    }
+
+    private static List<AIAnnotation> ReadSearchResults(JsonElement results, HashSet<string> citedUrls)
+    {
+        var result = new List<AIAnnotation>();
+
+        foreach (var entry in results.EnumerateArray())
+        {
+            string? url;
+            string? title = null;
+            string? snippet = null;
+
+            if (entry.ValueKind == JsonValueKind.String)
+            {
+                url = entry.GetString();
+            }
+            else if (entry.ValueKind == JsonValueKind.Object)
+            {
+                url = ReadString(entry, "url");
+                title = ReadString(entry, "title");
+                snippet = ReadString(entry, "snippet");
+            }
+            else
+            {
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(url) || !citedUrls.Add(url))
+            {
+                continue;
+            }
+
+            result.Add(new CitationAnnotation { Title = title, Url = Uri.TryCreate(url, UriKind.Absolute, out var uri) ? uri : null, Snippet = snippet });
+        }
+
+        return result;
+    }
+
+    private static string? ReadString(JsonElement element, string name)
+    {
+        return element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     }
 
     private static string FormatResult(FunctionResultContent result)

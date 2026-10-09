@@ -282,6 +282,7 @@ builder.Services.AddAIChatService();
         new("Reasoning", "/aichat#tools", "psychology", "Models that expose their reasoning show it as a collapsible block above the answer.", true),
         new("Conversation persistence", "/aichat#memory", "history", "Conversations are saved through IConversationStore after every answer and restored with tool calls and attachments.", true),
         new("File attachments", "/aichat#attachments", "attach_file", "Attach images, text files or PDFs to a message: images go to a multimodal model, text files are read by any model.", true),
+        new("Citations", "/aichat#citations", "format_quote", "Answers list their sources: citations returned by tools or attached by providers such as OpenAI web search or Perplexity.", true),
         new("Editor AI assistant", "/html-editor#ai", "edit_note", "Rewrite, summarize or translate the selection in the HtmlEditor and MarkdownEditor.", true)
     ];
 

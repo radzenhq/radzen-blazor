@@ -76,6 +76,7 @@ namespace Radzen.Blazor.Tests
                 Content = "Sunny",
                 Reasoning = "Checked the tool",
                 Usage = new UsageDetails { InputTokenCount = 3, OutputTokenCount = 4, TotalTokenCount = 7 },
+                Citations = { new ChatCitation { Title = "Weather service", Url = "https://example.com/weather", Snippet = "21 degrees", ToolName = "get_weather" } },
                 ToolCalls =
                 {
                     new ChatToolCall
@@ -123,6 +124,11 @@ namespace Radzen.Blazor.Tests
             Assert.Null(call.Exception);
             Assert.Equal("Checked the tool", copy.Messages[1].Reasoning);
             Assert.Equal(7, copy.Messages[1].Usage!.TotalTokenCount);
+            var citation = copy.Messages[1].Citations.Single();
+            Assert.Equal("Weather service", citation.Title);
+            Assert.Equal("https://example.com/weather", citation.Url);
+            Assert.Equal("21 degrees", citation.Snippet);
+            Assert.Equal("get_weather", citation.ToolName);
 
             Assert.Equal(4, copy.History.Count);
             Assert.Equal(ChatRole.User, copy.History[0].Role);

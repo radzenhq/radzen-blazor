@@ -62,4 +62,9 @@ public class ChatMessage
     /// Gets or sets the token usage reported by the model for this response, when the provider reports it.
     /// </summary>
     public Microsoft.Extensions.AI.UsageDetails? Usage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sources the answer is based on: citations the provider attached to the response and citations returned by tools.
+    /// </summary>
+    public List<ChatCitation> Citations { get; set; } = new();
 }

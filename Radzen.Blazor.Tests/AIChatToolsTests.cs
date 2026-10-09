@@ -72,6 +72,15 @@ namespace Radzen.Blazor.Tests
                     yield break;
                 }
 
+                if (options?.Instructions == "cite")
+                {
+                    var cited = new TextContent("Hello there");
+                    cited.Annotations = [new CitationAnnotation { Title = "Radzen docs", Url = new Uri("https://blazor.radzen.com/datagrid"), Snippet = "The grid" }];
+                    yield return new ChatResponseUpdate(ChatRole.Assistant, [cited]) { ResponseId = "r0", MessageId = "r0" };
+                    yield return new ChatResponseUpdate(ChatRole.Assistant, [new TextContent(string.Empty) { Annotations = [new CitationAnnotation { Title = "Radzen docs", Url = new Uri("https://blazor.radzen.com/datagrid") }, new CitationAnnotation { Title = "Second source" }] }]) { ResponseId = "r0", MessageId = "r0" };
+                    yield break;
+                }
+
                 if (options?.Instructions == "reason")
                 {
                     yield return new ChatResponseUpdate(ChatRole.Assistant, [new TextReasoningContent("Thinking about it")]) { ResponseId = "r0", MessageId = "r0" };
@@ -517,6 +526,109 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("city: Sofia, days: 3", call.FormattedArguments);
             Assert.Equal(new[] { 1, 2, 3 }, call.GetResult<int[]>());
             Assert.Null(new ChatToolCall().GetResult<int[]>());
+        }
+
+        [Description("Searches the docs")]
+        private static List<ChatCitation> SearchDocs([Description("The city")] string city) =>
+        [
+            new ChatCitation { Title = $"Guide for {city}", Url = "https://example.com/guide", Snippet = "A guide" },
+            new ChatCitation { Title = "Duplicate", Url = "HTTPS://EXAMPLE.COM/GUIDE" },
+            new ChatCitation { Title = "Internal note", Snippet = "No url" }
+        ];
+
+        [Fact]
+        public async Task RadzenAIChat_RendersCitationsReturnedByTools()
+        {
+            var (ctx, _) = CreateContext();
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { AIFunctionFactory.Create(SearchDocs) }));
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("Find it"));
+            component.WaitForAssertion(() => Assert.Contains("Result:", component.Markup));
+
+            var message = component.Instance.GetMessages().Last();
+            Assert.Equal(2, message.Citations.Count);
+            Assert.Equal("Guide for Sofia", message.Citations[0].Title);
+            Assert.Equal("Internal note", message.Citations[1].Title);
+
+            Assert.Contains("rz-chat-citations", component.Markup);
+            Assert.Contains("Sources", component.Markup);
+            var link = component.Find("a.rz-chat-citation");
+            Assert.Equal("https://example.com/guide", link.GetAttribute("href"));
+            Assert.Equal("_blank", link.GetAttribute("target"));
+            Assert.Equal("A guide", link.GetAttribute("title"));
+            Assert.Contains("Guide for Sofia", link.TextContent);
+            Assert.Equal(2, component.FindAll(".rz-chat-citation").Count);
+            Assert.Equal("2", component.FindAll(".rz-chat-citation-index")[1].TextContent);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_RendersCitationAnnotationsAndCanHideThem()
+        {
+            var (ctx, _) = CreateContext();
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite"));
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("Hi"));
+            component.WaitForAssertion(() => Assert.Contains("Hello there", component.Markup));
+
+            var message = component.Instance.GetMessages()[1];
+            Assert.Equal("Hello there", message.Content);
+            Assert.Equal(2, message.Citations.Count);
+            Assert.Equal("https://blazor.radzen.com/datagrid", message.Citations[0].Url);
+            Assert.Equal("The grid", message.Citations[0].Snippet);
+            Assert.Equal("Second source", message.Citations[1].Title);
+            Assert.Contains("rz-chat-citations", component.Markup);
+
+            var templated = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.CitationTemplate, citation => builder => builder.AddMarkupContent(0, $"<em class=\"custom-citation\">{citation.Title}</em>")));
+            await templated.InvokeAsync(() => templated.Instance.SendMessage("Hi"));
+            templated.WaitForAssertion(() => Assert.Contains("Hello there", templated.Markup));
+            Assert.Equal(2, templated.FindAll(".custom-citation").Count);
+            Assert.Empty(templated.FindAll("a.rz-chat-citation"));
+
+            var hidden = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.ShowCitations, false));
+            await hidden.InvokeAsync(() => hidden.Instance.SendMessage("Hi"));
+            hidden.WaitForAssertion(() => Assert.Contains("Hello there", hidden.Markup));
+            Assert.DoesNotContain("rz-chat-citations", hidden.Markup);
+        }
+
+        [Fact]
+        public void ChatCitation_ConvertsToAndFromAnnotations()
+        {
+            var citation = new ChatCitation { Title = "T", Url = "https://example.com/a", Snippet = "S", FileId = "f1", ToolName = "search" };
+            var annotation = citation.ToAnnotation();
+
+            Assert.Equal("T", annotation.Title);
+            Assert.Equal(new Uri("https://example.com/a"), annotation.Url);
+            Assert.Equal("S", annotation.Snippet);
+            Assert.Equal("f1", annotation.FileId);
+            Assert.Equal("search", annotation.ToolName);
+
+            var copy = ChatCitation.FromAnnotation(annotation);
+            Assert.Equal("https://example.com/a", copy.Url);
+            Assert.True(copy.IsSameSource(citation));
+            Assert.False(copy.IsSameSource(new ChatCitation { Url = "https://example.com/b" }));
+            Assert.True(new ChatCitation { FileId = "f" }.IsSameSource(new ChatCitation { FileId = "f" }));
+            Assert.True(new ChatCitation { Title = "Same" }.IsSameSource(new ChatCitation { Title = "same" }));
+            Assert.Null(new ChatCitation { Url = "not a url" }.ToAnnotation().Url);
+
+            var message = new ChatMessage();
+            AIChatService.ApplyCitations(message, new FunctionResultContent("c", new object[] { new ChatCitation { Url = "https://example.com/a" }, "ignored", new ChatCitation { Url = "https://example.com/a" } }));
+            AIChatService.ApplyCitations(message, new FunctionResultContent("c", "plain text"));
+            AIChatService.ApplyCitations(message, new FunctionResultContent("c", new TextContent("x") { Annotations = [new CitationAnnotation { Url = new Uri("https://example.com/c") }] }));
+            Assert.Equal(2, message.Citations.Count);
+
+            var json = new ChatMessage();
+            AIChatService.ApplyCitations(json, new FunctionResultContent("c", System.Text.Json.JsonSerializer.SerializeToElement(new object[] { new { title = "Doc", url = "https://example.com/d", snippet = "S" }, new { title = "Product", url = "https://example.com/p", price = 10 }, new { Title = "Note" } })));
+            AIChatService.ApplyCitations(json, new FunctionResultContent("c", System.Text.Json.JsonSerializer.SerializeToElement(new { title = "Single", url = "https://example.com/s" })));
+            AIChatService.ApplyCitations(json, new FunctionResultContent("c", System.Text.Json.JsonSerializer.SerializeToElement(new { snippet = "no title or url" })));
+            Assert.Equal(new[] { "Doc", "Note", "Single" }, json.Citations.Select(citation => citation.Title));
+
+            Assert.Equal("See [1] and [2].", ChatCitation.NormalizeMarkers("See 【1†L1-L4】 and 【2】."));
+            Assert.Equal("plain [3]", ChatCitation.NormalizeMarkers("plain [3]"));
+            Assert.Equal("", ChatCitation.NormalizeMarkers(""));
         }
     }
 }

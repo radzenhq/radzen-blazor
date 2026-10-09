@@ -286,7 +286,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             }
         }
 
-        message.Content = text.ToString();
+        message.Content = Blazor.ChatCitation.NormalizeMarkers(text.ToString());
 
         return message.Content.Length == 0 && message.ToolCalls.Count == 0 ? null : message;
     }
@@ -302,6 +302,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         ArgumentNullException.ThrowIfNull(message);
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(text);
+
+        ApplyCitations(message, content);
 
         switch (content)
         {
@@ -363,6 +365,25 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
                 text.Append(error.Message);
                 break;
+        }
+    }
+
+    /// <summary>
+    /// Adds the citations a piece of response content carries to a displayed message, skipping sources the message already cites.
+    /// </summary>
+    /// <param name="message">The displayed message.</param>
+    /// <param name="content">The content.</param>
+    public static void ApplyCitations(Blazor.ChatMessage message, AIContent content)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(content);
+
+        foreach (var citation in Blazor.ChatCitation.FromContent(content))
+        {
+            if (!message.Citations.Any(existing => existing.IsSameSource(citation)))
+            {
+                message.Citations.Add(citation);
+            }
         }
     }
 
