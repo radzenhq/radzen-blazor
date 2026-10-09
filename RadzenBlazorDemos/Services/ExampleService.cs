@@ -16,7 +16,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Overview",
             Path = "/",
-            Description = "145+ free, open-source Blazor UI components for data-rich web apps. DataGrid, Scheduler, Charts, Forms, and more. MIT licensed.",
+            Description = "155+ free, open-source Blazor UI components for data-rich web apps. DataGrid, Scheduler, Charts, Forms, and more. MIT licensed.",
             Icon = "\ue88a"
         },
         new Example
@@ -5179,7 +5179,7 @@ namespace RadzenBlazorDemos
                 return example.Title ?? $"Blazor {example.Name} | Free Radzen Blazor";
             }
 
-            return "Free Blazor Components | 145+ UI controls by Radzen";
+            return "Free Blazor Components | 155+ UI controls by Radzen";
         }
 
         public string DescriptionFor(Example example)

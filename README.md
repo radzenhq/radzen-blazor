@@ -3,7 +3,7 @@
 Radzen Blazor Components
 ========================
 
-The most sophisticated free UI component library for Blazor, featuring **145+ native components**. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
+The most sophisticated free UI component library for Blazor, featuring **155+ native components**. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
 
 Supports .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid.
 
