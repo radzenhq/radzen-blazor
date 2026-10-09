@@ -23,6 +23,20 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     private readonly Dictionary<string, ConversationSession> sessions = new();
     private readonly object sessionsLock = new();
     private IConversationStore? store;
+
+    internal static bool? IsBrowserOverride { get; set; }
+
+    private static bool IsBrowser => IsBrowserOverride ?? OperatingSystem.IsBrowser();
+
+    private const string BrowserKeyMessage = "An API key must not be used in the browser: everything in a WebAssembly application is visible to its users. Keep the key on the server and set AIChatServiceOptions.Proxy (or the Proxy parameter) to a server endpoint that adds it, as the ChatController of the demos does.";
+
+    private static void EnsureKeyStaysOnTheServer(string? apiKey)
+    {
+        if (IsBrowser && !string.IsNullOrEmpty(apiKey))
+        {
+            throw new InvalidOperationException(BrowserKeyMessage);
+        }
+    }
     private readonly Dictionary<string, IChatClient> clients = new();
     private IEmbeddingGenerator<string, Embedding<float>>? embeddingGenerator;
 
@@ -453,6 +467,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             throw new InvalidOperationException("Set AIChatServiceOptions.EmbeddingsEndpoint or register an IEmbeddingGenerator to generate embeddings.");
         }
 
+        EnsureKeyStaysOnTheServer(Options.ApiKey);
+
         if (!string.IsNullOrEmpty(Options.ApiKey) && string.IsNullOrWhiteSpace(Options.ApiKeyHeader))
         {
             throw new InvalidOperationException("API key header must be specified when an API key is provided.");
@@ -489,6 +505,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         var url = proxy ?? Options.Proxy ?? endpoint ?? Options.Endpoint;
         var effectiveApiKey = apiKey ?? Options.ApiKey;
         var effectiveApiKeyHeader = apiKeyHeader ?? Options.ApiKeyHeader;
+
+        EnsureKeyStaysOnTheServer(effectiveApiKey);
 
         if (!string.IsNullOrEmpty(effectiveApiKey) && string.IsNullOrWhiteSpace(effectiveApiKeyHeader))
         {

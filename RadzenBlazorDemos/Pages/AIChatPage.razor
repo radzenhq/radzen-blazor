@@ -161,6 +161,15 @@ builder.Services.AddAIChatService(options =>
 });
 </code>
 </pre>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-6 rz-mb-2">
+    Keep the API key on the server
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    In Blazor Server the options above live on the server and the key never reaches the browser. In a WebAssembly application everything in the client is visible to its users, so the service refuses an API key there:
+    set <code>Proxy</code> to an endpoint of your server instead and let the server add the key, as this demo does with <code>options.Proxy = "api/chat/completions"</code> in the client and a <code>ChatController</code> in the host
+    that forwards the body to the provider with the key from its configuration (<code>EmbeddingsProxy</code> does the same for embeddings). Protect that endpoint with <code>[Authorize]</code>, otherwise every visitor can spend your quota,
+    and decide on the server which models, token limits and system prompts the client may use.
+</RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
     To use a different provider, register its <code>IChatClient</code> and <strong>AIChat</strong> picks it up automatically. Any middleware added with
     <code>ChatClientBuilder</code> (logging, caching, OpenTelemetry, rate limiting) applies to the chat as well.
@@ -185,8 +194,9 @@ builder.Services.AddAIChatService();
     Runtime AI Configuration
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Customize AI behavior at runtime by configuring the <code>Model</code>, <code>Temperature</code>, <code>MaxTokens</code>, <code>SystemPrompt</code>, <code>Endpoint</code>, <code>Proxy</code>, <code>ApiKey</code>, and <code>ApiKeyHeader</code> parameters. 
+    Customize AI behavior at runtime by configuring the <code>Model</code>, <code>Temperature</code>, <code>MaxTokens</code>, <code>SystemPrompt</code>, <code>Endpoint</code> and <code>Proxy</code> parameters.
     These parameters can be set on the component or passed to the <code>SendMessage</code> method to override settings per message, enabling dynamic switching between different AI providers and models.
+    <code>ApiKey</code> and <code>ApiKeyHeader</code> exist for Blazor Server only; a WebAssembly client must go through a server <code>Proxy</code>, as described under AI providers.
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatModelSelection">
     <AIChatModelSelection />

@@ -74,7 +74,7 @@
         <RadzenRow Gap="1.5rem">
             @foreach (var item in components)
             {
-                <RadzenColumn Size="12" SizeMD="4">
+                <RadzenColumn Size="12" SizeMD="6" SizeXX="3">
                     <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-6">
                         <RadzenStack Gap="1rem" AlignItems="AlignItems.Start" class="rz-h-100">
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
@@ -195,7 +195,7 @@
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="12" SizeLG="7">
-<pre class="rz-m-0 rz-p-4 rz-border-radius-1" style="background-color: var(--rz-base-200); overflow: auto; font-size: 0.8125rem; line-height: 1.5;"><code>// Program.cs - any OpenAI-compatible endpoint
+<pre class="rz-m-0 rz-p-4 rz-border-radius-1" style="background-color: var(--rz-base-200); overflow: auto; font-size: 0.8125rem; line-height: 1.5;"><code>// Program.cs (server) - any OpenAI-compatible endpoint, the key stays here
 builder.Services.AddAIChatService(options =>
 {
     options.Endpoint = "https://api.openai.com/v1/chat/completions";
@@ -203,6 +203,9 @@ builder.Services.AddAIChatService(options =>
     options.Model = "gpt-4o-mini";
     options.EmbeddingsModel = "text-embedding-3-small";
 });
+
+// Program.cs (WebAssembly client) - no key in the browser, the server forwards
+builder.Services.AddAIChatService(options => options.Proxy = "api/chat/completions");
 
 // or register the IChatClient of your provider
 builder.Services.AddChatClient(new OllamaApiClient(new Uri("http://localhost:11434"), "llama3.2"))

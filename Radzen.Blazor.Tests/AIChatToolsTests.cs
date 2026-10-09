@@ -630,5 +630,39 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("plain [3]", ChatCitation.NormalizeMarkers("plain [3]"));
             Assert.Equal("", ChatCitation.NormalizeMarkers(""));
         }
+
+        [Fact]
+        public void AIChatService_RefusesAnApiKeyInTheBrowser()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(new System.Net.Http.HttpClient { BaseAddress = new Uri("https://localhost/") });
+            services.AddAIChatService(options =>
+            {
+                options.Endpoint = "https://api.example.com/v1/chat/completions";
+                options.ApiKey = "secret";
+            });
+
+            using var provider = services.BuildServiceProvider();
+            var service = provider.GetRequiredService<IAIChatService>();
+
+            AIChatService.IsBrowserOverride = true;
+
+            try
+            {
+                var error = Assert.Throws<InvalidOperationException>(() => service.GetChatClient());
+                Assert.Contains("must not be used in the browser", error.Message);
+                Assert.Throws<InvalidOperationException>(() => service.GetChatClient(apiKey: "another"));
+                Assert.Throws<InvalidOperationException>(() => service.GetEmbeddingGenerator());
+
+                var proxied = service.GetChatClient(proxy: "api/chat/completions", apiKey: "");
+                Assert.NotNull(proxied);
+            }
+            finally
+            {
+                AIChatService.IsBrowserOverride = null;
+            }
+
+            Assert.NotNull(service.GetChatClient(apiKey: "server side"));
+        }
     }
 }

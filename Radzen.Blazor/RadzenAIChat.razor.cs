@@ -120,25 +120,25 @@ namespace Radzen.Blazor
         public int? MaxTokens { get; set; }
 
         /// <summary>
-        /// Gets or sets the endpoint URL for the AI service.
+        /// Gets or sets the endpoint URL of the AI provider, overriding <see cref="AIChatServiceOptions.Endpoint"/>. In a WebAssembly application use <see cref="Proxy"/> instead, so the request goes through your server.
         /// </summary>
         [Parameter]
         public string? Endpoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the proxy URL for the AI service.
+        /// Gets or sets the URL of a server endpoint that forwards the requests to the AI provider and adds the API key, overriding <see cref="AIChatServiceOptions.Proxy"/>.
         /// </summary>
         [Parameter]
         public string? Proxy { get; set; }
 
         /// <summary>
-        /// Gets or sets the API key for authentication.
+        /// Gets or sets the API key, overriding <see cref="AIChatServiceOptions.ApiKey"/>. Blazor Server only: the component throws when a key is set in a WebAssembly application, because it would be visible to every user. Keep the key on the server and use <see cref="Proxy"/>.
         /// </summary>
         [Parameter]
         public string? ApiKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the API key header name.
+        /// Gets or sets the header the API key is sent with, overriding <see cref="AIChatServiceOptions.ApiKeyHeader"/>.
         /// </summary>
         [Parameter]
         public string? ApiKeyHeader { get; set; }

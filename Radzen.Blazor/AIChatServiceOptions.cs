@@ -16,7 +16,8 @@ public class AIChatServiceOptions
     public string? Proxy { get; set; }
 
     /// <summary>
-    /// Gets or sets the API key for authentication with the AI service.
+    /// Gets or sets the API key sent with the <see cref="ApiKeyHeader"/> header. Server-side only: configure it in Blazor Server or in the server that hosts a WebAssembly application and forwards the requests of <see cref="Proxy"/>.
+    /// A key configured in the browser is visible to every user, so the service throws when a WebAssembly application sets one.
     /// </summary>
     public string ApiKey { get; set; } = string.Empty;
 
