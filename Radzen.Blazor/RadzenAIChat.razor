@@ -183,13 +183,10 @@
                             @if (message.IsStreaming || !string.IsNullOrEmpty(message.Content))
                             {
                                 <div class="rz-chat-message-text">
+                                    <RadzenMarkdown Text=@message.Content />
                                     @if (message.IsStreaming)
                                     {
-                                        @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
-                                    }
-                                    else
-                                    {
-                                        <RadzenMarkdown Text=@message.Content />
+                                        <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
                                     }
                                 </div>
                             }

@@ -30,7 +30,7 @@
                 <div class="rz-aiprompt-output-content">
                     @if (IsGenerating)
                     {
-                        <span class="rz-aiprompt-output-text">@Output</span><RadzenIcon Icon="more_horiz" class="rz-aiprompt-streaming-icon" />
+                        <RadzenMarkdown Text="@Output" /><RadzenIcon Icon="more_horiz" class="rz-aiprompt-streaming-icon" />
                     }
                     else if (OutputTemplate != null)
                     {

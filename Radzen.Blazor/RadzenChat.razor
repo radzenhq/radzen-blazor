@@ -120,21 +120,18 @@
                                 </div>
                             </RadzenStack>
                             <div class="rz-chat-message-text">
-                                @if (message.IsStreaming)
+                                @if (!message.IsStreaming && MentionCharacter.HasValue && MentionDisplayTemplate != null && message.Content.Contains($"{MentionCharacter}["))
                                 {
-                                    @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
+                                    // Parse and render mentions
+                                    @RenderMessageWithMentions(message.Content)
                                 }
                                 else
                                 {
-                                    @if (MentionCharacter.HasValue && MentionDisplayTemplate != null && message.Content.Contains($"{MentionCharacter}["))
-                                    {
-                                        // Parse and render mentions
-                                        @RenderMessageWithMentions(message.Content)
-                                    }
-                                    else
-                                    {
-                                        <RadzenMarkdown Text=@message.Content />
-                                    }
+                                    <RadzenMarkdown Text=@message.Content />
+                                }
+                                @if (message.IsStreaming)
+                                {
+                                    <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
                                 }
                             </div>
                             
