@@ -270,7 +270,9 @@ builder.Services.AddAIChatService();
         new("AIPrompt", "One-shot AI tasks", "/aiprompt", "auto_awesome", "A prompt box with suggested prompts, a streaming output panel and commands that refine the result, optionally applied to a piece of text.",
             ["Suggestions and commands (shorter, formal, translate)", "Context for editor content or chart data", "Copy, regenerate, custom output template"], true),
         new("SmartPasteButton", "Fill forms from text", "/smartpastebutton", "content_paste_go", "Reads the clipboard, extracts the fields of your form model with the AI model and assigns the values - dates, numbers, enums included.",
-            ["Works with any model class and RadzenTemplateForm", "Description and Display attributes guide the model", "Fields, Instructions and Paste(text)"], true)
+            ["Works with any model class and RadzenTemplateForm", "Description and Display attributes guide the model", "Fields, Instructions and Paste(text)"], true),
+        new("InlineAIPrompt", "AI for any text field", "/inline-aiprompt", "edit_note", "A button next to a TextBox or TextArea opens a prompt popup; the value or the selected text is the context and the result replaces or extends it.",
+            ["Replace the whole value or just the selection", "Suggestions and commands per field", "Open from your own trigger with OpenAsync"], true)
     ];
 
     Demo[] agentic =

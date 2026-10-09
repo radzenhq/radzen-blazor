@@ -2322,6 +2322,23 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     New = true,
+                    Name = "InlineAIPrompt",
+                    Title = "Blazor Inline AI Prompt Component | Free Radzen Blazor",
+                    Path = "inline-aiprompt",
+                    Description = "The Blazor InlineAIPrompt component adds an AI assistant to any text field: a popup prompt that rewrites the value or the selected text and applies the result.",
+                    Related = new [] { "aiprompt", "textarea", "textbox", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does InlineAIPrompt change the field?", Answer = "Bind Value to the same value as the field. Replace sets the value to the output, or only the selected part of it when TargetId points to the input and text is selected; Append adds the output after the value." },
+                        new FaqItem { Question = "Can I open the assistant without the button?", Answer = "Yes. Set ShowButton to false and call OpenAsync with the element to anchor the popup to, for example from a keyboard shortcut or a selection toolbar." }
+                    },
+                    Icon = "\ue8ad",
+                    Tags = new [] { "ai", "prompt", "assistant", "inline", "field", "rewrite", "popup" },
+                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
+                },
+                new Example
+                {
+                    New = true,
                     Name = "SmartPasteButton",
                     Title = "Blazor Smart Paste Button | Free Radzen Blazor",
                     Path = "smartpastebutton",

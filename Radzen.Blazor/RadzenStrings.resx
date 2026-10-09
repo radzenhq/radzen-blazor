@@ -2636,4 +2636,19 @@
   <data name="AIChat_Sources" xml:space="preserve">
     <value>Sources</value>
   </data>
+  <data name="InlineAIPrompt_Title" xml:space="preserve">
+    <value>AI assistant</value>
+  </data>
+  <data name="InlineAIPrompt_ReplaceText" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="InlineAIPrompt_ReplaceSelectionText" xml:space="preserve">
+    <value>Replace selection</value>
+  </data>
+  <data name="InlineAIPrompt_AppendText" xml:space="preserve">
+    <value>Append</value>
+  </data>
+  <data name="InlineAIPrompt_DiscardText" xml:space="preserve">
+    <value>Discard</value>
+  </data>
 </root>

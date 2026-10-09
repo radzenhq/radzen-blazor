@@ -262,5 +262,107 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("ok", (await chatClient.GetResponseAsync("hi")).Text);
             Assert.Same(client, chatClient.GetService<FuncChatClient>());
         }
+
+        [Fact]
+        public async Task InlineAIPrompt_ReplacesAppendsAndDiscardsOutput()
+        {
+            var (ctx, client) = CreateContext((messages, _) => "Improved text");
+            using var _ = ctx;
+
+            string? value = "original text";
+            var applied = new List<string?>();
+
+            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters
+                .Add(p => p.Value, value)
+                .Add(p => p.ValueChanged, v => value = v)
+                .Add(p => p.Applied, v => applied.Add(v))
+                .Add(p => p.Suggestions, new[] { "Fix grammar" }));
+
+            Assert.Contains("rz-inline-aiprompt-button", component.Markup);
+            Assert.DoesNotContain("rz-aiprompt-textarea", component.Markup);
+
+            await component.InvokeAsync(() => component.Find("button.rz-inline-aiprompt-button").Click());
+            component.WaitForAssertion(() => Assert.Contains("rz-aiprompt-textarea", component.Markup));
+            Assert.True(component.Instance.IsOpen);
+
+            var prompt = component.FindComponent<RadzenAIPrompt>();
+            Assert.Equal("original text", prompt.Instance.Context);
+            Assert.Contains("return only the resulting text", prompt.Instance.SystemPrompt);
+
+            await component.InvokeAsync(() => prompt.Instance.Generate("Fix grammar"));
+            component.WaitForAssertion(() => Assert.Contains("rz-inline-aiprompt-actions", component.Markup));
+            Assert.Equal("Improved text", component.Instance.Output?.Trim());
+            Assert.Contains("original text", client.Requests.Last().Messages.Last().Text);
+
+            await component.InvokeAsync(() => component.Find("button.rz-inline-aiprompt-replace").Click());
+            Assert.Equal("Improved text", value?.Trim());
+            Assert.Equal("Improved text", applied.Single()?.Trim());
+
+            value = "first line\nsecond line";
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, value));
+            await component.InvokeAsync(() => component.Instance.OpenAsync());
+            component.WaitForAssertion(() => Assert.Contains("rz-aiprompt-textarea", component.Markup));
+            await component.InvokeAsync(() => component.FindComponent<RadzenAIPrompt>().Instance.Generate("More"));
+            component.WaitForAssertion(() => Assert.Contains("rz-inline-aiprompt-append", component.Markup));
+            await component.InvokeAsync(() => component.Find("button.rz-inline-aiprompt-append").Click());
+            Assert.Equal("first line\nsecond line\n\nImproved text", value?.Trim());
+
+            await component.InvokeAsync(() => component.Instance.OpenAsync());
+            component.WaitForAssertion(() => Assert.Contains("rz-aiprompt-textarea", component.Markup));
+            await component.InvokeAsync(() => component.FindComponent<RadzenAIPrompt>().Instance.Generate("More"));
+            component.WaitForAssertion(() => Assert.Contains("rz-inline-aiprompt-discard", component.Markup));
+            await component.InvokeAsync(() => component.Find("button.rz-inline-aiprompt-discard").Click());
+            component.WaitForAssertion(() => Assert.DoesNotContain("rz-inline-aiprompt-actions", component.Markup));
+            Assert.Null(component.Instance.Output);
+            Assert.Equal(2, applied.Count);
+        }
+
+        [Fact]
+        public async Task InlineAIPrompt_ReplacesOnlyTheSelectionOfTheTarget()
+        {
+            var (ctx, client) = CreateContext((messages, _) => "QUICK");
+            using var _ = ctx;
+            ctx.JSInterop.Setup<int[]?>("Radzen.getSelectionRange", "description").SetResult(new[] { 4, 9 });
+
+            string? value = "the quick fox";
+
+            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters
+                .Add(p => p.Value, value)
+                .Add(p => p.ValueChanged, v => value = v)
+                .Add(p => p.TargetId, "description")
+                .Add(p => p.ReplaceSelectionText, "Only selection"));
+
+            await component.InvokeAsync(() => component.Instance.OpenAsync());
+            component.WaitForAssertion(() => Assert.Contains("rz-aiprompt-textarea", component.Markup));
+
+            var prompt = component.FindComponent<RadzenAIPrompt>();
+            Assert.Equal("quick", prompt.Instance.Context);
+
+            await component.InvokeAsync(() => prompt.Instance.Generate("Uppercase"));
+            component.WaitForAssertion(() => Assert.Contains("Only selection", component.Markup));
+            Assert.Contains("quick", client.Requests.Single().Messages.Last().Text);
+
+            await component.InvokeAsync(() => component.Find("button.rz-inline-aiprompt-replace").Click());
+            Assert.Equal("the QUICK  fox", value);
+        }
+
+        [Fact]
+        public void InlineAIPrompt_CanHideTheButtonAndRendersAccessibleNames()
+        {
+            var (ctx, _) = CreateContext((_, _) => "x");
+            using var __ = ctx;
+
+            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.Title, "Improve").Add(p => p.Text, "Ask AI"));
+            var button = component.Find("button.rz-inline-aiprompt-button");
+            Assert.Equal("Improve", button.GetAttribute("title"));
+            Assert.Equal("dialog", button.GetAttribute("aria-haspopup"));
+            Assert.Equal("false", button.GetAttribute("aria-expanded"));
+            Assert.Contains("Ask AI", button.TextContent);
+            Assert.Equal("Improve", component.Find(".rz-inline-aiprompt-popup").GetAttribute("aria-label"));
+
+            var hidden = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.ShowButton, false));
+            Assert.Empty(hidden.FindAll("button.rz-inline-aiprompt-button"));
+            Assert.Single(hidden.FindAll(".rz-inline-aiprompt-popup"));
+        }
     }
 }

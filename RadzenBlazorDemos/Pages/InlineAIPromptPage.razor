@@ -1,0 +1,23 @@
+@page "/inline-aiprompt"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor InlineAIPrompt
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Blazor InlineAIPrompt component adds an AI assistant to any text field: a button opens an AIPrompt in a popup, the field value or its selection is the context and the result replaces or extends the value.
+</RadzenText>
+
+<RadzenExample ComponentName="InlineAIPrompt" Example="InlineAIPromptConfig">
+    <InlineAIPromptConfig />
+</RadzenExample>
+
+<RadzenText Anchor="inline-aiprompt#usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Bind <code>Value</code> to the same value as the field, for example with <code>@@bind-Value</code>, and the component replaces or appends to it when the user applies the output.
+    Set <code>TargetId</code> to the id of the input or textarea: the text selected in it when the popup opens becomes the context and only the selection is replaced. Without a selection the whole value is the context.
+    <code>Suggestions</code> and <code>Commands</code> work as in <a href="/aiprompt">AIPrompt</a>; the default <code>SystemPrompt</code> asks the model for the resulting text only, without explanations or markdown.
+    The button is configurable through <code>Icon</code>, <code>Text</code>, <code>ButtonStyle</code>, <code>Variant</code> and <code>Size</code>; set <code>ShowButton="false"</code> and call <code>OpenAsync(element)</code> to open the popup from your own trigger, for example a keyboard shortcut or a selection toolbar.
+    <code>Applied</code> fires with the new value, <code>Generated</code> with every output, and <code>Open</code> and <code>Close</code> follow the popup. The popup width is set by the <code>--rz-inline-aiprompt-popup-width</code> CSS variable.
+</RadzenText>

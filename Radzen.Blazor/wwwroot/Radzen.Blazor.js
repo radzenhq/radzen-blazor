@@ -7538,6 +7538,11 @@ Radzen.getSelectedText = function(element) {
   if (element && !element.contains(selection.anchorNode)) return '';
   return selection.toString();
 };
+Radzen.getSelectionRange = function(id) {
+  var element = typeof id === 'string' ? document.getElementById(id) : id;
+  if (!element || element.selectionStart == null || element.selectionEnd == null) return null;
+  return [element.selectionStart, element.selectionEnd];
+};
 Radzen.clickElement = function(id) {
   var element = typeof id === 'string' ? document.getElementById(id) : id;
   if (element) element.click();

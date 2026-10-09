@@ -70,3 +70,39 @@
         opacity: 0.6;
     }
 }
+
+.rz-inline-aiprompt {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.rz-inline-aiprompt-popup {
+    display: none;
+    position: absolute;
+    width: var(--rz-inline-aiprompt-popup-width, 28rem);
+    max-width: calc(100vw - 2rem);
+    border: var(--rz-panel-border);
+    border-radius: var(--rz-border-radius);
+    background-color: var(--rz-panel-background-color);
+    box-shadow: var(--rz-panel-shadow);
+    overflow: hidden;
+
+    .rz-aiprompt {
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+    }
+
+    .rz-aiprompt-output-content {
+        max-height: 16rem;
+        overflow: auto;
+    }
+
+    .rz-inline-aiprompt-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0 0.75rem 0.75rem;
+    }
+}
