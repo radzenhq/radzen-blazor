@@ -176,10 +176,10 @@ namespace Radzen.Blazor
         public Shade Shade { get; set; } = Shade.Default;
 
         /// <summary>
-        /// Gets or sets the size of the button. Default is <see cref="ButtonSize.Medium"/>.
+        /// Gets or sets the size of the button. Default is <see cref="ButtonSize.Small"/>.
         /// </summary>
         [Parameter]
-        public ButtonSize Size { get; set; } = ButtonSize.Medium;
+        public ButtonSize Size { get; set; } = ButtonSize.Small;
 
         /// <summary>
         /// Gets or sets whether the button is disabled.

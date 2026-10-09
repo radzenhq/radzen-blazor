@@ -77,6 +77,27 @@
     vertical-align: middle;
 }
 
+// In a form field the button is as far from the end edge as it is from the top edge,
+// whatever the theme sets as padding of the end slot.
+.rz-form-field-end:has(> .rz-inline-aiprompt) {
+    --rz-inline-aiprompt-button-size: var(--rz-button-size-sm);
+    padding-inline-end: max(0px, calc((var(--rz-input-height) - var(--rz-inline-aiprompt-button-size)) / 2));
+
+    @each $size in (xs, md, lg) {
+        &:has(.rz-inline-aiprompt-button.rz-button-#{$size}) {
+            --rz-inline-aiprompt-button-size: var(--rz-button-size-#{$size});
+        }
+    }
+}
+
+// Next to a multiline TextArea the button stays where it would be in a single-line field:
+// the end slot keeps the height of an input and is pinned to the top.
+.rz-form-field-content:has(> .rz-textarea) > .rz-form-field-end:has(> .rz-inline-aiprompt) {
+    align-self: flex-start;
+    box-sizing: border-box;
+    block-size: var(--rz-input-height);
+}
+
 .rz-inline-aiprompt-popup {
     display: none;
     position: absolute;
