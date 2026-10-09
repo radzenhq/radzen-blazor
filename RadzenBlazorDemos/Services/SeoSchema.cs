@@ -90,6 +90,11 @@ namespace RadzenBlazorDemos
                 return ArticleGraph(example, url, exampleService, "Spreadsheet", "spreadsheet");
             }
 
+            if (InCluster(exampleService.GetAIPages(), path))
+            {
+                return ArticleGraph(example, url, exampleService, "AI", "ai");
+            }
+
             // Forms has no single hub; each component is its own breadcrumb root.
             if (path != null && exampleService.GetFormsComponentHubs().TryGetValue(path, out var formsHub))
             {

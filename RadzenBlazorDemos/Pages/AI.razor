@@ -21,7 +21,7 @@
                         One abstraction, any model provider.
                     </RadzenText>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" Wrap="FlexWrap.Wrap" class="rz-mt-2">
-                        <RadzenLink Path="/aichat" Text="Try the AI chat" class="rz-button rz-button-lg rz-variant-filled rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
+                        <RadzenLink Path="/aichat" Text="Try the AI chat" class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
                         <RadzenLink Path="/aichat#providers" Text="Connect your provider" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
                     </RadzenStack>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
@@ -55,7 +55,7 @@
                                 </RadzenStack>
                                 <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">The assistant wants to run UpdateProductPrice.</RadzenText>
                                 <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                                    <RadzenButton Text="Approve" Icon="check" Size="ButtonSize.Small" />
+                                    <RadzenButton Text="Approve" Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" />
                                     <RadzenButton Text="Reject" Icon="close" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
                                 </RadzenStack>
                             </RadzenStack>
@@ -68,7 +68,7 @@
 
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
-            <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Components</RadzenText>
+            <RadzenText id="components" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Components</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">Drop them into any page. They share the same <code>IChatClient</code>, so configuring the provider once is enough.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
@@ -102,7 +102,12 @@
                                     </RadzenStack>
                                 }
                             </RadzenStack>
-                            <RadzenLink Path="@item.Path" Text="@($"{item.Title} demo")" Icon="arrow_forward" class="rz-button rz-button-md rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;" />
+                            <RadzenLink Path="@item.Path" class="rz-button rz-button-md rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                    <span>@item.Title demo</span>
+                                    <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenCard>
                 </RadzenColumn>
@@ -112,7 +117,7 @@
 
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
-            <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Agentic chat</RadzenText>
+            <RadzenText id="agentic-chat" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Agentic chat</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">RadzenAIChat goes beyond text. The model acts in your application and the user stays in control.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
@@ -130,7 +135,12 @@
                                 }
                             </RadzenStack>
                             <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
-                            <RadzenLink Path="@item.Path" Text="View demo" Icon="arrow_forward" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;" />
+                            <RadzenLink Path="@item.Path" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                    <span>View demo</span>
+                                    <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenCard>
                 </RadzenColumn>
@@ -140,7 +150,7 @@
 
     <RadzenStack Gap="1.5rem">
         <RadzenStack Gap="0.5rem">
-            <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">AI inside your data components</RadzenText>
+            <RadzenText id="ai-data-components" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">AI inside your data components</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">The same tools and prompts work with the DataGrid, Scheduler and Chart you already use.</RadzenText>
         </RadzenStack>
         <RadzenRow Gap="1.5rem">
@@ -161,7 +171,12 @@
                                     }
                                 </RadzenStack>
                                 <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
-                                <RadzenLink Path="@item.Path" Text="View demo" Icon="arrow_forward" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;" />
+                                <RadzenLink Path="@item.Path" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                        <span>View demo</span>
+                                        <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                    </RadzenStack>
+                                </RadzenLink>
                             </RadzenStack>
                         </RadzenStack>
                     </RadzenCard>
@@ -174,7 +189,7 @@
         <RadzenRow Gap="2rem" AlignItems="AlignItems.Center">
             <RadzenColumn Size="12" SizeLG="5">
                 <RadzenStack Gap="1rem">
-                    <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">One abstraction, any provider</RadzenText>
+                    <RadzenText id="providers" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">One abstraction, any provider</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">
                         Every component talks to the model through <code>IChatClient</code> from <strong>Microsoft.Extensions.AI</strong>.
                         Point the built-in client at any OpenAI-compatible endpoint, or register the client of your provider and add logging, caching or OpenTelemetry with <code>ChatClientBuilder</code>.
@@ -229,7 +244,7 @@ builder.Services.AddAIChatService();
     <RadzenRow AlignItems="AlignItems.Center" Gap="2rem" ID="special-offer">
         <RadzenColumn Size="12" SizeLG="7">
             <RadzenStack Gap="1.25rem" AlignItems="AlignItems.Start">
-                <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Radzen Blazor MCP</RadzenText>
+                <RadzenText id="radzen-blazor-mcp" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Radzen Blazor MCP</RadzenText>
                 <RadzenText class="rz-m-0">
                     <strong>Radzen Blazor MCP</strong> is a cloud-hosted <strong>Model Context Protocol (MCP)</strong> server that gives AI coding assistants real-time access to Radzen Blazor component documentation, APIs, and templates.
                     No packages to install — works with Cursor, Claude Code, GitHub Copilot, JetBrains, Windsurf, and other MCP-capable tools.

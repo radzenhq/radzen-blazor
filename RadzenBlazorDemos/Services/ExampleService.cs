@@ -29,21 +29,119 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name = "AI",
-            Path = "/ai",
-            Title = "AI and Radzen Blazor | Free Radzen Blazor",
-            Updated = true,
-            Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
-            Icon = "\uefac",
-            Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget", "tools", "agent", "prompt", "smart paste", "generative ui" }
-        },
-        new Example
-        {
             Name = "Support",
             Path = "/support",
             Title = "Support | Free Radzen Blazor",
             Description = "How to get support for the Radzen Blazor Components library.",
             Icon = "\ue0c6"
+        },
+        new Example
+        {
+            Name = "AI",
+            Updated = true,
+            Icon = "\uefac",
+            Children = new [] {
+                new Example
+                {
+                    Toc = [
+                        new () { Text = "Components", Anchor = "#components" },
+                        new () { Text = "Agentic chat", Anchor = "#agentic-chat" },
+                        new () { Text = "AI in data components", Anchor = "#ai-data-components" },
+                        new () { Text = "Any provider", Anchor = "#providers" },
+                        new () { Text = "Radzen Blazor MCP", Anchor = "#radzen-blazor-mcp" }
+                    ],
+                    Name = "AIOverview",
+                    Path = "/ai",
+                    Title = "AI and Radzen Blazor | Free Radzen Blazor",
+                    Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
+                    Icon = "\uefac",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget", "tools", "agent", "prompt", "smart paste", "generative ui" }
+                },
+                new Example
+                {
+                    Updated = true,
+                    Name = "AIChat",
+                    Title = "Blazor AI Chat Component | Free Radzen Blazor",
+                    Path = "aichat",
+                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants with tool calling, generative UI and human-in-the-loop approvals.",
+                    Related = new [] { "chat", "ai", "speechtotextbutton" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." },
+                        new FaqItem { Question = "Can the AI call my application code?", Answer = "Yes. Pass AIFunction tools created with AIFunctionFactory to the Tools parameter. The model calls them, the component invokes them and renders the calls; wrap a tool in ApprovalRequiredAIFunction to ask the user first." },
+                        new FaqItem { Question = "Which AI providers are supported?", Answer = "Any OpenAI-compatible endpoint out of the box, and any Microsoft.Extensions.AI IChatClient (OpenAI, Azure OpenAI, Ollama and others) registered in the service collection." }
+                    },
+                    Icon = "\ue0b7",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui", "citations", "sources", "rag" },
+                    Toc =
+                    [
+                        new () { Text = "Custom styling", Anchor = "#custom-styling" },
+                        new () { Text = "Compact AIChat", Anchor = "#compact-aichat" },
+                        new () { Text = "Events and interactions", Anchor = "#events" },
+                        new () { Text = "Date separator", Anchor = "#date-separator" },
+                        new () { Text = "Memory", Anchor = "#memory" },
+                        new () { Text = "Tool calling", Anchor = "#tools" },
+                        new () { Text = "Generative UI", Anchor = "#generative-ui" },
+                        new () { Text = "Human in the loop", Anchor = "#approval" },
+                        new () { Text = "Voice input", Anchor = "#voice" },
+                        new () { Text = "File attachments", Anchor = "#attachments" },
+                        new () { Text = "Citations", Anchor = "#citations" },
+                        new () { Text = "AI providers", Anchor = "#providers" },
+                        new () { Text = "Runtime configuration", Anchor = "#configuration" }
+                    ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "AIPrompt",
+                    Title = "Blazor AI Prompt Component | Free Radzen Blazor",
+                    Path = "aiprompt",
+                    Description = "The Blazor AIPrompt component is a prompt box for one-shot AI tasks with suggested prompts, a streaming output panel and commands that refine the result.",
+                    Related = new [] { "aichat", "smartpastebutton", "chart-ai-insights" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the difference between AIPrompt and AIChat?", Answer = "AIChat is a conversation with memory and tool calling. AIPrompt is a single prompt with an output panel and commands such as summarize, rewrite or translate, often applied to a piece of text." },
+                        new FaqItem { Question = "Can AIPrompt work on the text of an editor?", Answer = "Yes. Set Context to the editor content or selection and every prompt, suggestion and command runs against it." }
+                    },
+                    Icon = "\uf0eb",
+                    Tags = new [] { "ai", "prompt", "assistant", "summarize", "rewrite", "translate", "generate" },
+                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "InlineAIPrompt",
+                    Title = "Blazor Inline AI Prompt Component | Free Radzen Blazor",
+                    Path = "inline-aiprompt",
+                    Description = "The Blazor InlineAIPrompt component adds an AI assistant to any text field: a popup prompt that rewrites the value or the selected text and applies the result.",
+                    Related = new [] { "aiprompt", "textarea", "textbox", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does InlineAIPrompt change the field?", Answer = "Bind Value to the same value as the field. Replace sets the value to the output, or only the selected part of it when TargetId points to the input and text is selected; Append adds the output after the value." },
+                        new FaqItem { Question = "Can I open the assistant without the button?", Answer = "Yes. Set ShowButton to false and call OpenAsync with the element to anchor the popup to, for example from a keyboard shortcut or a selection toolbar." }
+                    },
+                    Icon = "\ue8ad",
+                    Tags = new [] { "ai", "prompt", "assistant", "inline", "field", "rewrite", "popup" },
+                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "SmartPasteButton",
+                    Title = "Blazor Smart Paste Button | Free Radzen Blazor",
+                    Path = "smartpastebutton",
+                    Description = "The Blazor SmartPasteButton fills a form from the text in the clipboard by asking an AI model to extract the fields of the form model.",
+                    Related = new [] { "templateform", "aiprompt", "aichat" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Smart Paste Button fill the form?", Answer = "It reads the clipboard, describes the properties of the form model to the AI model, asks for a JSON object with those keys and assigns the converted values." },
+                        new FaqItem { Question = "Which property types are supported?", Answer = "Strings, numbers, booleans, dates (DateTime, DateOnly, TimeOnly, DateTimeOffset), enums and Guids, including their nullable variants." }
+                    },
+                    Icon = "\uea8e",
+                    Tags = new [] { "ai", "paste", "clipboard", "form", "autofill", "extract" },
+                    Toc = [ new () { Text = "How it works", Anchor = "#how-it-works" } ]
+                }
+            }
         },
         new Example
         {
@@ -2269,90 +2367,6 @@ namespace RadzenBlazorDemos
             Name = "Forms",
             Icon = "\uf1c1",
             Children = new[] {
-                new Example
-                {
-                    Updated = true,
-                    Name = "AIChat",
-                    Title = "Blazor AI Chat Component | Free Radzen Blazor",
-                    Path = "aichat",
-                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants with tool calling, generative UI and human-in-the-loop approvals.",
-                    Related = new [] { "chat", "ai", "speechtotextbutton" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." },
-                        new FaqItem { Question = "Can the AI call my application code?", Answer = "Yes. Pass AIFunction tools created with AIFunctionFactory to the Tools parameter. The model calls them, the component invokes them and renders the calls; wrap a tool in ApprovalRequiredAIFunction to ask the user first." },
-                        new FaqItem { Question = "Which AI providers are supported?", Answer = "Any OpenAI-compatible endpoint out of the box, and any Microsoft.Extensions.AI IChatClient (OpenAI, Azure OpenAI, Ollama and others) registered in the service collection." }
-                    },
-                    Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui", "citations", "sources", "rag" },
-                    Toc =
-                    [
-                        new () { Text = "Custom styling", Anchor = "#custom-styling" },
-                        new () { Text = "Compact AIChat", Anchor = "#compact-aichat" },
-                        new () { Text = "Events and interactions", Anchor = "#events" },
-                        new () { Text = "Date separator", Anchor = "#date-separator" },
-                        new () { Text = "Memory", Anchor = "#memory" },
-                        new () { Text = "Tool calling", Anchor = "#tools" },
-                        new () { Text = "Generative UI", Anchor = "#generative-ui" },
-                        new () { Text = "Human in the loop", Anchor = "#approval" },
-                        new () { Text = "Voice input", Anchor = "#voice" },
-                        new () { Text = "File attachments", Anchor = "#attachments" },
-                        new () { Text = "Citations", Anchor = "#citations" },
-                        new () { Text = "AI providers", Anchor = "#providers" },
-                        new () { Text = "Runtime configuration", Anchor = "#configuration" }
-                    ]
-                },
-                new Example
-                {
-                    New = true,
-                    Name = "AIPrompt",
-                    Title = "Blazor AI Prompt Component | Free Radzen Blazor",
-                    Path = "aiprompt",
-                    Description = "The Blazor AIPrompt component is a prompt box for one-shot AI tasks with suggested prompts, a streaming output panel and commands that refine the result.",
-                    Related = new [] { "aichat", "smartpastebutton", "chart-ai-insights" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the difference between AIPrompt and AIChat?", Answer = "AIChat is a conversation with memory and tool calling. AIPrompt is a single prompt with an output panel and commands such as summarize, rewrite or translate, often applied to a piece of text." },
-                        new FaqItem { Question = "Can AIPrompt work on the text of an editor?", Answer = "Yes. Set Context to the editor content or selection and every prompt, suggestion and command runs against it." }
-                    },
-                    Icon = "\uf0eb",
-                    Tags = new [] { "ai", "prompt", "assistant", "summarize", "rewrite", "translate", "generate" },
-                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
-                },
-                new Example
-                {
-                    New = true,
-                    Name = "InlineAIPrompt",
-                    Title = "Blazor Inline AI Prompt Component | Free Radzen Blazor",
-                    Path = "inline-aiprompt",
-                    Description = "The Blazor InlineAIPrompt component adds an AI assistant to any text field: a popup prompt that rewrites the value or the selected text and applies the result.",
-                    Related = new [] { "aiprompt", "textarea", "textbox", "templateform" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does InlineAIPrompt change the field?", Answer = "Bind Value to the same value as the field. Replace sets the value to the output, or only the selected part of it when TargetId points to the input and text is selected; Append adds the output after the value." },
-                        new FaqItem { Question = "Can I open the assistant without the button?", Answer = "Yes. Set ShowButton to false and call OpenAsync with the element to anchor the popup to, for example from a keyboard shortcut or a selection toolbar." }
-                    },
-                    Icon = "\ue8ad",
-                    Tags = new [] { "ai", "prompt", "assistant", "inline", "field", "rewrite", "popup" },
-                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
-                },
-                new Example
-                {
-                    New = true,
-                    Name = "SmartPasteButton",
-                    Title = "Blazor Smart Paste Button | Free Radzen Blazor",
-                    Path = "smartpastebutton",
-                    Description = "The Blazor SmartPasteButton fills a form from the text in the clipboard by asking an AI model to extract the fields of the form model.",
-                    Related = new [] { "templateform", "aiprompt", "aichat" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does the Smart Paste Button fill the form?", Answer = "It reads the clipboard, describes the properties of the form model to the AI model, asks for a JSON object with those keys and assigns the converted values." },
-                        new FaqItem { Question = "Which property types are supported?", Answer = "Strings, numbers, booleans, dates (DateTime, DateOnly, TimeOnly, DateTimeOffset), enums and Guids, including their nullable variants." }
-                    },
-                    Icon = "\uea8e",
-                    Tags = new [] { "ai", "paste", "clipboard", "form", "autofill", "extract" },
-                    Toc = [ new () { Text = "How it works", Anchor = "#how-it-works" } ]
-                },
                 new Example
                 {
                     Name = "Chat",
@@ -5103,6 +5117,13 @@ namespace RadzenBlazorDemos
         {
             var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");
             return dataGrid?.Children != null ? CollectLeaves(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
+        // Every leaf page under the "AI" category, the AI overview included. Article-eligible for schema.
+        public IEnumerable<Example> GetAIPages()
+        {
+            var ai = Examples.FirstOrDefault(c => c.Name == "AI");
+            return ai?.Children != null ? CollectLeaves(ai.Children).ToList() : Enumerable.Empty<Example>();
         }
 
         // Every leaf page under the "PivotDataGrid" category. Article-eligible for schema.
