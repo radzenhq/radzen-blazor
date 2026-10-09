@@ -57,10 +57,6 @@
   flex: 1;
   overflow: auto;
   padding: 0.5rem;
-
-  code {
-    display: inline;
-  }
   outline: none;
   color: var(--rz-input-value-color);
   white-space: pre-wrap;
@@ -82,20 +78,6 @@
     margin-block-end: 0;
   }
 
-  pre {
-    background-color: color-mix(in srgb, var(--rz-text-color) 8%, transparent);
-    border-radius: var(--rz-border-radius);
-    padding: 0.5rem;
-    overflow-x: auto;
-  }
-
-  blockquote {
-    border-inline-start: 3px solid var(--rz-base-300);
-    margin-inline-start: 0;
-    padding-inline-start: 0.75rem;
-    color: var(--rz-text-secondary-color);
-  }
-
   table {
     border-collapse: collapse;
 
@@ -104,10 +86,6 @@
       padding: 0.25rem 0.5rem;
     }
   }
-
-  img {
-    max-width: 100%;
-  }
 }
 
 .rz-markdown-editor-custom-tool {
@@ -115,8 +93,115 @@
   align-items: center;
 }
 
+// Content rendered by RadzenMarkdown and edited in the design view of RadzenMarkdownEditor.
+// Headings, paragraphs, links, images and tables are Radzen components; these are the plain tags.
+// Tints mix with currentColor so they also read on colored backgrounds such as user chat messages.
 .rz-markdown-editor-design,
 .rz-markdown {
+  ul,
+  ol {
+    margin-block: 0 var(--rz-text-body1-margin-block-end, 0.5rem);
+    padding-inline-start: 1.5rem;
+    font-size: var(--rz-text-body1-font-size);
+    line-height: var(--rz-text-body1-line-height);
+    letter-spacing: var(--rz-text-body1-letter-spacing);
+  }
+
+  // Separate lists from the paragraphs around them, also where paragraphs have no margins (chat messages)
+  > p + ul,
+  > p + ol,
+  > ul + p,
+  > ol + p {
+    margin-block-start: 0.5rem;
+  }
+
+  li + li {
+    margin-block-start: 0.25rem;
+  }
+
+  li > ul,
+  li > ol {
+    margin-block: 0.25rem 0;
+  }
+
+  li > p:last-child {
+    margin-block-end: 0;
+  }
+
+  code {
+    display: inline;
+    padding: 0.125em 0.375em;
+    border-radius: calc(var(--rz-border-radius) / 2);
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+    font-family: var(--rz-font-family-monospace, monospace);
+    font-size: 0.875em;
+  }
+
+  pre {
+    margin-block: 0 var(--rz-text-body1-margin-block-end, 0.5rem);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--rz-border-radius);
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+    font-family: var(--rz-font-family-monospace, monospace);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-x: auto;
+
+    code {
+      padding: 0;
+      border-radius: 0;
+      background-color: transparent;
+      font-size: inherit;
+    }
+  }
+
+  blockquote {
+    margin-block: 0 var(--rz-text-body1-margin-block-end, 0.5rem);
+    margin-inline: 0;
+    padding-inline-start: 0.75rem;
+    border-inline-start: 3px solid color-mix(in srgb, currentColor 25%, transparent);
+    color: var(--rz-text-secondary-color);
+  }
+
+  hr {
+    margin-block: 1rem;
+    border: none;
+    border-block-start: var(--rz-border-base-300);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  kbd {
+    padding: 0.125em 0.375em;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-block-end-width: 2px;
+    border-radius: calc(var(--rz-border-radius) / 2);
+    font-family: var(--rz-font-family-monospace, monospace);
+    font-size: 0.8125em;
+  }
+
+  mark {
+    padding-inline: 0.125em;
+    border-radius: 0.125em;
+    background-color: var(--rz-warning-lighter);
+    color: inherit;
+  }
+
+  sup,
+  sub {
+    line-height: 0;
+  }
+
+  details {
+    margin-block: 0 var(--rz-text-body1-margin-block-end, 0.5rem);
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
   li:has(> input[type='checkbox']:first-child) {
     list-style: none;
 
