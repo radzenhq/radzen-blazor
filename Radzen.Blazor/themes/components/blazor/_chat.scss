@@ -556,7 +556,7 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     }
 
     .rz-chat-reasoning-content {
-        padding: 0.25rem 0.5rem 0.5rem;
+        padding: 0.5rem 0.75rem;
         border-top: var(--rz-chat-tool-call-border);
         white-space: pre-wrap;
         word-break: break-word;
