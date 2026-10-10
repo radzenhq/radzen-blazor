@@ -14,14 +14,24 @@ namespace RadzenBlazorDemos
     public class ChatController(HttpClient httpClient, IOptions<AIChatServiceOptions> chatStreamingServiceOptions) : ControllerBase
     {
         private readonly AIChatServiceOptions options = chatStreamingServiceOptions.Value;
-        
+
         [HttpPost("completions")]
-        public async Task<IActionResult> Completions()
+        public Task<IActionResult> Completions() => Proxy(options.Endpoint);
+
+        [HttpPost("embeddings")]
+        public Task<IActionResult> Embeddings() => Proxy(options.GetEmbeddingsEndpoint());
+
+        private async Task<IActionResult> Proxy(string endpoint)
         {
+            if (string.IsNullOrEmpty(endpoint))
+            {
+                return BadRequest("The AI endpoint is not configured.");
+            }
+
             var request = new HttpRequestMessage
             {
                 Method = new HttpMethod(Request.Method),
-                RequestUri = new Uri(options.Endpoint),
+                RequestUri = new Uri(endpoint),
                 Content = new StreamContent(Request.Body)
             };
 
@@ -31,8 +41,6 @@ namespace RadzenBlazorDemos
             {
                 request.Content.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
-
-            // Use configurable API key header
 
             if (string.Equals(options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
             {
@@ -47,7 +55,7 @@ namespace RadzenBlazorDemos
 
             try
             {
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
                 Response.StatusCode = (int)response.StatusCode;
 

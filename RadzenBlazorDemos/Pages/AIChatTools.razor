@@ -1,0 +1,76 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+@using RadzenBlazorDemos.Models.Northwind
+@inherits DbContextPage
+
+<RadzenAIChat Title="Northwind assistant"
+              Placeholder="Try: Which customers are from Germany? What did Ernst Handel order in 2023? How much Chai is in stock?"
+              SystemPrompt="You are an assistant for the Northwind trading company. Answer questions about customers, orders and products by calling the available tools. Never invent data: if a tool returns nothing, say so. Keep answers short and use markdown tables for lists."
+              Tools="@tools"
+              ToolCallCompleted="@OnToolCallCompleted"
+              Style="height: 500px" />
+
+<EventConsole @ref="console" Style="min-height: 150px;" />
+
+@code {
+    EventConsole console;
+    IEnumerable<AITool> tools;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        tools =
+        [
+            AIFunctionFactory.Create(FindCustomers),
+            AIFunctionFactory.Create(GetOrders),
+            AIFunctionFactory.Create(GetProductStock)
+        ];
+    }
+
+    record CustomerInfo(string Id, string Company, string Contact, string City, string Country);
+    record OrderInfo(int OrderId, DateTime? OrderDate, string ShipCountry, decimal? Freight);
+    record ProductStock(int ProductId, string Name, decimal? UnitPrice, short? UnitsInStock, bool? Discontinued);
+
+    [Description("Finds customers by company name or country. Returns up to 10 customers with their id, company, contact, city and country.")]
+    List<CustomerInfo> FindCustomers(
+        [Description("Part of the company name to search for. Leave empty to search by country only.")] string name = "",
+        [Description("Country to filter by. Leave empty for all countries.")] string country = "")
+    {
+        return dbContext.Customers
+            .Where(c => (name == "" || c.CompanyName.Contains(name)) && (country == "" || c.Country == country))
+            .OrderBy(c => c.CompanyName)
+            .Take(10)
+            .Select(c => new CustomerInfo(c.CustomerID, c.CompanyName, c.ContactName, c.City, c.Country))
+            .ToList();
+    }
+
+    [Description("Gets the orders of a customer, optionally for a given year. Returns up to 20 orders with id, date, ship country and freight.")]
+    List<OrderInfo> GetOrders(
+        [Description("The customer id, for example ERNSH. Use FindCustomers to look it up by name.")] string customerId,
+        [Description("Optional year, for example 2023. Use 0 for all years.")] int year = 0)
+    {
+        return dbContext.Orders
+            .Where(o => o.CustomerID == customerId && (year == 0 || (o.OrderDate.HasValue && o.OrderDate.Value.Year == year)))
+            .OrderByDescending(o => o.OrderDate)
+            .Take(20)
+            .Select(o => new OrderInfo(o.OrderID, o.OrderDate, o.ShipCountry, o.Freight))
+            .ToList();
+    }
+
+    [Description("Gets the price and units in stock of products whose name contains the specified text. Returns up to 10 products.")]
+    List<ProductStock> GetProductStock([Description("Part of the product name, for example Chai.")] string name)
+    {
+        return dbContext.Products
+            .Where(p => p.ProductName.Contains(name))
+            .OrderBy(p => p.ProductName)
+            .Take(10)
+            .Select(p => new ProductStock(p.ProductID, p.ProductName, p.UnitPrice, p.UnitsInStock, p.Discontinued))
+            .ToList();
+    }
+
+    void OnToolCallCompleted(ChatToolCall call)
+    {
+        console.Log($"{call.Name}({call.FormattedArguments}) → {call.Status}", call.Status == ChatToolCallStatus.Completed ? AlertStyle.Success : AlertStyle.Warning);
+    }
+}

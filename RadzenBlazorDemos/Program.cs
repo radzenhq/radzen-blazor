@@ -26,9 +26,13 @@ builder.Services.AddSingleton<GitHubService>();
 builder.Services.AddAIChatService(options =>
 {
     options.Proxy = "api/chat/completions";
-    options.Model = "@cf/meta/llama-4-scout-17b-16e-instruct";
+    options.EmbeddingsProxy = "api/chat/embeddings";
+    options.EmbeddingsModel = "@cf/baai/bge-base-en-v1.5";
+    options.Model = "@cf/openai/gpt-oss-120b";
     options.SystemPrompt = "You are a helpful AI code assistant.";
     options.Temperature = 0.7;
+    options.MaxTokens = 2048;
 });
+builder.Services.AddConversationStore<RadzenBlazorDemos.Services.HttpConversationStore>();
 
 await builder.Build().RunAsync();

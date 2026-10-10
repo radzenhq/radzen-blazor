@@ -1,0 +1,18 @@
+@page "/datagrid-ai-highlight"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor DataGrid <strong>AI Highlight</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Describe a condition in plain words and let the AI model pick the rows of a Blazor DataGrid that match it. The rows are highlighted in place while the grid keeps its paging, sorting and filtering.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridAIHighlight">
+    <DataGridAIHighlight />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-8">
+    The page sends a compact line per order and the condition to the <code>IChatClient</code> from <code>IAIChatService.GetChatClient()</code>, asking for a JSON object with the matching ids and a short explanation.
+    The ids go into a set that the <code>CellRender</code> handler checks to add a background to the cells of the matching rows. Unlike a filter, the user still sees the other rows and the context around the matches;
+    the same idea works with <code>RowRender</code>, or for the appointments of a Scheduler or the items of a Tree.
+</RadzenText>

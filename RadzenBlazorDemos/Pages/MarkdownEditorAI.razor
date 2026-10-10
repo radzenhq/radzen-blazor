@@ -1,0 +1,34 @@
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<RadzenMarkdownEditor @ref="editor" @bind-Value="@markdown" Style="height: 320px;">
+    <RadzenMarkdownEditorCustomTool>
+        <Template Context="editor">
+            <RadzenButton Icon="auto_awesome" Text="AI" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Title="Rewrite, summarize or translate the selection with AI" Click="@(() => OpenAI(editor))" class="rz-markdown-editor-ai" />
+        </Template>
+    </RadzenMarkdownEditorCustomTool>
+</RadzenMarkdownEditor>
+
+@code {
+    RadzenMarkdownEditor editor;
+
+    string markdown = "## Radzen Blazor\n\nradzen blazor is a set of 155+ free native blazor ui components. it has datagrid, scheduler, charts and alot more.\n\nThe components work in Blazor Server, WebAssembly and Auto render mode and come with themes like Material and Fluent.";
+
+    async Task OpenAI(RadzenMarkdownEditor editor)
+    {
+        var selected = await JSRuntime.InvokeAsync<string>("Radzen.getSelectedText", editor.Element);
+        var hasSelection = !string.IsNullOrWhiteSpace(selected) && markdown.Contains(selected.Trim());
+
+        var result = await DialogService.OpenAsync<EditorAIDialog>("AI assistant", new Dictionary<string, object>
+        {
+            ["Text"] = hasSelection ? selected.Trim() : markdown,
+            ["Selection"] = hasSelection,
+            ["SystemPrompt"] = "You are a writing assistant inside a Markdown editor. Keep the meaning of the text. Respond with Markdown only, without code fences or explanations."
+        }, new DialogOptions { Width = "720px" });
+
+        if (result is string output && !string.IsNullOrWhiteSpace(output))
+        {
+            markdown = hasSelection ? markdown.Replace(selected.Trim(), output.Trim()) : output;
+        }
+    }
+}

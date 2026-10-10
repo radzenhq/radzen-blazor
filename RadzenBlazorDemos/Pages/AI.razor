@@ -1,79 +1,327 @@
 @page "/ai"
 
-<PageTitle>Blazor AI Components — Chat, MCP Server & IDE Integration</PageTitle>
+<PageTitle>Blazor AI Components — Chat, Agents, Smart Paste, MCP Server & IDE Integration</PageTitle>
 
 <HeadContent>
-    <meta name="description" content="Add AI to your Blazor apps with RadzenAIChat and Radzen Blazor MCP. Built-in chat UI and a cloud-hosted MCP server for Cursor, Claude Code, GitHub Copilot, JetBrains, and other MCP-capable IDEs.">
+    <meta name="description" content="Add AI to your Blazor apps with RadzenAIChat, RadzenAIPrompt, RadzenSmartPasteButton, AI-powered DataGrid, Scheduler and Chart demos and Radzen Blazor MCP. Built on Microsoft.Extensions.AI with tool calling, approvals and generative UI.">
 </HeadContent>
 
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Blazor AI Components
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Radzen.Blazor includes built-in AI capabilities, and we also provide a cloud-hosted MCP server that gives AI coding assistants access to Radzen Blazor documentation and templates.
-</RadzenText>
-<RadzenStack Gap="3rem">
-<RadzenRow AlignItems="AlignItems.Center" class="rz-my-6">
-    <RadzenColumn Size="12" SizeLG="6" Order="2">
-        <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
-            <RadzenText TextStyle="TextStyle.DisplayH3" Text="RadzenAIChat" TagName="TagName.H2"></RadzenText>
-            <RadzenText>
-                <strong>RadzenAIChat</strong> is a Blazor-native chat component that integrates with any OpenAI-compatible service (OpenAI, Azure OpenAI, local servers, or third-party providers).
-            </RadzenText>
-            <RadzenStack Gap="1rem">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Works with any OpenAI API-compatible endpoint</RadzenText>
+<RadzenStack Gap="4rem" class="rz-pb-12">
+
+    <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter rz-p-8 rz-p-lg-12 rz-mt-8" Style="border-radius: 1rem;">
+        <RadzenRow AlignItems="AlignItems.Center" Gap="2rem">
+            <RadzenColumn Size="12" SizeLG="7">
+                <RadzenStack Gap="1.25rem" AlignItems="AlignItems.Start">
+                    <RadzenBadge BadgeStyle="BadgeStyle.Primary" Shade="Shade.Default" Text="Built on Microsoft.Extensions.AI" />
+                    <RadzenText TextStyle="TextStyle.DisplayH2" TagName="TagName.H1" class="rz-m-0">
+                        Blazor AI Components
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">
+                        Conversational and agentic UI for Blazor: a chat that calls your C# code and asks before it acts, a prompt box, smart paste, and AI inside the DataGrid, Scheduler and Chart.
+                        One abstraction, any model provider.
+                    </RadzenText>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" Wrap="FlexWrap.Wrap" class="rz-mt-2">
+                        <RadzenLink Path="/aichat" Text="Try the AI chat" class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
+                        <RadzenLink Path="/aichat#providers" Text="Connect your provider" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;" />
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">Works with</RadzenText>
+                        @foreach (var provider in providers)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Outlined" Shade="Shade.Darker" Text="@provider" />
+                        }
+                    </RadzenStack>
                 </RadzenStack>
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Supports streaming, theming, message history, and extensibility</RadzenText>
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Ideal for embedding AI assistants directly into your Blazor apps</RadzenText>
-                </RadzenStack>
-            </RadzenStack>
-            <RadzenLink Text="RadzenAIChat live demo" Path="/aichat" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default rz-w-auto rz-w-lg-100 rz-text-align-center rz-my-4" Style="--rz-link-hover-text-decoration: none;"></RadzenLink>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeLG="5">
+                <RadzenCard Variant="Variant.Filled" class="rz-p-0 rz-overflow-hidden" Style="border-radius: 1rem;">
+                    <RadzenStack Gap="0" class="rz-p-4">
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" class="rz-mb-3">
+                            <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary rz-color-on-primary rz-py-2 rz-px-3" Style="border-radius: 1rem 1rem 0.25rem 1rem;">
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-color-on-primary">Raise the price of Chai by 10%</RadzenText>
+                            </RadzenCard>
+                        </RadzenStack>
+                        <RadzenStack Gap="0.5rem" AlignItems="AlignItems.Start">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem" class="rz-border-radius-1 rz-px-2 rz-py-1" Style="border: var(--rz-border-normal); font-size: 0.8125rem;">
+                                <RadzenIcon Icon="check_circle" class="rz-color-success" Style="font-size: 1rem" />
+                                <span Style="font-family: monospace; font-weight: 600;">GetProduct</span>
+                                <span class="rz-text-secondary-color">name: Chai</span>
+                            </RadzenStack>
+                            <RadzenStack Gap="0.5rem" class="rz-border-radius-1 rz-p-3" Style="border: var(--rz-border-normal); font-size: 0.8125rem; width: 100%;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem">
+                                    <RadzenIcon Icon="help" class="rz-color-warning" Style="font-size: 1rem" />
+                                    <span Style="font-family: monospace; font-weight: 600;">UpdateProductPrice</span>
+                                    <span class="rz-text-secondary-color">productId: 1, newPrice: 19.8</span>
+                                </RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">The assistant wants to run UpdateProductPrice.</RadzenText>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenButton Text="Approve" Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" />
+                                    <RadzenButton Text="Reject" Icon="close" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+
+    <RadzenStack Gap="1.5rem">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText id="components" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Components</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">Drop them into any page. They share the same <code>IChatClient</code>, so configuring the provider once is enough.</RadzenText>
         </RadzenStack>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="5" SizeXL="4" Order="1" class="rz-text-align-center">
-        <RadzenCard Variant="Variant.Flat" class="rz-background-color-success-lighter rz-color-black rz-p-12 rz-w-fit-content rz-max-w-100" Style="min-width: 10vh; border-radius: 50%; margin: 0 auto;">
-            <RadzenIcon Icon="chat" Style="font-size: 10vh; font-weight: 300;" class="rz-m-12" />
-        </RadzenCard>
-    </RadzenColumn>
-</RadzenRow>
-<RadzenRow AlignItems="AlignItems.Center" class="rz-my-6" ID="special-offer">
-    <RadzenColumn Size="12" SizeLG="6" Order="2">
-        <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
-            <RadzenText TextStyle="TextStyle.DisplayH3" Text="Radzen Blazor MCP" TagName="TagName.H2"></RadzenText>
-            <RadzenText>
-                <strong>Radzen Blazor MCP</strong> is a cloud-hosted <strong>Model Context Protocol (MCP)</strong> server that gives AI coding assistants real-time access to Radzen Blazor component documentation, APIs, and templates.
-            </RadzenText>
-            <RadzenText>
-                No packages to install — works with Cursor, Claude Code, GitHub Copilot, JetBrains, Windsurf, and other MCP-capable tools.
-            </RadzenText>
-            <RadzenStack Gap="1rem">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Component API docs, ready-made templates, and usage guides for 145+ components</RadzenText>
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Semantic search over complete Radzen Blazor documentation — always up to date</RadzenText>
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenIcon Icon="task_alt" />
-                    <RadzenText>Free trial available — unlimited access included with Radzen Blazor Pro and Team subscriptions</RadzenText>
-                </RadzenStack>
-            </RadzenStack>
-            <RadzenLink Text="Learn more about Radzen Blazor MCP" Path="https://www.radzen.com/blazor-mcp/" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default rz-w-auto rz-w-lg-100 rz-text-align-center rz-my-4" Style="--rz-link-hover-text-decoration: none;"></RadzenLink>
+        <RadzenRow Gap="1.5rem">
+            @foreach (var item in components)
+            {
+                <RadzenColumn Size="12" SizeMD="6" SizeXX="3">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-6">
+                        <RadzenStack Gap="1rem" AlignItems="AlignItems.Start" class="rz-h-100">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
+                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-primary-lighter rz-color-primary" Style="width: 3rem; height: 3rem; border-radius: 0.75rem; flex-shrink: 0;">
+                                    <RadzenIcon Icon="@item.Icon" Style="font-size: 1.5rem" />
+                                </RadzenStack>
+                                <RadzenStack Gap="0.125rem">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
+                                        @if (item.IsNew)
+                                        {
+                                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                        }
+                                    </RadzenStack>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@item.Tagline</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">@item.Description</RadzenText>
+                            <RadzenStack Gap="0.5rem" Style="flex: 1 1 auto">
+                                @foreach (var feature in item.Features)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.5rem">
+                                        <RadzenIcon Icon="check" class="rz-color-primary" Style="font-size: 1.125rem; margin-top: 0.125rem;" />
+                                        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@feature</RadzenText>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                            <RadzenLink Path="@item.Path" class="rz-button rz-button-md rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                    <span>@item.Title demo</span>
+                                    <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                </RadzenStack>
+                            </RadzenLink>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+            }
+        </RadzenRow>
+    </RadzenStack>
+
+    <RadzenStack Gap="1.5rem">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText id="agentic-chat" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Agentic chat</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">RadzenAIChat goes beyond text. The model acts in your application and the user stays in control.</RadzenText>
         </RadzenStack>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="5" SizeXL="4" Order="1" class="rz-text-align-center">
-        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter rz-p-12 rz-w-fit-content rz-max-w-100" Style="min-width: 10vh; border-radius: 50%; margin: 0 auto;">
-            <RadzenImage Path="images/mcp.svg" Style="width: 10vh;" class="rz-m-12" AlternateText="Model Context Protocol (MCP)" />
-        </RadzenCard>
-    </RadzenColumn>
-</RadzenRow>
+        <RadzenRow Gap="1.5rem">
+            @foreach (var item in agentic)
+            {
+                <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
+                    <RadzenCard Variant="Variant.Filled" class="rz-h-100 rz-p-5">
+                        <RadzenStack Gap="0.75rem" AlignItems="AlignItems.Start" class="rz-h-100">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                <RadzenIcon Icon="@item.Icon" class="rz-color-primary" />
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
+                                @if (item.IsNew)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                }
+                            </RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
+                            <RadzenLink Path="@item.Path" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                    <span>View demo</span>
+                                    <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                </RadzenStack>
+                            </RadzenLink>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+            }
+        </RadzenRow>
+    </RadzenStack>
+
+    <RadzenStack Gap="1.5rem">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText id="ai-data-components" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">AI inside your data components</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 rz-text-secondary-color">The same tools and prompts work with the DataGrid, Scheduler and Chart you already use.</RadzenText>
+        </RadzenStack>
+        <RadzenRow Gap="1.5rem">
+            @foreach (var item in dataDemos)
+            {
+                <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-5">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="1rem" class="rz-h-100">
+                            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-info-lighter rz-color-info" Style="width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; flex-shrink: 0;">
+                                <RadzenIcon Icon="@item.Icon" Style="font-size: 1.375rem" />
+                            </RadzenStack>
+                            <RadzenStack Gap="0.5rem" AlignItems="AlignItems.Start" Style="flex: 1 1 auto; min-width: 0;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-m-0">@item.Title</RadzenText>
+                                    @if (item.IsNew)
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="New" />
+                                    }
+                                </RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color" Style="flex: 1 1 auto">@item.Description</RadzenText>
+                                <RadzenLink Path="@item.Path" class="rz-button rz-button-sm rz-variant-text rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none; margin-inline-start: -0.5rem;">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                                        <span>View demo</span>
+                                        <RadzenIcon Icon="arrow_forward" Style="font-size: 1.125rem" />
+                                    </RadzenStack>
+                                </RadzenLink>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+            }
+        </RadzenRow>
+    </RadzenStack>
+
+    <RadzenCard Variant="Variant.Outlined" class="rz-p-6 rz-p-lg-8">
+        <RadzenRow Gap="2rem" AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" SizeLG="5">
+                <RadzenStack Gap="1rem">
+                    <RadzenText id="providers" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">One abstraction, any provider</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">
+                        Every component talks to the model through <code>IChatClient</code> from <strong>Microsoft.Extensions.AI</strong>.
+                        Point the built-in client at any OpenAI-compatible endpoint, or register the client of your provider and add logging, caching or OpenTelemetry with <code>ChatClientBuilder</code>.
+                        Because the chat is built on <code>IChatClient</code>, an AG-UI agent backend plugs in through the AG-UI .NET SDK without changes to the UI.
+                    </RadzenText>
+                    <RadzenStack Gap="0.75rem">
+                        @foreach (var step in steps)
+                        {
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-background-color-primary rz-color-on-primary" Style="width: 1.75rem; height: 1.75rem; border-radius: 50%; flex-shrink: 0; font-weight: 600; font-size: 0.875rem;">@step.Number</RadzenStack>
+                                <RadzenStack Gap="0.125rem">
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">@step.Title</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color">@step.Description</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                        }
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeLG="7">
+<pre class="rz-m-0 rz-p-4 rz-border-radius-1" style="background-color: var(--rz-base-200); overflow: auto; font-size: 0.8125rem; line-height: 1.5;"><code>// Program.cs (server) - any OpenAI-compatible endpoint, the key stays here
+builder.Services.AddAIChatService(options =>
+{
+    options.Endpoint = "https://api.openai.com/v1/chat/completions";
+    options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
+    options.Model = "gpt-4o-mini";
+    options.EmbeddingsModel = "text-embedding-3-small";
+});
+
+// Program.cs (WebAssembly client) - no key in the browser, the server forwards
+builder.Services.AddAIChatService(options => options.Proxy = "api/chat/completions");
+
+// or register the IChatClient of your provider
+builder.Services.AddChatClient(new OllamaApiClient(new Uri("http://localhost:11434"), "llama3.2"))
+    .UseLogging();
+builder.Services.AddAIChatService();
+
+// Index.razor
+&lt;RadzenAIChat Title="Assistant" Tools="@@tools" /&gt;
+
+@@code {
+    AITool[] tools =
+    [
+        AIFunctionFactory.Create(GetOrders),
+        new ApprovalRequiredAIFunction(AIFunctionFactory.Create(CancelOrder))
+    ];
+}</code></pre>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+
+    <RadzenRow AlignItems="AlignItems.Center" Gap="2rem" ID="special-offer">
+        <RadzenColumn Size="12" SizeLG="7">
+            <RadzenStack Gap="1.25rem" AlignItems="AlignItems.Start">
+                <RadzenText id="radzen-blazor-mcp" TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-m-0">Radzen Blazor MCP</RadzenText>
+                <RadzenText class="rz-m-0">
+                    <strong>Radzen Blazor MCP</strong> is a cloud-hosted <strong>Model Context Protocol (MCP)</strong> server that gives AI coding assistants real-time access to Radzen Blazor component documentation, APIs, and templates.
+                    No packages to install — works with Cursor, Claude Code, GitHub Copilot, JetBrains, Windsurf, and other MCP-capable tools.
+                </RadzenText>
+                <RadzenStack Gap="0.75rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenIcon Icon="task_alt" class="rz-color-primary" />
+                        <RadzenText class="rz-m-0">Component API docs, ready-made templates, and usage guides for 155+ components</RadzenText>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenIcon Icon="task_alt" class="rz-color-primary" />
+                        <RadzenText class="rz-m-0">Semantic search over complete Radzen Blazor documentation — always up to date</RadzenText>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenIcon Icon="task_alt" class="rz-color-primary" />
+                        <RadzenText class="rz-m-0">Free trial available — unlimited access included with Radzen Blazor Pro and Team subscriptions</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+                <RadzenLink Text="Learn more about Radzen Blazor MCP" Path="https://www.radzen.com/blazor-mcp/" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none;"></RadzenLink>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="5" class="rz-text-align-center">
+            <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter rz-p-12 rz-w-fit-content rz-max-w-100" Style="min-width: 10vh; border-radius: 50%; margin: 0 auto;">
+                <RadzenImage Path="images/mcp.svg" Style="width: 10vh;" class="rz-m-12" AlternateText="Model Context Protocol (MCP)" />
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
 </RadzenStack>
+
+@code {
+    record Demo(string Title, string Path, string Icon, string Description, bool IsNew);
+    record Component(string Title, string Tagline, string Path, string Icon, string Description, string[] Features, bool IsNew);
+    record Step(string Number, string Title, string Description);
+
+    string[] providers = ["OpenAI", "Azure OpenAI", "Ollama", "Cloudflare Workers AI", "any OpenAI-compatible endpoint", "any IChatClient"];
+
+    Component[] components =
+    [
+        new("AIChat", "Conversational and agentic", "/aichat", "chat", "A streaming chat with conversation memory that can call your C# code, show the results with Radzen components and ask the user before it acts.",
+            ["Tool calling with AIFunction and your methods", "Human-in-the-loop approvals", "Generative UI through ToolCallTemplate", "Markdown, memory, voice input"], false),
+        new("AIPrompt", "One-shot AI tasks", "/aiprompt", "auto_awesome", "A prompt box with suggested prompts, a streaming output panel and commands that refine the result, optionally applied to a piece of text.",
+            ["Suggestions and commands (shorter, formal, translate)", "Context for editor content or chart data", "Copy, regenerate, custom output template"], true),
+        new("SmartPasteButton", "Fill forms from text", "/smartpastebutton", "content_paste_go", "Reads the clipboard, extracts the fields of your form model with the AI model and assigns the values - dates, numbers, enums included.",
+            ["Works with any model class and RadzenTemplateForm", "Description and Display attributes guide the model", "Fields, Instructions and Paste(text)"], true),
+        new("InlineAIPrompt", "AI for any text field", "/inline-aiprompt", "edit_note", "A button next to a TextBox or TextArea opens a prompt popup; the value or the selected text is the context and the result replaces or extends it.",
+            ["Replace the whole value or just the selection", "Suggestions and commands per field", "Open from your own trigger with OpenAsync"], true)
+    ];
+
+    Demo[] agentic =
+    [
+        new("Tool calling", "/aichat#tools", "build", "The model calls your C# methods; every call is shown as a card with arguments, status and result.", true),
+        new("Generative UI", "/aichat#generative-ui", "dashboard", "Render tool results with Radzen components - a chart or a data grid inside the conversation.", true),
+        new("Human in the loop", "/aichat#approval", "verified_user", "Wrap a tool in ApprovalRequiredAIFunction and the chat asks the user before it runs.", true),
+        new("Voice input", "/aichat#voice", "mic", "Talk to the assistant with RadzenSpeechToTextButton and the browser's speech recognition.", true),
+        new("Reasoning", "/aichat#tools", "psychology", "Models that expose their reasoning show it as a collapsible block above the answer.", true),
+        new("Conversation persistence", "/aichat#memory", "history", "Conversations are saved through IConversationStore after every answer and restored with tool calls and attachments.", true),
+        new("File attachments", "/aichat#attachments", "attach_file", "Attach images, text files or PDFs to a message: images go to a multimodal model, text files are read by any model.", true),
+        new("Citations", "/aichat#citations", "format_quote", "Answers list their sources: citations returned by tools or attached by providers such as OpenAI web search or Perplexity.", true),
+        new("Editor AI assistant", "/html-editor#ai", "edit_note", "Rewrite, summarize or translate the selection in the HtmlEditor and MarkdownEditor.", true)
+    ];
+
+    Demo[] dataDemos =
+    [
+        new("DataGrid AI assistant", "/datagrid-ai-assistant", "table_view", "Filter, sort, group and arrange a DataGrid in natural language through grid API tools.", true),
+        new("DataGrid AI column", "/datagrid-ai-column", "view_column", "A column with values generated by the model for the rows of the current page in one request.", true),
+        new("DataGrid semantic search", "/datagrid-semantic-search", "manage_search", "Find rows by meaning: rows and the query are embedded and ranked by similarity.", true),
+        new("DataGrid AI highlight", "/datagrid-ai-highlight", "highlight", "Describe a condition in plain words and the matching rows are highlighted in place.", true),
+        new("Scheduler AI assistant", "/scheduler#ai-assistant", "event", "Read, add, move and delete appointments by chatting, with approval for every change.", true),
+        new("Chart AI insights", "/chart-ai-insights", "insights", "Ask questions about a chart - AIPrompt gets the series as context and answers with the numbers.", true),
+        new("AI UI Blocks", "/ui-blocks-ai", "widgets", "Ready-made welcome screens, prompt suggestions and ask bars built around RadzenAIChat.", false),
+        new("MarkdownEditor AI assistant", "/markdown-editor#ai", "edit_note", "An AI toolbar tool that rewrites the selected Markdown with RadzenAIPrompt in a dialog.", true)
+    ];
+
+    Step[] steps =
+    [
+        new("1", "Register the service", "AddAIChatService with an endpoint, or AddChatClient with your provider."),
+        new("2", "Drop in a component", "RadzenAIChat, RadzenAIPrompt or RadzenSmartPasteButton pick up the client automatically."),
+        new("3", "Add tools", "Pass AIFunction tools created from your methods; wrap the risky ones in ApprovalRequiredAIFunction.")
+    ];
+}

@@ -1,0 +1,17 @@
+@page "/chart-ai-insights"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor Chart <strong>AI Insights</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Let users ask questions about a Blazor chart. RadzenAIPrompt receives the chart data as context and answers with a summary, a comparison or a forecast in natural language.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="ChartAIInsights">
+    <ChartAIInsights />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-8">
+    The chart series are serialized to JSON and passed to the <code>Context</code> parameter of <code>RadzenAIPrompt</code>. Every prompt, suggestion or command then runs against that data.
+    The same pattern works for a DataGrid page, a pivot or any other data the user is looking at.
+</RadzenText>

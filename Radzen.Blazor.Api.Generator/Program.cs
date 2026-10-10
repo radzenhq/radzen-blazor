@@ -368,8 +368,52 @@ static class AssemblyInspector
         foreach (var dll in Directory.GetFiles(assemblyDir, "*.dll"))
             paths.Add(dll);
 
+        AddPackageAssemblies(Path.ChangeExtension(assemblyPath, ".deps.json"), paths);
+
         paths.Add(assemblyPath);
         return paths.ToList();
+    }
+
+    static void AddPackageAssemblies(string depsPath, HashSet<string> paths)
+    {
+        if (!File.Exists(depsPath))
+            return;
+
+        var packagesRoot = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+
+        if (string.IsNullOrEmpty(packagesRoot))
+            packagesRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+
+        if (!Directory.Exists(packagesRoot))
+            return;
+
+        using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(depsPath));
+        var root = document.RootElement;
+
+        if (!root.TryGetProperty("targets", out var targets) || !root.TryGetProperty("libraries", out var libraries))
+            return;
+
+        foreach (var target in targets.EnumerateObject())
+        {
+            foreach (var library in target.Value.EnumerateObject())
+            {
+                if (!library.Value.TryGetProperty("runtime", out var runtime))
+                    continue;
+
+                if (!libraries.TryGetProperty(library.Name, out var libraryInfo) || !libraryInfo.TryGetProperty("path", out var libraryPath))
+                    continue;
+
+                var packageDir = Path.Combine(packagesRoot, libraryPath.GetString()!.Replace('/', Path.DirectorySeparatorChar));
+
+                foreach (var file in runtime.EnumerateObject())
+                {
+                    var dll = Path.Combine(packageDir, file.Name.Replace('/', Path.DirectorySeparatorChar));
+
+                    if (File.Exists(dll))
+                        paths.Add(dll);
+                }
+            }
+        }
     }
 
     static bool IsCompilerGenerated(Type t)

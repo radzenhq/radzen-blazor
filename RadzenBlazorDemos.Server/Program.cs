@@ -37,12 +37,14 @@ builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 
 builder.Services.AddDbContextFactory<NorthwindContext>();
+builder.Services.AddDbContextFactory<RadzenBlazorDemos.Data.ConversationContext>();
 
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddAIChatService(options =>
     builder.Configuration.GetSection("AIChatService").Bind(options));
+builder.Services.AddConversationStore<RadzenBlazorDemos.Services.EfConversationStore>();
 
 
 builder.Services.AddLocalization();

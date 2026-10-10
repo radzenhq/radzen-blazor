@@ -1,0 +1,94 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+@using System.Globalization
+@using RadzenBlazorDemos.Models
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="8">
+        <RadzenScheduler @ref="scheduler" Data="@appointments" TItem="Appointment" StartProperty="Start" EndProperty="End" TextProperty="Text" SelectedIndex="1" Style="height: 600px">
+            <RadzenDayView />
+            <RadzenWeekView />
+            <RadzenMonthView />
+        </RadzenScheduler>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenAIChat Title="Calendar assistant"
+                      Placeholder="Try: What do I have tomorrow? Book a dentist visit on Friday at 15:00 for an hour. Move the team standup to 10:30."
+                      SystemPrompt="@SystemPrompt"
+                      Tools="@tools"
+                      AllowMultipleToolCalls="false"
+                      Style="height: 600px" />
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    RadzenScheduler<Appointment> scheduler;
+    IEnumerable<AITool> tools;
+
+    IList<Appointment> appointments = new List<Appointment>
+    {
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
+        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
+        new Appointment { Start = DateTime.Today.AddDays(1).AddHours(9), End = DateTime.Today.AddDays(1).AddHours(9).AddMinutes(30), Text = "Team standup" },
+        new Appointment { Start = DateTime.Today.AddDays(1).AddHours(16), End = DateTime.Today.AddDays(1).AddHours(17), Text = "Code review" },
+        new Appointment { Start = DateTime.Today.AddDays(3).AddHours(11), End = DateTime.Today.AddDays(3).AddHours(12), Text = "Lunch with Maria" },
+    };
+
+    string SystemPrompt => $"You manage the user's calendar. Today is {DateTime.Today:dddd, yyyy-MM-dd}; the user's times are local. Use the tools to read, add, move and delete appointments. " +
+        "Resolve relative dates like tomorrow or Friday yourself before calling a tool and use ISO 8601 date-times. Adding, moving and deleting require the user's approval, which the application asks for; call the tools directly. " +
+        "Answer in one or two short sentences.";
+
+    protected override void OnInitialized()
+    {
+        tools =
+        [
+            AIFunctionFactory.Create(GetAppointments),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(AddAppointment)),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(MoveAppointment)),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(DeleteAppointment))
+        ];
+    }
+
+    record AppointmentInfo(string Text, DateTime Start, DateTime End);
+
+    [Description("Lists the appointments between two dates.")]
+    List<AppointmentInfo> GetAppointments([Description("Start of the range, ISO 8601.")] DateTime from, [Description("End of the range, ISO 8601.")] DateTime to)
+    {
+        return appointments.Where(a => a.End >= from && a.Start <= to).OrderBy(a => a.Start).Select(a => new AppointmentInfo(a.Text, a.Start, a.End)).ToList();
+    }
+
+    [Description("Adds an appointment to the calendar. Requires the user's approval.")]
+    async Task<string> AddAppointment([Description("Title of the appointment.")] string text, [Description("Start, ISO 8601.")] DateTime start, [Description("End, ISO 8601.")] DateTime end)
+    {
+        appointments.Add(new Appointment { Text = text, Start = start, End = end });
+        await scheduler.Reload();
+        return $"Added '{text}' on {start:f} until {end:t}.";
+    }
+
+    [Description("Moves an existing appointment to a new start time and keeps its duration. Requires the user's approval.")]
+    async Task<string> MoveAppointment([Description("Title of the appointment to move.")] string text, [Description("New start, ISO 8601.")] DateTime newStart)
+    {
+        var appointment = Find(text);
+        var duration = appointment.End - appointment.Start;
+        appointment.Start = newStart;
+        appointment.End = newStart + duration;
+        await scheduler.Reload();
+        return $"Moved '{appointment.Text}' to {newStart:f}.";
+    }
+
+    [Description("Deletes an appointment. Requires the user's approval.")]
+    async Task<string> DeleteAppointment([Description("Title of the appointment to delete.")] string text)
+    {
+        var appointment = Find(text);
+        appointments.Remove(appointment);
+        await scheduler.Reload();
+        return $"Deleted '{appointment.Text}'.";
+    }
+
+    Appointment Find(string text)
+    {
+        return appointments.FirstOrDefault(a => string.Equals(a.Text, text, StringComparison.OrdinalIgnoreCase))
+            ?? appointments.FirstOrDefault(a => a.Text.Contains(text, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"There is no appointment '{text}'. Existing appointments: {string.Join(", ", appointments.Select(a => a.Text))}.");
+    }
+}

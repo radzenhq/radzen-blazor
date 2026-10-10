@@ -84,17 +84,140 @@
                                 <div class="rz-chat-message-time">
                                     @message.Timestamp.ToString(TimestampFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                                 </div>
+                                @if (ShowUsage && !message.IsUser && message.Usage != null)
+                                {
+                                    <span class="rz-chat-message-usage">@FormatUsage(message)</span>
+                                }
                             </RadzenStack>
-                            <div class="rz-chat-message-text">
-                                @if (message.IsStreaming)
-                                {
-                                    @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
-                                }
-                                else
-                                {
+                            @if (message.Attachments.Count > 0)
+                            {
+                                <div class="rz-chat-message-attachments">
+                                    @foreach (var attachment in message.Attachments)
+                                    {
+                                        if (attachment.IsImage)
+                                        {
+                                            <img src="@attachment.Url" alt="@attachment.Name" title="@attachment.Name" class="rz-chat-message-attachment-image" />
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-chat-attachment"><RadzenIcon Icon="attach_file" /><span class="rz-chat-attachment-name">@attachment.Name</span></span>
+                                        }
+                                    }
+                                </div>
+                            }
+                            @if (ShowReasoning && !string.IsNullOrEmpty(message.Reasoning))
+                            {
+                                <details class="rz-chat-reasoning" open="@(message.IsStreaming && string.IsNullOrEmpty(message.Content))">
+                                    <summary class="rz-chat-reasoning-summary">
+                                        <RadzenIcon Icon="psychology" class="rz-chat-reasoning-icon" />
+                                        <span class="rz-chat-reasoning-title">@Localize(nameof(RadzenStrings.AIChat_Reasoning))</span>
+                                        @if (message.IsStreaming && string.IsNullOrEmpty(message.Content))
+                                        {
+                                            <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
+                                        }
+                                        <RadzenIcon Icon="expand_more" class="rz-chat-reasoning-toggle" />
+                                    </summary>
+                                    <div class="rz-chat-reasoning-content">@message.Reasoning</div>
+                                </details>
+                            }
+                            @if (ShowToolCalls && message.ToolCalls.Count > 0)
+                            {
+                                <div class="rz-chat-tool-calls">
+                                    @foreach (var call in message.ToolCalls)
+                                    {
+                                        if (ToolCallTemplate != null)
+                                        {
+                                            @ToolCallTemplate(call)
+                                        }
+                                        else
+                                        {
+                                            <details class="rz-chat-tool-call rz-chat-tool-call-@(call.Status.ToString().ToLowerInvariant())" open="@(call.Status == ChatToolCallStatus.AwaitingApproval)">
+                                                <summary class="rz-chat-tool-call-summary">
+                                                    <RadzenIcon Icon="@GetToolCallIcon(call)" class="rz-chat-tool-call-icon" />
+                                                    <span class="rz-chat-tool-call-name">@call.Name</span>
+                                                    @if (call.Arguments != null && call.Arguments.Count > 0)
+                                                    {
+                                                        <span class="rz-chat-tool-call-arguments">@call.FormattedArguments</span>
+                                                    }
+                                                    <span class="rz-chat-tool-call-status">@GetToolCallStatusText(call)</span>
+                                                    <RadzenIcon Icon="expand_more" class="rz-chat-tool-call-toggle" />
+                                                </summary>
+                                                <div class="rz-chat-tool-call-details">
+                                                    @if (call.Status == ChatToolCallStatus.AwaitingApproval)
+                                                    {
+                                                        <div class="rz-chat-tool-approval">
+                                                            <span>@string.Format(Culture ?? System.Globalization.CultureInfo.CurrentCulture, Localize(nameof(RadzenStrings.AIChat_ToolApprovalMessage)), call.Name)</span>
+                                                            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                                                <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_ApproveText))" Icon="check" Size="ButtonSize.Small" Disabled="@(IsLoading || Disabled)" Click="@(() => ApproveToolCall(call))" class="rz-chat-tool-approve" />
+                                                                <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_RejectText))" Icon="close" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Disabled="@(IsLoading || Disabled)" Click="@(() => RejectToolCall(call))" class="rz-chat-tool-reject" />
+                                                            </RadzenStack>
+                                                        </div>
+                                                    }
+                                                    @if (call.Arguments != null && call.Arguments.Count > 0)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallArguments))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.FormattedArgumentsJson</pre>
+                                                        </div>
+                                                    }
+                                                    @if (call.Exception != null)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallFailed))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.Exception.Message</pre>
+                                                        </div>
+                                                    }
+                                                    else if (call.Result != null)
+                                                    {
+                                                        <div class="rz-chat-tool-call-section">
+                                                            <span class="rz-chat-tool-call-label">@Localize(nameof(RadzenStrings.AIChat_ToolCallResult))</span>
+                                                            <pre class="rz-chat-tool-call-code">@call.FormattedResult</pre>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </details>
+                                        }
+                                    }
+                                </div>
+                            }
+                            @if (message.IsStreaming || !string.IsNullOrEmpty(message.Content))
+                            {
+                                <div class="rz-chat-message-text">
                                     <RadzenMarkdown Text=@message.Content />
-                                }
-                            </div>
+                                    @if (message.IsStreaming)
+                                    {
+                                        <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
+                                    }
+                                </div>
+                            }
+                            @if (ShowCitations && message.Citations.Count > 0)
+                            {
+                                <div class="rz-chat-citations">
+                                    <span class="rz-chat-citations-label">@Localize(nameof(RadzenStrings.AIChat_Sources))</span>
+                                    @for (var index = 0; index < message.Citations.Count; index++)
+                                    {
+                                        var citation = message.Citations[index];
+                                        if (CitationTemplate != null)
+                                        {
+                                            @CitationTemplate(citation)
+                                        }
+                                        else if (!string.IsNullOrEmpty(citation.Url))
+                                        {
+                                            <a class="rz-chat-citation" href="@citation.Url" target="_blank" rel="noopener noreferrer" title="@(citation.Snippet ?? citation.Url)">
+                                                <span class="rz-chat-citation-index">@(index + 1)</span>
+                                                <span class="rz-chat-citation-title">@(string.IsNullOrEmpty(citation.Title) ? citation.Url : citation.Title)</span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-chat-citation" title="@citation.Snippet">
+                                                <span class="rz-chat-citation-index">@(index + 1)</span>
+                                                <span class="rz-chat-citation-title">@(citation.Title ?? citation.FileId)</span>
+                                            </span>
+                                        }
+                                    }
+                                </div>
+                            }
                         </RadzenStack>
                     </div>
                     }
@@ -104,6 +227,26 @@
 
         <!-- Chat Input -->
         <div class="rz-chat-input">
+            @if (pendingAttachments.Count > 0)
+            {
+                <div class="rz-chat-attachments">
+                    @foreach (var attachment in pendingAttachments)
+                    {
+                        <span class="rz-chat-attachment" @key="attachment">
+                            @if (attachment.IsImage)
+                            {
+                                <img src="@attachment.Url" alt="@attachment.Name" class="rz-chat-attachment-thumb" />
+                            }
+                            else
+                            {
+                                <RadzenIcon Icon="attach_file" />
+                            }
+                            <span class="rz-chat-attachment-name" title="@attachment.Name">@attachment.Name</span>
+                            <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Title="@Localize(nameof(RadzenStrings.AIChat_RemoveAttachmentTitle))" Disabled="@(Disabled || IsLoading)" Click="@(() => RemoveAttachment(attachment))" class="rz-chat-attachment-remove" />
+                        </span>
+                    }
+                </div>
+            }
             <div class="rz-chat-input-inner">
                 <textarea @ref="inputElement" 
                           value="@CurrentInput"
@@ -116,13 +259,38 @@
                           readonly="@ReadOnly"
                           rows="1"
                           @attributes="@InputAttributes"></textarea>
-                    <RadzenButton Icon="send"
-                                ButtonStyle="ButtonStyle.Primary" 
-                                Variant="Variant.Text"
-                                Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
-                                Click="@OnSendMessage"
-                                Title="@Localize(nameof(RadzenStrings.AIChat_SendTitle))"
-                                class="rz-chat-send-btn" />
+                <div class="rz-chat-input-actions">
+                    @if (AllowAttachments)
+                    {
+                        <InputFile id="@attachInputId" OnChange="@OnFilesSelected" multiple accept="@AcceptedAttachmentTypes" style="display: none" />
+                        <RadzenButton Icon="attach_file"
+                                      ButtonStyle="ButtonStyle.Base"
+                                      Variant="Variant.Text"
+                                      Disabled="@(IsLoading || Disabled || ReadOnly)"
+                                      Click="@OnAttachClick"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_AttachTitle))"
+                                      class="rz-chat-attach-btn" />
+                    }
+                    @if (IsLoading)
+                    {
+                        <RadzenButton Icon="stop_circle"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Variant="Variant.Text"
+                                      Click="@Stop"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_StopTitle))"
+                                      class="rz-chat-stop-btn" />
+                    }
+                    else
+                    {
+                        <RadzenButton Icon="send"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Variant="Variant.Text"
+                                      Disabled="@((string.IsNullOrWhiteSpace(CurrentInput) && pendingAttachments.Count == 0) || Disabled)"
+                                      Click="@OnSendMessage"
+                                      Title="@Localize(nameof(RadzenStrings.AIChat_SendTitle))"
+                                      class="rz-chat-send-btn" />
+                    }
+                </div>
             </div>
         </div>
     </div>

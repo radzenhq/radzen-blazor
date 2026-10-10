@@ -1,0 +1,60 @@
+@inject HttpClient Http
+
+<RadzenStack Gap="0.5rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenButton Text="Attach sample screenshot" Icon="add_photo_alternate" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@AttachSample" IsBusy="@loading" />
+        <RadzenButton Text="Attach sample CSV" Icon="table_view" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@AttachCsv" />
+        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-text-secondary-color">or use the paperclip to pick an image, a text or a PDF file, then ask a question about it</RadzenText>
+    </RadzenStack>
+    <RadzenAIChat @ref="chat"
+                  Title="Vision assistant"
+                  Model="@visionModel"
+                  SystemPrompt="You describe and answer questions about the images the user sends. Be concise."
+                  Placeholder="Ask about the image, e.g. What is on this screenshot? Which navigation items do you see?"
+                  AllowAttachments="true"
+                  AcceptedAttachmentTypes="image/*,.txt,.md,.csv,.json,.xml,.pdf"
+                  ShowUsage="true"
+                  Error="@OnError"
+                  Style="height: 480px" />
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 120px;" />
+
+@code {
+    RadzenAIChat chat;
+    EventConsole console;
+    bool loading;
+    string visionModel = "@cf/meta/llama-4-scout-17b-16e-instruct";
+
+    async Task AttachSample()
+    {
+        loading = true;
+
+        try
+        {
+            var bytes = await Http.GetByteArrayAsync("images/blazor-template-repairshop.jpg");
+            chat.AddAttachment(new ChatAttachment { Name = "repair-shop.jpg", MediaType = "image/jpeg", Data = bytes });
+            console.Log($"Attached repair-shop.jpg ({bytes.Length / 1024} KB). Now ask a question about it.");
+        }
+        catch (Exception ex)
+        {
+            console.Log(ex.Message, AlertStyle.Danger);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    void AttachCsv()
+    {
+        var csv = "Product,Category,Unit price,Units in stock\nChai,Beverages,18.00,39\nChang,Beverages,19.00,17\nAniseed Syrup,Condiments,10.00,13\nCôte de Blaye,Beverages,263.50,17\nGorgonzola Telino,Dairy Products,12.50,0\nTofu,Produce,23.25,35\n";
+        chat.AddAttachment(new ChatAttachment { Name = "products.csv", MediaType = "text/csv", Data = System.Text.Encoding.UTF8.GetBytes(csv) });
+        console.Log("Attached products.csv. Try: Which product is the most expensive and which ones are out of stock?");
+    }
+
+    void OnError(Exception ex)
+    {
+        console.Log(ex.Message, AlertStyle.Danger);
+    }
+}

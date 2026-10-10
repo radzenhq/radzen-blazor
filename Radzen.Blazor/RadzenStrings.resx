@@ -2567,4 +2567,88 @@
   <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
     <value>Align column right</value>
   </data>
+  <data name="AIChat_ToolApprovalMessage" xml:space="preserve">
+    <value>The assistant wants to run {0}.</value>
+  </data>
+  <data name="AIChat_ApproveText" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="AIChat_RejectText" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="AIChat_ToolCallPending" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="AIChat_ToolCallCompleted" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="AIChat_ToolCallFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="AIChat_ToolCallAwaitingApproval" xml:space="preserve">
+    <value>Needs approval</value>
+  </data>
+  <data name="AIChat_ToolCallRejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="AIChat_ToolCallArguments" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="AIChat_ToolCallResult" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="SmartPasteButton_Text" xml:space="preserve">
+    <value>Smart paste</value>
+  </data>
+  <data name="SmartPasteButton_Title" xml:space="preserve">
+    <value>Fill the form from the clipboard</value>
+  </data>
+  <data name="AIPrompt_Placeholder" xml:space="preserve">
+    <value>Ask AI...</value>
+  </data>
+  <data name="AIPrompt_GenerateText" xml:space="preserve">
+    <value>Generate</value>
+  </data>
+  <data name="AIPrompt_StopText" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="AIPrompt_CopyTitle" xml:space="preserve">
+    <value>Copy output</value>
+  </data>
+  <data name="AIPrompt_RetryTitle" xml:space="preserve">
+    <value>Regenerate</value>
+  </data>
+  <data name="AIChat_Reasoning" xml:space="preserve">
+    <value>Reasoning</value>
+  </data>
+  <data name="AIChat_StopTitle" xml:space="preserve">
+    <value>Stop generating</value>
+  </data>
+  <data name="AIChat_AttachTitle" xml:space="preserve">
+    <value>Attach image</value>
+  </data>
+  <data name="AIChat_RemoveAttachmentTitle" xml:space="preserve">
+    <value>Remove attachment</value>
+  </data>
+  <data name="AIChat_UsageFormat" xml:space="preserve">
+    <value>{0} tokens</value>
+  </data>
+  <data name="AIChat_Sources" xml:space="preserve">
+    <value>Sources</value>
+  </data>
+  <data name="InlineAIPrompt_Title" xml:space="preserve">
+    <value>AI assistant</value>
+  </data>
+  <data name="InlineAIPrompt_ReplaceText" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="InlineAIPrompt_ReplaceSelectionText" xml:space="preserve">
+    <value>Replace selection</value>
+  </data>
+  <data name="InlineAIPrompt_AppendText" xml:space="preserve">
+    <value>Append</value>
+  </data>
+  <data name="InlineAIPrompt_DiscardText" xml:space="preserve">
+    <value>Discard</value>
+  </data>
 </root>
