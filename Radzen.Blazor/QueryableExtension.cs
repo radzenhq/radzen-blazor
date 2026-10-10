@@ -37,23 +37,23 @@ namespace Radzen
             filterOperator == FilterOperator.IsNull || filterOperator == FilterOperator.IsNotNull ||
             filterOperator == FilterOperator.IsEmpty || filterOperator == FilterOperator.IsNotEmpty;
 
-        static Expression? EnumerableIsEmpty(Expression collection, Type? elementType)
+        static Expression? EnumerableIsEmpty(Expression collection, Type? elementType, bool nullGuard)
         {
             if (elementType == null || !IsEnumerable(collection.Type))
             {
                 return null;
             }
 
-            return Expression.OrElse(
-                Expression.Equal(collection, Expression.Constant(null, collection.Type)),
-                Expression.Not(Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { elementType }, collection)));
+            var isEmpty = Expression.Not(Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { elementType }, collection));
+
+            return nullGuard ? Expression.OrElse(Expression.Equal(collection, Expression.Constant(null, collection.Type)), isEmpty) : isEmpty;
         }
 
-        static Expression EnumerableAnyOrAll(Expression collection, Type elementType, LambdaExpression predicate, bool all = false)
+        static Expression EnumerableAnyOrAll(Expression collection, Type elementType, LambdaExpression predicate, bool all, bool nullGuard)
         {
-            return Expression.AndAlso(
-                Expression.NotEqual(collection, Expression.Constant(null, collection.Type)),
-                Expression.Call(typeof(Enumerable), all ? nameof(Enumerable.All) : nameof(Enumerable.Any), new Type[] { elementType }, collection, predicate));
+            var anyOrAll = Expression.Call(typeof(Enumerable), all ? nameof(Enumerable.All) : nameof(Enumerable.Any), new Type[] { elementType }, collection, predicate);
+
+            return nullGuard ? Expression.AndAlso(Expression.NotEqual(collection, Expression.Constant(null, collection.Type)), anyOrAll) : anyOrAll;
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
@@ -647,7 +647,7 @@ namespace Radzen
 
             foreach (var filter in filterList)
             {
-                var expression = GetExpression<T>(parameter, filter, filterCaseSensitivity, filter.Type ?? typeof(object), inMemory);
+                var expression = GetExpression<T>(parameter, filter, filterCaseSensitivity, filter.Type ?? typeof(object), inMemory, inMemory);
                 if (expression == null)
                 {
                     continue;
@@ -847,7 +847,7 @@ namespace Radzen
         [DynamicDependency("StartsWith", typeof(string))]
         [DynamicDependency("EndsWith", typeof(string))]
         [DynamicDependency("ToLower", typeof(string))]
-        internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type, bool useOrdinalIgnoreCaseStrings = false)
+        internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type, bool useOrdinalIgnoreCaseStrings = false, bool inMemory = false)
         {
             Type? valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
             var isEnumerable = valueType != null && IsEnumerable(valueType) && valueType != typeof(string);
@@ -1004,8 +1004,8 @@ namespace Radzen
                 FilterOperator.EndsWith => Expression.Call(notNullCheck(property), StringEndsWith, constant),
                 FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
                 FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
-                FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
-                FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) is { } isEmpty ? Expression.Not(isEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
+                FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType, inMemory) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType, inMemory) is { } isEmpty ? Expression.Not(isEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                 _ => null
             };
 
@@ -1020,7 +1020,7 @@ namespace Radzen
             if (filter.Property != null)
             {
                 primaryExpression = EnumerableAnyOrAll(GetNestedPropertyExpression(parameter, filter.Property), collectionItemType!,
-                    Expression.Lambda(primaryExpression, collectionItemTypeParameter!), filter.CollectionFilterMode == CollectionFilterMode.All);
+                    Expression.Lambda(primaryExpression, collectionItemTypeParameter!), filter.CollectionFilterMode == CollectionFilterMode.All, inMemory);
             }
             }
 
@@ -1056,8 +1056,8 @@ namespace Radzen
                     FilterOperator.EndsWith => Expression.Call(notNullCheck(property), StringEndsWith, secondConstant!),
                     FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
                     FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
-                    FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
-                    FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType) is { } secondIsEmpty ? Expression.Not(secondIsEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
+                    FilterOperator.IsEmpty => EnumerableIsEmpty(rawProperty, collectionElementType, inMemory) ?? Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                    FilterOperator.IsNotEmpty => EnumerableIsEmpty(rawProperty, collectionElementType, inMemory) is { } secondIsEmpty ? Expression.Not(secondIsEmpty) : Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                     _ => null
                 };
 
@@ -1073,7 +1073,7 @@ namespace Radzen
             if (filter.Property != null)
             {
                 secondExpression = EnumerableAnyOrAll(GetNestedPropertyExpression(parameter, filter.Property), collectionItemType!,
-                    Expression.Lambda(secondExpression, collectionItemTypeParameter!));
+                    Expression.Lambda(secondExpression, collectionItemTypeParameter!), false, inMemory);
             }
             }
 
@@ -1718,7 +1718,7 @@ namespace Radzen
 
                 foreach (var filter in dataFilter.Filters)
                 {
-                    AddWhereExpression<T>(parameter, filter, ref filterExpressions, dataFilter.FilterCaseSensitivity);
+                    AddWhereExpression<T>(parameter, filter, ref filterExpressions, dataFilter.FilterCaseSensitivity, source is EnumerableQuery);
                 }
 
                 Expression? combinedExpression = null;
@@ -1770,7 +1770,7 @@ namespace Radzen
 
                 foreach (var filter in filters)
                 {
-                    AddWhereExpression<T>(parameter, filter, ref filterExpressions, filterCaseSensitivity);
+                    AddWhereExpression<T>(parameter, filter, ref filterExpressions, filterCaseSensitivity, source is EnumerableQuery);
                 }
 
                 Expression? combinedExpression = null;
@@ -1795,7 +1795,7 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
-        private static void AddWhereExpression<T>(ParameterExpression parameter, CompositeFilterDescriptor filter, ref List<Expression> filterExpressions, FilterCaseSensitivity filterCaseSensitivity)
+        private static void AddWhereExpression<T>(ParameterExpression parameter, CompositeFilterDescriptor filter, ref List<Expression> filterExpressions, FilterCaseSensitivity filterCaseSensitivity, bool inMemory = false)
         {
             if (filter.Filters != null)
             {
@@ -1803,7 +1803,7 @@ namespace Radzen
 
                 foreach (var f in filter.Filters)
                 {
-                    AddWhereExpression<T>(parameter, f, ref innerFilterExpressions, filterCaseSensitivity);
+                    AddWhereExpression<T>(parameter, f, ref innerFilterExpressions, filterCaseSensitivity, inMemory);
                 }
 
                 if (innerFilterExpressions.Count > 0)
@@ -1844,7 +1844,7 @@ namespace Radzen
                     Type = filter.Type
                 };
 
-                var expression = GetExpression<T>(parameter, f, filterCaseSensitivity, f.Type ?? typeof(object));
+                var expression = GetExpression<T>(parameter, f, filterCaseSensitivity, f.Type ?? typeof(object), false, inMemory);
                 if (expression != null)
                 {
                     filterExpressions.Add(expression);

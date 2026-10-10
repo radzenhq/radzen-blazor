@@ -30,6 +30,27 @@ namespace Radzen.Blazor.Tests
             public string Product { get; set; }
         }
 
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public List<CustomerOrder> Orders { get; set; } = new();
+        }
+
+        public class CustomerOrder
+        {
+            public int Id { get; set; }
+            public int CustomerId { get; set; }
+            public string Number { get; set; }
+        }
+
+        public class CustomerDto
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public IEnumerable<string> OrderNumbers { get; set; }
+        }
+
         class TestDbContext : DbContext
         {
             public TestDbContext(DbContextOptions options) : base(options) { }
@@ -37,6 +58,8 @@ namespace Radzen.Blazor.Tests
             public DbSet<Client> Clients { get; set; }
             public DbSet<Order> Orders { get; set; }
             public DbSet<OrderLine> OrderLines { get; set; }
+            public DbSet<Customer> Customers { get; set; }
+            public DbSet<CustomerOrder> CustomerOrders { get; set; }
         }
 
         static TestDbContext CreateContext()
@@ -62,9 +85,99 @@ namespace Radzen.Blazor.Tests
                 new Order { Id = 2, Lines = new List<OrderLine>() },
                 new Order { Id = 3, Lines = new List<OrderLine> { new OrderLine { Id = 3, Product = "apple" } } });
 
+            context.Customers.AddRange(
+                new Customer { Id = 1, Name = "a", Orders = { new CustomerOrder { Id = 1, Number = "123" }, new CustomerOrder { Id = 2, Number = "456" } } },
+                new Customer { Id = 2, Name = "b" },
+                new Customer { Id = 3, Name = "c", Orders = { new CustomerOrder { Id = 3, Number = "789" } } });
+
             context.SaveChanges();
 
             return context;
+        }
+
+        static IQueryable<CustomerDto> ProjectCustomers(TestDbContext context) => context.Customers.Select(c => new CustomerDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            OrderNumbers = c.Orders.Select(o => o.Number).ToList()
+        });
+
+        [Theory]
+        [InlineData(FilterOperator.Contains, "123", CollectionFilterMode.Any, new[] { 1 })]
+        [InlineData(FilterOperator.Equals, "789", CollectionFilterMode.Any, new[] { 3 })]
+        [InlineData(FilterOperator.Contains, "9", CollectionFilterMode.All, new[] { 2, 3 })]
+        public void Where_ProjectedCollectionProperty_TranslatesToSql(FilterOperator filterOperator, string value, CollectionFilterMode mode, int[] expected)
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = nameof(CustomerDto.OrderNumbers), FilterValue = value, FilterOperator = filterOperator, Type = typeof(IEnumerable<string>), CollectionFilterMode = mode }
+            };
+
+            var query = ProjectCustomers(context).Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive);
+            var sql = query.ToQueryString();
+            var result = query.OrderBy(c => c.Id).ToList();
+
+            Assert.Contains("EXISTS", sql);
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Theory]
+        [InlineData(FilterOperator.IsEmpty, new[] { 2 })]
+        [InlineData(FilterOperator.IsNotEmpty, new[] { 1, 3 })]
+        public void Where_ProjectedCollectionProperty_EmptyOperators_TranslateToSql(FilterOperator filterOperator, int[] expected)
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = nameof(CustomerDto.OrderNumbers), FilterOperator = filterOperator, Type = typeof(IEnumerable<string>) }
+            };
+
+            var query = ProjectCustomers(context).Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive);
+            var sql = query.ToQueryString();
+            var result = query.OrderBy(c => c.Id).ToList();
+
+            Assert.Equal(expected, result.Select(r => r.Id));
+        }
+
+        [Fact]
+        public void Where_ProjectedCollectionProperty_SecondFilter_TranslatesToSql()
+        {
+            using var context = CreateContext();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = nameof(CustomerDto.OrderNumbers), Type = typeof(IEnumerable<string>),
+                    FilterValue = "123", FilterOperator = FilterOperator.Equals,
+                    SecondFilterValue = "789", SecondFilterOperator = FilterOperator.Equals,
+                    LogicalFilterOperator = LogicalFilterOperator.Or
+                }
+            };
+
+            var query = ProjectCustomers(context).Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default);
+            var result = query.OrderBy(c => c.Id).ToList();
+
+            Assert.Equal(new[] { 1, 3 }, result.Select(r => r.Id));
+        }
+
+        [Fact]
+        public void Where_CompositeFilter_ProjectedCollectionProperty_TranslatesToSql()
+        {
+            using var context = CreateContext();
+
+            var filters = new List<CompositeFilterDescriptor>
+            {
+                new CompositeFilterDescriptor { Property = nameof(CustomerDto.OrderNumbers), Type = typeof(IEnumerable<string>), FilterValue = "456", FilterOperator = FilterOperator.Contains }
+            };
+
+            var query = ProjectCustomers(context).Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive);
+            var result = query.OrderBy(c => c.Id).ToList();
+
+            Assert.Equal(new[] { 1 }, result.Select(r => r.Id));
         }
 
         [Theory]
