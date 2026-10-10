@@ -569,6 +569,66 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void AutoComplete_KeepsValue_WhenValueIsDeclaredBeforeData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Value, "Beta");
+                parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
+            });
+
+            Assert.Equal("Beta", component.Instance.Value);
+            Assert.Equal("Beta", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void AutoComplete_KeepsValue_WhenDataIsReplacedAfterValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Value, "Beta");
+                parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
+            });
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, "Beta");
+                parameters.Add(p => p.Data, new[] { "Alpha", "Beta", "Gamma" });
+            });
+
+            Assert.Equal("Beta", component.Instance.Value);
+            Assert.Equal("Beta", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void AutoComplete_ClearsValue_WhenValueParameterBecomesNull()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Value, "Beta");
+                parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
+            });
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, null);
+                parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
+            });
+
+            Assert.Null(component.Instance.Value);
+            Assert.Null(component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
         public void AutoComplete_SyncsDomValue_WhenParentTransformsInput()
         {
             using var ctx = new TestContext();

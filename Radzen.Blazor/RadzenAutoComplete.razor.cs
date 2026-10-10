@@ -512,8 +512,14 @@ namespace Radzen.Blazor
             }
 
             var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
+            var hasValue = parameters.TryGetValue<string>(nameof(Value), out var value);
 
             await base.SetParametersAsync(parameters);
+
+            if (hasValue && Value != value)
+            {
+                Value = value;
+            }
 
             if (selectedItemChanged && SelectedItem != null)
             {
