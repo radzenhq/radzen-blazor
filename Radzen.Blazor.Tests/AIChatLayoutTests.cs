@@ -603,6 +603,8 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new[] { ChatRole.User, ChatRole.Assistant, ChatRole.User, ChatRole.Assistant }, session.History.Select(message => message.Role));
             Assert.Equal("Second", session.History[2].Text);
             Assert.Equal(messages[2].Id, session.History[2].MessageId);
+            Assert.Equal(messages[0].Id, session.Messages[0].Id);
+            Assert.Equal(messages[2].Id, session.Messages[2].Id);
 
             var service = ctx.Services.GetRequiredService<IAIChatService>();
             client.Queue = null;

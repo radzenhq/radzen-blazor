@@ -210,7 +210,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
         if (userText.Length > 0 || attachments.Count > 0)
         {
-            session.AddMessage(new Blazor.ChatMessage
+            var userMessage = new Blazor.ChatMessage
             {
                 UserId = "user",
                 Role = "user",
@@ -218,7 +218,14 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
                 Content = userText,
                 Timestamp = DateTime.Now,
                 Attachments = attachments
-            });
+            };
+
+            if (!string.IsNullOrEmpty(message.MessageId))
+            {
+                userMessage.Id = message.MessageId;
+            }
+
+            session.AddMessage(userMessage);
         }
 
         session.AddHistory([message]);
