@@ -83,6 +83,11 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     max-width: 90%;
 }
 
+// Let the content shrink to the message width so wide tool calls truncate instead of scrolling
+.rz-chat-message-content {
+    min-width: 0;
+}
+
 .rz-chat-message-text {
     padding: var(--rz-chat-message-text-padding);
     border-radius: var(--rz-chat-message-text-border-radius);
@@ -450,6 +455,12 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     background-color: var(--rz-text-disabled-color);
     display: block;
 }
+// Reasoning and tool calls stretch to the width of the message content so their boxes line up
+.rz-chat-reasoning,
+.rz-chat-tool-calls {
+    align-self: stretch;
+}
+
 .rz-chat-tool-calls {
     display: flex;
     flex-direction: column;
@@ -468,10 +479,13 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     min-width: 16rem;
     overflow: hidden;
 
+    // Icon, name and toggle on the first row; arguments and status below the name
     .rz-chat-tool-call-summary {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: center;
-        gap: 0.375rem;
+        column-gap: 0.375rem;
+        row-gap: 0.125rem;
         padding: 0.25rem 0.5rem;
         cursor: pointer;
         list-style: none;
@@ -483,18 +497,27 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     }
 
     .rz-chat-tool-call-icon {
+        grid-area: 1 / 1;
         font-size: 1rem;
-        flex-shrink: 0;
     }
 
     .rz-chat-tool-call-name {
-        font-family: var(--rz-font-family-monospace, monospace);
+        grid-area: 1 / 2;
         font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
+    .rz-chat-tool-call-meta {
+        grid-area: 2 / 2 / 3 / 4;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
     .rz-chat-tool-call-arguments {
-        font-family: var(--rz-font-family-monospace, monospace);
         color: var(--rz-text-secondary-color);
         overflow: hidden;
         text-overflow: ellipsis;
@@ -510,6 +533,7 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     }
 
     .rz-chat-tool-call-toggle {
+        grid-area: 1 / 3;
         font-size: 1.125rem;
         color: var(--rz-text-tertiary-color);
         transition: transform 0.2s;
@@ -584,7 +608,7 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
 
     .rz-chat-reasoning-icon {
         font-size: 1rem;
-        color: var(--rz-info);
+        color: color-mix(in srgb, var(--rz-info) 70%, var(--rz-text-color));
     }
 
     .rz-chat-reasoning-title {
@@ -670,17 +694,19 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     animation: rz-rotate 1s linear infinite;
 }
 
+// Status colors are mixed with the text color so light shades (such as a yellow warning)
+// keep their contrast on the light tool call background, and lighten on dark themes.
 .rz-chat-tool-call-completed .rz-chat-tool-call-icon {
-    color: var(--rz-success);
+    color: color-mix(in srgb, var(--rz-success) 70%, var(--rz-text-color));
 }
 
 .rz-chat-tool-call-failed .rz-chat-tool-call-icon,
 .rz-chat-tool-call-rejected .rz-chat-tool-call-icon {
-    color: var(--rz-danger);
+    color: color-mix(in srgb, var(--rz-danger) 70%, var(--rz-text-color));
 }
 
 .rz-chat-tool-call-awaitingapproval .rz-chat-tool-call-icon {
-    color: var(--rz-warning);
+    color: color-mix(in srgb, var(--rz-warning) 70%, var(--rz-text-color));
 }
 
 .rz-chat-tool-approval {

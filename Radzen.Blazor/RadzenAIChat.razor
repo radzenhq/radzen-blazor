@@ -267,12 +267,14 @@
                                         <summary class="rz-chat-tool-call-summary">
                                             <RadzenIcon Icon="@GetToolCallIcon(call)" class="rz-chat-tool-call-icon" />
                                             <span class="rz-chat-tool-call-name">@call.Name</span>
-                                            @if (call.Arguments != null && call.Arguments.Count > 0)
-                                            {
-                                                <span class="rz-chat-tool-call-arguments">@call.FormattedArguments</span>
-                                            }
-                                            <span class="rz-chat-tool-call-status">@GetToolCallStatusText(call)</span>
                                             <RadzenIcon Icon="expand_more" class="rz-chat-tool-call-toggle" />
+                                            <span class="rz-chat-tool-call-meta">
+                                                @if (call.Arguments != null && call.Arguments.Count > 0)
+                                                {
+                                                    <span class="rz-chat-tool-call-arguments">@call.FormattedArguments</span>
+                                                }
+                                                <span class="rz-chat-tool-call-status">@GetToolCallStatusText(call)</span>
+                                            </span>
                                         </summary>
                                         <div class="rz-chat-tool-call-details">
                                             @if (call.Status == ChatToolCallStatus.AwaitingApproval)
@@ -280,7 +282,7 @@
                                                 <div class="rz-chat-tool-approval">
                                                     <span>@string.Format(Culture ?? System.Globalization.CultureInfo.CurrentCulture, Localize(nameof(RadzenStrings.AIChat_ToolApprovalMessage)), call.Name)</span>
                                                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                                                        <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_ApproveText))" Icon="check" Size="ButtonSize.Small" Disabled="@(IsLoading || Disabled)" Click="@(() => ApproveToolCall(call))" class="rz-chat-tool-approve" />
+                                                        <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_ApproveText))" Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Disabled="@(IsLoading || Disabled)" Click="@(() => ApproveToolCall(call))" class="rz-chat-tool-approve" />
                                                         <RadzenButton Text="@Localize(nameof(RadzenStrings.AIChat_RejectText))" Icon="close" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Disabled="@(IsLoading || Disabled)" Click="@(() => RejectToolCall(call))" class="rz-chat-tool-reject" />
                                                     </RadzenStack>
                                                 </div>
