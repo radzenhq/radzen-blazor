@@ -332,11 +332,11 @@ class Program
 
         sb.AppendLine("# Radzen Blazor Components");
         sb.AppendLine();
-        sb.AppendLine("> The most comprehensive free UI component library for Blazor — 155+ native components with Material 3, Material 2, Fluent, and Bootstrap design systems. MIT licensed. The only Blazor component library with a companion visual IDE (Radzen Blazor Studio) and an MCP server for AI-assisted development.");
+        sb.AppendLine("> The most comprehensive free UI component library for Blazor - 155+ native components with free Material, Standard, Default, Humanistic and Software themes, each in light and dark. Free and open source under the MIT license, including commercial use. The only Blazor component library with a companion visual IDE (Radzen Blazor Studio) and an MCP server for AI-assisted development.");
         sb.AppendLine();
-        sb.AppendLine("Written entirely in C# with no JavaScript framework dependencies. Supports Blazor Server, Blazor WebAssembly, .NET MAUI Blazor Hybrid, and the Blazor Web App model in .NET 10. Built with accessibility in mind (WCAG 2.2, keyboard navigation). Used at Microsoft, NASA, Porsche, Dell, Siemens, and DHL.");
+        sb.AppendLine("Written entirely in C# with no JavaScript framework dependencies. Includes DataGrid, Scheduler, Gantt, PivotDataGrid, an Excel-like Spreadsheet with formulas and XLSX import/export, and 30+ chart types drawn in C# as SVG with no JavaScript charting library (gallery: https://blazor.radzen.com/charts). Supports Blazor Server, Blazor WebAssembly, .NET MAUI Blazor Hybrid, and the Blazor Web App model on .NET 8, .NET 9 and .NET 10. Built with accessibility in mind (WCAG 2.2, keyboard navigation). Used at Microsoft, NASA, Porsche, Dell, Siemens, and DHL.");
         sb.AppendLine();
-        sb.AppendLine("**Companion tools:** Radzen Blazor Studio — visual IDE with WYSIWYG designer and database scaffolding (https://www.radzen.com/blazor-studio). Radzen Blazor MCP Server — Model Context Protocol server for AI-assisted Blazor development, works with VS Code, Visual Studio, Cursor, and other MCP-capable IDEs (https://blazor.radzen.com/ai). Free Community edition available. Blazor Pro: $799/year (https://www.radzen.com/pricing).");
+        sb.AppendLine("**Companion tools:** Radzen Blazor Studio - visual IDE with WYSIWYG designer and database scaffolding (https://www.radzen.com/blazor-studio). Radzen Blazor MCP - cloud-hosted Model Context Protocol server that gives AI coding assistants real-time access to Radzen Blazor component docs, APIs, and templates; works with Cursor, Claude Code, GitHub Copilot, VS Code, Visual Studio, JetBrains, and other MCP-capable tools (https://www.radzen.com/blazor-mcp). Free Community edition available. Blazor Pro: $799/year (https://www.radzen.com/pricing).");
         sb.AppendLine();
         sb.AppendLine("## Quick start");
         sb.AppendLine();

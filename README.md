@@ -3,11 +3,11 @@
 Radzen Blazor Components
 ========================
 
-The most sophisticated free UI component library for Blazor, featuring **155+ native components** and the most complete AI toolkit for Blazor: AIChat with tool calling, approvals and attachments, AIPrompt, InlineAIPrompt and SmartPasteButton, built on Microsoft.Extensions.AI and working with any OpenAI-compatible provider. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
+The most sophisticated free UI component library for Blazor, featuring **155+ native components** - DataGrid, Scheduler, Gantt, PivotDataGrid, an Excel-like Spreadsheet with formulas and XLSX import/export, and 30+ chart types drawn in C# as SVG with no JavaScript charting library - and the most complete AI toolkit for Blazor: AIChat with tool calling, approvals and attachments, AIPrompt, InlineAIPrompt and SmartPasteButton, built on Microsoft.Extensions.AI and working with any OpenAI-compatible provider. Free and open source under the MIT license, including commercial use, and used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
 
-Supports .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid.
+Supports .NET 8, .NET 9 and .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid. AI coding assistants can use [Radzen Blazor MCP](https://www.radzen.com/blazor-mcp) for real-time access to the component docs and APIs.
 
-[Online Demos](https://blazor.radzen.com) · [Documentation](https://blazor.radzen.com/docs) · [Get Started](https://blazor.radzen.com/get-started)
+[Online Demos](https://blazor.radzen.com) · [Charts Gallery](https://blazor.radzen.com/charts) · [Documentation](https://blazor.radzen.com/docs) · [Get Started](https://blazor.radzen.com/get-started)
 
 Star this repo ⭐ to support the project and help other Blazor developers discover it.
 
@@ -63,7 +63,7 @@ For the full setup guide including render modes and dialog/notification configur
 
 **Utility** — QRCode, Barcode, Gravatar, GoogleMap, DropZone (drag-and-drop)
 
-**Theming** — 10 built-in themes with light and dark variants. Free themes: Material, Standard, Default, Humanistic, Software. Premium themes (included with [Radzen Blazor Pro](https://www.radzen.com/pricing)): Material 3, Fluent. Full CSS variable customization and a built-in theme service for runtime switching.
+**Theming** - 9 themes, each with light and dark variants. Free themes: Material, Standard, Default, Humanistic, Software. Premium themes (included with [Radzen Blazor Pro](https://www.radzen.com/pricing)): Material 3, Material 3 Expressive, Fluent, Zen. Full CSS variable customization and a built-in theme service for runtime switching.
 
 [Browse all components with live demos →](https://blazor.radzen.com)
 
