@@ -355,7 +355,13 @@ static class AssemblyInspector
             var aspNetDir = Path.Combine(dotnetRoot, "Microsoft.AspNetCore.App");
             if (Directory.Exists(aspNetDir))
             {
-                var latest = Directory.GetDirectories(aspNetDir).OrderDescending().FirstOrDefault();
+                var latest = Directory.GetDirectories(aspNetDir)
+                    .Select(d => (Path: d, Version: ParseVersion(Path.GetFileName(d))))
+                    .Where(d => d.Version != null)
+                    .OrderByDescending(d => d.Version!.Major == Environment.Version.Major)
+                    .ThenByDescending(d => d.Version)
+                    .Select(d => d.Path)
+                    .FirstOrDefault();
                 if (latest != null)
                 {
                     foreach (var dll in Directory.GetFiles(latest, "*.dll"))
@@ -411,7 +417,7 @@ static class AssemblyInspector
                     var dll = Path.Combine(packageDir, file.Name.Replace('/', Path.DirectorySeparatorChar));
 
                     if (File.Exists(dll))
-                        paths.Add(dll);
+                        AddPackageAssembly(paths, dll);
                 }
             }
         }
@@ -498,7 +504,7 @@ static class AssemblyInspector
                 if (tfmDir != null)
                 {
                     foreach (var dll in Directory.GetFiles(tfmDir, "*.dll"))
-                        paths.Add(dll);
+                        AddPackageAssembly(paths, dll);
                 }
             }
 
@@ -507,6 +513,16 @@ static class AssemblyInspector
             if (nuspec != null)
                 AddNuspecDependencies(nuspec, tfm, packagesRoot, paths, visited);
         }
+    }
+
+    static void AddPackageAssembly(HashSet<string> paths, string dll)
+    {
+        var name = Path.GetFileName(dll);
+
+        if (paths.Any(p => string.Equals(Path.GetFileName(p), name, StringComparison.OrdinalIgnoreCase)))
+            return;
+
+        paths.Add(dll);
     }
 
     static string? FindPackageDirectory(string packagesRoot, string id, string? version)
