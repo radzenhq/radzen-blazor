@@ -128,6 +128,7 @@ public class ChatMessage
     /// <summary>
     /// Splits the message into its parts in the order the assistant produced them: the text written before a tool call, the call, the text written after it.
     /// Tool calls are placed by <see cref="ChatToolCall.TextPosition"/>; calls with the same position keep their order in <see cref="ToolCalls"/>. Empty text is skipped.
+    /// Each text part is rendered as Markdown on its own, so a call that falls inside a list or a code block splits that block in two.
     /// </summary>
     /// <returns>The parts of the message.</returns>
     public IReadOnlyList<ChatMessagePart> GetParts()

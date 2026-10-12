@@ -53,6 +53,17 @@ namespace Radzen.Blazor.Tests
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         await Task.Delay(20, cancellationToken);
+
+                        var unread = i >= 10 ? Queue?.Taken.FirstOrDefault(taken => !Read.Contains(taken.MessageId!)) : null;
+
+                        if (unread != null)
+                        {
+                            Read.Add(unread.MessageId!);
+                            yield return new ChatResponseUpdate(ChatRole.User, []) { ResponseId = "r0", MessageId = unread.MessageId };
+                            yield return new ChatResponseUpdate(ChatRole.Assistant, "after ") { ResponseId = "r0", MessageId = "r1" };
+                            continue;
+                        }
+
                         yield return new ChatResponseUpdate(ChatRole.Assistant, "word ") { ResponseId = "r0", MessageId = "r0" };
                     }
 
@@ -77,6 +88,8 @@ namespace Radzen.Blazor.Tests
             }
 
             public QueueingClient? Queue { get; set; }
+
+            public HashSet<string> Read { get; } = new();
 
             public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : serviceType == typeof(IChatMessageQueue) ? Queue : null;
 
@@ -470,17 +483,23 @@ namespace Radzen.Blazor.Tests
             var service = Assert.IsType<TakingChatService>(ctx.Services.GetRequiredService<IAIChatService>());
             var taken = Assert.Single(service.Taken);
             Assert.Equal("Second", taken.Text);
+            Assert.Equal(component.Instance.GetMessages()[2].Id, taken.MessageId);
 
             Assert.Equal(3, component.Instance.GetMessages().Count);
             Assert.Empty(component.Instance.QueuedMessages);
-            Assert.DoesNotContain("rz-chat-message-queued", component.Markup);
+            component.WaitForAssertion(() => Assert.Contains("rz-chat-message-queued", component.Markup));
 
             await component.InvokeAsync(() => component.Instance.Stop());
             await send;
 
             Assert.Equal(3, component.Instance.GetMessages().Count);
+            component.WaitForAssertion(() => Assert.DoesNotContain("rz-chat-message-queued", component.Markup));
             Assert.True(string.IsNullOrEmpty(component.Instance.Input));
             Assert.Single(client.Requests);
+
+            var unread = component.Instance.GetMessages().Single(message => message.Id == taken.MessageId);
+            await component.InvokeAsync(() => Assert.True(component.Instance.RemoveMessage(unread)));
+            Assert.Equal(2, component.Instance.GetMessages().Count);
         }
 
         [Fact]
@@ -542,13 +561,32 @@ namespace Radzen.Blazor.Tests
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Second"));
 
-            Assert.Equal("Second", Assert.Single(client.Queue.Taken).Text);
+            var taken = Assert.Single(client.Queue.Taken);
+            Assert.Equal("Second", taken.Text);
+            Assert.Equal(component.Instance.GetMessages()[2].Id, taken.MessageId);
             Assert.Empty(component.Instance.QueuedMessages);
+            component.WaitForAssertion(() => Assert.Contains("rz-chat-message-queued", component.Markup));
+
+            component.WaitForAssertion(() => Assert.Equal(4, component.Instance.GetMessages().Count));
+            component.WaitForAssertion(() => Assert.Contains("after", component.Instance.GetMessages()[3].Content));
+
+            var messages = component.Instance.GetMessages();
+            Assert.Equal(new[] { true, false, true, false }, messages.Select(message => message.IsUser));
+            Assert.Equal("Second", messages[2].Content);
+            Assert.False(messages[1].IsStreaming);
+            Assert.DoesNotContain("after", messages[1].Content);
+            Assert.True(messages[3].IsStreaming);
+            Assert.DoesNotContain("rz-chat-message-queued", component.Markup);
+
+            var first = component.Markup.IndexOf("Second", StringComparison.Ordinal);
+            var answer = component.Markup.IndexOf("after", StringComparison.Ordinal);
+            Assert.True(first > 0 && first < answer);
 
             await component.InvokeAsync(() => component.Instance.Stop());
             await send;
 
             Assert.Single(client.Requests);
+            Assert.Equal(4, component.Instance.GetMessages().Count);
 
             var service = ctx.Services.GetRequiredService<IAIChatService>();
             client.Queue = null;
@@ -640,6 +678,51 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(2, component.FindAll(".rz-chat-message-avatar").Count);
             Assert.Equal(2, component.FindAll(".picker").Count);
             Assert.Contains("Hello there", component.Find(".rz-chat-message-assistant .rz-chat-message-text").TextContent);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_AttachmentAddingCanCancelOrReplaceAPickedFile()
+        {
+            var (ctx, _) = CreateContext();
+            using var __ = ctx;
+
+            var errors = new List<Exception>();
+            var seen = new List<string>();
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.AllowAttachments, true)
+                .Add(p => p.MaxTotalAttachmentSize, 6)
+                .Add(p => p.Error, error => errors.Add(error))
+                .Add(p => p.AttachmentAdding, args =>
+                {
+                    seen.Add(args.Attachment.Name);
+
+                    if (args.Attachment.Name == "skip.txt")
+                    {
+                        args.Cancel = true;
+                    }
+                    else if (args.Attachment.Name == "big.txt")
+                    {
+                        args.Attachment = new ChatAttachment { Name = "small.txt", MediaType = "text/plain", Data = new byte[] { 1, 2, 3 } };
+                    }
+                }));
+
+            var inputFile = component.FindComponent<InputFile>();
+
+            await component.InvokeAsync(() => inputFile.UploadFiles(
+                InputFileContent.CreateFromText("skip me", "skip.txt"),
+                InputFileContent.CreateFromText("0123456789", "big.txt"),
+                InputFileContent.CreateFromText("0123456789", "other.txt")));
+
+            Assert.Equal(new[] { "skip.txt", "big.txt", "other.txt" }, seen);
+            var pending = Assert.Single(component.Instance.PendingAttachments);
+            Assert.Equal("small.txt", pending.Name);
+            Assert.Equal(3, pending.Data.Length);
+            Assert.Contains("other.txt", Assert.Single(errors).Message);
+
+            await component.InvokeAsync(() => component.Instance.AddAttachment(new ChatAttachment { Name = "direct.txt", MediaType = "text/plain", Data = new byte[100] }));
+            Assert.Equal(2, component.Instance.PendingAttachments.Count);
+            Assert.Equal(3, seen.Count);
         }
     }
 }

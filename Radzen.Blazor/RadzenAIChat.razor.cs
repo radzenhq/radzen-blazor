@@ -27,6 +27,7 @@ namespace Radzen.Blazor
         private string CurrentInput { get; set; } = string.Empty;
         private bool IsLoading { get; set; }
         private readonly Queue<QueuedMessage> queuedMessages = new();
+        private readonly HashSet<ChatMessage> takenMessages = new();
 
         private sealed record QueuedMessage(ChatMessage UserMessage, Microsoft.Extensions.AI.ChatMessage Request, string? Model, string? SystemPrompt, double? Temperature, int? MaxTokens, string? Endpoint, string? Proxy, string? ApiKey, string? ApiKeyHeader);
         private bool preventDefault;
@@ -99,8 +100,11 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets whether messages sent while a response is being generated are accepted instead of ignored. Default is <c>false</c>.
-        /// Such a message appears in the conversation right away and is offered to the service with <see cref="IAIChatService.TryQueueMessageAsync"/>; a service that does not take it
-        /// is sent the message with the next request once the response completes, and <see cref="Stop"/> drops the messages waiting for that and returns their text to the input.
+        /// Such a message appears in the conversation right away, marked as queued, and is offered to the service with <see cref="IAIChatService.TryQueueMessageAsync"/> as a request whose
+        /// <see cref="Microsoft.Extensions.AI.ChatMessage.MessageId"/> is the <see cref="ChatMessage.Id"/> of the displayed message. A service that takes it tells the chat when the model reads it by
+        /// yielding a <see cref="ChatResponseUpdate"/> with <see cref="ChatRole.User"/> and that id: the message then moves to the end of the conversation, loses the queued mark and the rest of
+        /// the response goes into a new assistant message under it. A service that does not take the message is sent it with the next request once the response completes;
+        /// <see cref="Stop"/> drops the messages waiting for that and returns their text to the input, while messages a service took stay for the service to remove with <see cref="RemoveMessage"/>.
         /// The send button stays next to the stop button while the response streams.
         /// </summary>
         [Parameter]
@@ -269,7 +273,7 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the maximum total size in bytes of the attachments of a message. A file the user picks that would push the pending attachments over it is not attached and <see cref="Error"/> is raised.
-        /// Default is <c>null</c>: no limit.
+        /// Checked after <see cref="AttachmentAdding"/>, on the attachment it leaves. Attachments added from code with <see cref="AddAttachment"/> are not checked. Default is <c>null</c>: no limit.
         /// </summary>
         [Parameter]
         public long? MaxTotalAttachmentSize { get; set; }
@@ -286,6 +290,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<Exception> Error { get; set; }
 
+        /// <summary>
+        /// Event callback that is invoked with every file the user picks before it is attached. Set <see cref="ChatAttachmentAddingEventArgs.Cancel"/> to reject it or replace
+        /// <see cref="ChatAttachmentAddingEventArgs.Attachment"/>, for example with a scaled down image. Files added from code with <see cref="AddAttachment"/> do not raise it.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChatAttachmentAddingEventArgs> AttachmentAdding { get; set; }
+
         private readonly List<ChatAttachment> pendingAttachments = new();
         private readonly string attachInputId = $"rz-chat-attach-{Guid.NewGuid():N}";
 
@@ -295,7 +306,7 @@ namespace Radzen.Blazor
         public IReadOnlyList<ChatAttachment> PendingAttachments => pendingAttachments;
 
         /// <summary>
-        /// Adds an attachment to the next message.
+        /// Adds an attachment to the next message as it is: <see cref="AttachmentAdding"/>, <see cref="MaxAttachmentSize"/> and <see cref="MaxTotalAttachmentSize"/> apply only to files the user picks.
         /// </summary>
         /// <param name="attachment">The attachment.</param>
         public void AddAttachment(ChatAttachment attachment)
@@ -387,15 +398,31 @@ namespace Radzen.Blazor
             {
                 try
                 {
-                    if (MaxTotalAttachmentSize != null && pendingAttachments.Sum(attachment => (long)attachment.Data.Length) + file.Size > MaxTotalAttachmentSize)
-                    {
-                        throw new System.IO.IOException($"Attaching {file.Name} ({file.Size} bytes) would exceed the total attachment limit of {MaxTotalAttachmentSize} bytes.");
-                    }
-
                     using var stream = file.OpenReadStream(MaxAttachmentSize);
                     using var memory = new System.IO.MemoryStream();
                     await stream.CopyToAsync(memory);
-                    pendingAttachments.Add(new ChatAttachment { Name = file.Name, MediaType = string.IsNullOrEmpty(file.ContentType) ? ChatAttachment.GetMediaType(file.Name) : file.ContentType, Data = memory.ToArray() });
+
+                    var attachment = new ChatAttachment { Name = file.Name, MediaType = string.IsNullOrEmpty(file.ContentType) ? ChatAttachment.GetMediaType(file.Name) : file.ContentType, Data = memory.ToArray() };
+
+                    if (AttachmentAdding.HasDelegate)
+                    {
+                        var adding = new ChatAttachmentAddingEventArgs(attachment);
+                        await AttachmentAdding.InvokeAsync(adding);
+
+                        if (adding.Cancel)
+                        {
+                            continue;
+                        }
+
+                        attachment = adding.Attachment ?? attachment;
+                    }
+
+                    if (MaxTotalAttachmentSize != null && pendingAttachments.Sum(pending => (long)pending.Data.Length) + attachment.Data.Length > MaxTotalAttachmentSize)
+                    {
+                        throw new System.IO.IOException($"Attaching {attachment.Name} ({attachment.Data.Length} bytes) would exceed the total attachment limit of {MaxTotalAttachmentSize} bytes.");
+                    }
+
+                    pendingAttachments.Add(attachment);
                 }
                 catch (Exception exception) when (exception is System.IO.IOException or InvalidOperationException)
                 {
@@ -703,11 +730,15 @@ namespace Radzen.Blazor
 
             contents.AddRange(attachments.Select(attachment => (AIContent)attachment.ToDataContent()));
 
-            var request = new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, contents);
+            var request = new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, contents) { MessageId = userMessage.Id };
 
             if (IsLoading)
             {
-                if (!await ChatService.TryQueueMessageAsync(request, currentSessionId, cts.Token))
+                if (await ChatService.TryQueueMessageAsync(request, currentSessionId, cts.Token))
+                {
+                    takenMessages.Add(userMessage);
+                }
+                else
                 {
                     queuedMessages.Enqueue(new QueuedMessage(userMessage, request, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader));
                 }
@@ -719,7 +750,38 @@ namespace Radzen.Blazor
             await GetAIResponse(request, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
         }
 
-        private bool IsQueued(ChatMessage message) => queuedMessages.Count > 0 && queuedMessages.Any(queued => queued.UserMessage == message);
+        private bool IsQueued(ChatMessage message) => takenMessages.Contains(message) || (queuedMessages.Count > 0 && queuedMessages.Any(queued => queued.UserMessage == message));
+
+        private bool TryMarkRead(string messageId)
+        {
+            var message = Messages.FirstOrDefault(candidate => candidate.IsUser && candidate.Id == messageId);
+
+            if (message == null)
+            {
+                return false;
+            }
+
+            takenMessages.Remove(message);
+            Messages.Remove(message);
+            Messages.Add(message);
+
+            return true;
+        }
+
+        private async Task CompleteAssistantMessage(ChatMessage message)
+        {
+            ChatCitation.NormalizeMarkers(message);
+            message.IsStreaming = false;
+
+            if (message.Content.Length == 0 && message.ToolCalls.Count == 0)
+            {
+                Messages.Remove(message);
+                return;
+            }
+
+            await ResponseReceived.InvokeAsync(message.Content);
+            await MessageAdded.InvokeAsync(message);
+        }
 
         private string GetMessageCssClass(ChatMessage message)
         {
@@ -877,6 +939,17 @@ namespace Radzen.Blazor
             {
                 await foreach (var update in ChatService.GetStreamingResponseAsync(request, currentSessionId, options, endpoint, proxy, apiKey, apiKeyHeader, UserId, cts.Token))
                 {
+                    if (update.Role == ChatRole.User && !string.IsNullOrEmpty(update.MessageId) && TryMarkRead(update.MessageId))
+                    {
+                        await CompleteAssistantMessage(assistantMessage);
+
+                        assistantMessage = AddMessage(new ChatMessage { UserId = "system", IsUser = false, Timestamp = DateTime.Now, IsStreaming = true });
+                        text.Clear();
+
+                        await InvokeAsync(StateHasChanged);
+                        continue;
+                    }
+
                     foreach (var content in update.Contents)
                     {
                         ApplyContent(assistantMessage, content, text, completedCalls);
@@ -917,6 +990,7 @@ namespace Radzen.Blazor
             finally
             {
                 IsLoading = false;
+                takenMessages.Clear();
 
                 if (assistantMessage.Content.Length == 0 && assistantMessage.ToolCalls.Count == 0)
                 {
