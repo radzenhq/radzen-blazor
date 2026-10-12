@@ -26,6 +26,9 @@ namespace Radzen.Blazor
         private List<ChatMessage> Messages { get; set; } = new();
         private string CurrentInput { get; set; } = string.Empty;
         private bool IsLoading { get; set; }
+        private readonly Queue<QueuedMessage> queuedMessages = new();
+
+        private sealed record QueuedMessage(ChatMessage UserMessage, Microsoft.Extensions.AI.ChatMessage Request, string? Model, string? SystemPrompt, double? Temperature, int? MaxTokens, string? Endpoint, string? Proxy, string? ApiKey, string? ApiKeyHeader);
         private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
@@ -62,6 +65,94 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string? Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content rendered in the chat header between <see cref="Title"/> and the clear button, for example a conversation switcher.
+        /// The header is rendered when a title, the clear button or this template is set.
+        /// </summary>
+        [Parameter]
+        public RenderFragment? HeaderTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content rendered in the input area above the text box, below the pending attachments, for example a status line or a notice about the attachments.
+        /// </summary>
+        [Parameter]
+        public RenderFragment? InputHeaderTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content rendered in the input area below the text box, for example a model picker or action buttons.
+        /// </summary>
+        [Parameter]
+        public RenderFragment? InputFooterTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the text of the input. Bind it with <c>@bind-Input</c> to read what the user has typed or to set the text from code, for example to offer a prompt.
+        /// </summary>
+        [Parameter]
+        public string? Input { get; set; }
+
+        /// <summary>
+        /// Event callback that is invoked when the text of the input changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string> InputChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether messages sent while a response is being generated are accepted instead of ignored. Default is <c>false</c>.
+        /// Such a message appears in the conversation right away and is offered to the service with <see cref="IAIChatService.TryQueueMessageAsync"/>; a service that does not take it
+        /// is sent the message with the next request once the response completes, and <see cref="Stop"/> drops the messages waiting for that and returns their text to the input.
+        /// The send button stays next to the stop button while the response streams.
+        /// </summary>
+        [Parameter]
+        public bool QueueMessages { get; set; }
+
+        /// <summary>
+        /// Gets the messages waiting to be sent once the current response completes. See <see cref="QueueMessages"/>.
+        /// </summary>
+        public IReadOnlyList<ChatMessage> QueuedMessages => queuedMessages.Select(queued => queued.UserMessage).ToList();
+
+        /// <summary>
+        /// Gets or sets whether the avatars of the user and the assistant are rendered next to the messages. Default is <c>true</c>.
+        /// </summary>
+        [Parameter]
+        public bool ShowAvatars { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the text of the send button. Default is <c>null</c>: the button shows only its icon.
+        /// </summary>
+        [Parameter]
+        public string? SendButtonText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the icon of the send button. Default is <c>send</c>.
+        /// </summary>
+        [Parameter]
+        public string SendButtonIcon { get; set; } = "send";
+
+        /// <summary>
+        /// Gets or sets the text of the stop button shown while a response streams. Default is <c>null</c>: the button shows only its icon.
+        /// </summary>
+        [Parameter]
+        public string? StopButtonText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the icon of the stop button. Default is <c>stop_circle</c>.
+        /// </summary>
+        [Parameter]
+        public string StopButtonIcon { get; set; } = "stop_circle";
+
+        /// <summary>
+        /// Gets or sets the template rendered next to the time of an assistant message instead of the default token count, when <see cref="ShowUsage"/> is <c>true</c> and the message has <see cref="ChatMessage.Usage"/>.
+        /// Use it to show what <see cref="UsageDetails.AdditionalCounts"/> carries, for example credits.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<ChatMessage>? UsageTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template rendered at the end of every message, after its text and sources, for example the files an answer changed.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<ChatMessage>? MessageFooterTemplate { get; set; }
 
         private string? placeholder;
 
@@ -177,6 +268,13 @@ namespace Radzen.Blazor
         public long MaxAttachmentSize { get; set; } = 4 * 1024 * 1024;
 
         /// <summary>
+        /// Gets or sets the maximum total size in bytes of the attachments of a message. A file the user picks that would push the pending attachments over it is not attached and <see cref="Error"/> is raised.
+        /// Default is <c>null</c>: no limit.
+        /// </summary>
+        [Parameter]
+        public long? MaxTotalAttachmentSize { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the token usage reported by the model is shown next to the time of assistant messages. Default is <c>false</c>.
         /// </summary>
         [Parameter]
@@ -231,10 +329,56 @@ namespace Radzen.Blazor
         /// </summary>
         public void Stop()
         {
+            if (queuedMessages.Count > 0)
+            {
+                var texts = new List<string>();
+
+                while (queuedMessages.Count > 0)
+                {
+                    var queued = queuedMessages.Dequeue();
+                    Messages.Remove(queued.UserMessage);
+
+                    if (queued.UserMessage.Content.Length > 0)
+                    {
+                        texts.Add(queued.UserMessage.Content);
+                    }
+
+                    pendingAttachments.AddRange(queued.UserMessage.Attachments);
+                }
+
+                if (CurrentInput.Length > 0)
+                {
+                    texts.Add(CurrentInput);
+                }
+
+                _ = SetInput(string.Join(Environment.NewLine, texts));
+            }
+
             if (IsLoading)
             {
                 cts.Cancel();
             }
+            else
+            {
+                InvokeAsync(StateHasChanged);
+            }
+        }
+
+        /// <summary>
+        /// Focuses the input.
+        /// </summary>
+        public ValueTask FocusAsync() => inputElement.Context != null ? inputElement.FocusAsync() : ValueTask.CompletedTask;
+
+        private async Task SetInput(string value)
+        {
+            if (CurrentInput == value)
+            {
+                return;
+            }
+
+            CurrentInput = value;
+            Input = value;
+            await InputChanged.InvokeAsync(value);
         }
 
         private async Task OnFilesSelected(InputFileChangeEventArgs args)
@@ -243,6 +387,11 @@ namespace Radzen.Blazor
             {
                 try
                 {
+                    if (MaxTotalAttachmentSize != null && pendingAttachments.Sum(attachment => (long)attachment.Data.Length) + file.Size > MaxTotalAttachmentSize)
+                    {
+                        throw new System.IO.IOException($"Attaching {file.Name} ({file.Size} bytes) would exceed the total attachment limit of {MaxTotalAttachmentSize} bytes.");
+                    }
+
                     using var stream = file.OpenReadStream(MaxAttachmentSize);
                     using var memory = new System.IO.MemoryStream();
                     await stream.CopyToAsync(memory);
@@ -329,7 +478,8 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets the message template.
+        /// Gets or sets the template that renders every message in place of the default rendering. Call <see cref="RenderMessage"/> from it to keep the default rendering for some messages,
+        /// for example to render only the entries the application adds with <see cref="AddMessage(ChatMessage)"/> your way, or to add content under a message.
         /// </summary>
         /// <value>The message template.</value>
         [Parameter]
@@ -414,18 +564,28 @@ namespace Radzen.Blazor
         /// <returns>The created message.</returns>
         public ChatMessage AddMessage(string content, bool isUser = false)
         {
-            var message = new ChatMessage
+            return AddMessage(new ChatMessage
             {
                 Content = content,
                 UserId = isUser ? "user" : "system",
                 IsUser = isUser,
                 Timestamp = DateTime.Now
-            };
+            });
+        }
+
+        /// <summary>
+        /// Adds a message to the chat: a message of the conversation, or an entry of another <see cref="ChatMessage.Kind"/> such as a status line, a progress indicator or an error.
+        /// Messages added this way are shown but not sent to the model and not saved in the conversation.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>The message.</returns>
+        public ChatMessage AddMessage(ChatMessage message)
+        {
+            ArgumentNullException.ThrowIfNull(message);
 
             Messages.Add(message);
 
-            // Limit the number of messages
-            if (Messages.Count > MaxMessages)
+            while (Messages.Count > MaxMessages)
             {
                 Messages.RemoveAt(0);
             }
@@ -433,6 +593,30 @@ namespace Radzen.Blazor
             InvokeAsync(StateHasChanged);
             return message;
         }
+
+        /// <summary>
+        /// Removes a message from the chat, for example a <see cref="ChatMessageKind.Progress"/> entry that ended. The conversation sent to the model is not affected.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns><c>true</c> when the message was in the chat.</returns>
+        public bool RemoveMessage(ChatMessage message)
+        {
+            ArgumentNullException.ThrowIfNull(message);
+
+            var removed = Messages.Remove(message);
+
+            if (removed)
+            {
+                InvokeAsync(StateHasChanged);
+            }
+
+            return removed;
+        }
+
+        /// <summary>
+        /// Renders the chat again, for example after changing the <see cref="ChatMessage.Content"/> of a message it shows.
+        /// </summary>
+        public void Refresh() => InvokeAsync(StateHasChanged);
 
         /// <summary>
         /// Loads messages into the chat, replacing any existing ones. Preserves the timestamp of each message — use this to restore conversation history.
@@ -461,6 +645,7 @@ namespace Radzen.Blazor
         public async Task ClearChat()
         {
             Messages.Clear();
+            queuedMessages.Clear();
 
             if (!string.IsNullOrEmpty(currentSessionId))
             {
@@ -491,7 +676,7 @@ namespace Radzen.Blazor
         /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
         public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
-            if ((string.IsNullOrWhiteSpace(content) && pendingAttachments.Count == 0) || Disabled || IsLoading)
+            if ((string.IsNullOrWhiteSpace(content) && pendingAttachments.Count == 0) || Disabled || (IsLoading && !QueueMessages))
             {
                 return;
             }
@@ -506,7 +691,7 @@ namespace Radzen.Blazor
             await MessageAdded.InvokeAsync(userMessage);
             await MessageSent.InvokeAsync(content);
 
-            CurrentInput = string.Empty;
+            await SetInput(string.Empty);
             await InvokeAsync(StateHasChanged);
 
             var contents = new List<AIContent>();
@@ -518,7 +703,31 @@ namespace Radzen.Blazor
 
             contents.AddRange(attachments.Select(attachment => (AIContent)attachment.ToDataContent()));
 
-            await GetAIResponse(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, contents), model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
+            var request = new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, contents);
+
+            if (IsLoading)
+            {
+                if (!await ChatService.TryQueueMessageAsync(request, currentSessionId, cts.Token))
+                {
+                    queuedMessages.Enqueue(new QueuedMessage(userMessage, request, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader));
+                }
+
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            await GetAIResponse(request, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
+        }
+
+        private bool IsQueued(ChatMessage message) => queuedMessages.Count > 0 && queuedMessages.Any(queued => queued.UserMessage == message);
+
+        private string GetMessageCssClass(ChatMessage message)
+        {
+            return ClassList.Create("rz-chat-message")
+                .Add("rz-chat-message-user", message.IsUser)
+                .Add("rz-chat-message-assistant", !message.IsUser)
+                .Add("rz-chat-message-queued", IsQueued(message))
+                .ToString();
         }
 
         /// <summary>
@@ -595,6 +804,8 @@ namespace Radzen.Blazor
                 copy.Reasoning = message.Reasoning;
                 copy.Usage = message.Usage;
                 copy.Citations = message.Citations;
+                copy.AdditionalProperties = message.AdditionalProperties;
+                copy.Kind = message.Kind;
             }
 
             await InvokeAsync(StateHasChanged);
@@ -612,6 +823,25 @@ namespace Radzen.Blazor
 
         private async Task GetAIResponse(Microsoft.Extensions.AI.ChatMessage request, string? model, string? systemPrompt, double? temperature, int? maxTokens, string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
         {
+            await GetSingleAIResponse(request, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
+
+            while (!Disabled && queuedMessages.Count > 0)
+            {
+                var queued = queuedMessages.Dequeue();
+
+                if (!Messages.Remove(queued.UserMessage))
+                {
+                    continue;
+                }
+
+                Messages.Add(queued.UserMessage);
+
+                await GetSingleAIResponse(queued.Request, queued.Model, queued.SystemPrompt, queued.Temperature, queued.MaxTokens, queued.Endpoint, queued.Proxy, queued.ApiKey, queued.ApiKeyHeader);
+            }
+        }
+
+        private async Task GetSingleAIResponse(Microsoft.Extensions.AI.ChatMessage request, string? model, string? systemPrompt, double? temperature, int? maxTokens, string? endpoint, string? proxy, string? apiKey, string? apiKeyHeader)
+        {
             IsLoading = true;
             var previousCts = cts;
 #if NET8_0_OR_GREATER
@@ -628,8 +858,7 @@ namespace Radzen.Blazor
                 await SessionIdChanged.InvokeAsync(currentSessionId);
             }
 
-            var assistantMessage = AddMessage("", false);
-            assistantMessage.IsStreaming = true;
+            var assistantMessage = AddMessage(new ChatMessage { UserId = "system", IsUser = false, Timestamp = DateTime.Now, IsStreaming = true });
 
             var options = new ChatOptions
             {
@@ -653,11 +882,12 @@ namespace Radzen.Blazor
                         ApplyContent(assistantMessage, content, text, completedCalls);
                     }
 
+                    assistantMessage.MergeAdditionalProperties(update.AdditionalProperties);
                     assistantMessage.Content = text.ToString();
                     await InvokeAsync(StateHasChanged);
                 }
 
-                assistantMessage.Content = ChatCitation.NormalizeMarkers(assistantMessage.Content);
+                ChatCitation.NormalizeMarkers(assistantMessage);
                 assistantMessage.IsStreaming = false;
 
                 foreach (var call in completedCalls)
@@ -741,6 +971,50 @@ namespace Radzen.Blazor
             AIChatService.ApplyContent(message, content, text);
         }
 
+        private sealed record MessageSegment(string? Text, List<ChatToolCall>? ToolCalls);
+
+        private List<MessageSegment> GetSegments(ChatMessage message)
+        {
+            var segments = new List<MessageSegment>();
+
+            if (!ShowToolCalls)
+            {
+                if (!string.IsNullOrEmpty(message.Content))
+                {
+                    segments.Add(new MessageSegment(message.Content, null));
+                }
+
+                return segments;
+            }
+
+            List<ChatToolCall>? calls = null;
+
+            foreach (var part in message.GetParts())
+            {
+                if (part.ToolCall != null)
+                {
+                    calls ??= new List<ChatToolCall>();
+                    calls.Add(part.ToolCall);
+                    continue;
+                }
+
+                if (calls != null)
+                {
+                    segments.Add(new MessageSegment(null, calls));
+                    calls = null;
+                }
+
+                segments.Add(new MessageSegment(part.Text, null));
+            }
+
+            if (calls != null)
+            {
+                segments.Add(new MessageSegment(null, calls));
+            }
+
+            return segments;
+        }
+
         private ChatToolCall? FindToolCall(string callId)
         {
             for (var index = Messages.Count - 1; index >= 0; index--)
@@ -817,8 +1091,21 @@ namespace Radzen.Blazor
 
         private async Task OnInput(ChangeEventArgs e)
         {
-            CurrentInput = e.Value?.ToString() ?? "";
+            await SetInput(e.Value?.ToString() ?? "");
             await InvokeAsync(StateHasChanged);
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var inputChanged = parameters.DidParameterChange(nameof(Input), Input);
+
+            await base.SetParametersAsync(parameters);
+
+            if (inputChanged)
+            {
+                CurrentInput = Input ?? string.Empty;
+            }
         }
 
         private async Task OnKeyDown(KeyboardEventArgs e)

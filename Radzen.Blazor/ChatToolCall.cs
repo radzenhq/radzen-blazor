@@ -75,6 +75,12 @@ public class ChatToolCall
     public ChatToolCallStatus Status { get; set; }
 
     /// <summary>
+    /// Gets or sets the position of the call in <see cref="ChatMessage.Content"/>: the number of characters the assistant had written when it made the call.
+    /// <see cref="ChatMessage.GetParts"/> uses it to keep text and tool calls in the order they were produced. Defaults to 0, which places the call before the text.
+    /// </summary>
+    public int TextPosition { get; set; }
+
+    /// <summary>
     /// Gets or sets the approval request when the tool is an <see cref="ApprovalRequiredAIFunction"/>.
     /// </summary>
     [JsonIgnore]

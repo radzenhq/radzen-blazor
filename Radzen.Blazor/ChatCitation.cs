@@ -133,6 +133,35 @@ public class ChatCitation
         return string.IsNullOrEmpty(text) || !text.Contains('【', StringComparison.Ordinal) ? text : markers.Replace(text, "[$1]");
     }
 
+    /// <summary>
+    /// Replaces the citation markers in <see cref="ChatMessage.Content"/> and moves the <see cref="ChatToolCall.TextPosition"/> of the tool calls so that they stay at their place in the text.
+    /// </summary>
+    /// <param name="message">The message.</param>
+    public static void NormalizeMarkers(ChatMessage message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        var content = message.Content ?? string.Empty;
+        var normalized = NormalizeMarkers(content);
+
+        if (normalized.Length != content.Length)
+        {
+            foreach (var call in message.ToolCalls)
+            {
+                if (call.TextPosition > 0 && call.TextPosition < content.Length)
+                {
+                    call.TextPosition = NormalizeMarkers(content.Substring(0, call.TextPosition)).Length;
+                }
+                else if (call.TextPosition >= content.Length)
+                {
+                    call.TextPosition = normalized.Length;
+                }
+            }
+        }
+
+        message.Content = normalized;
+    }
+
     private static readonly string[] properties = ["title", "url", "snippet", "fileId", "toolName"];
 
     private static IEnumerable<ChatCitation> FromJson(System.Text.Json.JsonElement element)

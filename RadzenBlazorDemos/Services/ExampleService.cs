@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -77,6 +77,7 @@ namespace RadzenBlazorDemos
                     [
                         new () { Text = "Custom styling", Anchor = "#custom-styling" },
                         new () { Text = "Compact AIChat", Anchor = "#compact-aichat" },
+                        new () { Text = "Header and input slots", Anchor = "#layout" },
                         new () { Text = "Events and interactions", Anchor = "#events" },
                         new () { Text = "Date separator", Anchor = "#date-separator" },
                         new () { Text = "Memory", Anchor = "#memory" },

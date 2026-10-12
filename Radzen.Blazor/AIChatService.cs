@@ -211,6 +211,17 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     }
 
     /// <inheritdoc />
+    /// <remarks>Forwards to the <see cref="IChatMessageQueue"/> the chat client exposes through <see cref="IChatClient.GetService"/>, and returns <c>false</c> when it exposes none. Override to queue messages another way.</remarks>
+    public virtual Task<bool> TryQueueMessageAsync(ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        var queue = GetChatClient().GetService<IChatMessageQueue>();
+
+        return queue == null ? Task.FromResult(false) : queue.TryQueueMessageAsync(message, sessionId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public ConversationSession GetOrCreateSession(string? sessionId = null)
     {
         lock (sessionsLock)
@@ -298,9 +309,14 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             {
                 ApplyContent(message, content, text);
             }
+
+            message.MergeAdditionalProperties(responseMessage.AdditionalProperties);
         }
 
-        message.Content = Blazor.ChatCitation.NormalizeMarkers(text.ToString());
+        message.MergeAdditionalProperties(response.AdditionalProperties);
+
+        message.Content = text.ToString();
+        Blazor.ChatCitation.NormalizeMarkers(message);
 
         return message.Content.Length == 0 && message.ToolCalls.Count == 0 ? null : message;
     }
@@ -331,7 +347,8 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
                     Name = call.Name,
                     Arguments = call.Arguments,
                     Exception = call.Exception,
-                    Status = call.Exception != null ? Blazor.ChatToolCallStatus.Failed : Blazor.ChatToolCallStatus.Pending
+                    Status = call.Exception != null ? Blazor.ChatToolCallStatus.Failed : Blazor.ChatToolCallStatus.Pending,
+                    TextPosition = text.Length
                 });
                 break;
             case FunctionResultContent result:
@@ -340,7 +357,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
                     if (call == null)
                     {
-                        call = new Blazor.ChatToolCall { CallId = result.CallId };
+                        call = new Blazor.ChatToolCall { CallId = result.CallId, TextPosition = text.Length };
                         message.ToolCalls.Add(call);
                     }
 
@@ -355,7 +372,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
                     if (existing == null)
                     {
-                        existing = new Blazor.ChatToolCall { CallId = call.CallId };
+                        existing = new Blazor.ChatToolCall { CallId = call.CallId, TextPosition = text.Length };
                         message.ToolCalls.Add(existing);
                     }
 

@@ -1,4 +1,4 @@
-@page "/aichat"
+﻿@page "/aichat"
 @using Radzen
 @using Radzen.Blazor
 
@@ -31,6 +31,24 @@
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatCompact">
     <AIChatCompact />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#layout" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Header and input slots
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Build the chrome of an assistant around the conversation. <code>HeaderTemplate</code> renders in the header next to the title, for example a conversation switcher;
+    <code>InputHeaderTemplate</code> and <code>InputFooterTemplate</code> render above and below the text box, for a status line, a model picker or action buttons.
+    <code>SendButtonText</code>, <code>SendButtonIcon</code>, <code>StopButtonText</code> and <code>StopButtonIcon</code> label the send and stop buttons, <code>ShowAvatars="false"</code> hides the avatars and <code>@@bind-Input</code> reads or sets the text in the box - call <code>FocusAsync</code> to focus it.
+    With <code>QueueMessages="true"</code> a message sent while an answer streams is shown right away instead of being ignored: a service that implements <code>IAIChatService.TryQueueMessageAsync</code> takes it into the running answer,
+    otherwise it is sent when the answer completes and <code>Stop</code> drops it and returns the text to the box.
+    <code>UsageTemplate</code> formats the usage of an answer your way, for example credits from <code>UsageDetails.AdditionalCounts</code>, and <code>MessageFooterTemplate</code> adds content under every message.
+    When the model writes between tool calls, the answer keeps text and calls in the order they were produced; <code>ChatMessage.GetParts()</code> returns them in that order for your own <code>MessageTemplate</code>.
+    Entries that are not messages of the conversation - a status line, a progress indicator while something runs, an error - are added with <code>AddMessage</code> and a <code>ChatMessage.Kind</code> of <code>Status</code>, <code>Progress</code> or <code>Error</code>,
+    and removed with <code>RemoveMessage</code>; the Publish button of this demo adds them. A <code>MessageTemplate</code> can render some messages its own way and call <code>RenderMessage</code> for the rest.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatLayout">
+    <AIChatLayout />
 </RadzenExample>
 
 <RadzenText Anchor="aichat#events" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
