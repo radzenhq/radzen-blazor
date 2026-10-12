@@ -1,0 +1,110 @@
+@using Microsoft.Extensions.AI
+@using System.ComponentModel
+@using RadzenBlazorDemos.Models.Northwind
+@inherits DbContextPage
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="7">
+        <RadzenAIChat Title="Inventory assistant"
+                      Placeholder="Try: Raise the price of Chai by 10%. Discontinue Aniseed Syrup."
+                      SystemPrompt="You are an inventory assistant for the Northwind trading company. Use GetProduct to look products up and UpdateProductPrice or DiscontinueProduct to change them. Call the change tools directly without asking for confirmation in text: the application itself asks the user to approve each change. If a change is rejected, acknowledge it and do not retry. Keep answers short."
+                      Tools="@tools"
+                      AllowMultipleToolCalls="false"
+                      ToolCallCompleted="@OnToolCallCompleted"
+                      Style="height: 500px" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="5">
+        <RadzenDataGrid @ref="grid" Data="@products" TItem="Product" Density="Density.Compact" Style="height: 500px">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Product.ProductName)" Title="Product" />
+                <RadzenDataGridColumn Property="@nameof(Product.UnitPrice)" Title="Price" FormatString="{0:C}" Width="90px" TextAlign="TextAlign.Right" />
+                <RadzenDataGridColumn Property="@nameof(Product.Discontinued)" Title="Discontinued" Width="110px" TextAlign="TextAlign.Center">
+                    <Template Context="product">
+                        <RadzenCheckBox Value="@(product.Discontinued == true)" Disabled="true" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+</RadzenRow>
+
+<EventConsole @ref="console" Style="min-height: 150px;" />
+
+@code {
+    EventConsole console;
+    RadzenDataGrid<Product> grid;
+    IEnumerable<AITool> tools;
+    IQueryable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products.OrderBy(p => p.ProductName);
+
+        tools =
+        [
+            AIFunctionFactory.Create(GetProduct),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(UpdateProductPrice)),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(DiscontinueProduct))
+        ];
+    }
+
+    record ProductInfo(int ProductId, string Name, decimal? UnitPrice, bool? Discontinued);
+
+    [Description("Finds products whose name contains the specified text. Returns up to 10 products with id, name, price and whether they are discontinued.")]
+    List<ProductInfo> GetProduct([Description("Part of the product name.")] string name)
+    {
+        return dbContext.Products
+            .Where(p => p.ProductName.Contains(name))
+            .OrderBy(p => p.ProductName)
+            .Take(10)
+            .Select(p => new ProductInfo(p.ProductID, p.ProductName, p.UnitPrice, p.Discontinued))
+            .ToList();
+    }
+
+    [Description("Changes the unit price of a product. Requires the user's approval.")]
+    async Task<string> UpdateProductPrice([Description("The product id.")] int productId, [Description("The new unit price.")] decimal newPrice)
+    {
+        var product = await dbContext.Products.FindAsync(productId);
+
+        if (product == null)
+        {
+            return $"Product {productId} was not found.";
+        }
+
+        var oldPrice = product.UnitPrice;
+        product.UnitPrice = newPrice;
+        await dbContext.SaveChangesAsync();
+        await grid.Reload();
+
+        return $"The price of {product.ProductName} changed from {oldPrice:C} to {newPrice:C}.";
+    }
+
+    [Description("Marks a product as discontinued. Requires the user's approval.")]
+    async Task<string> DiscontinueProduct([Description("The product id.")] int productId)
+    {
+        var product = await dbContext.Products.FindAsync(productId);
+
+        if (product == null)
+        {
+            return $"Product {productId} was not found.";
+        }
+
+        product.Discontinued = true;
+        await dbContext.SaveChangesAsync();
+        await grid.Reload();
+
+        return $"{product.ProductName} is now discontinued.";
+    }
+
+    void OnToolCallCompleted(ChatToolCall call)
+    {
+        console.Log($"{call.Name}({call.FormattedArguments}) → {call.Status}", call.Status switch
+        {
+            ChatToolCallStatus.Completed => AlertStyle.Success,
+            ChatToolCallStatus.Rejected => AlertStyle.Warning,
+            _ => AlertStyle.Danger
+        });
+    }
+}

@@ -1,0 +1,129 @@
+.rz-aiprompt {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: var(--rz-border-normal);
+    border-radius: var(--rz-border-radius);
+    background-color: var(--rz-base-background-color);
+
+    .rz-aiprompt-input {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+
+    .rz-aiprompt-textarea {
+        flex: 1 1 auto;
+        min-width: 0;
+        resize: none;
+        field-sizing: content;
+        max-height: 12rem;
+    }
+
+    .rz-aiprompt-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .rz-aiprompt-output {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: var(--rz-border-radius);
+        background-color: var(--rz-base-200);
+    }
+
+    .rz-aiprompt-output-content {
+        white-space: pre-wrap;
+        word-break: break-word;
+        --rz-text-h1-margin-block-end: 0;
+        --rz-text-h2-margin-block-end: 0;
+        --rz-text-h3-margin-block-end: 0;
+        --rz-text-body1-margin-block-end: 0;
+        --rz-text-body2-margin-block-end: 0;
+
+        .rz-markdown {
+            white-space: normal;
+        }
+    }
+
+    .rz-aiprompt-streaming-icon {
+        animation: rz-pulse 1.5s infinite;
+        vertical-align: middle;
+    }
+
+    .rz-aiprompt-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .rz-aiprompt-toolbar-spacer {
+        flex: 1 1 auto;
+    }
+
+    &.rz-state-disabled {
+        opacity: 0.6;
+    }
+}
+
+.rz-inline-aiprompt {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+// In a form field the button is as far from the end edge as it is from the top edge,
+// whatever the theme sets as padding of the end slot.
+.rz-form-field-end:has(> .rz-inline-aiprompt) {
+    --rz-inline-aiprompt-button-size: var(--rz-button-size-sm);
+    padding-inline-end: max(0px, calc((var(--rz-input-height) - var(--rz-inline-aiprompt-button-size)) / 2));
+
+    @each $size in (xs, md, lg) {
+        &:has(.rz-inline-aiprompt-button.rz-button-#{$size}) {
+            --rz-inline-aiprompt-button-size: var(--rz-button-size-#{$size});
+        }
+    }
+}
+
+// Next to a multiline TextArea the button stays where it would be in a single-line field:
+// the end slot keeps the height of an input and is pinned to the top.
+.rz-form-field-content:has(> .rz-textarea) > .rz-form-field-end:has(> .rz-inline-aiprompt) {
+    align-self: flex-start;
+    box-sizing: border-box;
+    block-size: var(--rz-input-height);
+}
+
+.rz-inline-aiprompt-popup {
+    display: none;
+    position: absolute;
+    width: var(--rz-inline-aiprompt-popup-width, 28rem);
+    max-width: calc(100vw - 2rem);
+    border: var(--rz-panel-border);
+    border-radius: var(--rz-border-radius);
+    background-color: var(--rz-panel-background-color);
+    box-shadow: var(--rz-panel-shadow);
+    overflow: hidden;
+
+    .rz-aiprompt {
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+    }
+
+    .rz-aiprompt-output-content {
+        max-height: 16rem;
+        overflow: auto;
+    }
+
+    .rz-inline-aiprompt-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0 0.75rem 0.75rem;
+    }
+}

@@ -1,0 +1,134 @@
+@using Microsoft.Extensions.AI
+@using System.Text.Json
+@using System.Globalization
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@inherits DbContextPage
+@inject IAIChatService ChatService
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenTextBox @bind-Value="@condition" Placeholder="Try: orders with freight above 100 shipped outside Europe, or the five most expensive shipments" Style="flex: 1; min-width: 260px" @onkeyup="@OnKeyUp" />
+        <RadzenButton Text="Highlight" Icon="highlight" Click="@Highlight" IsBusy="@busy" />
+        <RadzenButton Text="Clear" Icon="close" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@Clear" Disabled="@(highlighted.Count == 0)" />
+    </RadzenStack>
+    @if (explanation != null)
+    {
+        <RadzenAlert AlertStyle="@(highlighted.Count > 0 ? AlertStyle.Info : AlertStyle.Warning)" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+            <strong>@highlighted.Count</strong> of @orders.Count orders highlighted. @explanation
+        </RadzenAlert>
+    }
+    <RadzenDataGrid @ref="grid" Data="@orders" TItem="Order" AllowPaging="true" PageSize="10" AllowSorting="true" Density="Density.Compact" CellRender="@CellRender">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Order.OrderID)" Title="Order" Width="90px" />
+            <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="120px" />
+            <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order date" FormatString="{0:d}" Width="130px" />
+            <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight" FormatString="{0:C}" TextAlign="TextAlign.Right" Width="110px" />
+            <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship country" Width="130px" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    RadzenDataGrid<Order> grid;
+    List<Order> orders = new();
+    HashSet<int> highlighted = new();
+    string condition;
+    string explanation;
+    bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include(o => o.Customer).Include(o => o.Employee).OrderBy(o => o.OrderID).ToList();
+    }
+
+    void CellRender(DataGridCellRenderEventArgs<Order> args)
+    {
+        if (highlighted.Contains(args.Data.OrderID))
+        {
+            args.Attributes["style"] = "background-color: var(--rz-warning-lighter, #fff3cd); font-weight: 600;";
+        }
+    }
+
+    async Task OnKeyUp(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await Highlight();
+        }
+    }
+
+    async Task Highlight()
+    {
+        if (string.IsNullOrWhiteSpace(condition) || busy)
+        {
+            return;
+        }
+
+        busy = true;
+
+        try
+        {
+            var rows = string.Join("\n", orders.Select(o => string.Create(CultureInfo.InvariantCulture, $"{o.OrderID}|{o.Customer?.CompanyName}|{o.Employee?.LastName}|{o.OrderDate:yyyy-MM-dd}|{o.Freight:0.00}|{o.ShipCountry}")));
+
+            var prompt = $"Each line is an order: id|customer|employee|date|freight|ship country.\n{rows}\n\n" +
+                $"Condition: {condition}\n" +
+                "Respond with a JSON object {\"orderIds\":[...],\"explanation\":\"one short sentence\"} listing the ids of the orders that match the condition. Use an empty array when none match.";
+
+            var response = await ChatService.GetChatClient().GetResponseAsync(prompt, new ChatOptions { Temperature = 0, MaxOutputTokens = 2048, ResponseFormat = ChatResponseFormat.Json });
+
+            var json = response.Text;
+            var start = json.IndexOf('{');
+            var end = json.LastIndexOf('}');
+
+            highlighted.Clear();
+            explanation = "The model did not return a result.";
+
+            if (start >= 0 && end > start)
+            {
+                using var document = JsonDocument.Parse(json.Substring(start, end - start + 1));
+
+                if (document.RootElement.TryGetProperty("orderIds", out var ids) && ids.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var id in ids.EnumerateArray())
+                    {
+                        if (id.TryGetInt32(out var orderId))
+                        {
+                            highlighted.Add(orderId);
+                        }
+                    }
+                }
+
+                explanation = document.RootElement.TryGetProperty("explanation", out var text) ? text.GetString() : null;
+            }
+
+            await grid.Reload();
+
+            var first = orders.FindIndex(o => highlighted.Contains(o.OrderID));
+
+            if (first >= 0)
+            {
+                await grid.GoToPage(first / grid.PageSize);
+            }
+        }
+        catch (Exception ex)
+        {
+            explanation = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    async Task Clear()
+    {
+        highlighted.Clear();
+        explanation = null;
+        condition = null;
+        await grid.Reload();
+    }
+}

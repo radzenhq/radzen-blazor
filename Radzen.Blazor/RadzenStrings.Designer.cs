@@ -865,5 +865,33 @@ namespace Radzen.Blazor {
         public static string MarkdownEditorTableAlignLeft_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignLeft_Title", resourceCulture); } }
         public static string MarkdownEditorTableAlignCenter_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignCenter_Title", resourceCulture); } }
         public static string MarkdownEditorTableAlignRight_Title { get { return ResourceManager.GetString("MarkdownEditorTableAlignRight_Title", resourceCulture); } }
+        public static string AIChat_ToolApprovalMessage { get { return ResourceManager.GetString("AIChat_ToolApprovalMessage", resourceCulture); } }
+        public static string AIChat_ApproveText { get { return ResourceManager.GetString("AIChat_ApproveText", resourceCulture); } }
+        public static string AIChat_RejectText { get { return ResourceManager.GetString("AIChat_RejectText", resourceCulture); } }
+        public static string AIChat_ToolCallPending { get { return ResourceManager.GetString("AIChat_ToolCallPending", resourceCulture); } }
+        public static string AIChat_ToolCallCompleted { get { return ResourceManager.GetString("AIChat_ToolCallCompleted", resourceCulture); } }
+        public static string AIChat_ToolCallFailed { get { return ResourceManager.GetString("AIChat_ToolCallFailed", resourceCulture); } }
+        public static string AIChat_ToolCallAwaitingApproval { get { return ResourceManager.GetString("AIChat_ToolCallAwaitingApproval", resourceCulture); } }
+        public static string AIChat_ToolCallRejected { get { return ResourceManager.GetString("AIChat_ToolCallRejected", resourceCulture); } }
+        public static string AIChat_ToolCallArguments { get { return ResourceManager.GetString("AIChat_ToolCallArguments", resourceCulture); } }
+        public static string AIChat_ToolCallResult { get { return ResourceManager.GetString("AIChat_ToolCallResult", resourceCulture); } }
+        public static string AIChat_Reasoning { get { return ResourceManager.GetString("AIChat_Reasoning", resourceCulture); } }
+        public static string AIChat_StopTitle { get { return ResourceManager.GetString("AIChat_StopTitle", resourceCulture); } }
+        public static string AIChat_AttachTitle { get { return ResourceManager.GetString("AIChat_AttachTitle", resourceCulture); } }
+        public static string AIChat_RemoveAttachmentTitle { get { return ResourceManager.GetString("AIChat_RemoveAttachmentTitle", resourceCulture); } }
+        public static string AIChat_UsageFormat { get { return ResourceManager.GetString("AIChat_UsageFormat", resourceCulture); } }
+        public static string AIChat_Sources { get { return ResourceManager.GetString("AIChat_Sources", resourceCulture); } }
+        public static string InlineAIPrompt_Title { get { return ResourceManager.GetString("InlineAIPrompt_Title", resourceCulture); } }
+        public static string InlineAIPrompt_ReplaceText { get { return ResourceManager.GetString("InlineAIPrompt_ReplaceText", resourceCulture); } }
+        public static string InlineAIPrompt_ReplaceSelectionText { get { return ResourceManager.GetString("InlineAIPrompt_ReplaceSelectionText", resourceCulture); } }
+        public static string InlineAIPrompt_AppendText { get { return ResourceManager.GetString("InlineAIPrompt_AppendText", resourceCulture); } }
+        public static string InlineAIPrompt_DiscardText { get { return ResourceManager.GetString("InlineAIPrompt_DiscardText", resourceCulture); } }
+        public static string SmartPasteButton_Text { get { return ResourceManager.GetString("SmartPasteButton_Text", resourceCulture); } }
+        public static string SmartPasteButton_Title { get { return ResourceManager.GetString("SmartPasteButton_Title", resourceCulture); } }
+        public static string AIPrompt_Placeholder { get { return ResourceManager.GetString("AIPrompt_Placeholder", resourceCulture); } }
+        public static string AIPrompt_GenerateText { get { return ResourceManager.GetString("AIPrompt_GenerateText", resourceCulture); } }
+        public static string AIPrompt_StopText { get { return ResourceManager.GetString("AIPrompt_StopText", resourceCulture); } }
+        public static string AIPrompt_CopyTitle { get { return ResourceManager.GetString("AIPrompt_CopyTitle", resourceCulture); } }
+        public static string AIPrompt_RetryTitle { get { return ResourceManager.GetString("AIPrompt_RetryTitle", resourceCulture); } }
     }
 }

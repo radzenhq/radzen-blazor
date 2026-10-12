@@ -1,0 +1,122 @@
+@using System.ComponentModel
+@inject IJSRuntime JSRuntime
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="5">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Gap="0.75rem">
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">1. Copy some text with customer details</RadzenText>
+                <RadzenTextArea @bind-Value="@sample" Rows="9" Style="width: 100%" />
+                <RadzenButton Text="Copy to clipboard" Icon="content_copy" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@CopySample" />
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="7">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenTemplateForm TItem="Customer" Data="@customer" Submit="@OnSubmit">
+                <RadzenStack Gap="0.75rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">2. Fill the form from the clipboard</RadzenText>
+                        <RadzenSmartPasteButton Data="@customer" Pasted="@((Customer c) => OnPasted(c))" EmptyClipboard="@(() => OnEmptyClipboard())" Error="@((Exception e) => OnError(e))" />
+                    </RadzenStack>
+                    <RadzenRow Gap="0.75rem">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Company" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.CompanyName" Name="CompanyName" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Contact" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.ContactName" Name="ContactName" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Email" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.Email" Name="Email" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Phone" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.Phone" Name="Phone" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12">
+                            <RadzenFormField Text="Address" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.Address" Name="Address" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="City" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.City" Name="City" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Country" Style="width: 100%"><RadzenTextBox @bind-Value="@customer.Country" Name="Country" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Customer since" Style="width: 100%"><RadzenDatePicker @bind-Value="@customer.CustomerSince" Name="CustomerSince" DateFormat="d" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Credit limit" Style="width: 100%"><RadzenNumeric @bind-Value="@customer.CreditLimit" Name="CreditLimit" Format="C" /></RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Segment" Style="width: 100%"><RadzenDropDown @bind-Value="@customer.Segment" Name="Segment" Data="@(Enum.GetValues<CustomerSegment>())" /></RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" />
+                        <RadzenButton Text="Reset" Icon="restart_alt" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@(() => customer = new Customer())" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+<EventConsole @ref="console" Style="min-height: 120px;" />
+
+@code {
+    EventConsole console;
+    Customer customer = new();
+
+    string sample = "Hi, this is Maria Anders from Alfreds Futterkiste. We have been your customer since March 2019. " +
+        "You can reach me at maria.anders@alfreds.example or on 030-0074321. Our office is at Obere Str. 57, 12209 Berlin, Germany. " +
+        "We are a small retail shop and would like a credit limit of 15,000 EUR.";
+
+    public enum CustomerSegment
+    {
+        Retail,
+        Wholesale,
+        Enterprise
+    }
+
+    public class Customer
+    {
+        public string CompanyName { get; set; }
+        [Description("The full name of the contact person")]
+        public string ContactName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        [Description("Street and number only, without city or postal code")]
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public DateTime? CustomerSince { get; set; }
+        public decimal? CreditLimit { get; set; }
+        public CustomerSegment? Segment { get; set; }
+    }
+
+    async Task CopySample()
+    {
+        await JSRuntime.InvokeVoidAsync("Radzen.copyToClipboard", sample);
+        console.Log("Sample text copied to the clipboard. Now click Smart paste.");
+    }
+
+    void OnPasted(Customer value)
+    {
+        console.Log($"Pasted: {value.CompanyName}, {value.ContactName}, {value.City}, {value.Country}, since {value.CustomerSince:d}, limit {value.CreditLimit:C}, {value.Segment}", AlertStyle.Success);
+    }
+
+    void OnEmptyClipboard()
+    {
+        console.Log("The clipboard is empty or the browser did not allow reading it.", AlertStyle.Warning);
+    }
+
+    void OnError(Exception ex)
+    {
+        console.Log(ex.Message, AlertStyle.Danger);
+    }
+
+    void OnSubmit(Customer value)
+    {
+        console.Log("Submit", AlertStyle.Info);
+    }
+}

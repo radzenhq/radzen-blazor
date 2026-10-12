@@ -1,0 +1,61 @@
+<RadzenTemplateForm TItem="Product" Data="@product" Submit="@OnSubmit">
+    <RadzenStack Gap="1rem" Style="max-width: 48rem">
+        <RadzenFormField Text="Product name" Variant="Variant.Outlined">
+            <ChildContent>
+                <RadzenTextBox id="name" Name="Name" @bind-Value="@product.Name" />
+            </ChildContent>
+            <End>
+                <RadzenInlineAIPrompt @bind-Value="@product.Name" TargetId="name" Title="Improve the name"
+                                      Suggestions="@(new[] { "Make it catchier", "Make it shorter", "Suggest an alternative" })"
+                                      Applied="@(value => console.Log($"Name: {value}"))" />
+            </End>
+        </RadzenFormField>
+        <RadzenFormField Text="Description" Variant="Variant.Outlined">
+            <ChildContent>
+                <RadzenTextArea id="description" Name="Description" @bind-Value="@product.Description" Rows="6" />
+            </ChildContent>
+            <End>
+                <RadzenInlineAIPrompt @bind-Value="@product.Description" TargetId="description" Title="Rewrite the description"
+                                      Suggestions="@(new[] { "Fix grammar and spelling", "Make it more persuasive", "Turn into bullet points" })"
+                                      Commands="@commands"
+                                      Applied="@(value => console.Log($"Description: {value.Length} characters"))" />
+            </End>
+        </RadzenFormField>
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-text-secondary-color">
+            Select a part of the description, then open the assistant: the selection is the context and only it is replaced.
+        </RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+<EventConsole @ref="console" Style="min-height: 120px;" />
+
+@code {
+    EventConsole console;
+
+    class Product
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    Product product = new()
+    {
+        Name = "blue mug",
+        Description = "this mug is made from ceramic and holds 350ml. it is blue and dishwasher safe, you can also put it in the microwave. good for coffee and tea, we think its a nice gift to."
+    };
+
+    AIPromptCommand[] commands =
+    [
+        new AIPromptCommand { Text = "Shorter", Icon = "compress", Prompt = "Make it shorter." },
+        new AIPromptCommand { Text = "Formal", Icon = "work", Prompt = "Rewrite in a formal tone." },
+        new AIPromptCommand { Text = "German", Icon = "translate", Prompt = "Translate to German." }
+    ];
+
+    void OnSubmit(Product value)
+    {
+        console.Log($"Saved: {value.Name}", AlertStyle.Success);
+    }
+}

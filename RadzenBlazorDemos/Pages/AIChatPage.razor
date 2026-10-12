@@ -58,19 +58,145 @@
     AI Chat with Memory
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The <strong>AIChat</strong> component supports conversation memory that remembers previous questions and maintains context across multiple interactions. 
-    Use <code>SessionId</code> to maintain conversation state and <code>SessionIdChanged</code> to track session changes.
+    The <strong>AIChat</strong> component supports conversation memory that remembers previous questions and maintains context across multiple interactions.
+    Use <code>SessionId</code> to maintain conversation state, <code>UserId</code> to tell whose conversation it is and <code>SessionIdChanged</code> to track session changes.
+    Conversations are kept in an <code>IConversationStore</code>: the default <code>InMemoryConversationStore</code> keeps them for the lifetime of the application, and <code>AddConversationStore&lt;TStore&gt;()</code>
+    plugs in your own - this demo uses one backed by Entity Framework that serializes each conversation with <code>ConversationSessionSerializer</code>, including tool calls, attachments and reasoning.
+    The store must live where the data survives a reload: on Blazor Server it runs in the server process, while the WebAssembly demo registers a store that calls a small API on the host, because the browser process restarts with every reload.
+    The service saves the conversation after every answer and <code>GetSessionsAsync</code>, <code>GetOrCreateSessionAsync</code> and <code>DeleteSessionAsync</code> manage the saved ones.
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatWithMemory">
     <AIChatWithMemory />
 </RadzenExample>
 
+<RadzenText Anchor="aichat#tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tool calling
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Give the model access to your application's data and logic with the <code>Tools</code> parameter. Tools are <code>AIFunction</code> instances from
+    <code>Microsoft.Extensions.AI</code> - create them from any C# method with <code>AIFunctionFactory.Create</code> and describe them with <code>[Description]</code> attributes.
+    The model decides when to call a tool, <strong>AIChat</strong> invokes it, shows the call in the conversation and feeds the result back to the model.
+    The <code>ToolCallCompleted</code> event fires when a tool finishes.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatTools">
+    <AIChatTools />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#generative-ui" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Generative UI
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>ToolCallTemplate</code> to render tool results with Radzen components instead of text. The template receives a <code>ChatToolCall</code> with the tool
+    <code>Name</code>, <code>Arguments</code>, <code>Status</code> and <code>Result</code>; call <code>GetResult&lt;T&gt;()</code> to deserialize the result.
+    Ask for the sales by month to get a chart, or for the orders of a customer to get a data grid, directly in the conversation.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatGenerativeUI">
+    <AIChatGenerativeUI />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#approval" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Human in the loop
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Wrap a tool in <code>ApprovalRequiredAIFunction</code> to ask the user before it runs. <strong>AIChat</strong> renders the call with its arguments and
+    <strong>Approve</strong> / <strong>Reject</strong> buttons, invokes the tool only when approved and tells the model when the call was rejected.
+    Use <code>ToolCallTemplate</code> with <code>ApproveToolCall</code> and <code>RejectToolCall</code> to build your own approval UI.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatApproval">
+    <AIChatApproval />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#voice" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Voice input
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Combine <strong>AIChat</strong> with <strong>RadzenSpeechToTextButton</strong> to let users talk to the assistant: the button captures speech with the browser's speech recognition
+    and its <code>Change</code> event passes the transcript to <code>SendMessage</code>.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatVoice">
+    <AIChatVoice />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#attachments" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    File attachments
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>AllowAttachments="true"</code> to let users attach files with the paperclip button, or add them from code with <code>AddAttachment</code>. Images are sent to a multimodal model as image content
+    and shown in the conversation; text files such as txt, csv, md, json or xml are sent as text, so any model can answer questions about them; PDF files are sent as file content for providers that support it (OpenAI). <code>MaxAttachmentSize</code> and <code>AcceptedAttachmentTypes</code> limit what can be attached and the <code>Error</code> event reports files that
+    cannot be read. <code>ShowUsage</code> displays the tokens the provider reports for each answer and the stop button next to the input cancels a response that is still streaming.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatAttachments">
+    <AIChatAttachments />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#citations" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Citations
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Answers can show the sources they are based on. A tool that returns <code>ChatCitation</code> instances (title, URL, snippet) sends them to the model as its result and the chat lists them under the answer as numbered links,
+    so the model can cite them as [1], [2] in the text. Providers that annotate their responses - OpenAI web search, Perplexity, Azure AI Search and others - arrive the same way: the client maps their annotations to
+    <code>CitationAnnotation</code> of <code>Microsoft.Extensions.AI</code> and the chat collects them in <code>ChatMessage.Citations</code>. <code>ShowCitations</code> hides the list and <code>CitationTemplate</code> renders a source your way.
+    This demo searches a small documentation index with a tool; replace it with your search service or vector store.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatCitations">
+    <AIChatCitations />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#providers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI providers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>AIChat</strong> talks to the model through the <code>IChatClient</code> abstraction of <code>Microsoft.Extensions.AI</code>.
+    <code>AddAIChatService</code> configures the built-in <code>OpenAICompatibleChatClient</code>, which works with any OpenAI-compatible chat completions endpoint
+    (OpenAI, Azure OpenAI, Ollama, LM Studio, Cloudflare Workers AI and others) and supports streaming and tool calling.
+</RadzenText>
+<pre>
+<code>
+builder.Services.AddAIChatService(options =>
+{
+    options.Endpoint = "https://api.openai.com/v1/chat/completions";
+    options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
+    options.Model = "gpt-4o-mini";
+    options.EmbeddingsModel = "text-embedding-3-small";
+});
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-6 rz-mb-2">
+    Keep the API key on the server
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    In Blazor Server the options above live on the server and the key never reaches the browser. In a WebAssembly application everything in the client is visible to its users, so the service refuses an API key there:
+    set <code>Proxy</code> to an endpoint of your server instead and let the server add the key, as this demo does with <code>options.Proxy = "api/chat/completions"</code> in the client and a <code>ChatController</code> in the host
+    that forwards the body to the provider with the key from its configuration (<code>EmbeddingsProxy</code> does the same for embeddings). Protect that endpoint with <code>[Authorize]</code>, otherwise every visitor can spend your quota,
+    and decide on the server which models, token limits and system prompts the client may use.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    To use a different provider, register its <code>IChatClient</code> and <strong>AIChat</strong> picks it up automatically. Any middleware added with
+    <code>ChatClientBuilder</code> (logging, caching, OpenTelemetry, rate limiting) applies to the chat as well.
+</RadzenText>
+<pre>
+<code>
+// OpenAI (Microsoft.Extensions.AI.OpenAI)
+builder.Services.AddChatClient(new OpenAIClient(apiKey).GetChatClient("gpt-4o-mini").AsIChatClient())
+    .UseLogging();
+
+// Azure OpenAI (Azure.AI.OpenAI + Microsoft.Extensions.AI.OpenAI)
+builder.Services.AddChatClient(new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential()).GetChatClient("gpt-4o-mini").AsIChatClient());
+
+// Ollama (OllamaSharp)
+builder.Services.AddChatClient(new OllamaApiClient(new Uri("http://localhost:11434"), "llama3.2"));
+
+builder.Services.AddAIChatService();
+</code>
+</pre>
+
 <RadzenText Anchor="aichat#configuration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Runtime AI Configuration
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Customize AI behavior at runtime by configuring the <code>Model</code>, <code>Temperature</code>, <code>MaxTokens</code>, <code>SystemPrompt</code>, <code>Endpoint</code>, <code>Proxy</code>, <code>ApiKey</code>, and <code>ApiKeyHeader</code> parameters. 
+    Customize AI behavior at runtime by configuring the <code>Model</code>, <code>Temperature</code>, <code>MaxTokens</code>, <code>SystemPrompt</code>, <code>Endpoint</code> and <code>Proxy</code> parameters.
     These parameters can be set on the component or passed to the <code>SendMessage</code> method to override settings per message, enabling dynamic switching between different AI providers and models.
+    <code>ApiKey</code> and <code>ApiKeyHeader</code> exist for Blazor Server only; a WebAssembly client must go through a server <code>Proxy</code>, as described under AI providers.
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatModelSelection">
     <AIChatModelSelection />

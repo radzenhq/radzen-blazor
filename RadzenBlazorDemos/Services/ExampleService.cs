@@ -16,7 +16,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Overview",
             Path = "/",
-            Description = "145+ free, open-source Blazor UI components for data-rich web apps. DataGrid, Scheduler, Charts, Forms, and more. MIT licensed.",
+            Description = "155+ free, open-source Blazor UI components for data-rich web apps. DataGrid, Scheduler, Charts, Forms, and more. MIT licensed.",
             Icon = "\ue88a"
         },
         new Example
@@ -29,20 +29,119 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name = "AI",
-            Path = "/ai",
-            Title = "AI and Radzen Blazor | Free Radzen Blazor",
-            Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
-            Icon = "\uefac",
-            Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget" }
-        },
-        new Example
-        {
             Name = "Support",
             Path = "/support",
             Title = "Support | Free Radzen Blazor",
             Description = "How to get support for the Radzen Blazor Components library.",
             Icon = "\ue0c6"
+        },
+        new Example
+        {
+            Name = "AI",
+            Updated = true,
+            Icon = "\uefac",
+            Children = new [] {
+                new Example
+                {
+                    Toc = [
+                        new () { Text = "Components", Anchor = "#components" },
+                        new () { Text = "Agentic chat", Anchor = "#agentic-chat" },
+                        new () { Text = "AI in data components", Anchor = "#ai-data-components" },
+                        new () { Text = "Any provider", Anchor = "#providers" },
+                        new () { Text = "Radzen Blazor MCP", Anchor = "#radzen-blazor-mcp" }
+                    ],
+                    Name = "AI Overview",
+                    Path = "/ai",
+                    Title = "AI and Radzen Blazor | Free Radzen Blazor",
+                    Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
+                    Icon = "\uefac",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget", "tools", "agent", "prompt", "smart paste", "generative ui" }
+                },
+                new Example
+                {
+                    Updated = true,
+                    Name = "AIChat",
+                    Title = "Blazor AI Chat Component | Free Radzen Blazor",
+                    Path = "aichat",
+                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants with tool calling, generative UI and human-in-the-loop approvals.",
+                    Related = new [] { "chat", "ai", "speechtotextbutton" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." },
+                        new FaqItem { Question = "Can the AI call my application code?", Answer = "Yes. Pass AIFunction tools created with AIFunctionFactory to the Tools parameter. The model calls them, the component invokes them and renders the calls; wrap a tool in ApprovalRequiredAIFunction to ask the user first." },
+                        new FaqItem { Question = "Which AI providers are supported?", Answer = "Any OpenAI-compatible endpoint out of the box, and any Microsoft.Extensions.AI IChatClient (OpenAI, Azure OpenAI, Ollama and others) registered in the service collection." }
+                    },
+                    Icon = "\ue0b7",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "tools", "function calling", "agent", "approval", "generative ui", "citations", "sources", "rag" },
+                    Toc =
+                    [
+                        new () { Text = "Custom styling", Anchor = "#custom-styling" },
+                        new () { Text = "Compact AIChat", Anchor = "#compact-aichat" },
+                        new () { Text = "Events and interactions", Anchor = "#events" },
+                        new () { Text = "Date separator", Anchor = "#date-separator" },
+                        new () { Text = "Memory", Anchor = "#memory" },
+                        new () { Text = "Tool calling", Anchor = "#tools" },
+                        new () { Text = "Generative UI", Anchor = "#generative-ui" },
+                        new () { Text = "Human in the loop", Anchor = "#approval" },
+                        new () { Text = "Voice input", Anchor = "#voice" },
+                        new () { Text = "File attachments", Anchor = "#attachments" },
+                        new () { Text = "Citations", Anchor = "#citations" },
+                        new () { Text = "AI providers", Anchor = "#providers" },
+                        new () { Text = "Runtime configuration", Anchor = "#configuration" }
+                    ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "AIPrompt",
+                    Title = "Blazor AI Prompt Component | Free Radzen Blazor",
+                    Path = "aiprompt",
+                    Description = "The Blazor AIPrompt component is a prompt box for one-shot AI tasks with suggested prompts, a streaming output panel and commands that refine the result.",
+                    Related = new [] { "aichat", "smartpastebutton", "chart-ai-insights" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the difference between AIPrompt and AIChat?", Answer = "AIChat is a conversation with memory and tool calling. AIPrompt is a single prompt with an output panel and commands such as summarize, rewrite or translate, often applied to a piece of text." },
+                        new FaqItem { Question = "Can AIPrompt work on the text of an editor?", Answer = "Yes. Set Context to the editor content or selection and every prompt, suggestion and command runs against it." }
+                    },
+                    Icon = "\uf0eb",
+                    Tags = new [] { "ai", "prompt", "assistant", "summarize", "rewrite", "translate", "generate" },
+                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "InlineAIPrompt",
+                    Title = "Blazor Inline AI Prompt Component | Free Radzen Blazor",
+                    Path = "inline-aiprompt",
+                    Description = "The Blazor InlineAIPrompt component adds an AI assistant to any text field: a popup prompt that rewrites the value or the selected text and applies the result.",
+                    Related = new [] { "aiprompt", "textarea", "textbox", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does InlineAIPrompt change the field?", Answer = "Bind Value to the same value as the field. Replace sets the value to the output, or only the selected part of it when TargetId points to the input and text is selected; Append adds the output after the value." },
+                        new FaqItem { Question = "Can I open the assistant without the button?", Answer = "Yes. Set ShowButton to false and call OpenAsync with the element to anchor the popup to, for example from a keyboard shortcut or a selection toolbar." }
+                    },
+                    Icon = "\ue8ad",
+                    Tags = new [] { "ai", "prompt", "assistant", "inline", "field", "rewrite", "popup" },
+                    Toc = [ new () { Text = "Usage", Anchor = "#usage" } ]
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "SmartPasteButton",
+                    Title = "Blazor Smart Paste Button | Free Radzen Blazor",
+                    Path = "smartpastebutton",
+                    Description = "The Blazor SmartPasteButton fills a form from the text in the clipboard by asking an AI model to extract the fields of the form model.",
+                    Related = new [] { "templateform", "aiprompt", "aichat" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Smart Paste Button fill the form?", Answer = "It reads the clipboard, describes the properties of the form model to the AI model, asks for a JSON object with those keys and assigns the converted values." },
+                        new FaqItem { Question = "Which property types are supported?", Answer = "Strings, numbers, booleans, dates (DateTime, DateOnly, TimeOnly, DateTimeOffset), enums and Guids, including their nullable variants." }
+                    },
+                    Icon = "\uea8e",
+                    Tags = new [] { "ai", "paste", "clipboard", "form", "autofill", "extract" },
+                    Toc = [ new () { Text = "How it works", Anchor = "#how-it-works" } ]
+                }
+            }
         },
         new Example
         {
@@ -448,6 +547,62 @@ namespace RadzenBlazorDemos
                             Faq = new []
                             {
                                 new FaqItem { Question = "Can I filter a column bound to a nested property?", Answer = "Yes. Set the column Property to the nested path (for example Order.Customer.Country); filtering, sorting, and grouping follow the same path." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "AI Assistant",
+                            Path = "datagrid-ai-assistant",
+                            Title = "Blazor DataGrid AI Assistant - Filter, Sort and Group in Natural Language | Free Radzen Blazor",
+                            Description = "Let users filter, sort, group and arrange a Blazor DataGrid in natural language. RadzenAIChat tools call the grid API so every request becomes a regular grid operation.",
+                            Tags = new [] { "ai", "assistant", "chat", "natural language", "filter", "sort", "group", "grid", "datagrid", "agent" },
+                            Related = new [] { "aichat", "datagrid-ai-column", "datagrid-filter-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does the AI assistant control the DataGrid?", Answer = "RadzenAIChat receives tools created from page methods that call the grid API - SetFilterValue, OrderBy, Groups and column Visible. The model picks the tool from the user's words." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "AI Highlight",
+                            Path = "datagrid-ai-highlight",
+                            Title = "Blazor DataGrid AI Highlight - Mark Rows by a Natural Language Condition | Free Radzen Blazor",
+                            Description = "Describe a condition in plain words and let the AI model highlight the matching rows of a Blazor DataGrid in place.",
+                            Tags = new [] { "ai", "highlight", "condition", "natural language", "rowrender", "grid", "datagrid" },
+                            Related = new [] { "datagrid-ai-assistant", "datagrid-semantic-search", "datagrid-conditional-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does AI highlight work?", Answer = "The rows and the condition are sent to the model, which returns the matching ids; a RowRender handler styles those rows while the grid keeps its paging and sorting." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "Semantic Search",
+                            Path = "datagrid-semantic-search",
+                            Title = "Blazor DataGrid Semantic Search - Find Rows by Meaning | Free Radzen Blazor",
+                            Description = "Search a Blazor DataGrid by meaning instead of exact words: rows and the query are embedded with an AI model and ranked by similarity.",
+                            Tags = new [] { "ai", "semantic", "search", "embeddings", "similarity", "grid", "datagrid" },
+                            Related = new [] { "datagrid-ai-assistant", "datagrid-ai-column", "datagrid-filter-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does semantic search work in the DataGrid?", Answer = "Each row is turned into a short text and embedded once with IAIChatService.GetEmbeddingGenerator(). A query is embedded the same way and the rows are ranked by cosine similarity, so 'something to drink' finds beverages." }
+                            }
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "AI Column",
+                            Path = "datagrid-ai-column",
+                            Title = "Blazor DataGrid AI Column - Generated Cell Values | Free Radzen Blazor",
+                            Description = "Add a Blazor DataGrid column whose values are generated by an AI model from the data of each row, computed per page in one request.",
+                            Tags = new [] { "ai", "column", "generated", "structured output", "grid", "datagrid" },
+                            Related = new [] { "datagrid-ai-assistant", "aichat", "datagrid-column-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Does the AI column make one request per row?", Answer = "No. The page asks the model for all rows of the current page in a single structured-output request and caches the values." }
                             }
                         },
                         new Example
@@ -1416,6 +1571,21 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    New = true,
+                    Name = "AI Insights",
+                    Path = "chart-ai-insights",
+                    Icon = "\uefac",
+                    Title = "Blazor Chart AI Insights - Ask Questions About Your Chart | Free Radzen Blazor",
+                    Description = "Let users ask questions about a Blazor chart. RadzenAIPrompt receives the chart data as context and answers with a summary, a comparison or a forecast.",
+                    Tags = new [] { "ai", "chart", "insights", "summary", "prompt", "analysis" },
+                    Related = new [] { "aiprompt", "column-chart", "aichat" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the AI know the chart data?", Answer = "The series are serialized to JSON and passed to the Context parameter of RadzenAIPrompt, so every prompt runs against the data the user sees." }
+                    }
+                },
+                new Example
+                {
                     Name = "Column Chart",
                     Icon = "\ue015",
                     Children = new [] {
@@ -2199,20 +2369,6 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
-                    Name = "AIChat",
-                    Title = "Blazor AI Chat Component | Free Radzen Blazor",
-                    Path = "aichat",
-                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants.",
-                    Related = new [] { "chat", "ai", "speechtotextbutton" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." }
-                    },
-                    Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
-                },
-                new Example
-                {
                     Name = "Chat",
                     Title = "Blazor Chat Component | Free Radzen Blazor",
                     Path = "chat",
@@ -2223,7 +2379,17 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "Does the Blazor Chat support multiple participants?", Answer = "Yes. It renders messages from distinct users with their own identity and supports real-time, multi-participant conversations." }
                     },
                     Icon = "\uefd1",
-                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
+                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" },
+                    Toc =
+                    [
+                        new () { Text = "Multi-participant support", Anchor = "#users" },
+                        new () { Text = "Customization options", Anchor = "#customization" },
+                        new () { Text = "Events and interactions", Anchor = "#events" },
+                        new () { Text = "Date separator", Anchor = "#date-separator" },
+                        new () { Text = "Compact chat", Anchor = "#compact" },
+                        new () { Text = "RenderFragment as Title", Anchor = "#title" },
+                        new () { Text = "Mention users", Anchor = "#mention" }
+                    ]
                 },
                 new Example
                 {
@@ -2563,7 +2729,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Updated = true,
+                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "AI assistant", Anchor = "#ai" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name="HtmlEditor",
                     Icon = "\ue3c9",
                     Children = new [] {
@@ -2631,7 +2798,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Updated = true,
+                    Toc = [ new () { Text = "Custom tools", Anchor = "#custom-tools" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "AI assistant", Anchor = "#ai" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "MarkdownEditor",
                     New = true,
                     Icon = "\uf552",
@@ -3405,7 +3573,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Group appointments by resource", Anchor = "#resources" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Updated = true,
+                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Group appointments by resource", Anchor = "#resources" }, new () { Text = "AI assistant", Anchor = "#ai-assistant" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Title = "Blazor Scheduler & Calendar Component | Free Radzen Blazor",
                     Path = "scheduler",
@@ -4950,6 +5119,13 @@ namespace RadzenBlazorDemos
             return dataGrid?.Children != null ? CollectLeaves(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
         }
 
+        // Every leaf page under the "AI" category, the AI overview included. Article-eligible for schema.
+        public IEnumerable<Example> GetAIPages()
+        {
+            var ai = Examples.FirstOrDefault(c => c.Name == "AI");
+            return ai?.Children != null ? CollectLeaves(ai.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
         // Every leaf page under the "PivotDataGrid" category. Article-eligible for schema.
         public IEnumerable<Example> GetPivotDataGridPages()
         {
@@ -5003,7 +5179,7 @@ namespace RadzenBlazorDemos
                 return example.Title ?? $"Blazor {example.Name} | Free Radzen Blazor";
             }
 
-            return "Free Blazor Components | 145+ UI controls by Radzen";
+            return "Free Blazor Components | 155+ UI controls by Radzen";
         }
 
         public string DescriptionFor(Example example)

@@ -1,0 +1,25 @@
+@page "/smartpastebutton"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor SmartPasteButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Blazor SmartPasteButton fills a form from whatever text is in the clipboard - an email, a signature, a document - by asking an AI model to extract the fields of the form model.
+</RadzenText>
+
+<RadzenExample ComponentName="SmartPasteButton" Example="SmartPasteButtonConfig">
+    <SmartPasteButtonConfig />
+</RadzenExample>
+
+<RadzenText Anchor="smartpastebutton#how-it-works" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    How it works
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Data</code> to the form model. On click the button reads the clipboard, describes the public properties of the model (name, type, and any <code>[Description]</code> or <code>[Display]</code> attribute)
+    to the <code>IChatClient</code> configured for <code>IAIChatService</code>, asks for a JSON object with those keys and assigns the values, converting dates, numbers, booleans and enums.
+    Properties the text does not mention stay unchanged. Use <code>Fields</code> to restrict which properties are filled, <code>Instructions</code> to add rules such as the expected language,
+    and <code>Pasted</code> to react when the model is filled. Call <code>Paste(text)</code> to fill the model from a string instead of the clipboard.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Reading the clipboard requires a user gesture and, in most browsers, the user's permission; the <code>EmptyClipboard</code> event fires when nothing could be read.
+</RadzenText>

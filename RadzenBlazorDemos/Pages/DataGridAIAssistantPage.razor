@@ -1,0 +1,18 @@
+@page "/datagrid-ai-assistant"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor DataGrid <strong>AI Assistant</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Let users filter, sort, group and arrange a Blazor DataGrid in natural language. RadzenAIChat tools call the grid API, so every request becomes a regular grid operation the user can see and undo.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridAIAssistant">
+    <DataGridAIAssistant />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-8">
+    The assistant is a <code>RadzenAIChat</code> with <code>Tools</code> created from methods of the page: <code>FilterColumn</code> calls <code>SetFilterOperator</code> and <code>SetFilterValue</code> on the matching column,
+    <code>SortByColumn</code> calls <code>OrderBy</code>, <code>GroupByColumn</code> adds a <code>GroupDescriptor</code> to <code>Groups</code> and <code>SetColumnVisibility</code> toggles the column <code>Visible</code> parameter.
+    The model picks the tool from the user's words and the system prompt lists the available columns. <code>AllowMultipleToolCalls="false"</code> keeps the model to one grid operation per step so the grid updates in order.
+</RadzenText>

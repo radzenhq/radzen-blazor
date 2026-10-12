@@ -1,0 +1,19 @@
+@page "/datagrid-semantic-search"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor DataGrid <strong>Semantic Search</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Search a Blazor DataGrid by meaning instead of exact words. "Something to drink" finds the beverages and "Italian cheese" finds Gorgonzola and Mozzarella, even though none of the rows contain those words.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridSemanticSearch">
+    <DataGridSemanticSearch />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-8">
+    Every row is turned into a short description and embedded once with the <code>IEmbeddingGenerator</code> from <code>IAIChatService.GetEmbeddingGenerator()</code> - the one registered in the
+    service collection or the built-in <code>OpenAICompatibleEmbeddingGenerator</code> configured by <code>AIChatServiceOptions.EmbeddingsModel</code> and <code>EmbeddingsEndpoint</code>.
+    The query is embedded the same way and the rows are ranked by cosine similarity with <code>TensorPrimitives.CosineSimilarity</code>; the top matches are shown with their score.
+    For large data sets store the vectors next to the rows, or in a vector database, instead of computing them on the page.
+</RadzenText>

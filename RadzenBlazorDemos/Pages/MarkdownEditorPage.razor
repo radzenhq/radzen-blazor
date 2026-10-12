@@ -56,6 +56,17 @@ The Radzen MarkdownEditor supports the following tools. Place them inside <stron
     </ul>
 </RadzenText>
 
+<RadzenText Anchor="markdown-editor#ai" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI assistant
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add an AI tool to the toolbar with <code>RadzenMarkdownEditorCustomTool</code>. Select some text and click <strong>AI</strong>: a dialog with <strong>RadzenAIPrompt</strong> opens with the selection as context,
+    you rewrite, summarize or translate it and the result replaces the selected text in the Markdown value. Without a selection the whole document is used.
+</RadzenText>
+<RadzenExample ComponentName="MarkdownEditor" Example="MarkdownEditorAI" AdditionalSourceCodePages=@(new [] { "EditorAIDialog.razor" })>
+    <MarkdownEditorAI />
+</RadzenExample>
+
 <RadzenText Anchor="markdown-editor#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor;
 
@@ -36,8 +37,34 @@ public class ChatMessage
     /// Gets or sets whether this message is currently streaming.
     /// </summary>
     public bool IsStreaming { get; set; }
+
     /// <summary>
     /// Gets or sets the role associated with the message (e.g., "user", "assistant").
     /// </summary>
     public string? Role { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tool calls the assistant made while producing this message.
+    /// </summary>
+    public List<ChatToolCall> ToolCalls { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the reasoning the model produced before answering, when the model exposes it.
+    /// </summary>
+    public string? Reasoning { get; set; }
+
+    /// <summary>
+    /// Gets or sets the files attached to the message.
+    /// </summary>
+    public List<ChatAttachment> Attachments { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the token usage reported by the model for this response, when the provider reports it.
+    /// </summary>
+    public Microsoft.Extensions.AI.UsageDetails? Usage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sources the answer is based on: citations the provider attached to the response and citations returned by tools.
+    /// </summary>
+    public List<ChatCitation> Citations { get; set; } = new();
 }

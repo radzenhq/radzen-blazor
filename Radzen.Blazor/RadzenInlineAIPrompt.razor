@@ -1,0 +1,24 @@
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (ShowButton)
+        {
+            <RadzenButton @ref="button" Icon="@Icon" IconColor="@IconColor" Text="@Text" title="@Title" ButtonStyle="@ButtonStyle" Variant="@Variant" Shade="@Shade" Size="@Size" Disabled="@Disabled"
+                          Click="@(() => OpenAsync())" aria-haspopup="dialog" aria-expanded="@(IsOpen ? "true" : "false")" aria-controls="@PopupId" class="rz-inline-aiprompt-button" />
+        }
+        <RadzenPopup @ref="popup" id="@PopupId" Lazy="true" class="rz-inline-aiprompt-popup" role="dialog" aria-label="@Title" Open="@OnPopupOpen" Close="@OnPopupClose">
+            <RadzenAIPrompt @ref="prompt" Context="@context" SystemPrompt="@SystemPrompt" ModelId="@ModelId" Temperature="@Temperature" MaxTokens="@MaxTokens"
+                            Suggestions="@Suggestions" Commands="@Commands" Placeholder="@Placeholder" OutputTemplate="@OutputTemplate" Generated="@OnGenerated" Error="@Error" OutputChanged="@OnOutputChanged" />
+            @if (!string.IsNullOrEmpty(output))
+            {
+                <div class="rz-inline-aiprompt-actions">
+                    <RadzenButton Icon="check" Text="@(hasSelection ? ReplaceSelectionText : ReplaceText)" Size="ButtonSize.Small" Disabled="@(!ready)" Click="@Replace" class="rz-inline-aiprompt-replace" />
+                    <RadzenButton Icon="add" Text="@AppendText" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Size="ButtonSize.Small" Disabled="@(!ready)" Click="@Append" class="rz-inline-aiprompt-append" />
+                    <RadzenButton Icon="close" Text="@DiscardText" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Click="@Discard" class="rz-inline-aiprompt-discard" />
+                </div>
+            }
+        </RadzenPopup>
+    </div>
+}
