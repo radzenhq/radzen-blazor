@@ -1,0 +1,96 @@
+@using Radzen
+@using Radzen.Blazor
+@inject IJSRuntime JSRuntime
+
+<RadzenStack class="rz-p-0 rz-p-md-12" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+        <RadzenButton Text="Offer a prompt" Icon="lightbulb" Variant="Variant.Flat" Click="@OfferPrompt" />
+        <RadzenButton Text="Send two at once" Icon="double_arrow" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Click="@SendTwo" />
+    </RadzenStack>
+    <RadzenAIChat @ref="chat"
+                  @bind-Input="@input"
+                  Model="@model"
+                  QueueMessages="true"
+                  ShowAvatars="false"
+                  ShowClearButton="false"
+                  ShowUsage="true"
+                  SendButtonText="Build it"
+                  SendButtonIcon="bolt"
+                  StopButtonText="Stop"
+                  Placeholder="Describe what to build..."
+                  Style="height: 520px;">
+        <HeaderTemplate>
+            <RadzenDropDown TValue="string" Data="@conversations" @bind-Value="@conversation" Style="min-width: 14rem;" />
+            <RadzenButton Icon="add" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Title="New conversation" Click="@NewConversation" />
+        </HeaderTemplate>
+        <InputHeaderTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenIcon Icon="@(chat?.QueuedMessages.Count > 0 ? "schedule" : "check_circle")" Style="font-size: 1rem;" class="rz-text-secondary-color" />
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">
+                    @(chat?.QueuedMessages.Count > 0 ? $"{chat.QueuedMessages.Count} message(s) queued - they are sent when the current answer completes" : "Ready")
+                </RadzenText>
+            </RadzenStack>
+        </InputHeaderTemplate>
+        <InputFooterTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                <RadzenDropDown TValue="string" Data="@models" @bind-Value="@model" Style="min-width: 16rem;" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Text="Publish" Icon="publish" Size="ButtonSize.Small" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Click="@Publish" />
+                </RadzenStack>
+            </RadzenStack>
+        </InputFooterTemplate>
+        <UsageTemplate Context="message">
+            @message.Usage.InputTokenCount in / @message.Usage.OutputTokenCount out
+        </UsageTemplate>
+        <MessageFooterTemplate Context="message">
+            @if (!message.IsUser && !message.IsStreaming)
+            {
+                <RadzenButton Icon="content_copy" Text="Copy" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", message.Content))" />
+            }
+        </MessageFooterTemplate>
+    </RadzenAIChat>
+</RadzenStack>
+
+@code {
+    RadzenAIChat chat;
+    string input;
+    string model = "@cf/meta/llama-4-scout-17b-16e-instruct";
+
+    List<string> models = new()
+    {
+        "@cf/openai/gpt-oss-120b",
+        "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "@cf/meta/llama-4-scout-17b-16e-instruct"
+    };
+
+    List<string> conversations = new() { "Landing page", "Invoice app", "Weather dashboard" };
+    string conversation = "Landing page";
+
+    async Task OfferPrompt()
+    {
+        input = "Build a landing page with a hero section, three feature cards and a contact form.";
+        await chat.FocusAsync();
+    }
+
+    async Task SendTwo()
+    {
+        var first = chat.SendMessage("What is Blazor? Answer in two sentences.");
+        await chat.SendMessage("And what is Radzen? Answer in two sentences.");
+        await first;
+    }
+
+    async Task Publish()
+    {
+        var progress = chat.AddMessage(new Radzen.Blazor.ChatMessage { Kind = ChatMessageKind.Progress, Content = "Publishing the app..." });
+        await Task.Delay(1500);
+        chat.RemoveMessage(progress);
+        chat.AddMessage(new Radzen.Blazor.ChatMessage { Kind = ChatMessageKind.Status, Content = $"Published at {DateTime.Now:HH:mm:ss}" });
+    }
+
+    async Task NewConversation()
+    {
+        conversation = $"Conversation {conversations.Count + 1}";
+        conversations.Add(conversation);
+        await chat.ClearChat();
+    }
+}

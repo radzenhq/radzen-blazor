@@ -45,6 +45,17 @@ public interface IAIChatService
     IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(ChatMessage message, string? sessionId = null, ChatOptions? options = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null, string? userId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Offers the service a message the user sent while a response of the session is still streaming, when <see cref="Blazor.RadzenAIChat.QueueMessages"/> is <c>true</c>.
+    /// Return <c>true</c> to take the message: the service gives it to the model as part of the running response, for example once the tool calls in progress finish, and the chat shows it as sent.
+    /// The default returns <c>false</c>: the chat keeps the message and sends it with <see cref="GetStreamingResponseAsync"/> once the response completes.
+    /// <see cref="AIChatService"/> forwards to the <see cref="IChatMessageQueue"/> its chat client exposes through <see cref="IChatClient.GetService"/>.
+    /// </summary>
+    /// <param name="message">The message. Usually a user message with text and attachments as <see cref="DataContent"/>.</param>
+    /// <param name="sessionId">The session whose response is streaming.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task<bool> TryQueueMessageAsync(ChatMessage message, string? sessionId, CancellationToken cancellationToken = default) => Task.FromResult(false);
+
+    /// <summary>
     /// Gets the store the conversations are kept in.
     /// </summary>
     IConversationStore Store { get; }
