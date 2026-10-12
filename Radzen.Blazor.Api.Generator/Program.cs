@@ -369,6 +369,7 @@ static class AssemblyInspector
             paths.Add(dll);
 
         AddPackageAssemblies(Path.ChangeExtension(assemblyPath, ".deps.json"), paths);
+        AddNuspecDependencies(assemblyPath, paths);
 
         paths.Add(assemblyPath);
         return paths.ToList();
@@ -414,6 +415,196 @@ static class AssemblyInspector
                 }
             }
         }
+    }
+
+    static void AddNuspecDependencies(string assemblyPath, HashSet<string> paths)
+    {
+        var tfmDir = Path.GetDirectoryName(assemblyPath);
+        var libDir = Path.GetDirectoryName(tfmDir);
+        var packageDir = Path.GetDirectoryName(libDir);
+
+        if (tfmDir == null || libDir == null || packageDir == null)
+            return;
+
+        if (!string.Equals(Path.GetFileName(libDir), "lib", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var nuspec = Directory.GetFiles(packageDir, "*.nuspec").FirstOrDefault();
+
+        if (nuspec == null)
+            return;
+
+        var packagesRoot = Path.GetDirectoryName(Path.GetDirectoryName(packageDir));
+
+        if (packagesRoot == null || !Directory.Exists(packagesRoot))
+            return;
+
+        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { Path.GetFileNameWithoutExtension(nuspec) };
+
+        AddNuspecDependencies(nuspec, Path.GetFileName(tfmDir), packagesRoot, paths, visited);
+    }
+
+    static void AddNuspecDependencies(string nuspecPath, string tfm, string packagesRoot, HashSet<string> paths, HashSet<string> visited)
+    {
+        XDocument document;
+
+        try
+        {
+            document = XDocument.Load(nuspecPath);
+        }
+        catch (Exception ex) when (ex is System.Xml.XmlException or IOException or UnauthorizedAccessException)
+        {
+            return;
+        }
+
+        var dependencies = document.Descendants().FirstOrDefault(e => e.Name.LocalName == "dependencies");
+
+        if (dependencies == null)
+            return;
+
+        var groups = dependencies.Elements().Where(e => e.Name.LocalName == "group").ToList();
+
+        IEnumerable<XElement> items;
+
+        if (groups.Count == 0)
+        {
+            items = dependencies.Elements().Where(e => e.Name.LocalName == "dependency");
+        }
+        else
+        {
+            var group = PickByTargetFramework(groups, tfm, g => NormalizeTargetFramework((string?)g.Attribute("targetFramework")));
+
+            items = group?.Elements().Where(e => e.Name.LocalName == "dependency") ?? Enumerable.Empty<XElement>();
+        }
+
+        foreach (var item in items)
+        {
+            var id = (string?)item.Attribute("id");
+
+            if (string.IsNullOrEmpty(id) || !visited.Add(id))
+                continue;
+
+            var packageDir = FindPackageDirectory(packagesRoot, id, (string?)item.Attribute("version"));
+
+            if (packageDir == null)
+                continue;
+
+            var libDir = Path.Combine(packageDir, "lib");
+
+            if (Directory.Exists(libDir))
+            {
+                var tfmDir = PickByTargetFramework(Directory.GetDirectories(libDir), tfm, d => NormalizeTargetFramework(Path.GetFileName(d)));
+
+                if (tfmDir != null)
+                {
+                    foreach (var dll in Directory.GetFiles(tfmDir, "*.dll"))
+                        paths.Add(dll);
+                }
+            }
+
+            var nuspec = Directory.GetFiles(packageDir, "*.nuspec").FirstOrDefault();
+
+            if (nuspec != null)
+                AddNuspecDependencies(nuspec, tfm, packagesRoot, paths, visited);
+        }
+    }
+
+    static string? FindPackageDirectory(string packagesRoot, string id, string? version)
+    {
+        var idDir = Directory.EnumerateDirectories(packagesRoot).FirstOrDefault(d => string.Equals(Path.GetFileName(d), id, StringComparison.OrdinalIgnoreCase));
+
+        if (idDir == null)
+            return null;
+
+        if (!string.IsNullOrEmpty(version))
+        {
+            var exact = Path.Combine(idDir, version.Trim('[', ']', '(', ')', ' ').Split(',')[0]);
+
+            if (Directory.Exists(exact))
+                return exact;
+        }
+
+        return Directory.GetDirectories(idDir)
+            .Select(d => (Path: d, Version: ParseVersion(Path.GetFileName(d))))
+            .Where(d => d.Version != null)
+            .OrderByDescending(d => d.Version)
+            .Select(d => d.Path)
+            .FirstOrDefault();
+    }
+
+    static Version? ParseVersion(string text)
+    {
+        var dash = text.IndexOf('-', StringComparison.Ordinal);
+
+        if (dash >= 0)
+            text = text[..dash];
+
+        return Version.TryParse(text, out var version) ? version : null;
+    }
+
+    static string NormalizeTargetFramework(string? tfm)
+    {
+        if (string.IsNullOrEmpty(tfm))
+            return "";
+
+        tfm = tfm.ToUpperInvariant();
+
+        if (tfm.StartsWith(".NETSTANDARD", StringComparison.Ordinal))
+            return "NETSTANDARD" + tfm[".NETSTANDARD".Length..];
+
+        if (tfm.StartsWith(".NETCOREAPP", StringComparison.Ordinal))
+            return "NETCOREAPP" + tfm[".NETCOREAPP".Length..];
+
+        return tfm;
+    }
+
+    static T? PickByTargetFramework<T>(IEnumerable<T> candidates, string tfm, Func<T, string> getTargetFramework) where T : class
+    {
+        var list = candidates.Select(c => (Candidate: c, Tfm: getTargetFramework(c))).ToList();
+
+        var target = NormalizeTargetFramework(tfm);
+        var targetVersion = ParseNetVersion(target);
+
+        var exact = list.FirstOrDefault(c => c.Tfm == target).Candidate;
+
+        if (exact != null)
+            return exact;
+
+        if (targetVersion != null)
+        {
+            var net = list
+                .Select(c => (c.Candidate, Version: ParseNetVersion(c.Tfm)))
+                .Where(c => c.Version != null && c.Version <= targetVersion)
+                .OrderByDescending(c => c.Version)
+                .Select(c => c.Candidate)
+                .FirstOrDefault();
+
+            if (net != null)
+                return net;
+        }
+
+        foreach (var fallback in new[] { "NETSTANDARD2.1", "NETSTANDARD2.0", "" })
+        {
+            var match = list.FirstOrDefault(c => c.Tfm == fallback).Candidate;
+
+            if (match != null)
+                return match;
+        }
+
+        return null;
+    }
+
+    static Version? ParseNetVersion(string tfm)
+    {
+        if (!tfm.StartsWith("NET", StringComparison.Ordinal) || tfm.StartsWith("NETSTANDARD", StringComparison.Ordinal) || tfm.StartsWith("NETCOREAPP", StringComparison.Ordinal))
+            return null;
+
+        var text = tfm["NET".Length..];
+
+        if (text.Length == 0 || !char.IsDigit(text[0]) || text.Contains('-', StringComparison.Ordinal))
+            return null;
+
+        return text.Contains('.', StringComparison.Ordinal) ? ParseVersion(text) : null;
     }
 
     static bool IsCompilerGenerated(Type t)
