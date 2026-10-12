@@ -939,14 +939,18 @@ namespace Radzen.Blazor
             {
                 await foreach (var update in ChatService.GetStreamingResponseAsync(request, currentSessionId, options, endpoint, proxy, apiKey, apiKeyHeader, UserId, cts.Token))
                 {
-                    if (update.Role == ChatRole.User && !string.IsNullOrEmpty(update.MessageId) && TryMarkRead(update.MessageId))
+                    if (update.Role == ChatRole.User)
                     {
-                        await CompleteAssistantMessage(assistantMessage);
+                        if (!string.IsNullOrEmpty(update.MessageId) && TryMarkRead(update.MessageId))
+                        {
+                            await CompleteAssistantMessage(assistantMessage);
 
-                        assistantMessage = AddMessage(new ChatMessage { UserId = "system", IsUser = false, Timestamp = DateTime.Now, IsStreaming = true });
-                        text.Clear();
+                            assistantMessage = AddMessage(new ChatMessage { UserId = "system", IsUser = false, Timestamp = DateTime.Now, IsStreaming = true });
+                            text.Clear();
 
-                        await InvokeAsync(StateHasChanged);
+                            await InvokeAsync(StateHasChanged);
+                        }
+
                         continue;
                     }
 

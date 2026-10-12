@@ -54,6 +54,11 @@ namespace Radzen.Blazor.Tests
                         cancellationToken.ThrowIfCancellationRequested();
                         await Task.Delay(20, cancellationToken);
 
+                        if (EmitUnknownMarker && i == 5)
+                        {
+                            yield return new ChatResponseUpdate(ChatRole.User, "leak") { ResponseId = "r0", MessageId = "nope" };
+                        }
+
                         var unread = i >= 10 ? Queue?.Taken.FirstOrDefault(taken => !Read.Contains(taken.MessageId!)) : null;
 
                         if (unread != null)
@@ -90,6 +95,8 @@ namespace Radzen.Blazor.Tests
             public QueueingClient? Queue { get; set; }
 
             public HashSet<string> Read { get; } = new();
+
+            public bool EmitUnknownMarker { get; set; }
 
             public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : serviceType == typeof(IChatMessageQueue) ? Queue : null;
 
@@ -588,6 +595,15 @@ namespace Radzen.Blazor.Tests
             Assert.Single(client.Requests);
             Assert.Equal(4, component.Instance.GetMessages().Count);
 
+            var session = ctx.Services.GetRequiredService<IAIChatService>().GetOrCreateSession(component.Instance.GetSessionId());
+            Assert.Equal(new[] { "First", null, "Second", null }, session.Messages.Select(message => message.IsUser ? message.Content : null));
+            Assert.StartsWith("word ", session.Messages[1].Content);
+            Assert.DoesNotContain("after", session.Messages[1].Content);
+            Assert.StartsWith("after ", session.Messages[3].Content);
+            Assert.Equal(new[] { ChatRole.User, ChatRole.Assistant, ChatRole.User, ChatRole.Assistant }, session.History.Select(message => message.Role));
+            Assert.Equal("Second", session.History[2].Text);
+            Assert.Equal(messages[2].Id, session.History[2].MessageId);
+
             var service = ctx.Services.GetRequiredService<IAIChatService>();
             client.Queue = null;
             Assert.False(await service.TryQueueMessageAsync(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, "Third"), component.Instance.GetSessionId()));
@@ -723,6 +739,55 @@ namespace Radzen.Blazor.Tests
             await component.InvokeAsync(() => component.Instance.AddAttachment(new ChatAttachment { Name = "direct.txt", MediaType = "text/plain", Data = new byte[100] }));
             Assert.Equal(2, component.Instance.PendingAttachments.Count);
             Assert.Equal(3, seen.Count);
+        }
+
+        [Fact]
+        public async Task RadzenAIChat_SkipsUserUpdatesThatMatchNoMessage()
+        {
+            var (ctx, client) = CreateContext();
+            using var __ = ctx;
+
+            client.EmitUnknownMarker = true;
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("Go"));
+
+            var messages = component.Instance.GetMessages();
+            Assert.Equal(2, messages.Count);
+            Assert.DoesNotContain("leak", messages[1].Content);
+            Assert.DoesNotContain("leak", component.Markup);
+            Assert.Equal(50, messages[1].Content.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length);
+
+            var session = ctx.Services.GetRequiredService<IAIChatService>().GetOrCreateSession(component.Instance.GetSessionId());
+            Assert.Equal(2, session.Messages.Count);
+            Assert.DoesNotContain("leak", session.Messages[1].Content);
+            Assert.Equal(new[] { ChatRole.User, ChatRole.Assistant }, session.History.Select(message => message.Role));
+            Assert.DoesNotContain("leak", session.History[1].Text);
+        }
+
+        [Fact]
+        public async Task AIChatService_DoesNotSaveTakenMessagesTheResponseNeverRead()
+        {
+            var (ctx, client) = CreateContext();
+            using var __ = ctx;
+
+            client.Queue = new QueueingClient();
+
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.SystemPrompt, "slow")
+                .Add(p => p.QueueMessages, true));
+
+            var send = component.InvokeAsync(() => component.Instance.SendMessage("First"));
+            component.WaitForAssertion(() => Assert.Contains("word", component.Instance.GetMessages()[1].Content));
+
+            await component.InvokeAsync(() => component.Instance.SendMessage("Second"));
+            await component.InvokeAsync(() => component.Instance.Stop());
+            await send;
+
+            var session = ctx.Services.GetRequiredService<IAIChatService>().GetOrCreateSession(component.Instance.GetSessionId());
+            Assert.Equal(new[] { true, false }, session.Messages.Select(message => message.IsUser));
+            Assert.Equal(new[] { ChatRole.User, ChatRole.Assistant }, session.History.Select(message => message.Role));
         }
     }
 }

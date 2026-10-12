@@ -155,6 +155,55 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
         var client = GetChatClient(endpoint, proxy, apiKey, apiKeyHeader);
 
+        AddUserMessage(session, message);
+
+        var updates = new List<ChatResponseUpdate>();
+
+        try
+        {
+            await foreach (var update in client.GetStreamingResponseAsync(session.History, options, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                updates.Add(update);
+
+                yield return update;
+            }
+        }
+        finally
+        {
+            if (updates.Count > 0)
+            {
+                var segment = new List<ChatResponseUpdate>();
+
+                foreach (var update in updates)
+                {
+                    if (update.Role != ChatRole.User)
+                    {
+                        segment.Add(update);
+                        continue;
+                    }
+
+                    if (TakeRequest(update.MessageId) is not ChatMessage taken)
+                    {
+                        continue;
+                    }
+
+                    SaveResponse(session, segment);
+                    segment = new List<ChatResponseUpdate>();
+
+                    AddUserMessage(session, taken);
+                }
+
+                SaveResponse(session, segment);
+            }
+
+            ForgetRequests(session.Id);
+
+            await Store.SaveAsync(session, CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    private static void AddUserMessage(ConversationSession session, ChatMessage message)
+    {
         var userText = string.Concat(message.Contents.OfType<TextContent>().Select(content => content.Text));
 
         var attachments = message.Contents.OfType<DataContent>().Select(Blazor.ChatAttachment.FromDataContent).ToList();
@@ -173,52 +222,91 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         }
 
         session.AddHistory([message]);
+    }
 
-        var updates = new List<ChatResponseUpdate>();
-
-        try
+    private static void SaveResponse(ConversationSession session, List<ChatResponseUpdate> updates)
+    {
+        if (updates.Count == 0)
         {
-            await foreach (var update in client.GetStreamingResponseAsync(session.History, options, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
-            {
-                updates.Add(update);
+            return;
+        }
 
-                yield return update;
+        var response = updates.ToChatResponse();
+
+        session.AddHistory(response.Messages);
+
+        var displayMessage = ToDisplayMessage(response);
+
+        if (displayMessage != null)
+        {
+            MergeToolCalls(session, displayMessage);
+
+            if (displayMessage.Content.Length > 0 || displayMessage.ToolCalls.Count > 0)
+            {
+                session.AddMessage(displayMessage);
             }
         }
-        finally
+    }
+
+    private readonly Dictionary<string, (string? SessionId, ChatMessage Message)> takenRequests = new();
+
+    private void RememberRequest(ChatMessage message, string? sessionId)
+    {
+        if (string.IsNullOrEmpty(message.MessageId))
         {
-            if (updates.Count > 0)
+            return;
+        }
+
+        lock (takenRequests)
+        {
+            takenRequests[message.MessageId] = (sessionId, message);
+        }
+    }
+
+    private ChatMessage? TakeRequest(string? messageId)
+    {
+        if (string.IsNullOrEmpty(messageId))
+        {
+            return null;
+        }
+
+        lock (takenRequests)
+        {
+            return takenRequests.Remove(messageId, out var taken) ? taken.Message : null;
+        }
+    }
+
+    private void ForgetRequests(string sessionId)
+    {
+        lock (takenRequests)
+        {
+            foreach (var key in takenRequests.Where(entry => entry.Value.SessionId == sessionId).Select(entry => entry.Key).ToList())
             {
-                var response = updates.ToChatResponse();
-
-                session.AddHistory(response.Messages);
-
-                var displayMessage = ToDisplayMessage(response);
-
-                if (displayMessage != null)
-                {
-                    MergeToolCalls(session, displayMessage);
-
-                    if (displayMessage.Content.Length > 0 || displayMessage.ToolCalls.Count > 0)
-                    {
-                        session.AddMessage(displayMessage);
-                    }
-                }
+                takenRequests.Remove(key);
             }
-
-            await Store.SaveAsync(session, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc />
-    /// <remarks>Forwards to the <see cref="IChatMessageQueue"/> the chat client exposes through <see cref="IChatClient.GetService"/>, and returns <c>false</c> when it exposes none. Override to queue messages another way.</remarks>
-    public virtual Task<bool> TryQueueMessageAsync(ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
+    /// <remarks>
+    /// Forwards to the <see cref="IChatMessageQueue"/> the chat client exposes through <see cref="IChatClient.GetService"/>, and returns <c>false</c> when it exposes none.
+    /// A taken message is saved in the conversation at the point where the response yields a <see cref="ChatResponseUpdate"/> with <see cref="ChatRole.User"/> and its <see cref="ChatMessage.MessageId"/>,
+    /// and the response is saved as one assistant message before and one after it; a message the response never reads is not saved. Override to queue messages another way.
+    /// </remarks>
+    public virtual async Task<bool> TryQueueMessageAsync(ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(message);
 
         var queue = GetChatClient().GetService<IChatMessageQueue>();
 
-        return queue == null ? Task.FromResult(false) : queue.TryQueueMessageAsync(message, sessionId, cancellationToken);
+        if (queue == null || !await queue.TryQueueMessageAsync(message, sessionId, cancellationToken).ConfigureAwait(false))
+        {
+            return false;
+        }
+
+        RememberRequest(message, sessionId);
+
+        return true;
     }
 
     /// <inheritdoc />
