@@ -5178,7 +5178,7 @@ namespace RadzenBlazorDemos
 
         public string DescriptionFor(Example example)
         {
-            return example?.Description ?? "The Radzen Blazor component library provides more than 100 UI controls for building rich ASP.NET Core web applications.";
+            return example?.Description ?? "Free, open-source (MIT) Blazor component library with 155+ native UI controls - DataGrid, Scheduler, Charts, Spreadsheet, forms and more - for ASP.NET Core.";
         }
     }
 }
