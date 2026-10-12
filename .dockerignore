@@ -1,9 +1,8 @@
-# Keep the Docker build context small. Without this, `COPY . .` ships the
-# entire .git history (~115MB) and every bin/obj into the build context,
-# bloating uploads and invalidating layer caches on every build.
+# Keep the Docker build context small. Without this, `COPY . .` ships
+# every bin/obj into the build context, bloating uploads and invalidating
+# layer caches on every build.
 
 # Version control
-.git
 .gitignore
 .gitattributes
 
