@@ -24,6 +24,33 @@
     Explore 40+ free, open-source data-visualization components for Blazor - including 30+ chart types, from area and line charts to financial and statistical ones, plus gauges, sparklines, a treemap and a Sankey diagram. Every chart is drawn in C# as SVG, so it renders under static server-side rendering with no JavaScript charting library. Click any chart for a live demo.
 </RadzenText>
 
+<RadzenText Anchor="charts#basic-usage" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+    Basic usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add a <code>RadzenChart</code> and place one or more series inside it. The <code>RadzenColumnSeries</code> tags below render a column for every <code>DataItem</code> in their <code>Data</code> arrays. The Y (value) axis displays the <code>Revenue</code> property and the X (category) axis displays the <code>Quarter</code> property.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="ChartSeriesConfig">
+    <ChartSeriesConfig />
+</RadzenExample>
+
+<RadzenText Anchor="charts#series" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+    Chart Series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Each series binds a set of data to a visual form like a line, bar, or pie. Combine several series in one chart, for example a column series with a line overlay, as long as they share compatible axes. All series have the following common properties:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>Data</code> - specifies the data source which the series should display.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>ValueProperty</code> - the name of the property which provides values for the Y axis of the chart. The property should be of numeric type: <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>decimal</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>CategoryProperty</code> - the name of the property which provides value for the X axis of the chart. The property can be <code>string</code>, <code>Date</code> or <code>numeric</code>. If not set RadzenChart will use the index of the data item as its X axis value.
+</RadzenText>
+
 <style>
     .chart-gallery .rz-link {
         --rz-link-text-decoration: none;
@@ -1407,7 +1434,7 @@
 <RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Series *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
-        <RadzenLink Path="/chart-series">
+        <RadzenLink Path="/charts#series">
             <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Series chart thumbnail">
@@ -1672,4 +1699,22 @@
         </RadzenLink>
     </RadzenColumn>
 </RadzenRow>
+
+<RadzenText Anchor="charts#keyboard-navigation" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Chart component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
 </div>
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate forward across Chart legend items." },
+        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate backward across Chart legend items." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Show/hide the focused Chart legend item series." }
+    };
+}

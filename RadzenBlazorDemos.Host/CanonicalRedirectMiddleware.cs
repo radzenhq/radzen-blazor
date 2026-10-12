@@ -17,6 +17,7 @@ public static class CanonicalRedirectMiddleware
     private static readonly FrozenDictionary<string, string> StaticRedirects = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
         ["/buttons"] = "/button",
+        ["/chart-series"] = "/charts",
         ["/docs"] = "/",
         ["/docs/guides/components/aichat.html"] = "/aichat",
         ["/docs/guides/components/accordion.html"] = "/accordion",

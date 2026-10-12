@@ -1171,7 +1171,15 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Charts - 30+ Chart Types | Free Radzen Blazor",
                     Description = "Browse 40+ free Blazor data-visualization components, including 30+ chart types plus gauges, sparklines, treemap and Sankey. Drawn in C# as SVG, with no JavaScript charting library.",
                     Icon = "\ue3b6",
-                    Tags = new [] { "chart", "gallery", "overview", "visualization" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Are the Radzen Blazor charts free?", Answer = "Yes. The charts are part of Radzen.Blazor, which is open source under the MIT license and free for commercial use." },
+                        new FaqItem { Question = "Which chart types are included?", Answer = "30+ chart types: area, bar, column, line, pie, donut, funnel, pyramid, scatter, bubble, candlestick, OHLC, box plot, waterfall, heatmap, treemap, Sankey and more, plus gauges and sparklines." },
+                        new FaqItem { Question = "Do the charts need a JavaScript charting library?", Answer = "No. Every chart is drawn in C# as SVG, so it also renders under static server-side rendering." },
+                        new FaqItem { Question = "How do I add a series to a chart?", Answer = "Place a series component such as RadzenLineSeries or RadzenColumnSeries inside the chart and bind its Data, then point CategoryProperty and ValueProperty at the fields you want." },
+                        new FaqItem { Question = "Can I combine different series types?", Answer = "Yes. Put more than one series inside the same chart - a column series with a line overlay, for example - as long as they share compatible axes." }
+                    },
+                    Tags = new [] { "chart", "gallery", "overview", "visualization", "graph", "series" },
                     New = true
                 },
                 new Example
@@ -1181,27 +1189,12 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
-                            Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                            Name = "Series",
-                            Path = "chart-series",
-                            Title = "Configure Chart Series in Radzen Blazor | Free Radzen Blazor",
-                            Description = "Bind data to a line, bar, pie, or other series - the building block of every Blazor chart.",
-                            Related = new [] { "line-chart", "column-chart", "chart-axis" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I add a series to a chart?", Answer = "Place a series component such as RadzenLineSeries or RadzenColumnSeries inside the chart and bind its Data, then point CategoryProperty and ValueProperty at the fields you want." },
-                                new FaqItem { Question = "Can I combine different series types?", Answer = "Yes. Put more than one series inside the same chart - a column series with a line overlay, for example - as long as they share compatible axes." }
-                            },
-                            Tags = new [] { "chart", "graph", "series" }
-                        },
-                        new Example
-                        {
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
                             Title = "Chart Axis Configuration in Radzen Blazor | Free Radzen Blazor",
                             Description = "Control the scale, gridlines, labels, and title of a Blazor chart's axes, or let them fit the data automatically.",
-                            Related = new [] { "chart-series", "multiple-axes-chart", "logarithmic-axis-chart" },
+                            Related = new [] { "multiple-axes-chart", "logarithmic-axis-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I set the axis minimum, maximum, and step?", Answer = "Set Min, Max, and Step on the value axis to control the range and tick spacing instead of letting the chart pick them from the data." },
@@ -1267,7 +1260,7 @@ namespace RadzenBlazorDemos
                             Name = "Indexed Category Axis",
                             Path = "indexed-category-axis-chart",
                             Description = "Align Blazor chart series by position rather than matching category values with an indexed category axis.",
-                            Related = new [] { "chart-axis", "line-chart", "chart-series" },
+                            Related = new [] { "chart-axis", "line-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "When do I need an indexed category axis?", Answer = "When your series do not share the same category values but you still want them aligned by order - comparing sequences of different lengths or with gaps." }
@@ -1282,7 +1275,7 @@ namespace RadzenBlazorDemos
                             Path = "chart-legend",
                             Title = "Chart Legend Options in Radzen Blazor | Free Radzen Blazor",
                             Description = "Show, move, restyle, or hide the legend that tells readers which series is which on a Blazor chart.",
-                            Related = new [] { "chart-series", "chart-tooltip", "pie-chart" },
+                            Related = new [] { "chart-tooltip", "pie-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I hide the chart legend?", Answer = "Add a legend component with Visible set to false - the chart then renders without the legend." },
@@ -1353,7 +1346,7 @@ namespace RadzenBlazorDemos
                             Name = "Data Labels",
                             Path = "chart-data-labels",
                             Description = "Print the value next to each point or bar on a Blazor chart, with position, formatting, and overlap handling.",
-                            Related = new [] { "chart-series", "chart-tooltip", "column-chart" },
+                            Related = new [] { "chart-tooltip", "column-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I show values on a chart?", Answer = "Add data labels to the series; each point then displays its value, with options for position, formatting, and a background chip." },
@@ -1382,7 +1375,7 @@ namespace RadzenBlazorDemos
                             Path = "styling-chart",
                             Title = "Style and Theme Radzen Blazor Charts | Free Radzen Blazor",
                             Description = "Restyle a Blazor chart with color schemes, custom series colors, fills, and fonts to match your theme.",
-                            Related = new [] { "chart-series", "styling-gauge", "column-chart" },
+                            Related = new [] { "styling-gauge", "column-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "How do I change a chart's colors?", Answer = "Pick a built-in color scheme or supply your own palette; you can also set a custom color per series." }
