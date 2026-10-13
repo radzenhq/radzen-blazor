@@ -571,7 +571,7 @@ static class XlsxReader
             }
             else if (reader.LocalName == "sheetData" && reader.NamespaceURI == ns)
             {
-                ReadChildren(reader, ns, "row", () => rows.Add(ReadRow(reader, ns)));
+                ReadChildren(reader, ns, "row", () => rows.Add(ReadRow(reader, ns, rows.Count > 0 && int.TryParse(rows[^1].Index, out var last) ? last : 0)));
             }
             else
             {
@@ -612,11 +612,37 @@ static class XlsxReader
         reader.Read();
     }
 
-    private static SheetRow ReadRow(XmlReader reader, string ns)
+    private static SheetRow ReadRow(XmlReader reader, string ns, int previousRow)
     {
-        var row = new SheetRow(reader.GetAttribute("r"), reader.GetAttribute("ht"));
+        // The r attribute is optional: a row without one follows the previous row.
+        var rowNumber = int.TryParse(reader.GetAttribute("r"), out var r) ? r : previousRow + 1;
+        var row = new SheetRow(rowNumber.ToString(CultureInfo.InvariantCulture), reader.GetAttribute("ht"));
 
         ReadChildren(reader, ns, "c", () => row.Cells.Add(ReadCell(reader, ns)));
+
+        // Likewise a cell without an r attribute takes the column after the previous cell in its row.
+        var previousColumn = -1;
+
+        for (var i = 0; i < row.Cells.Count; i++)
+        {
+            var cell = row.Cells[i];
+
+            if (string.IsNullOrEmpty(cell.Reference))
+            {
+                if (rowNumber < 1)
+                {
+                    continue;
+                }
+
+                cell = cell with { Reference = new CellRef(rowNumber - 1, previousColumn + 1).ToString() };
+                row.Cells[i] = cell;
+            }
+
+            if (CellRef.TryParse(cell.Reference, out var address))
+            {
+                previousColumn = address.Column;
+            }
+        }
 
         return row;
     }
@@ -2125,7 +2151,8 @@ static class XlsxReader
             {
                 if (RelMap.TryGetValue(RelId, out var sheetPath))
                 {
-                    return $"xl/{sheetPath.TrimStart('/')}"; // Excel paths are relative
+                    // An absolute target is a part name from the package root, a relative one is resolved against xl/.
+                    return sheetPath.StartsWith('/') ? sheetPath.TrimStart('/') : $"xl/{sheetPath}";
                 }
                 return string.Empty;
             }
