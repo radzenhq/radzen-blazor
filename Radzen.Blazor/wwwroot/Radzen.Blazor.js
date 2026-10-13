@@ -1873,7 +1873,7 @@ window.Radzen = {
             if (!children.length) return;
             var itemWidth = children[0].offsetWidth;
             if (itemWidth === 0) return;
-            var index = Math.round(container.scrollLeft / itemWidth);
+            var index = Math.round(Math.abs(container.scrollLeft) / itemWidth);
             if (index < 0) index = 0;
             if (index >= children.length) index = children.length - 1;
             try { ref.invokeMethodAsync('RadzenCarousel.OnScroll', index); } catch { }
