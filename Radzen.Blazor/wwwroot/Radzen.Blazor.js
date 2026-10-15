@@ -1809,9 +1809,10 @@ window.Radzen = {
     }
     el.focus();
   },
-  focusNext: function (container, reverse) {
+  focusNext: function (container, reverse, popupId) {
     if (!container) return;
-    var selector = 'a[href]:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"]):not([disabled])';
+    if (container.isConnected && Radzen.focusNextInTabOrder(container, reverse, popupId)) return;
+    var selector ='a[href]:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"]):not([disabled])';
     var candidates = Array.from(document.querySelectorAll(selector)).filter(function (el) {
       return (el.offsetWidth > 0 || el.offsetHeight > 0) && el !== container && !container.contains(el);
     });
@@ -1830,6 +1831,57 @@ window.Radzen = {
         }
       }
     }
+  },
+  focusNextInTabOrder: function (container, reverse, popupId) {
+    // Sequential focus order: positive tabindex first (by tabindex, then document order), then the rest in document order.
+    var popup = popupId ? document.getElementById(popupId) : null;
+    var selector = 'a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex]';
+    var candidates = Array.from(document.querySelectorAll(selector)).filter(function (el) {
+      return el === container ||
+        (!container.contains(el) && !(popup && popup.contains(el)) && Radzen.isTabbable(el));
+    });
+
+    // Tab stops only on the checked radio of a group, or on its first radio when none is checked.
+    var radioGroups = new Map();
+    candidates.forEach(function (el) {
+      if (el.type === 'radio' && el.name) {
+        var owner = el.form || document;
+        var groups = radioGroups.get(owner) || new Map();
+        var radios = groups.get(el.name) || [];
+        radios.push(el);
+        groups.set(el.name, radios);
+        radioGroups.set(owner, groups);
+      }
+    });
+    var keptRadios = new Set();
+    radioGroups.forEach(function (groups) {
+      groups.forEach(function (radios) {
+        keptRadios.add(radios.find(function (r) { return r.checked; }) || radios[0]);
+      });
+    });
+
+    var rank = function (el) { return el.tabIndex > 0 ? el.tabIndex : Number.MAX_SAFE_INTEGER; };
+    var ordered = candidates
+      .filter(function (el) { return !(el.type === 'radio' && el.name) || keptRadios.has(el); })
+      .map(function (el, index) { return { el: el, index: index }; })
+      .sort(function (a, b) { return rank(a.el) - rank(b.el) || a.index - b.index; })
+      .map(function (item) { return item.el; });
+
+    var position = ordered.indexOf(container);
+    if (position < 0) return false;
+    var next = ordered[reverse ? position - 1 : position + 1];
+    if (!next) return false;
+    next.focus();
+    return true;
+  },
+  isTabbable: function (el) {
+    if (el.tabIndex < 0 || el.matches(':disabled') || el.closest('[inert]')) return false;
+    if (el.offsetWidth === 0 && el.offsetHeight === 0) return false;
+    var style = getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.visibility === 'collapse') return false;
+    // A closed <details> hides everything but its own <summary>.
+    var details = el.parentElement ? el.parentElement.closest('details:not([open])') : null;
+    return !details || (el.tagName === 'SUMMARY' && el.parentElement === details);
   },
   scrollCarouselItem: function (el, duration) {
     var container = el.parentElement;
