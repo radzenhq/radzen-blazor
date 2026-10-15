@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -52,6 +53,56 @@ namespace Radzen.Blazor
         public string? RowGap { get; set; }
 
         /// <summary>
+        /// Gets or sets how many columns (1-12) fit on each line of the row by default.
+        /// Applies to child RadzenColumn components that do not set a Size for the current breakpoint; a column Size always takes precedence.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null (columns share the available space).</value>
+        [Parameter]
+        public int? Columns { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on mobile devices.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsXS { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on small tablets and larger devices.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsSM { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on tablets and larger devices.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsMD { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on desktops and larger devices.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsLG { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on large desktops and larger devices.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsXL { get; set; }
+
+        /// <summary>
+        /// Overrides the default Columns on very large displays.
+        /// </summary>
+        /// <value>The number of columns per line. Default is null.</value>
+        [Parameter]
+        public int? ColumnsXX { get; set; }
+
+        /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
         protected string GetStyle()
@@ -87,7 +138,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-display-flex rz-row rz-align-items-{GetFlexCSSClass<AlignItems>(AlignItems)} rz-justify-content-{GetFlexCSSClass<JustifyContent>(JustifyContent)}";
+            return ClassList.Create($"rz-display-flex rz-row rz-align-items-{GetFlexCSSClass<AlignItems>(AlignItems)} rz-justify-content-{GetFlexCSSClass<JustifyContent>(JustifyContent)}")
+                .AddSize("row-cols", nameof(Columns), Columns)
+                .AddSize("row-cols", nameof(ColumnsXS), "xs", ColumnsXS)
+                .AddSize("row-cols", nameof(ColumnsSM), "sm", ColumnsSM)
+                .AddSize("row-cols", nameof(ColumnsMD), "md", ColumnsMD)
+                .AddSize("row-cols", nameof(ColumnsLG), "lg", ColumnsLG)
+                .AddSize("row-cols", nameof(ColumnsXL), "xl", ColumnsXL)
+                .AddSize("row-cols", nameof(ColumnsXX), "xx", ColumnsXX)
+                .ToString();
         }
     }
 }

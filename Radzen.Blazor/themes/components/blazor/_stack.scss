@@ -75,6 +75,25 @@ $rz-offset-map: map.merge(
   width: 100%;
 }
 
+@mixin rz-row-cols($prefix) {
+  @for $cols from 1 through 12 {
+    .#{$prefix}-#{$cols} > .rz-col {
+      flex: 0 0 auto;
+      width: 100%;
+      max-width: calc((100% - #{$cols - 1} * var(--rz-gap)) / #{$cols});
+      flex-basis: calc((100% - #{$cols - 1} * var(--rz-gap)) / #{$cols});
+    }
+  }
+}
+
+@include rz-row-cols('rz-row-cols');
+
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @include rz-row-cols('rz-row-cols-#{$breakpoint}');
+  }
+}
+
 @each $col, $col-width in $rz-col-map {
   .rz-row > .rz-col-#{$col} {
     max-width: #{$col-width};

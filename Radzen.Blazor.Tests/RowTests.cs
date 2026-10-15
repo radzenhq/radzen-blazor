@@ -1,3 +1,4 @@
+using System;
 using Bunit;
 using Xunit;
 
@@ -130,6 +131,70 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("padding:1rem", component.Markup);
         }
+
+        [Fact]
+        public void Row_DoesNotRender_RowColsClass_ByDefault()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRow>();
+
+            Assert.DoesNotContain("rz-row-cols", component.Markup);
+        }
+
+        [Fact]
+        public void Row_Renders_Columns()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters.Add(p => p.Columns, 4));
+
+            Assert.Contains("rz-row-cols-4", component.Find(".rz-row").ClassList);
+        }
+
+        [Fact]
+        public void Row_Renders_ResponsiveColumns()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters
+                .Add(p => p.Columns, 1)
+                .Add(p => p.ColumnsXS, 2)
+                .Add(p => p.ColumnsSM, 3)
+                .Add(p => p.ColumnsMD, 4)
+                .Add(p => p.ColumnsLG, 5)
+                .Add(p => p.ColumnsXL, 6)
+                .Add(p => p.ColumnsXX, 7));
+
+            var classList = component.Find(".rz-row").ClassList;
+
+            Assert.Contains("rz-row-cols-1", classList);
+            Assert.Contains("rz-row-cols-xs-2", classList);
+            Assert.Contains("rz-row-cols-sm-3", classList);
+            Assert.Contains("rz-row-cols-md-4", classList);
+            Assert.Contains("rz-row-cols-lg-5", classList);
+            Assert.Contains("rz-row-cols-xl-6", classList);
+            Assert.Contains("rz-row-cols-xx-7", classList);
+        }
+
+        [Fact]
+        public void Row_Columns_KeepsAlignmentClasses()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters
+                .Add(p => p.Columns, 3)
+                .Add(p => p.AlignItems, AlignItems.Center));
+
+            var classList = component.Find(".rz-row").ClassList;
+
+            Assert.Contains("rz-display-flex", classList);
+            Assert.Contains("rz-align-items-center", classList);
+            Assert.Contains("rz-row-cols-3", classList);
+        }
+
+        [Fact]
+        public void Row_Throws_WhenColumnsOutOfRange()
+        {
+            using var ctx = new TestContext();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => ctx.RenderComponent<RadzenRow>(parameters => parameters.Add(p => p.Columns, 13)));
+        }
     }
 }
-

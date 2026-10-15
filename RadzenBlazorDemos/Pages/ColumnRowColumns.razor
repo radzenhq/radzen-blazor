@@ -1,0 +1,11 @@
+﻿<RadzenRow Columns="1" ColumnsSM="2" ColumnsMD="3" ColumnsLG="4" class="rz-text-align-center rz-border-info-light" Gap="1rem">
+    @foreach (var i in Enumerable.Range(1, 7))
+    {
+        <RadzenColumn class="rz-background-color-info-lighter rz-color-on-info-lighter rz-p-5">
+            Column @i
+        </RadzenColumn>
+    }
+    <RadzenColumn Size="12" class="rz-background-color-success-lighter rz-color-on-success-lighter rz-p-5">
+        Size="12"
+    </RadzenColumn>
+</RadzenRow>
