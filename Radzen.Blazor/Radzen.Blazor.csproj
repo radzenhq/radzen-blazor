@@ -54,6 +54,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Documents/Spreadsheet/theme1.xml" />
+    <EmbeddedResource Include="ILLink.Descriptors.xml" LogicalName="ILLink.Descriptors.xml" />
   </ItemGroup>
 
   <ItemGroup>

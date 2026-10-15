@@ -1,0 +1,5 @@
+<linker>
+  <assembly fullname="Radzen.Blazor">
+    <type fullname="Radzen.ODataServiceResult`1" preserve="all" required="false" />
+  </assembly>
+</linker>

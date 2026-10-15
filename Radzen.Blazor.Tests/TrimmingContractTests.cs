@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Xunit;
@@ -242,6 +243,25 @@ namespace Radzen.Blazor.Tests
             Assert.True(offenders.Count == 0,
                 "These types are read by reflection or serialized to JS/JSON at runtime but no [DynamicDependency] "
                 + "roots their members:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+        }
+
+        [Fact]
+        public void Embedded_ILLink_Descriptor_Preserves_ODataServiceResult_When_Kept()
+        {
+            using var stream = LibraryAssembly.GetManifestResourceStream("ILLink.Descriptors.xml");
+            Assert.True(stream != null,
+                "Radzen.Blazor must embed ILLink.Descriptors.xml with LogicalName=\"ILLink.Descriptors.xml\" so the "
+                + "trimmer keeps what System.Text.Json needs to create ODataServiceResult<T> in consumer code.");
+
+            var descriptor = XDocument.Load(stream!);
+            var entry = descriptor.Descendants("assembly")
+                .Where(assembly => (string?)assembly.Attribute("fullname") == LibraryAssembly.GetName().Name)
+                .Descendants("type")
+                .SingleOrDefault(type => (string?)type.Attribute("fullname") == typeof(ODataServiceResult<>).FullName);
+
+            Assert.NotNull(entry);
+            Assert.Equal("all", (string?)entry!.Attribute("preserve"));
+            Assert.Equal("false", (string?)entry.Attribute("required"));
         }
 
         [Fact]

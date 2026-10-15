@@ -16,8 +16,8 @@
 // does not preserve anything. The closed-generic-component instantiation below is the mechanism the
 // DAM fix actually repairs.
 
-using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using Radzen.Blazor;
 using Radzen.Blazor.TrimTest.Models;
 
@@ -77,10 +77,19 @@ object[] interopOwners =
     new RadzenChart(),
     new Radzen.DropDownItem<int>(),
     new Radzen.Documents.Spreadsheet.ChartDataPoint(),
-    new HttpResponseMessage(),
-    (Func<HttpResponseMessage, Task<object?>>)Radzen.HttpResponseMessageExtensions.ReadAsync<object>,
 ];
 GC.KeepAlive(interopOwners);
+
+try
+{
+    var odata = Read<Radzen.ODataServiceResult<object>>("{\"@odata.count\":1,\"value\":[{}]}");
+    if (odata?.Count != 1 || odata.Value?.Any() != true)
+        failures.Add($"ODataServiceResult`1: deserialized Count={odata?.Count} Value={odata?.Value?.Count()} instead of Count=1 with one item");
+}
+catch (Exception exception) when (exception is NotSupportedException or InvalidOperationException or JsonException)
+{
+    failures.Add($"ODataServiceResult`1: deserialization through an unannotated generic threw {exception.GetType().Name}: {exception.Message}");
+}
 
 var library = typeof(RadzenUpload).Assembly;
 string[] libraryNamespace = ["Radzen", "Radzen.Blazor", "Radzen.Blazor.Spreadsheet", "Radzen.Blazor.Rendering", "Radzen.Documents.Spreadsheet"];
@@ -137,3 +146,5 @@ if (failures.Count > 0)
 
 Console.WriteLine($"TRIM RUNTIME GATE PASSED - all {expectations.Sum(e => e.Members.Length)} gated model getters and {dtoExpectations.Sum(e => e.Setters.Length + e.Getters.Length)} interop DTO accessors survived trimming.");
 return 0;
+
+static T? Read<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Web);

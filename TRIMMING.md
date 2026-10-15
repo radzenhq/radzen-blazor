@@ -45,6 +45,8 @@ This covers, among others:
 
 DataGrid string filtering (`Contains`/`StartsWith`/`EndsWith`), sorting and grouping also work, and
 Radzen.Blazor's JS-interop callbacks (Upload, GoogleMap, HtmlEditor, Spreadsheet, ...) are preserved.
+`ODataServiceResult<T>` keeps the constructor and properties System.Text.Json needs whenever your app
+uses it, also when your own generic code deserializes it.
 
 ## What needs action when you trim your model assembly
 
