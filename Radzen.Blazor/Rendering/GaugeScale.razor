@@ -8,9 +8,9 @@
 {
     <g class="rz-tick">
         <Path class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
-        if (!string.IsNullOrEmpty(tick.Value))
+        @if (!string.IsNullOrEmpty(tick.Value))
         {
-            <Text Value=@tick.Value class="rz-tick-text" Position=@tick.Text />
+            <Radzen.Blazor.Rendering.Text Value=@tick.Value class="rz-tick-text" Position=@tick.Text />
         }
     </g>
 }
