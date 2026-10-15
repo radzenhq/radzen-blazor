@@ -209,6 +209,14 @@ namespace Radzen.Blazor
         public bool ShowDateTitle { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether clicking the date title opens a date picker that navigates the scheduler to the selected date.
+        /// Month and year views offer months instead of days. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the date title opens a date picker; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowDateSelection { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
         /// <example>
@@ -600,6 +608,57 @@ namespace Radzen.Blazor
             selectedIndex = Views.IndexOf(view);
 
             await InvokeLoadData();
+        }
+
+        ElementReference titleElement;
+        RadzenPopup? titlePopup;
+        DateTime titlePickerDate;
+
+        // Month and year views navigate by month or year, so their date picker offers months instead of days.
+        bool TitlePickerShowsDays => SelectedView is not (RadzenMonthView or SchedulerYearViewBase);
+
+        async Task OnTitleClick()
+        {
+            titlePickerDate = CurrentDate;
+
+            await titlePopup!.ToggleAsync(titleElement);
+        }
+
+        async Task OnTitleDateChanged(DateTime date)
+        {
+            if (TitlePickerShowsDays)
+            {
+                await NavigateToTitleDate(date);
+            }
+        }
+
+        // The month picker reports every change of the displayed month or year.
+        // Changing only the year browses; picking a month, even the displayed one, navigates to it.
+        async Task OnTitleCurrentDateChanged(DateTime date)
+        {
+            if (TitlePickerShowsDays)
+            {
+                return;
+            }
+
+            var calendar = Culture.Calendar;
+            var onlyYearChanged = calendar.GetMonth(date) == calendar.GetMonth(titlePickerDate) && calendar.GetYear(date) != calendar.GetYear(titlePickerDate);
+
+            titlePickerDate = date;
+
+            if (!onlyYearChanged)
+            {
+                await NavigateToTitleDate(date);
+            }
+        }
+
+        async Task NavigateToTitleDate(DateTime date)
+        {
+            CurrentDate = date;
+
+            await titlePopup!.CloseAsync();
+            await InvokeLoadData();
+            await titleElement.FocusAsync();
         }
 
         async Task OnPrev()
