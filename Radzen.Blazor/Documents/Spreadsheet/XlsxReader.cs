@@ -571,7 +571,17 @@ static class XlsxReader
             }
             else if (reader.LocalName == "sheetData" && reader.NamespaceURI == ns)
             {
-                ReadChildren(reader, ns, "row", () => rows.Add(ReadRow(reader, ns)));
+                var previousRow = 0;
+
+                ReadChildren(reader, ns, "row", () =>
+                {
+                    var row = ReadRow(reader, ns, previousRow);
+                    if (int.TryParse(row.Index, NumberStyles.Integer, CultureInfo.InvariantCulture, out var rowNumber))
+                    {
+                        previousRow = rowNumber;
+                    }
+                    rows.Add(row);
+                });
             }
             else
             {
@@ -612,11 +622,37 @@ static class XlsxReader
         reader.Read();
     }
 
-    private static SheetRow ReadRow(XmlReader reader, string ns)
+    private static SheetRow ReadRow(XmlReader reader, string ns, int previousRow)
     {
-        var row = new SheetRow(reader.GetAttribute("r"), reader.GetAttribute("ht"));
+        // ECMA-376 Part 1, 18.3.1.73: a row without r follows the previous row.
+        var index = reader.GetAttribute("r") ?? (previousRow + 1).ToString(CultureInfo.InvariantCulture);
+        var row = new SheetRow(index, reader.GetAttribute("ht"));
+        var hasRowNumber = int.TryParse(index, NumberStyles.Integer, CultureInfo.InvariantCulture, out var rowNumber);
+        var nextColumn = 0;
+        string? previousReference = null;
 
-        ReadChildren(reader, ns, "c", () => row.Cells.Add(ReadCell(reader, ns)));
+        ReadChildren(reader, ns, "c", () =>
+        {
+            var cell = ReadCell(reader, ns);
+
+            if (cell.Reference is not null)
+            {
+                previousReference = cell.Reference;
+            }
+            // ECMA-376 Part 1, 18.3.1.4: a cell without r takes the column after the previous cell in its row.
+            else if (hasRowNumber)
+            {
+                if (previousReference is not null)
+                {
+                    nextColumn = CellRef.Parse(previousReference).Column + 1;
+                    previousReference = null;
+                }
+
+                cell = cell with { Reference = new CellRef(rowNumber - 1, nextColumn++).ToString() };
+            }
+
+            row.Cells.Add(cell);
+        });
 
         return row;
     }
@@ -1283,9 +1319,7 @@ static class XlsxReader
         }
 
         var relMap = new Dictionary<string, string>();
-        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
-        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
-        var relsEntry = archive.GetEntry(relsPath);
+        var relsEntry = archive.GetEntry(GetRelationshipsPath(sheetInfo.FullPath));
         if (relsEntry is not null)
         {
             using var relsStream = relsEntry.Open();
@@ -1345,9 +1379,7 @@ static class XlsxReader
             return;
         }
 
-        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
-        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
-        var relsEntry = archive.GetEntry(relsPath);
+        var relsEntry = archive.GetEntry(GetRelationshipsPath(sheetInfo.FullPath));
         if (relsEntry is null)
         {
             return;
@@ -1374,8 +1406,7 @@ static class XlsxReader
             return;
         }
 
-        // Resolve drawing path relative to xl/worksheets/
-        var drawingPath = ResolvePath("xl/worksheets/", drawingTarget);
+        var drawingPath = ResolveTarget(sheetInfo.FullPath, drawingTarget);
         var drawingEntry = archive.GetEntry(drawingPath);
         if (drawingEntry is null)
         {
@@ -1383,11 +1414,8 @@ static class XlsxReader
         }
 
         // Load drawing relationships (for resolving image rIds)
-        var drawingFileName = drawingPath.Split('/').Last();
-        var drawingDir = drawingPath[..drawingPath.LastIndexOf('/')];
-        var drawingRelsPath = $"{drawingDir}/_rels/{drawingFileName}.rels";
         var drawingRelMap = new Dictionary<string, string>();
-        var drawingRelsEntry = archive.GetEntry(drawingRelsPath);
+        var drawingRelsEntry = archive.GetEntry(GetRelationshipsPath(drawingPath));
         if (drawingRelsEntry is not null)
         {
             using var drawingRelsStream = drawingRelsEntry.Open();
@@ -1462,7 +1490,7 @@ static class XlsxReader
             var graphicFrame = anchor.Element(xdr + "graphicFrame");
             if (graphicFrame is not null)
             {
-                ParseChartFromGraphicFrame(archive, graphicFrame, drawingRelMap, drawingDir, rNs, a, sheet, mode, from, to, anchorWidth, anchorHeight);
+                ParseChartFromGraphicFrame(archive, graphicFrame, drawingRelMap, drawingPath, rNs, a, sheet, mode, from, to, anchorWidth, anchorHeight);
                 continue;
             }
 
@@ -1496,7 +1524,7 @@ static class XlsxReader
                 continue;
             }
 
-            var imagePath = ResolvePath(drawingDir + "/", imageTarget);
+            var imagePath = ResolveTarget(drawingPath, imageTarget);
             var imageEntry = archive.GetEntry(imagePath);
             if (imageEntry is null)
             {
@@ -1532,7 +1560,7 @@ static class XlsxReader
 
     private static void ParseChartFromGraphicFrame(
         ZipArchive archive, XElement graphicFrame, Dictionary<string, string> drawingRelMap,
-        string drawingDir, XNamespace rNs, XNamespace a,
+        string drawingPath, XNamespace rNs, XNamespace a,
         Worksheet sheet, DrawingAnchorMode mode, CellAnchor from, CellAnchor? to, double width, double height)
     {
         // Look for <a:graphic><a:graphicData uri="...chart..."><c:chart r:id="..."/></a:graphicData></a:graphic>
@@ -1554,7 +1582,7 @@ static class XlsxReader
             return;
         }
 
-        var chartPath = ResolvePath(drawingDir + "/", chartTarget);
+        var chartPath = ResolveTarget(drawingPath, chartTarget);
         var chartEntry = archive.GetEntry(chartPath);
         if (chartEntry is null)
         {
@@ -1843,31 +1871,22 @@ static class XlsxReader
         };
     }
 
-    private static string ResolvePath(string basePath, string relativePath)
+    private static readonly Uri PackageRoot = new("http://package/");
+
+    // ECMA-376 Part 2, 9.3: a relationship target is a URI reference resolved against the source part name.
+    private static string ResolveTarget(string sourcePartPath, string target)
     {
-        // Handle relative paths like ../media/image1.png
-        var parts = (basePath.TrimEnd('/') + "/" + relativePath).Split('/');
-        var stack = new System.Collections.Generic.Stack<string>();
-        foreach (var part in parts)
-        {
-            if (part == "..")
-            {
-                if (stack.Count > 0)
-                {
-                    stack.Pop();
-                }
-            }
-            else if (part != "." && part.Length > 0)
-            {
-                stack.Push(part);
-            }
-        }
-        var result = new string[stack.Count];
-        for (var i = stack.Count - 1; i >= 0; i--)
-        {
-            result[i] = stack.Pop();
-        }
-        return string.Join("/", result);
+        var uri = new Uri(new Uri(PackageRoot, sourcePartPath), target);
+
+        return Uri.UnescapeDataString(uri.AbsolutePath.TrimStart('/'));
+    }
+
+    // ECMA-376 Part 2, 9.3: the relationships of a part live in _rels/<part file name>.rels next to the part.
+    private static string GetRelationshipsPath(string partPath)
+    {
+        var slash = partPath.LastIndexOf('/');
+
+        return $"{partPath[..(slash + 1)]}_rels/{partPath[(slash + 1)..]}.rels";
     }
 
     private static void ParseTables(ZipArchive archive, WorksheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
@@ -1879,9 +1898,7 @@ static class XlsxReader
             return;
         }
 
-        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
-        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
-        var relsEntry = archive.GetEntry(relsPath);
+        var relsEntry = archive.GetEntry(GetRelationshipsPath(sheetInfo.FullPath));
         if (relsEntry is null)
         {
             return;
@@ -1911,7 +1928,7 @@ static class XlsxReader
                 continue;
             }
 
-            var tablePath = ResolvePath("xl/worksheets/", target);
+            var tablePath = ResolveTarget(sheetInfo.FullPath, target);
             var tableEntry = archive.GetEntry(tablePath);
             if (tableEntry is null)
             {
@@ -2123,9 +2140,9 @@ static class XlsxReader
         {
             get
             {
-                if (RelMap.TryGetValue(RelId, out var sheetPath))
+                if (RelMap.TryGetValue(RelId, out var target))
                 {
-                    return $"xl/{sheetPath.TrimStart('/')}"; // Excel paths are relative
+                    return ResolveTarget("xl/workbook.xml", target);
                 }
                 return string.Empty;
             }
