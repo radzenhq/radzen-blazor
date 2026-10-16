@@ -4452,7 +4452,7 @@ namespace Radzen.Blazor
             var secondValue = GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType);
             if (filterPropertyType != null && !AreObjectsEqual(firstValue, secondValue))
             {
-                gridColumn.SetFilterValue(GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType), isFirst);
+                gridColumn.SetFilterValueFromSettings(GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType), isFirst);
                 return true;
             }
 

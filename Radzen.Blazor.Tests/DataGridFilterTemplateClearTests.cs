@@ -202,5 +202,36 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(FilterOperator.Equals, column.GetFilterOperator());
         }
+
+        [Fact]
+        public async Task ValuelessOperatorRoundTrip_KeepsBoundValue()
+        {
+            using var ctx = CreateContext();
+            var cut = await RenderHost(ctx);
+            var column = cut.Instance.Grid.ColumnsCollection.First();
+
+            column.SetFilterValue(null);
+            column.SetFilterValue(null, false);
+            column.SetFilterOperator(FilterOperator.IsNull);
+            column.SetFilterOperator(FilterOperator.GreaterThanOrEquals);
+
+            Assert.Equal(new DateTime(2024, 1, 1), column.GetFilterValue());
+        }
+
+        [Fact]
+        public async Task LoadingClearedSettings_ClearsTemplateValues()
+        {
+            using var ctx = CreateContext();
+            var cut = await RenderHost(ctx);
+            var grid = cut.Instance.Grid;
+            var column = grid.ColumnsCollection.First();
+            var settings = new DataGridColumnSettings { Property = "Date" };
+
+            grid.SetColumnFilterValueFromSettings(column, settings, true);
+            grid.SetColumnFilterValueFromSettings(column, settings, false);
+
+            Assert.Null(column.GetFilterValue());
+            Assert.Null(column.GetSecondFilterValue());
+        }
     }
 }

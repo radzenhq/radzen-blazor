@@ -1580,12 +1580,24 @@ namespace Radzen.Blazor
             {
                 filterValue = CanSetCurrentValue(value) ? value : 
                     GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
-                filterValueCleared = filterValue == null && (FilterTemplate != null || FilterValueTemplate != null);
             }
             else
             {
                 secondFilterValue = CanSetCurrentValue(value, false) ? value :
                     GetSecondFilterOperator() == FilterOperator.IsEmpty || GetSecondFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
+            }
+        }
+
+        internal void SetFilterValueFromSettings(object? value, bool isFirst)
+        {
+            SetFilterValue(value, isFirst);
+
+            if (isFirst)
+            {
+                filterValueCleared = filterValue == null && (FilterTemplate != null || FilterValueTemplate != null);
+            }
+            else
+            {
                 secondFilterValueCleared = secondFilterValue == null && (FilterTemplate != null || SecondFilterValueTemplate != null);
             }
         }
