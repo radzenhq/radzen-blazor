@@ -225,6 +225,11 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     font-size: var(--rz-scheduler-toolbar-title-font-size);
     font-weight: var(--rz-scheduler-toolbar-title-font-weight);
     color: var(--rz-scheduler-toolbar-title-color);
+
+    .rz-scheduler-nav-title-button {
+      font-size: var(--rz-scheduler-toolbar-title-font-size);
+      font-weight: var(--rz-scheduler-toolbar-title-font-weight);
+    }
   }
 }
 

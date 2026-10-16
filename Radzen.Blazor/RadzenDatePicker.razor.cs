@@ -196,6 +196,7 @@ namespace Radzen.Blazor
             }
 
             SetMonth(calendarMonth);
+            MonthSelect.InvokeAsync(CurrentDate);
 
             if (ShowDays)
             {
@@ -299,6 +300,14 @@ namespace Radzen.Blazor
 
         bool shouldFocusMonthCell;
         bool shouldFocusYearCell;
+
+        internal void FocusCalendar()
+        {
+            shouldFocusDay = currentView == CalendarViewKind.Days;
+            shouldFocusMonthCell = currentView == CalendarViewKind.Months;
+            shouldFocusYearCell = currentView == CalendarViewKind.Years;
+            StateHasChanged();
+        }
 
         void OnMonthCellKeyDown(KeyboardEventArgs args)
         {
@@ -1594,6 +1603,13 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<DateTime> CurrentDateChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the user picks a month in the month grid, by click or keyboard.
+        /// It is not invoked when the displayed month changes by navigation, for example with the arrow keys.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DateTime> MonthSelect { get; set; }
 
         private DateTime StartDate => GetStartDate(CurrentDate);
 

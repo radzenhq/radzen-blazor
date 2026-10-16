@@ -610,18 +610,36 @@ namespace Radzen.Blazor
             await InvokeLoadData();
         }
 
-        ElementReference titleElement;
+        RadzenButton? titleButton;
         RadzenPopup? titlePopup;
-        DateTime titlePickerDate;
+        RadzenDatePicker<DateTime>? titlePicker;
+        int titlePickerKey;
 
         // Month and year views navigate by month or year, so their date picker offers months instead of days.
         bool TitlePickerShowsDays => SelectedView is not (RadzenMonthView or SchedulerYearViewBase);
 
         async Task OnTitleClick()
         {
-            titlePickerDate = CurrentDate;
+            if (!titlePopup!.IsOpen)
+            {
+                // Start the picker over and render it before the popup is shown, so the popup is measured with its content.
+                // Doing this when the popup closes would change the picker while it is still fading out.
+                titlePickerKey++;
+                StateHasChanged();
+                await Task.Yield();
+            }
 
-            await titlePopup!.ToggleAsync(titleElement);
+            await titlePopup.ToggleAsync(titleButton!.Element);
+
+            if (titlePopup.IsOpen)
+            {
+                await titlePopup.Element.FocusAsync();
+
+                // Like RadzenPopup does before it focuses its first element, wait until the popup has finished showing.
+                await Task.Delay(200);
+
+                titlePicker?.FocusCalendar();
+            }
         }
 
         async Task OnTitleDateChanged(DateTime date)
@@ -632,21 +650,9 @@ namespace Radzen.Blazor
             }
         }
 
-        // The month picker reports every change of the displayed month or year.
-        // Changing only the year browses; picking a month, even the displayed one, navigates to it.
-        async Task OnTitleCurrentDateChanged(DateTime date)
+        async Task OnTitleMonthSelect(DateTime date)
         {
-            if (TitlePickerShowsDays)
-            {
-                return;
-            }
-
-            var calendar = Culture.Calendar;
-            var onlyYearChanged = calendar.GetMonth(date) == calendar.GetMonth(titlePickerDate) && calendar.GetYear(date) != calendar.GetYear(titlePickerDate);
-
-            titlePickerDate = date;
-
-            if (!onlyYearChanged)
+            if (!TitlePickerShowsDays)
             {
                 await NavigateToTitleDate(date);
             }
@@ -657,8 +663,8 @@ namespace Radzen.Blazor
             CurrentDate = date;
 
             await titlePopup!.CloseAsync();
+            await titleButton!.Element.FocusAsync();
             await InvokeLoadData();
-            await titleElement.FocusAsync();
         }
 
         async Task OnPrev()

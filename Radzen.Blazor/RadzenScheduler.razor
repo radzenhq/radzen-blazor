@@ -36,10 +36,10 @@
                 @if (ShowDateTitle && AllowDateSelection)
                 {
                 <div class="rz-scheduler-nav-title" aria-live="polite">
-                    <button type="button" @ref=titleElement style="border: 0; background: transparent; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer;" aria-haspopup="dialog" @onclick=@OnTitleClick>@SelectedView?.Title</button>
+                    <RadzenButton @ref=titleButton class="rz-scheduler-nav-title-button" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@SelectedView?.Title aria-haspopup="dialog" Click=@OnTitleClick />
                 </div>
-                <RadzenPopup @ref=titlePopup Lazy="true" Style="position: absolute; width: 20rem;">
-                    <RadzenDatePicker TValue="DateTime" Inline="true" Culture=@Culture ShowDays=@TitlePickerShowsDays Value=@CurrentDate ValueChanged=@OnTitleDateChanged CurrentDateChanged=@OnTitleCurrentDateChanged />
+                <RadzenPopup @ref=titlePopup AutoFocusFirstElement="false" tabindex="-1" Style="display: none; position: absolute; width: 20rem; outline: 0; --rz-datepicker-calendar-transition: none;">
+                    <RadzenDatePicker @ref=titlePicker @key=titlePickerKey TValue="DateTime" Inline="true" Style="-webkit-backdrop-filter: none; backdrop-filter: none;" Culture=@Culture ShowDays=@TitlePickerShowsDays Value=@CurrentDate ValueChanged=@OnTitleDateChanged MonthSelect=@OnTitleMonthSelect />
                 </RadzenPopup>
                 }
                 <div class="rz-scheduler-nav-views">

@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
@@ -40,9 +41,12 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        static IRenderedComponent<RadzenDatePicker<DateTime>> OpenPicker(IRenderedComponent<RadzenScheduler<Appointment>> cut)
+        static IRenderedComponent<RadzenDatePicker<DateTime>> OpenPicker(TestContext ctx, IRenderedComponent<RadzenScheduler<Appointment>> cut, int openCount = 1)
         {
             cut.Find(".rz-scheduler-nav-title button").Click();
+
+            // Opening finishes by focusing the picker a moment after the popup is shown.
+            cut.WaitForAssertion(() => Assert.Equal(openCount, ctx.JSInterop.Invocations["Radzen.focusElement"].Count));
 
             return cut.FindComponent<RadzenDatePicker<DateTime>>();
         }
@@ -77,13 +81,13 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
 
             var cut = RenderScheduler<RadzenWeekView>(ctx);
-            var picker = OpenPicker(cut);
+            var picker = OpenPicker(ctx, cut);
 
             Assert.True(picker.Instance.ShowDays);
 
             cut.InvokeAsync(() => picker.Instance.ValueChanged.InvokeAsync(new DateTime(2027, 3, 5)));
 
-            Assert.Equal(new DateTime(2027, 3, 5), cut.Instance.CurrentDate);
+            cut.WaitForAssertion(() => Assert.Equal(new DateTime(2027, 3, 5), cut.Instance.CurrentDate));
         }
 
         [Theory]
@@ -96,7 +100,7 @@ namespace Radzen.Blazor.Tests
             var cut = viewType == typeof(RadzenMonthView)
                 ? RenderScheduler<RadzenMonthView>(ctx)
                 : RenderScheduler<RadzenYearView>(ctx);
-            var picker = OpenPicker(cut);
+            var picker = OpenPicker(ctx, cut);
 
             Assert.False(picker.Instance.ShowDays);
             Assert.Equal(12, cut.FindAll(".rz-calendar-month-cell").Count);
@@ -108,13 +112,16 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
-            OpenPicker(cut);
+            OpenPicker(ctx, cut);
 
             PickMonth(cut, 3);
 
-            Assert.Equal(new DateTime(2026, 3, 14), cut.Instance.CurrentDate);
-            Assert.Equal("March 2026", cut.Find(".rz-scheduler-nav-title").TextContent.Trim());
-            ctx.JSInterop.VerifyInvoke("Radzen.closePopup");
+            cut.WaitForAssertion(() =>
+            {
+                Assert.Equal(new DateTime(2026, 3, 14), cut.Instance.CurrentDate);
+                Assert.Equal("March 2026", cut.Find(".rz-scheduler-nav-title").TextContent.Trim());
+                ctx.JSInterop.VerifyInvoke("Radzen.closePopup");
+            });
         }
 
         [Fact]
@@ -123,11 +130,96 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
-            OpenPicker(cut);
+            OpenPicker(ctx, cut);
 
             PickMonth(cut, 7);
 
-            ctx.JSInterop.VerifyInvoke("Radzen.closePopup");
+            cut.WaitForAssertion(() => ctx.JSInterop.VerifyInvoke("Radzen.closePopup"));
+        }
+
+        [Theory]
+        [InlineData(typeof(RadzenMonthView))]
+        [InlineData(typeof(RadzenYearView))]
+        public void ArrowKeys_InMonthGrid_ReachAnyMonthWithoutNavigatingOrClosing(Type viewType)
+        {
+            using var ctx = new TestContext();
+
+            var cut = viewType == typeof(RadzenMonthView)
+                ? RenderScheduler<RadzenMonthView>(ctx)
+                : RenderScheduler<RadzenYearView>(ctx);
+            OpenPicker(ctx, cut);
+
+            // July to September with the right arrow, then three months down to December. The browser keeps focus on the active cell.
+            foreach (var (key, month) in new[] { ("ArrowRight", "August"), ("ArrowRight", "September"), ("ArrowDown", "December") })
+            {
+                cut.Find(".rz-calendar-month-cell.rz-state-active").KeyDown(new KeyboardEventArgs { Code = key });
+                cut.WaitForAssertion(() => Assert.Equal(month, cut.Find(".rz-calendar-month-cell.rz-state-active").TextContent.Trim()));
+            }
+
+            Assert.Equal(new DateTime(2026, 7, 14), cut.Instance.CurrentDate);
+            ctx.JSInterop.VerifyNotInvoke("Radzen.closePopup");
+
+            // In the browser, Enter on the focused month cell clicks it.
+            cut.Find(".rz-calendar-month-cell.rz-state-active").Click();
+
+            cut.WaitForAssertion(() =>
+            {
+                Assert.Equal(new DateTime(2026, 12, 14), cut.Instance.CurrentDate);
+                ctx.JSInterop.VerifyInvoke("Radzen.closePopup");
+            });
+        }
+
+        [Fact]
+        public void PickingShownYear_ReturnsToMonthGrid()
+        {
+            using var ctx = new TestContext();
+
+            var cut = RenderScheduler<RadzenMonthView>(ctx);
+            OpenPicker(ctx, cut);
+
+            cut.Find(".rz-calendar-title-button").Click();
+            cut.Find("button[id$='-year-2026']").Click();
+
+            cut.WaitForAssertion(() => Assert.Equal(12, cut.FindAll(".rz-calendar-month-cell").Count));
+            Assert.Equal(new DateTime(2026, 7, 14), cut.Instance.CurrentDate);
+            ctx.JSInterop.VerifyNotInvoke("Radzen.closePopup");
+        }
+
+        [Theory]
+        [InlineData(typeof(RadzenMonthView), "-month-7")]
+        [InlineData(typeof(RadzenWeekView), "-day-2026-07-14")]
+        public void OpeningPicker_FocusesTheCurrentMonthOrDay(Type viewType, string expectedIdSuffix)
+        {
+            using var ctx = new TestContext();
+
+            var cut = viewType == typeof(RadzenMonthView)
+                ? RenderScheduler<RadzenMonthView>(ctx)
+                : RenderScheduler<RadzenWeekView>(ctx);
+            OpenPicker(ctx, cut);
+
+            cut.WaitForAssertion(() =>
+            {
+                var focused = Assert.Single(ctx.JSInterop.Invocations["Radzen.focusElement"]);
+                Assert.EndsWith(expectedIdSuffix, (string)focused.Arguments[0]!);
+            });
+        }
+
+        [Fact]
+        public void ReopeningPicker_StartsItOverAtTheCurrentDate()
+        {
+            using var ctx = new TestContext();
+
+            var cut = RenderScheduler<RadzenMonthView>(ctx);
+            OpenPicker(ctx, cut);
+            cut.Find(".rz-calendar-next").Click();
+
+            cut.WaitForAssertion(() => Assert.Equal("2027", cut.Find(".rz-calendar-title-text").TextContent.Trim()));
+
+            // The title button closes the popup, and the next click opens it again.
+            cut.Find(".rz-scheduler-nav-title button").Click();
+            OpenPicker(ctx, cut, openCount: 2);
+
+            cut.WaitForAssertion(() => Assert.Equal("2026", cut.Find(".rz-calendar-title-text").TextContent.Trim()));
         }
 
         [Fact]
@@ -136,16 +228,17 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
-            OpenPicker(cut);
+            OpenPicker(ctx, cut);
 
             cut.Find(".rz-calendar-next").Click();
 
+            cut.WaitForAssertion(() => Assert.Equal("2027", cut.Find(".rz-calendar-title-text").TextContent.Trim()));
             Assert.Equal(new DateTime(2026, 7, 14), cut.Instance.CurrentDate);
             ctx.JSInterop.VerifyNotInvoke("Radzen.closePopup");
 
             PickMonth(cut, 3);
 
-            Assert.Equal(new DateTime(2027, 3, 14), cut.Instance.CurrentDate);
+            cut.WaitForAssertion(() => Assert.Equal(new DateTime(2027, 3, 14), cut.Instance.CurrentDate));
         }
     }
 }
