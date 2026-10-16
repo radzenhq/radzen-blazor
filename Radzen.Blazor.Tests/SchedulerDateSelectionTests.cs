@@ -224,17 +224,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Escape_ReturnsFocusToTheTitle()
+        public void Escape_InCells_ReturnsFocusToTheTitle()
         {
             using var ctx = new TestContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
-            var focusCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
+            int FocusCalls() => ctx.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
 
-            cut.Find(".rz-calendar-month-cell.rz-state-active").KeyDown(new KeyboardEventArgs { Key = "Escape" });
+            // After an arrow key the cells stop keydown from bubbling, which Escape must still get through.
+            cut.Find(".rz-calendar-month-cell.rz-state-active").KeyDown(new KeyboardEventArgs { Code = "ArrowRight" });
+            cut.WaitForAssertion(() => Assert.Equal("August", cut.Find(".rz-calendar-month-cell.rz-state-active").TextContent.Trim()));
+            var before = FocusCalls();
 
-            cut.WaitForAssertion(() => Assert.Equal(focusCalls + 1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus")));
+            cut.Find(".rz-calendar-month-cell.rz-state-active").KeyDown(new KeyboardEventArgs { Code = "Escape" });
+
+            cut.WaitForAssertion(() => Assert.Equal(before + 1, FocusCalls()));
         }
 
         [Fact]

@@ -301,6 +301,9 @@ namespace Radzen.Blazor
         bool shouldFocusMonthCell;
         bool shouldFocusYearCell;
 
+        // Tells a host that shows an inline picker in a popup that Escape was pressed, even in cells that stop the key from bubbling up.
+        internal Action? OnEscape { get; set; }
+
         internal void FocusCalendar()
         {
             shouldFocusDay = currentView == CalendarViewKind.Days;
@@ -312,6 +315,11 @@ namespace Radzen.Blazor
         void OnMonthCellKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Escape")
+            {
+                OnEscape?.Invoke();
+            }
 
             var delta = key switch
             {
@@ -356,6 +364,11 @@ namespace Radzen.Blazor
         void OnYearCellKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Escape")
+            {
+                OnEscape?.Invoke();
+            }
 
             var delta = key switch
             {
@@ -1313,6 +1326,7 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
 
+                OnEscape?.Invoke();
                 await ClosePopup();
                 await FocusAsync();
                 return;
@@ -2854,6 +2868,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
 
+                OnEscape?.Invoke();
                 await ClosePopup();
                 await FocusAsync();
             }
