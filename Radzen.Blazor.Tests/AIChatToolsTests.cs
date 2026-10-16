@@ -196,6 +196,7 @@ namespace Radzen.Blazor.Tests
             Assert.Empty(messages[2].ToolCalls);
 
             var service = ctx.Services.GetRequiredService<IAIChatService>();
+            component.WaitForAssertion(() => Assert.Empty(component.FindAll(".rz-chat-stop-btn")));
             var session = service.GetOrCreateSession(component.Instance.GetSessionId());
             Assert.Contains(session.History, message => message.Contents.OfType<ToolApprovalRequestContent>().Any());
             Assert.Contains(session.History, message => message.Role == ChatRole.User && message.Contents.OfType<ToolApprovalResponseContent>().Any());
