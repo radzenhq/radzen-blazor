@@ -11,9 +11,15 @@
     <DropDownFiltering />
 </RadzenExample>
 
-<RadzenText Anchor="dropdown-filtering#loaddata-event" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+<RadzenText Anchor="dropdown-filtering#loaddata-event" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Custom filtering with <strong>LoadData</strong> event
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Use the <code>LoadData</code> event to implement custom filtering logic and load data on-demand.
+</RadzenText>
+<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-8">
+    With <code>LoadData</code> the <code>Data</code> collection holds only the current search results. When <code>ValueProperty</code> is set, the DropDown finds the selected item by looking up <code>Value</code> in <code>Data</code>, so the selected text disappears while the search results do not include that item and returns when they do. This example binds <code>Value</code> to the item itself (no <code>ValueProperty</code>) to keep the selected text visible while filtering. To keep using <code>ValueProperty</code>, include the selected item in the data returned by <code>LoadData</code>.
+</RadzenAlert>
 <RadzenExample ComponentName="DropDown" Example="DropDownFilteringLoadData">
     <DropDownFilteringLoadData />
 </RadzenExample>
