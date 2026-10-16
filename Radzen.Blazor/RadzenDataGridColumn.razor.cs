@@ -1191,8 +1191,10 @@ namespace Radzen.Blazor
 
         IEnumerable<SortOrder?> sortOrder = Enumerable.Empty<SortOrder?>();
         object? filterValue;
+        bool filterValueCleared;
         FilterOperator? filterOperator;
         object? secondFilterValue;
+        bool secondFilterValueCleared;
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
         CollectionFilterMode? collectionFilterMode;
@@ -1225,6 +1227,9 @@ namespace Radzen.Blazor
 
             var secondFilterValueChanged = parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue);
             var newSecondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+
+            var previousFilterValue = GetFilterValue();
+            var previousSecondFilterValue = GetSecondFilterValue();
 
             var customFilterExpressionChanged = parameters.DidParameterChange(nameof(CustomFilterExpression), CustomFilterExpression);
             var newCustomFilterExpression = parameters.GetValueOrDefault<string>(nameof(CustomFilterExpression));
@@ -1324,9 +1329,28 @@ namespace Radzen.Blazor
             if (filterValueChanged)
             {
                 filterValue = newFilterValue;
+                filterValueCleared = false;
 
                 FilterValue = filterValue;
-                if (grid != null)
+            }
+
+            if (secondFilterValueChanged)
+            {
+                secondFilterValue = newSecondFilterValue;
+
+                if (secondFilterTemplates)
+                {
+                    secondFilterValueCleared = false;
+                    SecondFilterValue = secondFilterValue;
+                }
+            }
+
+            if (filterValueChanged || secondFilterValueChanged && secondFilterTemplates)
+            {
+                var effectiveFilterValueChanged = !Equals(previousFilterValue, GetFilterValue())
+                    || !Equals(previousSecondFilterValue, GetSecondFilterValue());
+
+                if (grid != null && effectiveFilterValueChanged)
                 {
                     grid.SaveSettings();
                     if (grid.IsVirtualizationAllowed())
@@ -1342,35 +1366,8 @@ namespace Radzen.Blazor
                     }
                 }
 
-                if (filterTemplates)
+                if (filterValueChanged && filterTemplates || secondFilterValueChanged && secondFilterTemplates)
                 {
-                    return;
-                }
-            }
-
-            if (secondFilterValueChanged)
-            {
-                secondFilterValue = newSecondFilterValue;
-
-                if (secondFilterTemplates)
-                {
-                    SecondFilterValue = secondFilterValue;
-                    if (grid != null)
-                    {
-                        grid.SaveSettings();
-                        if (grid.IsVirtualizationAllowed())
-                        {
-                            if (grid.virtualize != null)
-                            {
-                                await grid.virtualize.RefreshDataAsync();
-                            }
-                        }
-                        else
-                        {
-                            await grid.Reload();
-                        }
-                    }
-
                     return;
                 }
             }
@@ -1463,7 +1460,7 @@ namespace Radzen.Blazor
         /// </summary>
         public object? GetFilterValue()
         {
-            return filterValue ?? FilterValue;
+            return filterValue ?? (filterValueCleared ? null : FilterValue);
         }
 
         internal void ClearFilterValues()
@@ -1487,7 +1484,7 @@ namespace Radzen.Blazor
         /// </summary>
         public object? GetSecondFilterValue()
         {
-            return secondFilterValue ?? SecondFilterValue;
+            return secondFilterValue ?? (secondFilterValueCleared ? null : SecondFilterValue);
         }
 
         /// <summary>
@@ -1583,12 +1580,23 @@ namespace Radzen.Blazor
             {
                 filterValue = CanSetCurrentValue(value) ? value : 
                     GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
+                filterValueCleared = filterValue == null && (FilterTemplate != null || FilterValueTemplate != null);
             }
             else
             {
                 secondFilterValue = CanSetCurrentValue(value, false) ? value :
                     GetSecondFilterOperator() == FilterOperator.IsEmpty || GetSecondFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
+                secondFilterValueCleared = secondFilterValue == null && (FilterTemplate != null || SecondFilterValueTemplate != null);
             }
+        }
+
+        static bool IsValueFilterOperator(FilterOperator value)
+        {
+            return value != FilterOperator.Custom
+                && value != FilterOperator.IsNull
+                && value != FilterOperator.IsNotNull
+                && value != FilterOperator.IsEmpty
+                && value != FilterOperator.IsNotEmpty;
         }
 
         /// <summary>
@@ -1666,6 +1674,7 @@ namespace Radzen.Blazor
                 ? FilterOperator.Custom
                 : QueryableExtension.IsEnumerable(FilterPropertyType)
                     ? !string.IsNullOrEmpty(FilterProperty) && FilterProperty != Property ? FilterOperator.In : FilterOperator.Contains
+                    : _filterOperator != null && IsValueFilterOperator(_filterOperator.Value) ? _filterOperator.Value
                     : FilterPropertyType == typeof(string) ? FilterOperator.Contains : default(FilterOperator);
 
             if (FilterOperators?.Contains(fo) == true || FilterOperators == null)
@@ -1677,6 +1686,9 @@ namespace Radzen.Blazor
 
             filterValue = null;
             secondFilterValue = null;
+
+            filterValueCleared = FilterTemplate != null || FilterValueTemplate != null;
+            secondFilterValueCleared = FilterTemplate != null || SecondFilterValueTemplate != null;
 
             ClearFilterValues();
 
