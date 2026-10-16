@@ -1798,6 +1798,59 @@ window.Radzen = {
         el.ondragstart = function (e) { e.dataTransfer.setData('', e.target.id); };
     }
   },
+  positionValidator: function (id, component, position) {
+    var validator = document.getElementById(id);
+
+    if (!validator) {
+      return;
+    }
+
+    validator.__rzPlace = function () {
+      // Moving the validator with a transform keeps it next to the component when the layout around them shifts.
+      validator.style.transform = '';
+
+      if (position == 'bottom') {
+        return;
+      }
+
+      var target = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
+
+      if (!target) {
+        return;
+      }
+
+      var gap = 12;
+      var t = target.getBoundingClientRect();
+      var v = validator.getBoundingClientRect();
+      var left = t.left;
+      var top = t.top;
+
+      if (position == 'top') {
+        top = t.top - v.height - gap;
+      } else if (position == 'left') {
+        left = t.left - v.width - gap;
+      } else if (position == 'right') {
+        left = t.right + gap;
+      }
+
+      validator.style.transform = 'translate(' + (left - v.left) + 'px, ' + (top - v.top) + 'px)';
+    };
+
+    validator.__rzPlace();
+
+    if (!validator.__rzResize) {
+      validator.__rzResize = function () {
+        if (!validator.isConnected) {
+          window.removeEventListener('resize', validator.__rzResize);
+          return;
+        }
+
+        validator.__rzPlace();
+      };
+
+      window.addEventListener('resize', validator.__rzResize);
+    }
+  },
   focusElement: function (elementId, onlyIfFocusNotMoved) {
     var el = document.getElementById(elementId);
     if (!el) return;
