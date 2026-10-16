@@ -6,6 +6,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -220,6 +221,20 @@ namespace Radzen.Blazor.Tests
             OpenPicker(ctx, cut, openCount: 2);
 
             cut.WaitForAssertion(() => Assert.Equal("2026", cut.Find(".rz-calendar-title-text").TextContent.Trim()));
+        }
+
+        [Fact]
+        public void Escape_ReturnsFocusToTheTitle()
+        {
+            using var ctx = new TestContext();
+
+            var cut = RenderScheduler<RadzenMonthView>(ctx);
+            OpenPicker(ctx, cut);
+            var focusCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
+
+            cut.Find(".rz-calendar-month-cell.rz-state-active").KeyDown(new KeyboardEventArgs { Key = "Escape" });
+
+            cut.WaitForAssertion(() => Assert.Equal(focusCalls + 1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus")));
         }
 
         [Fact]

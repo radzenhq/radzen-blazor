@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -639,6 +640,14 @@ namespace Radzen.Blazor
                 await Task.Delay(200);
 
                 titlePicker?.FocusCalendar();
+            }
+        }
+
+        async Task OnTitlePopupKeyDown(KeyboardEventArgs args)
+        {
+            if (args.Key == "Escape")
+            {
+                await titleButton!.Element.FocusAsync();
             }
         }
 
