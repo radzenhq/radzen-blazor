@@ -8,12 +8,12 @@
     <RadzenLabel Text="Select Value" Component="DropDownFilteringLoadData" />
     <RadzenDropDown AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"
-                    Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width: 100%; max-width: 400px;" Name="DropDownFilteringLoadData" />
+                    Data=@customers TextProperty="@nameof(Customer.CompanyName)" Style="width: 100%; max-width: 400px;" Name="DropDownFilteringLoadData" />
 </RadzenStack>
 
 @code {
     IEnumerable<Customer> customers;
-    string value;
+    Customer value;
 
     void LoadData(LoadDataArgs args)
     {
