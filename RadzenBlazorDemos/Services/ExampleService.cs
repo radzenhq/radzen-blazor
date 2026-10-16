@@ -3858,7 +3858,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Show ContextMenu with items", Anchor = "#contextmenu-with-items" }, new () { Text = "Show ContextMenu with custom content and separator", Anchor = "#contextmenu-with-custom-content" }, new () { Text = "Show ContextMenu for HTML element", Anchor = "#contextmenu-for-html-element" } ],
+                    Toc = [ new () { Text = "Show ContextMenu with items", Anchor = "#contextmenu-with-items" }, new () { Text = "Show ContextMenu with custom content and separator", Anchor = "#contextmenu-with-custom-content" }, new () { Text = "Show ContextMenu for HTML element", Anchor = "#contextmenu-for-html-element" }, new () { Text = "Close ContextMenu on scroll", Anchor = "#contextmenu-close-on-scroll" } ],
                     Name = "ContextMenu",
                     Title = "Blazor ContextMenu - Right-Click Menu | Free Radzen Blazor",
                     Description = "The Blazor ContextMenu opens a right-click menu of actions anywhere in your app via ContextMenuService.",

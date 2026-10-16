@@ -2600,7 +2600,10 @@ window.Radzen = {
         Radzen[id + 'contextMenuInvoker'] = invoker;
     }
 
-    var target = closeOnScroll && (x || y) ? document.elementFromPoint(x, y) : invoker;
+    var previousPopup = document.getElementById(id);
+    var target = closeOnScroll && (x || y) ?
+        document.elementsFromPoint(x, y).find(function (el) { return !previousPopup || !previousPopup.contains(el); }) :
+        invoker;
 
     Radzen.closePopup(id);
 
@@ -2627,7 +2630,7 @@ window.Radzen = {
 
             popup.__contextMenuClosedOnScroll = true;
             Radzen.activeElement = null;
-            Radzen[id](e);
+            Radzen.closePopup(id, instance, callback, e);
         };
 
         document.addEventListener('scroll', popup.__contextMenuScrollHandler, true);

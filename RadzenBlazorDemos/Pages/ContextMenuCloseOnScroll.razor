@@ -1,0 +1,41 @@
+@inject ContextMenuService ContextMenuService
+
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
+    <RadzenCard Variant="Variant.Outlined" class="rz-p-0" Style="height: 240px; overflow: auto;">
+        @foreach (var file in files)
+        {
+            <div class="rz-p-3 rz-border-bottom" @oncontextmenu=@(args => ShowContextMenu(args, file)) @oncontextmenu:preventDefault="true">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenIcon Icon="description" />
+                    <RadzenText TextStyle="TextStyle.Body2">@file</RadzenText>
+                </RadzenStack>
+            </div>
+        }
+    </RadzenCard>
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    EventConsole console;
+
+    IEnumerable<string> files = Enumerable.Range(1, 20).Select(i => $"Document {i}.docx");
+
+    void ShowContextMenu(MouseEventArgs args, string file)
+    {
+        ContextMenuService.Open(args, new ContextMenuOptions
+        {
+            CloseOnScroll = true,
+            Items = new List<ContextMenuItem>
+            {
+                new ContextMenuItem { Text = "Open", Value = "Open", Icon = "open_in_new" },
+                new ContextMenuItem { Text = "Rename", Value = "Rename", Icon = "edit" },
+                new ContextMenuItem { Text = "Delete", Value = "Delete", Icon = "delete" }
+            },
+            Click = item =>
+            {
+                console.Log($"{item.Value} {file}");
+                ContextMenuService.Close();
+            }
+        });
+    }
+}
