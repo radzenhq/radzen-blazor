@@ -115,6 +115,29 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(0, focusNextCalls);
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void DropDown_Filterable_TabInSearchWhenOpen_InvokesFocusNextWithPopupId(bool shiftKey)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, p =>
+            {
+                p.Add(x => x.ValueProperty, nameof(DataItem.Id));
+                p.Add(x => x.AllowFiltering, true);
+            });
+
+            component.Find("[role='combobox']").Click();
+            component.Find(".rz-dropdown-filter").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab", ShiftKey = shiftKey });
+
+            var popupId = component.Find(".rz-dropdown-panel").Id;
+            var focusNext = Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.focusNext");
+            Assert.Equal(shiftKey, focusNext.Arguments[1]);
+            Assert.Equal(popupId, focusNext.Arguments[2]);
+        }
+
         [Fact]
         public void DropDown_AppliesSelectionStyleForIntValue()
         {

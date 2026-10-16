@@ -500,7 +500,7 @@ namespace Radzen.Blazor
                 var key = args.Code ?? args.Key;
                 if (key == "Tab" && isFilter && wasOpen && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey);
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey, PopupID);
                 }
             }
         }

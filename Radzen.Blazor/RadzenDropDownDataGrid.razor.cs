@@ -1180,7 +1180,7 @@ namespace Radzen.Blazor
 
                 if (JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey);
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey, PopupID);
                 }
             }
             else if (key == "Delete" && AllowClear)
