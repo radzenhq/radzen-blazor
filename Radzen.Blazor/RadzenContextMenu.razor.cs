@@ -79,7 +79,8 @@ namespace Radzen.Blazor
                     menu.MouseEventArgs.ClientY,
                     UniqueID,
                     Reference,
-                    "RadzenContextMenu.CloseMenu");
+                    "RadzenContextMenu.CloseMenu",
+                    menu.Options?.CloseOnScroll == true);
             }
         }
 

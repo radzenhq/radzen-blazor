@@ -95,7 +95,7 @@ namespace Radzen
             options.Items = items;
             options.Click = click;
 
-            OpenTooltip(args, options);
+            Open(args, options);
         }
 
         /// <summary>
@@ -109,15 +109,15 @@ namespace Radzen
 
             options.ChildContent = childContent;
 
-            OpenTooltip(args, options);
+            Open(args, options);
         }
 
         /// <summary>
-        /// Opens the tooltip.
+        /// Opens a context menu with the specified options.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        /// <param name="options">The options.</param>
-        private void OpenTooltip(MouseEventArgs args, ContextMenuOptions options)
+        /// <param name="options">The context menu options.</param>
+        public void Open(MouseEventArgs args, ContextMenuOptions options)
         {
             OnOpen?.Invoke(args, options);
         }
@@ -164,6 +164,12 @@ namespace Radzen
         /// </summary>
         /// <value>The click.</value>
         public Action<MenuItemEventArgs>? Click { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the context menu should close when its target or the document is scrolled.
+        /// </summary>
+        /// <value><c>true</c> to close the context menu on scroll; otherwise, <c>false</c>.</value>
+        public bool CloseOnScroll { get; set; }
     }
 
     /// <summary>

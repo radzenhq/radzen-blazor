@@ -2594,18 +2594,46 @@ window.Radzen = {
 
     e.preventDefault();
   },
-  openContextMenu: function (x,y,id, instance, callback) {
-    Radzen.closePopup(id);
-
+  openContextMenu: function (x, y, id, instance, callback, closeOnScroll = false) {
     var invoker = document.activeElement;
     if (invoker && invoker !== document.body) {
         Radzen[id + 'contextMenuInvoker'] = invoker;
     }
 
+    var target = closeOnScroll && (x || y) ? document.elementFromPoint(x, y) : invoker;
+
+    Radzen.closePopup(id);
+
     Radzen.openPopup(null, id, false, null, x, y, instance, callback);
 
+    var popup = document.getElementById(id);
+    if (popup && closeOnScroll) {
+        if (popup.__contextMenuScrollHandler) {
+            document.removeEventListener('scroll', popup.__contextMenuScrollHandler, true);
+        }
+
+        popup.__contextMenuTarget = target;
+        popup.__contextMenuScrollHandler = function (e) {
+            var scrollTarget = e.target;
+            var contextMenuTarget = popup.__contextMenuTarget;
+            var targetScrolled = scrollTarget === document ||
+                !contextMenuTarget ||
+                !contextMenuTarget.isConnected ||
+                scrollTarget && scrollTarget.contains && scrollTarget.contains(contextMenuTarget);
+
+            if (!targetScrolled || scrollTarget && scrollTarget.nodeType && popup.contains(scrollTarget)) {
+                return;
+            }
+
+            popup.__contextMenuClosedOnScroll = true;
+            Radzen.activeElement = null;
+            Radzen[id](e);
+        };
+
+        document.addEventListener('scroll', popup.__contextMenuScrollHandler, true);
+    }
+
     requestAnimationFrame(function () {
-        var popup = document.getElementById(id);
         if (popup) {
             var menu = popup.querySelector('.rz-menu');
             if (menu) {
@@ -2617,8 +2645,17 @@ window.Radzen = {
   restoreContextMenuFocus: function (id) {
     var invoker = Radzen[id + 'contextMenuInvoker'];
     Radzen[id + 'contextMenuInvoker'] = null;
+    var popup = document.getElementById(id);
+    var closedOnScroll = popup && popup.__contextMenuClosedOnScroll;
+    if (popup) {
+        delete popup.__contextMenuClosedOnScroll;
+    }
     if (invoker && document.body.contains(invoker) && typeof invoker.focus === 'function') {
-        invoker.focus();
+        if (closedOnScroll) {
+            invoker.focus({ preventScroll: true });
+        } else {
+            invoker.focus();
+        }
     }
   },
   openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
@@ -3113,6 +3150,11 @@ window.Radzen = {
   closePopup: function (id, instance, callback, e, preventFocusRestore) {
     var popup = document.getElementById(id);
     if (!popup) return;
+    if (popup.__contextMenuScrollHandler) {
+      document.removeEventListener('scroll', popup.__contextMenuScrollHandler, true);
+      delete popup.__contextMenuScrollHandler;
+      delete popup.__contextMenuTarget;
+    }
     var popupInfo = (Radzen.popups || []).find(function (p) { return p.id === id; });
     if (popupInfo && popupInfo.parent) {
       Radzen.setPopupAriaExpanded(popupInfo.parent, id, false);
@@ -3244,6 +3286,11 @@ window.Radzen = {
   destroyPopup: function (id) {
     var popup = document.getElementById(id);
     if (popup) {
+      if (popup.__contextMenuScrollHandler) {
+          document.removeEventListener('scroll', popup.__contextMenuScrollHandler, true);
+          delete popup.__contextMenuScrollHandler;
+          delete popup.__contextMenuTarget;
+      }
       if (popup.__escapeHandler) {
           popup.removeEventListener('keydown', popup.__escapeHandler, true);
           delete popup.__escapeHandler;
