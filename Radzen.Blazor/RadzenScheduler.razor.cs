@@ -209,6 +209,14 @@ namespace Radzen.Blazor
         public bool ShowDateTitle { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether clicking the date title opens a date picker that navigates the scheduler to the selected date.
+        /// Month and year views offer months instead of days. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the date title opens a date picker; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowDateSelection { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
         /// <example>
@@ -599,6 +607,65 @@ namespace Radzen.Blazor
         {
             selectedIndex = Views.IndexOf(view);
 
+            await InvokeLoadData();
+        }
+
+        RadzenButton? titleButton;
+        RadzenPopup? titlePopup;
+        RadzenDatePicker<DateTime>? titlePicker;
+        int titlePickerKey;
+
+        // Month and year views navigate by month or year, so their date picker offers months instead of days.
+        bool TitlePickerShowsDays => SelectedView is not (RadzenMonthView or SchedulerYearViewBase);
+
+        async Task OnTitleClick()
+        {
+            if (!titlePopup!.IsOpen)
+            {
+                // Start the picker over and render it before the popup is shown, so the popup is measured with its content.
+                // Doing this when the popup closes would change the picker while it is still fading out.
+                titlePickerKey++;
+                StateHasChanged();
+                await Task.Yield();
+            }
+
+            titlePicker!.OnEscape = () => _ = titleButton!.Element.FocusAsync();
+
+            await titlePopup.ToggleAsync(titleButton!.Element);
+
+            if (titlePopup.IsOpen)
+            {
+                await titlePopup.Element.FocusAsync();
+
+                // Like RadzenPopup does before it focuses its first element, wait until the popup has finished showing.
+                await Task.Delay(200);
+
+                titlePicker?.FocusCalendar();
+            }
+        }
+
+        async Task OnTitleDateChanged(DateTime date)
+        {
+            if (TitlePickerShowsDays)
+            {
+                await NavigateToTitleDate(date);
+            }
+        }
+
+        async Task OnTitleMonthSelect(DateTime date)
+        {
+            if (!TitlePickerShowsDays)
+            {
+                await NavigateToTitleDate(date);
+            }
+        }
+
+        async Task NavigateToTitleDate(DateTime date)
+        {
+            CurrentDate = date;
+
+            await titlePopup!.CloseAsync();
+            await titleButton!.Element.FocusAsync();
             await InvokeLoadData();
         }
 

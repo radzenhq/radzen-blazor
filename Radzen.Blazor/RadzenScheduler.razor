@@ -29,9 +29,18 @@
                     }
                 </div>
                 }
-                @if (ShowDateTitle)
+                @if (ShowDateTitle && !AllowDateSelection)
                 {
                 <div class="rz-scheduler-nav-title" aria-live="polite">@SelectedView?.Title</div>
+                }
+                @if (ShowDateTitle && AllowDateSelection)
+                {
+                <div class="rz-scheduler-nav-title" aria-live="polite">
+                    <RadzenButton @ref=titleButton class="rz-scheduler-nav-title-button" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@SelectedView?.Title aria-haspopup="dialog" Click=@OnTitleClick />
+                </div>
+                <RadzenPopup @ref=titlePopup AutoFocusFirstElement="false" tabindex="-1" class="rz-scheduler-nav-title-popup">
+                    <RadzenDatePicker @ref=titlePicker @key=titlePickerKey TValue="DateTime" Inline="true" Culture=@Culture ShowDays=@TitlePickerShowsDays Value=@CurrentDate ValueChanged=@OnTitleDateChanged MonthSelect=@OnTitleMonthSelect />
+                </RadzenPopup>
                 }
                 <div class="rz-scheduler-nav-views">
                     @if (NavigationTemplate != null)

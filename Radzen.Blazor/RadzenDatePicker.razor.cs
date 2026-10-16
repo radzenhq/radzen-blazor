@@ -196,6 +196,7 @@ namespace Radzen.Blazor
             }
 
             SetMonth(calendarMonth);
+            MonthSelect.InvokeAsync(CurrentDate);
 
             if (ShowDays)
             {
@@ -300,9 +301,25 @@ namespace Radzen.Blazor
         bool shouldFocusMonthCell;
         bool shouldFocusYearCell;
 
+        // Tells a host that shows an inline picker in a popup that Escape was pressed, even in cells that stop the key from bubbling up.
+        internal Action? OnEscape { get; set; }
+
+        internal void FocusCalendar()
+        {
+            shouldFocusDay = currentView == CalendarViewKind.Days;
+            shouldFocusMonthCell = currentView == CalendarViewKind.Months;
+            shouldFocusYearCell = currentView == CalendarViewKind.Years;
+            StateHasChanged();
+        }
+
         void OnMonthCellKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Escape")
+            {
+                OnEscape?.Invoke();
+            }
 
             var delta = key switch
             {
@@ -347,6 +364,11 @@ namespace Radzen.Blazor
         void OnYearCellKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Escape")
+            {
+                OnEscape?.Invoke();
+            }
 
             var delta = key switch
             {
@@ -1304,6 +1326,7 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
 
+                OnEscape?.Invoke();
                 await ClosePopup();
                 await FocusAsync();
                 return;
@@ -1594,6 +1617,13 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<DateTime> CurrentDateChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the user picks a month in the month grid, by click or keyboard.
+        /// It is not invoked when the displayed month changes by navigation, for example with the arrow keys.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DateTime> MonthSelect { get; set; }
 
         private DateTime StartDate => GetStartDate(CurrentDate);
 
@@ -2838,6 +2868,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
 
+                OnEscape?.Invoke();
                 await ClosePopup();
                 await FocusAsync();
             }

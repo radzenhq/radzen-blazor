@@ -225,6 +225,28 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     font-size: var(--rz-scheduler-toolbar-title-font-size);
     font-weight: var(--rz-scheduler-toolbar-title-font-weight);
     color: var(--rz-scheduler-toolbar-title-color);
+
+    .rz-scheduler-nav-title-button {
+      font-size: var(--rz-scheduler-toolbar-title-font-size);
+      font-weight: var(--rz-scheduler-toolbar-title-font-weight);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+  }
+}
+
+// The popup is moved to the body when it opens, so it cannot be nested in .rz-scheduler-nav.
+.rz-scheduler-nav-title-popup {
+  display: none;
+  position: absolute;
+  width: 20rem;
+  outline: 0;
+  --rz-datepicker-calendar-transition: none;
+
+  // The popup blurs what is behind it, so the picker must not blur a second time.
+  .rz-datepicker-inline {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
