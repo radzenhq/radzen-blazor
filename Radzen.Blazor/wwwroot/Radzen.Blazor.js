@@ -1812,9 +1812,9 @@ window.Radzen = {
   focusNext: function (container, reverse, popupId) {
     if (!container) return;
     if (container.isConnected && Radzen.focusNextInTabOrder(container, reverse, popupId)) return;
-    var selector ='a[href]:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"]):not([disabled])';
+    var selector = 'a[href]:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"]):not([disabled])';
     var candidates = Array.from(document.querySelectorAll(selector)).filter(function (el) {
-      return (el.offsetWidth > 0 || el.offsetHeight > 0) && el !== container && !container.contains(el);
+      return (el.offsetWidth > 0 || el.offsetHeight > 0) && el !== container && !container.contains(el) && !Radzen.isInPopup(el, popupId);
     });
     if (reverse) {
       for (var i = candidates.length - 1; i >= 0; i--) {
@@ -1833,15 +1833,12 @@ window.Radzen = {
     }
   },
   focusNextInTabOrder: function (container, reverse, popupId) {
-    // Sequential focus order: positive tabindex first (by tabindex, then document order), then the rest in document order.
-    var popup = popupId ? document.getElementById(popupId) : null;
-    var selector = 'a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex]';
+    var selector = 'a[href], button, input:not([type="hidden"]), select, textarea, details > summary, [tabindex]';
     var candidates = Array.from(document.querySelectorAll(selector)).filter(function (el) {
       return el === container ||
-        (!container.contains(el) && !(popup && popup.contains(el)) && Radzen.isTabbable(el));
+        (!container.contains(el) && !Radzen.isInPopup(el, popupId) && Radzen.isTabbable(el));
     });
 
-    // Tab stops only on the checked radio of a group, or on its first radio when none is checked.
     var radioGroups = new Map();
     candidates.forEach(function (el) {
       if (el.type === 'radio' && el.name) {
@@ -1879,9 +1876,12 @@ window.Radzen = {
     if (el.offsetWidth === 0 && el.offsetHeight === 0) return false;
     var style = getComputedStyle(el);
     if (style.visibility === 'hidden' || style.visibility === 'collapse') return false;
-    // A closed <details> hides everything but its own <summary>.
-    var details = el.parentElement ? el.parentElement.closest('details:not([open])') : null;
-    return !details || (el.tagName === 'SUMMARY' && el.parentElement === details);
+    var parent = el.parentElement;
+    if (el.tagName === 'SUMMARY' && parent && parent.tagName === 'DETAILS') parent = parent.parentElement;
+    return !(parent && parent.closest('details:not([open])'));
+  },
+  isInPopup: function (el, popupId) {
+    return !!popupId && !!el.closest('#' + CSS.escape(popupId));
   },
   scrollCarouselItem: function (el, duration) {
     var container = el.parentElement;
