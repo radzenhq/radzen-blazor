@@ -7642,6 +7642,8 @@ Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCal
 Radzen.createDataGrid = function(el) {
   if (!el) return { dispose: function() {} };
   function onClick(e) {
+    if (e.__rzDataGridHandled) return;
+    e.__rzDataGridHandled = true;
     var label = e.target.closest('.rz-cell-filter-label');
     if (label) { e.preventDefault(); }
     var btn = e.target.closest('button[aria-haspopup][aria-controls]');
@@ -7650,6 +7652,8 @@ Radzen.createDataGrid = function(el) {
     }
   }
   function onMousedown(e) {
+    if (e.__rzDataGridHandled) return;
+    e.__rzDataGridHandled = true;
     var btn = e.target.closest('.rz-apply-filter');
     if (btn) { Radzen.blur(btn, e); }
   }
