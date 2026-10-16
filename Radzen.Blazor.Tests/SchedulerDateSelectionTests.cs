@@ -179,7 +179,7 @@ namespace Radzen.Blazor.Tests
             OpenPicker(ctx, cut);
 
             cut.Find(".rz-calendar-title-button").Click();
-            cut.Find("button[id$='-year-2026']").Click();
+            cut.WaitForElement("button[id$='-year-2026']").Click();
 
             cut.WaitForAssertion(() => Assert.Equal(12, cut.FindAll(".rz-calendar-month-cell").Count));
             Assert.Equal(new DateTime(2026, 7, 14), cut.Instance.CurrentDate);
