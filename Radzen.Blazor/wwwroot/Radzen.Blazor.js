@@ -1805,22 +1805,32 @@ window.Radzen = {
       return;
     }
 
-    validator.__rzPlace = function () {
-      // Moving the validator with a transform keeps it next to the component when the layout around them shifts.
+    if (validator.__rzObserver) {
+      validator.__rzObserver.disconnect();
+    }
+
+    // Moving the validator with a transform keeps it next to the component when the layout around them shifts.
+    validator.style.transform = '';
+
+    var field = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
+
+    // The input a component is named after can be hidden, so measure its first visible ancestor instead.
+    while (field && (field.offsetWidth == 0 || field.offsetHeight == 0)) {
+      field = field.parentElement;
+    }
+    // A radio button list shares one validator, so measure the whole list rather than its first radio button.
+    field = field && field.closest('.rz-radio-button-list') || field;
+
+    if (position == 'bottom' || !field) {
+      return;
+    }
+
+    var place = function () {
+      var gap = 12;
+
       validator.style.transform = '';
 
-      if (position == 'bottom') {
-        return;
-      }
-
-      var target = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
-
-      if (!target) {
-        return;
-      }
-
-      var gap = 12;
-      var t = target.getBoundingClientRect();
+      var t = field.getBoundingClientRect();
       var v = validator.getBoundingClientRect();
       var left = t.left;
       var top = t.top;
@@ -1836,20 +1846,16 @@ window.Radzen = {
       validator.style.transform = 'translate(' + (left - v.left) + 'px, ' + (top - v.top) + 'px)';
     };
 
-    validator.__rzPlace();
+    validator.__rzObserver = new ResizeObserver(function () {
+      if (!validator.isConnected) {
+        validator.__rzObserver.disconnect();
+        return;
+      }
 
-    if (!validator.__rzResize) {
-      validator.__rzResize = function () {
-        if (!validator.isConnected) {
-          window.removeEventListener('resize', validator.__rzResize);
-          return;
-        }
+      place();
+    });
 
-        validator.__rzPlace();
-      };
-
-      window.addEventListener('resize', validator.__rzResize);
-    }
+    validator.__rzObserver.observe(field);
   },
   focusElement: function (elementId, onlyIfFocusNotMoved) {
     var el = document.getElementById(elementId);
