@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -36,6 +37,12 @@ namespace Radzen.Blazor
         public bool Popup { get; set; }
 
         /// <summary>
+        /// Specifies the side of the validated component on which the validator is displayed when <see cref="Popup" /> is <c>true</c>. Set to <see cref="TooltipPosition.Bottom" /> by default.
+        /// </summary>
+        [Parameter]
+        public TooltipPosition PopupPosition { get; set; } = TooltipPosition.Bottom;
+
+        /// <summary>
         /// Returns the validity status.
         /// </summary>
         /// <value><c>true</c> if this validator is valid; otherwise, <c>false</c>.</value>
@@ -53,6 +60,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected ValidationMessageStore? messages;
         private FieldIdentifier FieldIdentifier { get; set; }
+        private bool positionedByScript;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -159,7 +167,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-message rz-messages-error {(Popup ? "rz-message-popup" : "")}";
+            return $"rz-message rz-messages-error {(Popup ? "rz-message-popup" : "")}{(Popup && PopupPosition != TooltipPosition.Bottom ? $" rz-message-popup-{PopupPosition.ToString().ToLowerInvariant()}" : "")}";
         }
 
         /// <summary>
@@ -172,6 +180,22 @@ namespace Radzen.Blazor
         private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            var position = Popup ? PopupPosition : TooltipPosition.Bottom;
+
+            // The default position is plain CSS. The script is only needed for the other sides, and to undo them.
+            if (Visible && !IsValid && JSRuntime != null && (position != TooltipPosition.Bottom || positionedByScript))
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.positionValidator", GetId(), Component, position.ToString().ToLowerInvariant());
+
+                positionedByScript = position != TooltipPosition.Bottom;
+            }
         }
 
         /// <inheritdoc />
@@ -193,8 +217,15 @@ namespace Radzen.Blazor
                 builder.OpenElement(0, "div");
                 builder.AddAttribute(1, "style", Style);
                 builder.AddAttribute(2, "class", GetCssClass());
-                builder.AddMultipleAttributes(3, Attributes);
-                builder.AddContent(4, Text);
+
+                // The script that positions the popup finds the validator by its id.
+                if (Popup && PopupPosition != TooltipPosition.Bottom || positionedByScript)
+                {
+                    builder.AddAttribute(3, "id", GetId());
+                }
+
+                builder.AddMultipleAttributes(4, Attributes);
+                builder.AddContent(5, Text);
                 builder.CloseElement();
             }
         }

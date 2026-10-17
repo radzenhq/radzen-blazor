@@ -43,3 +43,38 @@ $validator-transform: translateY(12px) !default;
     inset-inline-start: calc(var(--rz-border-radius) + (var(--rz-validator-pointer-size) / 2));
   }
 }
+
+// The position of these popups is set by Radzen.positionValidator, so the default offset does not apply.
+.rz-message-popup-top,
+.rz-message-popup-left,
+.rz-message-popup-right {
+  transform: none;
+  max-width: 20rem;
+  overflow-wrap: break-word;
+}
+
+.rz-message-popup-top:before {
+  border-bottom-color: transparent;
+  border-top-color: var(--rz-validator-background-color);
+  inset-block-start: auto;
+  inset-block-end: calc(-2 * var(--rz-validator-pointer-size));
+}
+
+.rz-message-popup-left:before,
+.rz-message-popup-right:before {
+  inset-block-start: calc(var(--rz-border-radius) + (var(--rz-validator-pointer-size) / 2));
+  inset-inline-start: auto;
+  border-bottom-color: transparent;
+}
+
+.rz-message-popup-left:before {
+  border-left-color: var(--rz-validator-background-color);
+  left: auto;
+  right: calc(-2 * var(--rz-validator-pointer-size));
+}
+
+.rz-message-popup-right:before {
+  border-right-color: var(--rz-validator-background-color);
+  right: auto;
+  left: calc(-2 * var(--rz-validator-pointer-size));
+}
