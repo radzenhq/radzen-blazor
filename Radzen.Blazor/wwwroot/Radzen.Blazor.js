@@ -5231,6 +5231,57 @@ window.Radzen = {
 
     return { rowIndex: -1, columnIndex: -1 };
   },
+  ensureTableCellSelection: function (context, section, position) {
+    var ref = context.ref;
+    var table = context.table;
+    var cell = context.cell;
+
+    if (!ref || !table || !cell || table.contains(cell) || !ref.contains(table) || !position) {
+      return;
+    }
+
+    if (!section || !table.contains(section) || !section.rows.length) {
+      section = table.tBodies.length ? table.tBodies[0] : table.tHead;
+    }
+
+    if ((!section || !section.rows.length) && table.tHead && table.tHead.rows.length) {
+      section = table.tHead;
+    }
+
+    var matrix = this.getCellMatrix(section);
+    if (!matrix.length) {
+      return;
+    }
+
+    var rowIndex = Math.max(0, Math.min(position.rowIndex, matrix.length - 1));
+    var row = matrix[rowIndex] || [];
+    if (!row.length) {
+      return;
+    }
+
+    var columnIndex = Math.max(0, Math.min(position.columnIndex, row.length - 1));
+    var target = row[columnIndex];
+
+    for (var offset = 1; !target && (columnIndex - offset >= 0 || columnIndex + offset < row.length); offset++) {
+      target = row[columnIndex - offset] || row[columnIndex + offset];
+    }
+
+    if (!target) {
+      return;
+    }
+
+    var range = document.createRange();
+    range.selectNodeContents(target);
+    range.collapse(true);
+    var selection = getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    ref.focus();
+
+    if (ref.lastSelectedTableCell && !ref.contains(ref.lastSelectedTableCell)) {
+      ref.lastSelectedTableCell = target;
+    }
+  },
   clearSelectedTableCells: function (ref) {
     if (!ref) {
       return;
@@ -5698,6 +5749,12 @@ window.Radzen = {
   },
   deleteTableRow: function (context) {
     var table = context.table;
+    var columns = 0;
+    Array.prototype.forEach.call(table.children, function (section) {
+      this.getCellMatrix(section).forEach(function (row) {
+        columns = Math.max(columns, row.length);
+      });
+    }, this);
     if (context.row) {
       context.row.remove();
     }
@@ -5705,7 +5762,7 @@ window.Radzen = {
       table.deleteTHead();
     }
     if (table.tBodies.length && !table.tBodies[0].rows.length) {
-      table.tBodies[0].appendChild(this.createTableRow(context.ref, this.getTableColumnCount(table) || 1, false));
+      table.tBodies[0].appendChild(this.createTableRow(context.ref, columns || 1, false));
     }
   },
   addTableColumn: function (context, command) {
@@ -5843,9 +5900,15 @@ window.Radzen = {
         ? this.getTableContextFromTarget(ref, ref.contextMenuTarget)
         : this.getTableContext(ref);
 
-      if (!context.table) {
+      var requiresCell = ['addRowBefore', 'addRowAfter', 'deleteRow', 'addColumnBefore', 'addColumnAfter', 'deleteColumn',
+        'mergeCellRight', 'mergeCellDown', 'splitCell'].includes(name);
+      if (!context.table || (requiresCell && (!context.cell || !context.row))) {
         return this.createCommandResult(ref, false, 'table.action.requiresTable');
       }
+
+      var restoresSelection = ['deleteRow', 'deleteColumn', 'updateTable', 'mergeCellRight', 'mergeCellDown'].includes(name);
+      var section = restoresSelection && context.row ? context.row.parentElement : null;
+      var position = context.cell && section ? this.getCellPosition(section, context.cell) : null;
 
       switch (name) {
         case 'copyCells': return this.copyTableCells(ref);
@@ -5866,6 +5929,8 @@ window.Radzen = {
         case 'splitCell': this.splitTableCell(context); break;
         case 'deleteTable': this.deleteTable(context); break;
       }
+
+      this.ensureTableCellSelection(context, section, position);
 
       return this.createCommandResult(ref, true);
     } finally {
@@ -6419,6 +6484,16 @@ window.Radzen = {
         }
         ref.lastSelectedTableCell = cell;
         ref.contextMenuTarget = cell;
+        ref.focus();
+        var selection = getSelection();
+        if (!cell.contains(selection.focusNode)) {
+          var range = document.createRange();
+          range.selectNodeContents(cell);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        Radzen.saveSelection(ref);
         e.preventDefault();
         try { instance.invokeMethodAsync('OnContextMenu', e.clientX, e.clientY); } catch { }
       }

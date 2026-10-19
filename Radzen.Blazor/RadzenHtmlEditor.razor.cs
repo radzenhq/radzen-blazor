@@ -283,6 +283,7 @@ namespace Radzen.Blazor
                     await RestoreSelectionAsync();
                     await ExecuteTableCommandAsync(command);
                     await UpdateCommandState();
+                    ContextMenuService?.Close();
                 }
             });
         }
