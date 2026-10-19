@@ -19,6 +19,12 @@
             </Columns>
         </RadzenDataGrid>
 
+        <RadzenDataGrid id="simple-grid" TItem="Order" Data="@orders" AllowFiltering="true" FilterMode="FilterMode.Simple">
+            <Columns>
+                <RadzenDataGridColumn TItem="Order" Property="Priority" Title="Priority" />
+            </Columns>
+        </RadzenDataGrid>
+
         <RadzenDropDown id="value-dropdown" TValue="string" Data="@(new[] { "A", "B", "C" })" @bind-Value="@selectedText" AllowFiltering="true" />
 
         <RadzenDropDown id="item-dropdown" TValue="int" Data="@dropDownItems" TextProperty="Text" ValueProperty="Value" @bind-Value="@selectedItem" />
