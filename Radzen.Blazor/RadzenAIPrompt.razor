@@ -4,8 +4,8 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         <div class="rz-aiprompt-input">
-            <textarea class="rz-textarea rz-aiprompt-textarea" placeholder="@Placeholder" value="@Value" rows="2" disabled="@Disabled"
-                      @oninput="@OnInput" @onkeydown="@OnKeyDown" @onkeydown:preventDefault="@preventDefault" @attributes="@InputAttributes"></textarea>
+            <textarea @ref="textarea" class="rz-textarea rz-aiprompt-textarea" placeholder="@Placeholder" @bind="@Value" @bind:event="oninput" @bind:after="@OnInput" rows="2" disabled="@Disabled"
+                      @onkeydown="@OnKeyDown" @attributes="@InputAttributes"></textarea>
             @if (IsGenerating)
             {
                 <RadzenButton Icon="stop" Text="@StopText" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="@Stop" class="rz-aiprompt-stop" />
