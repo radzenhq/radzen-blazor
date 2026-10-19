@@ -1798,6 +1798,65 @@ window.Radzen = {
         el.ondragstart = function (e) { e.dataTransfer.setData('', e.target.id); };
     }
   },
+  positionValidator: function (id, component, position) {
+    var validator = document.getElementById(id);
+
+    if (!validator) {
+      return;
+    }
+
+    if (validator.__rzObserver) {
+      validator.__rzObserver.disconnect();
+    }
+
+    // Moving the validator with a transform keeps it next to the component when the layout around them shifts.
+    validator.style.transform = '';
+
+    var field = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
+
+    // The input a component is named after can be hidden, so measure its first visible ancestor instead.
+    while (field && (field.offsetWidth == 0 || field.offsetHeight == 0)) {
+      field = field.parentElement;
+    }
+    // A radio button list shares one validator, so measure the whole list rather than its first radio button.
+    field = field && field.closest('.rz-radio-button-list') || field;
+
+    if (position == 'bottom' || !field) {
+      return;
+    }
+
+    var place = function () {
+      var gap = 12;
+
+      validator.style.transform = '';
+
+      var t = field.getBoundingClientRect();
+      var v = validator.getBoundingClientRect();
+      var left = t.left;
+      var top = t.top;
+
+      if (position == 'top') {
+        top = t.top - v.height - gap;
+      } else if (position == 'left') {
+        left = t.left - v.width - gap;
+      } else if (position == 'right') {
+        left = t.right + gap;
+      }
+
+      validator.style.transform = 'translate(' + (left - v.left) + 'px, ' + (top - v.top) + 'px)';
+    };
+
+    validator.__rzObserver = new ResizeObserver(function () {
+      if (!validator.isConnected) {
+        validator.__rzObserver.disconnect();
+        return;
+      }
+
+      place();
+    });
+
+    validator.__rzObserver.observe(field);
+  },
   focusElement: function (elementId, onlyIfFocusNotMoved) {
     var el = document.getElementById(elementId);
     if (!el) return;

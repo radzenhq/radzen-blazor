@@ -6,6 +6,8 @@
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
             <RadzenLabel Text="Display validators as popup" Component="popup" />
+            <RadzenLabel Text="Popup position" Component="position" class="rz-ms-4" />
+            <RadzenDropDown Name="position" @bind-Value=@position Data=@(Enum.GetValues<TooltipPosition>()) Disabled=@(!popup) />
         </RadzenStack>
     </RadzenCard>
 
@@ -19,8 +21,8 @@
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
                         <RadzenTextBox Name="ZIP" @bind-Value=@model.Zip Style="display: block; width: 100%;" />
-                        <RadzenRequiredValidator Component="ZIP" Text="ZIP code is required" Popup=@popup Style="position: absolute"/>
-                        <RadzenRegexValidator Component="ZIP" Text="ZIP code must be 5 digits" Pattern="\d{5}" Popup=@popup Style="position: absolute" />
+                        <RadzenRequiredValidator Component="ZIP" Text="ZIP code is required" Popup=@popup PopupPosition=@position Style="position: absolute"/>
+                        <RadzenRegexValidator Component="ZIP" Text="ZIP code must be 5 digits" Pattern="\d{5}" Popup=@popup PopupPosition=@position Style="position: absolute" />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
@@ -42,6 +44,7 @@
     }
 
     bool popup;
+    TooltipPosition position = TooltipPosition.Bottom;
 
     Model model = new Model();
     EventConsole console;
