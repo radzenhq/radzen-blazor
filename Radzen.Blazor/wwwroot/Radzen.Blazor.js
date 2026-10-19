@@ -5320,6 +5320,10 @@ window.Radzen = {
     if (ref.lastSelectedTableCell && !ref.contains(ref.lastSelectedTableCell)) {
       ref.lastSelectedTableCell = target;
     }
+
+    if (!this.getSelectedTableCells(ref).length) {
+      target.classList.add('rz-html-editor-cell-selected');
+    }
   },
   clearSelectedTableCells: function (ref) {
     if (!ref) {
@@ -5661,8 +5665,13 @@ window.Radzen = {
     return table.tBodies[0];
   },
   getTableColumnCount: function (table) {
-    var firstRow = table.rows.length ? table.rows[0] : null;
-    return firstRow ? firstRow.children.length : 0;
+    var columns = 0;
+    Array.prototype.forEach.call(table.children, function (section) {
+      this.getCellMatrix(section).forEach(function (row) {
+        columns = Math.max(columns, row.length);
+      });
+    }, this);
+    return columns;
   },
   createTableRow: function (ref, columns, header) {
     var tr = document.createElement('tr');
@@ -5788,12 +5797,7 @@ window.Radzen = {
   },
   deleteTableRow: function (context) {
     var table = context.table;
-    var columns = 0;
-    Array.prototype.forEach.call(table.children, function (section) {
-      this.getCellMatrix(section).forEach(function (row) {
-        columns = Math.max(columns, row.length);
-      });
-    }, this);
+    var columns = this.getTableColumnCount(table);
     if (context.row) {
       context.row.remove();
     }
@@ -6002,20 +6006,24 @@ window.Radzen = {
     context.table.remove();
   },
   getEditorHtml: function (ref) {
-    var selected = Array.from(ref.querySelectorAll('img.rz-state-selected'));
+    var selected = Array.from(ref.querySelectorAll('img.rz-state-selected')).map(function (element) {
+      return { element: element, className: 'rz-state-selected' };
+    }).concat(Array.from(ref.querySelectorAll('td.rz-html-editor-cell-selected,th.rz-html-editor-cell-selected')).map(function (element) {
+      return { element: element, className: 'rz-html-editor-cell-selected' };
+    }));
 
-    for (var img of selected) {
-      img.classList.remove('rz-state-selected');
+    for (var item of selected) {
+      item.element.classList.remove(item.className);
 
-      if (!img.getAttribute('class')) {
-        img.removeAttribute('class');
+      if (!item.element.getAttribute('class')) {
+        item.element.removeAttribute('class');
       }
     }
 
     var html = ref.innerHTML;
 
-    for (var img of selected) {
-      img.classList.add('rz-state-selected');
+    for (var item of selected) {
+      item.element.classList.add(item.className);
     }
 
     return html;
@@ -6406,7 +6414,7 @@ window.Radzen = {
         if (pasteCell && ref.contains(pasteCell) && ref.copiedCells && ref.copiedCells.matrix) {
           e.preventDefault();
           Radzen.pasteSelectedTableCells(ref, pasteCell);
-          try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
+          try { suppressDisposed(instance.invokeMethodAsync('OnChange', Radzen.getEditorHtml(ref))); } catch { }
           return;
         }
       }
@@ -6523,7 +6531,7 @@ window.Radzen = {
         }
         ref.lastSelectedTableCell = cell;
         ref.contextMenuTarget = cell;
-        ref.focus();
+        ref.focus({ preventScroll: true });
         var selection = getSelection();
         if (!cell.contains(selection.focusNode)) {
           var range = document.createRange();

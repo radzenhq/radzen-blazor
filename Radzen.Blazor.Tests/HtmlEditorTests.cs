@@ -421,6 +421,50 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Tabelle entfernen", component.DeleteTableText);
             Assert.Equal("Nach rechts verbinden", component.MergeRightText);
         }
+
+        static async Task<int> InvokeContextMenuTableCommand(TestContext ctx, string command)
+        {
+            ctx.JSInterop.Setup<HtmlEditorTableSelection>("Radzen.getContextTableSelection", _ => true)
+                .SetResult(new HtmlEditorTableSelection { InTable = true });
+
+            var contextMenuService = ctx.Services.GetRequiredService<ContextMenuService>();
+            ContextMenuOptions options = null;
+            var closed = 0;
+            contextMenuService.OnOpen += (_, o) => options = o;
+            contextMenuService.OnClose += () => closed++;
+
+            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+
+            await component.InvokeAsync(() => component.Instance.OnContextMenu(10, 10));
+
+            Assert.NotNull(options?.Click);
+
+            await component.InvokeAsync(() => options.Click(new MenuItemEventArgs { Value = command }));
+
+            return closed;
+        }
+
+        [Fact]
+        public async Task HtmlEditor_ContextMenuTableCommand_ClosesContextMenu()
+        {
+            using var ctx = CreateContext();
+
+            ctx.JSInterop.Setup<RadzenHtmlEditorCommandState>("Radzen.execTableCommand", _ => true)
+                .SetResult(new RadzenHtmlEditorCommandState { Success = true });
+
+            Assert.Equal(1, await InvokeContextMenuTableCommand(ctx, "deleteRow"));
+        }
+
+        [Fact]
+        public async Task HtmlEditor_ContextMenuTableCommand_ClosesContextMenu_WhenCommandThrows()
+        {
+            using var ctx = CreateContext();
+
+            ctx.JSInterop.Setup<RadzenHtmlEditorCommandState>("Radzen.execTableCommand", _ => true)
+                .SetException(new JSException("execTableCommand failed"));
+
+            Assert.Equal(1, await InvokeContextMenuTableCommand(ctx, "deleteRow"));
+        }
     }
 }
 
