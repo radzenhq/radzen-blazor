@@ -888,7 +888,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
       .rz-textbox,
       .rz-inputtext {
-        text-indent: map.get($button-sizes, md, min-width);
+        padding-inline-start: calc(var(--rz-input-padding-inline) + map.get($button-sizes, md, min-width));
       }
     }
   }
