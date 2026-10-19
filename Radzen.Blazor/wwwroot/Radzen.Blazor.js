@@ -1809,26 +1809,50 @@ window.Radzen = {
       validator.__rzObserver.disconnect();
     }
 
-    // Moving the validator with a transform keeps it next to the component when the layout around them shifts.
     validator.style.transform = '';
 
-    var field = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
+    var named = document.getElementById(component) || document.querySelector('[name="' + component + '"]');
 
-    // The input a component is named after can be hidden, so measure its first visible ancestor instead.
-    while (field && (field.offsetWidth == 0 || field.offsetHeight == 0)) {
-      field = field.parentElement;
-    }
-    // A radio button list shares one validator, so measure the whole list rather than its first radio button.
-    field = field && field.closest('.rz-radio-button-list') || field;
-
-    if (position == 'bottom' || !field) {
+    if (position == 'bottom' || !named) {
       return;
     }
+
+    var anchor = named.parentElement && getComputedStyle(named).display == 'none' ? named.parentElement : named;
+    var observer = null;
+    var observedField = null;
+
+    var resolveField = function () {
+      if (!anchor.isConnected || anchor.getClientRects().length == 0) {
+        return null;
+      }
+
+      var field = anchor;
+
+      while (field && (field.offsetWidth == 0 || field.offsetHeight == 0)) {
+        field = field.parentElement;
+      }
+
+      return field && field.closest('.rz-radio-button-list') || field;
+    };
 
     var place = function () {
       var gap = 12;
 
       validator.style.transform = '';
+
+      var field = resolveField();
+
+      if (!field || validator.getClientRects().length == 0) {
+        return;
+      }
+
+      if (field != anchor && field != observedField) {
+        requestAnimationFrame(function () {
+          if (validator.__rzObserver == observer) {
+            track(resolveField());
+          }
+        });
+      }
 
       var t = field.getBoundingClientRect();
       var v = validator.getBoundingClientRect();
@@ -1846,16 +1870,31 @@ window.Radzen = {
       validator.style.transform = 'translate(' + (left - v.left) + 'px, ' + (top - v.top) + 'px)';
     };
 
-    validator.__rzObserver = new ResizeObserver(function () {
+    var track = function (field) {
+      if (!field || field == anchor || field == observedField) {
+        return;
+      }
+
+      if (observedField) {
+        observer.unobserve(observedField);
+      }
+
+      observedField = field;
+      observer.observe(field);
+    };
+
+    observer = validator.__rzObserver = new ResizeObserver(function () {
       if (!validator.isConnected) {
-        validator.__rzObserver.disconnect();
+        observer.disconnect();
         return;
       }
 
       place();
     });
 
-    validator.__rzObserver.observe(field);
+    observer.observe(anchor);
+    observer.observe(validator);
+    track(resolveField());
   },
   focusElement: function (elementId, onlyIfFocusNotMoved) {
     var el = document.getElementById(elementId);
