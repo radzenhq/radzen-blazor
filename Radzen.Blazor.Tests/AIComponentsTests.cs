@@ -259,8 +259,6 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenAIPrompt>(parameters => parameters
                 .Add(p => p.ValueChanged, v => value = v));
 
-            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.preventEnterNewLine"));
-
             await component.Find(".rz-aiprompt-textarea").InputAsync(new Microsoft.AspNetCore.Components.ChangeEventArgs { Value = "Summarize" });
 
             Assert.Equal("Summarize", value);
@@ -270,7 +268,6 @@ namespace Radzen.Blazor.Tests
             component.WaitForAssertion(() => Assert.False(component.Instance.IsGenerating));
 
             Assert.Equal("Summarize", client.Requests.Single().Messages.Single().Text);
-            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.preventEnterNewLine"));
         }
 
         [Fact]

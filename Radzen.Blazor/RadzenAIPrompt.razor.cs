@@ -28,8 +28,6 @@ namespace Radzen.Blazor
         [Inject]
         IServiceProvider ServiceProvider { get; set; } = default!;
 
-        private ElementReference textarea;
-        private string? preparedTextareaId;
         private string? lastPrompt;
         private AIPromptCommand? lastCommand;
         private CancellationTokenSource? cts;
@@ -344,18 +342,6 @@ namespace Radzen.Blazor
             if (args.Key == "Enter" && !args.ShiftKey && !IsGenerating)
             {
                 await Generate();
-            }
-        }
-
-        /// <inheritdoc />
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (JSRuntime != null && textarea.Id != null && textarea.Id != preparedTextareaId)
-            {
-                preparedTextareaId = textarea.Id;
-                await JSRuntime.InvokeVoidAsync("Radzen.preventEnterNewLine", textarea);
             }
         }
 

@@ -7826,13 +7826,6 @@ Radzen.getSelectionRange = function(id) {
   if (!element || element.selectionStart == null || element.selectionEnd == null) return null;
   return [element.selectionStart, element.selectionEnd];
 };
-Radzen.preventEnterNewLine = function(element) {
-  if (!element || element.rzPreventEnterNewLine) return;
-  element.rzPreventEnterNewLine = true;
-  element.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) e.preventDefault();
-  });
-};
 Radzen.clickElement = function(id) {
   var element = typeof id === 'string' ? document.getElementById(id) : id;
   if (element) element.click();
@@ -8994,6 +8987,13 @@ Radzen.chatKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.chatKeydown);
+Radzen.aiPromptKeydown = function (e) {
+  if (e.isComposing) return;
+  var el = e.target;
+  if (!el || !el.classList || !el.classList.contains('rz-aiprompt-textarea')) return;
+  if (e.key === 'Enter' && !e.shiftKey) e.preventDefault();
+};
+document.addEventListener('keydown', Radzen.aiPromptKeydown);
 Radzen.popupTriggerKeydown = function (e) {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   var el = e.target;

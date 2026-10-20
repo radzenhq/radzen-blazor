@@ -4,7 +4,7 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         <div class="rz-aiprompt-input">
-            <textarea @ref="textarea" class="rz-textarea rz-aiprompt-textarea" placeholder="@Placeholder" @bind="@Value" @bind:event="oninput" @bind:after="@OnInput" rows="2" disabled="@Disabled"
+            <textarea class="rz-textarea rz-aiprompt-textarea" placeholder="@Placeholder" @bind="@Value" @bind:event="oninput" @bind:after="@OnInput" rows="2" disabled="@Disabled"
                       @onkeydown="@OnKeyDown" @attributes="@InputAttributes"></textarea>
             @if (IsGenerating)
             {
