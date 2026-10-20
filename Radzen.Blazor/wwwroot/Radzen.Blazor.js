@@ -7826,6 +7826,13 @@ Radzen.getSelectionRange = function(id) {
   if (!element || element.selectionStart == null || element.selectionEnd == null) return null;
   return [element.selectionStart, element.selectionEnd];
 };
+Radzen.preventEnterNewLine = function(element) {
+  if (!element || element.rzPreventEnterNewLine) return;
+  element.rzPreventEnterNewLine = true;
+  element.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) e.preventDefault();
+  });
+};
 Radzen.clickElement = function(id) {
   var element = typeof id === 'string' ? document.getElementById(id) : id;
   if (element) element.click();
