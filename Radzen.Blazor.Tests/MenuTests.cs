@@ -1,4 +1,5 @@
 using Bunit;
+using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 
@@ -425,6 +426,30 @@ namespace Radzen.Blazor.Tests
             // Nested submenu ul should have data-flyout="true"
             Assert.Contains("data-flyout=\"true\"", component.Markup);
         }
+            [Fact]
+        public void Menu_Does_Not_Prevent_Keydown_Default_At_Render_Time()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            static bool PreventsDefault(AngleSharp.Dom.IElement element) =>
+                element.Attributes.Any(a => a.Name.Contains("preventDefault", System.StringComparison.OrdinalIgnoreCase));
+
+            var menubar = component.Find("ul[role=menubar]");
+            Assert.False(PreventsDefault(menubar));
+
+            menubar.Focus();
+            Assert.False(PreventsDefault(component.Find("ul[role=menubar]")));
+
+            component.Find("ul[role=menubar]").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+            Assert.False(PreventsDefault(component.Find("ul[role=menubar]")));
+
+            component.Find("ul[role=menubar]").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" });
+            Assert.False(PreventsDefault(component.Find("ul[role=menubar]")));
+        }
     }
 }
-
