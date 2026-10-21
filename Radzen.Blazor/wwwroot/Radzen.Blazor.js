@@ -3139,15 +3139,14 @@ window.Radzen = {
                 var vv = window.visualViewport;
                 var viewportTop = vv.offsetTop;
                 var viewportBottom = viewportTop + vv.height;
+                itemsWrapper.style.maxHeight = popup.__originalWrapperMaxHeight;
+                popup.style.top = popup.__originalPopupTop;
                 var pRect = parent.getBoundingClientRect();
                 var popRect = popup.getBoundingClientRect();
-                if (popRect.top >= viewportTop - 1 && popRect.bottom <= viewportBottom + 1) {
-                    itemsWrapper.style.maxHeight = popup.__originalWrapperMaxHeight;
-                    popup.style.top = popup.__originalPopupTop;
-                    return;
-                }
-                var spaceBelow = viewportBottom - pRect.bottom - 5;
-                var spaceAbove = pRect.top - viewportTop - 5;
+                if (popRect.top >= viewportTop - 1 && popRect.bottom <= viewportBottom + 1) return;
+                var chromeHeight = popRect.height - itemsWrapper.getBoundingClientRect().height;
+                var spaceBelow = viewportBottom - pRect.bottom - 5 - chromeHeight;
+                var spaceAbove = pRect.top - viewportTop - 5 - chromeHeight;
                 var sTop = /Edge/.test(navigator.userAgent) ? document.body.scrollTop : document.documentElement.scrollTop;
                 if (spaceBelow >= spaceAbove) {
                     popup.style.top = (pRect.bottom + sTop) + 'px';
