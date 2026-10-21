@@ -2439,6 +2439,7 @@ window.Radzen = {
       files.push({
         Name: file.name,
         Size: file.size,
+        ContentType: file.type,
         Url: URL.createObjectURL(file)
       });
     }

@@ -29,7 +29,14 @@
                 <div class="rz-fileupload-row" style="margin-bottom: 10px">
                     @if (!string.IsNullOrEmpty(file.Url))
                     {
+                        @if (file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                        {
                     <div><img src="@file.Url" width="50px" alt="@ImageAlternateText"></div>
+                        }
+                        else
+                        {
+                    <div><i class="notranslate rzi rz-fileupload-file-icon" aria-hidden="true">draft</i></div>
+                        }
                     }
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>

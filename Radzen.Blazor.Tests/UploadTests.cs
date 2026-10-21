@@ -196,6 +196,34 @@ namespace Radzen.Blazor.Tests
             Assert.NotSame(unhandled, completed);
             Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createUpload"));
         }
+
+        [Fact]
+        public async Task Upload_Renders_ImagePreview_OnlyForImageFiles()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "api/upload"));
+
+            await component.InvokeAsync(() => component.Instance.OnChange(new[]
+            {
+                new PreviewFileInfo { Name = "photo.png", Size = 2048, ContentType = "image/png", Url = "blob:photo" },
+                new PreviewFileInfo { Name = "report.pdf", Size = 4096, ContentType = "application/pdf", Url = "blob:report" },
+                new PreviewFileInfo { Name = "unknown.bin", Size = 1024, Url = "blob:unknown" }
+            }));
+
+            var rows = component.FindAll(".rz-fileupload-row");
+            Assert.Equal(3, rows.Count);
+
+            var image = rows[0].QuerySelector("img");
+            Assert.NotNull(image);
+            Assert.Equal("blob:photo", image.GetAttribute("src"));
+            Assert.Null(rows[0].QuerySelector(".rz-fileupload-file-icon"));
+
+            Assert.Null(rows[1].QuerySelector("img"));
+            Assert.NotNull(rows[1].QuerySelector(".rz-fileupload-file-icon"));
+
+            Assert.Null(rows[2].QuerySelector("img"));
+            Assert.NotNull(rows[2].QuerySelector(".rz-fileupload-file-icon"));
+        }
     }
 }
-

@@ -85,6 +85,12 @@ $upload-button-background-color: var(--rz-primary) !default;
     display: none;
   }
 
+  .rz-fileupload-file-icon {
+    font-size: 2rem;
+    width: 50px;
+    text-align: center;
+  }
+
   .rz-button {
     background-color: var(--rz-upload-files-remove-background-color);
     color: var(--rz-upload-files-remove-color);
