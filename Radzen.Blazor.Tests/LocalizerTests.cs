@@ -123,6 +123,9 @@ public class LocalizerTests
     [InlineData("es")]
     [InlineData("it")]
     [InlineData("ja")]
+    [InlineData("pt")]
+    [InlineData("pt-BR")]
+    [InlineData("pt-PT")]
     public void Localizer_Resolves_Builtin_Translations_For_Culture(string lang)
     {
         var culture = new CultureInfo(lang);
@@ -140,6 +143,7 @@ public class LocalizerTests
         Assert.Equal("Abbrechen", Localizer.Default.Get(nameof(RadzenStrings.Spreadsheet_Cancel), new CultureInfo("de")));
         Assert.Equal("Aujourd'hui", Localizer.Default.Get(nameof(RadzenStrings.Scheduler_TodayText), new CultureInfo("fr")));
         Assert.Equal("キャンセル", Localizer.Default.Get(nameof(RadzenStrings.Spreadsheet_Cancel), new CultureInfo("ja")));
+        Assert.Equal("Nenhum registro para exibir.", Localizer.Default.Get(nameof(RadzenStrings.DataGrid_EmptyText), new CultureInfo("pt-BR")));
     }
 
     [Fact]
