@@ -40,6 +40,11 @@ abstract class LookupFunctionBase : FormulaFunction
         {
             return searchKey;
         }
+
+        if (searchKey.IsEmpty)
+        {
+            searchKey = CellData.FromNumber(0);
+        }
         if (indexArg.IsError)
         {
             return indexArg;
@@ -104,7 +109,7 @@ abstract class LookupFunctionBase : FormulaFunction
                 {
                     return cell;
                 }
-                if (cell.IsEqualTo(searchKey))
+                if (!cell.IsEmpty && cell.IsEqualTo(searchKey))
                 {
                     matchPosition = i;
                     break;
@@ -128,7 +133,12 @@ abstract class LookupFunctionBase : FormulaFunction
                     return cell;
                 }
 
-                if (cell.IsLessThanOrEqualTo(searchKey))
+                if (!RangeSearch.IsSameKind(cell, searchKey))
+                {
+                    continue;
+                }
+
+                if (cell.CompareTo(searchKey) <= 0)
                 {
                     lastCandidate = i;
                 }

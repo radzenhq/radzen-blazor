@@ -13,11 +13,6 @@ static class RangeSearch
         error = null;
         var bestIndex = -1;
 
-        if (lookup.IsEmpty)
-        {
-            return -1;
-        }
-
         for (var i = 0; i < values.Count; i++)
         {
             var cell = values[i];
@@ -32,13 +27,18 @@ static class RangeSearch
                 return i;
             }
 
-            if (matchMode == -1 && cell.IsLessThan(lookup) &&
-                (bestIndex == -1 || cell.IsGreaterThan(values[bestIndex])))
+            if (!IsSameKind(cell, lookup))
+            {
+                continue;
+            }
+
+            if (matchMode == -1 && cell.CompareTo(lookup) < 0 &&
+                (bestIndex == -1 || cell.CompareTo(values[bestIndex]) > 0))
             {
                 bestIndex = i;
             }
-            else if (matchMode == 1 && cell.IsGreaterThan(lookup) &&
-                (bestIndex == -1 || cell.IsLessThan(values[bestIndex])))
+            else if (matchMode == 1 && cell.CompareTo(lookup) > 0 &&
+                (bestIndex == -1 || cell.CompareTo(values[bestIndex]) < 0))
             {
                 bestIndex = i;
             }
@@ -47,8 +47,26 @@ static class RangeSearch
         return matchMode == 0 ? -1 : bestIndex;
     }
 
+    public static bool IsSameKind(CellData cell, CellData lookup)
+    {
+        if (cell.IsError || cell.IsEmpty || lookup.IsEmpty)
+        {
+            return false;
+        }
+
+        var cellIsNumber = cell.Type is CellDataType.Number or CellDataType.Date;
+        var lookupIsNumber = lookup.Type is CellDataType.Number or CellDataType.Date;
+
+        return cellIsNumber ? lookupIsNumber : cell.Type == lookup.Type;
+    }
+
     private static bool IsExactMatch(CellData cell, CellData lookup, bool wildcards)
     {
+        if (cell.IsEmpty || lookup.IsEmpty)
+        {
+            return cell.IsEmpty && lookup.IsEmpty;
+        }
+
         if (wildcards && lookup.Type == CellDataType.String)
         {
             var pattern = lookup.GetValueOrDefault<string>() ?? "";

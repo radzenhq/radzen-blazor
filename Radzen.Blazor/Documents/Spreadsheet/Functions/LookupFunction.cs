@@ -44,7 +44,7 @@ class LookupFunction : FormulaFunction
         {
             var cell = horizontal ? searched.CellAt(0, i) : searched.CellAt(i, 0);
 
-            if (!IsComparable(cell, lookup))
+            if (!RangeSearch.IsSameKind(cell, lookup))
             {
                 continue;
             }
@@ -73,19 +73,6 @@ class LookupFunction : FormulaFunction
         }
 
         return result.Rows == 1 && result.Columns > 1 ? result.CellAt(0, position) : result.CellAt(position, 0);
-    }
-
-    private static bool IsComparable(CellData cell, CellData lookup)
-    {
-        if (cell.IsError || cell.IsEmpty)
-        {
-            return false;
-        }
-
-        var cellIsNumber = cell.Type is CellDataType.Number or CellDataType.Date;
-        var lookupIsNumber = lookup.Type is CellDataType.Number or CellDataType.Date;
-
-        return cellIsNumber ? lookupIsNumber : cell.Type == lookup.Type;
     }
 
     private static Area? GetArea(FunctionArguments arguments, string parameterName)

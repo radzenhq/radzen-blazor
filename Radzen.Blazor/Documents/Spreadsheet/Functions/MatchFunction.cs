@@ -28,6 +28,11 @@ class MatchFunction : FormulaFunction
             return lookup;
         }
 
+        if (lookup.IsEmpty)
+        {
+            lookup = CellData.FromNumber(0);
+        }
+
         if (!TryGetInteger(arguments, "match_type", isRequired: false, defaultValue: 1, out var matchType, out var error))
         {
             return error!;
