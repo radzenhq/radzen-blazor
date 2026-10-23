@@ -1,4 +1,7 @@
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Xml.Linq;
 using Radzen.Documents.Spreadsheet;
 using Xunit;
 
@@ -96,6 +99,71 @@ public class DefinedNameTests
 
         Assert.Equal("'Plan input'!$A$1:$A$3", loaded.DefinedNames["PLANhours"]);
         Assert.Equal(4d, loaded.Sheets[0].Cells["C1"].Value);
+    }
+
+    [Fact]
+    public void SheetScopedNameTakesPrecedenceOnlyInItsSheet()
+    {
+        var workbook = CreateWorkbook();
+        var plan = workbook.Sheets[0];
+        var other = workbook.AddSheet("Other", 5, 5);
+        other.Cells["A2"].Value = 7;
+        plan.DefinedNames["Rate"] = "10";
+
+        plan.Cells["C1"].Formula = "=Rate";
+        other.Cells["A1"].Formula = "=Rate";
+
+        Assert.Equal(10d, plan.Cells["C1"].Value);
+        Assert.Equal(7d, other.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void SheetScopedAndHiddenNamesRoundTripThroughXlsx()
+    {
+        var workbook = CreateWorkbook();
+        var other = workbook.AddSheet("Other", 5, 5);
+        other.Cells["A1"].Value = 4;
+        other.DefinedNames["Rate"] = "Other!$A$1";
+        other.DefinedNames["_xlnm.Print_Area"] = "Other!$A$1:$E$5";
+        other.HiddenDefinedNames.Add("_xlnm.Print_Area");
+        workbook.DefinedNames["_xlnm._FilterDatabase"] = "'Plan input'!$A$1:$B$3";
+        workbook.HiddenDefinedNames.Add("_xlnm._FilterDatabase");
+        other.Cells["B1"].Formula = "=Rate*2";
+
+        using var ms = new MemoryStream();
+        workbook.SaveToStream(ms);
+        ms.Position = 0;
+
+        var loaded = Workbook.LoadFromStream(ms);
+        var loadedOther = loaded.Sheets[1];
+
+        Assert.Equal("Other!$A$1", loadedOther.DefinedNames["Rate"]);
+        Assert.Equal("Other!$A$1:$E$5", loadedOther.DefinedNames["_xlnm.Print_Area"]);
+        Assert.Contains("_xlnm.Print_Area", loadedOther.HiddenDefinedNames);
+        Assert.Empty(loaded.Sheets[0].DefinedNames);
+        Assert.Equal("'Plan input'!$A$1:$B$3", loaded.DefinedNames["_xlnm._FilterDatabase"]);
+        Assert.Contains("_xlnm._FilterDatabase", loaded.HiddenDefinedNames);
+        Assert.Equal("$A$2", loaded.DefinedNames["Rate"]);
+        Assert.Equal(8d, loadedOther.Cells["B1"].Value);
+    }
+
+    [Fact]
+    public void SheetScopedNamesAreWrittenWithTheSheetPosition()
+    {
+        var workbook = CreateWorkbook();
+        var other = workbook.AddSheet("Other", 5, 5);
+        other.DefinedNames["Rate"] = "Other!$A$1";
+
+        using var ms = new MemoryStream();
+        workbook.SaveToStream(ms);
+        ms.Position = 0;
+        using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
+        using var entry = zip.GetEntry("xl/workbook.xml")!.Open();
+        var names = XDocument.Load(entry).Descendants().Where(element => element.Name.LocalName == "definedName" && element.Attribute("name")?.Value == "Rate").ToList();
+
+        Assert.Equal(2, names.Count);
+        Assert.Null(names.Single(element => element.Value == "$A$2").Attribute("localSheetId"));
+        Assert.Equal("1", names.Single(element => element.Value == "Other!$A$1").Attribute("localSheetId")?.Value);
     }
 
     [Fact]

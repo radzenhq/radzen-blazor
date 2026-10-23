@@ -498,7 +498,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
 
     public void VisitName(NameSyntaxNode nameSyntaxNode)
     {
-        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name);
+        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name, sheet);
 
         if (tree is null || tree.Errors.Count > 0)
         {

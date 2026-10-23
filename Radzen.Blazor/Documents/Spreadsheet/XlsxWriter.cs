@@ -3171,15 +3171,23 @@ class XlsxWriter(Workbook sourceWorkbook)
         }
 
         // ECMA-376 part 1, 18.2.6 (definedNames)
-        if (sourceWorkbook.DefinedNames.Count > 0)
+        var definedNames = new XElement(mainNs + "definedNames");
+
+        foreach (var (name, refersTo) in sourceWorkbook.DefinedNames)
         {
-            var definedNames = new XElement(mainNs + "definedNames");
+            definedNames.Add(CreateDefinedName(mainNs, name, refersTo, sourceWorkbook.HiddenDefinedNames.Contains(name), localSheetId: null));
+        }
 
-            foreach (var definedName in sourceWorkbook.DefinedNames)
+        for (var i = 0; i < sheets.Count; i++)
+        {
+            foreach (var (name, refersTo) in sheets[i].DefinedNames)
             {
-                definedNames.Add(new XElement(mainNs + "definedName", new XAttribute("name", definedName.Key), definedName.Value));
+                definedNames.Add(CreateDefinedName(mainNs, name, refersTo, sheets[i].HiddenDefinedNames.Contains(name), localSheetId: i));
             }
+        }
 
+        if (definedNames.HasElements)
+        {
             sheetsElement.AddAfterSelf(definedNames);
         }
 
@@ -3192,6 +3200,26 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         using var entry = archive.CreateEntry("xl/workbook.xml").Open();
         workbook.Save(entry);
+    }
+
+    // ECMA-376 part 1, 18.2.5 (definedName)
+    private static XElement CreateDefinedName(XNamespace mainNs, string name, string refersTo, bool hidden, int? localSheetId)
+    {
+        var element = new XElement(mainNs + "definedName", new XAttribute("name", name));
+
+        if (localSheetId is not null)
+        {
+            element.Add(new XAttribute("localSheetId", localSheetId.Value));
+        }
+
+        if (hidden)
+        {
+            element.Add(new XAttribute("hidden", "1"));
+        }
+
+        element.Add(refersTo);
+
+        return element;
     }
 
     private static void AddSheetProtection(Worksheet sheet, XDocument sheetDoc)

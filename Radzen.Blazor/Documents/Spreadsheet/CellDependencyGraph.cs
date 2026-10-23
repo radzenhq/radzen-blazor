@@ -327,7 +327,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitName(NameSyntaxNode nameSyntaxNode)
     {
-        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name);
+        var tree = sheet.Workbook.ResolveDefinedName(nameSyntaxNode.Name, sheet);
 
         if (tree is null || tree.Errors.Count > 0 || !nameStack.Add(nameSyntaxNode.Name))
         {

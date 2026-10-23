@@ -244,7 +244,16 @@ public partial class Worksheet
     /// Gets the registry of formula functions available in the sheet.
     /// </summary>
     public FunctionStore FunctionRegistry { get; } = new();
-   
+
+    /// <summary>
+    /// Gets the defined names scoped to this sheet. The key is the name and the value is the reference or
+    /// expression it refers to, written as a formula without the leading equals sign. Formulas in this sheet
+    /// resolve a name here before <see cref="Spreadsheet.Workbook.DefinedNames"/>; formulas in other sheets do not see it.
+    /// </summary>
+    public IDictionary<string, string> DefinedNames { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    internal HashSet<string> HiddenDefinedNames { get; } = new(StringComparer.OrdinalIgnoreCase);
+
     private Workbook? workbook;
 
     internal Workbook? CreatedWorkbook => workbook;

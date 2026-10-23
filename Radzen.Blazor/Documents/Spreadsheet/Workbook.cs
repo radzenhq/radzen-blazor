@@ -51,9 +51,11 @@ public class Workbook
 
     private readonly Dictionary<string, FormulaSyntaxTree> definedNameTrees = [];
 
-    internal FormulaSyntaxTree? ResolveDefinedName(string name)
+    internal HashSet<string> HiddenDefinedNames { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    internal FormulaSyntaxTree? ResolveDefinedName(string name, Worksheet sheet)
     {
-        if (!DefinedNames.TryGetValue(name, out var refersTo))
+        if (!sheet.DefinedNames.TryGetValue(name, out var refersTo) && !DefinedNames.TryGetValue(name, out refersTo))
         {
             return null;
         }
@@ -291,9 +293,12 @@ public class Workbook
             }
         }
 
-        foreach (var (name, refersTo) in DefinedNames.ToList())
+        foreach (var names in sheets.Select(sheet => sheet.DefinedNames).Prepend(DefinedNames))
         {
-            DefinedNames[name] = RenameSheetInReference(refersTo, oldName, newName)!;
+            foreach (var (name, refersTo) in names.ToList())
+            {
+                names[name] = RenameSheetInReference(refersTo, oldName, newName)!;
+            }
         }
     }
 

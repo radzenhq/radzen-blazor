@@ -31,7 +31,6 @@ static class XlsxReader
         var sharedStrings = ParseSharedStrings(archive);
         var sheetInfos = ParseSheetDefinitions(archive);
 
-        ParseDefinedNames(archive, workbook);
         ParseExternalLinks(archive, workbook);
 
         foreach (var sheetInfo in sheetInfos)
@@ -39,6 +38,8 @@ static class XlsxReader
             var sheet = LoadSheet(archive, sheetInfo, styleInfo, sharedStrings);
             workbook.AddSheet(sheet);
         }
+
+        ParseDefinedNames(archive, workbook);
 
         foreach (var sheet in workbook.Sheets)
         {
@@ -63,16 +64,40 @@ static class XlsxReader
         var doc = XDocument.Load(stream);
         var ns = doc.Root!.Name.Namespace;
 
+        var sheetNames = doc.Descendants(ns + "sheet").Select(sheet => sheet.Attribute("name")?.Value).ToList();
+
         foreach (var element in doc.Descendants(ns + "definedName"))
         {
             var name = element.Attribute("name")?.Value;
 
-            if (string.IsNullOrEmpty(name) || name.StartsWith("_xlnm.", StringComparison.Ordinal) || element.Attribute("localSheetId") is not null)
+            if (string.IsNullOrEmpty(name))
             {
                 continue;
             }
 
-            workbook.DefinedNames[name] = element.Value;
+            var names = workbook.DefinedNames;
+            var hiddenNames = workbook.HiddenDefinedNames;
+
+            if (element.Attribute("localSheetId")?.Value is { } localSheetId)
+            {
+                if (!int.TryParse(localSheetId, NumberStyles.None, CultureInfo.InvariantCulture, out var index)
+                    || index >= sheetNames.Count
+                    || sheetNames[index] is not { } sheetName
+                    || workbook.GetSheet(sheetName) is not { } sheet)
+                {
+                    continue;
+                }
+
+                names = sheet.DefinedNames;
+                hiddenNames = sheet.HiddenDefinedNames;
+            }
+
+            names[name] = element.Value;
+
+            if (element.Attribute("hidden")?.Value is "1" or "true")
+            {
+                hiddenNames.Add(name);
+            }
         }
     }
 

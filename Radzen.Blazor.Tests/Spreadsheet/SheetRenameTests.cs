@@ -120,6 +120,20 @@ public class SheetRenameTests
     }
 
     [Fact]
+    public void RenamingSheet_RewritesSheetScopedDefinedNames()
+    {
+        var (_, data, report) = CreateWorkbook();
+        report.DefinedNames["Amounts"] = "Data!$A$1:$A$2";
+        report.Cells["A1"].Formula = "=SUM(Amounts)";
+
+        data.Name = "Other";
+        data.Cells["A2"].Value = 10;
+
+        Assert.Equal("Other!$A$1:$A$2", report.DefinedNames["Amounts"]);
+        Assert.Equal(11d, report.Cells["A1"].Value);
+    }
+
+    [Fact]
     public void RenamingSheet_RewritesChartSeriesRanges()
     {
         var (_, data, report) = CreateWorkbook();
