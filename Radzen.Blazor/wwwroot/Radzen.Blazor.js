@@ -7843,7 +7843,7 @@ Radzen.chatScrollAfterRender = function(selector, delay) {
     if (container) container.scrollTop = container.scrollHeight;
   }, delay || 100);
 };
-Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCallback, closeCallback) {
+Radzen.createAutoComplete = function(el, popupId, openOnFocus, minLength, instance, openCallback, closeCallback) {
   if (!el) return { dispose: function() {} };
   var input = el.querySelector('input.rz-autocomplete-input, textarea.rz-autocomplete-input');
   var list = el.querySelector('.rz-autocomplete-list');
@@ -7856,7 +7856,13 @@ Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCal
       try { suppressDisposed(instance.invokeMethodAsync(openCallback)); } catch { }
     }
   }
-  function onInput() { open(); }
+  function onInput() {
+    if (!openOnFocus && input.value.length < (minLength || 0)) {
+      Radzen.closePopup(popupId, instance, closeCallback);
+      return;
+    }
+    open();
+  }
   function onFocus() { open(); }
   function clearActive() { Radzen.activeElement = null; }
   input.addEventListener('input', onInput);

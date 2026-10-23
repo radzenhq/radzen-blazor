@@ -214,6 +214,8 @@ namespace Radzen.Blazor
             
             if (value.Length < MinLength && !OpenOnFocus)
             {
+                searchText = null;
+                customSearchText = null;
                 await ClosePopup();
                 await InvokeAsync(() => { StateHasChanged(); });
                 return;
@@ -480,7 +482,7 @@ namespace Radzen.Blazor
                 }
 
                 var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus, Reference, nameof(OnPopupOpen), nameof(OnPopupClose));
+                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus, MinLength, Reference, nameof(OnPopupOpen), nameof(OnPopupClose));
 
                 if (version == _jsRefVersion)
                 {
@@ -506,7 +508,7 @@ namespace Radzen.Blazor
                 _jsParamsChanged = true;
             }
 
-            if (parameters.DidParameterChange(nameof(OpenOnFocus), OpenOnFocus))
+            if (parameters.DidParameterChange(nameof(OpenOnFocus), OpenOnFocus) || parameters.DidParameterChange(nameof(MinLength), MinLength))
             {
                 _jsParamsChanged = true;
             }
