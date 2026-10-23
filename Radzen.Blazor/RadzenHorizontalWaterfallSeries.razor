@@ -19,16 +19,11 @@
         var category = ComposeCategory(valueScale);
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-        var barSeries = VisibleBarSeries;
-        if (barSeries.Count == 0) { return _ => { }; }
-
-        var seriesIndex = barSeries.IndexOf(this);
-        if (seriesIndex < 0) { return _ => { }; }
+        var slot = Slot;
+        if (slot.Index < 0) { return _ => { }; }
 
         var barOptions = chart.BarOptions;
-        var padding = barOptions?.Margin ?? 0;
-        var bandHeight = BandHeight;
-        var (height, groupHeight) = BandLayout.Resolve(bandHeight, barSeries.Count, padding, barOptions?.EffectiveMaxHeight);
+        var height = slot.Size;
         var className = $"rz-horizontal-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
         var radius = barOptions?.Radius ?? 0;
 
@@ -41,7 +36,7 @@
                 var data = Items[i];
                 var wf = wfItems[i];
 
-                var cy = category(data) - groupHeight / 2 + seriesIndex * (height + padding);
+                var cy = slot.Start(category(data));
                 var x1 = categoryScale.Scale(wf.Start, true);
                 var x2 = categoryScale.Scale(wf.End, true);
 

@@ -39,6 +39,35 @@
                 </RadzenValueAxis>
             </RadzenChart>
         </RadzenColumn>
+
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Stack groups and plain columns</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4">
+                Series with the same <code>StackGroup</code> stack on top of each other. Every distinct group and every <code>RadzenColumnSeries</code> gets its own column next to the others.
+            </RadzenText>
+            <RadzenChart Animate="true">
+                <RadzenStackedColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024 revenue" ValueProperty="Revenue" StackGroup="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenStackedColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023 revenue" ValueProperty="Revenue" StackGroup="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenStackedColumnSeries Data="@expenses2024" CategoryProperty="Quarter" Title="2024 expenses" ValueProperty="Revenue" StackGroup="Expenses">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenStackedColumnSeries Data="@expenses2023" CategoryProperty="Quarter" Title="2023 expenses" ValueProperty="Revenue" StackGroup="Expenses">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedColumnSeries>
+                <RadzenColumnSeries Data="@target" CategoryProperty="Quarter" Title="Target" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenColumnSeries>
+                <RadzenColumnOptions Radius="5" />
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Amount in USD" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
 
@@ -77,6 +106,27 @@
             Quarter = "Q4",
             Revenue = 294000
         },
+    };
+
+    DataItem[] expenses2023 = new DataItem[] {
+        new DataItem { Quarter = "Q1", Revenue = 142000 },
+        new DataItem { Quarter = "Q2", Revenue = 156000 },
+        new DataItem { Quarter = "Q3", Revenue = 151000 },
+        new DataItem { Quarter = "Q4", Revenue = 163000 },
+    };
+
+    DataItem[] expenses2024 = new DataItem[] {
+        new DataItem { Quarter = "Q1", Revenue = 158000 },
+        new DataItem { Quarter = "Q2", Revenue = 171000 },
+        new DataItem { Quarter = "Q3", Revenue = 182000 },
+        new DataItem { Quarter = "Q4", Revenue = 196000 },
+    };
+
+    DataItem[] target = new DataItem[] {
+        new DataItem { Quarter = "Q1", Revenue = 520000 },
+        new DataItem { Quarter = "Q2", Revenue = 600000 },
+        new DataItem { Quarter = "Q3", Revenue = 640000 },
+        new DataItem { Quarter = "Q4", Revenue = 700000 },
     };
 
     DataItem[] revenue2024 = new DataItem[] {

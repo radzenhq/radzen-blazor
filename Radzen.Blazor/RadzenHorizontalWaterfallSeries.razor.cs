@@ -192,41 +192,7 @@ namespace Radzen.Blazor
             public bool IsSummary { get; set; }
         }
 
-        private IList<IChartSeries> BarSeries =>
-            RequireChart().Series.Where(s => s is IChartBarSeries).Cast<IChartSeries>().ToList();
-
-        private IList<IChartSeries> VisibleBarSeries =>
-            BarSeries.Where(s => s.Visible).ToList();
-
-        internal double BandHeight
-        {
-            get
-            {
-                var barSeries = VisibleBarSeries;
-                if (barSeries.Count == 0)
-                {
-                    return 0;
-                }
-
-                var chart = RequireChart();
-                var barOptions = chart.BarOptions;
-
-                if (barOptions?.Height.HasValue == true)
-                {
-                    return barOptions.Height.Value * barSeries.Count;
-                }
-
-                if (barOptions?.CategoryGap is double gap)
-                {
-                    var step = System.Math.Abs(chart.ValueScale.Scale(1, true) - chart.ValueScale.Scale(0, true));
-                    return step * (1 - gap);
-                }
-
-                var availableHeight = chart.ValueScale.OutputSize;
-                var bands = barSeries.Cast<IChartBarSeries>().Max(s => s.Count) + 2;
-                return availableHeight / bands;
-            }
-        }
+        private BandSlot Slot => CategoryBands.Bars(RequireChart(), this);
 
         /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
@@ -285,19 +251,13 @@ namespace Radzen.Blazor
         {
             var chart = RequireChart();
             var category = ComposeCategory(chart.ValueScale);
-            var barSeries = VisibleBarSeries;
-            var seriesIndex = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || seriesIndex < 0)
+            var slot = Slot;
+            if (slot.Index < 0)
             {
                 return 0;
             }
 
-            var padding = chart.BarOptions?.Margin ?? 0;
-            var bandHeight = BandHeight;
-            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
-            var y = category(item) - groupHeight / 2 + seriesIndex * (height + padding);
-
-            return y + height / 2;
+            return slot.Center(category(item));
         }
 
         /// <inheritdoc />
@@ -316,16 +276,13 @@ namespace Radzen.Blazor
             }
 
             var category = ComposeCategory(chart.ValueScale);
-            var barSeries = VisibleBarSeries;
-            var seriesIndex = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || seriesIndex < 0)
+            var slot = Slot;
+            if (slot.Index < 0)
             {
                 return (default!, new Point());
             }
 
-            var padding = chart.BarOptions?.Margin ?? 0;
-            var bandHeight = BandHeight;
-            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+            var height = slot.Size;
 
             var wfItems = ComputeWaterfallItems();
 
@@ -334,7 +291,7 @@ namespace Radzen.Blazor
                 var data = Items[i];
                 var wf = wfItems[i];
 
-                var startY = category(data) - groupHeight / 2 + seriesIndex * (height + padding);
+                var startY = slot.Start(category(data));
                 var endY = startY + height;
                 var x1 = chart.CategoryScale.Scale(wf.Start, true);
                 var x2 = chart.CategoryScale.Scale(wf.End, true);

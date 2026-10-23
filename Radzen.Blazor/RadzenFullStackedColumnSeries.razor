@@ -16,7 +16,8 @@
         var columnIndex = ColumnIndex;
         var stackedColumnSeries = StackedColumnSeries;
 
-        var width = ColumnWidth;
+        var slot = Slot;
+        var width = slot.Size;
         var className = $"rz-full-stacked-column-series rz-series-{Chart?.Series?.IndexOf(this) ?? -1}";
 
         var groupStyle = $"--rz-zero-y: {valueScale.Scale(Math.Max(0, valueScale.Ticks(Chart?.ValueAxis?.TickDistance ?? 0).Start)).ToInvariantString()}px";
@@ -26,7 +27,7 @@
         @<g class="@className" style="@groupStyle">
             @foreach(var data in Items)
             {
-                var x = GetColumnLeft(data, category);
+                var x = slot.Start(category(data));
                 var y = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var itemValue = Value(data);
                 var radius = Chart?.ColumnOptions?.Radius ?? 0;

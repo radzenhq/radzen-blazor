@@ -154,22 +154,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private IList<IChartSeries> ColumnSeries
-        {
-            get
-            {
-                var chart = RequireChart();
-                return chart.Series.Where(series => series is IChartColumnSeries).Cast<IChartSeries>().ToList();
-            }
-        }
-
-        private IList<IChartSeries> VisibleColumnSeries
-        {
-            get
-            {
-                return ColumnSeries.Where(series => series.Visible).ToList();
-            }
-        }
+        private BandSlot Slot => CategoryBands.Columns(RequireChart(), this);
 
         /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
@@ -191,31 +176,6 @@ namespace Radzen.Blazor
             return style;
         }
 
-        private double BandWidth
-        {
-            get
-            {
-                var columnSeries = VisibleColumnSeries;
-
-                var chart = RequireChart();
-                if (chart.ColumnOptions.Width.HasValue)
-                {
-                    return chart.ColumnOptions.Width.Value * columnSeries.Count + chart.ColumnOptions.Margin * (columnSeries.Count - 1);
-                }
-                else if (chart.ColumnOptions.CategoryGap is double gap)
-                {
-                    var step = System.Math.Abs(chart.CategoryScale.Scale(1, true) - chart.CategoryScale.Scale(0, true));
-                    return step * (1 - gap);
-                }
-                else
-                {
-                    var availableWidth = chart.CategoryScale.OutputSize - (chart.CategoryAxis.Padding * 2);
-                    var bands = columnSeries.Cast<IChartColumnSeries>().Max(series => series.Count) + 2;
-                    return availableWidth / bands;
-                }
-            }
-        }
-
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
@@ -226,15 +186,9 @@ namespace Radzen.Blazor
         internal override double TooltipX(TItem item)
         {
             var chart = RequireChart();
-            var columnSeries = VisibleColumnSeries;
-            var index = columnSeries.IndexOf(this);
-            var padding = chart.ColumnOptions.Margin;
-            var bandWidth = BandWidth;
-            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
             var category = ComposeCategory(chart.CategoryScale);
-            var x = category(item) - groupWidth / 2 + index * (width + padding);
 
-            return x + width / 2;
+            return Slot.Center(category(item));
         }
 
         /// <inheritdoc />
@@ -254,15 +208,12 @@ namespace Radzen.Blazor
             var ticks = vs.Ticks(va.TickDistance);
             var y0 = vs.Scale(Math.Max(0, ticks.Start));
 
-            var columnSeries = VisibleColumnSeries;
-            var index = columnSeries.IndexOf(this);
-            var padding = chart.ColumnOptions.Margin;
-            var bandWidth = BandWidth;
-            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
+            var slot = Slot;
+            var width = slot.Size;
 
             foreach (var data in Items)
             {
-                var startX = category(data) - groupWidth / 2 + index * (width + padding);
+                var startX = slot.Start(category(data));
                 var endX = startX + width;
                 var dataY = value(data);
                 var startY = Math.Min(dataY, y0);

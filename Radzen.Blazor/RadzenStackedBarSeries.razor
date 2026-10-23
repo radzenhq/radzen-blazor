@@ -19,7 +19,8 @@
 
         var barSeries = StackedBarSeries;
         var barIndex = BarIndex;
-        var height = BarHeight;
+        var slot = Slot;
+        var height = slot.Size;
 
         var className = $"rz-bar-series rz-series-{Chart?.Series.IndexOf(this)}";
 
@@ -30,7 +31,7 @@
         @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
-                var y = GetBarTop(data, category);
+                var y = slot.Start(category(data));
                 var x = GetBarRight(data, barIndex, category, barSeries);
                 var itemValue = Value(data);
                 var radius = Chart?.BarOptions.Radius;

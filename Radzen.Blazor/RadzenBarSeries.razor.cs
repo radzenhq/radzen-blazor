@@ -122,27 +122,7 @@ namespace Radzen.Blazor
             return base.GetCategories().Reverse().ToList();
         }
 
-        private IList<IChartSeries> BarSeries
-        {
-            get
-            {
-                var chart = Chart;
-                if (chart == null)
-                {
-                    return new List<IChartSeries>();
-                }
-
-                return chart.Series.Where(series => series is IChartBarSeries).Cast<IChartSeries>().ToList();
-            }
-        }
-
-        private IList<IChartSeries> VisibleBarSeries
-        {
-            get
-            {
-                return BarSeries.Where(series => series.Visible).ToList();
-            }
-        }
+        private BandSlot Slot => Chart == null ? default : CategoryBands.Bars(Chart, this);
 
         /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
@@ -162,42 +142,6 @@ namespace Radzen.Blazor
             }
 
             return style;
-        }
-
-        private double BandHeight
-        {
-            get
-            {
-                var barSeries = VisibleBarSeries;
-                if (barSeries.Count == 0)
-                {
-                    return 0;
-                }
-
-                var chart = Chart;
-                if (chart == null)
-                {
-                    return 0;
-                }
-
-                var barOptions = chart.BarOptions;
-
-                if (barOptions?.Height.HasValue == true)
-                {
-                    return barOptions.Height.Value * barSeries.Count;
-                }
-                else if (barOptions?.CategoryGap is double gap)
-                {
-                    var step = Math.Abs(chart.ValueScale.Scale(1, true) - chart.ValueScale.Scale(0, true));
-                    return step * (1 - gap);
-                }
-                else
-                {
-                    var availableHeight = chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
-                    var bands = barSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
-                    return availableHeight / bands;
-                }
-            }
         }
 
         int IChartBarSeries.Count
@@ -270,20 +214,17 @@ namespace Radzen.Blazor
             var ticks = vs.Ticks(chart.GetValueAxis(ValueAxisName).TickDistance);
             var x0 = vs.Scale(Math.Max(0, ticks.Start));
 
-            var barSeries = VisibleBarSeries;
-            var index = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || index < 0)
+            var slot = Slot;
+            if (slot.Index < 0)
             {
                 return (default!, new Point());
             }
 
-            var padding = chart.BarOptions?.Margin ?? 0;
-            var bandHeight = BandHeight;
-            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+            var height = slot.Size;
 
             foreach (var data in Items)
             {
-                var startY = category(data) - groupHeight / 2 + index * (height + padding);
+                var startY = slot.Start(category(data));
                 var endY = startY + height;
                 var dataX = value(data);
                 var startX = Math.Min(dataX, x0);
@@ -308,19 +249,13 @@ namespace Radzen.Blazor
             }
 
             var category = ComposeCategory(chart.ValueScale);
-            var barSeries = VisibleBarSeries;
-            var index = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || index < 0)
+            var slot = Slot;
+            if (slot.Index < 0)
             {
                 return 0;
             }
 
-            var padding = chart.BarOptions?.Margin ?? 0;
-            var bandHeight = BandHeight;
-            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
-            var y = category(item) - groupHeight / 2 + index * (height + padding);
-
-            return y + height / 2;
+            return slot.Center(category(item));
         }
 
         /// <inheritdoc />

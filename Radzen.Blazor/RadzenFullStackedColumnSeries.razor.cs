@@ -93,6 +93,22 @@ namespace Radzen.Blazor
         [Parameter]
         public double GradientEndOpacity { get; set; } = 0.4;
 
+        /// <summary>
+        /// Specifies the stack this series belongs to. Series with the same stack group stack on top of each other and every distinct group renders as its own column placed next to the other groups and next to any plain column series in the chart. Series without a group share one stack.
+        /// </summary>
+        /// <value>The stack group. <c>null</c> by default.</value>
+        [Parameter]
+        public string? StackGroup { get; set; }
+
+        /// <inheritdoc />
+        string? IChartStackedColumnSeries.StackGroup => StackGroup;
+
+        /// <inheritdoc />
+        protected override bool ShouldRefreshChart(ParameterView parameters)
+        {
+            return DidParameterChange(parameters, nameof(StackGroup), StackGroup);
+        }
+
         /// <inheritdoc />
         public override string Color
         {
@@ -154,7 +170,7 @@ namespace Radzen.Blazor
             return Value(Items[index]);
         }
 
-        private IList<IChartSeries> ColumnSeries => Chart?.Series?.Where(series => series is IChartFullStackedColumnSeries).Cast<IChartSeries>().ToList() ?? new List<IChartSeries>();
+        private IList<IChartSeries> ColumnSeries => Chart?.Series?.Where(series => CategoryBands.SharesColumnSlot(series, this)).ToList() ?? new List<IChartSeries>();
 
         private IList<IChartSeries> VisibleColumnSeries => ColumnSeries.Where(series => series.Visible).ToList();
 
@@ -217,64 +233,13 @@ namespace Radzen.Blazor
             return string.Format(CultureInfo.InvariantCulture, "{0:0.##}%", percentage);
         }
 
-        private double BandWidth
-        {
-            get
-            {
-                var columnSeries = VisibleColumnSeries;
-
-                if (Chart?.ColumnOptions?.Width.HasValue == true)
-                {
-                    return Chart.ColumnOptions.Width.Value * columnSeries.Count + Chart.ColumnOptions.Margin * (columnSeries.Count - 1);
-                }
-                else if (Chart?.ColumnOptions?.CategoryGap is double gap)
-                {
-                    var step = System.Math.Abs(Chart.CategoryScale.Scale(1, true) - Chart.CategoryScale.Scale(0, true));
-                    return step * (1 - gap);
-                }
-                else if (Chart != null)
-                {
-                    var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
-                    var bands = columnSeries.Cast<IChartStackedColumnSeries>().Max(series => series.Count) + 2;
-                    return availableWidth / bands;
-                }
-
-                return 0;
-            }
-        }
-
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
             return DataAt(x, y).Item1 != null;
         }
 
-        double ColumnWidth
-        {
-            get
-            {
-                if (Chart == null)
-                {
-                    return 0;
-                }
-
-                var w = Chart.ColumnOptions.Width ?? (BandWidth - Chart.ColumnOptions.Margin);
-                var max = Chart.ColumnOptions.EffectiveMaxWidth;
-                return max is double m && w > m ? m : w;
-            }
-        }
-
-        private double GetColumnLeft(TItem item, Func<TItem, double>? category = null)
-        {
-            if (Chart == null)
-            {
-                return 0;
-            }
-
-            category = category ?? ComposeCategory(Chart.CategoryScale);
-
-            return category(item) - ColumnWidth / 2;
-        }
+        private BandSlot Slot => Chart == null ? default : CategoryBands.Columns(Chart, this);
 
         private double GetColumnTop(TItem item, int columnIndex, Func<TItem, double> category, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
@@ -327,7 +292,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            return GetColumnLeft(item) + ColumnWidth / 2;
+            if (Chart == null)
+            {
+                return 0;
+            }
+
+            var category = ComposeCategory(Chart.CategoryScale);
+
+            return Slot.Center(category(item));
         }
 
         /// <inheritdoc />
@@ -353,12 +325,13 @@ namespace Radzen.Blazor
 
             var category = ComposeCategory(Chart.CategoryScale);
             var columnIndex = ColumnIndex;
-            var width = ColumnWidth;
+            var slot = Slot;
+            var width = slot.Size;
             var stackedColumnSeries = StackedColumnSeries;
 
             foreach (var data in Items)
             {
-                var startX = GetColumnLeft(data, category);
+                var startX = slot.Start(category(data));
                 var endX = startX + width;
                 var dataY = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);

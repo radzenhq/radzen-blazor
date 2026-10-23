@@ -29,5 +29,10 @@ namespace Radzen.Blazor
         /// Gets the value at the specified index.
         /// </summary>
         double ValueAt(int index);
+
+        /// <summary>
+        /// Gets the stack group of the series. Series with the same group stack on top of each other; every distinct group renders as its own column or bar.
+        /// </summary>
+        string? StackGroup => null;
     }
 }

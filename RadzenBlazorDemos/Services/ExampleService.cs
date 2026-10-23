@@ -1643,13 +1643,14 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Stacked Column Chart",
                             Path = "stacked-column-chart",
-                            Description = "Show a total and its parts per category with a Blazor stacked column chart.",
-                            Tags = new [] { "chart", "stack", "graph", "column", "bar" },
+                            Description = "Show a total and its parts per category with a Blazor stacked column chart, or place several stacks and plain columns side by side with stack groups.",
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar", "group", "mixed" },
                             Related = new [] { "column-chart", "100-percent-stacked-column-chart", "stacked-bar-chart" },
                             Faq = new []
                             {
                                 new FaqItem { Question = "When should I use a stacked column chart?", Answer = "When categories break into parts that sum to a meaningful total - sales by region within each quarter - and you want totals and composition together." },
-                                new FaqItem { Question = "Stacked or grouped columns?", Answer = "Stack when the total matters and the parts add up to it; group them side by side when you mainly want to compare the parts." }
+                                new FaqItem { Question = "Stacked or grouped columns?", Answer = "Stack when the total matters and the parts add up to it; group them side by side when you mainly want to compare the parts." },
+                                new FaqItem { Question = "Can I show several stacks or a stack next to a plain column?", Answer = "Yes. Set StackGroup on the stacked series - series with the same group stack together and every group renders as its own column. RadzenColumnSeries in the same chart gets its own column too." }
                             }
                         },
                         new Example

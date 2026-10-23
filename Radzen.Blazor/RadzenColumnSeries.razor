@@ -19,12 +19,8 @@
         var y0 = vs.Scale(Math.Max(0, ticks.Start));
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-        var columnSeries = VisibleColumnSeries;
-        var index = columnSeries.IndexOf(this);
-        var padding = chart.ColumnOptions.Margin;
-
-        var bandWidth = BandWidth;
-        var (width, groupWidth) = BandLayout.Resolve(bandWidth, columnSeries.Count(), padding, chart.ColumnOptions.EffectiveMaxWidth);
+        var slot = Slot;
+        var width = slot.Size;
         var className = $"rz-column-series rz-series-{chart.Series.IndexOf(this)}";
 
         var groupStyle = $"--rz-zero-y: {y0.ToInvariantString()}px";
@@ -36,7 +32,7 @@
             @for (var itemIndex = 0; itemIndex < Items.Count; itemIndex++)
             {
                 var data = Items[itemIndex];
-                var x = category(data) - groupWidth / 2 + index * (width + padding);
+                var x = slot.Start(category(data));
 
                 if (cull && !BandIntersects(x, width, StrokeWidth, plotStart, plotEnd))
                 {
