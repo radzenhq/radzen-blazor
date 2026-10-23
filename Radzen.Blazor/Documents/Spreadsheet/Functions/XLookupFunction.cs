@@ -147,39 +147,17 @@ class XLookupFunction : FormulaFunction
             }
             else
             {
-                equal = cell.IsEqualTo(lookupValue);
+                equal = RangeSearch.IsExactMatch(cell, lookupValue, wildcards: false);
             }
 
-            if (matchMode == 0 || useWildcard)
+            if (equal)
             {
-                if (equal)
-                {
-                    return (i, null);
-                }
+                return (i, null);
             }
-            else if (matchMode == -1)
+
+            if (!useWildcard && RangeSearch.IsBetterCandidate(cell, lookupValue, bestIndex == -1 ? null : lookupArray[bestIndex], matchMode, acrossTypes: true))
             {
-                if (equal)
-                {
-                    return (i, null);
-                }
-                if (cell.IsLessThan(lookupValue) || cell.IsEqualTo(lookupValue))
-                {
-                    // Track last <= lookupValue in the chosen traversal direction
-                    bestIndex = i;
-                }
-            }
-            else if (matchMode == 1)
-            {
-                if (equal)
-                {
-                    return (i, null);
-                }
-                // For next larger, when traversing forward, pick first > value (if reverse, still first in traversal order)
-                if (cell.IsGreaterThan(lookupValue))
-                {
-                    return (i, null);
-                }
+                bestIndex = i;
             }
         }
 
@@ -200,27 +178,15 @@ class XLookupFunction : FormulaFunction
                 return (-1, cell);
             }
 
-            int cmp;
-            if (cell.IsEqualTo(lookupValue))
+            if (RangeSearch.IsExactMatch(cell, lookupValue, wildcards: false))
             {
                 found = mid;
                 // For consistency, return the first occurrence to the left
                 hi = mid - 1;
                 continue;
             }
-            else if (cell.IsLessThan(lookupValue))
-            {
-                cmp = -1;
-            }
-            else if (cell.IsGreaterThan(lookupValue))
-            {
-                cmp = 1;
-            }
-            else
-            {
-                // incomparable types
-                cmp = 0;
-            }
+
+            var cmp = RangeSearch.CompareAcrossTypes(cell, lookupValue);
 
             if (ascending)
             {

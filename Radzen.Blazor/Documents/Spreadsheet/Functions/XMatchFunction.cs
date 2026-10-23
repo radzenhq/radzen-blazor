@@ -50,7 +50,7 @@ class XMatchFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var index = RangeSearch.Find(array, lookup, mode, wildcards, out var error);
+        var index = RangeSearch.Find(array, lookup, mode, wildcards, acrossTypes: true, out var error);
 
         if (error is not null)
         {

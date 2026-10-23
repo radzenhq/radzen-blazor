@@ -8,7 +8,7 @@ namespace Radzen.Documents.Spreadsheet;
 static class RangeSearch
 {
     // matchMode: 0 = exact; -1 = exact or next-smaller (largest value <= lookup); 1 = exact or next-larger (smallest value >= lookup).
-    public static int Find(IReadOnlyList<CellData> values, CellData lookup, int matchMode, bool wildcards, out CellData? error)
+    public static int Find(IReadOnlyList<CellData> values, CellData lookup, int matchMode, bool wildcards, bool acrossTypes, out CellData? error)
     {
         error = null;
         var bestIndex = -1;
@@ -27,18 +27,12 @@ static class RangeSearch
                 return i;
             }
 
-            if (!IsSameKind(cell, lookup))
+            if (!acrossTypes && !IsSameKind(cell, lookup))
             {
                 continue;
             }
 
-            if (matchMode == -1 && cell.CompareTo(lookup) < 0 &&
-                (bestIndex == -1 || cell.CompareTo(values[bestIndex]) > 0))
-            {
-                bestIndex = i;
-            }
-            else if (matchMode == 1 && cell.CompareTo(lookup) > 0 &&
-                (bestIndex == -1 || cell.CompareTo(values[bestIndex]) < 0))
+            if (IsBetterCandidate(cell, lookup, bestIndex == -1 ? null : values[bestIndex], matchMode, acrossTypes))
             {
                 bestIndex = i;
             }
@@ -46,6 +40,39 @@ static class RangeSearch
 
         return matchMode == 0 ? -1 : bestIndex;
     }
+
+    public static bool IsBetterCandidate(CellData cell, CellData lookup, CellData? best, int matchMode, bool acrossTypes)
+    {
+        int Compare(CellData left, CellData right) => acrossTypes ? CompareAcrossTypes(left, right) : left.CompareTo(right);
+
+        return matchMode switch
+        {
+            -1 => Compare(cell, lookup) < 0 && (best is null || Compare(cell, best) > 0),
+            1 => Compare(cell, lookup) > 0 && (best is null || Compare(cell, best) < 0),
+            _ => false
+        };
+    }
+
+    public static int CompareAcrossTypes(CellData left, CellData right)
+    {
+        var rank = TypeRank(left).CompareTo(TypeRank(right));
+
+        if (rank != 0 || left.IsEmpty || left.Type == CellDataType.Boolean)
+        {
+            return rank;
+        }
+
+        return left.CompareTo(right);
+    }
+
+    private static int TypeRank(CellData value) => value.Type switch
+    {
+        CellDataType.Number or CellDataType.Date => 0,
+        CellDataType.String => 1,
+        CellDataType.Boolean => value.GetValueOrDefault<bool>() ? 3 : 2,
+        CellDataType.Empty => 4,
+        _ => 5
+    };
 
     public static bool IsSameKind(CellData cell, CellData lookup)
     {
@@ -60,7 +87,7 @@ static class RangeSearch
         return cellIsNumber ? lookupIsNumber : cell.Type == lookup.Type;
     }
 
-    private static bool IsExactMatch(CellData cell, CellData lookup, bool wildcards)
+    public static bool IsExactMatch(CellData cell, CellData lookup, bool wildcards)
     {
         if (cell.IsEmpty || lookup.IsEmpty)
         {

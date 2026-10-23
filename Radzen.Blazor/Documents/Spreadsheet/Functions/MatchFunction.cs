@@ -47,7 +47,7 @@ class MatchFunction : FormulaFunction
             _ => 0
         };
 
-        var index = RangeSearch.Find(array, lookup, matchMode, wildcards: matchType == 0, out var searchError);
+        var index = RangeSearch.Find(array, lookup, matchMode, wildcards: matchType == 0, acrossTypes: false, out var searchError);
 
         if (searchError is not null)
         {
