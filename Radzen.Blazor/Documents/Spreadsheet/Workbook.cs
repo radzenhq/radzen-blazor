@@ -336,7 +336,7 @@ public class Workbook
 
     internal void OnCellValueChanged(Cell cell)
     {
-        if (!Graph.HasDependents(cell))
+        if (!Graph.HasDependents(cell) && Graph.VolatileCells.Count == 0)
         {
             return;
         }
@@ -347,7 +347,7 @@ public class Workbook
             return;
         }
 
-        EvaluateFormulas(Graph.GetTopologicallySortedDependencies(cell));
+        EvaluateFormulas(Graph.GetTopologicallySortedDependencies([cell, .. Graph.VolatileCells]));
     }
 
     internal void OnCellFormulaChanged(Cell cell)
@@ -359,7 +359,7 @@ public class Workbook
         }
 
         Graph.Add(cell);
-        EvaluateFormulas([cell, .. Graph.GetTopologicallySortedDependencies(cell)]);
+        EvaluateFormulas(Graph.GetTopologicallySortedDependencies([cell, .. Graph.VolatileCells]));
     }
 
     internal void OnUpdateEnded(Worksheet sheet)
@@ -392,6 +392,7 @@ public class Workbook
         }
 
         roots.AddRange(changedDuringUpdate);
+        roots.AddRange(Graph.VolatileCells);
 
         pendingFormulaCells.Clear();
         updatedSheets.Clear();

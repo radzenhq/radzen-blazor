@@ -22,6 +22,8 @@ public abstract class FormulaFunction
     /// </summary>
     public virtual bool CoerceLiteralBooleans => false;
 
+    internal virtual bool IsVolatile => false;
+
     /// <summary>
     /// Gets the parameter definitions for this function.
     /// </summary>

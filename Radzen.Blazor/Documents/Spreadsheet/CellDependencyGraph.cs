@@ -10,6 +10,9 @@ internal class CellDependencyGraph
     private readonly Dictionary<Cell, List<RangeDependency>> rangeDependencies = [];
     private readonly Dictionary<RangeArea, RangeDependency> ranges = [];
     private readonly Dictionary<Worksheet, RangeIndex> indexes = [];
+    private readonly HashSet<Cell> volatileCells = [];
+
+    public IReadOnlyCollection<Cell> VolatileCells => volatileCells;
 
     public bool HasDependents(Cell cell)
     {
@@ -136,6 +139,8 @@ internal class CellDependencyGraph
 
     public void Remove(Cell cell)
     {
+        volatileCells.Remove(cell);
+
         if (rangeDependencies.Remove(cell, out var oldRanges))
         {
             foreach (var range in oldRanges)
@@ -176,6 +181,11 @@ internal class CellDependencyGraph
         var tree = cell.FormulaSyntaxTree ?? FormulaParser.Parse(cell.Formula);
         var visitor = new DependencyVisitor(cell.Worksheet);
         tree.Root.Accept(visitor);
+
+        if (visitor.IsVolatile)
+        {
+            volatileCells.Add(cell);
+        }
 
         var newDependencies = visitor.Dependencies;
         dependencies[cell] = newDependencies;
@@ -323,6 +333,8 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
     public List<RangeArea> Ranges { get; } = [];
 
+    public bool IsVolatile { get; private set; }
+
     private readonly HashSet<string> nameStack = new(StringComparer.OrdinalIgnoreCase);
 
     public void VisitName(NameSyntaxNode nameSyntaxNode)
@@ -397,6 +409,8 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
+        IsVolatile |= sheet.FunctionRegistry.Get(functionSyntaxNode.Name).IsVolatile;
+
         foreach (var argument in functionSyntaxNode.Arguments)
         {
             argument.Accept(this);

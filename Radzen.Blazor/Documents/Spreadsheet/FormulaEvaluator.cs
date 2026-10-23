@@ -535,6 +535,12 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
             return; // Error already set in ProcessArguments
         }
 
+        if (function is ReferenceFunction referenceFunction && arrayArguments is null)
+        {
+            EvaluateReferenceText(referenceFunction.GetReferenceText(functionArguments, out var error), error);
+            return;
+        }
+
         if (arrayArguments is null)
         {
             value = function.Evaluate(functionArguments);
@@ -542,6 +548,30 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
         }
 
         value = Broadcast([.. arrayArguments.Select(argument => argument.Values)], elements => EvaluateElement(function, functionArguments, arrayArguments, elements));
+    }
+
+    private void EvaluateReferenceText(string? text, CellData? error)
+    {
+        if (error is not null)
+        {
+            value = error;
+            return;
+        }
+
+        var tree = text is null ? null : FormulaParser.Parse("=" + text);
+
+        if (tree is null || tree.Errors.Count > 0 || tree.Root is not (CellSyntaxNode or RangeSyntaxNode or NameSyntaxNode))
+        {
+            value = CellData.FromError(CellError.Ref);
+            return;
+        }
+
+        tree.Root.Accept(this);
+
+        if (value is not RangeReference)
+        {
+            value = CellData.FromError(CellError.Ref);
+        }
     }
 
     private static CellData EvaluateElement(FormulaFunction function, FunctionArguments functionArguments, List<(string Name, RangeList Values)> arrayArguments, CellData[] elements)

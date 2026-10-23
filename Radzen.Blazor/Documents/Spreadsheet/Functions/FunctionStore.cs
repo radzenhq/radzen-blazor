@@ -73,6 +73,7 @@ public class FunctionStore
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
         Add<LookupFunction>();
+        Add<IndirectFunction>();
         Add<MatchFunction>();
         Add<LenFunction>();
         Add<TrimFunction>();
