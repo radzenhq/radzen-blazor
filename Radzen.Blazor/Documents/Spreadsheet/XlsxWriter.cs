@@ -122,6 +122,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         SaveStyles(archive, session.Styles);
         SaveSharedStrings(archive, session.SharedStrings);
         SaveWorkbook(archive);
+        SaveExternalLinks(archive);
         SaveTheme(archive);
         SaveDocPropsCore(archive);
         SaveDocPropsApp(archive);
@@ -842,6 +843,13 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml")));
         }
 
+        for (var i = 1; i <= sourceWorkbook.ExternalLinks.Count; i++)
+        {
+            contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
+                new XAttribute("PartName", $"/xl/externalLinks/externalLink{i}.xml"),
+                new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml")));
+        }
+
         for (var i = 1; i <= tableCount; i++)
         {
             contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
@@ -1074,6 +1082,14 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme"),
             new XAttribute("Target", "theme/theme1.xml")));
 
+        for (var i = 0; i < sourceWorkbook.ExternalLinks.Count; i++)
+        {
+            workbookRelsElement.Add(new XElement(XName.Get("Relationship", pkgNs),
+                new XAttribute("Id", ExternalLinkRelationshipId(i)),
+                new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink"),
+                new XAttribute("Target", $"externalLinks/externalLink{i + 1}.xml")));
+        }
+
         // sharedStrings only when something was written into it.
         if (sharedStrings.Count > 0)
         {
@@ -1085,6 +1101,27 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         using var relsEntry = archive.CreateEntry("xl/_rels/workbook.xml.rels").Open();
         workbookRels.Save(relsEntry);
+    }
+
+    private string ExternalLinkRelationshipId(int index) => $"rId{sheets.Count + 4 + index}";
+
+    private void SaveExternalLinks(ZipArchive archive)
+    {
+        for (var i = 0; i < sourceWorkbook.ExternalLinks.Count; i++)
+        {
+            var link = sourceWorkbook.ExternalLinks[i];
+
+            using (var entry = archive.CreateEntry($"xl/externalLinks/externalLink{i + 1}.xml").Open())
+            {
+                entry.Write(link.Part);
+            }
+
+            if (link.Relationships is not null)
+            {
+                using var relsEntry = archive.CreateEntry($"xl/externalLinks/_rels/externalLink{i + 1}.xml.rels").Open();
+                relsEntry.Write(link.Relationships);
+            }
+        }
     }
 
     private static XDocument CreateWorkbookRelationships()
@@ -1444,6 +1481,10 @@ class XlsxWriter(Workbook sourceWorkbook)
         return widths;
     }
 
+    // Excel refuses to open a workbook with a shared formula that references a sheet by name, which ECMA-376 allows.
+    private static bool ReferencesSheetByName(Cell cell) =>
+        cell.FormulaSyntaxTree?.Find(node => node is CellSyntaxNode reference && !string.IsNullOrEmpty(reference.Token.Address.Worksheet)).Count > 0;
+
     // ECMA-376 part 1, 18.3.1.40 (shared formulas)
     private static Dictionary<CellRef, (int Si, string? Ref)> BuildSharedFormulaGroups(Worksheet sheet)
     {
@@ -1451,7 +1492,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         foreach (var cell in sheet.Cells.GetPopulatedCells())
         {
-            if (!string.IsNullOrEmpty(cell.Formula))
+            if (!string.IsNullOrEmpty(cell.Formula) && !ReferencesSheetByName(cell))
             {
                 formulas[cell.Address] = cell.Formula;
             }
@@ -2768,12 +2809,14 @@ class XlsxWriter(Workbook sourceWorkbook)
 
                     if (!string.IsNullOrEmpty(rule.Formula1))
                     {
-                        if (rule.Type == DataValidationType.List)
+                        if (rule.Type == DataValidationType.List && rule.Formula1.StartsWith('='))
                         {
-                            // Excel format: each item quoted individually, e.g. "Yes","No","Maybe"
-                            var items = rule.Formula1.Split(',');
-                            var quoted = string.Join(",", items.Select(i => $"\"{i.Trim()}\""));
-                            element.Add(new XElement(XName.Get("formula1", ns), quoted));
+                            element.Add(new XElement(XName.Get("formula1", ns), rule.Formula1[1..]));
+                        }
+                        else if (rule.Type == DataValidationType.List)
+                        {
+                            var items = string.Join(",", rule.Formula1.Split(',').Select(i => i.Trim()));
+                            element.Add(new XElement(XName.Get("formula1", ns), $"\"{items.Replace("\"", "\"\"", StringComparison.Ordinal)}\""));
                         }
                         else
                         {
@@ -3138,6 +3181,13 @@ class XlsxWriter(Workbook sourceWorkbook)
             }
 
             sheetsElement.AddAfterSelf(definedNames);
+        }
+
+        if (sourceWorkbook.ExternalLinks.Count > 0)
+        {
+            sheetsElement.AddAfterSelf(new XElement(mainNs + "externalReferences",
+                sourceWorkbook.ExternalLinks.Select((_, index) =>
+                    new XElement(mainNs + "externalReference", new XAttribute(rNs + "id", ExternalLinkRelationshipId(index))))));
         }
 
         using var entry = archive.CreateEntry("xl/workbook.xml").Open();

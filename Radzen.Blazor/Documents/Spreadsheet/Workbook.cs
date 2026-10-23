@@ -47,6 +47,8 @@ public class Workbook
     /// </summary>
     public IDictionary<string, string> DefinedNames { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    internal List<ExternalLink> ExternalLinks { get; } = [];
+
     private readonly Dictionary<string, FormulaSyntaxTree> definedNameTrees = [];
 
     internal FormulaSyntaxTree? ResolveDefinedName(string name)

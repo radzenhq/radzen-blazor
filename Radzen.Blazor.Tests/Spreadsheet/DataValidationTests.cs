@@ -1,4 +1,7 @@
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Xml.Linq;
 using Xunit;
 
 using Radzen.Documents.Spreadsheet;
@@ -415,6 +418,67 @@ public class DataValidationTests
         var loadedRule = Assert.IsType<DataValidationRule>(validators[0]);
         Assert.Equal(DataValidationType.List, loadedRule.Type);
         Assert.Equal("Yes,No,Maybe", loadedRule.Formula1);
+    }
+
+    [Fact]
+    public void Xlsx_RoundTrip_ListFromRange()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
+        sheet.Cells["C1"].Value = "Red";
+        sheet.Cells["C2"].Value = "Green";
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
+        sheet.Validation.Add(range, new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$C$1:$C$2"
+        });
+
+        var loadedSheet = SaveAndLoad(workbook).Sheets[0];
+
+        var loadedRule = Assert.IsType<DataValidationRule>(Assert.Single(loadedSheet.Validation.GetValidators(range)));
+        Assert.Equal("=$C$1:$C$2", loadedRule.Formula1);
+        Assert.Equal(["Red", "Green"], loadedRule.GetListItems(loadedSheet));
+    }
+
+    [Fact]
+    public void Xlsx_ListOfItems_WritesOneQuotedString()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
+        sheet.Validation.Add(new RangeRef(new CellRef(0, 0), new CellRef(5, 0)), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "Yes, No,Maybe"
+        });
+
+        Assert.Equal("\"Yes,No,Maybe\"", SaveAndReadFormula1(workbook));
+    }
+
+    [Fact]
+    public void Xlsx_ListFromRange_WritesUnquotedFormula1()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
+        sheet.Validation.Add(new RangeRef(new CellRef(0, 0), new CellRef(5, 0)), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$C$1:$C$2"
+        });
+
+        Assert.Equal("$C$1:$C$2", SaveAndReadFormula1(workbook));
+    }
+
+    private static string SaveAndReadFormula1(Workbook workbook)
+    {
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read);
+        using var entry = zip.GetEntry("xl/worksheets/sheet1.xml")!.Open();
+        var doc = XDocument.Load(entry);
+
+        return Assert.Single(doc.Descendants().Where(element => element.Name.LocalName == "formula1")).Value;
     }
 
     [Fact]

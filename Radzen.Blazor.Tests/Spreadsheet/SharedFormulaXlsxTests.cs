@@ -223,6 +223,29 @@ public class SharedFormulaXlsxTests
     }
 
     [Fact]
+    public void Write_ShiftedFormulasReferencingAnotherSheet_StayPlain()
+    {
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Work", 20, 10);
+        var summary = wb.AddSheet("Summary", 20, 10);
+        summary.Cells["A1"].Value = 1d;
+        summary.Cells["A2"].Value = 2d;
+        sheet.Cells["A1"].Formula = "=Summary!A1";
+        sheet.Cells["A2"].Formula = "=Summary!A2";
+        sheet.Cells["B1"].Formula = "=SUM('Summary'!A1:A2)";
+        sheet.Cells["B2"].Formula = "=SUM('Summary'!A2:A3)";
+
+        var doc = SaveAndReadSheetXml(wb);
+
+        Assert.Null(FormulaElement(doc, "A1").Attribute("t"));
+        Assert.Equal("Summary!A1", FormulaElement(doc, "A1").Value);
+        Assert.Null(FormulaElement(doc, "A2").Attribute("t"));
+        Assert.Equal("Summary!A2", FormulaElement(doc, "A2").Value);
+        Assert.Null(FormulaElement(doc, "B2").Attribute("t"));
+        Assert.Equal("SUM('Summary'!A2:A3)", FormulaElement(doc, "B2").Value);
+    }
+
+    [Fact]
     public void Write_SeparateRuns_GetDistinctSharedIndexes()
     {
         var wb = new Workbook();
