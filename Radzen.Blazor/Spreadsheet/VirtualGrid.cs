@@ -236,6 +236,11 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
                 Render(View.ScrollLeft, View.ScrollTop);
             }
+            else if (region is not null && (View.RowHeaderOffset != renderedRowHeaderOffset || View.ColumnHeaderOffset != renderedColumnHeaderOffset))
+            {
+                // Headers were shown or hidden: the cached items still use the old offsets.
+                Render(ScrollLeft, ScrollTop);
+            }
         }
     }
 
@@ -338,8 +343,14 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         }
     }
 
+    private double renderedRowHeaderOffset;
+    private double renderedColumnHeaderOffset;
+
     private void Render(double scrollX, double scrollY)
     {
+        renderedRowHeaderOffset = View.RowHeaderOffset;
+        renderedColumnHeaderOffset = View.ColumnHeaderOffset;
+
         var columnRange = View.GetColumnRange(scrollX, scrollX + region.Width);
         var rowRange = View.GetRowRange(scrollY, scrollY + region.Height);
 
