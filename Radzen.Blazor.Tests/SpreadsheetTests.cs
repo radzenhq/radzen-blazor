@@ -149,6 +149,81 @@ public class SpreadsheetTests
         Assert.DoesNotContain("rz-spreadsheet-sheet-tabs", c.Markup);
     }
 
+    [Fact]
+    public void Headers_ByDefault_AreRendered()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
+
+        Assert.Contains("rz-spreadsheet-column-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-row-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-corner-header", c.Markup);
+    }
+
+    [Fact]
+    public void ShowColumnHeaders_False_HidesColumnHeadersAndCorner()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, NewWorkbook());
+            p.Add(x => x.ShowColumnHeaders, false);
+        });
+
+        Assert.DoesNotContain("rz-spreadsheet-column-header", c.Markup);
+        Assert.DoesNotContain("rz-spreadsheet-corner-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-row-header", c.Markup);
+    }
+
+    [Fact]
+    public void ShowRowHeaders_False_HidesRowHeaders()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, NewWorkbook());
+            p.Add(x => x.ShowRowHeaders, false);
+        });
+
+        Assert.DoesNotContain("rz-spreadsheet-row-header", c.Markup);
+        Assert.DoesNotContain("rz-spreadsheet-corner-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-column-header", c.Markup);
+    }
+
+    [Fact]
+    public void ShowColumnHeadersAndRowHeaders_False_HidesAllHeaders()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, NewWorkbook());
+            p.Add(x => x.ShowColumnHeaders, false);
+            p.Add(x => x.ShowRowHeaders, false);
+        });
+
+        Assert.DoesNotContain("rz-spreadsheet-column-header", c.Markup);
+        Assert.DoesNotContain("rz-spreadsheet-row-header", c.Markup);
+        Assert.DoesNotContain("rz-spreadsheet-corner-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-cell", c.Markup);
+    }
+
+    [Fact]
+    public void Headers_CanBeToggledAtRuntime()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        Assert.Contains("rz-spreadsheet-column-header", c.Markup);
+
+        c.SetParametersAndRender(p => p.Add(x => x.ShowColumnHeaders, false).Add(x => x.ShowRowHeaders, false));
+        Assert.DoesNotContain("rz-spreadsheet-column-header", c.Markup);
+        Assert.DoesNotContain("rz-spreadsheet-row-header", c.Markup);
+
+        c.SetParametersAndRender(p => p.Add(x => x.ShowColumnHeaders, true).Add(x => x.ShowRowHeaders, true));
+        Assert.Contains("rz-spreadsheet-column-header", c.Markup);
+        Assert.Contains("rz-spreadsheet-row-header", c.Markup);
+    }
+
     // ── ChildContent (custom toolbar) ──
 
     [Fact]

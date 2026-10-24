@@ -45,6 +45,14 @@
                 <RadzenSwitch @bind-Value=@showSheetTabs />
                 <RadzenLabel Text="ShowSheetTabs" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@showColumnHeaders />
+                <RadzenLabel Text="ShowColumnHeaders" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@showRowHeaders />
+                <RadzenLabel Text="ShowRowHeaders" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenFieldset>
 </RadzenStack>
@@ -58,7 +66,9 @@
                    AllowUndoRedo=@allowUndoRedo
                    ShowToolbar=@showToolbar
                    ShowFormulaBar=@showFormulaBar
-                   ShowSheetTabs=@showSheetTabs />
+                   ShowSheetTabs=@showSheetTabs
+                   ShowColumnHeaders=@showColumnHeaders
+                   ShowRowHeaders=@showRowHeaders />
 
 @code {
     Workbook workbook = new Workbook();
@@ -72,6 +82,8 @@
     bool showToolbar = true;
     bool showFormulaBar = true;
     bool showSheetTabs = true;
+    bool showColumnHeaders = true;
+    bool showRowHeaders = true;
 
     protected override void OnInitialized()
     {

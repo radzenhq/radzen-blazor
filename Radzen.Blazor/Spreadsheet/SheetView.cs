@@ -29,12 +29,16 @@ public class SheetView
     /// <summary>
     /// Gets or sets the header offset for rows (height of column headers in pixels).
     /// </summary>
-    public double RowHeaderOffset { get; set; } = 24;
+    public double RowHeaderOffset { get; set; } = DefaultRowHeaderOffset;
 
     /// <summary>
     /// Gets or sets the header offset for columns (width of row headers in pixels).
     /// </summary>
-    public double ColumnHeaderOffset { get; set; } = 100;
+    public double ColumnHeaderOffset { get; set; } = DefaultColumnHeaderOffset;
+
+    internal const double DefaultRowHeaderOffset = 24;
+
+    internal const double DefaultColumnHeaderOffset = 100;
 
     /// <summary>
     /// Gets or sets the horizontal scroll position for this sheet.
