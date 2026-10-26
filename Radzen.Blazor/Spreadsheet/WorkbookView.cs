@@ -37,10 +37,65 @@ public class WorkbookView
         if (!views.TryGetValue(sheet, out var view))
         {
             view = new SheetView(sheet);
+            ApplyHeaderOffsets(view);
             views[sheet] = view;
         }
 
         return view;
+    }
+
+    private bool showColumnHeaders = true;
+
+    /// <summary>
+    /// Gets or sets whether the column headers are rendered. Applies to every existing and future <see cref="SheetView"/>.
+    /// </summary>
+    public bool ShowColumnHeaders
+    {
+        get => showColumnHeaders;
+        set
+        {
+            if (showColumnHeaders == value)
+            {
+                return;
+            }
+
+            showColumnHeaders = value;
+            ApplyHeaderOffsets();
+        }
+    }
+
+    private bool showRowHeaders = true;
+
+    /// <summary>
+    /// Gets or sets whether the row headers are rendered. Applies to every existing and future <see cref="SheetView"/>.
+    /// </summary>
+    public bool ShowRowHeaders
+    {
+        get => showRowHeaders;
+        set
+        {
+            if (showRowHeaders == value)
+            {
+                return;
+            }
+
+            showRowHeaders = value;
+            ApplyHeaderOffsets();
+        }
+    }
+
+    private void ApplyHeaderOffsets()
+    {
+        foreach (var view in views.Values)
+        {
+            ApplyHeaderOffsets(view);
+        }
+    }
+
+    private void ApplyHeaderOffsets(SheetView view)
+    {
+        view.RowHeaderOffset = showColumnHeaders ? SheetView.DefaultRowHeaderOffset : 0;
+        view.ColumnHeaderOffset = showRowHeaders ? SheetView.DefaultColumnHeaderOffset : 0;
     }
 
     /// <summary>

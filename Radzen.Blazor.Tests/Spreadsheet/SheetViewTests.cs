@@ -336,4 +336,62 @@ public class WorkbookViewTests
 
         Assert.Throws<ArgumentNullException>(() => view.GetView(null!));
     }
+
+    private static Workbook NewTwoSheetWorkbook()
+    {
+        var wb = new Workbook();
+        wb.AddSheet("Sheet1", 10, 10);
+        wb.AddSheet("Sheet2", 10, 10);
+        return wb;
+    }
+
+    [Fact]
+    public void GetView_DefaultsToVisibleHeaders()
+    {
+        var wb = NewTwoSheetWorkbook();
+        var workbookView = new WorkbookView(wb);
+
+        var view = workbookView.GetView(wb.Sheets[0]);
+
+        Assert.True(workbookView.ShowColumnHeaders);
+        Assert.True(workbookView.ShowRowHeaders);
+        Assert.Equal(24, view.RowHeaderOffset);
+        Assert.Equal(100, view.ColumnHeaderOffset);
+    }
+
+    [Fact]
+    public void HiddenHeaders_ApplyToExistingAndFutureViews()
+    {
+        var wb = NewTwoSheetWorkbook();
+        var workbookView = new WorkbookView(wb);
+        var existing = workbookView.GetView(wb.Sheets[0]);
+
+        workbookView.ShowColumnHeaders = false;
+        workbookView.ShowRowHeaders = false;
+
+        var created = workbookView.GetView(wb.Sheets[1]);
+
+        Assert.Equal(0, existing.RowHeaderOffset);
+        Assert.Equal(0, existing.ColumnHeaderOffset);
+        Assert.Equal(0, created.RowHeaderOffset);
+        Assert.Equal(0, created.ColumnHeaderOffset);
+    }
+
+    [Fact]
+    public void HeaderSettings_AreIndependent()
+    {
+        var wb = NewTwoSheetWorkbook();
+        var workbookView = new WorkbookView(wb) { ShowColumnHeaders = false };
+
+        var view = workbookView.GetView(wb.Sheets[0]);
+
+        Assert.Equal(0, view.RowHeaderOffset);
+        Assert.Equal(100, view.ColumnHeaderOffset);
+
+        workbookView.ShowColumnHeaders = true;
+        workbookView.ShowRowHeaders = false;
+
+        Assert.Equal(24, view.RowHeaderOffset);
+        Assert.Equal(0, view.ColumnHeaderOffset);
+    }
 }

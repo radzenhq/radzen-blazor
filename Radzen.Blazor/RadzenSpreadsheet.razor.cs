@@ -410,19 +410,23 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private WorkbookView? workbookView;
 
-    private SheetView? ActiveView
-    {
-        get
-        {
-            if (Worksheet == null)
-            {
-                return null;
-            }
+    private SheetView? ActiveView => Worksheet != null ? (workbookView ??= CreateWorkbookView()).GetView(Worksheet) : null;
 
-            var view = (workbookView ??= new WorkbookView(workbook!)).GetView(Worksheet);
-            view.RowHeaderOffset = ShowColumnHeaders ? SheetView.DefaultRowHeaderOffset : 0;
-            view.ColumnHeaderOffset = ShowRowHeaders ? SheetView.DefaultColumnHeaderOffset : 0;
-            return view;
+    private WorkbookView CreateWorkbookView() => new(workbook!)
+    {
+        ShowColumnHeaders = ShowColumnHeaders,
+        ShowRowHeaders = ShowRowHeaders
+    };
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (workbookView is not null)
+        {
+            workbookView.ShowColumnHeaders = ShowColumnHeaders;
+            workbookView.ShowRowHeaders = ShowRowHeaders;
         }
     }
 
