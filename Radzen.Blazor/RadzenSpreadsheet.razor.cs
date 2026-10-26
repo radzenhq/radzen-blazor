@@ -191,6 +191,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public bool ShowSheetTabs { get; set; } = true;
 
     /// <summary>
+    /// When <c>true</c> (the default) the column headers (A, B, C, ...) are rendered above the grid.
+    /// Set to <c>false</c> to hide them together with their resize handles and the whole-column
+    /// selection they provide. The space they occupy is released as well.
+    /// </summary>
+    [Parameter]
+    public bool ShowColumnHeaders { get; set; } = true;
+
+    /// <summary>
+    /// When <c>true</c> (the default) the row headers (1, 2, 3, ...) are rendered to the left of the grid.
+    /// Set to <c>false</c> to hide them together with their resize handles and the whole-row
+    /// selection they provide. The space they occupy is released as well.
+    /// </summary>
+    [Parameter]
+    public bool ShowRowHeaders { get; set; } = true;
+
+    /// <summary>
     /// The zero-based index of the active sheet. Supports two-way binding via
     /// <c>@bind-SelectedSheetIndex</c>. Values outside the sheet range are clamped.
     /// Setting it selects the matching sheet even when <see cref="ShowSheetTabs"/> is
@@ -394,7 +410,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private WorkbookView? workbookView;
 
-    private SheetView? ActiveView => Worksheet != null ? (workbookView ??= new WorkbookView(workbook!)).GetView(Worksheet) : null;
+    private SheetView? ActiveView
+    {
+        get
+        {
+            if (Worksheet == null)
+            {
+                return null;
+            }
+
+            var view = (workbookView ??= new WorkbookView(workbook!)).GetView(Worksheet);
+            view.RowHeaderOffset = ShowColumnHeaders ? SheetView.DefaultRowHeaderOffset : 0;
+            view.ColumnHeaderOffset = ShowRowHeaders ? SheetView.DefaultColumnHeaderOffset : 0;
+            return view;
+        }
+    }
 
     private Editor? Editor => ActiveView?.Editor;
 
