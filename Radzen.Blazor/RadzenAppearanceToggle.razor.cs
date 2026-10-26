@@ -51,6 +51,19 @@ namespace Radzen.Blazor
         [Parameter]
         public string? DarkTheme { get; set; }
 
+        private string? ariaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible name of the button, exposed via the <c>aria-label</c> attribute. The button reports <c>aria-pressed="true"</c> while the dark theme is active.
+        /// When not set, an <c>aria-label</c> attribute supplied through <see cref="RadzenComponent.Attributes"/> is used, otherwise the localized "Dark theme" text.
+        /// </summary>
+        [Parameter]
+        public string AriaLabel { get => CurrentAriaLabel; set => ariaLabel = value; }
+
+        private string CurrentAriaLabel => ariaLabel ?? (Attributes != null && Attributes.TryGetValue("aria-label", out var attribute) ? attribute?.ToString() : null) ?? Localize(nameof(RadzenStrings.AppearanceToggle_AriaLabel));
+
+        private bool IsInert => CurrentLightTheme == CurrentDarkTheme;
+
         private string CurrentLightTheme => LightTheme ?? ThemeService?.Theme?.ToLowerInvariant() switch
         {
             "dark" => "default",
@@ -90,7 +103,7 @@ namespace Radzen.Blazor
             {
                 ThemeService.ThemeChanged += OnThemeChanged;
 
-                value = ThemeService.Theme != CurrentDarkTheme;
+                value = !IsInert && ThemeService.Theme == CurrentDarkTheme;
             }
         }
 
@@ -98,7 +111,7 @@ namespace Radzen.Blazor
         {
             if (ThemeService != null)
             {
-                value = ThemeService.Theme != CurrentDarkTheme;
+                value = !IsInert && ThemeService.Theme == CurrentDarkTheme;
             }
 
             StateHasChanged();
@@ -106,10 +119,10 @@ namespace Radzen.Blazor
 
         void OnChange(bool value)
         {
-            ThemeService?.SetTheme(value ? CurrentLightTheme : CurrentDarkTheme);
+            ThemeService?.SetTheme(value ? CurrentDarkTheme : CurrentLightTheme);
         }
 
-        private string Icon => value ? "dark_mode" : "light_mode";
+        private string Icon => value ? "light_mode" : "dark_mode";
 
         /// <inheritdoc />
         public override void Dispose()

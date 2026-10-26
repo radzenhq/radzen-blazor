@@ -2651,4 +2651,7 @@
   <data name="InlineAIPrompt_DiscardText" xml:space="preserve">
     <value>Discard</value>
   </data>
+  <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
+    <value>Dark theme</value>
+  </data>
 </root>

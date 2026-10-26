@@ -6,7 +6,7 @@
             type="@((Enum.GetName(typeof(ButtonType), ButtonType) ?? ButtonType.ToString()).ToLower())"
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
             @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-            aria-label="@AriaLabel" aria-pressed="@(Value.ToString().ToLowerInvariant())"
+            aria-label="@CurrentAriaLabel" aria-pressed="@(Value.ToString().ToLowerInvariant())"
             aria-expanded="@AriaExpanded" aria-controls="@AriaControls" aria-haspopup="@AriaHasPopup">
         @if (!string.IsNullOrEmpty(Name))
         {

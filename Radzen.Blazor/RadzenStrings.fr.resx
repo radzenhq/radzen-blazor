@@ -2557,4 +2557,7 @@
   <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
     <value>Aligner la colonne à droite</value>
   </data>
+  <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
+    <value>Thème sombre</value>
+  </data>
 </root>

@@ -332,10 +332,12 @@ namespace Radzen.Blazor
         public Variant? ToggleVariant { get; set; }
 
         /// <summary>
-        /// Gets or sets the aria-label attribute.
+        /// Gets or sets the aria-label attribute. When not set, an <c>aria-label</c> attribute supplied through <see cref="RadzenComponent.Attributes"/> is used.
         /// </summary>
         /// <value>The aria-label attribute.</value>
         [Parameter]
         public string? AriaLabel { get; set; }
+
+        internal string? CurrentAriaLabel => AriaLabel ?? (Attributes != null && Attributes.TryGetValue("aria-label", out var value) ? value?.ToString() : null);
     }
 }

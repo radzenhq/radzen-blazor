@@ -705,6 +705,7 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_A11yColumnDeleted { get { return ResourceManager.GetString("Spreadsheet_A11yColumnDeleted", resourceCulture); } }
         public static string Pager_ReloadTitle { get { return ResourceManager.GetString("Pager_ReloadTitle", resourceCulture); } }
         public static string Pager_ReloadAriaLabel { get { return ResourceManager.GetString("Pager_ReloadAriaLabel", resourceCulture); } }
+        public static string AppearanceToggle_AriaLabel { get { return ResourceManager.GetString("AppearanceToggle_AriaLabel", resourceCulture); } }
         public static string DataGrid_ExpandChildItemAriaLabel { get { return ResourceManager.GetString("DataGrid_ExpandChildItemAriaLabel", resourceCulture); } }
         public static string DataGrid_ExpandGroupAriaLabel { get { return ResourceManager.GetString("DataGrid_ExpandGroupAriaLabel", resourceCulture); } }
         public static string DataGrid_FilterToggleAriaLabel { get { return ResourceManager.GetString("DataGrid_FilterToggleAriaLabel", resourceCulture); } }

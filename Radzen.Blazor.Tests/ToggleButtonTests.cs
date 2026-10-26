@@ -215,6 +215,35 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-toggle-button", component.Markup);
         }
+        [Fact]
+        public void ToggleButton_Renders_AriaLabel_FromAttributes()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenToggleButton>(parameters => parameters.AddUnmatched("aria-label", "Dark theme"));
+
+            Assert.Equal("Dark theme", component.Find("button").GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void ToggleButton_AriaLabelParameter_Wins_OverAttributes()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            {
+                parameters.Add(p => p.AriaLabel, "From parameter");
+                parameters.AddUnmatched("aria-label", "From attributes");
+            });
+
+            Assert.Equal("From parameter", component.Find("button").GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void ToggleButton_Omits_AriaLabel_WhenNotSet()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenToggleButton>();
+
+            Assert.False(component.Find("button").HasAttribute("aria-label"));
+        }
     }
 }
-

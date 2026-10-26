@@ -2557,4 +2557,7 @@
   <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
     <value>Spalte rechtsbündig ausrichten</value>
   </data>
+  <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
+    <value>Dunkles Design</value>
+  </data>
 </root>

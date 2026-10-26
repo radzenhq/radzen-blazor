@@ -2557,4 +2557,7 @@
   <data name="MarkdownEditorTableAlignRight_Title" xml:space="preserve">
     <value>列を右揃え</value>
   </data>
+  <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
+    <value>ダークテーマ</value>
+  </data>
 </root>
