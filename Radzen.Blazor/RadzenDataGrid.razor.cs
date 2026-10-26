@@ -398,6 +398,53 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<Radzen.DataGridLoadChildDataEventArgs<TItem>> LoadChildData { get; set; }
 
+        /// <summary>
+        /// Gets or sets the accessible name of the grid, exposed via the <c>aria-label</c> attribute on the <c>role="grid"</c> or <c>role="treegrid"</c> element.
+        /// When not set, an <c>aria-label</c> attribute supplied through <see cref="RadzenComponent.Attributes"/> is used.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id of the element that labels the grid, exposed via the <c>aria-labelledby</c> attribute on the <c>role="grid"</c> or <c>role="treegrid"</c> element.
+        /// When not set, an <c>aria-labelledby</c> attribute supplied through <see cref="RadzenComponent.Attributes"/> is used.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
+        static readonly string[] gridNameAttributes = { "aria-label", "aria-labelledby" };
+
+        internal string? GridAriaLabel => AriaLabel ?? GetAttributeString("aria-label");
+
+        internal string? GridAriaLabelledBy => AriaLabelledBy ?? GetAttributeString("aria-labelledby");
+
+        string? GetAttributeString(string name)
+        {
+            return Attributes != null && Attributes.TryGetValue(name, out var value) ? Convert.ToString(value, Culture) : null;
+        }
+
+        IReadOnlyDictionary<string, object>? wrapperAttributesSource;
+        IReadOnlyDictionary<string, object>? wrapperAttributes;
+
+        internal IReadOnlyDictionary<string, object>? WrapperAttributes
+        {
+            get
+            {
+                if (Attributes == null || !gridNameAttributes.Any(Attributes.ContainsKey))
+                {
+                    return Attributes;
+                }
+
+                if (!ReferenceEquals(wrapperAttributesSource, Attributes))
+                {
+                    wrapperAttributesSource = Attributes;
+                    wrapperAttributes = Attributes.Where(a => !gridNameAttributes.Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
+                }
+
+                return wrapperAttributes;
+            }
+        }
+
         private string? expandChildItemAriaLabel;
 
         /// <summary>

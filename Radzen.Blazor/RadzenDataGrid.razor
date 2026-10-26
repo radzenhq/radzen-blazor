@@ -12,7 +12,7 @@
 {
     var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
 
-    <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
+    <div @ref=@Element style="@Style" @attributes="WrapperAttributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.ContextMenu.HasDelegate">
         @if (AllowGrouping || AllowColumnPicking)
         {
@@ -114,6 +114,7 @@
 
         <div class="rz-data-grid-data" tabindex="@TabIndex" id="@($"{GetId()}-data")"
             role="@(LoadChildData.HasDelegate ? "treegrid" : "grid")"
+            aria-label="@GridAriaLabel" aria-labelledby="@GridAriaLabelledBy"
             aria-multiselectable="@(SelectionMode == DataGridSelectionMode.Multiple ? "true" : null)"
             aria-rowcount="@GridAriaRowCount()"
             aria-activedescendant="@GetActiveDescendantId()"
