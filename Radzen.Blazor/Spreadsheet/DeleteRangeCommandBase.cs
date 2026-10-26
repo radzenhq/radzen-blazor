@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Radzen.Documents.Spreadsheet;
@@ -43,9 +44,18 @@ public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
     /// </summary>
     protected int Count => endIndex - startIndex + 1;
 
+    private readonly List<(Table Table, TableState State)> tableStates = [];
+
     /// <inheritdoc/>
     protected override bool DoExecute()
     {
+        tableStates.Clear();
+
+        foreach (var table in sheet.Tables)
+        {
+            tableStates.Add((table, table.CaptureState()));
+        }
+
         CaptureAffectedCells();
         DeleteRange();
         return true;
@@ -56,6 +66,17 @@ public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
     {
         ReinsertRange();
         RestoreSnapshot();
+
+        foreach (var (table, state) in tableStates)
+        {
+            sheet.RestoreTable(table);
+            table.RestoreState(state);
+        }
+
+        if (tableStates.Count > 0)
+        {
+            sheet.OnChromeChanged();
+        }
     }
 
     /// <summary>

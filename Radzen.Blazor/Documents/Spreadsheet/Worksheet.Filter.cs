@@ -18,7 +18,7 @@ public class SheetFilter(FilterCriterion criterion, RangeRef range)
     /// <summary>
     /// Gets or sets the range of rows that the filter applies to.
     /// </summary>
-    public RangeRef Range { get; } = range;
+    public RangeRef Range { get; internal set; } = range;
 }
 
 /// <summary>
@@ -309,7 +309,7 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     /// <summary>
     /// Gets or sets the index of the column that this filter criterion applies to.
     /// </summary>
-    public int Column { get; init; }
+    public int Column { get; set; }
 
     /// <inheritdoc/>
     public override bool Matches(Worksheet sheet, int row)

@@ -302,6 +302,47 @@ public class Workbook
         }
     }
 
+    internal static string? AdjustReference(string? text, Worksheet owner, Worksheet target, Func<FormulaToken, bool, CellRef> adjust)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        var hasEquals = text.StartsWith('=');
+        var formula = hasEquals ? text : "=" + text;
+        FormulaSyntaxTree tree;
+
+        try
+        {
+            tree = FormulaParser.Parse(formula);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or FormatException)
+        {
+            return text;
+        }
+
+        var rangeEnds = new HashSet<FormulaToken>();
+
+        foreach (var node in tree.Find(node => node is RangeSyntaxNode))
+        {
+            rangeEnds.Add(((RangeSyntaxNode)node).End.Token);
+        }
+
+        bool IsTarget(CellRef address) => string.IsNullOrEmpty(address.Worksheet)
+            ? owner == target
+            : string.Equals(address.Worksheet, target.Name, StringComparison.OrdinalIgnoreCase);
+
+        var rewritten = FormulaRewriter.Rewrite(formula, tree, token => IsTarget(token.Address) ? adjust(token, rangeEnds.Contains(token)) : token.Address);
+
+        if (string.Equals(rewritten, formula, StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        return hasEquals ? rewritten : rewritten[1..];
+    }
+
     private static string? RenameSheetInReference(string? text, string oldName, string newName)
     {
         if (string.IsNullOrEmpty(text))

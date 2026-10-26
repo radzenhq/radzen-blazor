@@ -90,7 +90,7 @@ public class TopFilterCriterion : FilterCriterion
     private readonly HashSet<int> matchingRows = [];
 
     /// <summary>The column this filter applies to.</summary>
-    public int Column { get; init; }
+    public int Column { get; set; }
 
     /// <summary>
     /// When <see cref="Percent"/> is false, the number of rows to keep. When true, a 0..100
@@ -168,7 +168,7 @@ public class DynamicFilterCriterion : FilterCriterion
     private bool averageComputed;
 
     /// <summary>The column this filter applies to.</summary>
-    public int Column { get; init; }
+    public int Column { get; set; }
 
     /// <summary>The dynamic predicate to apply.</summary>
     public DynamicFilterType Type { get; init; }
@@ -327,7 +327,7 @@ public class DynamicFilterCriterion : FilterCriterion
 public class CellColorFilterCriterion : FilterCriterion
 {
     /// <summary>The column this filter applies to.</summary>
-    public int Column { get; init; }
+    public int Column { get; set; }
 
     /// <summary>The hex color string to match (e.g. <c>#FFFF00</c>).</summary>
     public string? Color { get; init; }

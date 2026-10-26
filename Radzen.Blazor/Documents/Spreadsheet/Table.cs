@@ -404,6 +404,129 @@ public class Table
         Worksheet.RemoveTable(this);
     }
 
+    internal TableShift InsertRows(int fromRow, int count)
+    {
+        if (range.Start.Row >= fromRow)
+        {
+            range = range.Offset(count, 0);
+        }
+        else if (range.End.Row >= fromRow)
+        {
+            range = new RangeRef(range.Start, new CellRef(range.End.Row + count, range.End.Column));
+        }
+        else
+        {
+            return TableShift.None;
+        }
+
+        Filter.Range = range;
+        return TableShift.Moved;
+    }
+
+    internal TableShift DeleteRow(int row)
+    {
+        if (range.Start.Row > row)
+        {
+            range = range.Offset(-1, 0);
+        }
+        else if (range.End.Row >= row)
+        {
+            if (range.Rows == 1)
+            {
+                return TableShift.Removed;
+            }
+
+            range = new RangeRef(range.Start, new CellRef(range.End.Row - 1, range.End.Column));
+
+            if (showTotals && showHeaderRow && range.Rows < 2)
+            {
+                showTotals = false;
+            }
+        }
+        else
+        {
+            return TableShift.None;
+        }
+
+        Filter.Range = range;
+        return TableShift.Moved;
+    }
+
+    internal TableShift InsertColumns(int fromColumn, int count)
+    {
+        if (range.Start.Column >= fromColumn)
+        {
+            range = range.Offset(0, count);
+        }
+        else if (range.End.Column >= fromColumn)
+        {
+            range = new RangeRef(range.Start, new CellRef(range.End.Row, range.End.Column + count));
+
+            var at = fromColumn - range.Start.Column;
+
+            for (var i = 0; i < count; i++)
+            {
+                columns.Insert(at + i, new TableColumn(this, at + i));
+            }
+
+            Reindex();
+        }
+        else
+        {
+            return TableShift.None;
+        }
+
+        Filter.Range = range;
+        return TableShift.Moved;
+    }
+
+    internal TableShift DeleteColumn(int column)
+    {
+        if (range.Start.Column > column)
+        {
+            range = range.Offset(0, -1);
+        }
+        else if (range.End.Column >= column)
+        {
+            if (range.Columns == 1)
+            {
+                return TableShift.Removed;
+            }
+
+            columns.RemoveAt(column - range.Start.Column);
+            Reindex();
+            range = new RangeRef(range.Start, new CellRef(range.End.Row, range.End.Column - 1));
+        }
+        else
+        {
+            return TableShift.None;
+        }
+
+        Filter.Range = range;
+        return TableShift.Moved;
+    }
+
+    internal TableState CaptureState() => new(range, showHeaderRow, showTotals, [.. columns]);
+
+    internal void RestoreState(TableState state)
+    {
+        range = state.Range;
+        showHeaderRow = state.ShowHeaderRow;
+        showTotals = state.ShowTotals;
+        columns.Clear();
+        columns.AddRange(state.Columns);
+        Reindex();
+        Filter.Range = range;
+    }
+
+    private void Reindex()
+    {
+        for (var i = 0; i < columns.Count; i++)
+        {
+            columns[i] = columns[i].WithIndex(i);
+        }
+    }
+
     internal void ApplyAllTotalsCalculations()
     {
         for (var i = 0; i < columns.Count; i++)
@@ -457,6 +580,15 @@ public class Table
 
 }
 
+internal readonly record struct TableState(RangeRef Range, bool ShowHeaderRow, bool ShowTotals, TableColumn[] Columns);
+
+internal enum TableShift
+{
+    None,
+    Moved,
+    Removed
+}
+
 /// <summary>Represents a single column inside a <see cref="Table"/>.</summary>
 public class TableColumn
 {
@@ -471,6 +603,16 @@ public class TableColumn
         this.table = table;
         this.index = index;
     }
+
+    private TableColumn(Table table, int index, TableColumn source)
+        : this(table, index)
+    {
+        customName = source.customName;
+        totalsCalculation = source.totalsCalculation;
+        formula = source.formula;
+    }
+
+    internal TableColumn WithIndex(int newIndex) => newIndex == index ? this : new TableColumn(table, newIndex, this);
 
     /// <summary>Position of the column inside the table (zero-based).</summary>
     public int Index => index;

@@ -62,6 +62,43 @@ public class ValidationStore
     /// </summary>
     public IEnumerable<RangeRef> Ranges => validators.Keys;
 
+    internal void Shift(Func<RangeRef, RangeRef?> map)
+    {
+        var changed = false;
+
+        foreach (var (range, list) in validators.ToArray())
+        {
+            var moved = map(range);
+
+            if (moved == range)
+            {
+                continue;
+            }
+
+            validators.Remove(range);
+            changed = true;
+
+            if (moved is null)
+            {
+                continue;
+            }
+
+            if (validators.TryGetValue(moved.Value, out var existing))
+            {
+                existing.AddRange(list);
+            }
+            else
+            {
+                validators[moved.Value] = list;
+            }
+        }
+
+        if (changed)
+        {
+            worksheet?.OnChromeChanged();
+        }
+    }
+
     /// <summary>
     /// Adds a validation rule for a specific range of cells in the spreadsheet.
     /// </summary>

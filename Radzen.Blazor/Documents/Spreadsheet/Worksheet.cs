@@ -321,6 +321,268 @@ public partial class Worksheet
         return removed;
     }
 
+    private void ShiftStructures(int index, int count, bool isRow)
+    {
+        ShiftTables(table => count > 0
+            ? (isRow ? table.InsertRows(index, count) : table.InsertColumns(index, count))
+            : (isRow ? table.DeleteRow(index) : table.DeleteColumn(index)));
+
+        RangeRef? MapRange(RangeRef range) => ShiftRange(range, index, count, isRow);
+
+        AutoFilter.Range = ShiftRange(AutoFilter.Range, index, count, isRow);
+
+        ShiftFilters(index, count, isRow);
+
+        if (ConditionalFormats.Shift(MapRange))
+        {
+            OnChromeChanged();
+        }
+
+        Validation.Shift(MapRange);
+
+        int MapIndex(int value) => count > 0
+            ? (value >= index ? value + count : value)
+            : (value > index ? value + count : value);
+
+        CellRef Adjust(FormulaToken token, bool isRangeEnd)
+        {
+            var address = token.Address;
+            var value = isRow ? address.Row : address.Column;
+            var moved = count < 0 && isRangeEnd && value == index ? value + count : MapIndex(value);
+
+            if (moved < 0 || moved == value)
+            {
+                return address;
+            }
+
+            return isRow
+                ? new CellRef(moved, address.Column) { Worksheet = address.Worksheet }
+                : new CellRef(address.Row, moved) { Worksheet = address.Worksheet };
+        }
+
+        foreach (var rule in Validation.Ranges.SelectMany(Validation.GetValidators).OfType<DataValidationRule>().Distinct())
+        {
+            rule.Formula1 = Workbook.AdjustReference(rule.Formula1, this, this, Adjust);
+            rule.Formula2 = Workbook.AdjustReference(rule.Formula2, this, this, Adjust);
+        }
+
+        void ShiftAnchor(CellAnchor? anchor)
+        {
+            if (anchor is null)
+            {
+                return;
+            }
+
+            if (isRow)
+            {
+                anchor.Row = Math.Max(0, MapIndex(anchor.Row));
+            }
+            else
+            {
+                anchor.Column = Math.Max(0, MapIndex(anchor.Column));
+            }
+        }
+
+        foreach (var image in images)
+        {
+            ShiftAnchor(image.From);
+            ShiftAnchor(image.To);
+        }
+
+        if (images.Count > 0)
+        {
+            ImagesChanged?.Invoke();
+        }
+
+        foreach (var chart in charts)
+        {
+            ShiftAnchor(chart.From);
+            ShiftAnchor(chart.To);
+        }
+
+        foreach (var sheet in Workbook.Sheets)
+        {
+            var seriesChanged = false;
+
+            foreach (var series in sheet.Charts.SelectMany(chart => chart.Series))
+            {
+                var categories = Workbook.AdjustReference(series.Categories, sheet, this, Adjust);
+                var values = Workbook.AdjustReference(series.Values, sheet, this, Adjust);
+                var name = Workbook.AdjustReference(series.Name, sheet, this, Adjust);
+
+                seriesChanged |= !ReferenceEquals(categories, series.Categories) || !ReferenceEquals(values, series.Values) || !ReferenceEquals(name, series.Name);
+
+                series.Categories = categories;
+                series.Values = values;
+                series.Name = name;
+            }
+
+            if (seriesChanged && sheet != this)
+            {
+                sheet.ChartsChanged?.Invoke();
+            }
+        }
+
+        if (charts.Count > 0)
+        {
+            ChartsChanged?.Invoke();
+        }
+    }
+
+    private void ShiftFilters(int index, int count, bool isRow)
+    {
+        if (filters.Count == 0)
+        {
+            return;
+        }
+
+        var shifter = isRow ? null : new FilterColumnShifter(index, count);
+
+        for (var i = filters.Count - 1; i >= 0; i--)
+        {
+            var filter = filters[i];
+            var moved = ShiftRange(filter.Range, index, count, isRow);
+
+            if (moved is null)
+            {
+                filters.RemoveAt(i);
+                continue;
+            }
+
+            if (shifter is not null)
+            {
+                shifter.Removed = false;
+                filter.Criterion.Accept(shifter);
+
+                if (shifter.Removed)
+                {
+                    filters.RemoveAt(i);
+                    continue;
+                }
+            }
+
+            filter.Range = moved.Value;
+        }
+    }
+
+    private sealed class FilterColumnShifter(int index, int count) : FilterCriterionVisitorBase
+    {
+        public bool Removed { get; set; }
+
+        private int Map(int column)
+        {
+            if (count > 0)
+            {
+                return column >= index ? column + count : column;
+            }
+
+            if (column == index)
+            {
+                Removed = true;
+                return column;
+            }
+
+            return column > index ? column + count : column;
+        }
+
+        protected override void DefaultVisit(FilterCriterion criterion)
+        {
+            if (criterion is FilterCriterionLeaf leaf)
+            {
+                leaf.Column = Map(leaf.Column);
+            }
+        }
+
+        public override void Visit(TopFilterCriterion criterion)
+        {
+            ArgumentNullException.ThrowIfNull(criterion);
+            criterion.Column = Map(criterion.Column);
+        }
+
+        public override void Visit(DynamicFilterCriterion criterion)
+        {
+            ArgumentNullException.ThrowIfNull(criterion);
+            criterion.Column = Map(criterion.Column);
+        }
+
+        public override void Visit(CellColorFilterCriterion criterion)
+        {
+            ArgumentNullException.ThrowIfNull(criterion);
+            criterion.Column = Map(criterion.Column);
+        }
+    }
+
+    internal void RestoreTable(Table table)
+    {
+        if (tables.Contains(table))
+        {
+            return;
+        }
+
+        tables.Add(table);
+        OnChromeChanged();
+    }
+
+    private void ShiftTables(Func<Table, TableShift> shift)
+    {
+        var changed = false;
+
+        for (var i = tables.Count - 1; i >= 0; i--)
+        {
+            var result = shift(tables[i]);
+
+            if (result == TableShift.Removed)
+            {
+                tables.RemoveAt(i);
+            }
+
+            changed |= result != TableShift.None;
+        }
+
+        if (changed)
+        {
+            OnChromeChanged();
+        }
+    }
+
+    private static RangeRef? ShiftRange(RangeRef? value, int index, int count, bool isRow)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var range = value.Value;
+        var start = isRow ? range.Start.Row : range.Start.Column;
+        var end = isRow ? range.End.Row : range.End.Column;
+
+        if (count < 0 && start <= index && end >= index)
+        {
+            if (start == end)
+            {
+                return null;
+            }
+
+            return isRow
+                ? new RangeRef(range.Start, new CellRef(range.End.Row + count, range.End.Column))
+                : new RangeRef(range.Start, new CellRef(range.End.Row, range.End.Column + count));
+        }
+
+        if (start >= index && (count > 0 || start > index))
+        {
+            return isRow ? range.Offset(count, 0) : range.Offset(0, count);
+        }
+
+        if (count > 0 && end >= index)
+        {
+            return isRow
+                ? new RangeRef(range.Start, new CellRef(range.End.Row + count, range.End.Column))
+                : new RangeRef(range.Start, new CellRef(range.End.Row, range.End.Column + count));
+        }
+
+        return range;
+    }
+
     /// <summary>
     /// Raised when sheet chrome (table styling, custom cell types, validation, auto filter)
     /// changes and dependent cell views must refresh.
@@ -636,6 +898,8 @@ public partial class Worksheet
 
         MergedCells.ShiftColumnsLeft(columnIndex);
 
+        ShiftStructures(columnIndex, -1, isRow: false);
+
         invalidReferenceColumns.Add(columnIndex);
 
         Workbook.InvalidateFormulasReferencing(this, RangeKind.Columns, columnIndex);
@@ -675,6 +939,8 @@ public partial class Worksheet
         Rows.ShiftUp(rowIndex);
 
         MergedCells.ShiftRowsUp(rowIndex);
+
+        ShiftStructures(rowIndex, -1, isRow: true);
 
         invalidReferenceRows.Add(rowIndex);
 
@@ -824,6 +1090,8 @@ public partial class Worksheet
 
         MergedCells.ShiftRowsDown(rowIndex, count);
 
+        ShiftStructures(rowIndex, count, isRow: true);
+
         Workbook.AdjustFormulas(this, (cellToken) =>
         {
             var a = cellToken.Address;
@@ -875,6 +1143,8 @@ public partial class Worksheet
         Columns.ShiftDown(columnIndex, count);
 
         MergedCells.ShiftColumnsRight(columnIndex, count);
+
+        ShiftStructures(columnIndex, count, isRow: false);
 
         Workbook.AdjustFormulas(this, (cellToken) =>
         {

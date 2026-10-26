@@ -139,6 +139,12 @@ public readonly struct RangeRef : IEquatable<RangeRef>
     public static RangeRef FromCell(CellRef cell) => new(cell, cell);
 
     /// <summary>
+    /// Returns a copy of the range moved by the specified number of rows and columns.
+    /// </summary>
+    public RangeRef Offset(int rows, int columns) =>
+        new(new CellRef(Start.Row + rows, Start.Column + columns), new CellRef(End.Row + rows, End.Column + columns));
+
+    /// <summary>
     /// Parses a string representation of a range into a <see cref="RangeRef"/> instance.
     /// </summary>
     /// <param name="range"></param>

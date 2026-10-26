@@ -83,6 +83,40 @@ public class ConditionalFormatStore
     /// </summary>
     public IEnumerable<RangeRef> Ranges => formats.Keys;
 
+    internal bool Shift(Func<RangeRef, RangeRef?> map)
+    {
+        var changed = false;
+
+        foreach (var (range, rules) in formats.ToArray())
+        {
+            var moved = map(range);
+
+            if (moved == range)
+            {
+                continue;
+            }
+
+            formats.Remove(range);
+            changed = true;
+
+            if (moved is null)
+            {
+                continue;
+            }
+
+            if (formats.TryGetValue(moved.Value, out var existing))
+            {
+                existing.AddRange(rules);
+            }
+            else
+            {
+                formats[moved.Value] = rules;
+            }
+        }
+
+        return changed;
+    }
+
     /// <summary>
     /// Calculates the merged conditional overlay format for a cell from all matching rules.
     /// </summary>
