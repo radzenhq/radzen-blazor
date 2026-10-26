@@ -2939,6 +2939,15 @@ window.Radzen = {
     popup.classList.remove("rz-close");
     Radzen.setPopupAriaExpanded(parent, id, true);
 
+    var constrained = popup.__constrainedContent;
+    if (constrained) {
+        if (constrained.element.style.maxHeight === constrained.maxHeight) {
+            constrained.element.style.maxHeight = constrained.previousMaxHeight;
+            constrained.element.style.overflowY = constrained.previousOverflowY;
+        }
+        delete popup.__constrainedContent;
+    }
+
     var rect = popup.getBoundingClientRect();
     rect.width = x ? rect.width + 20 : rect.width;
     rect.height = y ? rect.height + 20 : rect.height;
@@ -3012,9 +3021,56 @@ window.Radzen = {
       }
 
       if (!placement) {
-        setTooltipSide(position);
-        resolvedPosition = position;
-        placement = tooltipPlacement(position);
+        var availableHeight = function (side) {
+          switch (side) {
+            case 'top': return parentRect.top + 5;
+            case 'bottom': return window.innerHeight - parentRect.bottom - 20;
+            default: return window.innerHeight;
+          }
+        };
+
+        var isVertical = function (side) {
+          return side == 'top' || side == 'bottom';
+        };
+
+        var best = null;
+
+        for (pi = 0; pi < fallbackOrder.length; pi++) {
+          if (best && isVertical(best.side) != isVertical(fallbackOrder[pi])) break;
+          setTooltipSide(fallbackOrder[pi]);
+          var sideCandidate = tooltipPlacement(fallbackOrder[pi]);
+          var available = availableHeight(fallbackOrder[pi]);
+          if (sideCandidate.left >= 0 && sideCandidate.left + rect.width <= window.innerWidth && (!best || available > best.available)) {
+            best = { side: fallbackOrder[pi], available: available };
+          }
+        }
+
+        if (!best) {
+          best = { side: position, available: availableHeight(position) };
+        }
+
+        setTooltipSide(best.side);
+
+        if (tooltipContent && rect.height > best.available && best.available > 0) {
+          var scrollTarget = tooltipContent;
+          var onlyChild = tooltipContent.children.length == 1 ? tooltipContent.children[0] : null;
+          var hasText = Array.prototype.some.call(tooltipContent.childNodes, function (node) { return node.nodeType == 3 && node.textContent.trim(); });
+          if (onlyChild && !hasText && getComputedStyle(onlyChild).display != 'inline') {
+            scrollTarget = onlyChild;
+          }
+          var targetRect = scrollTarget.getBoundingClientRect();
+          var targetStyle = getComputedStyle(scrollTarget);
+          var targetExtra = targetStyle.boxSizing === 'border-box' ? 0 :
+            parseFloat(targetStyle.paddingTop) + parseFloat(targetStyle.paddingBottom) + parseFloat(targetStyle.borderTopWidth) + parseFloat(targetStyle.borderBottomWidth);
+          var maxHeight = Math.floor(best.available - (rect.height - targetRect.height) - targetExtra) + 'px';
+          popup.__constrainedContent = { element: scrollTarget, maxHeight: maxHeight, previousMaxHeight: scrollTarget.style.maxHeight, previousOverflowY: scrollTarget.style.overflowY };
+          scrollTarget.style.maxHeight = maxHeight;
+          scrollTarget.style.overflowY = 'auto';
+          rect = popup.getBoundingClientRect();
+        }
+
+        resolvedPosition = best.side;
+        placement = tooltipPlacement(best.side);
         placement.left = Math.max(0, Math.min(placement.left, window.innerWidth - rect.width));
         placement.top = Math.max(0, Math.min(placement.top, window.innerHeight - rect.height));
       }
