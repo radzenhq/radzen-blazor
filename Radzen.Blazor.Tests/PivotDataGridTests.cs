@@ -31,7 +31,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_CssClasses()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_RowAndColumnHeaders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -68,7 +68,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowSorting_RendersSortableClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -87,7 +87,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowFiltering_RendersFilterIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -106,7 +106,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_AggregateValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -123,7 +123,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_DisallowFiltering_HidesFilterIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -142,7 +142,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_DisallowSorting_HidesSortableClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -161,7 +161,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ShowColumnsTotals_RendersFooter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -180,7 +180,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_HideColumnsTotals_NoFooter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -199,11 +199,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_DefaultEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<SalesData>());
                 parameters.Add(p => p.AllowFieldsPicking, false);
@@ -218,11 +218,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_CustomEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<SalesData>());
                 parameters.Add(p => p.EmptyText, "No data available");
@@ -238,7 +238,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowPaging_RendersPager()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -257,7 +257,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_DisallowPaging_HidesPager()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -275,7 +275,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_PagerPosition_Top()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -295,7 +295,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_PagerPosition_TopAndBottom()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -316,7 +316,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Density_Compact()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -337,7 +337,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowAlternatingRows_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -355,7 +355,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowAlternatingRows_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -373,7 +373,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowFieldsPicking_ShowsPanel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -391,7 +391,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_AllowFieldsPicking_False_HidesPanel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -409,7 +409,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_AllowDrillDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -428,7 +428,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_RowValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -447,11 +447,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_MultipleRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, SampleData);
 
@@ -497,11 +497,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_MultipleAggregates()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, SampleData);
 
@@ -548,7 +548,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Renders_AlternatingRowClasses()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -619,7 +619,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Sum_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -638,7 +638,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Count_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -657,7 +657,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Average_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -676,7 +676,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Min_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -695,7 +695,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Max_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -714,7 +714,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowTotals_AreCorrect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -733,7 +733,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ColumnTotals_AreCorrect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -754,7 +754,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_GrandTotal_IsCorrect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -776,11 +776,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_MultiLevelRows_RenderCorrectValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -831,11 +831,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_MultiLevelColumns_RenderCorrectValuesAndColspan()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -887,11 +887,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Filter_ReducesRenderedRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -977,16 +977,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ChangingABoundFilterValue_RefiltersTheRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
 
             Assert.Contains("North", RowHeaders(component));
             Assert.DoesNotContain("South", RowHeaders(component));
 
-            component.SetParametersAndRender(p => BuildFilteredPivot(p, "South"));
+            component.Render(p => BuildFilteredPivot(p, "South"));
 
             Assert.Contains("South", RowHeaders(component));
             Assert.DoesNotContain("North", RowHeaders(component));
@@ -995,15 +995,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ChangingABoundFilterValue_ReplacesTheInteractiveValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
             var row = component.FindComponent<RadzenPivotRow<SalesData>>().Instance;
             row.SetFilterValueInternal("North");
 
-            component.SetParametersAndRender(p => BuildFilteredPivot(p, "South"));
+            component.Render(p => BuildFilteredPivot(p, "South"));
 
             Assert.Contains("South", RowHeaders(component));
             Assert.DoesNotContain("North", RowHeaders(component));
@@ -1012,16 +1012,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ClearingABoundFilterValue_RestoresEveryRow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North"));
 
             Assert.DoesNotContain("South", RowHeaders(component));
 
             // Back to no filter at all, which is the same change in the other direction.
-            component.SetParametersAndRender(p => BuildFilteredPivot(p, null));
+            component.Render(p => BuildFilteredPivot(p, null));
 
             Assert.Contains("North", RowHeaders(component));
             Assert.Contains("South", RowHeaders(component));
@@ -1030,15 +1030,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ClearingABoundSecondFilterValue_ReplacesTheInteractiveValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North", "South"));
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(p => BuildFilteredPivot(p, "North", "South"));
             var row = component.FindComponent<RadzenPivotRow<SalesData>>().Instance;
             row.SetSecondFilterValueInternal("South");
 
-            component.SetParametersAndRender(p => BuildFilteredPivot(p, "North"));
+            component.Render(p => BuildFilteredPivot(p, "North"));
 
             Assert.Contains("North", RowHeaders(component));
             Assert.DoesNotContain("South", RowHeaders(component));
@@ -1047,13 +1047,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_Sort_OrdersRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             IRenderedComponent<RadzenPivotDataGrid<SalesData>> Render(SortOrder order)
             {
-                return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+                return ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
                 {
                     parameters.Add(p => p.Data, AggregationData);
                     parameters.Add(p => p.AllowDrillDown, false);
@@ -1107,11 +1107,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_SortByAggregate_OrdersRowsByAggregatedValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1156,11 +1156,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async System.Threading.Tasks.Task PivotDataGrid_ToggleRowDrillDown_ExpandsHierarchy()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, true);
@@ -1214,11 +1214,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_CollapsedGroup_ShowsAggregatedValueAcrossDescendants()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, true);
@@ -1264,7 +1264,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_DictionaryData_AggregatesValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1279,7 +1279,7 @@ namespace Radzen.Blazor.Tests
             var yearExpr = PropertyAccess.GetDynamicPropertyExpression("Year", typeof(int));
             var amountExpr = PropertyAccess.GetDynamicPropertyExpression("Amount", typeof(double));
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<IDictionary<string, object>>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<IDictionary<string, object>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1327,7 +1327,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_DictionaryData_SumAggregatesNumericValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1342,7 +1342,7 @@ namespace Radzen.Blazor.Tests
             var yearExpr = PropertyAccess.GetDynamicPropertyExpression("Year", typeof(int));
             var amountExpr = PropertyAccess.GetDynamicPropertyExpression("Amount", typeof(double));
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<IDictionary<string, object>>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<IDictionary<string, object>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1391,11 +1391,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_FormatString_AppliedToValueAndTotalCells()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1445,7 +1445,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_NullPropertyValues_HandledGracefully()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1456,7 +1456,7 @@ namespace Radzen.Blazor.Tests
                 new() { Region = "South", Category = "Furniture",   Product = "Chair",  Amount = 400, Year = 2024 },
             };
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1500,7 +1500,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_IQueryableData_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1517,7 +1517,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_IQueryableData_TotalsAndGrandTotalAreCorrect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1545,11 +1545,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_IQueryableData_FilterIsApplied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData.AsQueryable());
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1596,11 +1596,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_IQueryableData_SortOrdersRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData.AsQueryable());
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1644,7 +1644,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowMaxGroups_CombinesRemainingGroupsIntoOthers()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1664,7 +1664,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowMaxGroups_UsesCustomOthersLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1684,7 +1684,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowMaxGroups_UsesGridOthersText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1706,11 +1706,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowDrillDownToggler_IsKeyboardAccessible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, true);
@@ -1763,7 +1763,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowMaxGroups_LargerThanGroupCount_ShowsAllGroups()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1782,7 +1782,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_RowMaxGroups_RowTotalsIncludeOthers()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1801,7 +1801,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ColumnMaxGroups_CombinesRemainingGroupsIntoOthers()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1824,7 +1824,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_ColumnMaxGroups_ColumnTotalsIncludeOthers()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1845,7 +1845,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_MaxGroups_IQueryableData_ComputesCorrectCellValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1861,11 +1861,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async System.Threading.Tasks.Task PivotDataGrid_RowMaxGroups_OthersGroupSupportsDrillDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            var component = ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, true);
@@ -1922,14 +1922,14 @@ namespace Radzen.Blazor.Tests
         }
 
         private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderMaxGroupsGrid(
-            TestContext ctx,
+            BunitContext ctx,
             int? rowMaxGroups = null,
             int? columnMaxGroups = null,
             string othersLabel = null,
             IEnumerable<SalesData> data = null,
             Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
         {
-            return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            return ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, data ?? AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -1983,7 +1983,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_MaxGroups_DoesNotCauseAdditionalSourceEnumeration()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2003,7 +2003,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PivotDataGrid_IQueryableData_SourceEnumeratedLazilyAndNotPerCell()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2056,11 +2056,11 @@ namespace Radzen.Blazor.Tests
         }
 
         private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderSumGrid(
-            TestContext ctx,
+            BunitContext ctx,
             IEnumerable<SalesData> data,
             Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
         {
-            return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            return ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -2096,11 +2096,11 @@ namespace Radzen.Blazor.Tests
         }
 
         private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderAggregationGrid(
-            TestContext ctx,
+            BunitContext ctx,
             AggregateFunction aggregate,
             Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
         {
-            return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            return ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, AggregationData);
                 parameters.Add(p => p.AllowDrillDown, false);
@@ -2158,9 +2158,9 @@ namespace Radzen.Blazor.Tests
                 .Select(c => c.TextContent.Trim()).ToArray();
         }
 
-        private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderPivotDataGrid(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
+        private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderPivotDataGrid(BunitContext ctx, Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
         {
-            return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            return ctx.Render<RadzenPivotDataGrid<SalesData>>(parameters =>
             {
                 parameters.Add(p => p.Data, SampleData);
 

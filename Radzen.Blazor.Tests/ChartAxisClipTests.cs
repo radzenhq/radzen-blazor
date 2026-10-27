@@ -58,7 +58,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 390px; height: 300px")
                 .AddChildContent<RadzenColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -78,7 +78,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 390px; height: 300px")
                 .AddChildContent<RadzenBarSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -103,7 +103,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 390px; height: 300px")
                 .AddChildContent<RadzenColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -126,7 +126,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
             var data = Data("A", "B", "C", "D");
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 390px; height: 300px")
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

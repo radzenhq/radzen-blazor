@@ -30,9 +30,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_Menubar_Role_And_Orientation()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -44,9 +44,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_MenuItem_Roles_And_Haspopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -67,9 +67,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Exposes_ActiveDescendant_On_Focus()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -86,9 +86,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Keeps_Items_NonTabbable_And_Roves_ActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -111,9 +111,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_ActiveDescendant_Moves_With_Arrow_Keys()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -133,9 +133,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Aria_Expanded_Reflects_Submenu_State()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -155,9 +155,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Home_End_Move_ActiveDescendant_To_First_And_Last()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -177,9 +177,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Submenu_Is_Labelled_By_Parent_Item()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });
@@ -191,9 +191,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContextMenu_ArrowDown_Moves_Focus_Without_Opening_Submenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.IsContextMenu, true);
                 parameters.Add(p => p.Responsive, false);
@@ -213,9 +213,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContextMenu_ArrowDown_Wraps_From_Last_To_First()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.IsContextMenu, true);
                 parameters.Add(p => p.Responsive, false);
@@ -239,9 +239,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContextMenu_ArrowUp_Wraps_From_First_To_Last()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.IsContextMenu, true);
                 parameters.Add(p => p.Responsive, false);
@@ -260,9 +260,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContextMenu_ArrowRight_Opens_Submenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.IsContextMenu, true);
                 parameters.Add(p => p.Responsive, false);
@@ -285,9 +285,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>();
+            var component = ctx.Render<RadzenMenu>();
 
             Assert.Contains(@"rz-menu", component.Markup);
         }
@@ -295,9 +295,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_Responsive_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, true);
             });
@@ -309,9 +309,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_Responsive_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, false);
             });
@@ -324,9 +324,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_CustomToggleAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, true);
                 parameters.Add(p => p.ToggleAriaLabel, "Open navigation");
@@ -338,9 +338,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Renders_Flyout_Class_When_Enabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);
             });
@@ -351,9 +351,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Does_Not_Render_Flyout_Class_By_Default()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>();
+            var component = ctx.Render<RadzenMenu>();
 
             Assert.DoesNotContain("rz-menu-flyout", component.Markup);
         }
@@ -361,9 +361,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Flyout_Arrow_Icon_Is_Right_For_Nested_Items()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);
                 parameters.Add(p => p.ChildContent, (RenderFragment)(builder =>
@@ -398,9 +398,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Menu_Flyout_Submenu_Has_Data_Flyout_Attribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);
                 parameters.Add(p => p.ChildContent, (RenderFragment)(builder =>
@@ -429,9 +429,9 @@ namespace Radzen.Blazor.Tests
             [Fact]
         public void Menu_Does_Not_Prevent_Keydown_Default_At_Render_Time()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            var component = ctx.Render<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, MenuWithSubmenu);
             });

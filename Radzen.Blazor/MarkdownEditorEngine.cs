@@ -1145,7 +1145,7 @@ internal sealed class MarkdownEditorEngine
                     break;
                 // CommonMark 0.31.2, 4.4 Indented code blocks: blank lines preceding or following the block are not part of it
                 case IndentedCodeBlock code when BlankEdges.IsMatch(code.Value):
-                    var fenced = new FencedCodeBlock { Value = code.Value.EndsWith('\n') ? code.Value : code.Value + "\n", Closed = true };
+                    var fenced = new FencedCodeBlock { Value = code.Value.EndsWith('\n', StringComparison.Ordinal) ? code.Value : code.Value + "\n", Closed = true };
                     code.Parent.Replace(code, fenced);
                     Touch(fenced);
                     caretNode = caretNode == code ? fenced : caretNode;

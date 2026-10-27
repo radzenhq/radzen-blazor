@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
             Assert.Contains(@"rz-rating", component.Markup);
         }
@@ -17,10 +17,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_Stars()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Stars, 5));
+            component.Render(parameters => parameters.Add(p => p.Stars, 5));
 
             // Should render 5 star icons (rzi-star or rzi-star-o) + 1 clear button icon = 6 total
             var starCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "rz-rating-icon").Count;
@@ -30,10 +30,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_CustomStarCount()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Stars, 10));
+            component.Render(parameters => parameters.Add(p => p.Stars, 10));
 
             var starCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "rz-rating-icon").Count;
             Assert.Equal(11, starCount); // 10 stars + 1 clear button
@@ -42,10 +42,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_Value()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Value, 3);
                 parameters.Add(p => p.Stars, 5);
@@ -59,10 +59,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_ReadOnly()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ReadOnly, true));
+            component.Render(parameters => parameters.Add(p => p.ReadOnly, true));
 
             Assert.Contains("rz-state-readonly", component.Markup);
         }
@@ -70,10 +70,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_Disabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add(p => p.Disabled, true));
 
             Assert.Contains("rz-state-disabled", component.Markup);
         }
@@ -81,8 +81,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -93,8 +93,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_DefaultStars_IsFive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>();
 
             Assert.Equal(5, component.Instance.Stars);
         }
@@ -102,8 +102,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Rating_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRating>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRating>(parameters =>
             {
                 parameters.Add(p => p.Style, "font-size:2rem");
             });

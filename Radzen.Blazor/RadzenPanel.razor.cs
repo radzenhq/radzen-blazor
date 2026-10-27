@@ -183,8 +183,6 @@ namespace Radzen.Blazor
             {
                 await Expand.InvokeAsync(args);
             }
-
-            StateHasChanged();
         }
         string ContentClass => ClassList.Create("rz-panel-content-wrapper")
                                         .Add("rz-open", !collapsed)

@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLabel>();
+            var component = ctx.Render<RadzenLabel>();
 
             var value = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, value));
+            component.Render(parameters => parameters.Add(p => p.Text, value));
 
             Assert.Contains(@$">{value}</label>", component.Markup);
         }
@@ -22,13 +22,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_ComponentParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLabel>();
+            var component = ctx.Render<RadzenLabel>();
 
             var value = "test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Component, value));
+            component.Render(parameters => parameters.Add(p => p.Component, value));
 
             Assert.Contains(@$"for=""{value}""", component.Markup);
         }
@@ -36,13 +36,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLabel>();
+            var component = ctx.Render<RadzenLabel>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -50,11 +50,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLabel>();
+            var component = ctx.Render<RadzenLabel>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -62,8 +62,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLabel>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLabel>();
 
             Assert.Contains("rz-label", component.Markup);
         }
@@ -71,8 +71,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_LabelTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLabel>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLabel>();
 
             Assert.Contains("<label", component.Markup);
         }
@@ -80,8 +80,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLabel>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLabel>(parameters =>
             {
                 parameters.AddChildContent("<strong>Required</strong>");
             });
@@ -92,8 +92,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Label_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLabel>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLabel>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });

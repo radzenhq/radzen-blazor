@@ -12,11 +12,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_AutoHide_If_Count_Is_Less_Than_PageSize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<int>(p => p.Count, 100);
@@ -26,7 +26,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-pager", component.Markup);
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 101);
                 parameters.Add<int>(p => p.Count, 100);
@@ -37,11 +37,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Dont_AutoHide_If_PageSizeOptions_Specified()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 101);
                 parameters.Add<int>(p => p.Count, 100);
@@ -56,11 +56,11 @@ namespace Radzen.Blazor.Tests
 
         [Fact]
         public async Task RadzenPager_Renders_Summary() {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+            var component = ctx.Render<RadzenPager>(parameters => {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
                 parameters.Add<bool>(p => p.ShowPagingSummary, true);
@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-pager-summary", component.Markup); 
             Assert.Contains(@$"Page 3 of 10 (100 items)", component.Markup); 
             
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.ShowPagingSummary, false);
             });
             Assert.DoesNotContain(@$"rz-pager-summary", component.Markup);
@@ -80,11 +80,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Renders_PagerDensityDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<int>(p => p.Count, 100);
@@ -97,11 +97,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Renders_PagerDensityCompact()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<int>(p => p.Count, 100);
@@ -114,11 +114,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Renders_DefaultInputSize_On_PageSizeDropDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<int>(p => p.Count, 100);
@@ -131,11 +131,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Renders_InputSize_On_PageSizeDropDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<int>(p => p.Count, 100);
@@ -150,11 +150,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenPager_First_And_Prev_Buttons_Are_Disabled_When_On_The_First_Page()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+            var component = ctx.Render<RadzenPager>(parameters => {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
                 parameters.Add<bool>(p => p.ShowPagingSummary, true);
@@ -173,11 +173,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenPager_Last_And_Next_Buttons_Are_Disabled_When_On_The_Last_Page()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+            var component = ctx.Render<RadzenPager>(parameters => {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
                 parameters.Add<bool>(p => p.ShowPagingSummary, true);
@@ -196,11 +196,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Does_Not_Render_Reload_Button_By_Default()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
@@ -212,11 +212,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPager_Renders_Reload_Button_When_AllowReload_Is_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
@@ -232,14 +232,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenPager_Reload_Button_Fires_PageReload_And_PageChanged()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var reloadFired = false;
             PagerEventArgs pageChangedArgs = null;
 
-            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            var component = ctx.Render<RadzenPager>(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);

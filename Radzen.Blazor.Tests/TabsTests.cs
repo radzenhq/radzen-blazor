@@ -11,8 +11,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>();
 
             Assert.Contains(@"rz-tabview", component.Markup);
         }
@@ -20,8 +20,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_Top()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.Top);
             });
@@ -32,8 +32,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_Bottom()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.Bottom);
             });
@@ -44,8 +44,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_Left()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.Left);
             });
@@ -56,8 +56,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_Right()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.Right);
             });
@@ -68,8 +68,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_TopRight()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.TopRight);
             });
@@ -80,8 +80,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPosition_BottomRight()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.TabPosition, TabPosition.BottomRight);
             });
@@ -92,8 +92,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabNav()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>();
 
             Assert.Contains("rz-tabview-nav", component.Markup);
         }
@@ -101,8 +101,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Renders_TabPanels()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>();
 
             Assert.Contains("rz-tabview-panels", component.Markup);
         }
@@ -110,8 +110,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Nav_IsFocusTarget_WithRoleTablist()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>();
 
             var nav = component.Find("ul.rz-tabview-nav");
             Assert.Equal("tablist", nav.GetAttribute("role"));
@@ -121,8 +121,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Wrapper_HasNoRole_ToAvoidTablistOwningPanels()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>();
 
             var wrapper = component.Find("div.rz-tabview");
             Assert.Null(wrapper.GetAttribute("role"));
@@ -143,8 +143,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Wrapper_HasAriaActiveDescendant_PointingAt_SelectedTab()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 1)
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
@@ -161,8 +161,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_OnlyOneTab_HasAriaSelectedTrue()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 2)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
@@ -186,7 +186,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_KeyDownInPanelContent_DoesNotReRenderContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var contentRenderCount = 0;
             RenderFragment content = b => { contentRenderCount++; b.AddContent(0, "Panel-Content"); };
@@ -199,7 +199,7 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             };
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, tabs)
             );
@@ -218,9 +218,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_KeyDownInPanelContent_DoesNotDispatchToTabs()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content")))
             );
@@ -236,9 +236,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_ChangeHandlerThrows_StillRendersSelectedTab()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Change, (int _) => throw new System.InvalidOperationException("boom"))
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
@@ -257,13 +257,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_FocusAsyncThrowsJSException_DoesNotPropagate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop
                 .SetupVoid("Blazor._internal.domWrapper.focus", _ => true)
                 .SetException(new JSException("Unable to focus an invalid element."));
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
             );
@@ -279,13 +279,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_ClientRender_FocusAsyncThrowsJSException_DoesNotPropagate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop
                 .SetupVoid("Blazor._internal.domWrapper.focus", _ => true)
                 .SetException(new JSException("Unable to focus an invalid element."));
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.RenderMode, TabRenderMode.Client)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
@@ -300,9 +300,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_NonNavigationKeyDown_DoesNotBlockSubsequentRenders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
             );
@@ -315,7 +315,7 @@ namespace Radzen.Blazor.Tests
             wrapper.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
             wrapper.KeyDown(new KeyboardEventArgs { Key = "b", Code = "KeyB" });
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.SelectedIndex, 1));
+            component.Render(parameters => parameters.Add(p => p.SelectedIndex, 1));
 
             Assert.Contains("Second-Content", component.Markup);
             Assert.DoesNotContain("First-Content", component.Markup);
@@ -330,8 +330,8 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabPosition.Right, "vertical")]
         public void Tabs_Wrapper_HasAriaOrientation_MatchingTabPosition(TabPosition position, string expected)
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, position)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
@@ -355,8 +355,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_VerticalOrientation_ArrowDown_MovesActiveDescendantToNextTab()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Left)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -371,8 +371,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_VerticalOrientation_ArrowUp_MovesActiveDescendantToPreviousTab()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Right)
                 .Add(p => p.SelectedIndex, 2)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -387,8 +387,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_VerticalOrientation_ArrowLeftRight_DoNotMoveActiveDescendant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Left)
                 .Add(p => p.SelectedIndex, 1)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -405,8 +405,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_HorizontalOrientation_ArrowRight_MovesActiveDescendantToNextTab()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Top)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -421,8 +421,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_HorizontalOrientation_ArrowUpDown_DoNotMoveActiveDescendant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Top)
                 .Add(p => p.SelectedIndex, 1)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -439,8 +439,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_VerticalOrientation_HomeAndEnd_MoveActiveDescendantToEnds()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Left)
                 .Add(p => p.SelectedIndex, 1)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -458,10 +458,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_VerticalOrientation_EnterActivatesFocusedTab()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Left)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("One", "One-Content"), ("Two", "Two-Content"), ("Three", "Three-Content")))
@@ -478,8 +478,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_AriaLabel_AppliedToTabList()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.AriaLabel, "Sections")
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
@@ -491,8 +491,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_AriaLabelledBy_AppliedToTabList()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.AriaLabelledBy, "heading-id")
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
@@ -504,8 +504,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_SelectedPanel_HasNoTabIndex()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
             );
@@ -517,8 +517,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_HorizontalOrientation_ArrowRight_WrapsFromLastToFirst()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Top)
                 .Add(p => p.SelectedIndex, 2)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -533,8 +533,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_HorizontalOrientation_ArrowLeft_WrapsFromFirstToLast()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.TabPosition, TabPosition.Top)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
@@ -549,12 +549,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_CanChangePreventDefault_KeepsCurrentTab_AndDoesNotRaiseChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var changeRaised = false;
             TabsCanChangeEventArgs canChangeArgs = null;
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.CanChange, (TabsCanChangeEventArgs args) => { canChangeArgs = args; args.PreventDefault(); })
                 .Add(p => p.Change, (int _) => changeRaised = true)
@@ -575,11 +575,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_CanChangeWithoutPreventDefault_ChangesTab()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var changeRaised = false;
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.CanChange, (TabsCanChangeEventArgs _) => { })
                 .Add(p => p.Change, (int _) => changeRaised = true)
@@ -597,12 +597,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_ClientRender_CanChangePreventDefault_KeepsCurrentTab()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var changeRaised = false;
 
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.RenderMode, TabRenderMode.Client)
                 .Add(p => p.SelectedIndex, 0)
                 .Add(p => p.CanChange, (TabsCanChangeEventArgs args) => args.PreventDefault())

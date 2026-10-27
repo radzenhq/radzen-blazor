@@ -20,15 +20,11 @@
     void OnPopupOpen()
     {
         open = true;
-
-        StateHasChanged();
     }
 
     void OnPopupClose()
     {
         open = false;
-
-        StateHasChanged();
     }
 
     private string PopupId => $"{GetId()}-popup";

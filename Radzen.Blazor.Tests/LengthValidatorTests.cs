@@ -46,9 +46,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Empty_And_Min_Is_Zero()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0));
 
             Assert.True(component.Instance.Validate(""));
         }
@@ -56,9 +56,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Is_Null_And_Min_Is_Set()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0));
 
             Assert.False(component.Instance.Validate(null));
         }
@@ -66,9 +66,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Is_Empty_And_Min_Is_Greater_Than_Zero()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 3));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 3));
 
             Assert.False(component.Instance.Validate(""));
         }
@@ -76,9 +76,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Length_Equals_Min()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 3));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 3));
 
             Assert.True(component.Instance.Validate("abc"));
         }
@@ -86,9 +86,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Length_Greater_Than_Min()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 3));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 3));
 
             Assert.True(component.Instance.Validate("abcd"));
         }
@@ -96,9 +96,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Length_Less_Than_Min()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 3));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 3));
 
             Assert.False(component.Instance.Validate("ab"));
         }
@@ -106,9 +106,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Length_Equals_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 5));
 
             Assert.True(component.Instance.Validate("abcde"));
         }
@@ -116,9 +116,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Length_Less_Than_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 5));
 
             Assert.True(component.Instance.Validate("abc"));
         }
@@ -126,9 +126,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Length_Greater_Than_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 5));
 
             Assert.False(component.Instance.Validate("abcdef"));
         }
@@ -136,9 +136,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Length_Between_Min_And_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 2).Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 2).Add(p => p.Max, 5));
 
             Assert.True(component.Instance.Validate("abc"));
         }
@@ -146,9 +146,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Only_Max_Set_And_Value_Is_Null()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 5));
 
             Assert.True(component.Instance.Validate(null));
         }
@@ -156,9 +156,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Only_Max_Set_And_Value_Is_Empty()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLengthValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 5));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLengthValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 5));
 
             Assert.True(component.Instance.Validate(""));
         }

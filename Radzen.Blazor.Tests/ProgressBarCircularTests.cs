@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>();
 
             Assert.Contains("rz-progressbar-circular", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_SvgCirclesWithCorrectRadius()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(p =>
             {
                 p.Add(x => x.BufferValue, 75);
             });
@@ -33,8 +33,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_75Percent_Renders_CorrectDashoffset()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(p =>
             {
                 p.Add(x => x.Value, 75);
                 p.Add(x => x.ShowValue, true);
@@ -48,8 +48,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_0Percent_Renders_FullDashoffset()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(p =>
             {
                 p.Add(x => x.Value, 0);
             });
@@ -61,8 +61,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_100Percent_Renders_ZeroDashoffset()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(p =>
             {
                 p.Add(x => x.Value, 100);
             });
@@ -74,8 +74,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_BufferValue_Renders_CorrectDashoffset()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(p =>
             {
                 p.Add(x => x.Value, 40);
                 p.Add(x => x.BufferValue, 75);
@@ -91,9 +91,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_DoesNotRenderBuffer_WhenBufferValueIsNotSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, -10);
                 parameters.Add(p => p.Min, -100);
@@ -106,9 +106,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_RendersBuffer_WhenBufferIsZero()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, -20);
                 parameters.Add(p => p.BufferValue, 0);
@@ -124,8 +124,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_DeterminateMode_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>();
 
             Assert.Contains("rz-progressbar-determinate", component.Markup);
         }
@@ -133,8 +133,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_IndeterminateMode()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate);
             });
@@ -146,8 +146,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_MediumSize_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>();
 
             Assert.Contains("rz-progressbar-circular-md", component.Markup);
         }
@@ -155,8 +155,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_SmallSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Size, ProgressBarCircularSize.Small);
             });
@@ -167,8 +167,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_LargeSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Size, ProgressBarCircularSize.Large);
             });
@@ -179,8 +179,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_ExtraSmallSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Size, ProgressBarCircularSize.ExtraSmall);
             });
@@ -191,8 +191,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_ProgressBarStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success);
             });
@@ -203,8 +203,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_Value()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, 50);
                 parameters.Add(p => p.ShowValue, true);
@@ -217,8 +217,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_ShowValue_False_HidesLabel()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, 50);
                 parameters.Add(p => p.ShowValue, false);
@@ -230,8 +230,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_AriaAttributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, 25);
                 parameters.Add(p => p.Min, 0);
@@ -249,8 +249,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_CustomUnit()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, 50);
                 parameters.Add(p => p.Unit, "MB");
@@ -263,8 +263,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_Template()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Value, 75);
                 parameters.Add(p => p.ShowValue, true);
@@ -277,8 +277,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -289,8 +289,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBarCircular_Renders_InfoStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBarCircular>(parameters =>
             {
                 parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info);
             });

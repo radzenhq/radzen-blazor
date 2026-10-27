@@ -10,9 +10,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>();
+            var component = ctx.Render<RadzenCarousel>();
 
             Assert.Contains(@"rz-carousel", component.Markup);
         }
@@ -20,9 +20,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_AllowPaging_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowPaging, true);
                 parameters.Add(p => p.Items, builder =>
@@ -43,9 +43,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_AllowPaging_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowPaging, false);
                 parameters.Add(p => p.Items, builder =>
@@ -62,9 +62,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_AllowNavigation_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowNavigation, true);
             });
@@ -76,9 +76,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_AllowNavigation_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowNavigation, false);
             });
@@ -91,9 +91,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_PagerPosition_Top()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerPosition, PagerPosition.Top);
                 parameters.Add(p => p.AllowPaging, true);
@@ -111,9 +111,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_PagerPosition_Bottom()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerPosition, PagerPosition.Bottom);
                 parameters.Add(p => p.AllowPaging, true);
@@ -131,9 +131,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_PagerPosition_TopAndBottom()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerPosition, PagerPosition.TopAndBottom);
                 parameters.Add(p => p.AllowPaging, true);
@@ -152,9 +152,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_PagerOverlay_True()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerOverlay, true);
             });
@@ -165,9 +165,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_Renders_PagerOverlay_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerOverlay, false);
             });
@@ -178,9 +178,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_DefaultIsOne()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>();
+            var component = ctx.Render<RadzenCarousel>();
 
             Assert.Equal(1, component.Instance.ItemsPerPage);
         }
@@ -188,9 +188,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_SetsFlexBasisOnItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 3);
                 parameters.Add(p => p.Items, builder =>
@@ -215,9 +215,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_PagerShowsPageCount()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 2);
                 parameters.Add(p => p.AllowPaging, true);
@@ -241,9 +241,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_One_NoInlineStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 1);
                 parameters.Add(p => p.Items, builder =>
@@ -261,9 +261,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_PagerShowsCorrectActiveButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 3);
                 parameters.Add(p => p.AllowPaging, true);
@@ -292,9 +292,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_PagerWithUnevenItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 3);
                 parameters.Add(p => p.AllowPaging, true);
@@ -318,9 +318,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_AllItemsSetFlexBasis()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 4);
                 parameters.Add(p => p.Items, builder =>
@@ -347,9 +347,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_SingleItem_OnePage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 3);
                 parameters.Add(p => p.AllowPaging, true);
@@ -369,9 +369,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_SnapsPageBoundaryItemsOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 2);
                 parameters.Add(p => p.Items, builder =>
@@ -398,9 +398,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_One_NoSnapperStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -420,9 +420,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_ItemsPerPage_PagerButtonCount_WithTopAndBottom()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.ItemsPerPage, 2);
                 parameters.Add(p => p.AllowPaging, true);
@@ -458,9 +458,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_InitialSelectedIndex_RendersAndScrollsToItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.Auto, false);
                 parameters.Add(p => p.SelectedIndex, 6);
@@ -483,9 +483,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_InitialSelectedIndex_ItemsAddedLater_ScrollsToItemOnceItExists()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.Auto, false);
                 parameters.Add(p => p.SelectedIndex, 6);
@@ -493,7 +493,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.scrollCarouselItem");
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Items, TenItems()));
+            component.Render(parameters => parameters.Add(p => p.Items, TenItems()));
 
             var items = component.FindAll("li.rz-carousel-item");
             Assert.Equal("0", items[6].GetAttribute("tabindex"));
@@ -506,9 +506,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_InitialSelectedIndex_Zero_DoesNotScroll()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.RenderComponent<RadzenCarousel>(parameters =>
+            ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.Auto, false);
                 parameters.Add(p => p.Items, TenItems());
@@ -520,15 +520,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Carousel_SelectedIndex_ChangedAfterRender_ScrollsWithAnimation()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            var component = ctx.Render<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.Auto, false);
                 parameters.Add(p => p.Items, TenItems());
             });
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.SelectedIndex, 6));
+            component.Render(parameters => parameters.Add(p => p.SelectedIndex, 6));
 
             var items = component.FindAll("li.rz-carousel-item");
             Assert.Equal("0", items[6].GetAttribute("tabindex"));

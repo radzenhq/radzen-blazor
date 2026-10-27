@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -22,13 +22,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
             var text = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.Render(parameters => parameters.Add(p => p.Text, text));
 
             var textElement = component.Find(".rz-link-text");
 
@@ -39,13 +39,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
             var icon = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
+            component.Render(parameters => parameters.Add(p => p.Icon, icon));
 
             Assert.Contains(@$"<i class=""notranslate rzi"" aria-hidden=""true"">{icon}</i>", component.Markup);
         }
@@ -53,13 +53,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_PathParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
             var path = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Path, path));
+            component.Render(parameters => parameters.Add(p => p.Path, path));
 
             Assert.Contains(@$"<a href=""{path}""", component.Markup);
         }
@@ -67,13 +67,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_TargetParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
             var target = "_blank";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Target, target));
+            component.Render(parameters => parameters.Add(p => p.Target, target));
 
             Assert.Contains(@$"target=""{target}""", component.Markup);
         }
@@ -81,11 +81,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_DisabledParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add(p => p.Disabled, true));
 
             Assert.Contains("class=\"rz-link rz-link-disabled active\"", component.Markup);
 
@@ -95,11 +95,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Disabled_SetsAriaDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Path, "/home");
                 parameters.Add(p => p.Disabled, true);
@@ -115,11 +115,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Enabled_DoesNotSetAriaDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Path, "/home"));
+            component.Render(parameters => parameters.Add(p => p.Path, "/home"));
 
             var anchor = component.Find("a");
 
@@ -131,11 +131,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Icon_IsAriaHidden()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, "home"));
+            component.Render(parameters => parameters.Add(p => p.Icon, "home"));
 
             var icon = component.Find("i.rzi");
 
@@ -145,11 +145,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLink>();
+            var component = ctx.Render<RadzenLink>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("data-testid", "my-link"));
+            component.Render(parameters => parameters.AddUnmatched("data-testid", "my-link"));
 
             Assert.Contains(@"data-testid=""my-link""", component.Markup);
         }
@@ -157,8 +157,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLink>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLink>();
 
             Assert.Contains("rz-link", component.Markup);
         }
@@ -166,8 +166,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_ATag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLink>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLink>(parameters =>
             {
                 parameters.Add(p => p.Path, "/home");
             });
@@ -178,8 +178,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLink>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLink>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -190,8 +190,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Link_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenLink>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenLink>(parameters =>
             {
                 parameters.Add(p => p.Path, "/test");
                 parameters.AddChildContent("<span>Custom Link</span>");

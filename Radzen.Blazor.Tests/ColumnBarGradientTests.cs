@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,12 +13,12 @@ namespace Radzen.Blazor.Tests
     {
         static int Gradients(string markup) => Regex.Matches(markup, "<linearGradient").Count;
 
-        static async Task<string> RenderColumn(TestContext ctx,
+        static async Task<string> RenderColumn(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenColumnSeries<DataItem>>>? configure = null,
             DataItem[]? data = null,
             FillMode fillMode = FillMode.Gradient)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenColumnSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -31,12 +33,12 @@ namespace Radzen.Blazor.Tests
             return chart.Markup;
         }
 
-        static async Task<string> RenderBar(TestContext ctx,
+        static async Task<string> RenderBar(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenBarSeries<DataItem>>>? configure = null,
             DataItem[]? data = null,
             FillMode fillMode = FillMode.Gradient)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenBarSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -57,7 +59,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             // No FillMode set -> the library default (Solid) must not emit a gradient.
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenColumnSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -76,7 +78,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenAreaSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -229,7 +231,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenStackedColumnSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -256,7 +258,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "A", Value = 20, Target = 25, Max = 40 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenBulletSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));

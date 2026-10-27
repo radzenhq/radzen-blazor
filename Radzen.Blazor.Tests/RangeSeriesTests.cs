@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenRangeAreaSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.MinProperty, nameof(DataItem.Min))
@@ -27,7 +27,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenRangeColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.MinProperty, nameof(DataItem.Min))
@@ -42,7 +42,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenRangeBarSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.MinProperty, nameof(DataItem.Min))
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenRangeAreaSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.MinProperty, nameof(DataItem.Min))
@@ -75,7 +75,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenRangeColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.MinProperty, nameof(DataItem.Min))

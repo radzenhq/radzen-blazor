@@ -38,9 +38,9 @@ public class CustomCellEditorTests
         }
     }
 
-    private static TestContext CreateContext()
+    private static BunitContext CreateContext()
     {
-        var ctx = new TestContext();
+        var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<VirtualRegion>("Radzen.createVirtualItemContainer", _ => true)
             .SetResult(new VirtualRegion { Width = 800, Height = 600, ScrollWidth = 800, ScrollHeight = 600 });
@@ -48,7 +48,7 @@ public class CustomCellEditorTests
         return ctx;
     }
 
-    private static (Worksheet Sheet, IRenderedComponent<RadzenSpreadsheet> Spreadsheet) Render(TestContext ctx)
+    private static (Worksheet Sheet, IRenderedComponent<RadzenSpreadsheet> Spreadsheet) Render(BunitContext ctx)
     {
         var workbook = new Workbook();
         var sheet = workbook.AddSheet("Sheet1", 10, 10);
@@ -59,14 +59,14 @@ public class CustomCellEditorTests
             ["text"] = new SpreadsheetCellType { EditorType = typeof(TextProbeEditor) }
         };
 
-        var spreadsheet = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+        var spreadsheet = ctx.Render<RadzenSpreadsheet>(p => p
             .Add(x => x.Workbook, workbook)
             .Add(x => x.CellTypes, cellTypes));
 
         return (sheet, spreadsheet);
     }
 
-    private static int FocusCalls(TestContext ctx) =>
+    private static int FocusCalls(BunitContext ctx) =>
         ctx.JSInterop.Invocations["Blazor._internal.domWrapper.focus"].Count;
 
     private static Task PressAsync(IRenderedComponent<RadzenSpreadsheet> spreadsheet, string key, string code) =>

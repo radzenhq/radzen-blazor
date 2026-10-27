@@ -54,9 +54,9 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static async Task<IRenderedComponent<PinRightHost>> RenderHost(TestContext ctx)
+        static async Task<IRenderedComponent<PinRightHost>> RenderHost(BunitContext ctx)
         {
-            var host = ctx.RenderComponent<PinRightHost>();
+            var host = ctx.Render<PinRightHost>();
             await host.InvokeAsync(() => host.Instance.Chart.Resize(600, 300));
             return host;
         }

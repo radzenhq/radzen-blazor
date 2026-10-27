@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.Contains("rz-spider-chart", component.Markup);
         }
@@ -21,7 +21,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.Equal(SpiderChartGridShape.Polygon, component.Instance.GridShape);
         }
@@ -31,7 +31,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.True(component.Instance.ShowMarkers);
         }
@@ -41,7 +41,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.True(component.Instance.ShowTooltip);
         }
@@ -51,7 +51,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.Equal(0, component.Instance.StartAngle);
             Assert.Equal(360, component.Instance.EndAngle);
@@ -62,7 +62,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>();
+            var component = ctx.Render<RadzenSpiderChart>();
 
             Assert.Contains("rz-spider-chart-wrapper", component.Markup);
         }
@@ -72,7 +72,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>(parameters =>
+            var component = ctx.Render<RadzenSpiderChart>(parameters =>
             {
                 parameters.Add(p => p.GridShape, SpiderChartGridShape.Circular);
             });
@@ -85,7 +85,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenSpiderChart>(parameters =>
+            var component = ctx.Render<RadzenSpiderChart>(parameters =>
             {
                 parameters.Add(p => p.StartAngle, 90);
                 parameters.Add(p => p.EndAngle, 270);

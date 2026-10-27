@@ -132,7 +132,7 @@ namespace Radzen.Blazor
                 list.Add($"--rz-row-gap:{(RowGap.All(char.IsDigit) ? RowGap + "px" : RowGap)}");
             }
 
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}{string.Join(";", list)}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';', StringComparison.Ordinal) ? ";" : "")}{string.Join(";", list)}";
         }
 
         /// <inheritdoc />

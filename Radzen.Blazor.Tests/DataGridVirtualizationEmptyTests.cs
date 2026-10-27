@@ -14,12 +14,12 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx, IEnumerable<Item> data)
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx, IEnumerable<Item> data)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(p =>
+            return ctx.Render<RadzenDataGrid<Item>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add(g => g.AllowVirtualization, true);
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void EmptyVirtualizedGridReportsZeroItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render(ctx, new List<Item>());
 
@@ -49,13 +49,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void EmptyVirtualizedGridReportsZeroItemsAfterReload()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render(ctx, Enumerable.Range(1, 25).Select(i => new Item { Id = i }).ToList());
 
             cut.WaitForAssertion(() => Assert.Equal(25, cut.Instance.Count));
 
-            cut.SetParametersAndRender(p => p.Add(g => g.Data, new List<Item>()));
+            cut.Render(p => p.Add(g => g.Data, new List<Item>()));
 
             Assert.Equal(0, cut.Instance.Count);
         }
@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualizedGridStillCountsItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render(ctx, Enumerable.Range(1, 25).Select(i => new Item { Id = i }).ToList());
 

@@ -155,8 +155,6 @@ namespace Radzen.Blazor
             {
                 await Expand.InvokeAsync(args);
             }
-
-            StateHasChanged();
         }
 
         /// <inheritdoc />

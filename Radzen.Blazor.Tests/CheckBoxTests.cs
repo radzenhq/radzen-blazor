@@ -10,9 +10,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_CssClasses()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             component.Render();
 
@@ -23,23 +23,23 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_ValueParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool?>>();
+            var component = ctx.Render<RadzenCheckBox<bool?>>();
 
             var value = true;
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool?>(p => p.Value, value));
+            component.Render(parameters => parameters.Add<bool?>(p => p.Value, value));
 
             Assert.Contains(@$"rz-state-active", component.Markup);
             Assert.Contains(@$"rzi-check", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool?>(p => p.Value, !value));
+            component.Render(parameters => parameters.Add<bool?>(p => p.Value, !value));
 
             Assert.DoesNotContain(@$"rz-state-active", component.Markup);
             Assert.DoesNotContain(@$"rzi-check", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool?>(p => p.Value, null));
+            component.Render(parameters => parameters.Add<bool?>(p => p.Value, null));
 
             Assert.Contains(@$"rz-state-active", component.Markup);
             Assert.Contains(@$"rzi-times", component.Markup);
@@ -48,13 +48,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -62,11 +62,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -75,13 +75,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_NameParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var value = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Name, value));
+            component.Render(parameters => parameters.Add(p => p.Name, value));
 
             Assert.Contains(@$"name=""{value}""", component.Markup);
         }
@@ -89,11 +89,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_DisabledParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add<bool>(p => p.Disabled, true));
 
             Assert.Contains(@$"disabled", component.Markup);
             Assert.Contains(@$"rz-state-disabled", component.Markup);
@@ -102,13 +102,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Raises_ChangedEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
+            component.Render(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
 
             component.Find("div.rz-chkbox-box").Click();
 
@@ -118,13 +118,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Raises_ValueChangedEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; }));
+            component.Render(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; }));
 
             component.Find("div.rz-chkbox-box").Click();
 
@@ -134,11 +134,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_TriStateParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool?>>();
+            var component = ctx.Render<RadzenCheckBox<bool?>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.TriState, true));
+            component.Render(parameters => parameters.Add<bool>(p => p.TriState, true));
 
 
             component.Find("div.rz-chkbox-box").Click();
@@ -164,11 +164,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_Renders_ReadonlyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ReadOnly, true));
+            component.Render(parameters => parameters.Add<bool>(p => p.ReadOnly, true));
 
             Assert.Contains(@$"readonly", component.Markup);
         }
@@ -176,13 +176,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_DoesNotRaise_ChangedEvent_ReadonlyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
               .Add<bool>(p => p.ReadOnly, true)
               .Add(p => p.Change, args => { raised = true; })
             );
@@ -195,13 +195,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_DoesNotRaise_ValueChangedEvent_ReadonlyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
               .Add<bool>(p => p.ReadOnly, true)
               .Add(p => p.ValueChanged, args => { raised = true; })
             );
@@ -214,13 +214,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBox_ValueNotChanged_ReadonlyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+            var component = ctx.Render<RadzenCheckBox<bool>>();
 
             var value = true;
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
               .Add<bool>(p => p.ReadOnly, true)
               .Add<bool>(p => p.Value, value)
             );
@@ -229,7 +229,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-state-active", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
               .Add<bool>(p => p.ReadOnly, !true)
               .Add<bool>(p => p.Value, value)
             );

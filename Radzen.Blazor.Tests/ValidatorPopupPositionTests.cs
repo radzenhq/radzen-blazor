@@ -50,11 +50,11 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static IRenderedComponent<FormWrapper> RenderInvalid(TestContext ctx, bool popup, TooltipPosition position)
+        static IRenderedComponent<FormWrapper> RenderInvalid(BunitContext ctx, bool popup, TooltipPosition position)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var wrapper = ctx.RenderComponent<FormWrapper>(p => p.Add(x => x.Popup, popup).Add(x => x.PopupPosition, position));
+            var wrapper = ctx.Render<FormWrapper>(p => p.Add(x => x.Popup, popup).Add(x => x.PopupPosition, position));
 
             wrapper.Find("input").Change("some value");
             wrapper.Find("input").Change("");
@@ -65,7 +65,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BottomPopup_IsTheDefault_AndIsNotPositionedByScript()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderInvalid(ctx, popup: true, TooltipPosition.Bottom);
 
@@ -80,7 +80,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(TooltipPosition.Right, "right")]
         public void PopupOnAnotherSide_GetsItsClass_AndIsPositionedByScript(TooltipPosition position, string side)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderInvalid(ctx, popup: true, position);
 
@@ -96,10 +96,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ChangingBackToBottom_UndoesThePositionSetByScript()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderInvalid(ctx, popup: true, TooltipPosition.Top);
-            wrapper.SetParametersAndRender(p => p.Add(x => x.PopupPosition, TooltipPosition.Bottom));
+            wrapper.Render(p => p.Add(x => x.PopupPosition, TooltipPosition.Bottom));
 
             var calls = ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.positionValidator").ToList();
             Assert.Equal("top", calls[0].Arguments[2]);
@@ -109,7 +109,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PopupPosition_IsIgnored_WhenTheValidatorIsNotAPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderInvalid(ctx, popup: false, TooltipPosition.Top);
 

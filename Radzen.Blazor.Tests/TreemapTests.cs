@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -25,7 +25,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -51,7 +51,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -64,7 +64,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -78,7 +78,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            var component = ctx.Render<RadzenTreemap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
                 parameters.Add(p => p.ColorScheme, ColorScheme.Palette);

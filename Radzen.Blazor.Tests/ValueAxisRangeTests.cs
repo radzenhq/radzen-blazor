@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -33,9 +34,9 @@ namespace Radzen.Blazor.Tests
             };
         }
 
-        private static async Task<IRenderedComponent<RadzenChart>> RenderAsync(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenChart>> content)
+        private static async Task<IRenderedComponent<RadzenChart>> RenderAsync(BunitContext ctx, Action<ComponentParameterCollectionBuilder<RadzenChart>> content)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(content);
+            var chart = ctx.Render<RadzenChart>(content);
 
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
@@ -47,7 +48,7 @@ namespace Radzen.Blazor.Tests
             return string.Join("|", chart.FindAll($"{axis} .rz-tick-text").Select(t => t.TextContent.Trim()));
         }
 
-        private static List<(double X, double Y)> Points(IRenderedFragment chart, string series, int index)
+        private static List<(double X, double Y)> Points(IRenderedComponent<IComponent> chart, string series, int index)
         {
             var d = chart.FindAll($"{series} path")[index].GetAttribute("d") ?? string.Empty;
 
@@ -588,12 +589,12 @@ namespace Radzen.Blazor.Tests
 
             var axis = chart.FindComponent<RadzenValueAxis>();
 
-            axis.SetParametersAndRender(a => a.Add(x => x.Range, ValueAxisRange.Auto));
+            axis.Render(a => a.Add(x => x.Range, ValueAxisRange.Auto));
 
             Assert.Equal("0|5|10|15|20", Labels(chart, LeftValueAxis));
             Assert.Equal((118d, 236d), ColumnExtent(chart, 0));
 
-            axis.SetParametersAndRender(a => a.Add(x => x.Range, ValueAxisRange.Data));
+            axis.Render(a => a.Add(x => x.Range, ValueAxisRange.Data));
 
             Assert.Equal("10|15|20", Labels(chart, LeftValueAxis));
             Assert.Equal((236d, 236d), ColumnExtent(chart, 0));
@@ -610,7 +611,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("10|15|20", Labels(chart, LeftValueAxis));
 
-            chart.FindComponent<RadzenValueAxis>().SetParametersAndRender(a => a.Add(x => x.Range, ValueAxisRange.IncludeZero));
+            chart.FindComponent<RadzenValueAxis>().Render(a => a.Add(x => x.Range, ValueAxisRange.IncludeZero));
 
             Assert.Equal("0|5|10|15|20", Labels(chart, LeftValueAxis));
             Assert.Equal(118, FirstLinePointY(chart));
@@ -643,11 +644,11 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(labels, Labels(chart, LeftValueAxis));
         }
     
-        private static IRenderedComponent<RadzenSparkline> RenderSparkline(TestContext ctx, string type, ValueAxisRange? range)
+        private static IRenderedComponent<RadzenSparkline> RenderSparkline(BunitContext ctx, string type, ValueAxisRange? range)
         {
             var data = Values(100, 120, 110, 115);
 
-            return ctx.RenderComponent<RadzenSparkline>(p =>
+            return ctx.Render<RadzenSparkline>(p =>
             {
                 p.Add(x => x.Style, "width: 200px; height: 40px");
 

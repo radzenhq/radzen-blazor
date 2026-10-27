@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>();
 
             Assert.Contains(@"rz-datatable", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_TableElement()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>();
 
             Assert.Contains("rz-grid-table", component.Markup);
             Assert.Contains("<table", component.Markup);
@@ -27,8 +27,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_GridLines_None()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.GridLines, DataGridGridLines.None);
             });
@@ -39,8 +39,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_GridLines_Horizontal()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.GridLines, DataGridGridLines.Horizontal);
             });
@@ -51,8 +51,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_GridLines_Vertical()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.GridLines, DataGridGridLines.Vertical);
             });
@@ -63,8 +63,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_GridLines_Both()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.GridLines, DataGridGridLines.Both);
             });
@@ -75,8 +75,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_AllowAlternatingRows_True()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.AllowAlternatingRows, true);
             });
@@ -87,8 +87,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Table_Renders_AllowAlternatingRows_False()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTable>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTable>(parameters =>
             {
                 parameters.Add(p => p.AllowAlternatingRows, false);
             });

@@ -16,7 +16,7 @@ namespace Radzen.Blazor.Tests
             public string Name { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx)
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
@@ -27,7 +27,7 @@ namespace Radzen.Blazor.Tests
                 new Item { Id = 1, Name = "Alpha" },
             };
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(pb =>
+            return ctx.Render<RadzenDataGrid<Item>>(pb =>
             {
                 pb.Add(p => p.LoadData, async args => { await Task.Delay(5); });
                 pb.Add(p => p.Data, data);
@@ -49,7 +49,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ColumnInitialSortOrder_ReappliedAfterReset_WithAsyncLoadData_DoesNotThrowExpiredParameterView()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx);
 
             await cut.InvokeAsync(() => cut.Instance.Reset(true));

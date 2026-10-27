@@ -9,10 +9,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -28,10 +28,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Text()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -47,10 +47,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Icon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -67,10 +67,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Path()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -87,10 +87,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -107,10 +107,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_NestedItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -133,10 +133,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Image()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -153,10 +153,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_MultipleItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -182,10 +182,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_Target()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -203,10 +203,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_LevelVariable_ForNestedItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -236,10 +236,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PanelMenuItem_Renders_LevelVariable_WithCustomStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>(parameters =>
+            var component = ctx.Render<RadzenPanelMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {

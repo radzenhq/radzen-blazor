@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_PathParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenImage>();
+            var component = ctx.Render<RadzenImage>();
 
             var path = "Test.png";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Path, path));
+            component.Render(parameters => parameters.Add(p => p.Path, path));
 
             Assert.Contains(@$"<img src=""{path}""", component.Markup);
         }
@@ -22,13 +22,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenImage>();
+            var component = ctx.Render<RadzenImage>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -36,11 +36,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenImage>();
+            var component = ctx.Render<RadzenImage>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -48,13 +48,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Raises_ClickEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenImage>();
+            var component = ctx.Render<RadzenImage>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Click, args => { clicked = true; }));
+            component.Render(parameters => parameters.Add(p => p.Click, args => { clicked = true; }));
 
             component.Find("img").Click();
 
@@ -64,8 +64,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_DefaultAlternateText()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenImage>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenImage>();
 
             Assert.Contains(@"alt=""image""", component.Markup);
         }
@@ -73,8 +73,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_CustomAlternateText()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenImage>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenImage>(parameters =>
             {
                 parameters.Add(p => p.AlternateText, "Product Photo");
             });
@@ -85,8 +85,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenImage>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenImage>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -97,8 +97,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Image_Renders_ImgTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenImage>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenImage>();
 
             Assert.Contains("<img", component.Markup);
         }

@@ -29,8 +29,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>();
 
             Assert.Contains(@"rz-tree", component.Markup);
         }
@@ -38,8 +38,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_TreeContainer()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>();
 
             Assert.Contains("rz-tree-container", component.Markup);
         }
@@ -47,8 +47,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_TabIndex()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>();
 
             Assert.Contains("tabindex=\"0\"", component.Markup);
         }
@@ -56,14 +56,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithData_SingleLevel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" },
                 new Category { Name = "Clothing" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -81,7 +81,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithData_HierarchicalData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category 
@@ -95,7 +95,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -118,7 +118,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithData_SelfReferencing()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Employee>
             {
                 new Employee 
@@ -132,7 +132,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -151,13 +151,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithCheckBoxes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AllowCheckBoxes, true);
                 parameters.Add(p => p.Data, data);
@@ -175,7 +175,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_CheckParents_RendersMixed_AndReflectsInPlaceMutation()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var laptop = new Product { Name = "Laptop" };
             var phone = new Product { Name = "Phone" };
             var data = new List<Category>
@@ -207,7 +207,7 @@ namespace Radzen.Blazor.Tests
                 });
             }
 
-            var component = ctx.RenderComponent<RadzenTree>(BuildTree);
+            var component = ctx.Render<RadzenTree>(BuildTree);
 
             // Child registration settles on the next render pass.
             component.Render();
@@ -216,7 +216,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("mixed", parent.GetAttribute("aria-checked"));
 
             checkedValues.Add(phone);
-            component.SetParametersAndRender(BuildTree);
+            component.Render(BuildTree);
 
             parent = component.FindAll("[role=treeitem]").First(i => i.GetAttribute("aria-level") == "1");
             Assert.Equal("false", parent.GetAttribute("aria-checked"));
@@ -226,13 +226,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tree_ReflectsSameCountMutation_OnInternalRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var laptop = new Product { Name = "Laptop" };
             var phone = new Product { Name = "Phone" };
             var keyboard = new Product { Name = "Keyboard" };
             var checkedValues = new List<object> { laptop, phone };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AllowCheckBoxes, true);
                 parameters.Add(p => p.CheckedValues, checkedValues);
@@ -271,14 +271,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_HonoursTheComparerOnTheBoundCheckedValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var laptop = new Product { Name = "Laptop" };
             var keyboard = new Product { Name = "Keyboard" };
 
             var checkedValues = new HashSet<object>(new ByName()) { new Product { Name = "Laptop" } };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AllowCheckBoxes, true);
                 parameters.Add(p => p.CheckedValues, checkedValues);
@@ -302,14 +302,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_ReflectsSameCountMutation_OnItemOnlyRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var laptop = new Product { Name = "Laptop" };
             var phone = new Product { Name = "Phone" };
             var keyboard = new Product { Name = "Keyboard" };
             var checkedValues = new List<object> { laptop, phone };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AllowCheckBoxes, true);
                 parameters.Add(p => p.CheckedValues, checkedValues);
@@ -339,7 +339,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_WithExpandableItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category 
@@ -352,7 +352,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -375,8 +375,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_TreeRole()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>();
 
             var container = component.Find("[role=tree]");
 
@@ -386,8 +386,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_AriaLabel()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AriaLabel, "Categories");
             });
@@ -400,8 +400,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_AriaLabelledBy()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AriaLabelledBy, "tree-heading");
             });
@@ -414,7 +414,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_SetSizeAndPosInSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -434,7 +434,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -478,7 +478,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_TreeItemRoleAndLevel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -491,7 +491,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -525,7 +525,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_GroupRoleOnSubtree()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -538,7 +538,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -565,13 +565,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Renders_AriaSelectedOnItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -590,14 +590,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Exposes_ActiveDescendant_AsFocusMoves()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" },
                 new Category { Name = "Clothing" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -626,7 +626,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_HomeEnd_MoveActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" },
@@ -634,7 +634,7 @@ namespace Radzen.Blazor.Tests
                 new Category { Name = "Books" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -664,7 +664,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_ArrowRight_ExpandsThenMovesToFirstChild()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -677,7 +677,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -716,7 +716,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_ArrowLeft_CollapsesThenMovesToParent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -729,7 +729,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -766,7 +766,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_TypeAhead_MovesActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" },
@@ -774,7 +774,7 @@ namespace Radzen.Blazor.Tests
                 new Category { Name = "Books" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -798,7 +798,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_Enter_TogglesExpandableNode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category
@@ -811,7 +811,7 @@ namespace Radzen.Blazor.Tests
                 }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ChildContent, builder =>
@@ -842,13 +842,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tree_DoesNotRender_AriaSelected_WhenCheckBoxesAllowed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Category>
             {
                 new Category { Name = "Electronics" }
             };
 
-            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            var component = ctx.Render<RadzenTree>(parameters =>
             {
                 parameters.Add(p => p.AllowCheckBoxes, true);
                 parameters.Add(p => p.Data, data);

@@ -15,10 +15,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ChipList_SameCountValueMutation_ReflectedOnInternalRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var value = new List<int> { 1, 2 };
 
-            var component = ctx.RenderComponent<SelfRenderingChipList<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<SelfRenderingChipList<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, value);

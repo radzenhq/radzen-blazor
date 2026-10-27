@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -28,7 +28,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
                         .Add(x => x.Visible, true)))
@@ -51,7 +51,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
                         .Add(x => x.Visible, true)))
@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
                         .Add(x => x.Visible, true)))
@@ -101,7 +101,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
                         .Add(x => x.Visible, true)
@@ -122,7 +122,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.TooltipTolerance, 0)
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
@@ -152,7 +152,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             // TooltipTolerance=0 means the tooltip would never fire; the crosshair must still snap to a data point.
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.TooltipTolerance, 0)
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .AddChildContent<RadzenAxisCrosshair>(c => c
@@ -199,7 +199,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenValueAxis>(axis => axis
                     .Add(a => a.FormatString, "{0:N0} GW")
                     .AddChildContent<RadzenAxisCrosshair>(c => c
@@ -236,7 +236,7 @@ namespace Radzen.Blazor.Tests
                 new DateDataItem { Date = new System.DateTime(2025, 4, 7), Value = 25 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .Add(a => a.FormatString, "{0:MMM d}")
                     .AddChildContent<RadzenAxisCrosshair>(c => c
@@ -273,7 +273,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "D", Value = 25 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis
                     .Add(a => a.Padding, 50)
                     .Add(a => a.Formatter, value => value.ToString())

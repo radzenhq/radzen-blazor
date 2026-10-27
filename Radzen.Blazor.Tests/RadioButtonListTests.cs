@@ -31,10 +31,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_RadioGroupRole()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(AddThreeItems);
+            var component = ctx.Render<RadzenRadioButtonList<int>>(AddThreeItems);
 
             var group = component.Find("[role=radiogroup]");
             Assert.Equal("radiogroup", group.GetAttribute("role"));
@@ -47,10 +47,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_AriaCheckedReflectsValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, 2);
                 AddThreeItems(parameters);
@@ -65,10 +65,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Sets_GroupAriaLabelFromName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Name, "Shipping options");
                 AddThreeItems(parameters);
@@ -81,10 +81,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Exposes_ActiveDescendantOnFocus()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, 1);
                 AddThreeItems(parameters);
@@ -104,11 +104,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Arrow_MovesActiveDescendantAndChecks()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 1;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
@@ -133,11 +133,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Arrow_WrapsAtEnds()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 1;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
@@ -156,11 +156,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Arrow_BothAxesWork()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 1;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
                 parameters.Add(p => p.Value, value);
@@ -180,11 +180,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_HomeEnd_SelectFirstAndLast()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 2;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
@@ -206,11 +206,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Arrow_SkipsDisabledItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 1;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
@@ -246,8 +246,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>();
 
             Assert.Contains(@"rz-radio-button-list", component.Markup);
         }
@@ -255,8 +255,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_Orientation()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -267,19 +267,19 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
             // Orientation is applied via RadzenStack which uses flex-direction
             Assert.Contains("rz-flex-row", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
             Assert.Contains("rz-flex-column", component.Markup);
         }
 
         [Fact]
         public void RadioButtonList_Renders_Disabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Items, builder =>
@@ -298,8 +298,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_Items()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -322,8 +322,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -334,8 +334,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Style, "margin:1rem");
             });
@@ -362,10 +362,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_NullableValue_RendersItemsDeclaredWithNonNullableValueType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<bool?>>(AddNullableMismatchItems);
+            var component = ctx.Render<RadzenRadioButtonList<bool?>>(AddNullableMismatchItems);
 
             Assert.Equal(2, component.FindAll("[role=radio]").Count);
         }
@@ -373,12 +373,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_NullableValue_SelectsItemDeclaredWithNonNullableValueType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             bool? value = null;
 
-            var component = ctx.RenderComponent<RadzenRadioButtonList<bool?>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<bool?>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, (bool? v) => value = v);
@@ -394,11 +394,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadioButtonList_Keydown_DoesNotRenderPreventDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var value = 1;
-            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            var component = ctx.Render<RadzenRadioButtonList<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, value);
                 parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));

@@ -7,7 +7,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class CellSelectionTests : TestContext
+public class CellSelectionTests : BunitContext
 {
     private readonly Worksheet sheet = new (4,4);
 
@@ -20,7 +20,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -45,7 +45,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -65,7 +65,7 @@ public class CellSelectionTests : TestContext
         sheet.Selection.Select(new RangeRef(cell, cell));
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -84,7 +84,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -105,7 +105,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -148,7 +148,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
@@ -192,7 +192,7 @@ public class CellSelectionTests : TestContext
         var context = new MockVirtualGridContext(sheet);
 
         // Act
-        var cut = RenderComponent<CellSelection>(parameters => parameters
+        var cut = Render<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));

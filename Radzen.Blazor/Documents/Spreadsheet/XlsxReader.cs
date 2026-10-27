@@ -1025,7 +1025,7 @@ static class XlsxReader
 
         if (!string.IsNullOrEmpty(formulaValue))
         {
-            if (!formulaValue.StartsWith('='))
+            if (!formulaValue.StartsWith('=', StringComparison.Ordinal))
             {
                 formulaValue = "=" + formulaValue;
             }
@@ -1244,7 +1244,7 @@ static class XlsxReader
                 }
 
                 var formula = formulas[0];
-                if (formula.Length >= 2 && formula.StartsWith('"') && formula.EndsWith('"'))
+                if (formula.Length >= 2 && formula.StartsWith('"', StringComparison.Ordinal) && formula.EndsWith('"', StringComparison.Ordinal))
                 {
                     return new EqualToRule
                     {
@@ -1967,7 +1967,7 @@ static class XlsxReader
     // ECMA-376 Part 2, 9.3: the relationships of a part live in _rels/<part file name>.rels next to the part.
     private static string GetRelationshipsPath(string partPath)
     {
-        var slash = partPath.LastIndexOf('/');
+        var slash = partPath.LastIndexOf('/', StringComparison.Ordinal);
 
         return $"{partPath[..(slash + 1)]}_rels/{partPath[(slash + 1)..]}.rels";
     }
@@ -2302,7 +2302,7 @@ static class XlsxReader
             var formula1 = dvElement.Element(sNs + "formula1")?.Value;
             var formula2 = dvElement.Element(sNs + "formula2")?.Value;
 
-            if (type == DataValidationType.List && !string.IsNullOrWhiteSpace(formula1) && !formula1.TrimStart().StartsWith('"'))
+            if (type == DataValidationType.List && !string.IsNullOrWhiteSpace(formula1) && !formula1.TrimStart().StartsWith('"', StringComparison.Ordinal))
             {
                 formula1 = "=" + formula1;
             }

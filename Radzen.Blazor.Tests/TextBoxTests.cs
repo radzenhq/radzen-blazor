@@ -10,9 +10,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             Assert.Contains(@$"rz-textbox", component.Markup);
         }
@@ -20,13 +20,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_ValueParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, value));
+            component.Render(parameters => parameters.Add(p => p.Value, value));
 
             Assert.Contains(@$"value=""{value}""", component.Markup);
         }
@@ -34,7 +34,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextboxCanSetFieldIdentifier()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var editContext = new EditContext(ctx);
             var fieldIdentifier = new FieldIdentifier(ctx, nameof(RadzenTextBox.Value));
@@ -43,7 +43,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(e => e.Value, editContext);
             });
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            var component = ctx.Render<RadzenTextBox>(parameters =>
             {
                 parameters.Add(p => p.FieldIdentifier, fieldIdentifier);
             });
@@ -54,13 +54,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -68,13 +68,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_NameParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Name, value));
+            component.Render(parameters => parameters.Add(p => p.Name, value));
 
             Assert.Contains(@$"name=""{value}""", component.Markup);
         }
@@ -82,13 +82,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_TabIndexParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = 1;
 
-            component.SetParametersAndRender(parameters => parameters.Add<int>(p => p.TabIndex, value));
+            component.Render(parameters => parameters.Add<int>(p => p.TabIndex, value));
 
             Assert.Contains(@$"tabindex=""{value}""", component.Markup);
         }
@@ -96,13 +96,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_PlaceholderParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Placeholder, value));
+            component.Render(parameters => parameters.Add(p => p.Placeholder, value));
 
             Assert.Contains(@$"placeholder=""{value}""", component.Markup);
         }
@@ -110,11 +110,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_DisabledParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add<bool>(p => p.Disabled, true));
 
             Assert.Contains(@$"disabled", component.Markup);
             Assert.Contains(@$"rz-state-disabled", component.Markup);
@@ -123,13 +123,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_ReadOnlyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = true;
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ReadOnly, value));
+            component.Render(parameters => parameters.Add<bool>(p => p.ReadOnly, value));
 
             Assert.Contains(@$"readonly", component.Markup);
         }
@@ -137,27 +137,27 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_AutoCompleteParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", true));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autocomplete", "custom"));
+            component.Render(parameters => parameters.AddUnmatched("autocomplete", "custom"));
 
             Assert.Contains(@$"autocomplete=""custom""", component.Markup);
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
             component.Instance.DefaultAutoCompleteAttribute = "autocomplete-custom";
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""autocomplete-custom""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
@@ -166,27 +166,27 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_TypedAutoCompleteParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
-            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
-
-            Assert.Contains(@$"autocomplete=""off""", component.Markup);
-
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
-            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", false));
+            component.Render(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
-            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.AdditionalName));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", true));
+            component.Render(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", true));
+            component.Render(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.AdditionalName));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.AdditionalName.GetAutoCompleteValue()}""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
-            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.FamilyName));
+            component.Render(parameters => parameters.AddUnmatched("AutoComplete", true));
+            component.Render(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.FamilyName));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.FamilyName.GetAutoCompleteValue()}""", component.Markup);
         }
@@ -194,13 +194,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_MaxLengthParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var value = 10;
 
-            component.SetParametersAndRender(parameters => parameters.Add<long?>(p => p.MaxLength, value));
+            component.Render(parameters => parameters.Add<long?>(p => p.MaxLength, value));
 
             Assert.Contains(@$"maxlength=""{value}""", component.Markup);
         }
@@ -208,11 +208,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -220,15 +220,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Raises_ChangedEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var raised = false;
             var value = "Test";
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+            component.Render(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
 
             component.Find("input").Change(value);
 
@@ -239,15 +239,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Raises_ValueChangedEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             var raised = false;
             var value = "Test";
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
+            component.Render(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
 
             component.Find("input").Change(value);
 
@@ -258,9 +258,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Trim_TrimsOnChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
+            var wrapper = ctx.Render<RadzenTextBoxBindWrapper>(parameters =>
             {
                 parameters.Add(p => p.Trim, true);
             });
@@ -274,10 +274,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Immediate_Trim_DoesNotTrimOnInput()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             int changeCount = 0;
-            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
+            var wrapper = ctx.Render<RadzenTextBoxBindWrapper>(parameters =>
             {
                 parameters.Add(p => p.Immediate, true);
                 parameters.Add(p => p.Trim, true);
@@ -294,9 +294,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Immediate_Trim_TrimsOnChangeAfterInput()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
+            var wrapper = ctx.Render<RadzenTextBoxBindWrapper>(parameters =>
             {
                 parameters.Add(p => p.Immediate, true);
                 parameters.Add(p => p.Trim, true);
@@ -312,16 +312,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Trim_SkipsChangeNotificationWhenTrimDoesNotAlterExistingValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            var component = ctx.Render<RadzenTextBox>(parameters =>
             {
                 parameters.Add(p => p.Trim, true);
                 parameters.Add(p => p.Value, "hello");
             });
 
             int changeCount = 0;
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, _ => changeCount++));
+            component.Render(parameters => parameters.Add(p => p.Change, _ => changeCount++));
 
             component.Find("input").Change("hello   ");
 
@@ -335,9 +335,9 @@ namespace Radzen.Blazor.Tests
             // Demo-style usage: <RadzenTextBox Change=... /> with no @bind-Value or ValueChanged.
             // The user-typed value must survive the post-handler @bind:get/:set sync,
             // otherwise the input clears itself on every blur.
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.Render<RadzenTextBox>();
 
             component.Find("input").Change("user-typed");
 
@@ -348,10 +348,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var boundValue = "original";
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            var component = ctx.Render<RadzenTextBox>(parameters =>
             {
                 parameters.Add(p => p.Value, boundValue);
                 parameters.Add(p => p.ValueChanged, v => boundValue = v);
@@ -367,9 +367,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_SyncsDomValue_WhenParentTransformsInput()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var wrapper = ctx.RenderComponent<RadzenTextBoxTransformWrapper>();
+            var wrapper = ctx.Render<RadzenTextBoxTransformWrapper>();
 
             wrapper.Find("input").Change("user-typed");
 
@@ -420,10 +420,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TextBox_Renders_IdAttribute_OverNameParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters => parameters
+            var component = ctx.Render<RadzenTextBox>(parameters => parameters
                 .Add(p => p.Name, "MaskName")
                 .AddUnmatched("id", "explicit-id"));
 

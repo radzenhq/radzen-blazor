@@ -12,9 +12,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenAutoComplete>();
+            var component = ctx.Render<RadzenAutoComplete>();
 
             Assert.Contains(@"rz-autocomplete", component.Markup);
         }
@@ -22,9 +22,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_InputElement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenAutoComplete>();
+            var component = ctx.Render<RadzenAutoComplete>();
 
             Assert.Contains("type=\"text\"", component.Markup);
             Assert.Contains("rz-inputtext", component.Markup);
@@ -33,9 +33,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -47,9 +47,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_Placeholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Placeholder, "Type to search...");
             });
@@ -60,11 +60,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_WithData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -142,11 +142,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_EmptyTemplate_WhenNoData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -161,11 +161,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_DoesNotRender_EmptyTemplate_WhenItemsPresent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -180,11 +180,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_RendersItemText_ViaTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new[] { new { Name = "Apple" }, new { Name = "Banana" } };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -203,11 +203,11 @@ namespace Radzen.Blazor.Tests
             // Regression: the cached-getter path must keep GetItemOrValueFromProperty's primitive contract -
             // for a List<string> a non-empty TextProperty that happens to name a real member of string
             // ("Length") must still render the string itself, not string.Length.
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "alpha", "beta" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -229,7 +229,7 @@ namespace Radzen.Blazor.Tests
         {
             // "Child.Id" with a null Child must render blank (matching reflection), not the int leaf's default "0"
             // that a compiled getter would box.
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<NestedRoot>
             {
@@ -237,7 +237,7 @@ namespace Radzen.Blazor.Tests
                 new NestedRoot { Child = null },
             };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -253,11 +253,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_LoadingTemplate_WhenIsLoading()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -274,11 +274,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_DoesNotRender_EmptyMarker_WhenEmptyTemplateNotSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -292,11 +292,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_DoesNotRender_LoadingMarker_WhenLoadingTemplateNotSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -311,11 +311,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_LoadingTemplate_HasPrecedence_OverEmptyTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -332,11 +332,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Filters_StringList()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<AutoCompleteWithAccessibleView>(parameters =>
+            var component = ctx.Render<AutoCompleteWithAccessibleView>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -352,11 +352,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Renders_StableOptionIds()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -378,11 +378,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_DoesNotSet_AriaActiveDescendant_WhenNothingHighlighted()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -397,11 +397,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Sets_AriaActiveDescendant_OnArrowDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -424,11 +424,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Clears_AriaActiveDescendant_OnEscape()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -450,11 +450,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task AutoComplete_AriaExpanded_TracksPopupState()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -479,11 +479,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task AutoComplete_AriaExpanded_IsFalse_AfterEscape()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -504,12 +504,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_Sets_AriaSelected_OnHighlightedOption()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<int>("Radzen.focusListItem", _ => true).SetResult(1);
             var data = new List<string> { "Apple", "Banana", "Cherry" };
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, data)
@@ -537,10 +537,10 @@ namespace Radzen.Blazor.Tests
             // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
             // must survive the post-handler @bind:get/:set sync, otherwise the input
             // clears itself on every blur.
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>();
+            var component = ctx.Render<RadzenAutoComplete>();
 
             component.Find("input").Change("user-typed");
 
@@ -551,11 +551,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var boundValue = "original";
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Value, boundValue);
                 parameters.Add(p => p.ValueChanged, v => boundValue = v);
@@ -571,10 +571,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_KeepsValue_WhenValueIsDeclaredBeforeData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Value, "Beta");
                 parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
@@ -587,16 +587,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_KeepsValue_WhenDataIsReplacedAfterValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Value, "Beta");
                 parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
             });
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Value, "Beta");
                 parameters.Add(p => p.Data, new[] { "Alpha", "Beta", "Gamma" });
@@ -609,16 +609,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_ClearsValue_WhenValueParameterBecomesNull()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters.Add(p => p.Value, "Beta");
                 parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
             });
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Value, null);
                 parameters.Add(p => p.Data, new[] { "Alpha", "Beta" });
@@ -631,10 +631,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_SyncsDomValue_WhenParentTransformsInput()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var wrapper = ctx.RenderComponent<RadzenAutoCompleteTransformWrapper>();
+            var wrapper = ctx.Render<RadzenAutoCompleteTransformWrapper>();
 
             wrapper.Find("input").Change("user-typed");
 
@@ -659,10 +659,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_ChangingSelectedItemAtRuntime_DoesNotReadExpiredParameterView()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var host = ctx.RenderComponent<RadzenAutoCompleteSelectedItemHost>();
+            var host = ctx.Render<RadzenAutoCompleteSelectedItemHost>();
             var autoComplete = host.FindComponent<RadzenAutoComplete>();
 
             host.InvokeAsync(() =>
@@ -684,12 +684,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_ClearsStaleSuggestions_WhenInputDropsBelowMinLength()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var inputValue = ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true);
             inputValue.SetResult("one");
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, new List<string> { "one a", "one b", "one c", "two" })
@@ -721,13 +721,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_LoadData_ClearsStaleSuggestions_WhenInputDropsBelowMinLength()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var inputValue = ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true);
             inputValue.SetResult("one");
             var filters = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, new List<string> { "one a", "one b", "one c" })
@@ -754,10 +754,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AutoComplete_PassesMinLengthToJavaScript_AndRecreatesWhenItChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            var component = ctx.Render<RadzenAutoComplete>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, new List<string> { "one a" })
@@ -768,7 +768,7 @@ namespace Radzen.Blazor.Tests
             Assert.Single(created);
             Assert.Equal(3, created[0].Arguments[3]);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.MinLength, 2));
+            component.Render(parameters => parameters.Add(p => p.MinLength, 2));
 
             created = ctx.JSInterop.Invocations.Where(invocation => invocation.Identifier == "Radzen.createAutoComplete").ToList();
             Assert.Equal(2, created.Count);

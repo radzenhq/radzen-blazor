@@ -63,17 +63,17 @@ namespace Radzen.Blazor.Tests
             public void Rerender() => StateHasChanged();
         }
 
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             return ctx;
         }
 
-        static async Task<IRenderedComponent<Host>> RenderHost(TestContext ctx)
+        static async Task<IRenderedComponent<Host>> RenderHost(BunitContext ctx)
         {
-            var cut = ctx.RenderComponent<Host>();
+            var cut = ctx.Render<Host>();
             await Task.Delay(100);
             cut.Instance.Loads.Clear();
             cut.Instance.MaxInFlight = 0;
@@ -184,7 +184,7 @@ namespace Radzen.Blazor.Tests
         public void ClearFilters_DoesNotRestoreDeclaredValuelessOperator()
         {
             using var ctx = CreateContext();
-            var cut = ctx.RenderComponent<RadzenDataGrid<Item>>(parameters =>
+            var cut = ctx.Render<RadzenDataGrid<Item>>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<Item>());
                 parameters.Add(p => p.AllowFiltering, true);

@@ -35,7 +35,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenHeatmapSeries<HeatItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(HeatItem.X))
                     .Add(x => x.ValueProperty, nameof(HeatItem.Y))
@@ -55,7 +55,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenHeatmapSeries<HeatItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(HeatItem.X))
                     .Add(x => x.ValueProperty, nameof(HeatItem.Y))
@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenHeatmapSeries<HeatItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(HeatItem.X))
                     .Add(x => x.ValueProperty, nameof(HeatItem.Y))
@@ -95,7 +95,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenHeatmapSeries<HeatItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(HeatItem.X))
                     .Add(x => x.ValueProperty, nameof(HeatItem.Y))

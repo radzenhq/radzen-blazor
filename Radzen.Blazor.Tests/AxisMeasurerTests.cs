@@ -1,3 +1,5 @@
+#nullable enable
+
 using Radzen.Blazor.Rendering;
 using System;
 using Xunit;

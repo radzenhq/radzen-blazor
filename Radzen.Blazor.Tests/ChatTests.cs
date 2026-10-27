@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -17,9 +19,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldRenderWithTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -32,9 +34,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldRenderWithTitleContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.TitleContent, builder =>
                 {
                     builder.OpenComponent<RadzenBadge>(0);
@@ -53,9 +55,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldNotRenderTitleSpanWhenNoTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -67,9 +69,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldShowEmptyMessageWhenNoMessages()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -96,9 +98,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -118,9 +120,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -146,9 +148,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -162,9 +164,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldShowClearButtonWhenEnabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -179,9 +181,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldNotShowClearButtonWhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -206,9 +208,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user6", Name = "David" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -234,9 +236,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user1", Name = "John" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -261,9 +263,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -282,9 +284,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user1", Name = "John Doe" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -303,9 +305,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user1", Name = "John", AvatarUrl = "https://example.com/avatar.jpg" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -321,9 +323,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldBeDisabledWhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -338,9 +340,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldBeReadOnlyWhenReadOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -355,9 +357,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldShowCustomPlaceholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -382,9 +384,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user1", Name = "John" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -409,9 +411,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user1", Name = "John" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -431,9 +433,9 @@ namespace Radzen.Blazor.Tests
             };
             var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, messages)
@@ -455,9 +457,9 @@ namespace Radzen.Blazor.Tests
             };
             var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, messages)
@@ -481,9 +483,9 @@ namespace Radzen.Blazor.Tests
             };
             var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, messages)
@@ -508,9 +510,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
@@ -523,9 +525,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldNotShowMentionPopupWhenMentionCharacterIsNull()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -543,9 +545,9 @@ namespace Radzen.Blazor.Tests
             var messages = new List<ChatMessage>();
             var messageSent = false;
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
@@ -563,9 +565,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldParseMentionFormatCorrectly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -583,9 +585,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldParseMutipleMentionsCorrectly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -604,9 +606,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldNotParseMentionsWhenMentionCharacterIsNull()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -623,7 +625,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldRenderMentionUsersFromProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var results = new List<MentionUserContext>
@@ -632,7 +634,7 @@ namespace Radzen.Blazor.Tests
                 new MentionUserContext { UserId = "user-2", UserName = "Bob", IsInChat = false }
             };
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -650,7 +652,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldLoadNextMentionUsersPageWhenScrolledToBottom()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<bool>("Radzen.isScrolledToBottom", _ => true).SetResult(true);
 
@@ -671,7 +673,7 @@ namespace Radzen.Blazor.Tests
             var mentionUsers = firstPage.ToList();
             int? mentionCount = 4;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -691,7 +693,7 @@ namespace Radzen.Blazor.Tests
 
             await InvokePrivateAsync(component.Instance, "OnMentionPopupScroll");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -712,9 +714,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldHaveMentionPropertiesOptional()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -728,9 +730,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldAcceptMentionCharacter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -744,9 +746,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldAcceptMentionItemTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -765,9 +767,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenChat_ShouldAcceptMentionDisplayTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -797,9 +799,9 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user-123", Name = "Alice" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, messages)
@@ -825,10 +827,10 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane Smith" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -862,12 +864,12 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane Smith" }
             };
 
-            ChatMessage sentMessage = null;
+            ChatMessage? sentMessage = null;
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -911,11 +913,11 @@ namespace Radzen.Blazor.Tests
                 new ChatUser { Id = "user2", Name = "Jane Smith" }
             };
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<int[]>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 11, 11 });
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, users)
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -952,13 +954,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldTriggerMentionSearchForSingleWordFilter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            MentionSearchArgs capturedArgs = null;
+            MentionSearchArgs? capturedArgs = null;
             var searchCount = 0;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -978,7 +980,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("joh", capturedArgs!.Filter);
             Assert.Equal(1, searchCount);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true },
@@ -993,12 +995,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldKeepMentionPopupOpenWhenSearchTextContainsSpace()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            MentionSearchArgs capturedArgs = null;
+            MentionSearchArgs? capturedArgs = null;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1013,7 +1015,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true },
@@ -1030,7 +1032,7 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(capturedArgs);
             Assert.Equal("john do", capturedArgs!.Filter);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1045,13 +1047,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldCloseMentionPopupWhenMultiWordSearchHasNoResults()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            MentionSearchArgs capturedArgs = null;
+            MentionSearchArgs? capturedArgs = null;
             var searchCount = 0;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1067,7 +1069,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1082,7 +1084,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("john x", capturedArgs!.Filter);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>())
                 .Add(p => p.MentionUsersCount, 0)
             );
@@ -1105,13 +1107,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldContinueMentionSearchBeforeResultsArrive()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            MentionSearchArgs capturedArgs = null;
+            MentionSearchArgs? capturedArgs = null;
             var searchCount = 0;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1135,7 +1137,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("john do", capturedArgs.Filter);
             Assert.Equal(2, searchCount);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1150,10 +1152,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldNotReopenMentionPopupFromStaleResultsAfterClose()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1164,7 +1166,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1179,7 +1181,7 @@ namespace Radzen.Blazor.Tests
 
             component.WaitForAssertion(() => Assert.Empty(component.FindAll(".rz-chat-mention-item")));
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1201,10 +1203,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldInsertMentionAfterMultiWordSearch()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1215,7 +1217,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true },
@@ -1227,7 +1229,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john do");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john do");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1248,12 +1250,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldNotReopenMentionPopupWhenTypingAfterEscape()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var searchCount = 0;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1268,7 +1270,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true }
@@ -1305,10 +1307,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task RadzenChat_ShouldKeepMentionSelectionWhenSameUsersReapplied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+            var component = ctx.Render<RadzenChat>(parameters => parameters
                 .Add(p => p.CurrentUserId, "user1")
                 .Add(p => p.Users, new List<ChatUser>())
                 .Add(p => p.Messages, new List<ChatMessage>())
@@ -1319,7 +1321,7 @@ namespace Radzen.Blazor.Tests
             SetPrivateProperty(component.Instance, "CurrentInput", "@john");
             await InvokePrivateAsync(component.Instance, "DetectMentionTrigger", "@john");
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true },
@@ -1334,7 +1336,7 @@ namespace Radzen.Blazor.Tests
             component.WaitForAssertion(() =>
                 Assert.Contains("rz-chat-mention-item-selected", component.FindAll(".rz-chat-mention-item")[1].ClassName));
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-1", UserName = "John Doe", IsInChat = true },
@@ -1345,7 +1347,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-chat-mention-item-selected", component.FindAll(".rz-chat-mention-item")[1].ClassName);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.MentionUsers, new List<MentionUserContext>
                 {
                     new MentionUserContext { UserId = "user-3", UserName = "Jane Doe", IsInChat = true },
@@ -1360,20 +1362,19 @@ namespace Radzen.Blazor.Tests
         static void SetPrivateField(object instance, string fieldName, object value)
         {
             var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-            field.SetValue(instance, value);
+            field!.SetValue(instance, value);
         }
 
         static void SetPrivateProperty(object instance, string propertyName, object value)
         {
             var property = instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic);
-            property.SetValue(instance, value);
+            property!.SetValue(instance, value);
         }
 
         static async Task InvokePrivateAsync(object instance, string methodName, params object[] args)
         {
             var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
-            var task = (Task)method.Invoke(instance, args);
-            await task;
+            await (Task)method!.Invoke(instance, args)!;
         }
     }
 }

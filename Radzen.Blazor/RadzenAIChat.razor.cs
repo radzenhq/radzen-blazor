@@ -906,11 +906,7 @@ namespace Radzen.Blazor
         {
             IsLoading = true;
             var previousCts = cts;
-#if NET8_0_OR_GREATER
             await previousCts.CancelAsync();
-#else
-            previousCts.Cancel();
-#endif
             previousCts.Dispose();
             cts = new CancellationTokenSource();
 

@@ -121,7 +121,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
                 var count = stackedBarSeries.Max(series => series.Count);

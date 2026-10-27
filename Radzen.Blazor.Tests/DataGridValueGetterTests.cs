@@ -41,12 +41,12 @@ namespace Radzen.Blazor.Tests
             new Person { Id = 2, Name = "NoAddress", Address = null, Detail = null },
         };
 
-        static IRenderedComponent<RadzenDataGrid<Person>> RenderGrid(TestContext ctx, RenderFragment columns)
+        static IRenderedComponent<RadzenDataGrid<Person>> RenderGrid(BunitContext ctx, RenderFragment columns)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<Person>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.Data, People());
                 parameterBuilder.Add(p => p.AllowSorting, true);
@@ -54,11 +54,11 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        static IRenderedComponent<RadzenDataGrid<Person>> RenderGridWith(TestContext ctx, List<Person> data, RenderFragment columns)
+        static IRenderedComponent<RadzenDataGrid<Person>> RenderGridWith(BunitContext ctx, List<Person> data, RenderFragment columns)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            return ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add(g => g.Columns, columns);
@@ -72,7 +72,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void StringProperty_NestedValueTypeLeaf_NullIntermediate_RendersEmptyNotDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderGridWith(ctx, PeopleWithNullAddress(), builder =>
             {
                 builder.OpenComponent(0, typeof(RadzenDataGridColumn<Person>));
@@ -88,7 +88,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void StringProperty_NullableValueTypeIntermediate_NullIntermediate_RendersEmptyNotDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             // "Detail.Level" where Detail is a Nullable<Detail> (a value type). A null Detail must render
             // empty, not the leaf int's default "0".
             var component = RenderGridWith(ctx, PeopleWithNullAddress(), builder =>
@@ -106,7 +106,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void StringProperty_ExplicitNullableValueInPath_NullIntermediate_RendersEmptyNotThrows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             // "Detail.Value.Level" writes the Nullable<Detail>.Value access explicitly. A null Detail must
             // guard the .Value (rendering empty), not throw InvalidOperationException.
             var component = RenderGridWith(ctx, PeopleWithNullAddress(), builder =>
@@ -124,7 +124,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void StringProperty_HasValueInPath_KeepsBooleanSemantics()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             // "Detail.HasValue" must read the boolean, returning false for a null Detail rather than empty.
             var component = RenderGridWith(ctx, PeopleWithNullAddress(), builder =>
             {
@@ -141,7 +141,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void StringProperty_NestedReferenceLeaf_NullIntermediate_RendersEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderGridWith(ctx, PeopleWithNullAddress(), builder =>
             {
                 builder.OpenComponent(0, typeof(RadzenDataGridColumn<Person>));
@@ -157,7 +157,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ChangingProperty_RebuildsCachedValueGetter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderGrid(ctx, builder =>
             {
                 builder.OpenComponent(0, typeof(RadzenDataGridColumn<Person>));

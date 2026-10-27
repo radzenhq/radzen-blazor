@@ -127,7 +127,7 @@ class BlockParser
 
         var length = lines.Length;
 
-        if (markdown.EndsWith(InlineParser.LineFeed))
+        if (markdown.EndsWith(InlineParser.LineFeed, StringComparison.Ordinal))
         {
             length--;
         }

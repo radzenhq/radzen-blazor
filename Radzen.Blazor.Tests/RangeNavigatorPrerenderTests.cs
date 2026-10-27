@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,17 +16,17 @@ namespace Radzen.Blazor.Tests
     {
         class NullResultJSRuntime : IJSRuntime
         {
-            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args) => new(Task.FromResult(default(TValue)));
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) => new(Task.FromResult(default(TValue)!));
 
-            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object[] args) => InvokeAsync<TValue>(identifier, args);
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) => InvokeAsync<TValue>(identifier, args);
         }
 
         class StaticRenderJSRuntime : IJSRuntime
         {
-            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args) =>
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
                 throw new InvalidOperationException("JavaScript interop calls cannot be issued at this time. This is because the component is being statically rendered.");
 
-            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object[] args) => InvokeAsync<TValue>(identifier, args);
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) => InvokeAsync<TValue>(identifier, args);
         }
 
         class TestNavigationManager : NavigationManager

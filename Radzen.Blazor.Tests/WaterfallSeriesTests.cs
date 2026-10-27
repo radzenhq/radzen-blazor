@@ -18,7 +18,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "Sub", Value = -10 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenWaterfallSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -39,7 +39,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "Up", Value = 30 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenWaterfallSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "Add", Value = 30 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenWaterfallSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -85,7 +85,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "Change", Value = 20 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenHorizontalWaterfallSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))

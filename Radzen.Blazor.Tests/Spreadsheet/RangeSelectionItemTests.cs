@@ -5,7 +5,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class RangeSelectionItemTests : TestContext
+public class RangeSelectionItemTests : BunitContext
 {
     private readonly Worksheet sheet = new(4, 4);
 
@@ -23,7 +23,7 @@ public class RangeSelectionItemTests : TestContext
         var context = new MockVirtualGridContext();
 
         // Act
-        var cut = RenderComponent<RangeSelectionItem>(parameters => parameters
+        var cut = Render<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, selectionRange)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell) // This should be A1 (the active cell)
@@ -50,7 +50,7 @@ public class RangeSelectionItemTests : TestContext
         var context = new MockVirtualGridContext();
 
         // Act
-        var cut = RenderComponent<RangeSelectionItem>(parameters => parameters
+        var cut = Render<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, selectionRange)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)
@@ -87,7 +87,7 @@ public class RangeSelectionItemTests : TestContext
 
         // Test the frozen part (A1:A1)
         var frozenRange = ranges.First(r => r.FrozenColumn);
-        var frozenCut = RenderComponent<RangeSelectionItem>(parameters => parameters
+        var frozenCut = Render<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, frozenRange.Range)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)
@@ -110,7 +110,7 @@ public class RangeSelectionItemTests : TestContext
 
         // Test the non-frozen part (B1:B1)
         var nonFrozenRange = ranges.First(r => !r.FrozenColumn);
-        var nonFrozenCut = RenderComponent<RangeSelectionItem>(parameters => parameters
+        var nonFrozenCut = Render<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, nonFrozenRange.Range)
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)

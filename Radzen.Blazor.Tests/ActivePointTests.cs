@@ -19,9 +19,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -47,9 +47,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -78,9 +78,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -105,9 +105,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCandlestickSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.OpenProperty, nameof(DataItem.Open))
@@ -135,7 +135,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
             {
                 p.AddChildContent<RadzenCandlestickSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

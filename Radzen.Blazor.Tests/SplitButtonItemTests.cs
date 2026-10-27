@@ -8,10 +8,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -27,10 +27,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -47,10 +47,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -67,10 +67,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_Renders_MultipleItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -91,10 +91,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_Renders_MenuItemClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -110,10 +110,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButtonItem_HasValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters =>
+            var component = ctx.Render<RadzenSplitButton>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {

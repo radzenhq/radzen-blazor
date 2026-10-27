@@ -6,9 +6,9 @@ namespace Radzen.Blazor.Tests
 {
     internal static class ChartTestHelper
     {
-        internal static TestContext CreateChartContext(double navigatorWidth = 200, double navigatorHeight = 200)
+        internal static BunitContext CreateChartContext(double navigatorWidth = 200, double navigatorHeight = 200)
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });

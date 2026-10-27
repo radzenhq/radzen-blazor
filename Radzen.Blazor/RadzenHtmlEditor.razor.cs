@@ -357,7 +357,6 @@ namespace Radzen.Blazor
                 sourceChanged = true;
             }
             await OnChange();
-            StateHasChanged();
         }
 
         async Task OnChange()

@@ -10,10 +10,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_AB_Renders_CorrectViewBox()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -25,10 +25,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_AB_Renders_BackgroundRect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -40,10 +40,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_AB_Renders_FinderPatternEyes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -57,10 +57,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_AB_FinderPatterns_CorrectPositions()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -74,10 +74,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_Square_Renders_RectModules()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.ModuleShape, QRCodeModuleShape.Square);
@@ -91,10 +91,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_Circle_Renders_CircleModules()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.ModuleShape, QRCodeModuleShape.Circle);
@@ -110,10 +110,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_CustomForeground_AppliedToModules()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Foreground, "#FF0000");
@@ -126,10 +126,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_CustomSize_Applied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Size, "200px");
@@ -142,10 +142,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_WithImage_RendersImageElement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Image, "logo.png");
@@ -159,11 +159,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_DifferentValues_ProduceDifferentModulePatterns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var c1 = ctx.RenderComponent<RadzenQRCode>(p => p.Add(x => x.Value, "Hello"));
-            var c2 = ctx.RenderComponent<RadzenQRCode>(p => p.Add(x => x.Value, "World"));
+            var c1 = ctx.Render<RadzenQRCode>(p => p.Add(x => x.Value, "Hello"));
+            var c2 = ctx.Render<RadzenQRCode>(p => p.Add(x => x.Value, "World"));
 
             // Different data must produce different QR patterns
             Assert.NotEqual(c1.Markup, c2.Markup);
@@ -172,15 +172,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_HigherEcc_ProducesLargerMatrix()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var low = ctx.RenderComponent<RadzenQRCode>(p =>
+            var low = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "ABCDEFGHIJKLMNOP");
                 p.Add(x => x.Ecc, RadzenQREcc.Low);
             });
-            var high = ctx.RenderComponent<RadzenQRCode>(p =>
+            var high = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "ABCDEFGHIJKLMNOP");
                 p.Add(x => x.Ecc, RadzenQREcc.High);
@@ -194,10 +194,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void QRCode_CssClass_Applied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -208,14 +208,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task QRCode_ToPng_ReturnsPngData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
 
             var data = new byte[] { 137, 80, 78, 71 };
             ctx.JSInterop.Setup<IJSStreamReference>("Radzen.svgToPng", _ => true).SetResult(new TestJSStreamReference(data));
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -228,11 +228,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task QRCode_ToPng_PassesSizeToInterop()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
 
-            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            var component = ctx.Render<RadzenQRCode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });

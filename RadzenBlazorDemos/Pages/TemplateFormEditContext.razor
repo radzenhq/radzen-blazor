@@ -67,9 +67,9 @@
         console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
     }
 
-    void Validate()
+    async Task Validate()
     {
-        var isValid = editContext.Validate();
+        var isValid = await editContext.ValidateAsync();
         console.Log($"Validate: IsValid = {isValid}");
     }
 }

@@ -1010,8 +1010,6 @@ namespace Radzen.Blazor
             {
                 await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
             }
-
-            StateHasChanged();
         }
 
         string? previousSearch;

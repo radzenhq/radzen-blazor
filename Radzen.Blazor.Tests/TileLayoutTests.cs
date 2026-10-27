@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
 {
     public class TileLayoutTests
     {
-        private static TestContext CreateContext(Rect rect = null)
+        private static BunitContext CreateContext(Rect rect = null)
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             ctx.JSInterop.Setup<Rect>("Radzen.clientRect", _ => true)
@@ -23,7 +23,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>();
+            var component = ctx.Render<RadzenTileLayout>();
 
             Assert.Contains("rz-tile-layout", component.Markup);
             Assert.Contains("rz-tile-layout-cells", component.Markup);
@@ -34,7 +34,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
                 parameters.Add(p => p.Style, "height: 400px;"));
 
             Assert.Contains("height: 400px;", component.Markup);
@@ -45,7 +45,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 6);
                 parameters.Add(p => p.Gap, 12);
@@ -62,7 +62,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Rows, 4);
                 parameters.Add(p => p.RowHeight, 80);
@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
                 parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
                     item.Add(i => i.Title, "Tile");
@@ -96,7 +96,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
                 parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
                     item.Add(i => i.Title, "Sales");
@@ -113,7 +113,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, true);
                 parameters.AddChildContent<RadzenTileLayoutItem>(item => item.Add(i => i.Title, "T"));
@@ -128,7 +128,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, false);
                 parameters.AddChildContent<RadzenTileLayoutItem>(item => item.Add(i => i.Title, "T"));
@@ -143,7 +143,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.ShowGrid, true);
                 parameters.Add(p => p.Columns, 3);
@@ -164,7 +164,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.ShowGrid, false);
                 parameters.Add(p => p.Columns, 3);
@@ -183,7 +183,7 @@ namespace Radzen.Blazor.Tests
             var changedCol = -1;
             RadzenTileLayoutItem changedItem = null;
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.EditMode, true);
@@ -217,7 +217,7 @@ namespace Radzen.Blazor.Tests
 
             var changedRowSpan = -1;
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.RowHeight, 80);
@@ -250,7 +250,7 @@ namespace Radzen.Blazor.Tests
 
             var changeRaised = false;
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, true);
                 parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenTileLayoutItem>(this, _ => changeRaised = true));
@@ -278,7 +278,7 @@ namespace Radzen.Blazor.Tests
 
             var changedCol = -1;
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.EditMode, true);
@@ -303,11 +303,11 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(10, changedCol);
         }
 
-        private static IRenderedComponent<RadzenTileLayout> RenderTwoTiles(TestContext ctx, bool allowOverlap,
+        private static IRenderedComponent<RadzenTileLayout> RenderTwoTiles(BunitContext ctx, bool allowOverlap,
             int colA, int rowA, int colSpanA, int rowSpanA, int colB, int rowB, int colSpanB, int rowSpanB,
             System.Action<RadzenTileLayoutItem> changed = null)
         {
-            return ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            return ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.RowHeight, 80);
@@ -429,7 +429,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+            var component = ctx.Render<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.EditMode, true);

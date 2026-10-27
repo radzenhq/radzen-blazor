@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>();
+            var component = ctx.Render<RadzenSignaturePad>();
 
             Assert.Contains("rz-signature-pad", component.Markup);
         }
@@ -18,9 +18,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_Canvas()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>();
+            var component = ctx.Render<RadzenSignaturePad>();
 
             Assert.Contains("<canvas", component.Markup);
             Assert.Contains("rz-signature-pad-canvas", component.Markup);
@@ -29,9 +29,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -42,9 +42,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_ReadOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.ReadOnly, true);
             });
@@ -55,9 +55,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -68,9 +68,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Style, "margin:2rem");
             });
@@ -82,9 +82,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_Placeholder_WhenEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Placeholder, "Sign here");
             });
@@ -96,9 +96,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_DoesNotRender_Placeholder_WhenHasValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Placeholder, "Sign here");
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
@@ -110,9 +110,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_ClearButton_WhenHasValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
             });
@@ -123,9 +123,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_DoesNotRender_ClearButton_WhenEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>();
+            var component = ctx.Render<RadzenSignaturePad>();
 
             Assert.DoesNotContain("rz-signature-pad-clear", component.Markup);
         }
@@ -133,9 +133,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_DoesNotRender_ClearButton_WhenAllowClearFalse()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
                 parameters.Add(p => p.AllowClear, false);
@@ -147,9 +147,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_DoesNotRender_ClearButton_WhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
                 parameters.Add(p => p.Disabled, true);
@@ -161,9 +161,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_Renders_ClearButton_WhenReadOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
                 parameters.Add(p => p.ReadOnly, true);
@@ -175,9 +175,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SignaturePad_ClearButton_HasAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSignaturePad>(parameters =>
+            var component = ctx.Render<RadzenSignaturePad>(parameters =>
             {
                 parameters.Add(p => p.Value, "data:image/png;base64,test");
                 parameters.Add(p => p.ClearAriaLabel, "Remove signature");

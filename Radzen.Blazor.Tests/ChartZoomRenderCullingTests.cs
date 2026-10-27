@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,9 +18,9 @@ namespace Radzen.Blazor.Tests
 
         static readonly string[] Fills = Months.Select((_, index) => $"#0000{index:X2}").ToArray();
 
-        static async Task<IRenderedComponent<RadzenChart>> RenderColumnChart(TestContext ctx, double viewStart, double viewEnd)
+        static async Task<IRenderedComponent<RadzenChart>> RenderColumnChart(BunitContext ctx, double viewStart, double viewEnd)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.ViewStart, viewStart)
                 .Add(x => x.ViewEnd, viewEnd)
@@ -33,9 +35,9 @@ namespace Radzen.Blazor.Tests
             return chart;
         }
 
-        static async Task<IRenderedComponent<RadzenChart>> RenderLineChart(TestContext ctx, double viewStart, double viewEnd, bool animate = false, Interpolation interpolation = Interpolation.Line)
+        static async Task<IRenderedComponent<RadzenChart>> RenderLineChart(BunitContext ctx, double viewStart, double viewEnd, bool animate = false, Interpolation interpolation = Interpolation.Line)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.AnimateDataUpdates, animate)
                 .Add(x => x.ViewStart, viewStart)
@@ -98,7 +100,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.ViewStart, 0.55)
                 .Add(x => x.ViewEnd, 1)

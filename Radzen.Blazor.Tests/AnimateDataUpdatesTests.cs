@@ -19,9 +19,9 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static IRenderedComponent<RadzenChart> Render<TSeries>(TestContext ctx, bool animate) where TSeries : Radzen.Blazor.CartesianSeries<DataItem>
+        static IRenderedComponent<RadzenChart> Render<TSeries>(BunitContext ctx, bool animate) where TSeries : Radzen.Blazor.CartesianSeries<DataItem>
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .Add(x => x.AnimateDataUpdates, animate)
                 .AddChildContent<TSeries>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

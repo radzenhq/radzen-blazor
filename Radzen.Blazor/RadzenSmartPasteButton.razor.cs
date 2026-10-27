@@ -277,7 +277,7 @@ namespace Radzen.Blazor
         private void Apply(string json, List<PropertyInfo> properties)
         {
             var start = json.IndexOf('{', StringComparison.Ordinal);
-            var end = json.LastIndexOf('}');
+            var end = json.LastIndexOf('}', StringComparison.Ordinal);
 
             if (start < 0 || end <= start)
             {

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,9 +73,9 @@ namespace Radzen.Blazor.Tests
             public List<string> Tags { get; set; } = new();
         }
 
-        private static (TestContext Context, FuncChatClient Client) CreateContext(Func<IList<Microsoft.Extensions.AI.ChatMessage>, ChatOptions?, string> respond)
+        private static (BunitContext Context, FuncChatClient Client) CreateContext(Func<IList<Microsoft.Extensions.AI.ChatMessage>, ChatOptions?, string> respond)
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var client = new FuncChatClient(respond);
             ctx.Services.AddSingleton<IChatClient>(client);
@@ -90,7 +92,7 @@ namespace Radzen.Blazor.Tests
             var customer = new Customer();
             Customer? pasted = null;
 
-            var component = ctx.RenderComponent<RadzenSmartPasteButton<Customer>>(parameters => parameters
+            var component = ctx.Render<RadzenSmartPasteButton<Customer>>(parameters => parameters
                 .Add(p => p.Data, customer)
                 .Add(p => p.Pasted, c => pasted = c));
 
@@ -126,7 +128,7 @@ namespace Radzen.Blazor.Tests
 
             var customer = new Customer { Contact = "Keep me", CreditLimit = 7 };
 
-            var component = ctx.RenderComponent<RadzenSmartPasteButton<Customer>>(parameters => parameters
+            var component = ctx.Render<RadzenSmartPasteButton<Customer>>(parameters => parameters
                 .Add(p => p.Data, customer)
                 .Add(p => p.Fields, new[] { "Company", "Contact" }));
 
@@ -147,7 +149,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<string?>("Radzen.readClipboardText").SetResult("clip text");
 
             var customer = new Customer();
-            var component = ctx.RenderComponent<RadzenSmartPasteButton<Customer>>(parameters => parameters.Add(p => p.Data, customer));
+            var component = ctx.Render<RadzenSmartPasteButton<Customer>>(parameters => parameters.Add(p => p.Data, customer));
 
             await component.Find("button").ClickAsync(new Microsoft.AspNetCore.Components.Web.MouseEventArgs());
 
@@ -163,7 +165,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<string?>("Radzen.readClipboardText").SetResult(null);
 
             var empty = false;
-            var component = ctx.RenderComponent<RadzenSmartPasteButton<Customer>>(parameters => parameters
+            var component = ctx.Render<RadzenSmartPasteButton<Customer>>(parameters => parameters
                 .Add(p => p.Data, new Customer())
                 .Add(p => p.EmptyClipboard, () => empty = true));
 
@@ -183,7 +185,7 @@ namespace Radzen.Blazor.Tests
             string? output = null;
             AIPromptGeneratedEventArgs? generated = null;
 
-            var component = ctx.RenderComponent<RadzenAIPrompt>(parameters => parameters
+            var component = ctx.Render<RadzenAIPrompt>(parameters => parameters
                 .Add(p => p.Suggestions, new[] { "Summarize", "Translate" })
                 .Add(p => p.SystemPrompt, "Be brief.")
                 .Add(p => p.ValueChanged, v => value = v)
@@ -213,7 +215,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, client) = CreateContext((messages, _) => messages.Single().Text.Contains("Instruction: Shorter") ? "short" : "long answer here");
             using var _ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIPrompt>(parameters => parameters
+            var component = ctx.Render<RadzenAIPrompt>(parameters => parameters
                 .Add(p => p.Context, "Some long text")
                 .Add(p => p.Commands, new[] { new AIPromptCommand { Text = "Shorter", Prompt = "Shorter" } }));
 
@@ -239,7 +241,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext((_, _) => throw new InvalidOperationException("boom"));
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIPrompt>();
+            var component = ctx.Render<RadzenAIPrompt>();
 
             await component.InvokeAsync(() => component.Instance.Generate("Hi"));
             component.WaitForAssertion(() => Assert.False(component.Instance.IsGenerating));
@@ -256,7 +258,7 @@ namespace Radzen.Blazor.Tests
 
             string? value = null;
 
-            var component = ctx.RenderComponent<RadzenAIPrompt>(parameters => parameters
+            var component = ctx.Render<RadzenAIPrompt>(parameters => parameters
                 .Add(p => p.ValueChanged, v => value = v));
 
             await component.Find(".rz-aiprompt-textarea").InputAsync(new Microsoft.AspNetCore.Components.ChangeEventArgs { Value = "Summarize" });
@@ -294,7 +296,7 @@ namespace Radzen.Blazor.Tests
             string? value = "original text";
             var applied = new List<string?>();
 
-            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters
+            var component = ctx.Render<RadzenInlineAIPrompt>(parameters => parameters
                 .Add(p => p.Value, value)
                 .Add(p => p.ValueChanged, v => value = v)
                 .Add(p => p.Applied, v => applied.Add(v))
@@ -321,7 +323,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Improved text", applied.Single()?.Trim());
 
             value = "first line\nsecond line";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, value));
+            component.Render(parameters => parameters.Add(p => p.Value, value));
             await component.InvokeAsync(() => component.Instance.OpenAsync());
             component.WaitForAssertion(() => Assert.Contains("rz-aiprompt-textarea", component.Markup));
             await component.InvokeAsync(() => component.FindComponent<RadzenAIPrompt>().Instance.Generate("More"));
@@ -348,7 +350,7 @@ namespace Radzen.Blazor.Tests
 
             string? value = "the quick fox";
 
-            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters
+            var component = ctx.Render<RadzenInlineAIPrompt>(parameters => parameters
                 .Add(p => p.Value, value)
                 .Add(p => p.ValueChanged, v => value = v)
                 .Add(p => p.TargetId, "description")
@@ -374,7 +376,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext((_, _) => "x");
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.Title, "Improve").Add(p => p.Text, "Ask AI"));
+            var component = ctx.Render<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.Title, "Improve").Add(p => p.Text, "Ask AI"));
             var button = component.Find("button.rz-inline-aiprompt-button");
             Assert.Equal("Improve", button.GetAttribute("title"));
             Assert.Equal("dialog", button.GetAttribute("aria-haspopup"));
@@ -382,7 +384,7 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("Ask AI", button.TextContent);
             Assert.Equal("Improve", component.Find(".rz-inline-aiprompt-popup").GetAttribute("aria-label"));
 
-            var hidden = ctx.RenderComponent<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.ShowButton, false));
+            var hidden = ctx.Render<RadzenInlineAIPrompt>(parameters => parameters.Add(p => p.ShowButton, false));
             Assert.Empty(hidden.FindAll("button.rz-inline-aiprompt-button"));
             Assert.Single(hidden.FindAll(".rz-inline-aiprompt-popup"));
         }

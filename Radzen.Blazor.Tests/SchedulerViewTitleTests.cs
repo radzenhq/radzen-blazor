@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
@@ -18,7 +20,7 @@ namespace Radzen.Blazor.Tests
             public string Text { get; set; } = "";
         }
 
-        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler<TView>(TestContext ctx, DateTime date, Action<ComponentParameterCollectionBuilder<TView>>? configureView = null)
+        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler<TView>(BunitContext ctx, DateTime date, Action<ComponentParameterCollectionBuilder<TView>>? configureView = null)
             where TView : SchedulerViewBase
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -26,7 +28,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
 
-            return ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            return ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Culture, CultureInfo.InvariantCulture);
                 p.Add(x => x.Date, date);
@@ -44,7 +46,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AgendaView_DefaultTitle_IsDateRange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenAgendaView>(ctx, new DateTime(2026, 7, 14), v => v.Add(x => x.NumberOfDays, 7));
 
@@ -54,7 +56,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AgendaView_TitleFormat_FormatsStartDate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenAgendaView>(ctx, new DateTime(2026, 7, 14), v =>
             {
@@ -68,7 +70,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AgendaView_TitleFormat_ReceivesLastVisibleDate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenAgendaView>(ctx, new DateTime(2026, 7, 14), v =>
             {
@@ -82,7 +84,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AgendaView_TitleFormatter_TakesPrecedenceOverTitleFormat()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenAgendaView>(ctx, new DateTime(2026, 7, 14), v =>
             {
@@ -96,7 +98,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MonthView_TitleFormat_ReceivesMonthStartAndEnd()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx, new DateTime(2026, 7, 14), v => v.Add(x => x.TitleFormat, "{0:MM/dd} - {1:MM/dd}"));
 
@@ -106,7 +108,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_TitleFormatter_ReceivesWeekStartAndEnd()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenWeekView>(ctx, new DateTime(2026, 7, 14), v => v.Add(x => x.TitleFormatter, (start, end) => $"{start:yyyy-MM-dd}/{end:yyyy-MM-dd}"));
 
@@ -116,7 +118,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_TitleFormatter_ReceivesCurrentDay()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenDayView>(ctx, new DateTime(2026, 7, 14), v => v.Add(x => x.TitleFormatter, (start, end) => $"{start:yyyy-MM-dd}|{end:yyyy-MM-dd}"));
 
@@ -126,7 +128,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void YearView_TitleFormat_ReceivesYearStartAndEnd()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenYearView>(ctx, new DateTime(2026, 7, 14), v =>
             {
@@ -140,7 +142,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void YearView_DefaultTitle_IsUnchanged()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenYearView>(ctx, new DateTime(2026, 7, 14), v => v.Add(x => x.StartMonth, Month.April));
 

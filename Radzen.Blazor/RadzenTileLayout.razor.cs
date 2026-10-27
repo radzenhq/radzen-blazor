@@ -288,7 +288,6 @@ namespace Radzen.Blazor
                 if (colSpan != activeItem.CurrentColSpan || rowSpan != activeItem.CurrentRowSpan)
                 {
                     activeItem.SetSpan(colSpan, rowSpan);
-                    StateHasChanged();
                 }
             }
             else
@@ -327,7 +326,6 @@ namespace Radzen.Blazor
                 if (col != activeItem.CurrentCol || row != activeItem.CurrentRow)
                 {
                     activeItem.SetPosition(col, row);
-                    StateHasChanged();
                 }
             }
         }

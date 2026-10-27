@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -22,11 +22,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_UsernameLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(p => {
+            component.Render(p => {
                 p.AddUnmatched("id", "login");
             });
 
@@ -37,9 +37,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_UsernameInput()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             Assert.Contains(@$"<input name=""Username""", component.Markup);
         }
@@ -47,11 +47,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -59,13 +59,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Raises_LoginEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.Username, "user");
                 parameters.Add(p => p.Password, "pwd");
                 parameters.Add(p => p.Login, args => { clicked = true; });
@@ -79,13 +79,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_NotRaises_LoginEvent_WhenEmptyUsernameOrPasword()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.Login, args => { clicked = true; });
             });
 
@@ -97,11 +97,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_LoginTextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.LoginText, "Test");
             });
 
@@ -111,11 +111,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_AllowResetPasswordParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowResetPassword, true);
             });
 
@@ -125,11 +125,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_ResetPasswordTextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowResetPassword, true);
                 parameters.Add(p => p.ResetPasswordText, "Test");
             });
@@ -140,11 +140,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_AllowRegisterParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowRegister, true);
             });
 
@@ -154,11 +154,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_RegisterTextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowRegister, true);
                 parameters.Add(p => p.RegisterText, "Test");
             });
@@ -169,11 +169,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Renders_RegisterMessageTextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowRegister, true);
                 parameters.Add(p => p.RegisterMessageText, "Test");
             });
@@ -184,13 +184,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Raises_RegisterEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowRegister, true);
                 parameters.Add(p => p.Register, args => { clicked = true; });
             });
@@ -203,13 +203,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Raises_ResetPasswordEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowResetPassword, true);
                 parameters.Add(p => p.Username, "user");
                 parameters.Add(p => p.ResetPassword, args => { clicked = true; });
@@ -223,13 +223,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Login_Raises_ResetPasswordEvent_WhenEmptyUsername()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenLogin>();
+            var component = ctx.Render<RadzenLogin>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.AllowResetPassword, true);
                 parameters.Add(p => p.ResetPassword, args => { clicked = true; });
             });

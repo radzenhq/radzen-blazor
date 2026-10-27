@@ -10,13 +10,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_ValueParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             var value = 4.5;
 
-            component.SetParametersAndRender(parameters => parameters.Add<double>(p => p.Value, value));
+            component.Render(parameters => parameters.Add<double>(p => p.Value, value));
 
 
             Assert.Contains(@$"<div class=""rz-progressbar-label"">", component.Markup);
@@ -28,9 +28,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_MaxParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             component.Render();
 
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
 
             var value = 500;
 
-            component.SetParametersAndRender(parameters => parameters.Add<double>(p => p.Max, value));
+            component.Render(parameters => parameters.Add<double>(p => p.Max, value));
 
             Assert.Contains(@$"aria-valuemax=""{value}""", component.Markup);
         }
@@ -46,9 +46,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_UnitParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             component.Render();
 
@@ -56,7 +56,7 @@ namespace Radzen.Blazor.Tests
 
             var unit = "mm";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Unit, unit));
+            component.Render(parameters => parameters.Add(p => p.Unit, unit));
 
             Assert.Contains(@$"0{unit}", component.Markup);
         }
@@ -64,13 +64,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""--rz-progressbar-value: 0%;--rz-progressbar-buffer-value: 0%;{value}""", component.Markup);
         }
@@ -78,15 +78,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_ModeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             component.Render();
 
             Assert.Contains(@$"rz-progressbar-determinate", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<ProgressBarMode>(p => p.Mode, ProgressBarMode.Indeterminate));
+            component.Render(parameters => parameters.Add<ProgressBarMode>(p => p.Mode, ProgressBarMode.Indeterminate));
 
             Assert.Contains(@$"rz-progressbar-indeterminate", component.Markup);
         }
@@ -94,11 +94,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -106,14 +106,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_WidthFromValueAndMaxParameters()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
             var value = 4.5;
             var max = 500;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<double>(p => p.Value, value);
                 parameters.Add<double>(p => p.Max, max);
@@ -125,30 +125,30 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_ProgressBarStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>();
+            var component = ctx.Render<RadzenProgressBar>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success));
+            component.Render(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success));
             Assert.Contains(@$"rz-progressbar-success", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
+            component.Render(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
             Assert.Contains(@$"rz-progressbar-info", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success));
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
+            component.Render(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success));
+            component.Render(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
             Assert.Contains(@$"rz-progressbar-success", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
+            component.Render(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
+            component.Render(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
             Assert.Contains(@$"rz-progressbar-info", component.Markup);
         }
 
         [Fact]
         public void ProgressBar_Renders_ShowValue_True()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.ShowValue, true);
                 parameters.Add(p => p.Value, 50);
@@ -161,8 +161,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_ShowValue_False()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.ShowValue, false);
                 parameters.Add(p => p.Value, 50);
@@ -174,8 +174,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_Template()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.Value, 75);
                 parameters.Add(p => p.Template, builder => builder.AddContent(0, "Custom: 75%"));
@@ -187,10 +187,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_BufferValueParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var bufferValue = 70;
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, bufferValue);
             });
@@ -202,12 +202,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_WidthFromBufferValueAndMaxParameters()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bufferValue = 250d;
             var max = 500d;
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, bufferValue);
                 parameters.Add(p => p.Max, max);
@@ -219,13 +219,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_BufferValueWithCustomRange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bufferValue = 300d;
             var min = 100d;
             var max = 500d;
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, bufferValue);
                 parameters.Add(p => p.Min, min);
@@ -240,9 +240,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Clamps_BufferValueAboveMax()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, 150);
                 parameters.Add(p => p.Max, 100);
@@ -254,9 +254,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Clamps_BufferValueBelowMin()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, -50);
                 parameters.Add(p => p.Min, 0);
@@ -269,9 +269,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_DoesNotRender_BufferInIndeterminateMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.BufferValue, 70);
                 parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate);
@@ -283,9 +283,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_DoesNotRenderBuffer_WhenBufferValueIsNotSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.Value, -10);
                 parameters.Add(p => p.Min, -100);
@@ -297,9 +297,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_Renders_BufferBehindValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.Value, 30);
                 parameters.Add(p => p.BufferValue, 70);
@@ -318,9 +318,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProgressBar_RendersBuffer_WhenBufferIsZero()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            var component = ctx.Render<RadzenProgressBar>(parameters =>
             {
                 parameters.Add(p => p.Value, -20);
                 parameters.Add(p => p.BufferValue, 0);

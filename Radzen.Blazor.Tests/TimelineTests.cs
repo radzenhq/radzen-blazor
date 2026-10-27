@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
             Assert.Contains(@"rz-timeline", component.Markup);
         }
@@ -17,52 +17,52 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Renders_Orientation()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
             Assert.Contains("rz-timeline-row", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
             Assert.Contains("rz-timeline-column", component.Markup);
         }
 
         [Fact]
         public void Timeline_Renders_LinePosition()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.LinePosition, LinePosition.Start));
+            component.Render(parameters => parameters.Add(p => p.LinePosition, LinePosition.Start));
             Assert.Contains("rz-timeline-start", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.LinePosition, LinePosition.End));
+            component.Render(parameters => parameters.Add(p => p.LinePosition, LinePosition.End));
             Assert.Contains("rz-timeline-end", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.LinePosition, LinePosition.Center));
+            component.Render(parameters => parameters.Add(p => p.LinePosition, LinePosition.Center));
             Assert.Contains("rz-timeline-center", component.Markup);
         }
 
         [Fact]
         public void Timeline_Renders_AlignItems()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlignItems, AlignItems.Start));
+            component.Render(parameters => parameters.Add(p => p.AlignItems, AlignItems.Start));
             Assert.Contains("rz-timeline-align-items-start", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlignItems, AlignItems.Center));
+            component.Render(parameters => parameters.Add(p => p.AlignItems, AlignItems.Center));
             Assert.Contains("rz-timeline-align-items-center", component.Markup);
         }
 
         [Fact]
         public void Timeline_Renders_Reverse()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Reverse, true));
+            component.Render(parameters => parameters.Add(p => p.Reverse, true));
 
             Assert.Contains("rz-timeline-reverse", component.Markup);
         }
@@ -70,8 +70,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_DoesNotRender_Reverse_WhenFalse()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
             Assert.DoesNotContain("rz-timeline-reverse", component.Markup);
         }
@@ -79,8 +79,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Renders_Items()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -97,8 +97,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -109,8 +109,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>(parameters =>
             {
                 parameters.Add(p => p.Style, "margin:2rem");
             });
@@ -121,8 +121,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_DefaultOrientation_IsVertical()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
             Assert.Contains("rz-timeline-column", component.Markup);
         }
@@ -130,8 +130,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Renders_ListRole()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>();
 
             Assert.Contains(@"role=""list""", component.Markup);
         }
@@ -139,8 +139,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Timeline_Marks_OnlyTheConnectorOwner_WithItsLineStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimeline>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {

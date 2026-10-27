@@ -10,8 +10,8 @@ namespace Radzen.Blazor.Tests
 {
     public class AreaSeriesLineEndTests
     {
-        static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx, RenderFragment series) =>
-            ctx.RenderComponent<RadzenChart>(p => p.AddChildContent(series));
+        static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx, RenderFragment series) =>
+            ctx.Render<RadzenChart>(p => p.AddChildContent(series));
 
         static RenderFragment Series<TSeries>(LineType lineType) where TSeries : IComponent => b =>
         {

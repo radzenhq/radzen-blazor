@@ -17,9 +17,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>();
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>();
 
             Assert.Contains(@"rz-dropdown", component.Markup);
         }
@@ -27,9 +27,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_DropdownTrigger()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>();
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>();
 
             Assert.Contains("rz-dropdown-trigger", component.Markup);
             Assert.Contains("rzi-chevron-down", component.Markup);
@@ -38,9 +38,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_TriggerIcon_IsHiddenFromAssistiveTechnology()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>();
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>();
 
             var icon = component.Find(".rz-dropdown-trigger-icon");
 
@@ -50,11 +50,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_WithData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2", "Item3" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -65,7 +65,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_WithCustomTextValueProperties()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -73,7 +73,7 @@ namespace Radzen.Blazor.Tests
                 new Customer { Id = 2, CompanyName = "Tech Inc", ContactName = "Jane Smith" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "CompanyName");
@@ -87,11 +87,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_DataGrid()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -103,11 +103,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_AllowFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowFiltering, true);
                 parameters.Add(p => p.Data, data);
@@ -120,11 +120,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_SearchInput_HasComboboxAriaAttributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowFiltering, true);
                 parameters.Add(p => p.Data, data);
@@ -143,11 +143,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_EmbeddedGrid_IsNotTabbable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -160,9 +160,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Placeholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Placeholder, "Select an item");
             });
@@ -174,11 +174,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_AllowClear_WithValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowClear, true);
                 parameters.Add(p => p.Data, data);
@@ -191,11 +191,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_DoesNotRender_AllowClear_WhenNotAllowed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowClear, false);
                 parameters.Add(p => p.Data, data);
@@ -208,9 +208,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -222,9 +222,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Multiple_Panel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
             });
@@ -235,12 +235,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Multiple_WithChips()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
             var selectedItems = new List<string> { "Item1" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<string>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<string>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -255,7 +255,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Multiple_WithChips_SelectedItemsTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -265,7 +265,7 @@ namespace Radzen.Blazor.Tests
             };
             var selectedItems = new List<int> { 1, 2 };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -282,7 +282,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Multiple_DoesNotDuplicateItemsForRepeatedBoundValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -293,7 +293,7 @@ namespace Radzen.Blazor.Tests
             // A value repeated in the bound collection must map to its item exactly once.
             var selectedItems = new List<int> { 1, 1, 2 };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -318,7 +318,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Multiple_ResolvesEnumValuePropertyFromIntegerValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<RatedCustomer>
             {
@@ -327,7 +327,7 @@ namespace Radzen.Blazor.Tests
                 new RatedCustomer { CompanyName = "Company3", Rating = CustomerRating.Gold }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -344,7 +344,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Multiple_WithLabel_SelectedItemsTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -354,7 +354,7 @@ namespace Radzen.Blazor.Tests
             };
             var selectedItems = new List<int> { 1, 2 };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, false);
@@ -371,12 +371,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_DoesNotRender_Multiple_SelectedItemsTitle_WithoutTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2", "Item3" };
             var selectedItems = new List<string> { "Item1", "Item3" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<string>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<string>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -391,7 +391,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_Multiple_SelectedItemsTitle_CustomSeparator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -401,7 +401,7 @@ namespace Radzen.Blazor.Tests
             };
             var selectedItems = new List<int> { 1, 2, 3 };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, false);
@@ -420,14 +420,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_AllowSorting()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
                 new Customer { Id = 1, CompanyName = "Acme" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.AllowSorting, true);
                 parameters.Add(p => p.Data, data);
@@ -440,11 +440,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_SearchTextPlaceholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowFiltering, true);
                 parameters.Add(p => p.SearchTextPlaceholder, "Type to filter...");
@@ -457,10 +457,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_EmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<string>());
                 parameters.Add(p => p.EmptyText, "No items found");
@@ -472,11 +472,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_PageSize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = Enumerable.Range(1, 20).Select(i => $"Item {i}").ToList();
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.PageSize, 10);
@@ -489,11 +489,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Renders_AllowRowSelectOnRowClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowRowSelectOnRowClick, true);
                 parameters.Add(p => p.Data, data);
@@ -506,7 +506,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_LoadData_ReceivesSorts_OnColumnHeaderClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -517,7 +517,7 @@ namespace Radzen.Blazor.Tests
 
             LoadDataArgs capturedArgs = null;
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.Count, 1);
@@ -540,7 +540,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_LoadData_ReceivesFilter_OnSearchInputChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("foo");
@@ -552,7 +552,7 @@ namespace Radzen.Blazor.Tests
 
             var loadDataCalls = new List<LoadDataArgs>();
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.Count, 1);
@@ -570,11 +570,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Forwards_IsLoading_ToInnerDataGrid()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.IsLoading, true);
@@ -586,11 +586,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Forwards_LoadingTemplate_ToInnerDataGrid()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Item1", "Item2" };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.IsLoading, true);
@@ -603,14 +603,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_OpenOnFocus_FocusThenClick_OpensPopupOnce()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
                 new Customer { Id = 1, CompanyName = "Acme Corp" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "CompanyName");
@@ -629,14 +629,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_OpenOnFocus_ClickWhileOpen_ClosesPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
                 new Customer { Id = 1, CompanyName = "Acme Corp" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "CompanyName");
@@ -656,7 +656,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Multiple_CtrlA_SelectsAllItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -665,7 +665,7 @@ namespace Radzen.Blazor.Tests
             };
 
             IEnumerable<int> value = null;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Data, data);
@@ -683,7 +683,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Multiple_CtrlA_DoesNothingWhenSelectAllNotAllowed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -692,7 +692,7 @@ namespace Radzen.Blazor.Tests
             };
 
             IEnumerable<int> value = null;
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.AllowSelectAll, false);
@@ -711,7 +711,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_ComboboxAriaLabel_UsesTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -719,7 +719,7 @@ namespace Radzen.Blazor.Tests
                 new Customer { Id = 2, CompanyName = "Tech Inc" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "CompanyName");
@@ -735,11 +735,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_OmitsComboboxAriaLabel_WhenSelectedItemHasNoText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer> { new Customer { Id = 1, CompanyName = "Acme Corp" } };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ValueProperty, "Id");
@@ -755,7 +755,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDownDataGrid_Multiple_AriaLabelAndChipsFallBackToCount_WhenItemsHaveNoText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
@@ -763,7 +763,7 @@ namespace Radzen.Blazor.Tests
                 new Customer { Id = 2, CompanyName = "Company2" }
             };
 
-            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);

@@ -23,9 +23,9 @@ public class BarSeriesMultipleAxesTests
         new() { Month = "Mar", Revenue = 233000, Count = 302 },
     };
 
-    private static TestContext CreateChartContext()
+    private static BunitContext CreateChartContext()
     {
-        var ctx = new TestContext();
+        var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createChart", _ => true)
             .SetResult(new Radzen.Blazor.Rendering.Rect { Left = 0, Top = 0, Width = 600, Height = 400 });
@@ -33,14 +33,14 @@ public class BarSeriesMultipleAxesTests
         return ctx;
     }
 
-    private static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx)
+    private static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx)
     {
         return RenderChart(ctx, secondSeriesVisible: true);
     }
 
-    private static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx, bool secondSeriesVisible)
+    private static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx, bool secondSeriesVisible)
     {
-        return ctx.RenderComponent<RadzenChart>(parameters => parameters
+        return ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenBarSeries<Item>>(series => series
                 .Add(p => p.Title, "Revenue")
                 .Add(p => p.CategoryProperty, nameof(Item.Month))
@@ -147,7 +147,7 @@ public class BarSeriesMultipleAxesTests
     {
         using var ctx = CreateChartContext();
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenBarSeries<Item>>(series => series
                 .Add(p => p.Title, "Revenue")
                 .Add(p => p.CategoryProperty, nameof(Item.Month))
@@ -175,7 +175,7 @@ public class BarSeriesMultipleAxesTests
     {
         using var ctx = CreateChartContext();
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<Item>>(series => series
                 .Add(p => p.CategoryProperty, nameof(Item.Month))
                 .Add(p => p.ValueProperty, nameof(Item.Revenue))
@@ -226,7 +226,7 @@ public class BarSeriesMultipleAxesTests
     {
         using var ctx = CreateChartContext();
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<Item>>(series => series
                 .Add(p => p.CategoryProperty, nameof(Item.Month))
                 .Add(p => p.ValueProperty, nameof(Item.Revenue))

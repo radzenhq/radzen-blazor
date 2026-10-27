@@ -21,9 +21,9 @@ namespace Radzen.Blazor.Tests
             new DataItem { Category = "Aug", Value = 590 },
         };
 
-        private static async Task<IRenderedComponent<RadzenChart>> RenderAsync(TestContext ctx, object min, object max, double height)
+        private static async Task<IRenderedComponent<RadzenChart>> RenderAsync(BunitContext ctx, object min, object max, double height)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))

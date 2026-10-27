@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -9,10 +11,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Renders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             Assert.NotNull(component.Instance);
         }
@@ -20,10 +22,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_DefaultVariant_IsText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             Assert.Equal(Variant.Text, component.Instance.Variant);
         }
@@ -31,10 +33,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_DefaultButtonStyle_IsBase()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             Assert.Equal(ButtonStyle.Base, component.Instance.ButtonStyle);
         }
@@ -42,10 +44,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Renders_CustomVariant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
             });
@@ -56,10 +58,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Renders_CustomButtonStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.ButtonStyle, ButtonStyle.Primary);
             });
@@ -70,10 +72,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -84,10 +86,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Renders_ToggleShade()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.ToggleShade, Shade.Lighter);
             });
@@ -98,10 +100,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Accepts_CustomLightTheme()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.LightTheme, "my-light");
             });
@@ -112,10 +114,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppearanceToggle_Accepts_CustomDarkTheme()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.DarkTheme, "my-dark");
             });
@@ -123,9 +125,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("my-dark", component.Instance.DarkTheme);
         }
 
-        static TestContext CreateContext(string? theme)
+        static BunitContext CreateContext(string? theme)
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<ThemeService>();
 
@@ -142,7 +144,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext("material");
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             Assert.Equal("Dark theme", component.Find("button").GetAttribute("aria-label"));
         }
@@ -152,7 +154,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext("material");
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.AriaLabel, "Toggle dark mode");
                 parameters.AddUnmatched("aria-label", "From attributes");
@@ -166,7 +168,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext("material");
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.AddUnmatched("aria-label", "From attributes");
                 parameters.AddUnmatched("title", "Theme");
@@ -183,7 +185,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext("material");
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             var button = component.Find("button");
 
@@ -198,7 +200,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext("material-dark");
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             var button = component.Find("button");
 
@@ -213,7 +215,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext("material");
             var themeService = ctx.Services.GetRequiredService<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             component.Find("button").Click();
 
@@ -232,7 +234,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext("default");
             var themeService = ctx.Services.GetRequiredService<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             component.InvokeAsync(() => themeService.SetTheme("dark")).Wait();
 
@@ -245,7 +247,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext("my-custom");
             var themeService = ctx.Services.GetRequiredService<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>();
+            var component = ctx.Render<RadzenAppearanceToggle>();
 
             var button = component.Find("button");
 
@@ -263,7 +265,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext("my-custom");
             var themeService = ctx.Services.GetRequiredService<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenAppearanceToggle>(parameters =>
+            var component = ctx.Render<RadzenAppearanceToggle>(parameters =>
             {
                 parameters.Add(p => p.LightTheme, "my-custom");
                 parameters.Add(p => p.DarkTheme, "my-custom-dark");

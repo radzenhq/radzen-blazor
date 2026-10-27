@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
 {
     public class ChartTooltipHostWarningTests
     {
-        static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx)
+        static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx)
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -30,7 +30,7 @@ namespace Radzen.Blazor.Tests
             return (ml + x, mt + y);
         }
 
-        static int Warnings(TestContext ctx)
+        static int Warnings(BunitContext ctx)
         {
             return ctx.JSInterop.Invocations.Count(i => i.Identifier == "console.warn");
         }
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
             var chart = RenderChart(ctx);
 
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));

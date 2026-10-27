@@ -43,12 +43,12 @@ namespace Radzen.Blazor.Tests
             return data;
         }
 
-        static IRenderedComponent<RadzenDataGrid<Employee>> CreateGrid(TestContext ctx, List<Employee> data, Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Employee>>> configure = null)
+        static IRenderedComponent<RadzenDataGrid<Employee>> CreateGrid(BunitContext ctx, List<Employee> data, Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Employee>>> configure = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Employee>>(pb =>
+            return ctx.Render<RadzenDataGrid<Employee>>(pb =>
             {
                 pb.Add(p => p.Data, data.Where(e => e.ParentId == null).ToList());
                 pb.Add(p => p.LoadChildData, EventCallback.Factory.Create<DataGridLoadChildDataEventArgs<Employee>>(data,
@@ -67,7 +67,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_ExpandedChildren_AppearAfterParent()
         {
             var data = CreateData(3, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data);
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -84,7 +84,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_NestedExpand_AppearsInOrder()
         {
             var data = CreateData(2, 2, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data);
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -103,7 +103,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_Collapse_RestoresRootView()
         {
             var data = CreateData(3, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data);
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -121,7 +121,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_Filter_KeepsParentWithMatchingChild()
         {
             var data = CreateData(3, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data, pb => pb.Add(p => p.AllowFiltering, true));
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -141,7 +141,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_Filter_RemovesParentWithoutMatchingChild()
         {
             var data = CreateData(3, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data, pb => pb.Add(p => p.AllowFiltering, true));
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -161,7 +161,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_Sort_OrdersChildrenWithinParent()
         {
             var data = CreateData(2, 3);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data, pb => pb.Add(p => p.AllowSorting, true));
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();
@@ -187,12 +187,12 @@ namespace Radzen.Blazor.Tests
                 || data.Any(c => c.ParentId == r.Id && c.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))).ToList();
         }
 
-        static IRenderedComponent<RadzenDataGrid<Employee>> CreateLoadDataGrid(TestContext ctx, List<Employee> data, Func<IEnumerable<Employee>> getData, Action<LoadDataArgs> onLoadData)
+        static IRenderedComponent<RadzenDataGrid<Employee>> CreateLoadDataGrid(BunitContext ctx, List<Employee> data, Func<IEnumerable<Employee>> getData, Action<LoadDataArgs> onLoadData)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Employee>>(pb =>
+            return ctx.Render<RadzenDataGrid<Employee>>(pb =>
             {
                 pb.Add(p => p.Data, getData());
                 pb.Add(p => p.AllowFiltering, true);
@@ -213,7 +213,7 @@ namespace Radzen.Blazor.Tests
         {
             var data = CreateData(3, 2);
             IEnumerable<Employee> gridData = ServerFilter(data, null);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
             {
@@ -225,7 +225,7 @@ namespace Radzen.Blazor.Tests
 
             await component.InvokeAsync(() => column.SetFilterValue("Child 1.0"));
             await component.InvokeAsync(() => grid.Reload());
-            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+            component.Render(pb => pb.Add(p => p.Data, gridData));
 
             List<Employee> view = null;
             await component.InvokeAsync(() => view = grid.View.ToList());
@@ -238,7 +238,7 @@ namespace Radzen.Blazor.Tests
         {
             var data = CreateData(3, 2);
             IEnumerable<Employee> gridData = ServerFilter(data, null);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
             {
@@ -253,7 +253,7 @@ namespace Radzen.Blazor.Tests
             var column = grid.ColumnsCollection.First();
             await component.InvokeAsync(() => column.SetFilterValue("Child 1.0"));
             await component.InvokeAsync(() => grid.Reload());
-            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+            component.Render(pb => pb.Add(p => p.Data, gridData));
 
             List<Employee> view = null;
             await component.InvokeAsync(() => view = grid.View.ToList());
@@ -266,7 +266,7 @@ namespace Radzen.Blazor.Tests
         {
             var data = CreateData(3, 2);
             IEnumerable<Employee> gridData = ServerFilter(data, null);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreateLoadDataGrid(ctx, data, () => gridData, args =>
             {
@@ -281,7 +281,7 @@ namespace Radzen.Blazor.Tests
             var column = grid.ColumnsCollection.First();
             await component.InvokeAsync(() => column.SetFilterValue("root 2"));
             await component.InvokeAsync(() => grid.Reload());
-            component.SetParametersAndRender(pb => pb.Add(p => p.Data, gridData));
+            component.Render(pb => pb.Add(p => p.Data, gridData));
 
             List<Employee> view = null;
             await component.InvokeAsync(() => view = grid.View.ToList());
@@ -293,7 +293,7 @@ namespace Radzen.Blazor.Tests
         public async Task DataGrid_SelfRefHierarchy_ViewCount_ScalesLinearly()
         {
             var data = CreateData(20000, 2);
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = CreateGrid(ctx, data, pb => pb.Add(p => p.AllowVirtualization, true));
             var grid = component.Instance;
             var roots = data.Where(e => e.ParentId == null).ToList();

@@ -781,7 +781,7 @@ namespace Radzen
                         ? indexer.Type
                         : type
                             ?? Type.GetType(
-                                typeString.EndsWith('?')
+                                typeString.EndsWith('?', StringComparison.Ordinal)
                                     ? $"System.Nullable`1[System.{typeString.TrimEnd('?')}]"
                                     : $"System.{typeString}"
                             )

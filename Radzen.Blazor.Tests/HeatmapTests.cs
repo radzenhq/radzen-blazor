@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -25,7 +25,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -39,7 +39,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -52,7 +52,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
                 parameters.Add(p => p.MinColor, "#FFFFFF");
@@ -68,7 +68,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });
@@ -81,7 +81,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenHeatmap>(parameters =>
+            var component = ctx.Render<RadzenHeatmap>(parameters =>
             {
                 parameters.Add(p => p.Data, new List<object>());
             });

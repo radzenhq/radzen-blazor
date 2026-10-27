@@ -7,9 +7,9 @@ namespace Radzen.Blazor.Tests
 {
     public class ChartSyncTests
     {
-        static IRenderedComponent<RadzenChart> RenderSyncedChart(TestContext ctx, string group)
+        static IRenderedComponent<RadzenChart> RenderSyncedChart(BunitContext ctx, string group)
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .Add(x => x.SyncGroup, group)
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -22,7 +22,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
             // Unique group per test - the sync registry is static.
             var group = $"test-{System.Guid.NewGuid():N}";
@@ -53,11 +53,11 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
             using var otherCtx = CreateChartContext();
             otherCtx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            otherCtx.RenderComponent<RadzenChartTooltip>();
+            otherCtx.Render<RadzenChartTooltip>();
 
             var group = $"test-{System.Guid.NewGuid():N}";
             var source = RenderSyncedChart(ctx, group);

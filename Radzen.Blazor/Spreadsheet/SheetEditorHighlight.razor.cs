@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ public partial class SheetEditorHighlight : ComponentBase
 
     private List<HighlightToken> GetHighlightTokens()
     {
-        if (string.IsNullOrEmpty(Value) || !Value.StartsWith('='))
+        if (string.IsNullOrEmpty(Value) || !Value.StartsWith('=', StringComparison.Ordinal))
         {
             return [new() { Text = Value, Class = "rz-default-highlight" }];
         }

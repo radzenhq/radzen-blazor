@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>();
 
             Assert.Contains("rz-card-group", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_Renders_Responsive_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>();
 
             Assert.Contains("rz-card-group-responsive", component.Markup);
         }
@@ -26,8 +26,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_Renders_NonResponsive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>(parameters =>
             {
                 parameters.Add(p => p.Responsive, false);
             });
@@ -38,8 +38,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>(parameters =>
             {
                 parameters.AddChildContent("<div>Card 1</div><div>Card 2</div>");
             });
@@ -51,8 +51,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -63,8 +63,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CardGroup_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCardGroup>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCardGroup>(parameters =>
             {
                 parameters.Add(p => p.Style, "gap:1rem");
             });

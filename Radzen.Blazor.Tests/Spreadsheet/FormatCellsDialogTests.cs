@@ -6,7 +6,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class FormatCellsDialogTests : TestContext
+public class FormatCellsDialogTests : BunitContext
 {
     public FormatCellsDialogTests()
     {
@@ -17,7 +17,7 @@ public class FormatCellsDialogTests : TestContext
     private IRenderedComponent<FormatCellsDialog> RenderDialog(
         object sampleValue = null, CellDataType valueType = CellDataType.Number, string currentFormat = null)
     {
-        return RenderComponent<FormatCellsDialog>(parameters => parameters
+        return Render<FormatCellsDialog>(parameters => parameters
             .Add(p => p.SampleValue, sampleValue ?? 1234.5)
             .Add(p => p.ValueType, valueType)
             .Add(p => p.CurrentFormat, currentFormat)

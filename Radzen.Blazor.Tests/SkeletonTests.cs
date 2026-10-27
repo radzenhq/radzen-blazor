@@ -9,11 +9,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains("rz-skeleton-text", component.Markup);
@@ -22,13 +22,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_TypeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, SkeletonVariant.Circular));
+            component.Render(parameters => parameters.Add(p => p.Variant, SkeletonVariant.Circular));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains("rz-skeleton-circular", component.Markup);
@@ -40,11 +40,11 @@ namespace Radzen.Blazor.Tests
         [InlineData(SkeletonVariant.Rectangular, "rz-skeleton-rectangular")]
         public void Skeleton_Renders_AllTypes(SkeletonVariant type, string expectedClass)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>(parameters => parameters.Add(p => p.Variant, type));
+            var component = ctx.Render<RadzenSkeleton>(parameters => parameters.Add(p => p.Variant, type));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains(expectedClass, component.Markup);
@@ -53,13 +53,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_AnimationParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Animation, SkeletonAnimation.Wave));
+            component.Render(parameters => parameters.Add(p => p.Animation, SkeletonAnimation.Wave));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains("rz-skeleton-wave", component.Markup);
@@ -70,11 +70,11 @@ namespace Radzen.Blazor.Tests
         [InlineData(SkeletonAnimation.Pulse, "rz-skeleton-pulse")]
         public void Skeleton_Renders_AllAnimations(SkeletonAnimation animation, string expectedClass)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>(parameters => parameters.Add(p => p.Animation, animation));
+            var component = ctx.Render<RadzenSkeleton>(parameters => parameters.Add(p => p.Animation, animation));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains(expectedClass, component.Markup);
@@ -83,15 +83,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
             var style = "width: 200px; height: 20px;";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, style));
+            component.Render(parameters => parameters.Add(p => p.Style, style));
 
             Assert.Contains($"style=\"{style}\"", component.Markup);
         }
@@ -99,16 +99,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_VisibleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
             // Should be visible by default
             Assert.Contains("rz-skeleton", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+            component.Render(parameters => parameters.Add(p => p.Visible, false));
 
             // Should not render when not visible
             Assert.DoesNotContain("rz-skeleton", component.Markup);
@@ -117,13 +117,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("data-testid", "skeleton-test"));
+            component.Render(parameters => parameters.AddUnmatched("data-testid", "skeleton-test"));
 
             Assert.Contains("data-testid=\"skeleton-test\"", component.Markup);
         }
@@ -131,11 +131,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_DefaultType_IsText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
             // Should render with text type by default
             Assert.Contains("rz-skeleton-text", component.Markup);
@@ -144,11 +144,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Skeleton_DefaultAnimation_IsNone()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>();
+            var component = ctx.Render<RadzenSkeleton>();
 
             // Should not render animation classes by default
             Assert.DoesNotContain("rz-skeleton-wave", component.Markup);

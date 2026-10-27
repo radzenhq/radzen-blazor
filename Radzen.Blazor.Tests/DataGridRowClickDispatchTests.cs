@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
@@ -15,13 +17,13 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Item>>> extra)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(pb =>
+            return ctx.Render<RadzenDataGrid<Item>>(pb =>
             {
                 pb.Add(p => p.Data, new List<Item> { new() { Id = 1 }, new() { Id = 2 } });
                 pb.Add(p => p.Columns, b =>
@@ -43,7 +45,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RowClick_FiresFromTheRowElement_WithThatRowsData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             Item? clicked = null;
             var cut = Render(ctx, pb => pb.Add(p => p.RowClick, (DataGridRowMouseEventArgs<Item> a) => clicked = a.Data));
 
@@ -56,7 +58,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RowClick_SelectsTheRow_WhenSelectionIsOn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             Item? selected = null;
             var cut = Render(ctx, pb =>
             {
@@ -73,7 +75,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellClick_StillFiresFromTheCell_WithItsColumn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             string? column = null;
             var cut = Render(ctx, pb => pb.Add(p => p.CellClick, (DataGridCellMouseEventArgs<Item> a) => column = a.Column?.Property));
 
@@ -85,7 +87,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellClick_AlsoRaisesRowClickAndSelection_WhenDefaultIsNotPrevented()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var order = new List<string>();
             Item? selected = null;
             var cut = Render(ctx, pb =>
@@ -105,7 +107,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellClick_PreventDefault_SuppressesRowClickAndSelection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var order = new List<string>();
             Item? selected = null;
             var cut = Render(ctx, pb =>
@@ -129,7 +131,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellClick_PreventDefault_AppliesOnlyToThatClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var prevent = true;
             var rowClicks = new List<int>();
             var cut = Render(ctx, pb =>
@@ -156,7 +158,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellClick_PreventDefault_SuppressesRowClick_RaisedFromTheCell()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var rowClicked = false;
             var cut = Render(ctx, pb =>
             {
@@ -175,7 +177,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(true, false)]
         public void CellDoubleClick_PreventDefault_SuppressesRowDoubleClick(bool prevent, bool expectRowDoubleClick)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var rowDoubleClicked = false;
             var cut = Render(ctx, pb =>
             {
@@ -197,7 +199,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RowRender_Onclick_IsPreserved_AndRunsAfterTheBuiltInRowClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var order = new List<string>();
             var cut = Render(ctx, pb =>
             {
@@ -216,7 +218,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RowRender_StringOnclick_IsKept_AndBuiltInRowClickStillFiresFromTheCell()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             // A string HTML handler can't be chained with the built-in delegate, so it stays verbatim on the
             // row and the built-in row click is raised from the cell instead - both must survive.
             Item? rowClicked = null;
@@ -237,7 +239,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void NoRowHandler_IsWired_WhenNoRowOrCellClickIsSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx, _ => { });
 
             var row = cut.FindAll("tr.rz-data-row")[0];

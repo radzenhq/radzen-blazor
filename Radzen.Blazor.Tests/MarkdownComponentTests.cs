@@ -8,10 +8,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>();
+            var component = ctx.Render<RadzenMarkdown>();
 
             Assert.Contains("rz-markdown", component.Markup);
         }
@@ -19,10 +19,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "Hello World");
             });
@@ -33,10 +33,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Heading()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "# Heading 1");
             });
@@ -48,10 +48,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Bold()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "This is **bold** text");
             });
@@ -63,10 +63,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Italic()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "This is *italic* text");
             });
@@ -78,10 +78,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Link()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "[Click here](https://example.com)");
             });
@@ -93,10 +93,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_UnorderedList()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "- Item 1\n- Item 2");
             });
@@ -109,10 +109,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Paragraph()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "A simple paragraph.");
             });
@@ -124,10 +124,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_CodeBlock()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "```\nvar x = 1;\n```");
             });
@@ -139,10 +139,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_InlineCode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "Use `Console.WriteLine` here");
             });
@@ -154,10 +154,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_H2()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "## Sub Heading");
             });
@@ -169,10 +169,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Style, "max-width:800px");
             });
@@ -183,10 +183,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Blockquote()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "> This is a quote");
             });
@@ -198,11 +198,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_Renders_Link_WithInvalidDestination_AsText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // "https://" has no host: NavigationManager.ToAbsoluteUri throws UriFormatException for it.
-            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            var component = ctx.Render<RadzenMarkdown>(parameters =>
             {
                 parameters.Add(p => p.Text, "[Click here](https://)");
             });
@@ -214,10 +214,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Markdown_EmptyText_StillRenders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMarkdown>();
+            var component = ctx.Render<RadzenMarkdown>();
 
             Assert.Contains("rz-markdown", component.Markup);
         }

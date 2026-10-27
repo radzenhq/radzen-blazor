@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>();
 
             Assert.Contains("rz-sidebar", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.AddChildContent("<nav>Menu Items</nav>");
             });
@@ -29,8 +29,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Expanded_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>();
 
             Assert.True(component.Instance.Expanded);
         }
@@ -38,8 +38,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_CollapsedClass_WhenNotExpanded()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Expanded, false);
                 parameters.Add(p => p.Responsive, false);
@@ -51,8 +51,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_ExpandedClass_WhenExpanded()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Expanded, true);
                 parameters.Add(p => p.Responsive, false);
@@ -64,8 +64,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Toggle_ChangesState()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Responsive, false);
             });
@@ -78,8 +78,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_FullHeightClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.FullHeight, true);
             });
@@ -90,8 +90,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_DoesNotRender_FullHeight_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>();
 
             Assert.DoesNotContain("rz-sidebar-fullheight", component.Markup);
         }
@@ -99,8 +99,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_StartPosition_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>();
 
             Assert.Contains("rz-sidebar-start", component.Markup);
         }
@@ -108,8 +108,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_RightPosition()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Position, SidebarPosition.Right);
             });
@@ -120,8 +120,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_EndPosition()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Position, SidebarPosition.End);
             });
@@ -132,8 +132,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -144,8 +144,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Sidebar_Renders_DefaultStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSidebar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSidebar>();
 
             Assert.Contains("width:250px", component.Markup);
         }

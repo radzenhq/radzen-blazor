@@ -16,12 +16,12 @@ namespace Radzen.Blazor.Tests
                 .ToArray();
         }
 
-        private static IRenderedComponent<RadzenChart> Render(TestContext ctx, double width, double height, string type, DataItem[] data,
+        private static IRenderedComponent<RadzenChart> Render(BunitContext ctx, double width, double height, string type, DataItem[] data,
             Action<ComponentParameterCollectionBuilder<RadzenCategoryAxis>> axis = null,
             Action<ComponentParameterCollectionBuilder<RadzenLegend>> legend = null,
             string title = "Value")
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 p.Add(x => x.Style, FormattableString.Invariant($"width: {width}px; height: {height}px"));
 

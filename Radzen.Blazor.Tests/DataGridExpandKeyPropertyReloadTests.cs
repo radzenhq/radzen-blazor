@@ -16,12 +16,12 @@ namespace Radzen.Blazor.Tests
             public string Name { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Row>> Render(TestContext ctx, Func<IEnumerable<Row>> source, bool keyProperty)
+        static IRenderedComponent<RadzenDataGrid<Row>> Render(BunitContext ctx, Func<IEnumerable<Row>> source, bool keyProperty)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Row>>(pb =>
+            return ctx.Render<RadzenDataGrid<Row>>(pb =>
             {
                 if (keyProperty)
                 {
@@ -50,7 +50,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(false)]
         public async Task ExpandedRow_IconAndDetailAgree_AfterReloadWithFreshObjects(bool keyProperty)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx, Fresh, keyProperty);
 
             await cut.InvokeAsync(() => cut.Instance.ExpandRow(cut.Instance.Data.First()));
@@ -58,7 +58,7 @@ namespace Radzen.Blazor.Tests
             Assert.Single(cut.FindAll("tr.rz-expanded-row-content"));
             Assert.Single(cut.FindAll(".rzi-chevron-circle-down"));
 
-            cut.SetParametersAndRender(pb => pb.Add(p => p.Data, Fresh()));
+            cut.Render(pb => pb.Add(p => p.Data, Fresh()));
             await cut.InvokeAsync(() => cut.Instance.Reload());
             cut.Render();
 
@@ -73,13 +73,13 @@ namespace Radzen.Blazor.Tests
         [InlineData(false)]
         public async Task ExpandedRow_ToggleStillWorks_AfterReloadWithFreshObjects(bool keyProperty)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx, Fresh, keyProperty);
 
             await cut.InvokeAsync(() => cut.Instance.ExpandRow(cut.Instance.Data.First()));
             cut.Render();
 
-            cut.SetParametersAndRender(pb => pb.Add(p => p.Data, Fresh()));
+            cut.Render(pb => pb.Add(p => p.Data, Fresh()));
             await cut.InvokeAsync(() => cut.Instance.Reload());
             cut.Render();
 
@@ -109,12 +109,12 @@ namespace Radzen.Blazor.Tests
             new Node { Id = 4, ParentId = 1, Name = "Child 1.2" },
         };
 
-        static IRenderedComponent<RadzenDataGrid<Node>> RenderHierarchy(TestContext ctx, Func<List<Node>> source, List<Node> loadChildDataCalls)
+        static IRenderedComponent<RadzenDataGrid<Node>> RenderHierarchy(BunitContext ctx, Func<List<Node>> source, List<Node> loadChildDataCalls)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Node>>(pb =>
+            return ctx.Render<RadzenDataGrid<Node>>(pb =>
             {
                 pb.Add(p => p.KeyProperty, nameof(Node.Id));
                 pb.Add(p => p.LoadData, EventCallback.Factory.Create<LoadDataArgs>(new object(), (LoadDataArgs _) => { }));
@@ -136,7 +136,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task HierarchyExpandedRow_KeepsChildrenAndToggle_AfterReloadWithFreshObjects()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var calls = new List<Node>();
             var cut = RenderHierarchy(ctx, FreshNodes, calls);
 
@@ -146,7 +146,7 @@ namespace Radzen.Blazor.Tests
             Assert.Single(cut.FindAll(".rzi-chevron-circle-down"));
 
             var fresh = FreshNodes().Where(n => n.ParentId == null).ToList();
-            cut.SetParametersAndRender(pb => pb.Add(p => p.Data, fresh));
+            cut.Render(pb => pb.Add(p => p.Data, fresh));
             await cut.InvokeAsync(() => cut.Instance.Reload());
             cut.Render();
 

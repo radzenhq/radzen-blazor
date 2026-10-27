@@ -255,7 +255,7 @@ public static class NumberFormat
 
             if (c == '[')
             {
-                var close = formatCode.IndexOf(']', i + 1);
+                var close = formatCode.IndexOf(']', i + 1, StringComparison.Ordinal);
 
                 if (close < 0)
                 {

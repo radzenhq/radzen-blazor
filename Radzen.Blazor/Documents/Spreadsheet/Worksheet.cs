@@ -1063,20 +1063,9 @@ public partial class Worksheet
     /// </summary>
     public void InsertRow(int rowIndex, int count = 1)
     {
-#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(rowIndex);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(rowIndex, RowCount);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
-#else
-        if (rowIndex < 0 || rowIndex > RowCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
-        if (count <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
-#endif
 
         Batch(() => InsertRowCore(rowIndex, count));
     }
@@ -1117,20 +1106,9 @@ public partial class Worksheet
     /// </summary>
     public void InsertColumn(int columnIndex, int count = 1)
     {
-#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(columnIndex);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(columnIndex, ColumnCount);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
-#else
-        if (columnIndex < 0 || columnIndex > ColumnCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(columnIndex));
-        }
-        if (count <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
-#endif
 
         Batch(() => InsertColumnCore(columnIndex, count));
     }

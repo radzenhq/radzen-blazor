@@ -33,11 +33,11 @@ namespace Radzen.Blazor.Tests
         [InlineData(true)]
         public void ContextMenu_ForwardsCloseOnScroll(bool closeOnScroll)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var service = new ContextMenuService(null);
             ctx.Services.AddSingleton(service);
-            var component = ctx.RenderComponent<RadzenContextMenu>();
+            var component = ctx.Render<RadzenContextMenu>();
 
             service.Open(new MouseEventArgs { ClientX = 10, ClientY = 20 }, new ContextMenuOptions
             {

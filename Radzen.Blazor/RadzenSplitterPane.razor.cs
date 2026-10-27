@@ -265,7 +265,7 @@ namespace Radzen.Blazor
 
             value = value.Trim();
 
-            if (value.EndsWith('%')
+            if (value.EndsWith('%', StringComparison.Ordinal)
                 && double.TryParse(value.AsSpan(0, value.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
             {
                 return result;

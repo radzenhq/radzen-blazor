@@ -23,14 +23,14 @@ namespace Radzen.Blazor.Tests
             new Person { Id = 2, Name = null, Salary = 61234.5m },
         };
 
-        static IRenderedComponent<RadzenDataGrid<Person>> Render(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Person>> Render(BunitContext ctx,
             Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Person>>> extra = null,
             RenderFragment columns = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            return ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People);
                 p.Add(g => g.Columns, columns ?? NameColumn);
@@ -52,7 +52,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TheCellCarriesItsOwnValueAsATitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx));
 
@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ACellWithNoValueCarriesNoTitleAttributeAtAll()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx));
 
@@ -74,7 +74,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TurningItOffLeavesNoTitleOnAnyCell()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx, p => p.Add(g => g.ShowCellDataAsTooltip, false)));
 
@@ -84,7 +84,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ATemplateColumnGetsNoTitleFromTheGridWideDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx, columns: builder =>
             {
@@ -102,7 +102,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ATemplateColumnThatAsksForATitleGetsTheUnderlyingValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx, columns: builder =>
             {
@@ -122,7 +122,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TheTitleIsTheFormattedValueAndMatchesWhatTheCellShows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx, columns: builder =>
             {
@@ -159,7 +159,7 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Person>> RenderCounting(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Person>> RenderCounting(BunitContext ctx,
             bool tooltip, int rows, out CountingColumn column, bool returnsNull = false)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -167,7 +167,7 @@ namespace Radzen.Blazor.Tests
 
             CountingColumn captured = null;
 
-            var cut = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var cut = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People.Take(rows).ToList());
                 p.Add(g => g.ShowCellDataAsTooltip, tooltip);
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void EnteringEditModeAsksForNoValueWhenTheTooltipIsOff()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderCounting(ctx, tooltip: false, rows: 1, out var column);
             var before = column.Calls;
@@ -206,8 +206,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TheTooltipDoesNotCostASecondLookup()
         {
-            using var withTooltipCtx = new TestContext();
-            using var withoutTooltipCtx = new TestContext();
+            using var withTooltipCtx = new BunitContext();
+            using var withoutTooltipCtx = new BunitContext();
 
             RenderCounting(withTooltipCtx, tooltip: true, rows: 2, out var withTooltip);
             RenderCounting(withoutTooltipCtx, tooltip: false, rows: 2, out var withoutTooltip);
@@ -220,8 +220,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AnOverrideThatReturnsNullIsStillOnlyAskedOnce()
         {
-            using var nullCtx = new TestContext();
-            using var valueCtx = new TestContext();
+            using var nullCtx = new BunitContext();
+            using var valueCtx = new BunitContext();
 
             RenderCounting(nullCtx, tooltip: true, rows: 2, out var returnsNull, returnsNull: true);
             RenderCounting(valueCtx, tooltip: true, rows: 2, out var returnsValue);
@@ -233,7 +233,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TheResponsiveBranchCarriesTheTitleToo()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cells = Cells(Render(ctx, p => p.Add(g => g.Responsive, true)));
 

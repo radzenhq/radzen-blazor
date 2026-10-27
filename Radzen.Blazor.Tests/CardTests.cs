@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>();
 
             Assert.Contains(@"rz-card", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>(parameters =>
             {
                 parameters.AddChildContent("<div>Card Content</div>");
             });
@@ -29,24 +29,24 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_Renders_Variant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, Variant.Outlined));
+            component.Render(parameters => parameters.Add(p => p.Variant, Variant.Outlined));
             Assert.Contains("rz-variant-outlined", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, Variant.Filled));
+            component.Render(parameters => parameters.Add(p => p.Variant, Variant.Filled));
             Assert.Contains("rz-variant-filled", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, Variant.Flat));
+            component.Render(parameters => parameters.Add(p => p.Variant, Variant.Flat));
             Assert.Contains("rz-variant-flat", component.Markup);
         }
 
         [Fact]
         public void Card_Renders_Variant_Text()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Text);
             });
@@ -57,8 +57,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_DefaultVariant_IsFilled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>();
 
             Assert.Contains("rz-variant-filled", component.Markup);
         }
@@ -66,8 +66,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -78,8 +78,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>(parameters =>
             {
                 parameters.Add(p => p.Style, "padding:2rem");
             });
@@ -90,8 +90,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Card_Renders_UnmatchedAttributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCard>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCard>(parameters =>
             {
                 parameters.AddUnmatched("data-testid", "my-card");
             });

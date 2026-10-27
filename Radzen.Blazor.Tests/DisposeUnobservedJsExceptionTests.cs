@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -66,10 +68,10 @@ namespace Radzen.Blazor.Tests
 
         static void RenderAndDisposeWithDisconnectedJs<TComponent>() where TComponent : Microsoft.AspNetCore.Components.IComponent, IDisposable
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var cut = ctx.RenderComponent<TComponent>();
+            var cut = ctx.Render<TComponent>();
             var instance = cut.Instance;
 
             FieldInfo? field = null;
@@ -106,10 +108,10 @@ namespace Radzen.Blazor.Tests
 
         static void RenderAndDisposeWithDisconnectedRuntime<TComponent>(string identifier, string? flagField) where TComponent : Microsoft.AspNetCore.Components.IComponent, IDisposable
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var cut = ctx.RenderComponent<TComponent>();
+            var cut = ctx.Render<TComponent>();
             var instance = cut.Instance;
 
             ctx.JSInterop.SetupVoid(identifier, _ => true).SetException(new JSDisconnectedException("circuit disconnected"));

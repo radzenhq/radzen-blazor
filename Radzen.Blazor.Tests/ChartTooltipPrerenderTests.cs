@@ -88,7 +88,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "Quiz 4", Value = 61 },
             };
 
-            ctx.RenderComponent<RadzenSparkline>(p => p
+            ctx.Render<RadzenSparkline>(p => p
                 .Add(c => c.Style, "width: 100px; height: 20px")
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.Smooth, true)

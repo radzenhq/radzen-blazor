@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Renders_Record_Button_When_Visible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             component.Render();
 
@@ -22,11 +22,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Does_Not_Renders_Record_Button_When_Visible_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -37,10 +37,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Renders_Additional_Css()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component =
-                ctx.RenderComponent<RadzenSpeechToTextButton>(ComponentParameter.CreateParameter("class", "another-class"));
+                ctx.Render<RadzenSpeechToTextButton>(p => p.AddUnmatched("class", "another-class"));
 
             var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button.another-class");
 
@@ -50,12 +50,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Can_Override_Default_Title_And_Aria_Label()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component =
-                ctx.RenderComponent<RadzenSpeechToTextButton>(
-                    ComponentParameter.CreateParameter("title", "title override"),
-                    ComponentParameter.CreateParameter("aria-label", "aria-label override"));
+                ctx.Render<RadzenSpeechToTextButton>(p => p
+                    .AddUnmatched("title", "title override")
+                    .AddUnmatched("aria-label", "aria-label override"));
 
             var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
@@ -67,9 +67,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Sets_Record_Button_Css_When_Record_Button_Clicked()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -91,9 +91,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Sets_StopTitle_When_Record_Button_Clicked()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -115,9 +115,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_ChangesIconWhen_When_Record_Button_Clicked()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -140,9 +140,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_UnSets_Record_Button_Css_When_Record_Button_Clicked_Twice()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -171,15 +171,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SpeechToTextButton_Invokes_OnResult_FromJs()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+            var component = ctx.Render<RadzenSpeechToTextButton>();
 
             string resultsFromJs = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, r => resultsFromJs = r));
+            component.Render(parameters => parameters.Add(p => p.Change, r => resultsFromJs = r));
 
             var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 

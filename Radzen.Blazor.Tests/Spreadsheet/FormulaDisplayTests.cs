@@ -28,9 +28,9 @@ public class FormulaDisplayTests
     [Fact]
     public void Highlight_CrossSheetReference_KeepsSheetPrefix()
     {
-        using var ctx = new TestContext();
+        using var ctx = new BunitContext();
 
-        var cut = ctx.RenderComponent<SheetEditorHighlight>(
+        var cut = ctx.Render<SheetEditorHighlight>(
             parameters => parameters.Add(p => p.Value, "=SUM('Q1 Sales'!B2:D2)"));
 
         // The syntax-highlight overlay must keep the worksheet prefix (it previously rendered
@@ -41,9 +41,9 @@ public class FormulaDisplayTests
     [Fact]
     public void Highlight_BareCellReference_StillRenders()
     {
-        using var ctx = new TestContext();
+        using var ctx = new BunitContext();
 
-        var cut = ctx.RenderComponent<SheetEditorHighlight>(
+        var cut = ctx.Render<SheetEditorHighlight>(
             parameters => parameters.Add(p => p.Value, "=B2+C2"));
 
         Assert.Contains("B2", cut.Markup);

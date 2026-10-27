@@ -18,10 +18,10 @@ namespace Radzen.Blazor.Tests
         static List<Person> People(int n) =>
             Enumerable.Range(1, n).Select(i => new Person { Id = i, Name = "Person " + i }).ToList();
 
-        static IRenderedComponent<RadzenDataGrid<Person>> RenderEditableGrid(TestContext ctx, List<Person> data,
+        static IRenderedComponent<RadzenDataGrid<Person>> RenderEditableGrid(BunitContext ctx, List<Person> data,
             bool withValidator)
         {
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            return ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add<RenderFragment>(g => g.Columns, builder =>
@@ -56,7 +56,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void EditRow_CascadesEditContextToEditors()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -77,7 +77,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void EditRow_CascadesFormSoValidatorsResolveTheirComponent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -97,13 +97,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ReadOnlyRow_WithInputInPlainTemplate_StillRenders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var data = People(3);
 
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add<RenderFragment>(g => g.Columns, builder =>

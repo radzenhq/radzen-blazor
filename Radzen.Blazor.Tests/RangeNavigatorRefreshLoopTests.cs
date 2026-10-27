@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext(800, 60);
 
-            var host = WithinTimeout(() => ctx.RenderComponent<PerRenderDataHost>());
+            var host = WithinTimeout(() => ctx.Render<PerRenderDataHost>());
 
             Assert.Contains("<svg", host.Markup);
             Assert.InRange(host.Instance.Renders, 1, 4);
@@ -83,11 +83,11 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext(800, 60);
 
-            var host = WithinTimeout(() => ctx.RenderComponent<PerRenderDataHost>());
+            var host = WithinTimeout(() => ctx.Render<PerRenderDataHost>());
             var navigator = host.FindComponent<RadzenRangeNavigator>();
             var before = navigator.Instance.ValueScale.Input.End;
 
-            WithinTimeout(() => { host.SetParametersAndRender(p => p.Add(x => x.Offset, 10000)); return true; });
+            WithinTimeout(() => { host.Render(p => p.Add(x => x.Offset, 10000)); return true; });
 
             Assert.True(navigator.Instance.ValueScale.Input.End > before);
         }

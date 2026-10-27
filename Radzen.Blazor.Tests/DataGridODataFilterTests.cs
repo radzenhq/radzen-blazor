@@ -18,11 +18,11 @@ namespace Radzen.Blazor.Tests
         [InlineData(2026, "Day eq 2026-01-01")]
         public void DataGrid_ODataFilter_WritesDateOnlyWithFourDigitYear(int year, string expected)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<Holiday>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<Holiday>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<Holiday>>(p => p.Data, new List<Holiday>().AsODataEnumerable());
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>

@@ -9,10 +9,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_Renders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            var component = ctx.Render<RadzenMediaQuery>(parameters =>
             {
                 parameters.Add(p => p.Query, "(max-width: 768px)");
             });
@@ -23,11 +23,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_HasQueryParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var query = "(max-width: 1024px)";
-            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            var component = ctx.Render<RadzenMediaQuery>(parameters =>
             {
                 parameters.Add(p => p.Query, query);
             });
@@ -38,13 +38,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_InvokesChangeCallback()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             bool changeInvoked = false;
             bool matchResult = false;
 
-            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            var component = ctx.Render<RadzenMediaQuery>(parameters =>
             {
                 parameters.Add(p => p.Query, "(max-width: 768px)");
                 parameters.Add(p => p.Change, EventCallback.Factory.Create<bool>(this, (matches) =>
@@ -64,12 +64,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_OnChange_FalseValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             bool matchResult = true;
 
-            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            var component = ctx.Render<RadzenMediaQuery>(parameters =>
             {
                 parameters.Add(p => p.Query, "(max-width: 768px)");
                 parameters.Add(p => p.Change, EventCallback.Factory.Create<bool>(this, (matches) =>
@@ -86,10 +86,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_WithoutQuery_Renders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMediaQuery>();
+            var component = ctx.Render<RadzenMediaQuery>();
 
             Assert.NotNull(component.Instance);
             Assert.Null(component.Instance.Query);
@@ -98,10 +98,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MediaQuery_WithoutChangeHandler_DoesNotThrow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            var component = ctx.Render<RadzenMediaQuery>(parameters =>
             {
                 parameters.Add(p => p.Query, "(min-width: 1024px)");
             });

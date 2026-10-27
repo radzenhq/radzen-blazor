@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_CssClasses()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
             Assert.Contains(@"rz-alert", component.Markup);
         }
@@ -17,35 +17,35 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_AlertStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Danger));
+            component.Render(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Danger));
             Assert.Contains("rz-danger", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Success));
+            component.Render(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Success));
             Assert.Contains("rz-success", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Warning));
+            component.Render(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Warning));
             Assert.Contains("rz-warning", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Info));
+            component.Render(parameters => parameters.Add(p => p.AlertStyle, AlertStyle.Info));
             Assert.Contains("rz-info", component.Markup);
         }
 
         [Fact]
         public void Alert_Renders_Shade()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.AlertStyle, AlertStyle.Primary)
                 .Add(p => p.Shade, Shade.Lighter));
 
             Assert.Contains("rz-shade-lighter", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.AlertStyle, AlertStyle.Primary)
                 .Add(p => p.Shade, Shade.Darker));
 
@@ -55,24 +55,24 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_Variant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, Variant.Outlined));
+            component.Render(parameters => parameters.Add(p => p.Variant, Variant.Outlined));
             Assert.Contains("rz-variant-outlined", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, Variant.Flat));
+            component.Render(parameters => parameters.Add(p => p.Variant, Variant.Flat));
             Assert.Contains("rz-variant-flat", component.Markup);
         }
 
         [Fact]
         public void Alert_Renders_Title()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
             var title = "Alert Title";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Title, title));
+            component.Render(parameters => parameters.Add(p => p.Title, title));
 
             Assert.Contains(title, component.Markup);
             Assert.Contains("rz-alert-title", component.Markup);
@@ -81,11 +81,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_Text()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
             var text = "This is an alert message";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.Render(parameters => parameters.Add(p => p.Text, text));
 
             Assert.Contains(text, component.Markup);
         }
@@ -93,8 +93,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.AddChildContent("Custom alert content");
             });
@@ -105,28 +105,28 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_ShowIcon_DisplaysIcon()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
             // Default should show icon
             Assert.Contains("rz-alert-icon", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ShowIcon, false));
+            component.Render(parameters => parameters.Add(p => p.ShowIcon, false));
             Assert.DoesNotContain("rz-alert-icon", component.Markup);
         }
 
         [Fact]
         public void Alert_AllowClose_DisplaysCloseButton()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenAlert>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenAlert>();
 
             // Default AllowClose is true - should contain a button with close icon
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AllowClose, true));
+            component.Render(parameters => parameters.Add(p => p.AllowClose, true));
             Assert.Contains("close", component.Markup);
             Assert.Contains("rz-button", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AllowClose, false));
+            component.Render(parameters => parameters.Add(p => p.AllowClose, false));
             // When AllowClose is false, should not have close button
             var buttonCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "rz-button").Count;
             Assert.Equal(0, buttonCount);
@@ -135,11 +135,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_CloseButton_RaisesCloseEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             
             var closeRaised = false;
 
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.AllowClose, true);
                 parameters.Add(p => p.Close, () => closeRaised = true);
@@ -154,9 +154,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Renders_AlertRole()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.Text, "Alert message");
             });
@@ -169,9 +169,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Does_Not_Set_AriaLive()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.Text, "Alert message");
             });
@@ -183,9 +183,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Does_Not_Steal_Focus()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.Text, "Alert message");
             });
@@ -197,9 +197,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_Visible_ControlsDisplay()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.Visible, true);
                 parameters.Add(p => p.Text, "Visible Alert");
@@ -207,7 +207,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("Visible Alert", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+            component.Render(parameters => parameters.Add(p => p.Visible, false));
 
             // When not visible, component should not render
             Assert.DoesNotContain("Visible Alert", component.Markup);
@@ -216,11 +216,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Alert_CloseButton_SetsVisibleToFalse()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             
             var visibleValue = true;
 
-            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            var component = ctx.Render<RadzenAlert>(parameters =>
             {
                 parameters.Add(p => p.Visible, visibleValue);
                 parameters.Add(p => p.AllowClose, true);

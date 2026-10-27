@@ -21,11 +21,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -53,11 +53,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_RendersWidthOnColOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -91,11 +91,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CompositeColumns_RenderWidthOnCells()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -120,14 +120,14 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(component.FindAll("th"), cell => (cell.GetAttribute("style") ?? string.Empty).Contains("width:80px"));
         }
 
-        private static IRenderedComponent<RadzenDataGrid<dynamic>> RenderTwoColumnGrid(TestContext ctx,
+        private static IRenderedComponent<RadzenDataGrid<dynamic>> RenderTwoColumnGrid(BunitContext ctx,
             out RadzenDataGridColumn<dynamic> first, out RadzenDataGridColumn<dynamic> second,
-            Action<DataGridColumnResizedEventArgs<dynamic>>? columnResized = null)
+            Action<DataGridColumnResizedEventArgs<dynamic>> columnResized = null)
         {
             RadzenDataGridColumn<dynamic> idColumn = null!;
             RadzenDataGridColumn<dynamic> nameColumn = null!;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Alice" } });
 
@@ -158,7 +158,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_Resize_PreservesAllVisibleColumnWidths()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             DataGridColumnResizedEventArgs<dynamic> args = null!;
@@ -178,7 +178,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_Resize_LeavesColumnWithoutWidth()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -198,11 +198,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Respects_ShowHeaderParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -219,7 +219,7 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("MyId", component.Markup);
 
             // ShowHeader=false hides the column header row
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ShowHeader, false));
+            component.Render(parameters => parameters.Add(p => p.ShowHeader, false));
 
             Assert.Empty(component.FindAll("thead tr"));
             Assert.DoesNotContain("MyId", component.Markup);
@@ -229,11 +229,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnPropertyParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -254,11 +254,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnTitleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -276,11 +276,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_TitleAttribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, true);
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
@@ -300,11 +300,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_DoesNotRender_TitleAttribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, false);
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
@@ -324,11 +324,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_AllowSortingParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -343,7 +343,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-sortable-column", component.Markup);
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowSorting, false);
             });
@@ -354,11 +354,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnSortableParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -378,11 +378,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_AllowFilteringParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -397,7 +397,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-grid-filter-icon", component.Markup);
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowFiltering, false);
             });
@@ -408,11 +408,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnFilterableParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -432,11 +432,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterModeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -452,7 +452,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-grid-filter", component.Markup);
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<FilterMode>(p => p.FilterMode, FilterMode.Simple);
             });
@@ -463,11 +463,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnHeaderTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1, 2, 3 });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -489,11 +489,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnFooterTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1, 2, 3 });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -518,11 +518,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_ColumnSortIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -548,11 +548,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_AllowPagingParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -571,11 +571,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_PagerInputSizeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -596,11 +596,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_PagerPositionTopParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -620,11 +620,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_PagerPositionTopAndBottomParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -644,13 +644,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_PagerDensityDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
@@ -663,13 +663,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_PagerDensityCompact()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
@@ -682,11 +682,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_DefaultEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
             component.Render();
 
             Assert.Contains("No records to display.", component.Markup);
@@ -696,12 +696,12 @@ namespace Radzen.Blazor.Tests
         public void DataGrid_Renders_EmptyText()
         {
             string emptyText = "Lorem Ipsum";
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
-            component.SetParametersAndRender(parameters =>
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.EmptyText, emptyText);
             });
@@ -712,12 +712,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_EmptyTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
-            component.SetParametersAndRender(parameters =>
+            var component = ctx.Render<RadzenDataGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Array.Empty<int>()));
+            component.Render(parameters =>
             {
                 parameters.Add<RenderFragment>(p => p.EmptyTemplate, builder =>
                 {
@@ -733,11 +733,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEventOnNextPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -753,7 +753,7 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -768,11 +768,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEventOnLastPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -788,7 +788,7 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -803,11 +803,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEventOnPrevPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -823,7 +823,7 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -839,11 +839,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEventOnFirstPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -859,7 +859,7 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -875,11 +875,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_NotRaises_LoadDataEventOnFirstPageClickWhenOnFirstPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -894,7 +894,7 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -907,11 +907,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_NotRaises_LoadDataEventOnPrevPageClickWhenOnFirstPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -926,7 +926,7 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -939,11 +939,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_NotRaises_LoadDataEventOnLastPageClickWhenOnLastPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -960,7 +960,7 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-pager-last").Click();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -973,11 +973,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_NotRaises_LoadDataEventOnNextPageClickWhenOnLastPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -994,7 +994,7 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-pager-last").Click();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -1007,11 +1007,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Respects_PageSizeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1027,12 +1027,12 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 20);
             });
@@ -1048,7 +1048,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterInput_ForStringColumn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1059,7 +1059,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Charlie" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1081,7 +1081,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEvent_WhenFilterChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1095,7 +1095,7 @@ namespace Radzen.Blazor.Tests
             var raised = false;
             LoadDataArgs capturedArgs = null;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1120,7 +1120,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterInput_ForNumericColumn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1131,7 +1131,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Value = 30 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1153,7 +1153,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Raises_LoadDataEvent_OnFilterClear()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1166,7 +1166,7 @@ namespace Radzen.Blazor.Tests
 
             var eventCount = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1194,7 +1194,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_MultipleColumns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1205,7 +1205,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Charlie", Age = 25 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1241,7 +1241,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Respects_LogicalFilterOperator_And()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1252,7 +1252,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Alice", Age = 30 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1289,7 +1289,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Respects_FilterCaseSensitivityParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1300,7 +1300,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "charlie" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1321,7 +1321,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ShowsFilterIcon_WhenFilterIsApplied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1331,7 +1331,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Bob" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1351,13 +1351,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ResetsPaging_WhenFilterIsApplied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = Enumerable.Range(0, 100).Select(i => new { Id = i, Name = $"Name{i}" });
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1388,7 +1388,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterWithSimpleWithMenuMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1398,7 +1398,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Bob" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1420,7 +1420,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_WithColumnFilterProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1430,7 +1430,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Bob", SearchName = "bob" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1454,11 +1454,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterMode_Simple()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1478,11 +1478,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterMode_Advanced()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1502,11 +1502,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_FilterMode_CheckBoxList()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<string>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<string>>(p => p.Data, new[] { "Test1", "Test2" });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1528,7 +1528,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsStringFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1539,7 +1539,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Cherry" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1559,7 +1559,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsNumericFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1570,7 +1570,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Value = 300 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1590,7 +1590,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsDateFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1601,7 +1601,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Date = new DateTime(2023, 12, 1) }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1620,7 +1620,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsBooleanFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -1631,7 +1631,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, IsActive = true }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1651,11 +1651,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleWithMenuMode_ShowsFilterOperatorButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1674,11 +1674,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleWithMenuMode_ShowsOperatorMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1698,11 +1698,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleWithMenuMode_StringColumn_ShowsStringOperators()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1723,11 +1723,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleWithMenuMode_NumericColumn_ShowsNumericOperators()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1749,11 +1749,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AdvancedMode_ShowsFilterPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1772,11 +1772,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AdvancedMode_SupportsMultipleFilterConditions()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1796,11 +1796,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AdvancedMode_ShowsAndOrOperators()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1822,11 +1822,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CheckBoxListMode_ShowsFilterIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<string>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<string>>(p => p.Data, new[] { "Test1", "Test2" });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1846,13 +1846,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CheckBoxListMode_RendersFilterPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { "Category A", "Category B", "Category C" };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<string>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<string>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1873,11 +1873,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_Equals_IsDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1897,11 +1897,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_ContainsForStrings()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1922,11 +1922,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_IsNull_Available()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1946,11 +1946,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_IsNotNull_Available()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1970,11 +1970,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_StartsWith_Available()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -1994,11 +1994,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_EndsWith_Available()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2018,11 +2018,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_LessThan_ForNumeric()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2041,11 +2041,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_GreaterThan_ForNumeric()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2064,11 +2064,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_LessThanOrEquals_ForNumeric()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2087,11 +2087,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_GreaterThanOrEquals_ForNumeric()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Value = 100 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2110,11 +2110,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterOperator_NotEquals_Available()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2133,11 +2133,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ClearsFilterValue_WhenSwitchingFromIsEmptyToValueOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2170,7 +2170,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleWithMenuMode_FilterMenuIdsRemainBoundToColumn_AfterHidingColumn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2203,7 +2203,7 @@ namespace Radzen.Blazor.Tests
                 return null;
             }
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => Columns(builder));
@@ -2212,7 +2212,7 @@ namespace Radzen.Blazor.Tests
             });
 
             hideId = true;
-            component.SetParametersAndRender(parameterBuilder =>
+            component.Render(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => Columns(builder));
@@ -2241,13 +2241,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsStringColumns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { new { Id = 1, Name = "Test" } };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2266,13 +2266,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AdvancedMode_SupportsStringColumns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { new { Id = 1, Name = "Test" } };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2291,13 +2291,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsNumericColumns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { new { Id = 1, Value = 100 } };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2316,13 +2316,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AdvancedMode_SupportsNumericColumns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { new { Id = 1, Value = 100 } };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2341,7 +2341,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filter_RaisesLoadDataEvent_WithAllFilterModes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2351,7 +2351,7 @@ namespace Radzen.Blazor.Tests
             {
                 var raised = false;
 
-                var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+                var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
                 {
                     parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                     parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2376,7 +2376,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_WithInOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2388,7 +2388,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 4, Category = "Electronics" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2409,7 +2409,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_WithNotInOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2421,7 +2421,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 4, Status = "Active" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2442,7 +2442,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_WithDoesNotContainOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2453,7 +2453,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Description = "Premium item" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2474,7 +2474,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_CollectionProperty_WithContains()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2485,7 +2485,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Product 3", Tags = new[] { "electronics", "sale" } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2511,7 +2511,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_MultipleValues_WithInOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2524,7 +2524,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 5, Priority = 2 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2544,13 +2544,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CheckBoxListMode_SupportsInOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { "Category A", "Category B", "Category C" };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<string>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<string>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2571,7 +2571,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_StringCollection_WithContainsAny()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2582,7 +2582,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Roles = new List<string> { "Admin", "Manager" } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2602,7 +2602,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_NumericCollection_WithIn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2613,7 +2613,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Scores = new[] { 95, 92, 98 } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2633,7 +2633,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_StringValues_WithCheckBoxListMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2645,7 +2645,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 4, Type = "TypeD" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2665,7 +2665,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_CombinesCollectionFilters_WithAnd()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2676,7 +2676,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Category = "A", Status = "Pending" }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2702,7 +2702,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_CombinesCollectionFilters_WithOr()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2713,7 +2713,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Category = "Clothing", Price = 50 }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2739,7 +2739,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_EmptyCollection_WithInOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2750,7 +2750,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Tags = new string[] { } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2770,7 +2770,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_NullCollection_HandledGracefully()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2780,7 +2780,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Items = new[] { "item1" } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2800,13 +2800,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Renders_WithCheckBoxListFilterMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var testData = new[] { "Category A", "Category B" };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<string>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<string>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2827,7 +2827,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Filters_NestedCollectionProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2837,7 +2837,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Item2", Meta = new { Tags = new[] { "sale" } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2858,7 +2858,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithSimpleMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2868,7 +2868,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Product2", Tags = new[] { new { Label = "sale", Priority = 2 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2888,7 +2888,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithSimpleWithMenuMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2898,7 +2898,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Order2", Items = new[] { new { Product = "B", Quantity = 10 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2918,7 +2918,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithAdvancedMode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2928,7 +2928,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Customer2", Orders = new[] { new { OrderId = "B1", Total = 200 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2948,7 +2948,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_StringProperty_WithEquals()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2958,7 +2958,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Tags = new[] { new { Name = "normal", Value = 20 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -2978,7 +2978,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_NumericProperty_WithComparison()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -2988,7 +2988,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Items = new[] { new { Quantity = 10, Price = 200 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3009,7 +3009,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithStartsWithOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3019,7 +3019,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Files = new[] { new { Name = "image.png", Size = 200 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3039,7 +3039,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithEndsWithOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3049,7 +3049,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Files = new[] { new { Name = "photo.jpg", Extension = ".jpg" } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3069,7 +3069,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithNotEqualsOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3079,7 +3079,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Statuses = new[] { new { Code = "inactive", Description = "Inactive" } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3099,7 +3099,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithIsNullOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3109,7 +3109,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Tags = new[] { new { Name = "tag2", Value = 20 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3135,7 +3135,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithIsNotNullOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3145,7 +3145,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Tags = new[] { new { Name = "tag2", Value = 20 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3171,7 +3171,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithContainsOperator_InAllModes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3183,7 +3183,7 @@ namespace Radzen.Blazor.Tests
 
             foreach (var mode in new[] { FilterMode.Simple, FilterMode.SimpleWithMenu, FilterMode.Advanced })
             {
-                var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+                var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
                 {
                     parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                     parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3204,7 +3204,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_NumericProperty_WithAllComparisons()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3214,7 +3214,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Scores = new[] { new { Value = 75, Subject = "Science" } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3235,7 +3235,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_WithCaseInsensitiveFilter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3245,7 +3245,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Tags = new[] { new { Label = "normal" } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3266,7 +3266,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_MultipleFilters_WithAndOperator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3276,7 +3276,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Name = "Product2", Tags = new[] { new { Label = "standard", Price = 50 } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3302,7 +3302,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_NestedProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3312,7 +3312,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 2, Items = new[] { new { Name = "item2", Details = new { Category = "B" } } } }
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3332,7 +3332,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FiltersCollectionItems_LoadDataEvent_TriggeredOnFilter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3344,7 +3344,7 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3368,7 +3368,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ShowsData_AfterVisibilityToggle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3387,7 +3387,7 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.Visible, true);
@@ -3397,14 +3397,14 @@ namespace Radzen.Blazor.Tests
             var cellsBefore = component.FindAll(".rz-cell-data");
             Assert.True(cellsBefore.Count > 0, "Grid should show data initially");
 
-            component.SetParametersAndRender(parameterBuilder =>
+            component.Render(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.Visible, false);
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, columns);
             });
 
-            component.SetParametersAndRender(parameterBuilder =>
+            component.Render(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.Visible, true);
@@ -3419,14 +3419,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_InsertRow_ShowsNewRow_WhenLoadDataReturnsEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             IEnumerable<dynamic> data = Enumerable.Empty<dynamic>();
             var count = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<int>(p => p.Count, count);
@@ -3457,7 +3457,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_InsertRow_ShowsNewRow_WhenCountIsZeroAndDataIsEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3471,7 +3471,7 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<int>(p => p.Count, 0);
@@ -3486,7 +3486,7 @@ namespace Radzen.Blazor.Tests
 
             // Re-render with Count still 0 (simulates LoadData/virtualized scenario
             // where Count reflects server-side count, not including pending inserts)
-            component.SetParametersAndRender(parameterBuilder =>
+            component.Render(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<int>(p => p.Count, 0);
@@ -3502,13 +3502,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Reset_DoesNotInfinitelyCallLoadData_WhenColumnHasSortOrder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var loadDataCallCount = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3536,7 +3536,7 @@ namespace Radzen.Blazor.Tests
             RadzenDataGridColumn<GroupTestItem> CityColumn,
             RadzenDataGridColumn<GroupTestItem> NameColumn,
             RadzenDataGridColumn<GroupTestItem> CountryColumn) RenderGroupsDataGrid(
-                TestContext ctx,
+                BunitContext ctx,
                 ObservableCollection<GroupDescriptor> groups,
                 bool hideGroupedColumn = true,
                 bool allowGrouping = false,
@@ -3552,7 +3552,7 @@ namespace Radzen.Blazor.Tests
             RadzenDataGridColumn<GroupTestItem> nameColumn = null!;
             RadzenDataGridColumn<GroupTestItem> countryColumn = null!;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<GroupTestItem>>(parameters =>
+            var component = ctx.Render<RadzenDataGrid<GroupTestItem>>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, new[]
@@ -3604,7 +3604,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GroupsParameter_HidesGroupedColumnOnFirstRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.City) }
@@ -3634,7 +3634,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GroupsParameter_TracksCollectionReplacement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var oldGroups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.City) }
@@ -3645,7 +3645,7 @@ namespace Radzen.Blazor.Tests
             };
             var (component, cityColumn, nameColumn, _) = RenderGroupsDataGrid(ctx, oldGroups);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Data, component.Instance.Data)
                 .Add(p => p.HideGroupedColumn, true)
                 .Add(p => p.Groups, newGroups)
@@ -3657,14 +3657,14 @@ namespace Radzen.Blazor.Tests
             component.InvokeAsync(oldGroups.Clear);
             Assert.False(nameColumn.GetVisible());
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Data, component.Instance.Data)
                 .Add(p => p.HideGroupedColumn, false)
                 .Add(p => p.Groups, newGroups)
                 .Add(p => p.Columns, component.Instance.Columns));
             Assert.True(nameColumn.GetVisible());
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Data, component.Instance.Data)
                 .Add(p => p.HideGroupedColumn, true)
                 .Add(p => p.Groups, newGroups)
@@ -3678,7 +3678,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GroupsParameter_DoesNotDuplicateCollectionSubscription()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>();
             var settingsChangedCount = 0;
             var (component, _, _, _) = RenderGroupsDataGrid(
@@ -3687,7 +3687,7 @@ namespace Radzen.Blazor.Tests
                 allowGrouping: true,
                 settingsChanged: _ => settingsChangedCount++);
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Data, component.Instance.Data)
                 .Add(p => p.AllowGrouping, true)
                 .Add(p => p.Groups, groups)
@@ -3706,7 +3706,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GroupsParameter_InvalidatesGroupedViewAndSurvivesReset()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.City) }
@@ -3728,7 +3728,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GroupsParameter_SettingsRestoreMutatesSameCollection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.City) }
@@ -3753,7 +3753,7 @@ namespace Radzen.Blazor.Tests
             Assert.True(cityColumn.GetVisible());
             Assert.False(nameColumn.GetVisible());
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Data, component.Instance.Data)
                 .Add(p => p.HideGroupedColumn, true)
                 .Add(p => p.Groups, groups)
@@ -3768,7 +3768,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_HideGroupedColumn_RestoresDeclaredVisibilityOnUngroup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.Country) }
@@ -3785,7 +3785,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_HideGroupedColumn_SavesVisibilityBeforeGrouping()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var groups = new ObservableCollection<GroupDescriptor>
             {
                 new GroupDescriptor { Property = nameof(GroupTestItem.City) }
@@ -3810,7 +3810,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Sorts_KeepsInternalSortsInSync_OnClearAndRemove()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -3820,7 +3820,7 @@ namespace Radzen.Blazor.Tests
                 new { City = "Berlin", FirstName = "Anna", Country = "DE" },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<object>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<object>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowSorting, true);
@@ -3874,11 +3874,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Wrapper_Has_RoleGrid_AsFocusTarget()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3899,11 +3899,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_GridRole_OwnsOnlyRowStructure()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
                 parameterBuilder.Add(p => p.AllowPaging, true);
@@ -3931,11 +3931,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ActiveDescendant_IsClearedWhenNoActiveRow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3960,11 +3960,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AppliesAriaGridRolesToTableDescendants()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -3999,7 +3999,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Virtualization_DoesNotFullyEnumerateData_OnReRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4010,7 +4010,7 @@ namespace Radzen.Blazor.Tests
             var items = Enumerable.Range(1, 1000).Select(i => new { Id = i }).ToArray();
             var tracking = new TrackingEnumerable<object>(items);
 
-            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<object>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<object>>(p => p.Data, tracking);
                 parameterBuilder.Add(p => p.AllowVirtualization, true);
@@ -4049,11 +4049,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_Virtualization_ShowsEmptyMessage_WhenDataIsEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<object>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<object>>(p => p.Data, Enumerable.Empty<object>());
                 parameterBuilder.Add(p => p.AllowVirtualization, true);
@@ -4081,7 +4081,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AutoApplyCheckBoxListFilter_FiltersOnSelectionWithoutApply()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4092,7 +4092,7 @@ namespace Radzen.Blazor.Tests
                 new AutoApplyItem { Name = "C", Code = 1 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4139,7 +4139,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AutoApplyCheckBoxListFilter_KeepsFilterListPopulatedAfterSelection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4150,7 +4150,7 @@ namespace Radzen.Blazor.Tests
                 new AutoApplyItem { Name = "C", Code = 1 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4191,13 +4191,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CheckBoxListFilter_RendersApplyButton_WhenAutoApplyOff()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var data = new[] { new AutoApplyItem { Name = "A", Code = 1 } };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4224,7 +4224,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_FilterLookupData_FiltersByValueProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4242,7 +4242,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Critical" },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4272,7 +4272,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CheckBoxList_WithoutFilterLookupData_RendersNativeFilter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4282,7 +4282,7 @@ namespace Radzen.Blazor.Tests
                 new FilterLookupItem { Reference = "B", Code = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4301,7 +4301,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_FilterLookupData_RendersOptionLabelsFromTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4313,7 +4313,7 @@ namespace Radzen.Blazor.Tests
                 new { Id = 3, Name = "Critical" },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4377,9 +4377,9 @@ namespace Radzen.Blazor.Tests
         }
 
         static IRenderedComponent<RadzenDataGrid<SortComparerItem>> RenderSortComparerGrid(
-            TestContext ctx, SortComparerItem[] data, SortOrder order)
+            BunitContext ctx, SortComparerItem[] data, SortOrder order)
         {
-            return ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowSorting, true);
@@ -4401,7 +4401,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SortComparer_OrdersByMappedName_Ascending()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4422,7 +4422,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SortComparer_OrdersByMappedName_Descending()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4443,7 +4443,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SortComparer_ComposesWithSecondaryColumn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4455,7 +4455,7 @@ namespace Radzen.Blazor.Tests
                 new SortComparerItem { Reference = "B1", Code = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowSorting, true);
@@ -4485,7 +4485,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_WithoutSortComparer_OrdersByRawValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4496,7 +4496,7 @@ namespace Radzen.Blazor.Tests
                 new SortComparerItem { Reference = "C", Code = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowSorting, true);
@@ -4522,7 +4522,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_SortComparer_HandlesValuesMissingFromMap()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4545,7 +4545,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_LoadData_PreservesHiddenColumnFilter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4557,7 +4557,7 @@ namespace Radzen.Blazor.Tests
 
             LoadDataArgs capturedArgs = null;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -4585,11 +4585,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_ColumnPickerSorting_TogglesColumnAndSortsPicker()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "A" }, new { Id = 2, Name = "B" } });
                 parameterBuilder.Add(p => p.AllowColumnPicking, true);
@@ -4608,7 +4608,7 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.NotNull(component.Find(".rz-column-picker th.rz-sortable-column"));
-            Assert.Contains("aria-label=\"All\"", component.Find(".rz-column-picker thead").ToMarkup());
+            Assert.Contains("aria-label=\"All\"", component.Find(".rz-column-picker thead").OuterHtml);
 
             Assert.Contains("2 columns showing", component.Find(".rz-column-picker .rz-dropdown-label").TextContent);
 
@@ -4622,9 +4622,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("ascending", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
         }
 
-        static IRenderedComponent<RadzenDataGrid<dynamic>> RenderSimpleFilterDataGrid(TestContext ctx, bool filterAsYouType)
+        static IRenderedComponent<RadzenDataGrid<dynamic>> RenderSimpleFilterDataGrid(BunitContext ctx, bool filterAsYouType)
         {
-            return ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<dynamic>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Name = "A" }, new { Name = "B" } });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -4644,7 +4644,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_DoesNotAttachSimpleFilterKeyDownHandler_WhenFilterAsYouTypeIsDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4658,7 +4658,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_DoesNotRerender_OnSimpleFilterKeyDown_WhenFilterAsYouTypeIsEnabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4675,7 +4675,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_AppliesCustomFilterExpression_WhenNoOtherFilterIsActive()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -4686,7 +4686,7 @@ namespace Radzen.Blazor.Tests
                 new AutoApplyItem { Name = "C", Code = 1 },
             };
 
-            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            var component = ctx.Render<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);

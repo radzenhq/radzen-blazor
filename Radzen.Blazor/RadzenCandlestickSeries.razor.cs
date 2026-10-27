@@ -170,7 +170,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items != null && Items.Any())
+            if (Items != null && Items.Count > 0)
             {
                 var high = High;
                 var low = Low;
@@ -290,7 +290,7 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = Chart;
-            if (chart == null || !Items.Any())
+            if (chart == null || Items.Count == 0)
             {
                 return (default!, new Point());
             }

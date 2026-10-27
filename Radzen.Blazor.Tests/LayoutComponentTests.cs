@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Header_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenHeader>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenHeader>();
 
             Assert.Contains("rz-header", component.Markup);
         }
@@ -18,8 +18,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Header_Renders_Fixed_WhenNoLayout()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenHeader>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenHeader>();
 
             Assert.Contains("fixed", component.Markup);
         }
@@ -27,8 +27,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Header_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenHeader>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenHeader>(parameters =>
             {
                 parameters.AddChildContent("<nav>Navigation</nav>");
             });
@@ -39,8 +39,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Header_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenHeader>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenHeader>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -52,8 +52,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Footer_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFooter>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFooter>();
 
             Assert.Contains("rz-footer", component.Markup);
         }
@@ -61,8 +61,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Footer_Renders_Fixed_WhenNoLayout()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFooter>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFooter>();
 
             Assert.Contains("fixed", component.Markup);
         }
@@ -70,8 +70,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Footer_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFooter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFooter>(parameters =>
             {
                 parameters.AddChildContent("<p>Copyright 2024</p>");
             });
@@ -82,8 +82,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Footer_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFooter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFooter>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -95,10 +95,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>();
+            var component = ctx.Render<RadzenBody>();
 
             Assert.Contains("rz-body", component.Markup);
         }
@@ -106,10 +106,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>(parameters =>
+            var component = ctx.Render<RadzenBody>(parameters =>
             {
                 parameters.AddChildContent("<main>Page Content</main>");
             });
@@ -120,10 +120,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_NotExpanded_ByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>();
+            var component = ctx.Render<RadzenBody>();
 
             Assert.DoesNotContain("rz-body-expanded", component.Markup);
         }
@@ -131,10 +131,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Renders_ExpandedClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>(parameters =>
+            var component = ctx.Render<RadzenBody>(parameters =>
             {
                 parameters.Add(p => p.Expanded, true);
             });
@@ -145,10 +145,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Toggle_ChangesExpandedState()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>();
+            var component = ctx.Render<RadzenBody>();
 
             Assert.DoesNotContain("rz-body-expanded", component.Markup);
 
@@ -160,10 +160,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Toggle_Twice_CollapsesBack()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>();
+            var component = ctx.Render<RadzenBody>();
 
             component.InvokeAsync(() => component.Instance.Toggle());
             component.InvokeAsync(() => component.Instance.Toggle());
@@ -174,10 +174,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>(parameters =>
+            var component = ctx.Render<RadzenBody>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -188,10 +188,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Body_Renders_DefaultStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBody>();
+            var component = ctx.Render<RadzenBody>();
 
             Assert.Contains("margin-top: 51px", component.Markup);
         }

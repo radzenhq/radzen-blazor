@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
@@ -58,7 +60,7 @@ namespace Radzen.Blazor.Tests
             new() { Id = 2, Name = "Andrew" },
         };
 
-        static void Setup(TestContext ctx)
+        static void Setup(BunitContext ctx)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
@@ -90,7 +92,7 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        static IRenderedComponent<RadzenScheduler<TItem>> Render<TItem, TView>(TestContext ctx, List<TItem> bookings,
+        static IRenderedComponent<RadzenScheduler<TItem>> Render<TItem, TView>(BunitContext ctx, List<TItem> bookings,
             Action<ComponentParameterCollectionBuilder<RadzenScheduler<TItem>>> addResources,
             bool groupByResource = true,
             Action<ComponentParameterCollectionBuilder<TView>>? configureView = null,
@@ -98,7 +100,7 @@ namespace Radzen.Blazor.Tests
         {
             Setup(ctx);
 
-            return ctx.RenderComponent<RadzenScheduler<TItem>>(p =>
+            return ctx.Render<RadzenScheduler<TItem>>(p =>
             {
                 p.Add(x => x.Culture, CultureInfo.InvariantCulture);
                 p.Add(x => x.Date, Today);
@@ -119,7 +121,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Renders_Header_And_Column_For_Every_Resource()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenDayView>(ctx, new List<Booking>(), p => AddRoomResource(p));
 
@@ -134,7 +136,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Renders_Appointment_In_Matching_Resource_Column()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -153,7 +155,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_By_Two_Resource_Types_Renders_Hierarchical_Columns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -190,7 +192,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_SlotSelect_Provides_Resources_Path()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             SchedulerSlotSelectEventArgs? slotSelectArgs = null;
 
@@ -209,7 +211,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Renders_AllDay_Appointment_In_AllDay_Row()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -233,7 +235,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Vertical_Orientation_Renders_Stacked_Day_Views()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenDayView>(ctx, new List<Booking>(), p => AddRoomResource(p),
                 configureView: v => v.Add(x => x.GroupOrientation, Orientation.Vertical));
@@ -249,7 +251,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Supports_Collection_ResourceProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<SharedBooking>
             {
@@ -268,7 +270,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Not_Grouped_Renders_Default_Day_View()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenDayView>(ctx, new List<Booking>(), p => AddRoomResource(p), groupByResource: false);
 
@@ -279,7 +281,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Without_Resources_Renders_Default_Day_View()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenDayView>(ctx, new List<Booking>(), p => { });
 
@@ -290,7 +292,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Renders_Section_Per_Resource_With_Filtered_Appointments()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -313,7 +315,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_By_Two_Resource_Types_Renders_Nested_Sections()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => { AddRoomResource(p); AddEmployeeResource(p); });
 
@@ -329,7 +331,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_GroupBy_Renders_Sections_For_Specified_Resource_Type_Only()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => { AddRoomResource(p); AddEmployeeResource(p); },
                 configureView: v => v.Add(x => x.GroupBy, "Employee"));
@@ -342,7 +344,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Horizontal_Orientation_Renders_Groups_Side_By_Side()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
                 configureView: v => v.Add(x => x.GroupOrientation, Orientation.Horizontal));
@@ -353,7 +355,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_AllDayProperty_Places_Appointment_In_AllDay_Row()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -370,7 +372,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Empty_AllDay_Cell_Click_Raises_SlotSelect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             SchedulerSlotSelectEventArgs? slotSelectArgs = null;
 
@@ -398,7 +400,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Renders_AllDay_Row_With_Cell_Per_Day()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {
@@ -421,7 +423,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_AllDay_Cell_Click_Selects_Day_With_Resource()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             SchedulerSlotSelectEventArgs? slotSelectArgs = null;
 
@@ -442,7 +444,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Hides_AllDay_Row_When_ShowAllDay_Is_False()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
                 configureView: v => v.Add(x => x.ShowAllDay, false));
@@ -453,7 +455,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Horizontal_Renders_Hours_Only_In_First_Group()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
                 configureView: v => v.Add(x => x.GroupOrientation, Orientation.Horizontal));
@@ -468,7 +470,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_Vertical_Renders_Hours_In_Every_Group()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
                 configureView: v => v.Add(x => x.GroupOrientation, Orientation.Vertical));
@@ -481,7 +483,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WeekView_Grouped_SlotSelect_Provides_Resources()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             SchedulerSlotSelectEventArgs? slotSelectArgs = null;
 
@@ -500,7 +502,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MonthView_Grouped_SlotRender_Provides_Resources()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var resources = new HashSet<int>();
 
@@ -519,7 +521,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async System.Threading.Tasks.Task DayView_Grouped_AppointmentMove_Provides_Target_Resources()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             SchedulerAppointmentMoveEventArgs? moveArgs = null;
 
@@ -548,7 +550,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ResourceType_HeaderTemplate_Is_Used_For_Group_Headers()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             Microsoft.AspNetCore.Components.RenderFragment<object> template = resource => builder =>
             {
@@ -559,7 +561,7 @@ namespace Radzen.Blazor.Tests
 
             Setup(ctx);
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Booking>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Booking>>(p =>
             {
                 p.Add(x => x.Culture, CultureInfo.InvariantCulture);
                 p.Add(x => x.Date, Today);
@@ -588,7 +590,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayView_Grouped_Has_Localized_AllDay_Label()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = Render<Booking, RadzenDayView>(ctx, new List<Booking>(), p => AddRoomResource(p));
 
@@ -598,7 +600,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Existing_Views_Render_Unchanged_When_Scheduler_Has_Resources_But_View_Does_Not_Group()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var bookings = new List<Booking>
             {

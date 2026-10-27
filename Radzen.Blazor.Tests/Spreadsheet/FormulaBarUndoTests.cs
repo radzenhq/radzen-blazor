@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 /// Selection.Changed, so nothing tells it to refresh once the value comes back. It
 /// self-corrects on the next click, but should update on undo.
 /// </summary>
-public class FormulaBarUndoTests : TestContext
+public class FormulaBarUndoTests : BunitContext
 {
     [Fact]
     public async Task FormulaBar_ShowsRestoredValue_AfterUndoOfInsertColumn()
@@ -25,7 +25,7 @@ public class FormulaBarUndoTests : TestContext
         sheet.Selection.Select(new CellRef(0, 2));
 
         // Render the formula bar so it reacts to selection changes as it does in the app.
-        var cut = RenderComponent<FormulaEditor>(parameters => parameters
+        var cut = Render<FormulaEditor>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Editor, view.Editor));
 

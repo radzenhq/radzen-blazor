@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Linq;
 using Xunit;
 
@@ -124,6 +126,7 @@ public class MarkdownEditorEngineTests
         var update = engine.Delete(start, end);
 
         Assert.Equal(expected, engine.Text);
+        Assert.NotNull(update);
         Assert.Equal(expectedCaret, update.SelectionStart);
     }
 

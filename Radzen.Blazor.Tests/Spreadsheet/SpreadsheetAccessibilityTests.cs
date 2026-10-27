@@ -14,9 +14,9 @@ namespace Radzen.Blazor.Tests.Spreadsheet;
 
 public class SpreadsheetAccessibilityTests
 {
-    private static TestContext CreateContext()
+    private static BunitContext CreateContext()
     {
-        var ctx = new TestContext();
+        var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<VirtualRegion>("Radzen.createVirtualItemContainer", _ => true)
             .SetResult(new VirtualRegion { Width = 800, Height = 600, ScrollWidth = 800, ScrollHeight = 600 });
@@ -84,7 +84,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, _) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         Assert.Contains("role=\"application\"", c.Markup);
         Assert.Contains("aria-keyshortcuts=\"F6 Shift+F6\"", c.Markup);
@@ -98,7 +98,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, _) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         Assert.Contains("role=\"group\"", c.Markup);
         Assert.Contains("aria-label=\"Bold\"", c.Markup);  // RadzenToggleButton AriaLabel
@@ -110,7 +110,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, _) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         // Reuses the already-localized HelpShowShortcuts string as the button's accessible name.
         Assert.Contains("aria-label=\"Show keyboard shortcuts\"", c.Markup);
@@ -123,7 +123,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, _) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         Assert.Contains("role=\"textbox\"", c.Markup);
         Assert.Contains("aria-label=\"Formula bar\"", c.Markup);
@@ -136,7 +136,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(0, 0)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "Tab", Code = "Tab" }, true));
@@ -149,7 +149,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(0, 0)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "Tab", Code = "Tab" }, false));
@@ -164,7 +164,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(2, 2)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "Home", Code = "Home", CtrlKey = true }, true));
@@ -178,7 +178,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(2, 2)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "Home", Code = "Home" }, true));
@@ -192,7 +192,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(2, 2)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true }, true));
@@ -206,7 +206,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(2, 2)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "Home", Code = "Home", CtrlKey = true }, false));
@@ -219,7 +219,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook(); // 10x10
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(0, 0)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown", CtrlKey = true }, true));
@@ -233,7 +233,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook(); // 10x10
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await c.InvokeAsync(() => sheet.Selection.Select(new CellRef(2, 2)));
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(new KeyboardEventArgs { Key = " ", Code = "Space", CtrlKey = true }, true));
@@ -256,7 +256,7 @@ public class SpreadsheetAccessibilityTests
             new("Ctrl+A", "Select the used range")
         };
 
-        var c = ctx.RenderComponent<SpreadsheetShortcutsDialog>(p => p
+        var c = ctx.Render<SpreadsheetShortcutsDialog>(p => p
             .Add(x => x.Shortcuts, rows)
             .Add(x => x.ShortcutColumn, "Shortcut")
             .Add(x => x.ActionColumn, "Action"));
@@ -284,7 +284,7 @@ public class SpreadsheetAccessibilityTests
         };
         sheet.AddImage(image);
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         // Ctrl+Alt+5 enters the drawing layer and selects the first image.
         await c.InvokeAsync(() => c.Instance.OnKeyDownAsync(
@@ -309,7 +309,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, sheet) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         var startWidth = sheet.Columns[2];
 
@@ -332,7 +332,7 @@ public class SpreadsheetAccessibilityTests
     {
         using var ctx = CreateContext();
         var (wb, _) = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         var registered = c.Instance.RegisteredShortcutKeys.ToHashSet();
         var documented = RadzenSpreadsheet.DocumentedShortcutKeys.ToHashSet();

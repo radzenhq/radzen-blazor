@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, LegendWithSeries(position)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, LegendWithSeries(position)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             Assert.Contains(expectedClass, chart.Markup);
@@ -70,7 +70,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, LegendWithSeries(position)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, LegendWithSeries(position)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
             await chart.InvokeAsync(() => chart.Instance.SetRTL(true));
 
@@ -96,7 +96,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             // No Position set -> defaults to LegendPosition.End.
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, DefaultLegendWithSeries()));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, DefaultLegendWithSeries()));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             Assert.Contains("rz-legend-right", chart.Markup);
@@ -111,10 +111,10 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var single = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TopLegendWithSeries(1)));
+            var single = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TopLegendWithSeries(1)));
             await single.InvokeAsync(() => single.Instance.Resize(200, 200));
 
-            var many = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TopLegendWithSeries(12)));
+            var many = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TopLegendWithSeries(12)));
             await many.InvokeAsync(() => many.Instance.Resize(200, 200));
 
             Assert.True(MarginTopOf(many.Markup) > MarginTopOf(single.Markup),
@@ -126,7 +126,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLegend>()
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -180,7 +180,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, false)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, false)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             var item = chart.Find(".rz-legend-item");
@@ -194,7 +194,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, true)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Right, true, true)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             var texts = chart.FindAll(".rz-legend-item-text").Select(e => e.InnerHtml).ToArray();
@@ -207,7 +207,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var templated = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            var templated = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
             await templated.InvokeAsync(() => templated.Instance.Resize(400, 300));
 
             var invocation = Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.observeChartLegend");
@@ -219,7 +219,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.observeChartLegend");
@@ -230,7 +230,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            var chart = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             var estimated = MarginTopOf(chart.Markup);
@@ -246,14 +246,14 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var templated = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
+            var templated = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, true, false)));
             await templated.InvokeAsync(() => templated.Instance.Resize(400, 300));
             var estimated = MarginTopOf(templated.Markup);
             await templated.InvokeAsync(() => templated.Instance.LegendResize(90, true));
 
             Assert.Equal(estimated, MarginTopOf(templated.Markup));
 
-            var plain = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
+            var plain = ctx.Render<RadzenChart>(p => p.Add(c => c.ChildContent, TemplatedLegend(LegendPosition.Top, false, false)));
             await plain.InvokeAsync(() => plain.Instance.Resize(400, 300));
             await plain.InvokeAsync(() => plain.Instance.LegendResize(90, false));
 

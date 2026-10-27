@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -10,9 +12,9 @@ namespace Radzen.Blazor.Tests
     {
         static int RadialGradients(string markup) => Regex.Matches(markup, "<radialGradient").Count;
 
-        static async Task<string> RenderPie(TestContext ctx, FillMode fillMode = FillMode.Gradient, string[]? fills = null)
+        static async Task<string> RenderPie(BunitContext ctx, FillMode fillMode = FillMode.Gradient, string[]? fills = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenPieSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -30,9 +32,9 @@ namespace Radzen.Blazor.Tests
             return chart.Markup;
         }
 
-        static async Task<string> RenderDonut(TestContext ctx, FillMode fillMode = FillMode.Gradient, string[]? fills = null)
+        static async Task<string> RenderDonut(BunitContext ctx, FillMode fillMode = FillMode.Gradient, string[]? fills = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenDonutSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -56,7 +58,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             // No FillMode set -> the library default (Solid) must not emit a gradient.
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenPieSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -106,7 +108,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenPieSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -195,7 +197,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenDonutSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));

@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
 {
     public class TooltipServiceTests
     {
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<TooltipService>();
             return ctx;
@@ -20,7 +20,7 @@ namespace Radzen.Blazor.Tests
         public async Task Open_DoesNotModifyCallerOptions_WhenTooltipIsRepositioned()
         {
             using var ctx = CreateContext();
-            var tooltip = ctx.RenderComponent<RadzenTooltip>();
+            var tooltip = ctx.Render<RadzenTooltip>();
             var service = ctx.Services.GetRequiredService<TooltipService>();
 
             var sharedOptions = new TooltipOptions { Position = TooltipPosition.Top, Duration = 0 };
@@ -43,7 +43,7 @@ namespace Radzen.Blazor.Tests
         public async Task Open_DoesNotWriteTextOrContentToCallerOptions()
         {
             using var ctx = CreateContext();
-            var tooltip = ctx.RenderComponent<RadzenTooltip>();
+            var tooltip = ctx.Render<RadzenTooltip>();
             var service = ctx.Services.GetRequiredService<TooltipService>();
 
             var sharedOptions = new TooltipOptions();
@@ -66,7 +66,7 @@ namespace Radzen.Blazor.Tests
         public async Task OpenOnTheTop_DoesNotModifyCallerPosition()
         {
             using var ctx = CreateContext();
-            var tooltip = ctx.RenderComponent<RadzenTooltip>();
+            var tooltip = ctx.Render<RadzenTooltip>();
             var service = ctx.Services.GetRequiredService<TooltipService>();
 
             var sharedOptions = new TooltipOptions { Position = TooltipPosition.Bottom };

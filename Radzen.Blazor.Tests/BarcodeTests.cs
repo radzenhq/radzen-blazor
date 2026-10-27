@@ -10,10 +10,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code128_ABC_Renders_CorrectViewBox()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "ABC");
             });
@@ -25,10 +25,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code128_ABC_Renders_BackgroundRect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "ABC");
             });
@@ -40,10 +40,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code128_ABC_Renders_CorrectBarCount()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "ABC");
             });
@@ -57,10 +57,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code128_ABC_ShowsChecksum_InText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "ABC");
             });
@@ -72,10 +72,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code39_AB_Renders_CorrectViewBox()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Type, RadzenBarcodeType.Code39);
@@ -87,10 +87,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_Code39_AB_ShowsValue_InText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Type, RadzenBarcodeType.Code39);
@@ -103,10 +103,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_CustomColors_AppliedToAllBarsAndBackground()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Foreground, "#FF0000");
@@ -126,10 +126,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_ShowValue_False_NoTextElement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.ShowValue, false);
@@ -144,10 +144,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_CustomDimensions_Applied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.Width, "300px");
@@ -172,10 +172,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Barcode_BarHeight_AffectsRendering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
                 p.Add(x => x.BarHeight, 80);
@@ -190,14 +190,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Barcode_ToPng_ReturnsPngData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
 
             var data = new byte[] { 137, 80, 78, 71 };
             ctx.JSInterop.Setup<IJSStreamReference>("Radzen.svgToPng", _ => true).SetResult(new TestJSStreamReference(data));
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });
@@ -210,11 +210,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Barcode_ToPng_PassesSizeToInterop()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
 
-            var component = ctx.RenderComponent<RadzenBarcode>(p =>
+            var component = ctx.Render<RadzenBarcode>(p =>
             {
                 p.Add(x => x.Value, "AB");
             });

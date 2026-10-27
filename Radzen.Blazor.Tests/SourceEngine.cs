@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Radzen.Blazor.Tests;
 
 internal sealed class SourceEngine(string? text)

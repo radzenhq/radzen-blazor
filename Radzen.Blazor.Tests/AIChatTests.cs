@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Tests
 {
     public class AIChatTests
     {
-        private void RegisterChatService(TestContext ctx)
+        private void RegisterChatService(BunitContext ctx)
         {
             // Register a dummy HttpClient and default options for AIChatService
             ctx.Services.AddSingleton(new HttpClient());
@@ -21,18 +21,18 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldRenderWithDefaultProperties()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>();
+            var component = ctx.Render<RadzenAIChat>();
             Assert.Contains("Type your message...", component.Markup);
         }
 
         [Fact]
         public void RadzenAIChat_ShouldRenderWithCustomTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Title, "Custom Chat"));
             Assert.Contains("Custom Chat", component.Markup);
         }
@@ -40,9 +40,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldRenderWithCustomPlaceholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Placeholder, "Enter your message here..."));
             Assert.Contains("Enter your message here...", component.Markup);
         }
@@ -50,9 +50,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldRenderWithCustomEmptyMessage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.EmptyMessage, "No messages yet"));
             Assert.Contains("No messages yet", component.Markup);
         }
@@ -60,18 +60,18 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldShowClearButtonByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>();
+            var component = ctx.Render<RadzenAIChat>();
             Assert.Contains("rz-chat-header-clear", component.Markup);
         }
 
         [Fact]
         public void RadzenAIChat_ShouldHideClearButtonWhenShowClearButtonIsFalse()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.ShowClearButton, false));
             Assert.DoesNotContain("clear_all", component.Markup);
         }
@@ -79,9 +79,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldBeDisabledWhenDisabledIsTrue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Disabled, true));
             Assert.Contains("disabled", component.Markup);
         }
@@ -89,9 +89,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldBeReadOnlyWhenReadOnlyIsTrue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.ReadOnly, true));
             Assert.Contains("readonly", component.Markup);
         }
@@ -99,9 +99,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldHaveCorrectCssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>();
+            var component = ctx.Render<RadzenAIChat>();
             Assert.Contains("rz-chat", component.Markup);
         }
 
@@ -125,9 +125,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_AddMessage_ShouldAddMessageToList()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>();
+            var component = ctx.Render<RadzenAIChat>();
             // Act
             component.Instance.AddMessage("Test message", true);
             // Assert
@@ -140,9 +140,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ClearChat_ShouldRemoveAllMessages()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>();
+            var component = ctx.Render<RadzenAIChat>();
             component.Instance.AddMessage("Test message 1", true);
             component.Instance.AddMessage("Test message 2", false);
             // Act
@@ -154,9 +154,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldLimitMessagesToMaxMessages()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.MaxMessages, 3));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.MaxMessages, 3));
             component.Instance.AddMessage("Message 1", true);
             component.Instance.AddMessage("Message 2", false);
             component.Instance.AddMessage("Message 3", true);
@@ -172,10 +172,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldRenderTimestampUsingTimestampFormat()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.TimestampFormat, "yyyy-MM-dd HH:mm")
                 .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture));
 
@@ -190,10 +190,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldRenderDateSeparatorWhenDayChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.DateSeparatorFormat, "yyyy-MM-dd")
                 .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture));
 
@@ -213,10 +213,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_ShouldNotRenderDateSeparatorWhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.ShowDateSeparator, false));
 
             component.InvokeAsync(() => component.Instance.LoadMessages(new[]
@@ -231,10 +231,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenAIChat_LoadMessages_ShouldReplaceExistingMessagesAndHonorMaxMessages()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             RegisterChatService(ctx);
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.MaxMessages, 2));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.MaxMessages, 2));
 
             component.Instance.AddMessage("Initial", true);
 

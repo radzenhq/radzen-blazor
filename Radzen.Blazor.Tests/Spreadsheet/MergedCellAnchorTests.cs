@@ -13,7 +13,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 /// directly via the cell store indexer. CellView now resolves the merge anchor before
 /// reading the cell, so every split piece displays the anchor's value.
 /// </summary>
-public class MergedCellAnchorTests : TestContext
+public class MergedCellAnchorTests : BunitContext
 {
     private static Worksheet CreateSheetWithMerge(int frozenRows = 0, int frozenColumns = 0)
     {
@@ -39,7 +39,7 @@ public class MergedCellAnchorTests : TestContext
     {
         var sheet = CreateSheetWithMerge();
 
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 0));
@@ -52,7 +52,7 @@ public class MergedCellAnchorTests : TestContext
     {
         var sheet = CreateSheetWithMerge();
 
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 4)
             .Add(c => c.Column, 2));
@@ -67,7 +67,7 @@ public class MergedCellAnchorTests : TestContext
 
         // The second split piece starts at (frozenRows, mergeStartColumn) = (2, 0).
         // Before the fix this position read an empty non-anchor cell.
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 2)
             .Add(c => c.Column, 0));
@@ -81,7 +81,7 @@ public class MergedCellAnchorTests : TestContext
         var sheet = CreateSheetWithMerge(frozenColumns: 2);
 
         // The right split piece starts at (mergeStartRow, frozenColumns) = (0, 2).
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 2));
@@ -96,7 +96,7 @@ public class MergedCellAnchorTests : TestContext
 
         // With both axes frozen, SplitRange produces 4 pieces. The bottom-right piece
         // starts at (frozenRows, frozenColumns) = (2, 2).
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 2)
             .Add(c => c.Column, 2));
@@ -110,7 +110,7 @@ public class MergedCellAnchorTests : TestContext
         var sheet = CreateSheetWithMerge(frozenRows: 2, frozenColumns: 2);
 
         // The bottom-left piece starts at (frozenRows, mergeStartColumn) = (2, 0).
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 2)
             .Add(c => c.Column, 0));
@@ -124,7 +124,7 @@ public class MergedCellAnchorTests : TestContext
         var sheet = CreateSheetWithMerge(frozenRows: 2, frozenColumns: 2);
 
         // The top-right piece starts at (mergeStartRow, frozenColumns) = (0, 2).
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 2));
@@ -138,7 +138,7 @@ public class MergedCellAnchorTests : TestContext
         var sheet = CreateSheetWithMerge();
         sheet.Cells[10, 10].Value = "OUTSIDE";
 
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 10)
             .Add(c => c.Column, 10));
@@ -153,7 +153,7 @@ public class MergedCellAnchorTests : TestContext
         var sheet = CreateSheetWithMerge();
 
         // Mount at a non-anchor cell within the merge.
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 3)
             .Add(c => c.Column, 3));

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -10,10 +12,10 @@ namespace Radzen.Blazor.Tests
     {
         static int LinearGradients(string markup) => Regex.Matches(markup, "<linearGradient").Count;
 
-        static async Task<string> RenderRangeArea(TestContext ctx, FillMode? fillMode = null,
+        static async Task<string> RenderRangeArea(BunitContext ctx, FillMode? fillMode = null,
             string? fill = null, Interpolation interpolation = Interpolation.Line)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenRangeAreaSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));

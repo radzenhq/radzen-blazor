@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Linq;
 using System.Text.RegularExpressions;
 using Bunit;
@@ -8,11 +10,11 @@ namespace Radzen.Blazor.Tests
 {
     public class DataLabelTests
     {
-        static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx,
+        static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenSeriesDataLabels>>? labels = null,
             System.Action<ComponentParameterCollectionBuilder<RadzenSeriesDataLabels>>? secondSeriesLabels = null)
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 p.AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -164,12 +166,12 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(new[] { "10", "15" }, LabelTexts(chart.Markup).OrderBy(t => t).ToArray());
         }
 
-        static IRenderedComponent<RadzenChart> RenderSeriesChart<TSeries>(TestContext ctx,
+        static IRenderedComponent<RadzenChart> RenderSeriesChart<TSeries>(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenSeriesDataLabels>>? labels = null,
             DataItem[]? data = null)
             where TSeries : Radzen.Blazor.CartesianSeries<DataItem>
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<TSeries>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -274,10 +276,10 @@ namespace Radzen.Blazor.Tests
             Assert.True(center[1].Position.Y > inside[1].Position.Y);
         }
 
-        static IRenderedComponent<RadzenChart> RenderTwoSeriesChart<TSeries>(TestContext ctx)
+        static IRenderedComponent<RadzenChart> RenderTwoSeriesChart<TSeries>(BunitContext ctx)
             where TSeries : Radzen.Blazor.CartesianSeries<DataItem>
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 p.AddChildContent<TSeries>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -452,9 +454,9 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("20u", chart.Markup);
         }
 
-        static IRenderedComponent<RadzenChart> RenderBubbleChart(TestContext ctx)
+        static IRenderedComponent<RadzenChart> RenderBubbleChart(BunitContext ctx)
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenBubbleSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Value2))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -495,11 +497,11 @@ namespace Radzen.Blazor.Tests
             Assert.All(labels, l => Assert.Equal(l.Anchor!.Y, l.Position.Y));
         }
 
-        static IRenderedComponent<RadzenChart> RenderPieChart<TSeries>(TestContext ctx,
+        static IRenderedComponent<RadzenChart> RenderPieChart<TSeries>(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenSeriesDataLabels>>? labels = null)
             where TSeries : RadzenPieSeries<DataItem>
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<TSeries>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))

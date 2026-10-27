@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
 {
     public class ChartTooltipTriggerTests
     {
-        static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx, ChartTooltipTrigger trigger, bool crosshair)
+        static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx, ChartTooltipTrigger trigger, bool crosshair)
         {
             // CreateChartContext already registers TooltipService.
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenChartTooltipOptions>(t => t
                     .Add(x => x.Trigger, trigger))
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
@@ -26,7 +26,7 @@ namespace Radzen.Blazor.Tests
                         .Add(x => x.Visible, crosshair))));
         }
 
-        static int TooltipOpens(TestContext ctx)
+        static int TooltipOpens(BunitContext ctx)
         {
             return ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openChartTooltip");
         }

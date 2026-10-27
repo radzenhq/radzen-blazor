@@ -33,14 +33,14 @@ namespace Radzen.Blazor.Tests
 
         private static string CreatePanelMenu(string currentAbsoluteUrl, NavLinkMatch match, Dictionary<string, bool> urls)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.Services.RemoveAll<NavigationManager>();
             ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager(currentAbsoluteUrl));
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>();
+            var component = ctx.Render<RadzenPanelMenu>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Match, match).AddChildContent(builder =>
+            component.Render(parameters => parameters.Add(p => p.Match, match).AddChildContent(builder =>
             {
                 foreach (var url in urls)
                 {
@@ -119,12 +119,12 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-navigation-item-wrapper-active", component);
         }
 
-        private IRenderedComponent<RadzenPanelMenu> CreatePanelMenuWithItem(TestContext ctx, string currentAbsoluteUrl, string path, bool selected, bool bindSelected)
+        private IRenderedComponent<RadzenPanelMenu> CreatePanelMenuWithItem(BunitContext ctx, string currentAbsoluteUrl, string path, bool selected, bool bindSelected)
         {
             ctx.Services.RemoveAll<NavigationManager>();
             ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager(currentAbsoluteUrl));
 
-            return ctx.RenderComponent<RadzenPanelMenu>(parameters => parameters.AddChildContent(builder =>
+            return ctx.Render<RadzenPanelMenu>(parameters => parameters.AddChildContent(builder =>
             {
                 builder.OpenComponent<RadzenPanelMenuItem>(0);
                 builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), path);
@@ -140,7 +140,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_DoesNotSelectFromUrl_WhenSelectedIsBound()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreatePanelMenuWithItem(ctx, "http://www.example.com/foo", "/foo", selected: false, bindSelected: true);
 
@@ -150,7 +150,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_SelectsFromUrl_WhenSelectedIsNotBound()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreatePanelMenuWithItem(ctx, "http://www.example.com/foo", "/foo", selected: false, bindSelected: false);
 
@@ -160,7 +160,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_HonorsBoundSelected_WhenUrlDoesNotMatch()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreatePanelMenuWithItem(ctx, "http://www.example.com/other", "/foo", selected: true, bindSelected: true);
 
@@ -170,7 +170,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_KeepsBoundSelected_AfterLocationChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreatePanelMenuWithItem(ctx, "http://www.example.com/", "/foo", selected: false, bindSelected: true);
 
@@ -184,7 +184,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_SelectsFromUrl_AfterLocationChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = CreatePanelMenuWithItem(ctx, "http://www.example.com/", "/foo", selected: false, bindSelected: false);
 

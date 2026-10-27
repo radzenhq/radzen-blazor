@@ -11,10 +11,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -30,10 +30,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -50,10 +50,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Template_OverridesText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -79,10 +79,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Renders_TemplateWithSwitch()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -106,10 +106,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Renders_PathParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -128,9 +128,9 @@ namespace Radzen.Blazor.Tests
             public override AntiforgeryRequestToken GetAntiforgeryToken() => token;
         }
 
-        static IRenderedComponent<RadzenProfileMenu> RenderMenuWithActionItem(TestContext ctx, string method = null)
+        static IRenderedComponent<RadzenProfileMenu> RenderMenuWithActionItem(BunitContext ctx, string method = null)
         {
-            return ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            return ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(item =>
                 {
@@ -149,7 +149,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_RendersFormThatPostsToAction()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(null));
 
@@ -164,7 +164,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_UsesMethod()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(null));
 
@@ -176,7 +176,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_IncludesAntiforgeryToken()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(new AntiforgeryRequestToken("token-value", "__RequestVerificationToken")));
 
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_OmitsAntiforgeryTokenWhenNoneIsAvailable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(null));
 
@@ -203,7 +203,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_WithGetMethod_OmitsAntiforgeryToken()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(new AntiforgeryRequestToken("token-value", "__RequestVerificationToken")));
 
@@ -215,7 +215,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_Action_RendersSubmitButtonLikeOtherItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new TestAntiforgeryStateProvider(null));
 
@@ -233,10 +233,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_WithoutAction_DoesNotRenderForm()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(item =>
                 {
@@ -253,10 +253,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenuItem_PathTakesPrecedenceOverAction()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(item =>
                 {

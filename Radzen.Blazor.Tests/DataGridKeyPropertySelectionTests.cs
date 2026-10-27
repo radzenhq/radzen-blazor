@@ -14,11 +14,11 @@ namespace Radzen.Blazor.Tests
             public string Name { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Order>> Render(TestContext ctx, List<Order> data, IList<Order> selected, string keyProperty, bool keyPropertyFirst)
+        static IRenderedComponent<RadzenDataGrid<Order>> Render(BunitContext ctx, List<Order> data, IList<Order> selected, string keyProperty, bool keyPropertyFirst)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            return ctx.RenderComponent<RadzenDataGrid<Order>>(pb =>
+            return ctx.Render<RadzenDataGrid<Order>>(pb =>
             {
                 if (keyPropertyFirst && keyProperty != null)
                 {
@@ -51,7 +51,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(false)]
         public void KeyProperty_MatchesSelectedItem_ByKey_RegardlessOfParameterOrder(bool keyPropertyFirst)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var grid = Render(ctx, Orders(), new List<Order> { new Order { Id = 2, Name = "Order 2" } }, nameof(Order.Id), keyPropertyFirst);
 
@@ -64,7 +64,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void NoKeyProperty_DoesNotMatch_DifferentInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var grid = Render(ctx, Orders(), new List<Order> { new Order { Id = 2, Name = "Order 2" } }, null, false);
 
@@ -74,14 +74,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void KeyProperty_Change_AfterRender_IsApplied()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = Orders();
 
             var grid = Render(ctx, data, new List<Order> { new Order { Id = 2, Name = "Changed" } }, nameof(Order.Name), false);
 
             Assert.Empty(grid.FindAll("tr.rz-state-highlight"));
 
-            grid.SetParametersAndRender(pb => pb.Add(p => p.KeyProperty, nameof(Order.Id)));
+            grid.Render(pb => pb.Add(p => p.KeyProperty, nameof(Order.Id)));
 
             var highlighted = grid.FindAll("tr.rz-state-highlight");
 

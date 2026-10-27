@@ -11,10 +11,10 @@ namespace Radzen.Blazor.Tests
         {
             const string path = "_content/Radzen.Blazor/css";
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenTheme>(parameters =>
+            var component = ctx.Render<RadzenTheme>(parameters =>
             {
                 parameters.Add(p => p.Theme, "material");
             });
@@ -27,10 +27,10 @@ namespace Radzen.Blazor.Tests
         {
             const string path = "\"css";
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenTheme>(parameters =>
+            var component = ctx.Render<RadzenTheme>(parameters =>
             {
                 parameters.Add(p => p.Theme, "awesome");
             });
@@ -43,10 +43,10 @@ namespace Radzen.Blazor.Tests
         {
             const string path = "_content/custom-assembly/css";
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenTheme>(parameters =>
+            var component = ctx.Render<RadzenTheme>(parameters =>
             {
                 parameters.Add(p => p.CssPath, path);
                 parameters.Add(p => p.Theme, "my-light");
@@ -61,10 +61,10 @@ namespace Radzen.Blazor.Tests
             const string path = "_content/Radzen.Blazor/css";
             const string customPath = "_content/custom-assembly/css";
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenTheme>(parameters =>
+            var component = ctx.Render<RadzenTheme>(parameters =>
             {
                 parameters.Add(p => p.CssPath, customPath);
                 parameters.Add(p => p.Theme, "material");
@@ -79,10 +79,10 @@ namespace Radzen.Blazor.Tests
         {
             const string path = "_content/custom-assembly/css";
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddScoped<ThemeService>();
 
-            var component = ctx.RenderComponent<RadzenTheme>(parameters =>
+            var component = ctx.Render<RadzenTheme>(parameters =>
             {
                 parameters.Add(p => p.CssPath, path);
                 parameters.Add(p => p.Theme, "my-light");

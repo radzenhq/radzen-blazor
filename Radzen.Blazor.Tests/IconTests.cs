@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
             var icon = "account_circle";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
+            component.Render(parameters => parameters.Add(p => p.Icon, icon));
 
             Assert.Contains(@$">{icon}</i>", component.Markup);
             Assert.Contains(@$"class=""notranslate rzi""", component.Markup);
@@ -23,13 +23,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -37,11 +37,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -49,11 +49,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_IconStyleClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconStyle, IconStyle.Primary));
+            component.Render(parameters => parameters.Add(icon => icon.IconStyle, IconStyle.Primary));
 
             Assert.Contains(@$"rzi-primary", component.Markup);
         }
@@ -61,11 +61,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_IconColor()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconColor, Colors.Primary));
+            component.Render(parameters => parameters.Add(icon => icon.IconColor, Colors.Primary));
 
             Assert.Contains(@$"color:", component.Markup);
         }
@@ -73,11 +73,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_NotRenders_IconStyleClass_WhenNull()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconStyle, null));
+            component.Render(parameters => parameters.Add(icon => icon.IconStyle, null));
 
             Assert.DoesNotContain(@$"rzi-primary", component.Markup);
         }
@@ -85,11 +85,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_NotRenders_IconColor_WhenNull()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenIcon>();
+            var component = ctx.Render<RadzenIcon>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconColor, null));
+            component.Render(parameters => parameters.Add(icon => icon.IconColor, null));
 
             Assert.DoesNotContain(@$"color:", component.Markup);
         }
@@ -97,8 +97,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_ITag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenIcon>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenIcon>();
 
             Assert.Contains("<i", component.Markup);
         }
@@ -106,8 +106,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_NotranslateClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenIcon>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenIcon>();
 
             Assert.Contains("notranslate", component.Markup);
         }
@@ -115,8 +115,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_SecondaryIconStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenIcon>(parameters =>
             {
                 parameters.Add(p => p.IconStyle, Radzen.IconStyle.Secondary);
             });
@@ -127,8 +127,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_SuccessIconStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenIcon>(parameters =>
             {
                 parameters.Add(p => p.IconStyle, Radzen.IconStyle.Success);
             });
@@ -139,8 +139,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Icon_Renders_CombinedColorAndStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenIcon>(parameters =>
             {
                 parameters.Add(p => p.IconColor, "#FF0000");
                 parameters.Add(p => p.Style, "font-size:2rem");

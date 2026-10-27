@@ -10,7 +10,7 @@ namespace Radzen.Blazor.Tests
 {
     public class ValueLabelTests
     {
-        static IRenderedComponent<RadzenChart> RenderChartWithValueLabels(TestContext ctx, double lastValue1, double lastValue2)
+        static IRenderedComponent<RadzenChart> RenderChartWithValueLabels(BunitContext ctx, double lastValue1, double lastValue2)
         {
             var data1 = new[]
             {
@@ -23,7 +23,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "B", Value = lastValue2 }
             };
 
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))

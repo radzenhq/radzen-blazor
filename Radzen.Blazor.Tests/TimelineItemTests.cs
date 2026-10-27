@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.Contains("rz-timeline-item", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.Text, "Event occurred");
             });
@@ -29,8 +29,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_LabelParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.Label, "Jan 2024");
             });
@@ -41,8 +41,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.AddChildContent("<p>Detailed description</p>");
             });
@@ -53,8 +53,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.Contains("rz-timeline-point", component.Markup);
         }
@@ -62,8 +62,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointStyle, PointStyle.Primary);
             });
@@ -74,8 +74,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointStyle_Success()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointStyle, PointStyle.Success);
             });
@@ -86,8 +86,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointVariant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointVariant, Variant.Outlined);
             });
@@ -98,8 +98,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_DefaultPointVariant_IsFilled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.Contains("rz-timeline-point-filled", component.Markup);
         }
@@ -107,8 +107,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointSize_Small()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointSize, PointSize.Small);
             });
@@ -119,8 +119,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointSize_Large()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointSize, PointSize.Large);
             });
@@ -131,8 +131,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointSize_ExtraSmall()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointSize, PointSize.ExtraSmall);
             });
@@ -143,8 +143,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_DefaultPointSize_IsMedium()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.Contains("rz-timeline-axis-md", component.Markup);
         }
@@ -152,8 +152,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointShadow()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointShadow, 5);
             });
@@ -164,8 +164,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_LabelContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.LabelContent, (Microsoft.AspNetCore.Components.RenderFragment)(builder =>
                 {
@@ -179,8 +179,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_PointContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointContent, (Microsoft.AspNetCore.Components.RenderFragment)(builder =>
                 {
@@ -196,8 +196,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Appends_PointClass_ToPointElement()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.PointClass, "my-point");
             });
@@ -208,8 +208,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_Current_AsAriaCurrentStep()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.Current, true);
             });
@@ -220,8 +220,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Omits_AriaCurrent_WhenNotCurrent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.DoesNotContain("aria-current", component.Markup);
         }
@@ -229,8 +229,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_ListItemRole()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.Contains(@"role=""listitem""", component.Markup);
         }
@@ -238,8 +238,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_LineStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.LineStyle, PointStyle.Success);
             });
@@ -250,8 +250,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Omits_LineStyleClass_WhenLineStyleNotSet()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>();
 
             Assert.DoesNotContain("rz-timeline-line-", component.Markup);
         }
@@ -259,8 +259,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TimelineItem_Renders_Current_AsStyleHook()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTimelineItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTimelineItem>(parameters =>
             {
                 parameters.Add(p => p.Current, true);
             });

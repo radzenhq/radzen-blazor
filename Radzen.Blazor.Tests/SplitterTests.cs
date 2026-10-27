@@ -6,11 +6,11 @@ namespace Radzen.Blazor.Tests
 {
     public class SplitterTests
     {
-        static IRenderedComponent<RadzenSplitter> RenderSplitter(TestContext ctx, Orientation orientation = Orientation.Horizontal)
+        static IRenderedComponent<RadzenSplitter> RenderSplitter(BunitContext ctx, Orientation orientation = Orientation.Horizontal)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            return ctx.RenderComponent<RadzenSplitter>(parameters =>
+            return ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Orientation, orientation);
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
@@ -26,7 +26,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_HasRoleSeparator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var separator = component.Find("span.rz-resize");
@@ -37,7 +37,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_HasAriaValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var separator = component.Find("span.rz-resize");
@@ -50,10 +50,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_DefaultAriaValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent<RadzenSplitterPane>(pane => pane.Add(p => p.Size, "40%"));
                 parameters.AddChildContent<RadzenSplitterPane>();
@@ -69,7 +69,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_HasAriaControls()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var separator = component.Find("span.rz-resize");
@@ -82,7 +82,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_HasAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var separator = component.Find("span.rz-resize");
@@ -93,7 +93,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_IsFocusable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var separator = component.Find("span.rz-resize");
@@ -104,7 +104,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Horizontal_Separator_AriaOrientationIsVertical()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx, Orientation.Horizontal);
 
             var separator = component.Find("span.rz-resize");
@@ -115,7 +115,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Vertical_Separator_AriaOrientationIsHorizontal()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx, Orientation.Vertical);
 
             var separator = component.Find("span.rz-resize");
@@ -126,7 +126,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_ArrowKey_StartsResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<Rect>("Radzen.clientRect", _ => true).SetResult(new Rect());
 
@@ -142,7 +142,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_HomeKey_StartsResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<Rect>("Radzen.clientRect", _ => true).SetResult(new Rect());
 
@@ -157,12 +157,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_EnterKey_CollapsesPane()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             RadzenSplitterEventArgs collapsed = null;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Collapse, Microsoft.AspNetCore.Components.EventCallback.Factory.Create<RadzenSplitterEventArgs>(this, args => collapsed = args));
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
@@ -183,10 +183,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_CollapseButton_HasRoleAndLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
                 {
@@ -206,10 +206,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_ExpandButton_HasRoleAndLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
                 {
@@ -230,10 +230,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Separator_AriaLabelledBy_TakesPrecedence()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
                 {
@@ -252,7 +252,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Bar_PointerDown_StartsResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var bar = component.Find("div.rz-splitter-bar");
@@ -264,7 +264,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_CollapseButton_PointerDown_DoesNotStartResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderSplitter(ctx);
 
             var collapse = component.Find("span.rz-collapse");
@@ -276,10 +276,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_ExpandButton_PointerDown_DoesNotStartResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent<RadzenSplitterPane>(pane =>
                 {
@@ -299,8 +299,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>();
 
             Assert.Contains(@"rz-splitter", component.Markup);
         }
@@ -308,8 +308,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_Orientation_Horizontal()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
             });
@@ -320,8 +320,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_Orientation_Vertical()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Vertical);
             });
@@ -332,8 +332,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_DefaultOrientation_IsHorizontal()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>();
 
             Assert.Contains("rz-splitter-horizontal", component.Markup);
         }
@@ -341,8 +341,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Style, "height:400px");
             });
@@ -353,8 +353,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -365,8 +365,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddChildContent("<div>Pane Content</div>");
             });
@@ -377,8 +377,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splitter_Renders_UnmatchedAttributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.AddUnmatched("data-testid", "my-splitter");
             });

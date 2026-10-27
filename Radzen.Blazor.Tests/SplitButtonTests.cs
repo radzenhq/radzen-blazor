@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
 {
     public class SplitButtonTests
     {
-        private static IRenderedComponent<RadzenSplitButton> RenderWithItems(TestContext ctx)
+        private static IRenderedComponent<RadzenSplitButton> RenderWithItems(BunitContext ctx)
         {
-            return ctx.RenderComponent<RadzenSplitButton>(parameters => parameters
+            return ctx.Render<RadzenSplitButton>(parameters => parameters
                 .Add(p => p.Text, "Save")
                 .AddChildContent<RadzenSplitButtonItem>(item => item
                     .Add(p => p.Text, "Save and Close")
@@ -23,7 +23,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_MenuRoles()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -35,7 +35,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_ToggleButton_AriaHasPopupAndExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -49,7 +49,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_ArrowDown_OpensMenu_SetsAriaExpandedAndActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -70,7 +70,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_ArrowDown_MovesActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -89,7 +89,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_End_ActivatesLastItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -106,7 +106,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Home_ActivatesFirstItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -124,7 +124,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_ArrowUp_OpensMenu_FocusesLastItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -140,7 +140,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Escape_ClosesMenu_ClearsAriaExpandedAndActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -157,14 +157,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -172,14 +172,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var text = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.Render(parameters => parameters.Add(p => p.Text, text));
 
             Assert.Contains(@$"<span class=""rz-button-text"">{text}</span>", component.Markup);
         }
@@ -187,14 +187,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var icon = "account_circle";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
+            component.Render(parameters => parameters.Add(p => p.Icon, icon));
 
             Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"" aria-hidden=""true"">{icon}</i>", component.Markup);
         }
@@ -202,15 +202,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_IconAndTextParameters()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var text = "Test";
             var icon = "account_circle";
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.Text, text);
                 parameters.Add(p => p.Icon, icon);
             });
@@ -222,14 +222,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_ImageParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var image = "test.png";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Image, image));
+            component.Render(parameters => parameters.Add(p => p.Image, image));
 
             Assert.Contains(@$"<img class=""notranslate rz-button-icon-left rzi"" src=""{image}"" alt=""image"" />", component.Markup);
         }
@@ -237,15 +237,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_ImageAndTextParameters()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var text = "Test";
             var image = "test.png";
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add(p => p.Text, text);
                 parameters.Add(p => p.Image, image);
                 parameters.Add(p => p.ImageAlternateText, text);
@@ -258,13 +258,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_ButtonContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             RenderFragment buttonContent = (builder) => builder.AddMarkupContent(0, "<strong>Custom button content</strong>");
 
             var text = "Test";
-            var component = ctx.RenderComponent<RadzenSplitButton>(parameters => parameters
+            var component = ctx.Render<RadzenSplitButton>(parameters => parameters
             .Add(p => p.ButtonContent, buttonContent)
             .Add(p => p.Text, text));
 
@@ -275,12 +275,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_DisabledParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add(p => p.Disabled, true));
 
             Assert.Contains(@$"rz-state-disabled", component.Markup);
         }
@@ -288,12 +288,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -301,7 +301,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_OpensPopup_OnToggleClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -315,7 +315,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_ClosesPopup_OnSecondToggleClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -331,12 +331,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_DestroysPopup_WhenVisibleToggled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+            component.Render(parameters => parameters.Add(p => p.Visible, false));
 
             Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.destroyPopup"));
         }
@@ -344,7 +344,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_UpdatesState_WhenPopupClosedFromClient()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
@@ -361,16 +361,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitButton_Raises_ClickEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSplitButton>();
+            var component = ctx.Render<RadzenSplitButton>();
 
             var clicked = false;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Click, args => { clicked = true; }));
+            component.Render(parameters => parameters.Add(p => p.Click, args => { clicked = true; }));
 
             component.Find("button").Click();
 

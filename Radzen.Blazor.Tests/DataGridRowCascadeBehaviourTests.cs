@@ -29,8 +29,8 @@ namespace Radzen.Blazor.Tests
                 => b.AddContent(0, "probe");
         }
 
-        static IRenderedComponent<RadzenDataGrid<Person>> EditableGrid(TestContext ctx, List<Person> data) =>
-            ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+        static IRenderedComponent<RadzenDataGrid<Person>> EditableGrid(BunitContext ctx, List<Person> data) =>
+            ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add<RenderFragment>(g => g.Columns, cb =>
@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task CancellingAnEdit_ClearsTheRowEditContext()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task UpdatingARow_ClearsTheRowEditContext()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -93,14 +93,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ReadOnlyRow_NoLongerShadowsAnEnclosingForm()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var data = People(2);
             var model = new Person { Id = 99, Name = "Outer" };
 
-            var form = ctx.RenderComponent<RadzenTemplateForm<Person>>(p =>
+            var form = ctx.Render<RadzenTemplateForm<Person>>(p =>
             {
                 p.Add(f => f.Data, model);
                 p.Add<RenderFragment<EditContext>>(f => f.ChildContent, _ => builder =>
@@ -130,14 +130,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TogglingEditMode_RebuildsTheRowSubtree()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var data = People(2);
             InitCounter.Initialised = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add<RenderFragment>(g => g.Columns, builder =>
@@ -173,14 +173,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WhileEditing_ReRendersDoNotRebuildTheRow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var data = People(2);
             InitCounter.Initialised = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, data);
                 p.Add<RenderFragment>(g => g.Columns, builder =>

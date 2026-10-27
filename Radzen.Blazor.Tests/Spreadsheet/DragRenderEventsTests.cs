@@ -52,7 +52,7 @@ public class DragRenderEventsTests
         };
     }
 
-    public class Render : TestContext
+    public class Render : BunitContext
     {
         [Fact]
         public async System.Threading.Tasks.Task AutofillOverlay_ShowsPreview_WhenSet_AndClears()
@@ -61,7 +61,7 @@ public class DragRenderEventsTests
             sheet.Selection.Select(new CellRef(0, 0));
             var context = new ImageMockContext(sheet);
 
-            var cut = RenderComponent<AutofillOverlay>(parameters => parameters
+            var cut = Render<AutofillOverlay>(parameters => parameters
                 .Add(p => p.Worksheet, sheet)
                 .Add(p => p.Context, context));
 
@@ -82,7 +82,7 @@ public class DragRenderEventsTests
             sheet.AddImage(image);
             var context = new ImageMockContext(sheet);
 
-            var cut = RenderComponent<ImageOverlay>(parameters => parameters
+            var cut = Render<ImageOverlay>(parameters => parameters
                 .Add(p => p.Worksheet, sheet)
                 .Add(p => p.Context, context));
 
@@ -107,7 +107,7 @@ public class DragRenderEventsTests
             sheet.AddImage(CreateImage());
             var context = new ImageMockContext(sheet);
 
-            var cut = RenderComponent<ImageOverlay>(parameters => parameters
+            var cut = Render<ImageOverlay>(parameters => parameters
                 .Add(p => p.Worksheet, sheet)
                 .Add(p => p.Context, context));
 

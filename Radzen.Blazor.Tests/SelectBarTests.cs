@@ -10,8 +10,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>();
 
             Assert.Contains(@"rz-selectbar", component.Markup);
         }
@@ -19,8 +19,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Renders_Orientation()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -31,19 +31,19 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Horizontal));
             Assert.Contains("rz-selectbar-horizontal", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
+            component.Render(parameters => parameters.Add(p => p.Orientation, Orientation.Vertical));
             Assert.Contains("rz-selectbar-vertical", component.Markup);
         }
 
         [Fact]
         public void SelectBar_Renders_Multiple()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             // When Multiple is true, TValue should be IEnumerable<T>
-            var component = ctx.RenderComponent<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Items, builder =>
@@ -67,10 +67,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task SelectBar_SameCountValueMutation_ReflectedOnInternalRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var value = new List<int> { 1, 2 };
 
-            var component = ctx.RenderComponent<SelfRenderingSelectBar<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<SelfRenderingSelectBar<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, value);
@@ -102,8 +102,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Renders_Size()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -114,18 +114,18 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Size, ButtonSize.Small));
+            component.Render(parameters => parameters.Add(p => p.Size, ButtonSize.Small));
             Assert.Contains("rz-button-sm", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Size, ButtonSize.Large));
+            component.Render(parameters => parameters.Add(p => p.Size, ButtonSize.Large));
             Assert.Contains("rz-button-lg", component.Markup);
         }
 
         [Fact]
         public void SelectBar_Renders_Disabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Items, builder =>
@@ -143,8 +143,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -155,8 +155,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Renders_MultipleItems()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
                 {
@@ -179,8 +179,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_SingleSelect_Renders_RadiogroupRole()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, 1);
                 parameters.Add(p => p.Items, builder =>
@@ -208,8 +208,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Multiple_Renders_ToolbarRole_WithAriaPressed()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, new System.Collections.Generic.List<int> { 1 });
@@ -238,8 +238,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_SingleSelect_ArrowKeys_SelectFocusedItem_AndWrap()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.Value, 1);
                 parameters.Add(p => p.Items, builder =>
@@ -271,8 +271,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Multiple_ArrowKeys_DoNotToggleSelection()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<System.Collections.Generic.IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, new System.Collections.Generic.List<int> { 1 });
@@ -300,8 +300,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SelectBar_Renders_AriaLabelledBy()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSelectBar<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSelectBar<int>>(parameters =>
             {
                 parameters.Add(p => p.AriaLabelledBy, "label-id");
                 parameters.Add(p => p.Items, builder =>

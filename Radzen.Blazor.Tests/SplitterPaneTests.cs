@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -28,8 +28,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Renders_MultiPanes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -52,8 +52,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Renders_WithSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -76,8 +76,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Renders_Collapsed()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -100,8 +100,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Renders_Bar_BetweenPanes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -123,8 +123,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_NonResizable_DoesNotShowResizeBar()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -148,8 +148,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SplitterPane_Collapsible_DefaultTrue()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSplitter>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {

@@ -338,8 +338,6 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromFileInput", fileUpload);
             }
-
-            StateHasChanged();
         }
 
         /// <summary>

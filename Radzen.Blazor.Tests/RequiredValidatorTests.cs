@@ -49,17 +49,17 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static IRenderedComponent<ValidatedFormWrapper<TComponent>> RenderForm<TComponent>(TestContext ctx)
+        static IRenderedComponent<ValidatedFormWrapper<TComponent>> RenderForm<TComponent>(BunitContext ctx)
             where TComponent : IComponent
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            return ctx.RenderComponent<ValidatedFormWrapper<TComponent>>();
+            return ctx.Render<ValidatedFormWrapper<TComponent>>();
         }
 
         static void AssertStaysValidAfterChange<TComponent>(string selector) where TComponent : IComponent
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderForm<TComponent>(ctx);
 
@@ -105,7 +105,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RequiredValidator_BecomesInvalid_WhenBoundTextBoxIsCleared()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderForm<RadzenTextBox>(ctx);
 
@@ -121,7 +121,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Submit_Fires_WhenBoundTextBoxHasValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderForm<RadzenTextBox>(ctx);
 
@@ -135,7 +135,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void InvalidSubmit_Fires_WhenBoundTextBoxIsEmpty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var wrapper = RenderForm<RadzenTextBox>(ctx);
 

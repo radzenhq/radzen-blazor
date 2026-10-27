@@ -20,7 +20,7 @@ namespace Radzen.Blazor.Tests
             public string Text { get; set; } = "";
         }
 
-        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler<TView>(TestContext ctx, bool allowDateSelection = true)
+        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler<TView>(BunitContext ctx, bool allowDateSelection = true)
             where TView : SchedulerViewBase
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -28,7 +28,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
 
-            return ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            return ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Culture, CultureInfo.InvariantCulture);
                 p.Add(x => x.Date, new DateTime(2026, 7, 14));
@@ -42,7 +42,7 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        static IRenderedComponent<RadzenDatePicker<DateTime>> OpenPicker(TestContext ctx, IRenderedComponent<RadzenScheduler<Appointment>> cut, int openCount = 1)
+        static IRenderedComponent<RadzenDatePicker<DateTime>> OpenPicker(BunitContext ctx, IRenderedComponent<RadzenScheduler<Appointment>> cut, int openCount = 1)
         {
             cut.Find(".rz-scheduler-nav-title button").Click();
 
@@ -58,7 +58,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Title_IsPlainText_ByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx, allowDateSelection: false);
 
@@ -69,7 +69,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Title_IsButton_WhenAllowDateSelection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
 
@@ -79,7 +79,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DayBasedViews_PickDays()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenWeekView>(ctx);
             var picker = OpenPicker(ctx, cut);
@@ -96,7 +96,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(typeof(RadzenYearView))]
         public void MonthAndYearViews_PickMonths(Type viewType)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = viewType == typeof(RadzenMonthView)
                 ? RenderScheduler<RadzenMonthView>(ctx)
@@ -110,7 +110,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickingMonth_NavigatesToItAndClosesPicker()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
@@ -128,7 +128,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickingDisplayedMonth_ClosesPicker()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
@@ -143,7 +143,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(typeof(RadzenYearView))]
         public void ArrowKeys_InMonthGrid_ReachAnyMonthWithoutNavigatingOrClosing(Type viewType)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = viewType == typeof(RadzenMonthView)
                 ? RenderScheduler<RadzenMonthView>(ctx)
@@ -173,7 +173,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickingShownYear_ReturnsToMonthGrid()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(typeof(RadzenWeekView), "-day-2026-07-14")]
         public void OpeningPicker_FocusesTheCurrentMonthOrDay(Type viewType, string expectedIdSuffix)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = viewType == typeof(RadzenMonthView)
                 ? RenderScheduler<RadzenMonthView>(ctx)
@@ -208,7 +208,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ReopeningPicker_StartsItOverAtTheCurrentDate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
@@ -226,7 +226,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Escape_InCells_ReturnsFocusToTheTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);
@@ -245,7 +245,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ChangingYear_OnlyBrowses_UntilAMonthIsPicked()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var cut = RenderScheduler<RadzenMonthView>(ctx);
             OpenPicker(ctx, cut);

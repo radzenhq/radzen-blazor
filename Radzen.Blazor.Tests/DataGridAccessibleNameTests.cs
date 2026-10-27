@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
@@ -13,13 +15,13 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Item>>>? extra = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(pb =>
+            return ctx.Render<RadzenDataGrid<Item>>(pb =>
             {
                 pb.Add(p => p.Data, new List<Item> { new() { Id = 1 }, new() { Id = 2 } });
                 pb.Add(p => p.Columns, b =>
@@ -35,7 +37,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Grid_without_name_renders_no_name_attributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx);
 
             var role = grid.Find("[role=grid]");
@@ -46,7 +48,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AriaLabel_parameter_renders_on_role_grid_element()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx, pb => pb.Add(p => p.AriaLabel, "All requests"));
 
             Assert.Equal("All requests", grid.Find("[role=grid]").GetAttribute("aria-label"));
@@ -56,7 +58,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AriaLabelledBy_parameter_renders_on_role_treegrid_element()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx, pb =>
             {
                 pb.Add(p => p.AriaLabelledBy, "requests-title");
@@ -69,7 +71,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Splatted_name_attributes_move_to_role_grid_element()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx, pb =>
             {
                 pb.AddUnmatched("aria-labelledby", "requests-title");
@@ -90,7 +92,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Parameters_take_precedence_over_splatted_attributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx, pb =>
             {
                 pb.Add(p => p.AriaLabel, "From parameter");
@@ -103,12 +105,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Splatted_name_attribute_change_is_reflected()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var grid = Render(ctx, pb => pb.AddUnmatched("aria-labelledby", "first"));
 
             Assert.Equal("first", grid.Find("[role=grid]").GetAttribute("aria-labelledby"));
 
-            await grid.InvokeAsync(() => grid.SetParametersAndRender(pb => pb.AddUnmatched("aria-labelledby", "second")));
+            await grid.InvokeAsync(() => grid.Render(pb => pb.AddUnmatched("aria-labelledby", "second")));
 
             Assert.Equal("second", grid.Find("[role=grid]").GetAttribute("aria-labelledby"));
             Assert.False(grid.Find(".rz-data-grid").HasAttribute("aria-labelledby"));

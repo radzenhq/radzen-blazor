@@ -7,7 +7,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class ImageOverlayTests : TestContext
+public class ImageOverlayTests : BunitContext
 {
     private static readonly byte[] PngBytes =
     [
@@ -28,7 +28,7 @@ public class ImageOverlayTests : TestContext
         var sheet = new Worksheet(10, 10);
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -43,7 +43,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(2, 2));
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -61,7 +61,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(0, 0));
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -77,7 +77,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(0, 0)); // column 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -93,7 +93,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(0, 0)); // row 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -110,7 +110,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(2, 2)); // row 2, col 2 - not frozen
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -126,7 +126,7 @@ public class ImageOverlayTests : TestContext
         sheet.AddImage(CreateImage(0, 0));
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
@@ -148,7 +148,7 @@ public class ImageOverlayTests : TestContext
         sheet.SelectedImage = image;
         var context = new ImageMockContext(sheet);
 
-        var cut = RenderComponent<ImageOverlay>(parameters => parameters
+        var cut = Render<ImageOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 

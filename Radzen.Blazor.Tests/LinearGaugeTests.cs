@@ -9,10 +9,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px"));
 
             Assert.Contains("rz-linear-gauge", component.Markup);
@@ -21,10 +21,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_SvgWhenDimensionsSet()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px"));
 
             Assert.Contains("rz-linear-gauge", component.Markup);
@@ -34,10 +34,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ScaleLine()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>());
 
@@ -47,10 +47,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_Ticks()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>());
 
@@ -61,11 +61,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_TickLabels()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // Default scale: Min=0, Max=100, Step=20
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>());
 
@@ -80,10 +80,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_CustomMinMax()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.Min, 0)
@@ -99,10 +99,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_HideTickLabels()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.ShowTickLabels, false)));
@@ -114,10 +114,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_NoTicksWhenPositionNone()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.TickPosition, GaugeTickPosition.None)));
@@ -128,10 +128,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_FormatString()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.FormatString, "{0:N1}")
@@ -147,10 +147,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px"));
 
             Assert.Contains(@"style=""width:300px;height:150px""", component.Markup);
@@ -159,10 +159,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_VisibleFalse()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .Add(p => p.Visible, false));
 
@@ -172,10 +172,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_Pointer()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -187,10 +187,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_PointerArrow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -203,10 +203,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_PointerBar()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -219,10 +219,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_PointerLine()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -235,10 +235,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_DraggablePointerCursor()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -251,10 +251,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_DoesNotRender_DraggableCursorWhenNotDraggable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -266,10 +266,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ShowValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -283,10 +283,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_DoesNotRender_ValueWhenShowValueFalse()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -299,10 +299,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ValueFormatString()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -316,10 +316,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_Range()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScaleRange>(range =>
@@ -334,10 +334,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_VerticalOrientation()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:150px;height:300px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.Orientation, Orientation.Vertical)));
@@ -350,12 +350,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ClickOverlay()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             double clickedValue = -1;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.Click, (double v) => clickedValue = v)));
@@ -366,10 +366,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_DoesNotRender_ClickOverlayWithoutHandler()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>());
 
@@ -379,10 +379,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddUnmatched("data-testid", "my-gauge"));
 
@@ -392,10 +392,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_PointerFill()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -408,10 +408,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ScaleStroke()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.Add(p => p.Stroke, "blue")));
@@ -422,10 +422,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_ValueTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScalePointer>(pointer =>
@@ -441,10 +441,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Range_UpdatesOnResize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScaleRange>(range =>
@@ -466,10 +466,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LinearGauge_Renders_RangeBorderRadius()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+            var component = ctx.Render<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px")
                     .AddChildContent<RadzenLinearGaugeScale>(scale =>
                         scale.AddChildContent<RadzenLinearGaugeScaleRange>(range =>

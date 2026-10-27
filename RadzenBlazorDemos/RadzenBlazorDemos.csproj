@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>disable</Nullable>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
@@ -17,9 +17,9 @@
     <PackageReference Include="Radzen.Blazor" Version="*" GeneratePathProperty="true" Condition="'$(UseRadzenPackage)' == 'true'" />
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" Condition="'$(UseRadzenPackage)' != 'true'" />
     <ProjectReference Include="..\Radzen.Blazor.Api\Radzen.Blazor.Api.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.*-*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.*-*" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.*-*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="11.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.36" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.36" />
@@ -82,7 +82,7 @@
     <PropertyGroup>
       <LlmsTxtOutputDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Host\wwwroot</LlmsTxtOutputDir>
       <LlmsTxtToolPath>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj</LlmsTxtToolPath>
-      <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net10.0\</LlmsTxtToolDir>
+      <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net11.0\</LlmsTxtToolDir>
       <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>
       <LlmsTxtToolExe Condition="'$(OS)' != 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools</LlmsTxtToolExe>
     </PropertyGroup>

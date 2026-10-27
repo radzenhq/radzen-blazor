@@ -13,9 +13,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1,2,3}));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1,2,3}));
 
             Assert.Contains(@$"rz-datalist-content", component.Markup);
         }
@@ -23,11 +23,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_AllowPagingParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPaging, true));
+            component.Render(parameters => parameters.Add<bool>(p => p.AllowPaging, true));
 
             Assert.Contains(@$"rz-pager-bottom", component.Markup);
         }
@@ -35,11 +35,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_PagerPositionTopParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top); 
             });
@@ -51,11 +51,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_PagerPositionTopAndBottomParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.TopAndBottom);
             });
@@ -67,11 +67,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_PagerDensityDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
@@ -84,11 +84,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_PagerDensityCompact()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
@@ -101,11 +101,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Renders_WrapItemsParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1, 2, 3 }));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, new[] { 1, 2, 3 }));
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.WrapItems, true);
             });
 
@@ -115,14 +115,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Raises_LoadDataEventOnNextPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -137,14 +137,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Raises_LoadDataEventOnLastPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -159,14 +159,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Raises_LoadDataEventOnPrevPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -182,14 +182,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Raises_LoadDataEventOnFirstPageClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
@@ -205,13 +205,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_NotRaises_LoadDataEventOnFirstPageClickWhenOnFirstPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -224,13 +224,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_NotRaises_LoadDataEventOnPrevPageClickWhenOnFirstPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
@@ -243,19 +243,19 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_NotRaises_LoadDataEventOnLastPageClickWhenOnLastPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
             });
 
             component.Find(".rz-pager-last").Click();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
@@ -267,19 +267,19 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_NotRaises_LoadDataEventOnNextPageClickWhenOnLastPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
             });
 
             component.Find(".rz-pager-last").Click();
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
@@ -291,14 +291,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataList_Respects_PageSizeParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+            var component = ctx.Render<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
 
             var raised = false;
             LoadDataArgs newArgs = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<bool>(p => p.AllowPaging, true);
                 parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });

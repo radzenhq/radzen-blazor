@@ -222,7 +222,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
 
         await ValueChanged.InvokeAsync(value);
 
-        if (value.StartsWith('='))
+        if (value.StartsWith('=', StringComparison.Ordinal))
         {
             var length = Math.Min(caretPosition + 1, value.Length);
 

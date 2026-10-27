@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
@@ -14,13 +16,13 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx,
             System.Action<ComponentParameterCollectionBuilder<RadzenDataGrid<Item>>>? extra = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(pb =>
+            return ctx.Render<RadzenDataGrid<Item>>(pb =>
             {
                 pb.Add(p => p.Data, new List<Item> { new() { Id = 1 }, new() { Id = 2 } });
                 pb.Add(p => p.Columns, b =>
@@ -40,7 +42,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RepeatedUnhandledKey_DoesNotRerenderTheGrid()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx);
             var grid = cut.Find(".rz-data-grid-data");
 
@@ -57,7 +59,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void FirstUnhandledKey_StillRerenders_ToClearPreventDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx);
             var renderCount = cut.RenderCount;
 
@@ -69,7 +71,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void UnhandledKey_AfterNavigationKey_StillRerenders()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx);
             var grid = cut.Find(".rz-data-grid-data");
 
@@ -87,7 +89,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RepeatedUnhandledKey_StillRaisesKeyDown()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var keys = new List<string?>();
             var cut = Render(ctx, pb => pb.Add(p => p.KeyDown, (KeyboardEventArgs a) => keys.Add(a.Code)));
             var grid = cut.Find(".rz-data-grid-data");

@@ -19,10 +19,10 @@ namespace Radzen.Blazor.Tests
         static List<Person> People(int n) =>
             Enumerable.Range(1, n).Select(i => new Person { Id = i, Name = "Person " + i }).ToList();
 
-        static IRenderedComponent<RadzenDataGrid<Person>> RenderGrid(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Person>> RenderGrid(BunitContext ctx,
             EventCallback<DataGridCellMouseEventArgs<Person>>? contextMenu)
         {
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            return ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People(3));
 
@@ -60,13 +60,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_AddingCellContextMenu_DoesNotRebuildTheCellSubtree()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var initializations = 0;
 
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People(1));
                 p.Add<RenderFragment>(g => g.Columns, builder =>
@@ -87,14 +87,14 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(1, initializations);
 
-            component.SetParametersAndRender(p => p.Add(g => g.CellContextMenu,
+            component.Render(p => p.Add(g => g.CellContextMenu,
                 EventCallback.Factory.Create<DataGridCellMouseEventArgs<Person>>(this, _ => { })));
 
             Assert.Equal(1, initializations);
 
             DataGridCellMouseEventArgs<Person> received = null;
 
-            component.SetParametersAndRender(p => p.Add(g => g.CellContextMenu,
+            component.Render(p => p.Add(g => g.CellContextMenu,
                 EventCallback.Factory.Create<DataGridCellMouseEventArgs<Person>>(this, args => received = args)));
 
             component.Find("td").ContextMenu();
@@ -102,7 +102,7 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(received);
             Assert.Equal(1, initializations);
 
-            component.SetParametersAndRender(p => p.Add(g => g.CellContextMenu,
+            component.Render(p => p.Add(g => g.CellContextMenu,
                 default(EventCallback<DataGridCellMouseEventArgs<Person>>)));
 
             Assert.Equal(1, initializations);
@@ -111,7 +111,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_CellContextMenu_FiresWithCellAndItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -132,7 +132,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_WithoutCellContextMenu_RendersTheSameCells()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -153,7 +153,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TheContextMenuModifiersAreTheOnesBlazorActuallyLooksFor()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -176,7 +176,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AGridWithNoContextMenuHandlerEmitsNoModifiersAtAll()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 

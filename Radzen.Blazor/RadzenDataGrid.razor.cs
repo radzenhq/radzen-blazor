@@ -112,11 +112,13 @@ namespace Radzen.Blazor
                     return true;
                 }
 
+#pragma warning disable CS0618
                 return editContexts.All(c => 
                 { 
                     c.Value.Validate();
                     return !c.Value.GetValidationMessages().Any(); 
                 });
+#pragma warning restore CS0618
             }
         }
 
@@ -258,10 +260,10 @@ namespace Radzen.Blazor
             var totalItemsCount = 0;
             _groupedPagedView = Enumerable.Empty<GroupResult>();
 
-            if (Groups.Any())
+            if (Groups.Count > 0)
             {
-                query = view.AsQueryable().OrderBy(Groups.Any() ? string.Join(',', Groups.Select(g => g.Property)) : null);
-                _groupedPagedView = await Task.FromResult(query.GroupByMany(Groups.Any() ? Groups.Select(g => g.Property).ToArray() : DefaultGroupProperty).ToList());
+                query = view.AsQueryable().OrderBy(Groups.Count > 0 ? string.Join(',', Groups.Select(g => g.Property)) : null);
+                _groupedPagedView = await Task.FromResult(query.GroupByMany(Groups.Count > 0 ? Groups.Select(g => g.Property).ToArray() : DefaultGroupProperty).ToList());
 
                 totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
             }
@@ -277,7 +279,7 @@ namespace Radzen.Blazor
             {
                 if (AllowVirtualization)
                 {
-                    if(AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
+                    if(AllowGrouping && Groups.Count > 0 && !LoadData.HasDelegate)
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<GroupResult>(LoadGroups));
@@ -345,7 +347,7 @@ namespace Radzen.Blazor
 
         internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            if (Groups.Any())
+            if (Groups.Count > 0)
             {
                 foreach (var group in GroupedPagedView)
                 {
@@ -3199,9 +3201,9 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (allowColumnPickingChanged || emptyTextChanged || allGroupsExpandedChanged && Groups.Any())
+            if (allowColumnPickingChanged || emptyTextChanged || allGroupsExpandedChanged && Groups.Count > 0)
             {
-                if (allGroupsExpandedChanged && Groups.Any() && allGroupsExpanded == true)
+                if (allGroupsExpandedChanged && Groups.Count > 0 && allGroupsExpanded == true)
                 {
                     collapsedGroupItems.Clear();
                 }
@@ -3831,7 +3833,12 @@ namespace Radzen.Blazor
             {
                 var editContext = editContexts.FirstOrDefault(i => ItemEquals(i.Key, item)).Value;
 
-                if (editContext?.Validate() == true)
+#if NET11_0_OR_GREATER
+                var valid = editContext != null && await editContext.ValidateAsync();
+#else
+                var valid = editContext?.Validate() == true;
+#endif
+                if (valid)
                 {
                     editedItems = editedItems.Where(i => !ItemEquals(i.Key, item)).ToDictionary(i => i.Key, i => i.Value);
                     editContexts = editContexts.Where(i => !ItemEquals(i.Key, item)).ToDictionary(i => i.Key, i => i.Value);

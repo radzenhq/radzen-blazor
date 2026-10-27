@@ -11,16 +11,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Popup_Dispose_DestroysPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenPopup>(p => p
+            var component = ctx.Render<RadzenPopup>(p => p
                 .Add(x => x.Lazy, true)
                 .AddChildContent("<span>content</span>"));
 
             await component.InvokeAsync(() => component.Instance.ToggleAsync(default(ElementReference)));
 
-            ctx.DisposeComponents();
+            await ctx.DisposeComponentsAsync();
 
             Assert.Contains(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.destroyPopup");
         }

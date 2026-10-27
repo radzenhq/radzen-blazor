@@ -159,12 +159,12 @@ namespace Radzen.Blazor.Tests
             [Fact(DisplayName = "Side dialog shows resize bar when Resizable is true")]
             public void SideDialog_Resizable_ShowsResizeBar()
             {
-                using var ctx = new TestContext();
+                using var ctx = new BunitContext();
                 ctx.JSInterop.Mode = JSRuntimeMode.Loose;
                 ctx.Services.AddScoped<DialogService>();
 
                 // Render the dialog host
-                var cut = ctx.RenderComponent<RadzenDialog>();
+                var cut = ctx.Render<RadzenDialog>();
 
                 // Open a side dialog with Resizable=true
                 var dialogService = ctx.Services.GetRequiredService<DialogService>();
@@ -184,12 +184,12 @@ namespace Radzen.Blazor.Tests
             [Fact(DisplayName = "Side dialog hides resize bar when Resizable is false")]
             public void SideDialog_NonResizable_HidesResizeBar()
             {
-                using var ctx = new TestContext();
+                using var ctx = new BunitContext();
                 ctx.JSInterop.Mode = JSRuntimeMode.Loose;
                 ctx.Services.AddScoped<DialogService>();
 
                 // Render the dialog host
-                var cut = ctx.RenderComponent<RadzenDialog>();
+                var cut = ctx.Render<RadzenDialog>();
 
                 // Open a side dialog with Resizable=false
                 var dialogService = ctx.Services.GetRequiredService<DialogService>();
@@ -519,11 +519,11 @@ namespace Radzen.Blazor.Tests
 			[Fact(DisplayName = "Opening a dialog invokes Radzen.openDialog so the invoking element is captured")]
 			public void OpenDialog_Invokes_RadzenOpenDialog()
 			{
-				using var ctx = new TestContext();
+				using var ctx = new BunitContext();
 				ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 				ctx.Services.AddScoped<DialogService>();
 
-				var cut = ctx.RenderComponent<RadzenDialog>();
+				var cut = ctx.Render<RadzenDialog>();
 				var dialogService = ctx.Services.GetRequiredService<DialogService>();
 
 				cut.InvokeAsync(() => dialogService.Open("Test", typeof(RadzenButton),
@@ -538,11 +538,11 @@ namespace Radzen.Blazor.Tests
 			[Fact(DisplayName = "Closing the last dialog invokes Radzen.closeDialog so focus is restored to the invoker")]
 			public void CloseDialog_Invokes_RadzenCloseDialog()
 			{
-				using var ctx = new TestContext();
+				using var ctx = new BunitContext();
 				ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 				ctx.Services.AddScoped<DialogService>();
 
-				var cut = ctx.RenderComponent<RadzenDialog>();
+				var cut = ctx.Render<RadzenDialog>();
 				var dialogService = ctx.Services.GetRequiredService<DialogService>();
 
 				cut.InvokeAsync(() => dialogService.Open("Test", typeof(RadzenButton),

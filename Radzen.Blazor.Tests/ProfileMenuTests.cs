@@ -12,10 +12,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             Assert.Contains("rz-profile-menu", component.Markup);
             Assert.Contains("rz-menu", component.Markup);
@@ -24,10 +24,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Opens_OnToggleClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.Find(".rz-navigation-item-wrapper").Click();
 
@@ -39,10 +39,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Closes_OnSecondToggleClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.Find(".rz-navigation-item-wrapper").Click();
             component.Find(".rz-navigation-item-wrapper").Click();
@@ -54,10 +54,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_RoleMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             Assert.Contains(@"role=""menu""", component.Markup);
         }
@@ -65,10 +65,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_ToggleAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ToggleAriaLabel, "User menu");
             });
@@ -79,10 +79,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_DefaultAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             Assert.Contains("Profile menu", component.Markup);
         }
@@ -90,10 +90,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_ShowIcon_True_RendersIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ShowIcon, true);
             });
@@ -104,10 +104,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_ShowIcon_False_HidesIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.ShowIcon, false);
             });
@@ -118,10 +118,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_Template()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.Template, (RenderFragment)(builder =>
                 {
@@ -135,10 +135,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_StartsCollapsed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             Assert.Contains("rz-state-collapsed", component.Markup);
             Assert.Contains(@"aria-expanded=""false""", component.Markup);
@@ -147,10 +147,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Toggle_ExpandsMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.InvokeAsync(() => component.Instance.Toggle(new MouseEventArgs()));
 
@@ -161,10 +161,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Toggle_Twice_CollapsesMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.InvokeAsync(() => component.Instance.Toggle(new MouseEventArgs()));
             component.InvokeAsync(() => component.Instance.Toggle(new MouseEventArgs()));
@@ -175,10 +175,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Close_CollapsesMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             // Open first
             component.InvokeAsync(() => component.Instance.Toggle(new MouseEventArgs()));
@@ -192,10 +192,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -206,10 +206,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_AddItem_TracksItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var item = new RadzenProfileMenuItem();
             component.Instance.AddItem(item);
@@ -220,10 +220,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_AddItem_NoDuplicates()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var item = new RadzenProfileMenuItem();
             component.Instance.AddItem(item);
@@ -235,10 +235,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_IsFocused_ReturnsFalse_WhenNoFocus()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var item = new RadzenProfileMenuItem();
             component.Instance.AddItem(item);
@@ -249,10 +249,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_IsFocused_ReturnsTrue_WhenFocused()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var item = new RadzenProfileMenuItem();
             component.Instance.AddItem(item);
@@ -264,10 +264,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Renders_AriaHaspopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             Assert.Contains(@"aria-haspopup=""menu""", component.Markup);
         }
@@ -275,10 +275,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Toggle_HasRoleMenu_OnPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -294,10 +294,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Trigger_HasAriaHaspopupAndExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var toggle = component.Find("div.rz-navigation-item-wrapper");
 
@@ -312,10 +312,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_OuterList_IsPresentation_NotMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             var root = component.Find("ul.rz-profile-menu");
 
@@ -325,10 +325,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Item_HasRoleMenuItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -344,10 +344,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_ArrowDown_ExposesActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -373,10 +373,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_ActiveDescendant_FollowsActiveItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -407,10 +407,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_End_ActivatesLastItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -436,10 +436,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Home_ActivatesFirstItem()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -461,10 +461,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_Escape_ClosesAndClearsActiveDescendant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {
@@ -490,10 +490,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_RegistersClickAway_WhenOpened()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.Find(".rz-navigation-item-wrapper").Click();
 
@@ -503,10 +503,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_UnregistersClickAway_WhenClosed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.Find(".rz-navigation-item-wrapper").Click();
             component.Find(".rz-navigation-item-wrapper").Click();
@@ -517,10 +517,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async System.Threading.Tasks.Task ProfileMenu_Closes_OnClickAway()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>();
+            var component = ctx.Render<RadzenProfileMenu>();
 
             component.Find(".rz-navigation-item-wrapper").Click();
 
@@ -537,13 +537,13 @@ namespace Radzen.Blazor.Tests
         [InlineData("Space")]
         public void ProfileMenu_EnterOrSpaceOnActionItem_SubmitsItsForm(string code)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<AntiforgeryStateProvider>(new NoAntiforgeryStateProvider());
 
             RadzenProfileMenuItem clicked = null;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.Add(p => p.Click, item => clicked = item);
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
@@ -565,10 +565,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ProfileMenu_EnterOnItemWithoutAction_DoesNotSubmit()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            var component = ctx.Render<RadzenProfileMenu>(parameters =>
             {
                 parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
                 {

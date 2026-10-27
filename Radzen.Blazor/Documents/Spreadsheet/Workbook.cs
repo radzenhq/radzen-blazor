@@ -309,7 +309,7 @@ public class Workbook
             return text;
         }
 
-        var hasEquals = text.StartsWith('=');
+        var hasEquals = text.StartsWith('=', StringComparison.Ordinal);
         var formula = hasEquals ? text : "=" + text;
         FormulaSyntaxTree tree;
 
@@ -350,7 +350,7 @@ public class Workbook
             return text;
         }
 
-        var hasEquals = text.StartsWith('=');
+        var hasEquals = text.StartsWith('=', StringComparison.Ordinal);
         var formula = hasEquals ? text : "=" + text;
         var renamed = RenameSheetInFormula(formula, FormulaParser.Parse(formula), oldName, newName);
 

@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_With_Attributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>(parameters =>
             {
                 parameters.Add(p => p.Attributes, new Dictionary<string, object>
                 {
@@ -26,8 +26,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>();
 
             Assert.Contains("rz-toc-item", component.Markup);
         }
@@ -35,8 +35,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_Text()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>(parameters =>
             {
                 parameters.Add(p => p.Text, "Introduction");
             });
@@ -47,8 +47,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_Selector()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>(parameters =>
             {
                 parameters.Add(p => p.Selector, "#section-1");
             });
@@ -59,8 +59,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>(parameters =>
             {
                 parameters.AddChildContent("<span>Nested Items</span>");
             });
@@ -71,8 +71,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_WrapperClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>();
 
             Assert.Contains("rz-toc-item-wrapper", component.Markup);
         }
@@ -80,8 +80,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void TocItem_Renders_LinkClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTocItem>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTocItem>(parameters =>
             {
                 parameters.Add(p => p.Text, "Link Item");
             });

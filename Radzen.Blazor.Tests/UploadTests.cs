@@ -10,9 +10,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>();
+            var component = ctx.Render<RadzenUpload>();
 
             Assert.Contains(@"rz-fileupload", component.Markup);
         }
@@ -20,9 +20,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -33,9 +33,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_ChooseText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.ChooseText, "Select Files");
             });
@@ -46,9 +46,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_DefaultChooseText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>();
+            var component = ctx.Render<RadzenUpload>();
 
             Assert.Contains("Choose", component.Markup);
         }
@@ -56,9 +56,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_Icon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.Icon, "upload");
             });
@@ -70,9 +70,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_Multiple_Attribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
             });
@@ -83,9 +83,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_Accept_Attribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.Accept, "image/*");
             });
@@ -96,9 +96,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_DefaultTabIndex_OnChooseButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>();
+            var component = ctx.Render<RadzenUpload>();
 
             Assert.Equal("0", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
         }
@@ -106,9 +106,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_TabIndex_OnChooseButton_NotWrapper()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.TabIndex, 22);
             });
@@ -120,9 +120,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Upload_PassesMethodAndStream_WhenTriggeredFromCode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.Auto, false);
                 parameters.Add(p => p.Url, "api/upload");
@@ -141,9 +141,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Upload_Renders_DisabledTabIndex_OnChooseButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            var component = ctx.Render<RadzenUpload>(parameters =>
             {
                 parameters.Add(p => p.TabIndex, 22);
                 parameters.Add(p => p.Disabled, true);
@@ -155,17 +155,17 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Upload_DoesNotThrow_WhenDisposedWhileRecreatingJsHandler()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
             var disposePlan = module.SetupVoid("dispose");
 
-            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
+            var component = ctx.Render<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/2"));
+            component.Render(parameters => parameters.Add(p => p.Url, "upload/2"));
 
-            ctx.DisposeComponents();
+            await ctx.DisposeComponentsAsync();
 
             disposePlan.SetVoidResult();
 
@@ -178,16 +178,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Upload_CreatesSingleJsHandler_WhenRecreationsOverlap()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
             var disposePlan = module.SetupVoid("dispose");
 
-            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
+            var component = ctx.Render<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/2"));
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/3"));
+            component.Render(parameters => parameters.Add(p => p.Url, "upload/2"));
+            component.Render(parameters => parameters.Add(p => p.Url, "upload/3"));
 
             disposePlan.SetVoidResult();
 
@@ -200,9 +200,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Upload_Renders_ImagePreview_OnlyForImageFiles()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "api/upload"));
+            var component = ctx.Render<RadzenUpload>(parameters => parameters.Add(p => p.Url, "api/upload"));
 
             await component.InvokeAsync(() => component.Instance.OnChange(new[]
             {

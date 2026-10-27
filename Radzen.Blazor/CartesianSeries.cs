@@ -481,7 +481,7 @@ namespace Radzen.Blazor
                 return scale;
             }
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 scale.Input.MergeWidth(ScaleRange.From(Items, Category(scale)));
             }
@@ -940,13 +940,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public double GetMean()
         {
-            return Items.Any() ? Items.Select(Value).Average() : double.NaN;
+            return Items.Count > 0 ? Items.Select(Value).Average() : double.NaN;
         }
 
         /// <inheritdoc />
         public double GetMode()
         {
-            if (!Items.Any())
+            if (Items.Count == 0)
             {
                 return double.NaN;
             }
@@ -972,7 +972,7 @@ namespace Radzen.Blazor
                 return (a, b);
             }
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 Func<TItem, double> X;
                 Func<TItem, double> Y;
@@ -1017,7 +1017,7 @@ namespace Radzen.Blazor
         {
             var result = new List<Point>();
             var chart = Chart;
-            if (chart == null || Items == null || !Items.Any())
+            if (chart == null || Items == null || Items.Count == 0)
             {
                 return result;
             }

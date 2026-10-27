@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             Assert.Contains(@"rz-button", component.Markup);
         }
@@ -17,11 +17,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             var text = "Toggle Me";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.Render(parameters => parameters.Add(p => p.Text, text));
 
             Assert.Contains(text, component.Markup);
         }
@@ -29,11 +29,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             var icon = "toggle_on";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
+            component.Render(parameters => parameters.Add(p => p.Icon, icon));
 
             Assert.Contains(icon, component.Markup);
         }
@@ -41,10 +41,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_Value()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, true));
+            component.Render(parameters => parameters.Add(p => p.Value, true));
 
             Assert.Contains("rz-state-active", component.Markup);
         }
@@ -52,10 +52,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_Disabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add(p => p.Disabled, true));
 
             Assert.Contains("rz-state-disabled", component.Markup);
         }
@@ -63,26 +63,26 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_ButtonStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Primary));
+            component.Render(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Primary));
             Assert.Contains("rz-primary", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Success));
+            component.Render(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Success));
             Assert.Contains("rz-success", component.Markup);
         }
 
         [Fact]
         public void ToggleButton_Raises_ChangeEvent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             var changed = false;
             bool newValue = false;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args =>
+            component.Render(parameters => parameters.Add(p => p.Change, args =>
             {
                 changed = true;
                 newValue = args;
@@ -97,8 +97,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_Variant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
             });
@@ -109,8 +109,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_ToggleButtonStyle_WhenActive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Value, true);
                 parameters.Add(p => p.ToggleButtonStyle, ButtonStyle.Info);
@@ -122,8 +122,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_ToggleShade_WhenActive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Value, true);
                 parameters.Add(p => p.ToggleShade, Shade.Lighter);
@@ -135,8 +135,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_ToggleIcon_WhenActive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Icon, "toggle_off");
                 parameters.Add(p => p.ToggleIcon, "toggle_on");
@@ -149,8 +149,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Renders_NormalIcon_WhenInactive()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Icon, "toggle_off");
                 parameters.Add(p => p.ToggleIcon, "toggle_on");
@@ -164,8 +164,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -176,10 +176,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Click_Toggles_Value()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             bool newValue = false;
 
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Value, false);
                 parameters.Add(p => p.ValueChanged, (bool v) => newValue = v);
@@ -193,10 +193,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Disabled_Click_DoesNotToggle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var changed = false;
 
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Change, (bool _) => changed = true);
@@ -210,16 +210,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_HasClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             Assert.Contains("rz-toggle-button", component.Markup);
         }
         [Fact]
         public void ToggleButton_Renders_AriaLabel_FromAttributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters => parameters.AddUnmatched("aria-label", "Dark theme"));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters => parameters.AddUnmatched("aria-label", "Dark theme"));
 
             Assert.Equal("Dark theme", component.Find("button").GetAttribute("aria-label"));
         }
@@ -227,8 +227,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_AriaLabelParameter_Wins_OverAttributes()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>(parameters =>
             {
                 parameters.Add(p => p.AriaLabel, "From parameter");
                 parameters.AddUnmatched("aria-label", "From attributes");
@@ -240,8 +240,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ToggleButton_Omits_AriaLabel_WhenNotSet()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenToggleButton>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenToggleButton>();
 
             Assert.False(component.Find("button").HasAttribute("aria-label"));
         }

@@ -46,10 +46,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ComponentInsideFormFieldReceivesEachNewValueOnce()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var host = ctx.RenderComponent<Host>();
+            var host = ctx.Render<Host>();
             var numeric = host.FindComponent<RecordingNumeric>().Instance;
 
             host.Find("input").Change("5");
@@ -61,10 +61,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void FormFieldStillReflectsDisabledChangesOfTheWrappedComponent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenFormField>(parameters =>
+            var component = ctx.Render<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, b =>
                 {

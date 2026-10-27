@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -78,10 +80,10 @@ namespace Radzen.Blazor.Tests
                           - double.Parse(m.Groups["xl"].Value, System.Globalization.CultureInfo.InvariantCulture));
         }
 
-        static async Task<IRenderedComponent<RadzenChart>> RenderColumn(TestContext ctx,
+        static async Task<IRenderedComponent<RadzenChart>> RenderColumn(BunitContext ctx,
             Action<ComponentParameterCollectionBuilder<RadzenColumnOptions>>? options = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
             {
                 p.AddChildContent<RadzenColumnSeries<DataItem>>(s =>
                 {
@@ -152,7 +154,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
             {
                 p.AddChildContent<RadzenBarSeries<DataItem>>(s =>
                 {

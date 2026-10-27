@@ -17,13 +17,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Submit_Passes_EditContext_Model_When_Data_Not_Set()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var model = new ContactInfo { Name = "Alice" };
             var editContext = new EditContext(model);
 
             ContactInfo submitted = null;
 
-            var form = ctx.RenderComponent<RadzenTemplateForm<ContactInfo>>(parameters => parameters
+            var form = ctx.Render<RadzenTemplateForm<ContactInfo>>(parameters => parameters
                 .Add(p => p.EditContext, editContext)
                 .Add(p => p.Submit, EventCallback.Factory.Create<ContactInfo>(this, value => submitted = value)));
 

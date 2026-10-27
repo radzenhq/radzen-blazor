@@ -12,9 +12,9 @@ namespace Radzen.Blazor.Tests
             .Select((month, index) => new DataItem { Category = month, Value = 10 + index })
             .ToArray();
 
-        static IRenderedComponent<RadzenChart> RenderZoomedChart(TestContext ctx, string group)
+        static IRenderedComponent<RadzenChart> RenderZoomedChart(BunitContext ctx, string group)
         {
-            return ctx.RenderComponent<RadzenChart>(p => p
+            return ctx.Render<RadzenChart>(p => p
                 .Add(x => x.SyncGroup, group)
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.ViewStart, 0.55)
@@ -40,7 +40,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
             var chart = RenderZoomedChart(ctx, $"test-{System.Guid.NewGuid():N}");
             await chart.InvokeAsync(() => chart.Instance.Resize(600, 300));
@@ -60,7 +60,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
             var group = $"test-{System.Guid.NewGuid():N}";
             var source = RenderZoomedChart(ctx, group);
@@ -82,9 +82,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-            ctx.RenderComponent<RadzenChartTooltip>();
+            ctx.Render<RadzenChartTooltip>();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.SyncGroup, $"test-{System.Guid.NewGuid():N}")
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

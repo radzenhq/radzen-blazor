@@ -1979,7 +1979,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private void WriteFormula(XmlWriter writer, Cell cell, Dictionary<CellRef, (int Si, string? Ref)> sharedFormulas)
     {
-        var formula = cell.Formula!.StartsWith('=') ? cell.Formula![1..] : cell.Formula!;
+        var formula = cell.Formula!.StartsWith('=', StringComparison.Ordinal) ? cell.Formula![1..] : cell.Formula!;
 
         writer.WriteStartElement("f", Main);
 
@@ -2809,7 +2809,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
                     if (!string.IsNullOrEmpty(rule.Formula1))
                     {
-                        if (rule.Type == DataValidationType.List && rule.Formula1.StartsWith('='))
+                        if (rule.Type == DataValidationType.List && rule.Formula1.StartsWith('=', StringComparison.Ordinal))
                         {
                             element.Add(new XElement(XName.Get("formula1", ns), rule.Formula1[1..]));
                         }

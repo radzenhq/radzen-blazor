@@ -9,10 +9,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>();
+            var component = ctx.Render<RadzenDropZoneContainer<string>>();
 
             Assert.Contains("rz-dropzone-container", component.Markup);
         }
@@ -20,10 +20,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.AddChildContent("<div>Zone Content</div>");
             });
@@ -34,10 +34,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -48,10 +48,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZone_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -66,10 +66,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZone_Renders_WithValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -85,10 +85,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZone_Renders_Footer()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.ChildContent, builder =>
                 {
@@ -105,12 +105,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_Renders_Items_WithSelector()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[] { "Item1", "Item2", "Item3" };
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ItemSelector, (item, zone) => true);
@@ -133,10 +133,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_Payload_IsNull_Initially()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>();
+            var component = ctx.Render<RadzenDropZoneContainer<string>>();
 
             Assert.Null(component.Instance.Payload);
         }
@@ -144,10 +144,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZoneContainer_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            var component = ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.Style, "display:flex");
             });
@@ -155,9 +155,9 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("display:flex", component.Markup);
         }
 
-        static IRenderedComponent<RadzenDropZoneContainer<string>> RenderZoneWithItems(TestContext ctx)
+        static IRenderedComponent<RadzenDropZoneContainer<string>> RenderZoneWithItems(BunitContext ctx)
         {
-            return ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            return ctx.Render<RadzenDropZoneContainer<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, new[] { "Item1", "Item2" });
                 parameters.Add(p => p.ItemSelector, (item, zone) => true);
@@ -174,7 +174,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZone_KeepsCanDropClass_WhenDraggingOverItsItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderZoneWithItems(ctx);
@@ -198,7 +198,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropZone_RemovesCanDropClass_WhenDragLeavesTheZone()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderZoneWithItems(ctx);

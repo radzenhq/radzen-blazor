@@ -10,16 +10,16 @@ namespace Radzen.Blazor.Tests
 {
     public class MarkdownEditorTests
     {
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.Services.AddScoped<ContextMenuService>();
             return ctx;
         }
 
-        static BunitJSModuleInterop Module(TestContext ctx) => ctx.JSInterop.SetupModule(invocation => invocation.Identifier == "Radzen.createMarkdownEditor");
+        static BunitJSModuleInterop Module(BunitContext ctx) => ctx.JSInterop.SetupModule(invocation => invocation.Identifier == "Radzen.createMarkdownEditor");
 
         static MarkdownEditorUpdate LastUpdate(BunitJSModuleInterop module) =>
             Assert.IsType<MarkdownEditorUpdate>(module.Invocations["update"].Last().Arguments[0]);
@@ -28,7 +28,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_Renders_WithClassName()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+            var component = ctx.Render<RadzenMarkdownEditor>();
             Assert.Contains("rz-markdown-editor", component.Markup);
             Assert.Contains("rz-markdown-editor-toolbar", component.Markup);
             Assert.Contains("rz-markdown-editor-textarea", component.Markup);
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_HidesToolbar_WhenShowToolbarFalse()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.ShowToolbar, false));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.ShowToolbar, false));
             Assert.DoesNotContain("rz-markdown-editor-toolbar", component.Markup);
         }
 
@@ -46,7 +46,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_DesignMode_RendersEditableAndHidesTextarea()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi"));
             var editable = component.Find(".rz-markdown-editor-design");
             Assert.Equal("true", editable.GetAttribute("contenteditable"));
             Assert.Empty(editable.InnerHtml.Trim());
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_SourceMode_ShowsTextareaAndHidesEditable()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
             Assert.False(component.Find("textarea").HasAttribute("hidden"));
@@ -68,7 +68,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_DisabledRemovesContentEditable()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
             Assert.Equal("false", component.Find(".rz-markdown-editor-design").GetAttribute("contenteditable"));
         }
 
@@ -77,7 +77,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             MarkdownEditorMode? changed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.ModeChanged, m => changed = m));
             component.Find(".rz-markdown-editor-tools button[title^='View source']").Click();
             Assert.Equal(MarkdownEditorMode.Source, changed);
@@ -87,7 +87,7 @@ namespace Radzen.Blazor.Tests
         public async Task ToolbarFollowsTheCaretAcrossSelectionReports()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi\n\nplain **bold**"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "# Hi\n\nplain **bold**"));
 
             await component.InvokeAsync(() => component.Instance.OnSelectionAsync(1, 1));
             Assert.Contains("Heading 1", component.Find(".rz-dropdown-label").TextContent);
@@ -107,12 +107,13 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             string? value = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.ValueChanged, v => value = v));
             var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(0, 0, "typed", "insertText", 1));
             Assert.Equal("typed", value);
             Assert.Equal("typed", component.Instance.Value);
+            Assert.NotNull(update);
             Assert.Equal(1, update.Version);
             Assert.Null(update.Html);
             Assert.Equal((5, 5), (update.SelectionStart, update.SelectionEnd));
@@ -123,10 +124,10 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var count = 0;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Input, _ => count++));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Input, _ => count++));
             await component.InvokeAsync(() => component.Instance.OnEditAsync(0, 0, "a", "insertText", 1));
             Assert.Equal(0, count);
-            component.SetParametersAndRender(p => p.Add(x => x.Immediate, true));
+            component.Render(p => p.Add(x => x.Immediate, true));
             await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 2));
             Assert.Equal(1, count);
         }
@@ -135,9 +136,10 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_Edit_InDesignMode_InsertsLiteralText_AndRendersIt()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "old"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "old"));
             var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, " *x*", "insertText", 1));
             Assert.Equal("old \\*x\\*", component.Instance.Value);
+            Assert.NotNull(update);
             Assert.Equal("<p>old *x*</p>", update.Html);
             Assert.Equal((7, 7), (update.SelectionStart, update.SelectionEnd));
         }
@@ -146,7 +148,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_Enter_InAListItem_StartsANewItem()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "- item"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "- item"));
             var update = await component.InvokeAsync(() => component.Instance.OnInsertParagraphAsync(6, 6, 1));
             Assert.Equal("- item\n- ", component.Instance.Value);
             Assert.Contains("<li>​</li>", update!.Html);
@@ -156,7 +158,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_Undo_RevertsTheEdit_AndSendsTheText()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
             await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 1));
             var update = await component.InvokeAsync(() => component.Instance.OnUndoAsync(2));
             Assert.Equal("a", component.Instance.Value);
@@ -172,7 +174,7 @@ namespace Radzen.Blazor.Tests
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 5 });
             string? executed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hello")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName));
@@ -190,7 +192,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             string? executed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "text")
                 .Add(x => x.Execute, args => executed = args.CommandName));
             var count = module.Invocations["update"].Count;
@@ -205,7 +207,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 5 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hello"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hello"));
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
             var update = LastUpdate(module);
             Assert.Equal("<p><strong>hello</strong></p>", update.Html);
@@ -219,7 +221,7 @@ namespace Radzen.Blazor.Tests
             var module = Module(ctx);
             var getSelection = module.Setup<int[]?>("getSelection", _ => true);
             getSelection.SetResult(new[] { 0, 2 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hi"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "hi"));
             _ = component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Link));
             Assert.Single(getSelection.Invocations);
         }
@@ -228,7 +230,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_RendersDefaultToolbar_WhenNoChildContent()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>();
+            var component = ctx.Render<RadzenMarkdownEditor>();
             var icons = component.FindAll(".rz-markdown-editor-tools > button.rz-button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "undo", "redo", "format_bold", "format_italic", "strikethrough_s", "format_quote", "code", "code_blocks",
                                  "format_list_bulleted", "format_list_numbered", "checklist", "link", "image", "horizontal_rule",
@@ -241,7 +243,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_RendersOnlyChildContent_WhenProvided()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.AddChildContent<RadzenMarkdownEditorBold>());
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.AddChildContent<RadzenMarkdownEditorBold>());
             var icons = component.FindAll(".rz-markdown-editor-tools > button .rzi").Select(i => i.TextContent).ToList();
             Assert.Equal(new[] { "format_bold" }, icons);
         }
@@ -252,7 +254,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 2 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorItalic>());
@@ -264,7 +266,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_Disabled_DisablesTextarea_AndAllTools()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Disabled, true));
             Assert.True(component.Find("textarea").HasAttribute("disabled"));
             Assert.All(component.FindAll(".rz-markdown-editor-tools button"), b => Assert.True(b.HasAttribute("disabled")));
         }
@@ -274,10 +276,10 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var module = Module(ctx);
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Visible, false));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Visible, false));
             Assert.DoesNotContain("rz-markdown-editor", component.Markup);
             ctx.JSInterop.VerifyNotInvoke("Radzen.createMarkdownEditor");
-            component.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+            component.Render(p => p.Add(x => x.Visible, true));
             ctx.JSInterop.VerifyInvoke("Radzen.createMarkdownEditor");
         }
 
@@ -285,7 +287,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_ModeSwitcher_UpdatesInternalMode_WhenOneWayBound()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "# Hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Design));
             component.Find(".rz-markdown-editor-tools button[title^='View source']").Click();
@@ -299,7 +301,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 2 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "hi")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorBold>());
@@ -317,7 +319,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 6, 11 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "line1\r\nline2")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
             await component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.Bold));
@@ -328,7 +330,7 @@ namespace Radzen.Blazor.Tests
         public void MarkdownEditor_Tools_RegisterShortcuts()
         {
             using var ctx = CreateContext();
-            ctx.RenderComponent<RadzenMarkdownEditor>();
+            ctx.Render<RadzenMarkdownEditor>();
             var invocation = Assert.Single(ctx.JSInterop.Invocations["Radzen.createMarkdownEditor"]);
             var keys = Assert.IsAssignableFrom<System.Collections.Generic.IEnumerable<string>>(invocation.Arguments[3]);
             Assert.Equal(new[] { "Ctrl+B", "Ctrl+I", "Ctrl+K" }, keys.OrderBy(k => k));
@@ -340,7 +342,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             string? executed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .Add(x => x.Execute, args => executed = args.CommandName)
                 .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
@@ -356,7 +358,7 @@ namespace Radzen.Blazor.Tests
         public void CustomTool_RendersTemplate_WithEditor()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .AddChildContent<RadzenMarkdownEditorCustomTool>(t => t
                     .Add(x => x.Template, editor => b => b.AddContent(0, $"mode:{editor.Mode}"))));
             Assert.Contains("rz-markdown-editor-custom-tool", component.Markup);
@@ -368,9 +370,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var module = Module(ctx);
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
             var count = module.Invocations["update"].Count;
-            component.SetParametersAndRender(p => p.Add(x => x.Value, "b"));
+            component.Render(p => p.Add(x => x.Value, "b"));
             Assert.Equal(count + 1, module.Invocations["update"].Count);
             var update = LastUpdate(module);
             Assert.Equal("b", update.Text);
@@ -383,10 +385,10 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var module = Module(ctx);
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "a"));
             await component.InvokeAsync(() => component.Instance.OnEditAsync(1, 1, "b", "insertText", 1));
             var count = module.Invocations["update"].Count;
-            component.SetParametersAndRender(p => p.Add(x => x.Value, "ab"));
+            component.Render(p => p.Add(x => x.Value, "ab"));
             Assert.Equal(count, module.Invocations["update"].Count);
         }
 
@@ -395,11 +397,11 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var module = Module(ctx);
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "a")
                 .Add(x => x.Mode, MarkdownEditorMode.Source));
             var count = module.Invocations["update"].Count;
-            component.SetParametersAndRender(p => p.Add(x => x.Mode, MarkdownEditorMode.Design));
+            component.Render(p => p.Add(x => x.Mode, MarkdownEditorMode.Design));
             Assert.Equal(count + 1, module.Invocations["update"].Count);
             Assert.Equal("<p>a</p>", LastUpdate(module).Html);
         }
@@ -409,7 +411,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             string? changed = null;
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "old")
                 .Add(x => x.Change, v => changed = v));
             await component.InvokeAsync(() => component.Instance.OnFocusAsync());
@@ -425,7 +427,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_Selection_ShowsTheCurrentBlockInTheFormatBlockTool()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "## title"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "## title"));
             await component.InvokeAsync(() => component.Instance.OnSelectionAsync(4, 4));
             Assert.Equal("h2", component.Instance.FormatBlock);
             Assert.Equal("Heading 2", component.Find(".rz-dropdown-label").TextContent);
@@ -435,7 +437,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_Selection_DisablesTheFormatBlockTool_WithoutParagraphOrHeading()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "para\n\n```\ncode\n```"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "para\n\n```\ncode\n```"));
             await component.InvokeAsync(() => component.Instance.OnSelectionAsync(2, 2));
             Assert.DoesNotContain("rz-state-disabled", component.Find(".rz-dropdown").ClassName);
             await component.InvokeAsync(() => component.Instance.OnSelectionAsync(7, 7));
@@ -448,7 +450,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 0 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(e => e.Value, "title").Add(e => e.Mode, MarkdownEditorMode.Source));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(e => e.Value, "title").Add(e => e.Mode, MarkdownEditorMode.Source));
             component.FindComponent<RadzenMarkdownEditorFormatBlock>().FindAll(".rz-dropdown-item")[3].Click();
             Assert.Equal("### title", LastUpdate(module).Text);
         }
@@ -457,7 +459,7 @@ namespace Radzen.Blazor.Tests
         public async Task TableToolsFollowTheCaretIntoAndOutOfATable()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "text\n\n| a | b |\n| - | -: |\n| c | d |")
                 .AddChildContent<RadzenMarkdownEditorTableTools>());
             var buttons = component.FindAll(".rz-markdown-editor-tools > button");
@@ -487,7 +489,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 2, 2 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p
                 .Add(x => x.Value, "| a | b |\n| - | - |")
                 .Add(x => x.Mode, MarkdownEditorMode.Source)
                 .AddChildContent<RadzenMarkdownEditorTableCommandButton>(b => b
@@ -504,7 +506,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var module = Module(ctx);
             module.Setup<int[]?>("getSelection", _ => true).SetResult(new[] { 0, 0 });
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Source));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Mode, MarkdownEditorMode.Source));
             component.InvokeAsync(() => component.Instance.ExecuteCommandAsync(MarkdownEditorCommands.InsertTable, "1x2")).GetAwaiter().GetResult();
             Assert.Equal("|  |  |\n| --- | --- |", LastUpdate(module).Text);
         }
@@ -513,7 +515,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_ContextMenu_InsideATable_OpensTheTableCommands()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "| a | b |\n| --- | --- |\n| 1 | 2 |"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "| a | b |\n| --- | --- |\n| 1 | 2 |"));
             var service = ctx.Services.GetRequiredService<ContextMenuService>();
             ContextMenuOptions? opened = null;
             service.OnOpen += (_, options) => opened = options;
@@ -531,7 +533,7 @@ namespace Radzen.Blazor.Tests
         public async Task MarkdownEditor_ContextMenu_OutsideATable_DoesNotOpen()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "plain"));
+            var component = ctx.Render<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "plain"));
             var service = ctx.Services.GetRequiredService<ContextMenuService>();
             var opened = false;
             service.OnOpen += (_, _) => opened = true;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.AI;
@@ -116,9 +118,9 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        private static (TestContext Context, ScriptedChatClient Client) CreateContext()
+        private static (BunitContext Context, ScriptedChatClient Client) CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var client = new ScriptedChatClient();
             ctx.Services.AddSingleton<IChatClient>(client);
@@ -134,7 +136,7 @@ namespace Radzen.Blazor.Tests
 
             var tool = AIFunctionFactory.Create((string city) => $"Sunny in {city}", "get_weather");
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { tool }));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { tool }));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Weather?"));
 
@@ -209,7 +211,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, client) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "slow")
                 .Add(p => p.QueueMessages, true));
 
@@ -254,7 +256,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, client) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
 
             var send = component.InvokeAsync(() => component.Instance.SendMessage("First"));
 
@@ -278,7 +280,7 @@ namespace Radzen.Blazor.Tests
 
             var input = string.Empty;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "slow")
                 .Add(p => p.QueueMessages, true)
                 .Add(p => p.InputChanged, value => input = value));
@@ -313,7 +315,7 @@ namespace Radzen.Blazor.Tests
 
             var changes = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Input, "Offered prompt")
                 .Add(p => p.InputChanged, value => changes.Add(value)));
 
@@ -324,10 +326,10 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Typed", Assert.Single(changes));
             Assert.Equal("Typed", component.Instance.Input);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Input, "Typed"));
+            component.Render(parameters => parameters.Add(p => p.Input, "Typed"));
             Assert.Equal("Typed", component.Find("textarea").GetAttribute("value"));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Input, "Replaced"));
+            component.Render(parameters => parameters.Add(p => p.Input, "Replaced"));
             Assert.Equal("Replaced", component.Find("textarea").GetAttribute("value"));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Replaced"));
@@ -344,7 +346,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.ShowClearButton, false)
                 .Add(p => p.HeaderTemplate, builder => builder.AddMarkupContent(0, "<select class=\"chat-switcher\"></select>"))
                 .Add(p => p.InputHeaderTemplate, builder => builder.AddMarkupContent(0, "<span class=\"run-status\">Building</span>"))
@@ -362,7 +364,7 @@ namespace Radzen.Blazor.Tests
             Assert.True(header.CompareDocumentPosition(inner).HasFlag(AngleSharp.Dom.DocumentPositions.Following));
             Assert.True(inner.CompareDocumentPosition(footer).HasFlag(AngleSharp.Dom.DocumentPositions.Following));
 
-            var plain = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.ShowClearButton, false));
+            var plain = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.ShowClearButton, false));
             Assert.Empty(plain.FindAll(".rz-chat-header"));
         }
 
@@ -372,7 +374,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.ShowAvatars, false)
                 .Add(p => p.SendButtonText, "Build it")
                 .Add(p => p.SendButtonIcon, "bolt"));
@@ -387,7 +389,7 @@ namespace Radzen.Blazor.Tests
             Assert.Empty(component.FindAll(".rz-chat-message-avatar"));
             Assert.Equal(2, component.FindAll(".rz-chat-message").Count);
 
-            var withAvatars = ctx.RenderComponent<RadzenAIChat>();
+            var withAvatars = ctx.Render<RadzenAIChat>();
             await withAvatars.InvokeAsync(() => withAvatars.Instance.SendMessage("Hi"));
             withAvatars.WaitForAssertion(() => Assert.Equal(2, withAvatars.FindAll(".rz-chat-message-avatar").Count));
             Assert.Contains("send", withAvatars.Find(".rz-chat-send-btn .rzi").TextContent);
@@ -399,7 +401,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "credits")
                 .Add(p => p.ShowUsage, true)
                 .Add(p => p.UsageTemplate, message => builder => builder.AddMarkupContent(0, $"<em class=\"credits\">{message.Usage!.AdditionalCounts!["credits"]} credits</em>"))
@@ -430,7 +432,7 @@ namespace Radzen.Blazor.Tests
 
             var errors = new List<Exception>();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.AllowAttachments, true)
                 .Add(p => p.MaxTotalAttachmentSize, 10)
                 .Add(p => p.Error, error => errors.Add(error)));
@@ -459,7 +461,7 @@ namespace Radzen.Blazor.Tests
         {
             public List<Microsoft.Extensions.AI.ChatMessage> Taken { get; } = new();
 
-            public Task<bool> TryQueueMessageAsync(Microsoft.Extensions.AI.ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
+            public override Task<bool> TryQueueMessageAsync(Microsoft.Extensions.AI.ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
             {
                 Taken.Add(message);
                 return Task.FromResult(true);
@@ -474,7 +476,7 @@ namespace Radzen.Blazor.Tests
 
             ctx.Services.AddScoped<IAIChatService, TakingChatService>();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "slow")
                 .Add(p => p.QueueMessages, true));
 
@@ -515,7 +517,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
 
             var send = component.InvokeAsync(() => component.Instance.SendMessage("First"));
             component.WaitForAssertion(() => Assert.Contains("rz-chat-stop-btn", component.Markup));
@@ -532,7 +534,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "files")
                 .Add(p => p.MessageFooterTemplate, message => builder => builder.AddMarkupContent(0, message.AdditionalProperties?.TryGetValue("changedFiles", out string[]? files) == true ? $"<span class=\"changed\">{string.Join(", ", files!)}</span>" : string.Empty)));
 
@@ -559,7 +561,7 @@ namespace Radzen.Blazor.Tests
 
             client.Queue = new QueueingClient();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "slow")
                 .Add(p => p.QueueMessages, true));
 
@@ -617,7 +619,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.StopButtonText, "Stop the agent")
                 .Add(p => p.StopButtonIcon, "stop")
                 .Add(p => p.MessageFooterTemplate, message => builder => builder.AddMarkupContent(0, "<i class=\"footer\"></i>")));
@@ -670,7 +672,7 @@ namespace Radzen.Blazor.Tests
 
             RadzenAIChat chat = null!;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.MessageTemplate, message => builder =>
                 {
                     if (message.AdditionalProperties?.ContainsKey("plan") == true)
@@ -707,7 +709,7 @@ namespace Radzen.Blazor.Tests
             var errors = new List<Exception>();
             var seen = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.AllowAttachments, true)
                 .Add(p => p.MaxTotalAttachmentSize, 6)
                 .Add(p => p.Error, error => errors.Add(error))
@@ -751,7 +753,7 @@ namespace Radzen.Blazor.Tests
 
             client.EmitUnknownMarker = true;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Go"));
 
@@ -776,7 +778,7 @@ namespace Radzen.Blazor.Tests
 
             client.Queue = new QueueingClient();
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "slow")
                 .Add(p => p.QueueMessages, true));
 

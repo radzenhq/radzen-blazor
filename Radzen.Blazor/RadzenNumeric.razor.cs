@@ -624,7 +624,7 @@ namespace Radzen.Blazor
 
                 if (ch == '\'' || ch == '"')
                 {
-                    var close = format.IndexOf(ch, i + 1);
+                    var close = format.IndexOf(ch, i + 1, StringComparison.Ordinal);
                     if (close < 0)
                     {
                         close = format.Length;

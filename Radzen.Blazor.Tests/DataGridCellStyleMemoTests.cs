@@ -13,12 +13,12 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx)
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<Item>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.Data, new List<Item> { new() { Id = 1 }, new() { Id = 2 } });
                 parameterBuilder.Add(p => p.Columns, builder =>
@@ -34,7 +34,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GetStyle_ReturnsCellStyle_AndReusesTheSameStringAcrossCells()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Render(ctx).Instance.ColumnsCollection.Single();
 
             var first = column.GetStyle(forCell: true);
@@ -48,7 +48,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GetStyle_Memo_InvalidatesWhenInputChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Render(ctx).Instance.ColumnsCollection.Single();
 
             Assert.Contains("text-align:right", column.GetStyle(forCell: true));

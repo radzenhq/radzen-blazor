@@ -14,12 +14,12 @@ namespace Radzen.Blazor.Tests
             public int Id { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Item>> Render(TestContext ctx, Action<RenderTreeBuilderColumn> configure)
+        static IRenderedComponent<RadzenDataGrid<Item>> Render(BunitContext ctx, Action<RenderTreeBuilderColumn> configure)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<Item>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<Item>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.Data, new List<Item> { new() { Id = 1 }, new() { Id = 2 } });
                 parameterBuilder.Add(p => p.Columns, builder =>
@@ -40,7 +40,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CachedCellCssClass_ReturnsCssClass_AndReusesTheSameStringAcrossCells()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.CssClass), "my-cls")).Instance.ColumnsCollection.Single();
 
             var first = column.GetCachedCellCssClass("", "");
@@ -53,7 +53,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CachedCellCssClass_InvalidatesWhenCssClassChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.CssClass), "my-cls")).Instance.ColumnsCollection.Single();
 
             Assert.Equal("my-cls", column.GetCachedCellCssClass("", ""));
@@ -66,7 +66,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CachedCellCssClass_InvalidatesWhenFrozenOrCompositeChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.CssClass), "my-cls")).Instance.ColumnsCollection.Single();
 
             Assert.Equal("my-cls", column.GetCachedCellCssClass("", ""));
@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataCell_RendersColumnCssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.CssClass), "my-cls"));
 
             var cells = cut.FindAll("td[role=\"gridcell\"]");
@@ -87,7 +87,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CalculatedCssClass_AppliesDistinctClassPerRow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             Func<RadzenDataGridColumn<Item>, Item, string> calc = (_, item) => item.Id == 1 ? "cls-a" : "cls-b";
             var cut = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.CalculatedCssClass), calc));
 
@@ -99,7 +99,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ShowCellDataAsTooltip_RendersTitle_WithLazySpanAttributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var cut = Render(ctx, c => c.Add(nameof(RadzenDataGridColumn<Item>.ShowCellDataAsTooltip), true));
 
             var titled = cut.FindAll("span[title]");

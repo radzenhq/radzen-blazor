@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,12 +12,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task GoogleMap_Raises_BoundsChanged_WithVisibleArea()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             GoogleMapBoundsChangedEventArgs? raised = null;
 
-            var component = ctx.RenderComponent<RadzenGoogleMap>(parameters =>
+            var component = ctx.Render<RadzenGoogleMap>(parameters =>
                 parameters.Add(p => p.BoundsChanged, (GoogleMapBoundsChangedEventArgs args) => raised = args));
 
             var args = JsonSerializer.Deserialize<GoogleMapBoundsChangedEventArgs>(

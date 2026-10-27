@@ -18,10 +18,10 @@ namespace Radzen.Blazor.Tests
         static List<Person> People(int n) =>
             Enumerable.Range(1, n).Select(i => new Person { Id = i, Name = "Person " + i }).ToList();
 
-        static IRenderedComponent<RadzenDataGrid<Person>> Render(TestContext ctx,
+        static IRenderedComponent<RadzenDataGrid<Person>> Render(BunitContext ctx,
             System.Action<DataGridCellRenderEventArgs<Person>> cellRender, TextAlign align = TextAlign.Right)
         {
-            return ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            return ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People(2));
 
@@ -43,7 +43,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColumnStyle_WinsOverCellRenderStyle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -59,7 +59,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CellRenderClass_IsMergedWithTheColumnClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -73,7 +73,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void WithoutCellRender_ClassAndStyleStillLandOnTheCell()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 

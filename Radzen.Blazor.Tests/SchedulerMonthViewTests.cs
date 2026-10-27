@@ -24,7 +24,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MonthView_MultiDayEvent_StartingLaterInDay_RendersFromFirstDay_WhenOtherEventsStartEarlier()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
@@ -41,7 +41,7 @@ namespace Radzen.Blazor.Tests
                 new() { Start = monday.AddHours(12), End = monday.AddDays(2).AddHours(17), Text = "Vacation" },
             };
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Culture, culture);
                 p.Add(x => x.Date, new DateTime(2024, 12, 9));
@@ -75,7 +75,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void AppointmentRender_Class_MergesWith_DefaultEventContentClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
@@ -87,7 +87,7 @@ namespace Radzen.Blazor.Tests
                 new() { Start = monday.AddHours(8), End = monday.AddHours(9), Text = "Meeting" },
             };
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Date, new DateTime(2024, 12, 9));
                 p.Add(x => x.Data, appointments);
@@ -111,7 +111,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void MonthView_Localizes_ViewStrings_Using_Scheduler_UICulture()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
@@ -126,7 +126,7 @@ namespace Radzen.Blazor.Tests
                 new() { Start = monday.AddHours(12), End = monday.AddHours(13), Text = "D" },
             };
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.UICulture, new CultureInfo("de"));
                 p.Add(x => x.Date, new DateTime(2024, 12, 9));

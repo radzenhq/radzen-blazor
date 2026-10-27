@@ -26,7 +26,7 @@ public class HtmlBlock : Leaf
     {
         base.Close(parser);
 
-        if (Value.EndsWith('\n'))
+        if (Value.EndsWith('\n', StringComparison.Ordinal))
         {
             TrimContentEnd(Value.Length - 1);
         }

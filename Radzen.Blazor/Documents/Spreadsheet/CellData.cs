@@ -686,17 +686,17 @@ public class CellData : IComparable, IComparable<CellData>
             return ("<>", criteria[2..]);
         }
 
-        if (criteria.StartsWith('>'))
+        if (criteria.StartsWith('>', StringComparison.Ordinal))
         {
             return (">", criteria[1..].Trim());
         }
 
-        if (criteria.StartsWith('<'))
+        if (criteria.StartsWith('<', StringComparison.Ordinal))
         {
             return ("<", criteria[1..].Trim());
         }
 
-        if (criteria.StartsWith('='))
+        if (criteria.StartsWith('=', StringComparison.Ordinal))
         {
             return ("=", criteria[1..]);
         }

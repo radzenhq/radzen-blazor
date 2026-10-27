@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -52,9 +53,9 @@ namespace Radzen.Blazor.Tests
         static List<NullableDateOnlyItem> NullableDateOnlyData() => Enumerable.Range(0, 365)
             .Select(i => new NullableDateOnlyItem { Date = Start.AddDays(i), Value = 100 + i % 7 }).ToList();
 
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 400 });
@@ -64,9 +65,9 @@ namespace Radzen.Blazor.Tests
             return ctx;
         }
 
-        static IRenderedComponent<RadzenChart> RenderChart<TItem>(TestContext ctx, IEnumerable<TItem> data, Action<ComponentParameterCollectionBuilder<RadzenChart>> configure = null, Action<ComponentParameterCollectionBuilder<RadzenCategoryAxis>> axis = null)
+        static IRenderedComponent<RadzenChart> RenderChart<TItem>(BunitContext ctx, IEnumerable<TItem> data, Action<ComponentParameterCollectionBuilder<RadzenChart>> configure = null, Action<ComponentParameterCollectionBuilder<RadzenCategoryAxis>> axis = null)
         {
-            return ctx.RenderComponent<RadzenChart>(parameters =>
+            return ctx.Render<RadzenChart>(parameters =>
             {
                 configure?.Invoke(parameters);
                 parameters.AddChildContent<RadzenLineSeries<TItem>>(series => series
@@ -81,7 +82,7 @@ namespace Radzen.Blazor.Tests
             });
         }
 
-        static List<string> CategoryLabels(IRenderedFragment chart)
+        static List<string> CategoryLabels(IRenderedComponent<IComponent> chart)
         {
             return chart.FindAll("g.rz-category-axis .rz-tick-text").Select(e => e.TextContent).ToList();
         }
@@ -217,7 +218,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(parameters =>
+            var chart = ctx.Render<RadzenChart>(parameters =>
             {
                 parameters.AddChildContent<RadzenLineSeries<DateOnlyItem>>(series => series
                     .Add(p => p.Data, DateOnlyData())
@@ -247,9 +248,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(expected.GetType(), actual.GetType());
         }
 
-        static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(TestContext ctx, IEnumerable<TItem> data, Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
+        static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(BunitContext ctx, IEnumerable<TItem> data, Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
         {
-            return ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            return ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.ShowAxis, true);
                 parameters.Add(p => p.AxisFormatString, "{0:MMM}");
@@ -298,7 +299,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var navigator = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var navigator = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.ShowAxis, true);
                 parameters.Add(p => p.AxisFormatString, "{0:MMM}");

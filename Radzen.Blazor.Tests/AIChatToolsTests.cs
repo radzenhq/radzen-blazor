@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -96,9 +98,9 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        private static (TestContext Context, ScriptedChatClient Client) CreateContext()
+        private static (BunitContext Context, ScriptedChatClient Client) CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var client = new ScriptedChatClient();
             ctx.Services.AddSingleton<IChatClient>(client);
@@ -119,7 +121,7 @@ namespace Radzen.Blazor.Tests
             var completed = new List<ChatToolCall>();
             var tool = AIFunctionFactory.Create((string city) => { invoked++; return GetWeather(city); }, "get_weather", "Gets the weather");
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Tools, new AITool[] { tool })
                 .Add(p => p.ToolCallCompleted, call => completed.Add(call)));
 
@@ -166,7 +168,7 @@ namespace Radzen.Blazor.Tests
             var invoked = 0;
             var tool = new ApprovalRequiredAIFunction(AIFunctionFactory.Create((string city) => { invoked++; return GetWeather(city); }, "get_weather", "Gets the weather"));
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { tool }));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { tool }));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Weather in Sofia?"));
 
@@ -212,7 +214,7 @@ namespace Radzen.Blazor.Tests
             var completed = new List<ChatToolCall>();
             var tool = new ApprovalRequiredAIFunction(AIFunctionFactory.Create((string city) => { invoked++; return GetWeather(city); }, "get_weather", "Gets the weather"));
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Tools, new AITool[] { tool })
                 .Add(p => p.ToolCallCompleted, call => completed.Add(call)));
 
@@ -246,7 +248,7 @@ namespace Radzen.Blazor.Tests
                 new ApprovalRequiredAIFunction(AIFunctionFactory.Create((string city) => { invoked.Add("second"); return "Second"; }, "second_tool"))
             };
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Tools, tools)
                 .Add(p => p.AllowMultipleToolCalls, false));
 
@@ -294,7 +296,7 @@ namespace Radzen.Blazor.Tests
 
             var tool = AIFunctionFactory.Create((string city) => GetWeather(city), "get_weather");
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Tools, new AITool[] { tool })
                 .Add(p => p.ToolCallTemplate, call => builder =>
                 {
@@ -321,7 +323,7 @@ namespace Radzen.Blazor.Tests
 
             var tool = AIFunctionFactory.Create((string city) => GetWeather(city), "get_weather");
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.Tools, new AITool[] { tool })
                 .Add(p => p.ShowToolCalls, false));
 
@@ -339,7 +341,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, client) = CreateContext();
             using var _ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "Be terse."));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "Be terse."));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Hi"));
 
@@ -356,7 +358,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason"));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Hi"));
             component.WaitForAssertion(() => Assert.Contains("Hello there", component.Markup));
@@ -366,7 +368,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Thinking about it", component.Instance.GetMessages()[1].Reasoning);
             Assert.Equal("Hello there", component.Instance.GetMessages()[1].Content);
 
-            var hidden = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason").Add(p => p.ShowReasoning, false));
+            var hidden = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "reason").Add(p => p.ShowReasoning, false));
             await hidden.InvokeAsync(() => hidden.Instance.SendMessage("Hi"));
             hidden.WaitForAssertion(() => Assert.Contains("Hello there", hidden.Markup));
             Assert.DoesNotContain("rz-chat-reasoning", hidden.Markup);
@@ -378,7 +380,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "slow"));
 
             var send = component.InvokeAsync(() => component.Instance.SendMessage("Go"));
 
@@ -402,7 +404,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, client) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters
                 .Add(p => p.SystemPrompt, "usage")
                 .Add(p => p.AllowAttachments, true)
                 .Add(p => p.ShowUsage, true));
@@ -543,7 +545,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { AIFunctionFactory.Create(SearchDocs) }));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.Tools, new AITool[] { AIFunctionFactory.Create(SearchDocs) }));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Find it"));
             component.WaitForAssertion(() => Assert.Contains("Result:", component.Markup));
@@ -570,7 +572,7 @@ namespace Radzen.Blazor.Tests
             var (ctx, _) = CreateContext();
             using var __ = ctx;
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite"));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite"));
 
             await component.InvokeAsync(() => component.Instance.SendMessage("Hi"));
             component.WaitForAssertion(() => Assert.Contains("Hello there", component.Markup));
@@ -583,13 +585,13 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Second source", message.Citations[1].Title);
             Assert.Contains("rz-chat-citations", component.Markup);
 
-            var templated = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.CitationTemplate, citation => builder => builder.AddMarkupContent(0, $"<em class=\"custom-citation\">{citation.Title}</em>")));
+            var templated = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.CitationTemplate, citation => builder => builder.AddMarkupContent(0, $"<em class=\"custom-citation\">{citation.Title}</em>")));
             await templated.InvokeAsync(() => templated.Instance.SendMessage("Hi"));
             templated.WaitForAssertion(() => Assert.Contains("Hello there", templated.Markup));
             Assert.Equal(2, templated.FindAll(".custom-citation").Count);
             Assert.Empty(templated.FindAll("a.rz-chat-citation"));
 
-            var hidden = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.ShowCitations, false));
+            var hidden = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SystemPrompt, "cite").Add(p => p.ShowCitations, false));
             await hidden.InvokeAsync(() => hidden.Instance.SendMessage("Hi"));
             hidden.WaitForAssertion(() => Assert.Contains("Hello there", hidden.Markup));
             Assert.DoesNotContain("rz-chat-citations", hidden.Markup);

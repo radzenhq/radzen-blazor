@@ -202,7 +202,7 @@ internal class FormulaLexer(string expression, bool strict = true)
         address = default;
 
         string? worksheet = null;
-        var bang = text.LastIndexOf('!');
+        var bang = text.LastIndexOf('!', StringComparison.Ordinal);
 
         if (bang >= 0)
         {
@@ -221,7 +221,7 @@ internal class FormulaLexer(string expression, bool strict = true)
             text = text[(bang + 1)..];
         }
 
-        var isAbsolute = text.StartsWith('$');
+        var isAbsolute = text.StartsWith('$', StringComparison.Ordinal);
         var body = isAbsolute ? text[1..] : text;
 
         if (body.Length == 0)

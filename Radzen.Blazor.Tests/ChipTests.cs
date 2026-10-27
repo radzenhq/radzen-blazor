@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>();
 
             Assert.Contains("rz-chip", component.Markup);
         }
@@ -18,8 +18,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Text, "Hello");
             });
@@ -31,8 +31,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Icon, "home");
             });
@@ -44,8 +44,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.AddChildContent("CustomContent");
             });
@@ -56,8 +56,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_ChipStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.ChipStyle, BadgeStyle.Success);
             });
@@ -68,9 +68,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_Variant()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
             });
@@ -81,8 +81,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_SmallSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Size, ChipSize.Small);
             });
@@ -93,8 +93,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_ExtraSmallSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Size, ChipSize.ExtraSmall);
             });
@@ -105,8 +105,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_SelectedState()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Selected, true);
             });
@@ -117,8 +117,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_DisabledState()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -130,8 +130,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_TabIndex()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.TabIndex, 5);
             });
@@ -142,8 +142,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Disabled_TabIndex_IsMinusOne()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.TabIndex, 5);
                 parameters.Add(p => p.Disabled, true);
@@ -155,8 +155,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_CloseButton_WhenCloseHasDelegate()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Close, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { }));
             });
@@ -167,8 +167,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_DoesNotRender_CloseButton_WhenNoCloseDelegate()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Text, "Tag");
             });
@@ -181,8 +181,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_RemoveChipTitle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.RemoveChipTitle, "Delete this");
                 parameters.Add(p => p.Close, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { }));
@@ -194,10 +194,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Click_DoesNotFire_WhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var clicked = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Click, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { clicked = true; }));
@@ -212,10 +212,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Close_DoesNotFire_WhenDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var closed = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Close, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { closed = true; }));
@@ -230,10 +230,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_Enter_InvokesClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var clicked = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Click, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { clicked = true; }));
             });
@@ -248,10 +248,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_Space_InvokesClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var clicked = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Click, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { clicked = true; }));
             });
@@ -265,10 +265,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_Delete_InvokesClose()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var closed = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Close, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { closed = true; }));
             });
@@ -283,10 +283,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_Backspace_InvokesClose()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var closed = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Close, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { closed = true; }));
             });
@@ -300,10 +300,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_Disabled_DoesNotInvokeClick()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var clicked = false;
 
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
                 parameters.Add(p => p.Click, new Microsoft.AspNetCore.Components.EventCallback<MouseEventArgs>(null, () => { clicked = true; }));
@@ -319,9 +319,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_KeyDown_OtherKey_DoesNotPrevent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenChip>();
+            var component = ctx.Render<RadzenChip>();
 
             var instance = component.Instance;
             instance.OnKeyDown(new KeyboardEventArgs { Key = "Tab" }).GetAwaiter().GetResult();
@@ -332,8 +332,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_RoleButton()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>();
 
             Assert.Contains(@"role=""button""", component.Markup);
         }
@@ -341,8 +341,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_Renders_Shade()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>(parameters =>
             {
                 parameters.Add(p => p.Shade, Shade.Lighter);
             });
@@ -353,8 +353,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Chip_DefaultStyle_IsBase()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenChip>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenChip>();
 
             Assert.Contains("rz-chip-base", component.Markup);
         }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,7 +90,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task AIChatService_GetEmbeddingGenerator_UsesRegisteredOrBuiltIn()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var handler = new FakeHandler((_, _) => Json("""{"data":[{"index":0,"embedding":[1,2,3]}]}"""));
             ctx.Services.AddSingleton(new HttpClient(handler));
             ctx.Services.AddAIChatService(options =>
@@ -109,7 +111,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("https://host/v1/embeddings", handler.Request!.RequestUri!.ToString());
             Assert.Equal("embed-model", handler.Body!.RootElement.GetProperty("model").GetString());
 
-            using var ctx2 = new TestContext();
+            using var ctx2 = new BunitContext();
             var registered = new OpenAICompatibleEmbeddingGenerator(new HttpClient(handler), "https://registered/embeddings");
             ctx2.Services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(registered);
             ctx2.Services.AddAIChatService();

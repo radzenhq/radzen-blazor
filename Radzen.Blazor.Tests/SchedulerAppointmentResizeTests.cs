@@ -19,9 +19,9 @@ namespace Radzen.Blazor.Tests
             public string Text { get; set; } = "";
         }
 
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
@@ -29,9 +29,9 @@ namespace Radzen.Blazor.Tests
             return ctx;
         }
 
-        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler(TestContext ctx, IList<Appointment> appointments, Action<SchedulerAppointmentResizeEventArgs> onResize = null)
+        static IRenderedComponent<RadzenScheduler<Appointment>> RenderScheduler(BunitContext ctx, IList<Appointment> appointments, Action<SchedulerAppointmentResizeEventArgs> onResize = null)
         {
-            return ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            return ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Date, DateTime.Today);
                 p.Add(x => x.Data, appointments);

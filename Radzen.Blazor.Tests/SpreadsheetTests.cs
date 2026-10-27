@@ -14,9 +14,9 @@ namespace Radzen.Blazor.Tests;
 
 public class SpreadsheetTests
 {
-    private static TestContext CreateContext()
+    private static BunitContext CreateContext()
     {
-        var ctx = new TestContext();
+        var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         // VirtualGrid relies on a JS-measured region. Loose mode returns null for class types,
         // which would NRE inside its first render. Hand it a stub so OnAfterRender completes.
@@ -42,7 +42,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = 1234.5;
         sheet.Cells[0, 0].Format.NumberFormat = "#,##0.00";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+        var c = ctx.Render<RadzenSpreadsheet>(p => p
             .Add(x => x.Workbook, wb)
             .Add(x => x.Culture, CultureInfo.InvariantCulture));
 
@@ -50,7 +50,7 @@ public class SpreadsheetTests
         Assert.Contains("1,234.50", c.Markup);
 
         var german = CultureInfo.GetCultureInfo("de-DE");
-        c.SetParametersAndRender(p => p.Add(x => x.Culture, german));
+        c.Render(p => p.Add(x => x.Culture, german));
 
         Assert.Same(german, wb.Culture);
         Assert.Contains("1.234,50", c.Markup);
@@ -62,14 +62,14 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+        var c = ctx.Render<RadzenSpreadsheet>(p => p
             .Add(x => x.Workbook, wb)
             .Add(x => x.Culture, CultureInfo.InvariantCulture));
 
         var german = CultureInfo.GetCultureInfo("de-DE");
         wb.Culture = german;
 
-        c.SetParametersAndRender(p => p.Add(x => x.ReadOnly, true));
+        c.Render(p => p.Add(x => x.ReadOnly, true));
 
         Assert.Same(german, wb.Culture);
     }
@@ -89,7 +89,7 @@ public class SpreadsheetTests
     public void Spreadsheet_Renders_HostCssClass()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>();
+        var c = ctx.Render<RadzenSpreadsheet>();
         Assert.Contains("rz-spreadsheet", c.Markup);
     }
 
@@ -97,7 +97,7 @@ public class SpreadsheetTests
     public void Spreadsheet_Defaults_RenderToolbarFormulaBarAndSheetTabs()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
 
         Assert.Contains("rz-tabview", c.Markup);                       // toolbar
         Assert.Contains("rz-spreadsheet-formula-editor", c.Markup); // formula bar
@@ -110,7 +110,7 @@ public class SpreadsheetTests
     public void ShowToolbar_False_HidesToolbarToolsetLabels()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ShowToolbar, false);
@@ -127,7 +127,7 @@ public class SpreadsheetTests
     public void ShowFormulaBar_False_HidesFormulaEditor()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ShowFormulaBar, false);
@@ -140,7 +140,7 @@ public class SpreadsheetTests
     public void ShowSheetTabs_False_HidesSheetTabsStrip()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ShowSheetTabs, false);
@@ -153,7 +153,7 @@ public class SpreadsheetTests
     public void Headers_ByDefault_AreRendered()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
 
         Assert.Contains("rz-spreadsheet-column-header", c.Markup);
         Assert.Contains("rz-spreadsheet-row-header", c.Markup);
@@ -167,7 +167,7 @@ public class SpreadsheetTests
     public void Headers_RenderOnlyWhenEnabled(bool showColumnHeaders, bool showRowHeaders)
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ShowColumnHeaders, showColumnHeaders);
@@ -185,14 +185,14 @@ public class SpreadsheetTests
     {
         using var ctx = CreateContext();
         var wb = NewWorkbook();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
         Assert.Contains("rz-spreadsheet-column-header", c.Markup);
 
-        c.SetParametersAndRender(p => p.Add(x => x.ShowColumnHeaders, false).Add(x => x.ShowRowHeaders, false));
+        c.Render(p => p.Add(x => x.ShowColumnHeaders, false).Add(x => x.ShowRowHeaders, false));
         Assert.DoesNotContain("rz-spreadsheet-column-header", c.Markup);
         Assert.DoesNotContain("rz-spreadsheet-row-header", c.Markup);
 
-        c.SetParametersAndRender(p => p.Add(x => x.ShowColumnHeaders, true).Add(x => x.ShowRowHeaders, true));
+        c.Render(p => p.Add(x => x.ShowColumnHeaders, true).Add(x => x.ShowRowHeaders, true));
         Assert.Contains("rz-spreadsheet-column-header", c.Markup);
         Assert.Contains("rz-spreadsheet-row-header", c.Markup);
     }
@@ -203,25 +203,25 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         wb.AddSheet("Sheet2", 10, 10);
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.ShowColumnHeaders, false);
             p.Add(x => x.ShowRowHeaders, false);
         });
 
-        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 1));
+        c.Render(p => p.Add(x => x.SelectedSheetIndex, 1));
 
         Assert.Equal(1, c.Instance.SelectedSheetIndex);
         Assert.DoesNotContain("rz-spreadsheet-column-header", c.Markup);
         Assert.DoesNotContain("rz-spreadsheet-row-header", c.Markup);
         Assert.Contains("rz-spreadsheet-cell", c.Markup);
 
-        c.SetParametersAndRender(p => p.Add(x => x.ShowColumnHeaders, true).Add(x => x.ShowRowHeaders, true));
+        c.Render(p => p.Add(x => x.ShowColumnHeaders, true).Add(x => x.ShowRowHeaders, true));
         Assert.Contains("rz-spreadsheet-column-header", c.Markup);
         Assert.Contains("rz-spreadsheet-row-header", c.Markup);
 
-        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 0));
+        c.Render(p => p.Add(x => x.SelectedSheetIndex, 0));
         Assert.Contains("rz-spreadsheet-column-header", c.Markup);
         Assert.Contains("rz-spreadsheet-row-header", c.Markup);
     }
@@ -235,7 +235,7 @@ public class SpreadsheetTests
         sheet.Rows.Frozen = 1;
         sheet.Columns.Frozen = 1;
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.ShowColumnHeaders, false);
@@ -252,7 +252,7 @@ public class SpreadsheetTests
     public void ChildContent_Replaces_DefaultToolsets()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.AddChildContent("<RadzenTabsItem Text=\"My Tab\"><div>my tools</div></RadzenTabsItem>");
@@ -276,7 +276,7 @@ public class SpreadsheetTests
         sheet.AddTable("T1", RangeRef.Parse("A1:B2"));
         sheet.Selection.Select(CellRef.Parse("A1"));
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.AddChildContent("<RadzenTabsItem Text=\"Only Mine\"><div /></RadzenTabsItem>");
@@ -296,7 +296,7 @@ public class SpreadsheetTests
         sheet.AddTable("T1", RangeRef.Parse("A1:B2"));
         sheet.Selection.Select(CellRef.Parse("A1"));
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.AddChildContent<Radzen.Blazor.RadzenSpreadsheetTableDesignToolset>(tab =>
@@ -316,7 +316,7 @@ public class SpreadsheetTests
         sheet.AddTable("T1", RangeRef.Parse("A1:B2"));
         sheet.Selection.Select(CellRef.Parse("E5")); // outside table
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.AddChildContent<Radzen.Blazor.RadzenSpreadsheetTableDesignToolset>(tab =>
@@ -335,7 +335,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.ReadOnly, true);
@@ -353,7 +353,7 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "hello";
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         var ran = await Run(c,new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
 
@@ -365,7 +365,7 @@ public class SpreadsheetTests
     public void ReadOnly_True_DisablesAddSheetButton()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ReadOnly, true);
@@ -384,7 +384,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowEditing, false);
@@ -401,7 +401,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowFiltering, false);
@@ -419,7 +419,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowSorting, false);
@@ -436,7 +436,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowCellFormatting, false);
@@ -453,7 +453,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowMerge, false);
@@ -470,7 +470,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowImages, false);
@@ -488,7 +488,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowCharts, false);
@@ -506,7 +506,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowTables, false);
@@ -523,7 +523,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowHyperlinks, false);
@@ -540,7 +540,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowDataValidation, false);
@@ -558,7 +558,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowConditionalFormatting, false);
@@ -577,7 +577,7 @@ public class SpreadsheetTests
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowImages, false);
@@ -597,12 +597,12 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "hello";
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
         Assert.True(c.Instance.CanUndo);
 
-        c.SetParametersAndRender(p => p.Add(x => x.AllowUndoRedo, false));
+        c.Render(p => p.Add(x => x.AllowUndoRedo, false));
 
         Assert.False(c.Instance.CanUndo);
         Assert.False(c.Instance.CanRedo);
@@ -615,12 +615,12 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "hello";
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
         Assert.True(c.Instance.CanUndo);
 
-        c.SetParametersAndRender(p => p.Add(x => x.ReadOnly, true));
+        c.Render(p => p.Add(x => x.ReadOnly, true));
 
         Assert.False(c.Instance.CanUndo);
     }
@@ -632,12 +632,12 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "hello";
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await Run(c, new ClearContentsCommand(sheet, RangeRef.Parse("A1")));
         Assert.Null(sheet.Cells["A1"].Value);
 
-        c.SetParametersAndRender(p => p.Add(x => x.AllowUndoRedo, false));
+        c.Render(p => p.Add(x => x.AllowUndoRedo, false));
         c.Instance.Undo();
 
         Assert.Null(sheet.Cells["A1"].Value); // not restored
@@ -649,7 +649,7 @@ public class SpreadsheetTests
     public void IsFeatureAllowed_ReturnsTrue_ByDefault()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
 
         foreach (SpreadsheetFeature f in System.Enum.GetValues(typeof(SpreadsheetFeature)))
         {
@@ -663,7 +663,7 @@ public class SpreadsheetTests
         // Clipboard is intentionally decoupled from ReadOnly so view-only users can
         // still copy data unless the host explicitly sets AllowClipboard to false.
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.ReadOnly, true);
@@ -686,7 +686,7 @@ public class SpreadsheetTests
     public void IsFeatureAllowed_AllowClipboard_False_TurnsOff_Clipboard_EvenWhenNotReadOnly()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.AllowClipboard, false);
@@ -699,7 +699,7 @@ public class SpreadsheetTests
     public void IsFeatureAllowed_MapsToCorrectAllowParameter()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, NewWorkbook());
             p.Add(x => x.AllowCharts, false);
@@ -721,7 +721,7 @@ public class SpreadsheetTests
         sheet.Cells["A1"].Value = "before";
 
         ICommand seen = null;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(args =>
@@ -748,7 +748,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "keep";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(args => args.PreventDefault()));
@@ -769,7 +769,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "keep";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(async args =>
@@ -794,7 +794,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells["A1"].Value = "hello";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(args =>
@@ -823,7 +823,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
 
         var fired = false;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.ReadOnly, true);
@@ -845,7 +845,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
 
         var fired = false;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowCharts, false);
@@ -870,7 +870,7 @@ public class SpreadsheetTests
         sheet.Cells["A1"].Value = "before";
 
         SpreadsheetChangeEventArgs seen = null;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args =>
@@ -898,7 +898,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
 
         var fired = false;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.CommandExecuting, EventCallbackFactory.Create<SpreadsheetCommandEventArgs>(args => args.PreventDefault()));
@@ -919,7 +919,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
 
         var fired = false;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.ReadOnly, true);
@@ -941,7 +941,7 @@ public class SpreadsheetTests
         sheet.Cells["A1"].Value = "before";
 
         var seen = new List<SpreadsheetChangeReason>();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args => seen.Add(args.Reason)));
@@ -965,7 +965,7 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
 
         var fired = false;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(_ => fired = true));
@@ -984,7 +984,7 @@ public class SpreadsheetTests
         var wb = NewWorkbook();
 
         SpreadsheetChangeEventArgs seen = null;
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.Change, EventCallbackFactory.Create<SpreadsheetChangeEventArgs>(args => seen = args));
@@ -1017,7 +1017,7 @@ public class SpreadsheetTests
     public void SelectedSheetIndex_DefaultsToFirstSheet()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
 
         Assert.Equal(0, c.Instance.SelectedSheetIndex);
         Assert.Contains("AlphaCell", c.Markup);
@@ -1027,9 +1027,9 @@ public class SpreadsheetTests
     public void SelectedSheetIndex_Set_SelectsMatchingSheet()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
 
-        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 1));
+        c.Render(p => p.Add(x => x.SelectedSheetIndex, 1));
 
         Assert.Equal(1, c.Instance.SelectedSheetIndex);
         Assert.Contains("BetaCell", c.Markup);
@@ -1039,7 +1039,7 @@ public class SpreadsheetTests
     public void SelectedSheetIndex_InitialValue_HonoredWhenWorkbookLoads()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, TwoSheetWorkbook());
             p.Add(x => x.SelectedSheetIndex, 1);
@@ -1053,9 +1053,9 @@ public class SpreadsheetTests
     public void SelectedSheetIndex_OutOfRange_ClampsToLastSheet()
     {
         using var ctx = CreateContext();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
 
-        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 99));
+        c.Render(p => p.Add(x => x.SelectedSheetIndex, 99));
 
         Assert.Contains("BetaCell", c.Markup);        // clamped to the last valid sheet
         Assert.DoesNotContain("AlphaCell", c.Markup);
@@ -1066,7 +1066,7 @@ public class SpreadsheetTests
     {
         using var ctx = CreateContext();
         var reported = new List<int>();
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, TwoSheetWorkbook());
             p.Add(x => x.SelectedSheetIndexChanged, EventCallbackFactory.Create<int>(reported.Add));
@@ -1081,7 +1081,7 @@ public class SpreadsheetTests
 
     // SetupModule intercepts the InvokeAsync<IJSObjectReference> that creates the Spreadsheet JS
     // object, so measureTexts can return a canned result and its payload can be inspected.
-    private static BunitJSModuleInterop SetupSpreadsheetJs(TestContext ctx, params double[] widths)
+    private static BunitJSModuleInterop SetupSpreadsheetJs(BunitContext ctx, params double[] widths)
     {
         var module = ctx.JSInterop.SetupModule("Radzen.createSpreadsheet", _ => true);
         module.Mode = JSRuntimeMode.Loose;
@@ -1115,7 +1115,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = "Short";
         sheet.Cells[1, 0].Value = "This is a much longer string";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1134,7 +1134,7 @@ public class SpreadsheetTests
         sheet.Cells[2, 0].Value = 2d;
         sheet.Cells[0, 0].Formula = "=A2+A3";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1153,7 +1153,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = 39448d;
         sheet.Cells[0, 0].Format.NumberFormat = "0.00";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+        var c = ctx.Render<RadzenSpreadsheet>(p => p
             .Add(x => x.Workbook, wb)
             .Add(x => x.Culture, CultureInfo.InvariantCulture));
 
@@ -1173,7 +1173,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Columns[1] = 50;
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 1);
 
@@ -1193,7 +1193,7 @@ public class SpreadsheetTests
         sheet.MergedCells.Add(new RangeRef(new CellRef(0, 0), new CellRef(0, 1)));
         sheet.Cells[1, 0].Value = "tiny";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1212,7 +1212,7 @@ public class SpreadsheetTests
         sheet.Cells[1, 0].Value = "very long content in a hidden row";
         sheet.Rows.Hide(1);
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1229,7 +1229,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells[0, 0].Value = "content";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
         Assert.Equal(ColumnWidthConversion.MaxWidthInPixels, sheet.Columns[0]);
@@ -1240,7 +1240,7 @@ public class SpreadsheetTests
         var sheet2 = wb2.Sheets[0];
         sheet2.Cells[0, 0].Value = "content";
 
-        var c2 = ctx2.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb2));
+        var c2 = ctx2.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb2));
 
         await AutoFit(c2, 0);
         Assert.Equal(RadzenSpreadsheet.MinColumnWidth, sheet2.Columns[0]);
@@ -1256,7 +1256,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = "content";
         sheet.Columns[0] = 120;
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
         Assert.Equal(300, sheet.Columns[0]);
@@ -1277,7 +1277,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells[0, 0].Value = "content";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
         Assert.True(sheet.Columns.IsAutoFit(0));
@@ -1297,7 +1297,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells[0, 0].Value = "content";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        var c = ctx.Render<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
             p.Add(x => x.AllowResizing, false);
@@ -1320,7 +1320,7 @@ public class SpreadsheetTests
         sheet.Cells[1, 0].Value = "Same";
         sheet.Cells[2, 0].Value = "Same";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1336,7 +1336,7 @@ public class SpreadsheetTests
         var sheet = wb.Sheets[0];
         sheet.Cells[0, 0].Value = "content";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1354,7 +1354,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 2].Value = "content";
         sheet.Columns.Hide(2);
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, -1);
         await AutoFit(c, sheet.Columns.Count);
@@ -1377,7 +1377,7 @@ public class SpreadsheetTests
         sheet.ConditionalFormats.Add(new RangeRef(new CellRef(0, 0), new CellRef(1, 0)),
             new GreaterThanRule { Value = 0, Format = new Format { Bold = true } });
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1397,7 +1397,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Format.WrapText = true;
         sheet.Cells[1, 0].Value = "a\nbb";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1420,7 +1420,7 @@ public class SpreadsheetTests
             sheet.Cells[row, 0].Format.FontSize = row + 1d; // distinct font group per cell
         }
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1441,7 +1441,7 @@ public class SpreadsheetTests
         sheet.Cells[150, 0].Value = 1e10;
         sheet.Cells[150, 0].Format.NumberFormat = "dddd, mmmm dd, yyyy";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 
@@ -1460,7 +1460,7 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = "content";
         sheet.Columns[0] = 300;
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
         Assert.Equal(300, sheet.Columns[0]);
@@ -1482,7 +1482,7 @@ public class SpreadsheetTests
         sheet.ConditionalFormats.Add(new RangeRef(new CellRef(0, 0), new CellRef(9, 0)),
             new Top10Rule { Count = 1, Format = new Format { Bold = true } });
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.Render<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
         await AutoFit(c, 0);
 

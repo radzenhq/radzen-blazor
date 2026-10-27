@@ -19,16 +19,16 @@ namespace Radzen.Blazor.Tests
             public bool Disabled { get; set; }
         }
 
-        private static IRenderedComponent<RadzenDropDown<T>> DropDown<T>(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenDropDown<T>>> configure = null)
+        private static IRenderedComponent<RadzenDropDown<T>> DropDown<T>(BunitContext ctx, Action<ComponentParameterCollectionBuilder<RadzenDropDown<T>>> configure = null)
         {
             var data = new[] {
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<T>>();
+            var component = ctx.Render<RadzenDropDown<T>>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -50,7 +50,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Dropdown_SelectItem_Method_Should_Not_Throw()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -67,7 +67,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_RendersItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -81,10 +81,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_NonFilterable_TabWhenOpen_DoesNotInvokeFocusNext()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropDown<string>>(p =>
+            var component = ctx.Render<RadzenDropDown<string>>(p =>
             {
                 p.Add(x => x.Data, new[] { "one", "two" });
             });
@@ -101,7 +101,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_NonFilterable_TabAfterArrow_DoesNotInvokeFocusNext()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx);
@@ -120,7 +120,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(true)]
         public void DropDown_Filterable_TabInSearchWhenOpen_InvokesFocusNextWithPopupId(bool shiftKey)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, p =>
@@ -141,7 +141,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesSelectionStyleForIntValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -161,7 +161,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesSelectionStyleForStringValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -184,7 +184,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Respects_ItemEqualityComparer()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             List<DataItem> boundCollection = [new() { Text = "Item 2" }];
@@ -213,7 +213,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_SelectsItemsMatchingBoundValueByValueProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
@@ -245,7 +245,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_SelectsEqualValuesWhenValueTypeDoesNotOverrideGetHashCode()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -254,7 +254,7 @@ namespace Radzen.Blazor.Tests
                 new FaultyHashItem { Text = "Item 2", Key = new FaultyHashValue { Id = 2 } },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<FaultyHashValue>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<FaultyHashValue>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(FaultyHashItem.Text));
@@ -292,7 +292,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_AsksCustomCollectionsForMembership()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<ICollection<object>>(ctx, parameters =>
@@ -310,7 +310,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_DoesNotDuplicateItemsForRepeatedBoundValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
@@ -334,7 +334,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DropDown_Multiple_InPlaceElementReplacement_UpdatesSelectionOnInternalRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -345,7 +345,7 @@ namespace Radzen.Blazor.Tests
 
             var value = new List<int> { 2 };
 
-            var component = ctx.RenderComponent<SelfRenderingDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<SelfRenderingDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -368,7 +368,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_InPlaceElementReplacement_UpdatesSelectionOnReRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // Same list and count ensure the membership is rebuilt rather than reused.
@@ -393,7 +393,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_InPlaceDataMutation_ResolvesSelectedLabelOnReRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // Bind value 3, whose item is not in Data yet, then add the matching item to the SAME Data
@@ -404,7 +404,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -414,7 +414,7 @@ namespace Radzen.Blazor.Tests
             });
 
             data.Add(new DataItem { Text = "Item 3", Id = 3 });
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Data, data));
+            component.Render(parameters => parameters.Add(p => p.Data, data));
 
             Assert.Contains(component.FindAll(".rz-dropdown-label"), l => l.TextContent.Contains("Item 3"));
         }
@@ -422,7 +422,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ItemText_UpdatesWhenItemMutatedInPlace()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // ShouldRender must compare the resolved text, not the Item reference: mutating an item's
@@ -432,7 +432,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -459,7 +459,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_ResolvesEnumValuePropertyFromIntegerValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new List<ColorItem>
@@ -468,7 +468,7 @@ namespace Radzen.Blazor.Tests
                 new ColorItem { Name = "Green", Code = ItemColor.Green },
                 new ColorItem { Name = "Blue", Code = ItemColor.Blue },
             };
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(ColorItem.Name));
@@ -492,7 +492,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_NullBoundValue_SelectsItemWithNullValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new List<CodeItem>
@@ -500,7 +500,7 @@ namespace Radzen.Blazor.Tests
                 new CodeItem { Name = "Alpha", Code = "a" },
                 new CodeItem { Name = "Beta", Code = null },
             };
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<string>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<string>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(CodeItem.Name));
@@ -525,7 +525,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_PreserveCollection_Clear_RemovesSelection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new List<DataItem>
@@ -533,7 +533,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
-            var component = ctx.RenderComponent<PreservingDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<PreservingDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -553,7 +553,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesSelectionStyleWhenMultipleSelectionIsEnabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -583,7 +583,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesValueTemplateOnMultipleSelection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -614,7 +614,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesValueTemplateWhenTepmlateDefined()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -654,7 +654,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_AppliesValueTemplateOnMultipleSelectionChips()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -691,7 +691,7 @@ namespace Radzen.Blazor.Tests
         [InlineData(false, false, false, true, "false")]
         public void DropDown_AllSelectedFalseIfListIsAllDisabled(bool item1Selected, bool item1Disabled, bool item2Selected, bool item2Disabled, string expectedAriaCheckedValue)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[] {
@@ -709,7 +709,7 @@ namespace Radzen.Blazor.Tests
                 selectedValues.Add(data[1].Id);
             }
 
-            var component = ctx.RenderComponent<RadzenDropDown<List<int>>>(parameters => parameters
+            var component = ctx.Render<RadzenDropDown<List<int>>>(parameters => parameters
                .Add(p => p.Data, data)
                .Add(p => p.Value, selectedValues)
                .Add(p => p.Multiple, true)
@@ -731,7 +731,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_HashSet_ReferencesInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalHashSet = new HashSet<int>();
@@ -762,7 +762,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_HashSet_MultipleSelections()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalHashSet = new HashSet<int> { 2 }; // Pre-populate with Item 2
@@ -809,7 +809,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_SortedSet_ReferencesInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalSortedSet = new SortedSet<int>();
@@ -845,7 +845,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_CustomCollection_ReferencesInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalCollection = new CustomCollection<int>();
@@ -877,7 +877,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_List_ReferencesInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalList = new List<int>();
@@ -909,7 +909,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ReferenceGenericCollectionAssignment_DisabledByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalList = new List<int>();
@@ -940,7 +940,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Reset_PreservesCollectionInstanceButClears()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalHashSet = new HashSet<int> { 1, 2 }; // Pre-populate
@@ -974,7 +974,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_SelectAll_PreservesCollectionInstanceAndPopulates()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var originalHashSet = new HashSet<int>(); // Start empty
@@ -1010,7 +1010,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_Multiple_WithChips_SelectedItemsTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
@@ -1028,7 +1028,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_Multiple_WithLabel_SelectedItemsTitle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
@@ -1046,11 +1046,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_DoesNotRender_Multiple_SelectedItemsTitle_WithoutTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[] { "Item 1", "Item 2" };
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<string>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<string>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Chips, true);
@@ -1065,7 +1065,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_Multiple_SelectedItemsTitle_CustomSeparator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<IEnumerable<int>>(ctx, parameters =>
@@ -1091,16 +1091,16 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        private static IRenderedComponent<ReferenceCollectionDropDown<T>> DropDownWithReferenceCollection<T>(TestContext ctx, Action<ComponentParameterCollectionBuilder<ReferenceCollectionDropDown<T>>> configure = null)
+        private static IRenderedComponent<ReferenceCollectionDropDown<T>> DropDownWithReferenceCollection<T>(BunitContext ctx, Action<ComponentParameterCollectionBuilder<ReferenceCollectionDropDown<T>>> configure = null)
         {
             var data = new[] {
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            var component = ctx.RenderComponent<ReferenceCollectionDropDown<T>>();
+            var component = ctx.Render<ReferenceCollectionDropDown<T>>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1165,10 +1165,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_Placeholder()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.Placeholder, "Select an option");
             });
@@ -1180,11 +1180,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_AllowClear_WithValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.AllowClear, true);
                 parameters.Add(p => p.Data, data);
@@ -1209,13 +1209,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_SelectedBaseValue_WhenDataItemsAreDerived()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[] { new DerivedDataItem { Text = "Item 1", Id = 1 } };
             var value = new BaseDataItem { Text = "Item 1" };
 
-            var component = ctx.RenderComponent<RadzenDropDown<BaseDataItem>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<BaseDataItem>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(BaseDataItem.Text));
@@ -1230,11 +1230,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_DoesNotRender_AllowClear_WhenNotAllowed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.AllowClear, false);
                 parameters.Add(p => p.Data, data);
@@ -1249,7 +1249,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_FilterInput_HasComboboxAriaAttributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1271,7 +1271,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_TriggerIcon_IsHiddenFromAssistiveTechnology()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx);
@@ -1284,7 +1284,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_NoFilter_Combobox_ControlsListbox()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1304,7 +1304,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_FilterInput_HasComboboxAriaAttributes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1313,7 +1313,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1335,7 +1335,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_ConsumerSuppliedAriaLabel_OverridesComputedAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -1353,7 +1353,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_AriaLabel_ReflectsSelectedItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1363,7 +1363,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 3", Id = 3 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1380,7 +1380,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_AriaLabel_ShowsCount_WhenAboveMaxSelectedLabels()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1390,7 +1390,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 3", Id = 3 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1408,7 +1408,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Chips_RemoveButtons_AreNotTabbable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1417,7 +1417,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1436,7 +1436,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_HiddenHelperInput_IsHiddenFromAccessibilityTree()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1453,7 +1453,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_WithoutConsumerAriaLabel_FallsBackToComputedAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -1471,7 +1471,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Renders_LoadingTemplate_WhenIsLoading()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1489,7 +1489,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_DoesNotRender_LoadingTemplate_WhenNotLoading()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1505,10 +1505,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Suppresses_EmptyTemplate_WhileLoading()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters
                     .Add(p => p.Data, new DataItem[] { })
@@ -1520,7 +1520,7 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain("empty-marker", component.Markup);
         }
 
-        private static IRenderedComponent<RadzenDropDown<IEnumerable<int>>> MultipleDropDown(TestContext ctx, Action<IEnumerable<int>> valueChanged, Action<ComponentParameterCollectionBuilder<RadzenDropDown<IEnumerable<int>>>> configure = null)
+        private static IRenderedComponent<RadzenDropDown<IEnumerable<int>>> MultipleDropDown(BunitContext ctx, Action<IEnumerable<int>> valueChanged, Action<ComponentParameterCollectionBuilder<RadzenDropDown<IEnumerable<int>>>> configure = null)
         {
             var data = new[]
             {
@@ -1528,7 +1528,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            return ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            return ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
@@ -1544,7 +1544,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_CtrlA_SelectsAllItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int> value = null;
@@ -1559,7 +1559,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_CtrlA_TogglesToNoneWhenAllSelected()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int> value = null;
@@ -1575,7 +1575,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_CtrlA_WithFilteringEnabled_SelectsAllItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int> value = null;
@@ -1593,7 +1593,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_CtrlA_DoesNothingWhenSelectAllNotAllowed()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int> value = null;
@@ -1611,7 +1611,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_CtrlA_DoesNothingWhenReadOnly()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int> value = null;
@@ -1629,7 +1629,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_OpenOnFocus_FocusThenClick_OpensPopupOnce()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1649,7 +1649,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_OpenOnFocus_ClickWhileOpen_ClosesPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1670,7 +1670,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_WithoutOpenOnFocus_Click_TogglesPopup()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx, parameters =>
@@ -1687,7 +1687,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Single_CtrlA_DoesNotChangeValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var changed = false;
@@ -1706,7 +1706,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_OmitsOptionAriaLabel_WhenTextPropertyIsMissingAndItemHasNoText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1717,7 +1717,7 @@ namespace Radzen.Blazor.Tests
 
             var template = (RenderFragment<dynamic>)(item => builder => builder.AddContent(0, item.Text));
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
@@ -1736,7 +1736,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_RendersOptionAriaLabel_FromTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx);
@@ -1750,10 +1750,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_RendersOptionAriaLabel_ForSimpleValuesWithoutTextProperty()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenDropDown<string>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, new[] { "Apple", "Banana" });
             });
@@ -1767,12 +1767,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_OmitsComboboxAriaLabel_WhenSelectedItemHasNoText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
 
-            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
@@ -1787,7 +1787,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DropDown_Multiple_AriaLabelAndChipsFallBackToCount_WhenItemsHaveNoText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new[]
@@ -1796,7 +1796,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
-            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenDropDown<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));

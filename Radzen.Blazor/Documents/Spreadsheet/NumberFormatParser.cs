@@ -300,7 +300,7 @@ static class NumberFormatParser
 
             if (c == '"')
             {
-                var end = section.IndexOf('"', i + 1);
+                var end = section.IndexOf('"', i + 1, StringComparison.Ordinal);
                 if (end > i)
                 {
                     tokens.Add(new FormatToken(TokenType.Literal, section[(i + 1)..end]));
@@ -316,7 +316,7 @@ static class NumberFormatParser
             // Bracket (color codes, conditions)
             if (c == '[')
             {
-                var end = section.IndexOf(']', i + 1);
+                var end = section.IndexOf(']', i + 1, StringComparison.Ordinal);
                 if (end > i)
                 {
                     var bracketContent = section[(i + 1)..end];

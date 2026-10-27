@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>();
+            var component = ctx.Render<RadzenSecurityCode>();
 
             Assert.Contains(@"rz-security-code", component.Markup);
         }
@@ -18,11 +18,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_Renders_Count()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>();
+            var component = ctx.Render<RadzenSecurityCode>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Count, 6));
+            component.Render(parameters => parameters.Add(p => p.Count, 6));
 
             // Should render 6 input boxes + 1 hidden input for form submission = 7 total
             var inputCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "<input").Count;
@@ -32,11 +32,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>();
+            var component = ctx.Render<RadzenSecurityCode>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.Render(parameters => parameters.Add(p => p.Disabled, true));
 
             Assert.Contains("disabled", component.Markup);
         }
@@ -44,9 +44,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_DefaultCount_IsFour()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>();
+            var component = ctx.Render<RadzenSecurityCode>();
 
             // Default count is 4, so 4 inputs + 1 hidden = 5
             var inputCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "<input").Count;
@@ -56,9 +56,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            var component = ctx.Render<RadzenSecurityCode>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -69,9 +69,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_Renders_Gap()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            var component = ctx.Render<RadzenSecurityCode>(parameters =>
             {
                 parameters.Add(p => p.Gap, "1rem");
             });
@@ -82,9 +82,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SecurityCode_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            var component = ctx.Render<RadzenSecurityCode>(parameters =>
             {
                 parameters.Add(p => p.Style, "margin:2rem");
             });

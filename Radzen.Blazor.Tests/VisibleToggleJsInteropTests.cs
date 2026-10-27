@@ -6,14 +6,14 @@ namespace Radzen.Blazor.Tests
 {
     public class VisibleToggleJsInteropTests
     {
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             return ctx;
         }
 
-        static int Count(TestContext ctx, string identifier)
+        static int Count(BunitContext ctx, string identifier)
         {
             return ctx.JSInterop.Invocations.Count(i => i.Identifier == identifier);
         }
@@ -23,12 +23,12 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<TComponent>();
+            var component = ctx.Render<TComponent>();
 
             Assert.Equal(1, Count(ctx, identifier));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+            component.Render(parameters => parameters.Add(p => p.Visible, false));
+            component.Render(parameters => parameters.Add(p => p.Visible, true));
 
             Assert.Equal(2, Count(ctx, identifier));
         }
@@ -98,12 +98,12 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenAccordion>(parameters => parameters
+            var component = ctx.Render<RadzenAccordion>(parameters => parameters
                 .Add(p => p.Visible, false));
 
             Assert.Equal(0, Count(ctx, "Radzen.createAccordion"));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+            component.Render(parameters => parameters.Add(p => p.Visible, true));
 
             Assert.Equal(1, Count(ctx, "Radzen.createAccordion"));
         }
@@ -113,9 +113,9 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenMenu>();
+            var component = ctx.Render<RadzenMenu>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, "width: 100px"));
+            component.Render(parameters => parameters.Add(p => p.Style, "width: 100px"));
 
             Assert.Equal(1, Count(ctx, "Radzen.createMenu"));
         }

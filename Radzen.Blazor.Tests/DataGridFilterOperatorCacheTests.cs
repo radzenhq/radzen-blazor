@@ -14,12 +14,12 @@ namespace Radzen.Blazor.Tests
             public int Count { get; set; }
         }
 
-        static RadzenDataGridColumn<Item> Column(TestContext ctx, string property, IEnumerable<FilterOperator> operators = null)
+        static RadzenDataGridColumn<Item> Column(BunitContext ctx, string property, IEnumerable<FilterOperator> operators = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var grid = ctx.RenderComponent<RadzenDataGrid<Item>>(p =>
+            var grid = ctx.Render<RadzenDataGrid<Item>>(p =>
             {
                 p.Add(g => g.Data, new List<Item> { new() { Name = "a", Count = 1 } });
                 p.Add(g => g.AllowFiltering, true);
@@ -41,7 +41,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GetFilterOperators_IsMemoized_AndReturnsCorrectOperators()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var column = Column(ctx, "Name");
 
             var first = column.GetFilterOperators();
@@ -59,7 +59,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GetFilterOperators_ReturnsCallerProvidedCollectionLive()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var operators = new List<FilterOperator> { FilterOperator.Equals, FilterOperator.NotEquals };
             var column = Column(ctx, "Name", operators);
 
@@ -73,10 +73,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GetFilterOperators_DiffersByColumnType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var stringOps = Column(ctx, "Name").GetFilterOperators().ToList();
 
-            using var ctx2 = new TestContext();
+            using var ctx2 = new BunitContext();
             var numericOps = Column(ctx2, "Count").GetFilterOperators().ToList();
 
             // Numeric columns get comparison operators but not string ones.

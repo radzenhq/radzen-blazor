@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>();
 
             Assert.Contains(@"rz-row", component.Markup);
         }
@@ -18,8 +18,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.AddChildContent("<div>Row Content</div>");
             });
@@ -30,10 +30,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_Gap()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Gap, "2rem"));
+            component.Render(parameters => parameters.Add(p => p.Gap, "2rem"));
 
             Assert.Contains("--rz-gap:2rem", component.Markup);
         }
@@ -41,10 +41,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_RowGap()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.RowGap, "1.5rem"));
+            component.Render(parameters => parameters.Add(p => p.RowGap, "1.5rem"));
 
             Assert.Contains("--rz-row-gap:1.5rem", component.Markup);
         }
@@ -52,10 +52,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_ColumnGap()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Gap, "1rem"));
+            component.Render(parameters => parameters.Add(p => p.Gap, "1rem"));
 
             Assert.Contains("--rz-gap:1rem", component.Markup);
         }
@@ -63,8 +63,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Gap_NumericOnly_AppendsPx()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.Gap, "16");
             });
@@ -75,8 +75,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_RowGap_NumericOnly_AppendsPx()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.RowGap, "8");
             });
@@ -87,8 +87,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -99,8 +99,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_AlignItems()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.AlignItems, AlignItems.Center);
             });
@@ -111,8 +111,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_JustifyContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.JustifyContent, JustifyContent.SpaceBetween);
             });
@@ -123,8 +123,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters =>
             {
                 parameters.Add(p => p.Style, "padding:1rem");
             });
@@ -135,8 +135,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_DoesNotRender_RowColsClass_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>();
 
             Assert.DoesNotContain("rz-row-cols", component.Markup);
         }
@@ -144,8 +144,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_Columns()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters.Add(p => p.Columns, 4));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters => parameters.Add(p => p.Columns, 4));
 
             Assert.Contains("rz-row-cols-4", component.Find(".rz-row").ClassList);
         }
@@ -153,8 +153,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Renders_ResponsiveColumns()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters => parameters
                 .Add(p => p.Columns, 1)
                 .Add(p => p.ColumnsXS, 2)
                 .Add(p => p.ColumnsSM, 3)
@@ -177,8 +177,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Columns_KeepsAlignmentClasses()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenRow>(parameters => parameters
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenRow>(parameters => parameters
                 .Add(p => p.Columns, 3)
                 .Add(p => p.AlignItems, AlignItems.Center));
 
@@ -192,9 +192,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Row_Throws_WhenColumnsOutOfRange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => ctx.RenderComponent<RadzenRow>(parameters => parameters.Add(p => p.Columns, 13)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => ctx.Render<RadzenRow>(parameters => parameters.Add(p => p.Columns, 13)));
         }
     }
 }

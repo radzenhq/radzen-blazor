@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             Assert.Contains("rz-gravatar", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_ImgTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             Assert.Contains("<img", component.Markup);
         }
@@ -26,8 +26,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_GravatarUrl()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Email, "test@example.com");
             });
@@ -38,8 +38,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_DefaultAlternateText()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             Assert.Contains(@"alt=""gravatar""", component.Markup);
         }
@@ -47,8 +47,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_CustomAlternateText()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.AlternateText, "User Avatar");
             });
@@ -59,8 +59,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_DefaultSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             Assert.Contains("s=36", component.Markup);
         }
@@ -68,8 +68,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_CustomSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Size, 80);
             });
@@ -80,8 +80,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_RetroStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             Assert.Contains("d=retro", component.Markup);
         }
@@ -89,14 +89,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_DifferentEmails_ProduceDifferentUrls()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component1 = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            var component1 = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Email, "user1@example.com");
             });
 
-            var component2 = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            var component2 = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Email, "user2@example.com");
             });
@@ -108,8 +108,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_NullEmail_StillRenders()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>();
 
             // Should render without throwing even with null email
             Assert.Contains("secure.gravatar.com/avatar/", component.Markup);
@@ -118,8 +118,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Style, "border-radius:50%");
             });
@@ -130,8 +130,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Gravatar_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenGravatar>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenGravatar>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });

@@ -150,9 +150,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal((0, 394000, 50000), scale.Ticks(TickDistance));
         }
 
-        private static async Task<IRenderedComponent<RadzenChart>> RenderAreaDemoAsync(TestContext ctx, ValueAxisRange range, double width)
+        private static async Task<IRenderedComponent<RadzenChart>> RenderAreaDemoAsync(BunitContext ctx, ValueAxisRange range, double width)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenAreaSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))

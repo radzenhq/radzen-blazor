@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>();
 
             Assert.Contains("rz-fab", component.Markup);
             Assert.Contains("rz-button", component.Markup);
@@ -18,8 +18,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_IconParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Icon, "add");
             });
@@ -30,8 +30,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_DefaultSize_IsLarge()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>();
 
             Assert.Equal(ButtonSize.Large, component.Instance.Size);
         }
@@ -39,8 +39,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_IconOnly_Class()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Icon, "add");
             });
@@ -51,8 +51,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_ButtonStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.ButtonStyle, ButtonStyle.Primary);
             });
@@ -63,8 +63,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_Variant()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
             });
@@ -75,8 +75,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_DisabledState()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -87,8 +87,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Text, "Add Item");
             });
@@ -99,8 +99,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_Renders_Shade()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Shade, Shade.Lighter);
             });
@@ -111,8 +111,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Fab_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenFab>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenFab>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });

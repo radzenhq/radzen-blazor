@@ -8,11 +8,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_Items()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+            var component = ctx.Render<RadzenBreadCrumb>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
           {
@@ -29,11 +29,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_Icon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+            var component = ctx.Render<RadzenBreadCrumb>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
           {
@@ -52,11 +52,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_Link()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+            var component = ctx.Render<RadzenBreadCrumb>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -77,8 +77,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBreadCrumb>();
 
             Assert.Contains("rz-breadcrumb", component.Markup);
         }
@@ -86,9 +86,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_MultipleItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -110,8 +110,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -122,8 +122,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(p => p.Style, "margin:1rem");
             });
@@ -134,9 +134,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Item_WithoutPath_DoesNotRenderLink()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -153,9 +153,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_NavigationLandmark_WithDefaultAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+            var component = ctx.Render<RadzenBreadCrumb>();
 
             Assert.Contains("<nav", component.Markup);
             Assert.Contains("aria-label=\"breadcrumb\"", component.Markup);
@@ -164,9 +164,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_CustomAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(p => p.AriaLabel, "You are here");
             });
@@ -177,9 +177,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Item_WithoutPath_Renders_AriaCurrentPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -195,9 +195,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_NonLastItem_WithPath_DoesNotRender_AriaCurrentPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -222,9 +222,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_LastItem_WithPath_Renders_AriaCurrentPage()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {
@@ -248,9 +248,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void BreadCrumb_Renders_OrderedList_WithListItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            var component = ctx.Render<RadzenBreadCrumb>(parameters =>
             {
                 parameters.Add(c => c.ChildContent, builder =>
                 {

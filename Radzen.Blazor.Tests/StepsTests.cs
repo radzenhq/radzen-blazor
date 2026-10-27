@@ -9,8 +9,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>();
 
             Assert.Contains(@"rz-steps", component.Markup);
         }
@@ -18,8 +18,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_ShowStepsButtons_True()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
             });
@@ -30,8 +30,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_ShowStepsButtons_False()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, false);
             });
@@ -42,8 +42,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_StepsButtons()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
             });
@@ -55,8 +55,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_CustomButtonText()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
                 parameters.Add(p => p.NextText, "Continue");
@@ -70,8 +70,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_NextButton_DisabledWhenNextStepIsDisabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
                 parameters.Add(p => p.SelectedIndex, 0);
@@ -98,8 +98,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_PrevButton_DisabledWhenPrevStepIsDisabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
                 parameters.Add(p => p.SelectedIndex, 2);
@@ -126,8 +126,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_NextButton_NotDisabledWhenNextStepIsEnabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.ShowStepsButtons, true);
                 parameters.Add(p => p.SelectedIndex, 0);
@@ -152,8 +152,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -164,8 +164,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_SelectedIndex()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.SelectedIndex, 1);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -185,8 +185,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_StepTexts()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
                 {
@@ -210,8 +210,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_TabList_HasOrientationAndAriaLabel()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
                 {
@@ -229,8 +229,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_TabList_RendersCustomAriaLabel()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.TabListAriaLabel, "Checkout steps");
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -248,8 +248,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Tabs_HaveRovingTabindex()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.SelectedIndex, 1);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -275,8 +275,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Style, "width:100%");
             });
@@ -287,8 +287,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_None_DoesNotRenderAnimationClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.None);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -306,8 +306,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_Fade_RendersAnimationClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.Fade);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -324,8 +324,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_Slide_RendersAnimationClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.Slide);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -342,8 +342,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_Fade_RendersTransitionDurationStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.Fade);
                 parameters.Add(p => p.TransitionDuration, 500);
@@ -361,8 +361,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_None_DoesNotRenderTransitionDurationStyle()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.None);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>
@@ -379,8 +379,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Steps_Transition_DefaultDuration_Is300()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenSteps>(parameters =>
             {
                 parameters.Add(p => p.Transition, StepsTransition.Fade);
                 parameters.Add<RenderFragment>(p => p.Steps, builder =>

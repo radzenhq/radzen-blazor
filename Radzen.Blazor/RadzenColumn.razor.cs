@@ -285,7 +285,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetComponentStyle()
         {
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';', StringComparison.Ordinal) ? ";" : "")}";
         }
 
         /// <inheritdoc />

@@ -5,7 +5,7 @@
 //        dotnet publish ../Radzen.Blazor.TrimTest/Radzen.Blazor.TrimTest.csproj -c Release
 //   2. Serve the published wwwroot with a WASM-MIME-correct server, e.g.:
 //        dotnet tool install -g dotnet-serve
-//        dotnet serve -d ../Radzen.Blazor.TrimTest/bin/Release/net10.0/publish/wwwroot -p 5050
+//        dotnet serve -d ../Radzen.Blazor.TrimTest/bin/Release/net11.0/publish/wwwroot -p 5050
 //   3. Run this harness:
 //        npm install && npx playwright install chromium
 //        TRIM_URL=http://localhost:5050 node trim-smoke.mjs

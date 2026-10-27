@@ -73,11 +73,7 @@ namespace Radzen.Blazor
 
             ThemeService.ThemeChanged += OnThemeChanged;
 
-#if NET8_0_OR_GREATER
             persistingSubscription = persistentComponentState?.RegisterOnPersisting(PersistTheme, RenderMode.InteractiveAuto);
-#else
-            persistingSubscription = persistentComponentState?.RegisterOnPersisting(PersistTheme);
-#endif
 
             base.OnInitialized();
         }

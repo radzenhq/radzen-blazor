@@ -21,11 +21,11 @@ namespace Radzen.Blazor.Tests
 
         static readonly string[] FiveTabs = new[] { "One", "Two", "Three", "Four", "Five" };
 
-        static IRenderedComponent<RadzenTabs> RenderCollapsible(TestContext ctx, int selectedIndex = 0, System.Action<ComponentParameterCollectionBuilder<RadzenTabs>> configure = null)
+        static IRenderedComponent<RadzenTabs> RenderCollapsible(BunitContext ctx, int selectedIndex = 0, System.Action<ComponentParameterCollectionBuilder<RadzenTabs>> configure = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            return ctx.RenderComponent<RadzenTabs>(parameters =>
+            return ctx.Render<RadzenTabs>(parameters =>
             {
                 parameters.Add(p => p.Overflow, TabsOverflow.Collapse)
                           .Add(p => p.SelectedIndex, selectedIndex)
@@ -50,8 +50,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_DoesNotRender_OverflowMarkup_ByDefault()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             Assert.DoesNotContain("rz-tabview-overflow", component.Markup);
             Assert.DoesNotContain("rz-tabview-more", component.Markup);
@@ -64,9 +64,9 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabsOverflow.Collapse, "rz-tabview-overflow-collapse")]
         public void Tabs_Renders_OverflowClass(TabsOverflow overflow, string expectedClass)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             Assert.Contains(expectedClass, component.Find(".rz-tabview").ClassList);
         }
@@ -76,9 +76,9 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabsOverflow.Scroll)]
         public void Tabs_WrapAndScroll_DoNotRender_MoreButton(TabsOverflow overflow)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             Assert.Empty(component.FindAll(".rz-tabview-more"));
         }
@@ -88,9 +88,9 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabPosition.Left, "keyboard_arrow_up", "keyboard_arrow_down")]
         public void Tabs_Scroll_Renders_ScrollButtons(TabPosition position, string backwardIcon, string forwardIcon)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.Overflow, TabsOverflow.Scroll)
                 .Add(p => p.TabPosition, position)
                 .Add(p => p.Tabs, TabsFragment(FiveTabs)));
@@ -120,9 +120,9 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabsOverflow.Collapse)]
         public void Tabs_OtherModes_DoNotRender_ScrollButtons(TabsOverflow overflow)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             Assert.Empty(component.FindAll(".rz-tabview-scroll"));
         }
@@ -134,9 +134,9 @@ namespace Radzen.Blazor.Tests
         [InlineData(TabsOverflow.Collapse)]
         public async Task Tabs_Tablist_Contains_Only_Tabs(TabsOverflow overflow)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Overflow, overflow).Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             if (overflow == TabsOverflow.Collapse)
             {
@@ -152,9 +152,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_Sets_AriaSetSize_And_PosInSet_For_Visible_Tabs()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.Overflow, TabsOverflow.Collapse)
                 .Add(p => p.RenderMode, TabRenderMode.Client)
                 .Add(p => p.Tabs, builder =>
@@ -181,8 +181,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Default_DoesNotRender_AriaSetSize()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters.Add(p => p.Tabs, TabsFragment(FiveTabs)));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenTabs>(parameters => parameters.Add(p => p.Tabs, TabsFragment(FiveTabs)));
 
             Assert.DoesNotContain("aria-setsize", component.Markup);
             Assert.DoesNotContain("aria-posinset", component.Markup);
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Tabs_Collapse_Renders_HiddenMoreButton_BeforeMeasurement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx);
 
             var more = component.Find(".rz-tabview-more");
@@ -210,7 +210,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_CollapsesTabsThatDoNotFit_AndKeepsSelectedVisible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx, selectedIndex: 4);
 
             await Measure(component, available: 350);
@@ -230,7 +230,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_CollapsesNothing_WhenEverythingFits()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx);
 
             await Measure(component, available: 500);
@@ -243,7 +243,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_SelectingFromMenu_SelectsTab_AndKeepsItVisible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var changed = -1;
             var bound = -1;
             var component = RenderCollapsible(ctx, configure: parameters => parameters
@@ -271,7 +271,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_SelectingFromMenu_RespectsCanChange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx, configure: parameters => parameters
                 .Add(p => p.CanChange, args => args.PreventDefault()));
 
@@ -287,7 +287,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_KeyboardFocus_KeepsFocusedTabVisible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx);
 
             await Measure(component, available: 350);
@@ -308,9 +308,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_DisabledTab_IsRenderedDisabled_InMenu()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.Overflow, TabsOverflow.Collapse)
                 .Add(p => p.Tabs, builder =>
                 {
@@ -333,7 +333,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_ClickingMoreButton_TogglesAriaExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx);
 
             await Measure(component, available: 350);
@@ -349,13 +349,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_SwitchingOverflow_RemovesMoreButton_AndCollapsedState()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var component = RenderCollapsible(ctx);
 
             await Measure(component, available: 350);
             Assert.True(IsCollapsed(component, 3));
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Overflow, TabsOverflow.Default));
+            component.Render(parameters => parameters.Add(p => p.Overflow, TabsOverflow.Default));
 
             Assert.Empty(component.FindAll(".rz-tabview-more"));
             Assert.DoesNotContain("rz-tabview-collapsed", component.Markup);
@@ -365,9 +365,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task Tabs_Collapse_IgnoresInvisibleTabs()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+            var component = ctx.Render<RadzenTabs>(parameters => parameters
                 .Add(p => p.Overflow, TabsOverflow.Collapse)
                 .Add(p => p.RenderMode, TabRenderMode.Client)
                 .Add(p => p.Tabs, builder =>

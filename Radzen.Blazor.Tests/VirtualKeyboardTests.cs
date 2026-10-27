@@ -9,10 +9,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_WithClassNameAndChildContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.AddChildContent("<input class=\"my-input\" />"));
 
             Assert.Contains(@"rz-virtual-keyboard", component.Markup);
@@ -22,10 +22,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Visible, false));
 
             Assert.Empty(component.Markup.Trim());
@@ -34,10 +34,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_AlphanumericLayoutByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             Assert.Contains(@"data-vk-key=""q""", component.Markup);
             Assert.Contains(@"data-vk-shift=""Q""", component.Markup);
@@ -50,10 +50,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_SingleSectionByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             Assert.Single(component.FindAll(".rz-virtual-keyboard-section"));
         }
@@ -61,10 +61,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_NumpadType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Type, VirtualKeyboardType.Numpad));
 
             Assert.Contains(@"data-vk-key=""7""", component.Markup);
@@ -75,10 +75,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_AllType_WithTwoSections()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Type, VirtualKeyboardType.All));
 
             Assert.Contains(@"data-vk-key=""q""", component.Markup);
@@ -88,10 +88,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_SectionColumnCount_FromTheLongestRow()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Type, VirtualKeyboardType.All));
 
             var sections = component.FindAll(".rz-virtual-keyboard-section");
@@ -99,7 +99,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("--rz-virtual-keyboard-columns:10", sections[0].GetAttribute("style"));
             Assert.Equal("--rz-virtual-keyboard-columns:3", sections[1].GetAttribute("style"));
 
-            component.SetParametersAndRender(parameters => parameters
+            component.Render(parameters => parameters
                 .Add(p => p.Type, VirtualKeyboardType.Alphanumeric)
                 .Add(p => p.Layout, VirtualKeyboardLayout.Qwertz));
 
@@ -109,10 +109,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_CultureDecimalSeparator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
             {
                 parameters.Add(p => p.Type, VirtualKeyboardType.Numpad);
                 parameters.Add(p => p.Culture, CultureInfo.GetCultureInfo("de-DE"));
@@ -124,10 +124,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_DecimalSeparatorOverride()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
             {
                 parameters.Add(p => p.Type, VirtualKeyboardType.Numpad);
                 parameters.Add(p => p.Culture, CultureInfo.GetCultureInfo("de-DE"));
@@ -140,10 +140,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_CustomLayout()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Layout, VirtualKeyboardLayout.FromRows("7 8 9 °C", "{clear} {backspace} {enter}")));
 
             Assert.Contains(@"data-vk-key=""°C""", component.Markup);
@@ -154,10 +154,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_ShiftLayoutFromPreset()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Layout, VirtualKeyboardLayout.Qwertz));
 
             Assert.Contains(@"data-vk-key=""z""", component.Markup);
@@ -168,10 +168,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_BottomPlacementByDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             Assert.Contains(@"rz-virtual-keyboard-bottom", component.Markup);
             Assert.Contains(@"display:none", component.Markup);
@@ -180,10 +180,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_TopPlacement()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Placement, VirtualKeyboardPlacement.Top));
 
             Assert.Contains(@"rz-virtual-keyboard-top", component.Markup);
@@ -192,10 +192,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_InlinePlacement_Visible()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>(parameters =>
+            var component = ctx.Render<RadzenVirtualKeyboard>(parameters =>
                 parameters.Add(p => p.Placement, VirtualKeyboardPlacement.Inline));
 
             Assert.Contains(@"rz-virtual-keyboard-inline", component.Markup);
@@ -205,10 +205,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_AriaLabels()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             Assert.Contains(@"aria-label=""Virtual keyboard""", component.Markup);
             Assert.Contains(@"aria-label=""Backspace""", component.Markup);
@@ -217,10 +217,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_ShiftKeyAsToggleButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             var shiftKey = component.Find(@"[data-vk-action=""shift""]");
 
@@ -230,10 +230,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_Renders_KeysNotFocusable()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+            var component = ctx.Render<RadzenVirtualKeyboard>();
 
             foreach (var key in component.FindAll(".rz-virtual-keyboard-key"))
             {
@@ -245,10 +245,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void VirtualKeyboard_CreatesJSInstance()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            ctx.RenderComponent<RadzenVirtualKeyboard>();
+            ctx.Render<RadzenVirtualKeyboard>();
 
             Assert.Contains(ctx.JSInterop.Invocations, invocation => invocation.Identifier == "Radzen.createVirtualKeyboard");
         }

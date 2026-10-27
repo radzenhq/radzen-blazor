@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenContourSeries<ContourItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(ContourItem.X))
                     .Add(x => x.ValueProperty, nameof(ContourItem.Y))
@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenContourSeries<ContourItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(ContourItem.X))
                     .Add(x => x.ValueProperty, nameof(ContourItem.Y))
@@ -125,7 +125,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenContourSeries<ContourItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(ContourItem.X))
                     .Add(x => x.ValueProperty, nameof(ContourItem.Y))

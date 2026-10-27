@@ -71,10 +71,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Grid_Does_Not_Render_New_Data_With_Removed_Columns()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var host = ctx.RenderComponent<Host>();
+            var host = ctx.Render<Host>();
             host.InvokeAsync(() => host.Instance.SetDataOne()).GetAwaiter().GetResult();
             Assert.Equal(6, host.FindAll("th[role=columnheader]").Count);
             Assert.Equal(48, host.FindAll("td[role=gridcell]").Count);

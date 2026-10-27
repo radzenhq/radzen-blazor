@@ -1,3 +1,5 @@
+#nullable enable
+
 using Xunit;
 
 using Radzen.Documents.Spreadsheet;

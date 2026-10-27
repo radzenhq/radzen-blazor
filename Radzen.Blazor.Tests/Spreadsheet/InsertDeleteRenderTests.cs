@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 /// grid against intermediate geometry, never re-bound the cell views, or never told the
 /// selection-dependent chrome to re-read the active cell.
 /// </summary>
-public class InsertDeleteRenderTests : TestContext
+public class InsertDeleteRenderTests : BunitContext
 {
     [Fact]
     public void InsertColumn_RaisesColumnChange_AfterCellsHaveShifted()
@@ -97,7 +97,7 @@ public class InsertDeleteRenderTests : TestContext
 
         // Render a single cell pinned to grid position (0,0) — exactly how the virtual
         // grid renders it. The position never changes; only the cell underneath does.
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 0));
@@ -108,7 +108,7 @@ public class InsertDeleteRenderTests : TestContext
         sheet.InsertColumn(0, 1);
 
         // The virtual grid re-renders and re-passes the same Row/Column to this cell.
-        cut.SetParametersAndRender(parameters => parameters
+        cut.Render(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 0));

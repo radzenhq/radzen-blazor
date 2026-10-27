@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Content_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContent>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContent>();
 
             Assert.Contains("content", component.Markup);
         }
@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Content_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContent>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContent>(parameters =>
             {
                 parameters.AddChildContent("<div>Page Content</div>");
             });
@@ -29,8 +29,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Content_Renders_ContainerParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContent>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContent>(parameters =>
             {
                 parameters.Add(p => p.Container, "main-container");
             });
@@ -41,8 +41,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Content_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContent>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContent>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -54,8 +54,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContentContainer_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContentContainer>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContentContainer>(parameters =>
             {
                 parameters.AddChildContent("<div>Container Content</div>");
             });
@@ -66,8 +66,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContentContainer_Renders_NameParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContentContainer>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContentContainer>(parameters =>
             {
                 parameters.Add(p => p.Name, "sidebar");
             });
@@ -78,8 +78,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ContentContainer_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenContentContainer>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenContentContainer>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
                 parameters.AddChildContent("Should Not Show");

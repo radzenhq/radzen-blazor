@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -10,9 +12,9 @@ namespace Radzen.Blazor.Tests
     {
         static int LinearGradients(string markup) => Regex.Matches(markup, "<linearGradient").Count;
 
-        static async Task<string> RenderFunnel(TestContext ctx, FillMode? fillMode = null, string[]? fills = null)
+        static async Task<string> RenderFunnel(BunitContext ctx, FillMode? fillMode = null, string[]? fills = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenFunnelSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -32,9 +34,9 @@ namespace Radzen.Blazor.Tests
             return chart.Markup;
         }
 
-        static async Task<string> RenderPyramid(TestContext ctx, FillMode? fillMode = null, string[]? fills = null)
+        static async Task<string> RenderPyramid(BunitContext ctx, FillMode? fillMode = null, string[]? fills = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenPyramidSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));

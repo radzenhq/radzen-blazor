@@ -12,11 +12,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>();
+            var component = ctx.Render<RadzenDateRangePicker>();
 
             Assert.Contains("rz-datepicker", component.Markup);
             Assert.Contains("rz-datepicker-range", component.Markup);
@@ -26,14 +26,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Selects_Range_With_Two_Clicks()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             DateRange emitted = null;
             var initial = new DateTime(2024, 1, 1);
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, initial);
                 parameters.Add(p => p.ValueChanged, args => { emitted = args; });
@@ -54,14 +54,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Restarts_Selection_When_Clicked_Date_Is_Before_Start()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             DateRange emitted = null;
             var initial = new DateTime(2024, 1, 1);
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, initial);
                 parameters.Add(p => p.ValueChanged, args => { emitted = args; });
@@ -78,14 +78,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Allows_Same_Day_Range()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             DateRange emitted = null;
             var initial = new DateTime(2024, 1, 1);
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, initial);
                 parameters.Add(p => p.ValueChanged, args => { emitted = args; });
@@ -102,11 +102,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Highlights_Days_Between_Start_And_End()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 1, 13)));
@@ -126,11 +126,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Previews_Range_On_Hover()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
@@ -147,12 +147,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Hover_Dispatches_With_Tracing_And_Skips_Disabled_Days()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             Microsoft.AspNetCore.Components.Infrastructure.ComponentsMetricsServiceCollectionExtensions.AddComponentsTracing(ctx.Services);
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
                 parameters.Add(p => p.Min, new DateTime(2024, 1, 5));
@@ -171,11 +171,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Formats_Value_With_Separator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
                 parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
@@ -189,11 +189,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Formats_Value_With_Custom_Separator()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
                 parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
@@ -208,11 +208,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Normalizes_Reversed_Range_Value()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
                 parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
@@ -226,14 +226,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Clears_Value()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             DateRange emitted = new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 1, 20));
             var raised = false;
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.AllowClear, true);
                 parameters.Add(p => p.Value, emitted);
@@ -249,11 +249,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Renders_Two_Months_By_Default()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
@@ -277,11 +277,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Navigates_By_Year_And_Month()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
@@ -307,11 +307,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Renders_Single_Month_When_DisplayMonths_Is_One()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.DisplayMonths, 1);
             });
@@ -328,11 +328,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Uses_DrillDown_Navigation_By_Default()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
@@ -346,13 +346,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Selects_Range_Across_Months()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             DateRange emitted = null;
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
                 parameters.Add(p => p.ValueChanged, args => { emitted = args; });
@@ -378,11 +378,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Renders_Unique_Day_Cell_Ids()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
@@ -394,11 +394,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Announces_Range_Endpoints_And_Selection()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 1, 13)));
@@ -421,11 +421,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_DrillDown_Zooms_Out_And_Back()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DrillDown);
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
@@ -450,11 +450,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_DropDown_Mode_Renders_Static_Titles()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DropDown);
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
@@ -467,11 +467,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Follows_Aria_Authoring_Practices()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
                 parameters.Add(p => p.Value, new DateRange(new DateTime(2024, 1, 10), new DateTime(2024, 2, 5)));
@@ -521,11 +521,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DateRangePicker_Does_Not_Render_TimePicker()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenDateRangePicker>(parameters =>
+            var component = ctx.Render<RadzenDateRangePicker>(parameters =>
             {
                 parameters.Add(p => p.ShowTime, true);
             });

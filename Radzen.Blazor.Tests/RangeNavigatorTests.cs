@@ -18,7 +18,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.Contains("rz-range-nav", component.Markup);
         }
@@ -28,7 +28,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.Equal(0, component.Instance.Start);
         }
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.Equal(1, component.Instance.End);
         }
@@ -48,7 +48,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.Start, 0.25);
                 parameters.Add(p => p.End, 0.75);
@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.Contains("rz-range-nav-window", component.Markup);
         }
@@ -73,7 +73,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.False(component.Instance.ShowHandleLabels);
         }
@@ -83,7 +83,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
 
             Assert.False(component.Instance.ShowAxis);
         }
@@ -93,7 +93,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.ShowHandleLabels, true);
                 parameters.Add(p => p.ShowAxis, true);
@@ -108,7 +108,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.HandleLabelFormatter, value => $"#{value}");
                 parameters.Add(p => p.HandleLabelFormatString, "{0:N2}");
@@ -130,7 +130,7 @@ namespace Radzen.Blazor.Tests
             var start = new DateTime(2024, 1, 1);
             var end = new DateTime(2024, 12, 31);
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.HandleLabelFormatter, value =>
                 {
@@ -152,7 +152,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 parameters.Add(p => p.HandleLabelFormatString, "{0:N2}");
             });
@@ -173,7 +173,7 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderNavigatorWithLineSeries(ctx);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Start, 0.1));
+            component.Render(parameters => parameters.Add(p => p.Start, 0.1));
 
             Assert.DoesNotContain("rz-range-nav-series", component.Markup);
         }
@@ -200,7 +200,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(10, component.Instance.ValueScale.Input.Start);
             Assert.Equal(20, component.Instance.ValueScale.Input.End);
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
                 parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
                 {
                     series.Add(p => p.Data, WiderData);
@@ -219,7 +219,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
             var component = RenderNavigatorWithLineSeries(ctx);
-            component.SetParametersAndRender(p => p.Add(x => x.ShowAxis, true));
+            component.Render(p => p.Add(x => x.ShowAxis, true));
             var data = new[]
             {
                 new DataItem { Category = renameCategories ? "X" : "A", Value = 10 },
@@ -227,7 +227,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = renameCategories ? "Z" : "C", Value = renameCategories ? 15 : 12 },
             };
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
                 parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
                 {
                     series.Add(p => p.Data, data);
@@ -248,7 +248,7 @@ namespace Radzen.Blazor.Tests
                 Assert.DoesNotContain("166.66666666666669 100 ", component.Markup);
             }
             var renders = component.RenderCount;
-            component.SetParametersAndRender(p => p.Add(x => x.Start, 0.2));
+            component.Render(p => p.Add(x => x.Start, 0.2));
             Assert.Equal(renders + 1, component.RenderCount);
         }
 
@@ -293,7 +293,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            var component = ctx.Render<RadzenRangeNavigator>(parameters =>
                 parameters.AddChildContent<RadzenRangeNavigatorLineSeries<DataItem>>(series =>
                 {
                     series.Add(p => p.Data, SampleData);
@@ -326,7 +326,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var component = ctx.RenderComponent<RadzenRangeNavigator>();
+            var component = ctx.Render<RadzenRangeNavigator>();
             component.Instance.AddSeries(new CustomSeries());
 
             Assert.Empty(component.Instance.GetTooltipPoints());
@@ -353,7 +353,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
 
             var component = RenderNavigatorWithLineSeries(ctx);
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ShowTooltip, true));
+            component.Render(parameters => parameters.Add(p => p.ShowTooltip, true));
 
             Assert.Contains(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
         }
@@ -388,7 +388,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenChartRangeNavigator>(n => n
                     .Add(x => x.ShowTooltip, true)
                     .Add(x => x.TooltipFormatString, "{0:N1}")));
@@ -433,25 +433,25 @@ namespace Radzen.Blazor.Tests
             });
             Assert.Equal("A: 10.00", LastSentTexts(ctx)[0]);
 
-            component.SetParametersAndRender(p => p.Add(x => x.TooltipFormatString, "{0:N1}"));
+            component.Render(p => p.Add(x => x.TooltipFormatString, "{0:N1}"));
             Assert.Equal("A: 10.0", LastSentTexts(ctx)[0]);
 
-            component.SetParametersAndRender(p => p.Add(x => x.Culture, CultureInfo.GetCultureInfo("de-DE")));
+            component.Render(p => p.Add(x => x.Culture, CultureInfo.GetCultureInfo("de-DE")));
             Assert.Equal("A: 10,0", LastSentTexts(ctx)[0]);
 
-            component.SetParametersAndRender(p => p.Add(x => x.ShowTooltip, false));
+            component.Render(p => p.Add(x => x.ShowTooltip, false));
             Assert.Empty(LastSentTexts(ctx));
-            component.SetParametersAndRender(p => p.Add(x => x.ShowTooltip, true));
+            component.Render(p => p.Add(x => x.ShowTooltip, true));
             Assert.Equal("A: 10,0", LastSentTexts(ctx)[0]);
         }
 
-        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithLineSeries(TestContext ctx,
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithLineSeries(BunitContext ctx,
             Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
         {
             return RenderNavigator(ctx, SampleData, nameof(DataItem.Category), nameof(DataItem.Value), configure);
         }
 
-        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithDateSeries(TestContext ctx,
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigatorWithDateSeries(BunitContext ctx,
             Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)
         {
             var data = new[]
@@ -463,10 +463,10 @@ namespace Radzen.Blazor.Tests
             return RenderNavigator(ctx, data, nameof(DateItem.Date), nameof(DateItem.Value), configure);
         }
 
-        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(TestContext ctx, IEnumerable<TItem> data,
+        private static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(BunitContext ctx, IEnumerable<TItem> data,
             string categoryProperty, string valueProperty, Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure)
         {
-            return ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            return ctx.Render<RadzenRangeNavigator>(parameters =>
             {
                 configure?.Invoke(parameters);
                 parameters.AddChildContent<RadzenRangeNavigatorLineSeries<TItem>>(series =>
@@ -480,7 +480,7 @@ namespace Radzen.Blazor.Tests
 
         private static string Describe(RadzenRangeNavigator.TooltipPoint point) => $"{point.Category}: {point.Value}";
 
-        private static string[] LastSentTexts(TestContext ctx)
+        private static string[] LastSentTexts(BunitContext ctx)
         {
             var last = ctx.JSInterop.Invocations.Last(i => i.Identifier == "Radzen.updateRangeNavigatorTooltip");
             return Assert.IsAssignableFrom<IEnumerable<RadzenRangeNavigator.TooltipPoint>>(last.Arguments[1]).Select(Describe).ToArray();

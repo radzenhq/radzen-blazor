@@ -54,12 +54,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Is_Null()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
-                component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
+                component.Render(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
             });
 
             Assert.False(component.Instance.Validate(null));
@@ -67,12 +67,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Null_And_AllowNull_Is_True()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
-                component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10).Add(p => p.AllowNull, true));
+                component.Render(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10).Add(p => p.AllowNull, true));
             });
 
             Assert.True(component.Instance.Validate(null));
@@ -81,12 +81,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Value_Overflows()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
 
-            component.SetParametersAndRender(parameters =>
+            component.Render(parameters =>
             {
-                component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
+                component.Render(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
             });
 
             Assert.False(component.Instance.Validate(long.MaxValue));
@@ -95,9 +95,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Greater_Than_Min()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0));
 
             Assert.True(component.Instance.Validate(1));
         }
@@ -105,9 +105,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Equal_To_Min()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0));
 
             Assert.True(component.Instance.Validate(0));
         }
@@ -115,9 +115,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Less_Than_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 10));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 10));
 
             Assert.True(component.Instance.Validate(9));
         }
@@ -125,9 +125,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Equal_To_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Max, 10));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Max, 10));
 
             Assert.True(component.Instance.Validate(10));
         }
@@ -135,9 +135,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_True_If_Value_Is_Between_Min_And_Max()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
 
             Assert.True(component.Instance.Validate(5));
         }
@@ -147,18 +147,18 @@ namespace Radzen.Blazor.Tests
         {
             int? min = 0;
             int? max = 10;
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, min).Add(p => p.Max, max));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, min).Add(p => p.Max, max));
             Assert.True(component.Instance.Validate(5));
         }
 
         [Fact]
         public void Returns_True_When_Value_Is_Of_DifferentType()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0m).Add(p => p.Max, 10m));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0m).Add(p => p.Max, 10m));
 
             Assert.True(component.Instance.Validate(5));
         }
@@ -166,9 +166,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Returns_False_If_Cannot_Conert_Value()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0m).Add(p => p.Max, 10m));
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenNumericRangeValidatorTestDouble>();
+            component.Render(parameters => parameters.Add(p => p.Min, 0m).Add(p => p.Max, 10m));
 
             Assert.False(component.Instance.Validate(DateTime.Now));
         }

@@ -16,9 +16,9 @@ namespace Radzen.Blazor.Tests
             public int? ParentId { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<Employee>> Render(TestContext ctx, List<Employee> roots, List<Employee> children, List<int> loadChildDataCalls)
+        static IRenderedComponent<RadzenDataGrid<Employee>> Render(BunitContext ctx, List<Employee> roots, List<Employee> children, List<int> loadChildDataCalls)
         {
-            return ctx.RenderComponent<RadzenDataGrid<Employee>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<Employee>>(parameterBuilder =>
             {
                 parameterBuilder.Add(p => p.Data, roots);
                 parameterBuilder.Add(p => p.ExpandMode, DataGridExpandMode.Multiple);
@@ -40,7 +40,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_ResetRowState_ShouldRemoveChildRows()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -75,7 +75,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_ResetRowState_ShouldNotLeakChildRowsIntoNewData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -103,7 +103,7 @@ namespace Radzen.Blazor.Tests
             {
                 new Employee { Id = 3, Name = "NewRoot" }
             };
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Data, newRoots));
+            component.Render(parameters => parameters.Add(p => p.Data, newRoots));
 
             Assert.Contains("NewRoot", component.Markup);
             Assert.DoesNotContain("OldChild", component.Markup);
@@ -112,7 +112,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_ExpandRowsAfterReset_ShouldRestoreExpandedState()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 

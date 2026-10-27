@@ -366,7 +366,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
                 var count = stackedColumnSeries.Max(series => series.Count);

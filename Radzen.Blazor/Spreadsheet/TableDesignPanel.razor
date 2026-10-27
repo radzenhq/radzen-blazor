@@ -224,7 +224,6 @@
     {
         if (Worksheet is null || CurrentTable is null || Spreadsheet is null) return;
         await Spreadsheet.ExecuteAsync(new RemoveTableCommand(Worksheet, CurrentTable));
-        StateHasChanged();
     }
 
     public void Dispose()

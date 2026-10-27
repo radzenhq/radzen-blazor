@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,12 +18,12 @@ internal static class BlankLines
         }
 
         var lines = new List<int>();
-        var firstNewline = source.IndexOf('\n', from, to - from);
+        var firstNewline = source.IndexOf('\n', from, to - from, StringComparison.Ordinal);
         var lineStart = from == 0 || !hasPrevious || source[from - 1] == '\n' ? from : firstNewline < 0 ? -1 : firstNewline + 1;
 
         while (lineStart >= 0 && lineStart <= to)
         {
-            var newline = source.IndexOf('\n', lineStart, to - lineStart);
+            var newline = source.IndexOf('\n', lineStart, to - lineStart, StringComparison.Ordinal);
             var lineEnd = newline >= 0 ? newline : to;
 
             if (newline < 0 && to < source.Length && source[to] != '\n')

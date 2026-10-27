@@ -108,9 +108,9 @@ namespace Radzen.Blazor.Tests
             public DateTime End { get; set; }
         }
 
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
@@ -118,11 +118,11 @@ namespace Radzen.Blazor.Tests
             return ctx;
         }
 
-        static IRenderedComponent<RadzenGantt<Item>> RenderGantt(TestContext ctx, GanttZoomLevel zoom, CultureInfo culture, string headerDateFormat = null)
+        static IRenderedComponent<RadzenGantt<Item>> RenderGantt(BunitContext ctx, GanttZoomLevel zoom, CultureInfo culture, string headerDateFormat = null)
         {
             var items = new List<Item> { new Item { Id = 1, Text = "Task", Start = new DateTime(2026, 7, 27), End = new DateTime(2026, 8, 20) } };
 
-            return ctx.RenderComponent<RadzenGantt<Item>>(p =>
+            return ctx.Render<RadzenGantt<Item>>(p =>
             {
                 p.Add(x => x.Data, items);
                 p.Add(x => x.IdProperty, nameof(Item.Id));

@@ -343,7 +343,7 @@ namespace Radzen.Blazor
         /// <returns>System.Boolean.</returns>
         public bool GetVisible()
         {
-            if (Columns != null && ColumnsCollection.Any() && VisibleColumns.Count() == 0)
+            if (Columns != null && ColumnsCollection.Count > 0 && VisibleColumns.Count() == 0)
             {
                 return false;
             }
@@ -1025,7 +1025,7 @@ namespace Radzen.Blazor
                     continue;
                 }
 
-                if (w.StartsWith("calc(", StringComparison.Ordinal) && w.EndsWith(')'))
+                if (w.StartsWith("calc(", StringComparison.Ordinal) && w.EndsWith(')', StringComparison.Ordinal))
                 {
                     var calcExpression = w.Remove(w.Length - 1).Substring("calc(".Length);
                     widths.Add(calcExpression);
@@ -2018,12 +2018,10 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual bool ShowTimeForDateTimeFilter()
         {
-#if NET6_0_OR_GREATER
             if (FilterPropertyType == typeof(DateOnly))
             {
                 return false;
             }
-#endif
             return true;
         }
 

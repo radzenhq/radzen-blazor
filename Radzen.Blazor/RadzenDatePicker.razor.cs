@@ -945,7 +945,6 @@ namespace Radzen.Blazor
             RevertUncommittedTimeChange();
             ResetView();
             contentStyle = "display:none;";
-            StateHasChanged();
         }
 
         async Task UpdateHour(int v)
@@ -2081,7 +2080,6 @@ namespace Radzen.Blazor
                 }
 
                 await Change.InvokeAsync(DateTimeValue);
-                StateHasChanged();
             }
         }
 

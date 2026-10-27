@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -18,9 +20,9 @@ namespace Radzen.Blazor.Tests
             new DataItem { Category = "Down", Value = -10 },
         };
 
-        static async Task<string> RenderWaterfall(TestContext ctx, FillMode? fillMode = null, DataItem[]? data = null)
+        static async Task<string> RenderWaterfall(BunitContext ctx, FillMode? fillMode = null, DataItem[]? data = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenWaterfallSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));
@@ -38,9 +40,9 @@ namespace Radzen.Blazor.Tests
             return chart.Markup;
         }
 
-        static async Task<string> RenderHorizontalWaterfall(TestContext ctx, FillMode? fillMode = null, DataItem[]? data = null)
+        static async Task<string> RenderHorizontalWaterfall(BunitContext ctx, FillMode? fillMode = null, DataItem[]? data = null)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            var chart = ctx.Render<RadzenChart>(p =>
                 p.AddChildContent<RadzenHorizontalWaterfallSeries<DataItem>>(s =>
                 {
                     s.Add(x => x.CategoryProperty, nameof(DataItem.Category));

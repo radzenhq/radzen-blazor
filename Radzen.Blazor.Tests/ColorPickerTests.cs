@@ -9,19 +9,19 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_ShouldAcceptInvalidValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(ComponentParameter.CreateParameter("Value", "invalid"));
+            var component = ctx.Render<RadzenColorPicker>(p => p.Add(x => x.Value, "invalid"));
         }
 
         [Fact]
         public void ColorPicker_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>();
+            var component = ctx.Render<RadzenColorPicker>();
 
             Assert.Contains("rz-colorpicker", component.Markup);
         }
@@ -29,10 +29,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_Renders_WithValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Value, "#FF0000");
             });
@@ -43,10 +43,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -57,10 +57,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -71,10 +71,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_Renders_Icon()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Icon, "palette");
             });
@@ -85,10 +85,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_Renders_ToggleAriaLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.ToggleAriaLabel, "Pick color");
             });
@@ -99,10 +99,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_AcceptsNullValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Value, (string)null!);
             });
@@ -113,10 +113,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void ColorPicker_AcceptsHexValue()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenColorPicker>(parameters =>
+            var component = ctx.Render<RadzenColorPicker>(parameters =>
             {
                 parameters.Add(p => p.Value, "#00FF00");
             });

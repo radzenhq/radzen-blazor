@@ -19,9 +19,9 @@ namespace Radzen.Blazor.Tests
         // Declared out of their markup order on purpose: the rendered order is Name, City, Id, and
         // the declaration order is Id, Name, City. A reset that reads OrderIndex gives the first;
         // one that rebuilds the column list without reading it gives the second.
-        static IRenderedComponent<RadzenDataGrid<Row>> Render(TestContext ctx)
+        static IRenderedComponent<RadzenDataGrid<Row>> Render(BunitContext ctx)
         {
-            return ctx.RenderComponent<RadzenDataGrid<Row>>(builder =>
+            return ctx.Render<RadzenDataGrid<Row>>(builder =>
             {
                 builder.Add(p => p.Data, new List<Row> { new Row { Id = 1, Name = "One", City = "Paris" } });
                 builder.Add(p => p.AllowColumnReorder, true);
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task DataGrid_SettingsSetToNull_RestoresDeclaredOrderIndex()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 

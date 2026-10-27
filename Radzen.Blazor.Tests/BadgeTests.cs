@@ -8,13 +8,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBadge>();
+            var component = ctx.Render<RadzenBadge>();
 
             var text = "Test";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.Render(parameters => parameters.Add(p => p.Text, text));
 
             Assert.Contains(text, component.Markup);
         }
@@ -22,11 +22,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBadge>();
+            var component = ctx.Render<RadzenBadge>();
 
-            component.SetParametersAndRender(parameters => parameters.AddChildContent("SomeContent"));
+            component.Render(parameters => parameters.AddChildContent("SomeContent"));
 
             Assert.Contains(@$"SomeContent", component.Markup);
         }
@@ -36,10 +36,10 @@ namespace Radzen.Blazor.Tests
         {
             var badgeStyle = BadgeStyle.Danger;
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBadge>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.BadgeStyle, badgeStyle));
+            var component = ctx.Render<RadzenBadge>();
+            component.Render(parameters => parameters.Add(p => p.BadgeStyle, badgeStyle));
 
             Assert.Contains($"badge-{badgeStyle.ToString().ToLower()}", component.Markup);
         }
@@ -47,8 +47,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_Variant_Outlined()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
             });
@@ -59,8 +59,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_Variant_Flat()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Flat);
             });
@@ -71,8 +71,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_Variant_Text()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Text);
             });
@@ -83,8 +83,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_Shade()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.Shade, Shade.Lighter);
             });
@@ -95,8 +95,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_IsPill()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.IsPill, true);
             });
@@ -107,8 +107,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_DoesNotRender_IsPill_WhenFalse()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.IsPill, false);
             });
@@ -119,8 +119,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
             });
@@ -131,8 +131,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_DefaultStyle_IsPrimary()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenBadge>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenBadge>();
 
             Assert.Contains("rz-badge-primary", component.Markup);
         }
@@ -140,21 +140,21 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Badge_Renders_AllBadgeStyles()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
-            var component = ctx.RenderComponent<RadzenBadge>(parameters =>
+            var component = ctx.Render<RadzenBadge>(parameters =>
             {
                 parameters.Add(p => p.BadgeStyle, BadgeStyle.Success);
             });
             Assert.Contains("rz-badge-success", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Warning));
+            component.Render(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Warning));
             Assert.Contains("rz-badge-warning", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Info));
+            component.Render(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Info));
             Assert.Contains("rz-badge-info", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Light));
+            component.Render(parameters => parameters.Add(p => p.BadgeStyle, BadgeStyle.Light));
             Assert.Contains("rz-badge-light", component.Markup);
         }
     }

@@ -8,9 +8,9 @@ namespace Radzen.Blazor.Tests
 {
     public class HtmlEditorTests
     {
-        static TestContext CreateContext()
+        static BunitContext CreateContext()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.Services.AddScoped<ContextMenuService>();
@@ -22,7 +22,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_WithClassName()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             Assert.Contains(@"rz-html-editor", component.Markup);
         }
@@ -31,7 +31,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_ShowToolbar_True()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.ShowToolbar, true);
             });
@@ -43,7 +43,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_ShowToolbar_False()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.ShowToolbar, false);
             });
@@ -55,7 +55,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_Mode_Design()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.Mode, HtmlEditorMode.Design);
             });
@@ -68,7 +68,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_Mode_Source()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.Mode, HtmlEditorMode.Source);
             });
@@ -82,7 +82,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
             var raised = 0;
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.Value, "<p>initial</p>");
                 parameters.Add(p => p.Disabled, true);
@@ -100,7 +100,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateContext();
             var raised = 0;
             var html = string.Empty;
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.Value, "<p>initial</p>");
                 parameters.Add(p => p.Input, args => { raised++; html = args; });
@@ -116,7 +116,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_Disabled_Attribute()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters =>
+            var component = ctx.Render<RadzenHtmlEditor>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -128,7 +128,7 @@ namespace Radzen.Blazor.Tests
         public void HtmlEditor_Renders_ContentArea()
         {
             using var ctx = CreateContext();
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             Assert.Contains("rz-html-editor-content", component.Markup);
         }
@@ -138,7 +138,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             Assert.Contains("table_chart", component.Markup);
             Assert.Contains("merge_type", component.Markup);
@@ -150,7 +150,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             var icons = component.FindAll(".rz-dropdown-trigger-icon");
 
@@ -163,7 +163,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditorTable>();
+            var component = ctx.Render<RadzenHtmlEditorTable>();
 
             Assert.Equal("Insert table", component.Instance.Title);
             Assert.Equal("Column width (px)", component.Instance.ColumnWidthPxText);
@@ -176,7 +176,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditorTable>();
+            var component = ctx.Render<RadzenHtmlEditorTable>();
 
             Assert.Equal("Right", component.Instance.BorderRightText);
             Assert.Equal("Bottom", component.Instance.BorderBottomText);
@@ -189,7 +189,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters => parameters
+            var component = ctx.Render<RadzenHtmlEditor>(parameters => parameters
                 .AddChildContent<RadzenHtmlEditorTableCommandButton>(childParameters => childParameters
                     .Add(p => p.TableCommand, "mergeCellRight")
                     .Add(p => p.Icon, "merge_type")
@@ -205,7 +205,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters => parameters
+            var component = ctx.Render<RadzenHtmlEditor>(parameters => parameters
                 .AddChildContent<RadzenHtmlEditorTableTools>());
 
             Assert.Contains("table_chart", component.Markup);
@@ -237,7 +237,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Setup<HtmlEditorTableSelection>("Radzen.getTableSelection", _ => true)
                 .SetResult(new HtmlEditorTableSelection());
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters => parameters
+            var component = ctx.Render<RadzenHtmlEditor>(parameters => parameters
                 .Add(p => p.TableStrings, new HtmlEditorTableStrings
                 {
                     ActionBlocked = "Aktion blockiert",
@@ -278,7 +278,7 @@ namespace Radzen.Blazor.Tests
                     Html = $"<p>{command}</p>"
                 });
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>(parameters => parameters
+            var component = ctx.Render<RadzenHtmlEditor>(parameters => parameters
                 .Add(p => p.Value, "<p>initial</p>"));
 
             await component.InvokeAsync(() => component.Instance.ExecuteTableCommandAsync(command));
@@ -300,7 +300,7 @@ namespace Radzen.Blazor.Tests
                     Html = "<table><tbody><tr><td>Cell</td></tr><tr><td>&nbsp;</td></tr></tbody></table>"
                 });
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             await component.InvokeAsync(() => component.Instance.ExecuteTableCommandAsync("addRowAfter"));
 
@@ -330,7 +330,7 @@ namespace Radzen.Blazor.Tests
                     BorderLeft = true
                 });
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             var selection = await component.InvokeAsync(() => component.Instance.GetTableSelectionAsync().AsTask());
 
@@ -422,7 +422,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Nach rechts verbinden", component.MergeRightText);
         }
 
-        static async Task<int> InvokeContextMenuTableCommand(TestContext ctx, string command)
+        static async Task<int> InvokeContextMenuTableCommand(BunitContext ctx, string command)
         {
             ctx.JSInterop.Setup<HtmlEditorTableSelection>("Radzen.getContextTableSelection", _ => true)
                 .SetResult(new HtmlEditorTableSelection { InTable = true });
@@ -433,7 +433,7 @@ namespace Radzen.Blazor.Tests
             contextMenuService.OnOpen += (_, o) => options = o;
             contextMenuService.OnClose += () => closed++;
 
-            var component = ctx.RenderComponent<RadzenHtmlEditor>();
+            var component = ctx.Render<RadzenHtmlEditor>();
 
             await component.InvokeAsync(() => component.Instance.OnContextMenu(10, 10));
 

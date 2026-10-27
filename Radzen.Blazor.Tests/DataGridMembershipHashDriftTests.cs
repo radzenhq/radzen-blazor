@@ -20,13 +20,13 @@ namespace Radzen.Blazor.Tests
             public override int GetHashCode() => HashCode.Combine(Id, Name);
         }
 
-        static IRenderedComponent<RadzenDataGrid<ValueRow>> Render(TestContext ctx, List<ValueRow> data,
+        static IRenderedComponent<RadzenDataGrid<ValueRow>> Render(BunitContext ctx, List<ValueRow> data,
             Action<ComponentParameterCollectionBuilder<RadzenDataGrid<ValueRow>>> extra = null)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<ValueRow>>(pb =>
+            return ctx.Render<RadzenDataGrid<ValueRow>>(pb =>
             {
                 pb.Add(p => p.Data, data);
                 pb.Add(p => p.Columns, b =>
@@ -42,7 +42,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task EditedRow_StaysInEditMode_WhenValueHashedItemIsMutatedDuringEdit()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<ValueRow>
             {
                 new ValueRow { Id = 1, Name = "One" },
@@ -64,7 +64,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task SelectedRow_StaysHighlighted_WhenValueHashedItemIsMutated()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<ValueRow>
             {
                 new ValueRow { Id = 1, Name = "One" },
@@ -88,7 +88,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ExpandedRow_StaysExpanded_WhenValueHashedItemIsMutated()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<ValueRow>
             {
                 new ValueRow { Id = 1, Name = "One" },

@@ -17,8 +17,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCheckBoxList<int>>();
 
             Assert.Contains(@"rz-checkbox-list", component.Markup);
         }
@@ -26,10 +26,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_WithData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2", "Option 3" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -42,14 +42,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_WithCustomTextValueProperties()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Item>
             {
                 new Item { Id = 1, Name = "First" },
                 new Item { Id = 2, Name = "Second" }
             };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -63,8 +63,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_Orientation_Horizontal()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCheckBoxList<int>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
             });
@@ -75,8 +75,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_Orientation_Vertical()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCheckBoxList<int>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Vertical);
             });
@@ -87,8 +87,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_Disabled()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenCheckBoxList<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -100,10 +100,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_AllowSelectAll()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowSelectAll, true);
                 parameters.Add(p => p.Data, data);
@@ -115,10 +115,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_SelectAllText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.AllowSelectAll, true);
                 parameters.Add(p => p.SelectAllText, "Select All Options");
@@ -131,10 +131,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_CheckboxInputs()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -146,14 +146,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_DisabledItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<Item>
             {
                 new Item { Id = 1, Name = "Enabled", Disabled = false },
                 new Item { Id = 2, Name = "Disabled", Disabled = true }
             };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<int>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -168,10 +168,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_GroupRole()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -185,10 +185,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_GroupAccessibleName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Name, "Notifications");
                 parameters.Add(p => p.Data, data);
@@ -202,10 +202,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Renders_CheckboxRoleAndState()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Value, new List<string> { "Option 1" });
                 parameters.Add(p => p.Data, data);
@@ -222,11 +222,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_InPlaceValueMutation_ReflectedOnReRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2", "Option 3" };
             var value = new List<string> { "Option 1" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.Value, value);
@@ -253,11 +253,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task CheckBoxList_SameCountValueMutation_ReflectedOnInternalRender()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2", "Option 3" };
             var value = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<SelfRendering<string>>(parameters =>
+            var component = ctx.Render<SelfRendering<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.Value, value);
@@ -292,7 +292,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_ResolvesProperties_AcrossMixedItemTypes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<object>
             {
                 new Person { Name = "Ada", Id = "p1" },
@@ -300,7 +300,7 @@ namespace Radzen.Blazor.Tests
                 new Person { Name = "Grace", Id = "p2" },
             };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -322,10 +322,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Updates_AriaChecked_OnSelect()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -341,10 +341,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Sets_ActiveDescendant_OnFocus()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Data, data);
             });
@@ -363,10 +363,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Moves_ActiveDescendant_OnArrowKey()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2", "Option 3" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
                 parameters.Add(p => p.Data, data);
@@ -384,12 +384,12 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_NullableValue_RendersAndSelectsItemsDeclaredWithNonNullableValueType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             IEnumerable<int?> value = null;
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<int?>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<int?>>(parameters =>
             {
                 parameters.Add(p => p.ValueChanged, (IEnumerable<int?> v) => value = v);
                 parameters.Add(p => p.Items, builder =>
@@ -418,10 +418,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void CheckBoxList_Keydown_DoesNotRenderPreventDefault()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             var data = new List<string> { "Option 1", "Option 2", "Option 3" };
 
-            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            var component = ctx.Render<RadzenCheckBoxList<string>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
                 parameters.Add(p => p.Data, data);

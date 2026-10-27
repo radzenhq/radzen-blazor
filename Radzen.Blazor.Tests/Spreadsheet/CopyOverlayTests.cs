@@ -7,7 +7,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class CopyOverlayTests : TestContext
+public class CopyOverlayTests : BunitContext
 {
     [Fact]
     public void CopyOverlay_RendersNothing_When_Clipboard_Empty()
@@ -16,7 +16,7 @@ public class CopyOverlayTests : TestContext
         var clipboard = new SpreadsheetClipboard();
         var context = new CopyMockContext(sheet);
 
-        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+        var cut = Render<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
@@ -35,7 +35,7 @@ public class CopyOverlayTests : TestContext
 
         var context = new CopyMockContext(sheet);
 
-        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+        var cut = Render<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
@@ -58,7 +58,7 @@ public class CopyOverlayTests : TestContext
 
         var context = new CopyMockContext(sheet2);
 
-        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+        var cut = Render<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet2)
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
@@ -72,7 +72,7 @@ public class CopyOverlayTests : TestContext
         var clipboard = new SpreadsheetClipboard();
         var context = new CopyMockContext(sheet);
 
-        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+        var cut = Render<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
@@ -107,7 +107,7 @@ public class CopyOverlayTests : TestContext
             }
         });
 
-        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+        var cut = Render<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, frozenContext)
             .AddCascadingValue(clipboard));

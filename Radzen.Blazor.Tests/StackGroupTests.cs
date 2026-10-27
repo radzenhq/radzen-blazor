@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Globalization;
 using System.Linq;
@@ -38,9 +40,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(gap, Math.Max(second.Start - first.End, first.Start - second.End), 3);
         }
 
-        static async Task<IRenderedComponent<RadzenChart>> Render(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenChart>> series)
+        static async Task<IRenderedComponent<RadzenChart>> Render(BunitContext ctx, Action<ComponentParameterCollectionBuilder<RadzenChart>> series)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(series);
+            var chart = ctx.Render<RadzenChart>(series);
 
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
@@ -163,7 +165,7 @@ namespace Radzen.Blazor.Tests
 
             AssertSameSpan(HorizontalSpan(chart, 0), HorizontalSpan(chart, 1));
 
-            chart.SetParametersAndRender(p => p.Add(x => x.ChildContent, Series("b")));
+            chart.Render(p => p.Add(x => x.ChildContent, Series("b")));
 
             AssertDisjoint(HorizontalSpan(chart, 0), HorizontalSpan(chart, 1), chart.Instance.ColumnOptions.Margin);
         }

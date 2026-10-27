@@ -21,15 +21,15 @@ public class ChartTests
     [Fact(Timeout = 30000)]
     public async Task Chart_Tooltip_Performance()
     {
-        using var ctx = new TestContext();
+        using var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createChart", _ => true).SetResult(new Radzen.Blazor.Rendering.Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
         ctx.Services.AddScoped<TooltipService>();
         ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
-        ctx.RenderComponent<RadzenChartTooltip>();
+        ctx.Render<RadzenChartTooltip>();
 
         var seriesData = Enumerable.Range(0, 5000).Select(i => new Point { X = i, Y = i });
-        var chart = ctx.RenderComponent<RadzenChart>(chartParameters =>
+        var chart = ctx.Render<RadzenChart>(chartParameters =>
             chartParameters
                 .AddChildContent<RadzenLineSeries<Point>>(seriesParameters =>
                     seriesParameters
@@ -72,9 +72,9 @@ public class ChartTests
         new() { Month = "Mar", Revenue = 9500, Rate = 50 },
     };
 
-    private static TestContext CreateChartContext()
+    private static BunitContext CreateChartContext()
     {
-        var ctx = new TestContext();
+        var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createChart", _ => true)
             .SetResult(new Radzen.Blazor.Rendering.Rect { Left = 0, Top = 0, Width = 600, Height = 400 });
@@ -87,7 +87,7 @@ public class ChartTests
     {
         using var ctx = CreateChartContext();
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
                 .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
                 .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
@@ -124,7 +124,7 @@ public class ChartTests
     {
         using var ctx = CreateChartContext();
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
                 .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
                 .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
@@ -135,10 +135,10 @@ public class ChartTests
         Assert.Equal("0", root.GetAttribute("data-zoom-start"));
         Assert.Equal("1", root.GetAttribute("data-zoom-end"));
 
-        chart.SetParametersAndRender(parameters => parameters.Add(p => p.AllowZoom, true));
+        chart.Render(parameters => parameters.Add(p => p.AllowZoom, true));
         Assert.Equal("true", chart.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
 
-        chart.SetParametersAndRender(parameters => parameters.Add(p => p.AllowZoom, false));
+        chart.Render(parameters => parameters.Add(p => p.AllowZoom, false));
         Assert.Equal("false", chart.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
     }
 
@@ -147,7 +147,7 @@ public class ChartTests
     {
         using var ctx = CreateChartContext();
 
-        IRenderedComponent<RadzenChart> Render(bool showScrollbar) => ctx.RenderComponent<RadzenChart>(parameters => parameters
+        IRenderedComponent<RadzenChart> Render(bool showScrollbar) => ctx.Render<RadzenChart>(parameters => parameters
             .Add(p => p.AllowZoom, true)
             .Add(p => p.AllowPan, true)
             .Add(p => p.ShowScrollbar, showScrollbar)
@@ -175,7 +175,7 @@ public class ChartTests
 
         Assert.Equal(20, PlotBottom(withoutScrollbar) - PlotBottom(withScrollbar));
 
-        withoutScrollbar.SetParametersAndRender(parameters => parameters.Add(p => p.ShowScrollbar, true));
+        withoutScrollbar.Render(parameters => parameters.Add(p => p.ShowScrollbar, true));
         Assert.Contains("rz-chart-scrollbar", withoutScrollbar.Markup);
     }
 
@@ -188,7 +188,7 @@ public class ChartTests
         var data = new byte[] { 137, 80, 78, 71 };
         ctx.JSInterop.Setup<IJSStreamReference>("Radzen.svgToPng", _ => true).SetResult(new TestJSStreamReference(data));
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
                 .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
                 .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
@@ -205,7 +205,7 @@ public class ChartTests
         using var ctx = CreateChartContext();
         ctx.JSInterop.Setup<string>("Radzen.chartToSvg", _ => true).SetResult("<svg></svg>");
 
-        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+        var chart = ctx.Render<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
                 .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
                 .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))

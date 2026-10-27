@@ -387,16 +387,16 @@ public class DataGridExportTests
         Assert.Equal(new[] { "direction" }, Assert.IsAssignableFrom<IEnumerable<string>>(invocation.Arguments[1]));
     }
 
-    private static TestContext CreateContext()
+    private static BunitContext CreateContext()
     {
-        var context = new TestContext();
+        var context = new BunitContext();
         context.JSInterop.Mode = JSRuntimeMode.Loose;
         context.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
         return context;
     }
 
     private static IRenderedComponent<RadzenDataGrid<ExportRow>> RenderGrid(
-        TestContext context,
+        BunitContext context,
         IEnumerable<ExportRow> rows,
         CultureInfo culture = null,
         bool allowPaging = false,
@@ -419,7 +419,7 @@ public class DataGridExportTests
             builder.CloseComponent();
         };
 
-        return context.RenderComponent<RadzenDataGrid<ExportRow>>(parameters =>
+        return context.Render<RadzenDataGrid<ExportRow>>(parameters =>
         {
             parameters.Add(grid => grid.Data, rows);
             parameters.Add(grid => grid.Columns, columns);

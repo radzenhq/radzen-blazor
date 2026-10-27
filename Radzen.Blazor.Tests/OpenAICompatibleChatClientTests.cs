@@ -1,3 +1,5 @@
+#nullable enable
+
 using Microsoft.Extensions.AI;
 using Radzen;
 using System;

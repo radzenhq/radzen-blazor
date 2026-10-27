@@ -39,9 +39,9 @@ namespace Radzen.Blazor.Tests
             new Person { Id = 2, Name = "Bob", Salary = 7m, Status = Status.Inactive, Address = new Address { City = "Berlin" } },
         };
 
-        static TestContext NewCtx()
+        static BunitContext NewCtx()
         {
-            var ctx = new TestContext();
+            var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             return ctx;
@@ -53,7 +53,7 @@ namespace Radzen.Blazor.Tests
         public void NestedStringProperty_RendersCellValue()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.Columns, b =>
@@ -73,7 +73,7 @@ namespace Radzen.Blazor.Tests
         public void FormatString_RendersFormattedValue()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.Columns, b =>
@@ -95,7 +95,7 @@ namespace Radzen.Blazor.Tests
         public void EnumProperty_RendersDisplayValue()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.Columns, b =>
@@ -117,7 +117,7 @@ namespace Radzen.Blazor.Tests
         public void FrozenColumn_RendersFrozenCellClass()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.Columns, b =>
@@ -140,7 +140,7 @@ namespace Radzen.Blazor.Tests
         public void MinMaxWidth_RendersInCellStyle()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.Columns, b =>
@@ -164,7 +164,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = NewCtx();
             var people = People();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, people);
                 p.Add(g => g.SelectionMode, DataGridSelectionMode.Single);
@@ -189,7 +189,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = NewCtx();
             var people = People();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, people);
                 p.Add(g => g.KeyProperty, "Id");
@@ -217,7 +217,7 @@ namespace Radzen.Blazor.Tests
                 new Person { Id = 1, Name = "Alice II", Address = new Address { City = "Paris" } },
                 new Person { Id = 2, Name = "Bob II", Address = new Address { City = "Berlin" } },
             };
-            component.SetParametersAndRender(p => p.Add(g => g.Data, rebound));
+            component.Render(p => p.Add(g => g.Data, rebound));
 
             var highlighted = component.FindAll("tr.rz-state-highlight");
             Assert.Single(highlighted);
@@ -230,7 +230,7 @@ namespace Radzen.Blazor.Tests
         public void CellRender_AddsAttributeToCell()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.CellRender, args => args.Attributes["data-city"] = "yes");
@@ -249,7 +249,7 @@ namespace Radzen.Blazor.Tests
         public void RowRender_AddsAttributeToRow()
         {
             using var ctx = NewCtx();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, People());
                 p.Add(g => g.RowRender, args => args.Attributes["data-row"] = "r");
@@ -277,7 +277,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = NewCtx();
             var people = People();
-            var component = ctx.RenderComponent<RadzenDataGrid<Person>>(p =>
+            var component = ctx.Render<RadzenDataGrid<Person>>(p =>
             {
                 p.Add(g => g.Data, people);
                 p.Add(g => g.Columns, b =>

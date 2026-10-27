@@ -6,8 +6,8 @@ namespace Radzen.Blazor.Tests
 {
     public class GaugeScaleTests
     {
-        static IRenderedComponent<GaugeScale> RenderScale(TestContext ctx, bool showTickLabels) =>
-            ctx.RenderComponent<GaugeScale>(parameters => parameters
+        static IRenderedComponent<GaugeScale> RenderScale(BunitContext ctx, bool showTickLabels) =>
+            ctx.Render<GaugeScale>(parameters => parameters
                 .Add(p => p.StartAngle, -90)
                 .Add(p => p.EndAngle, 90)
                 .Add(p => p.Radius, 100)
@@ -25,7 +25,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GaugeScale_Renders_TickLabels_WithoutLeakedText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = RenderScale(ctx, true);
 
@@ -36,7 +36,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void GaugeScale_DoesNotRender_TickText_WhenLabelsHidden()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = RenderScale(ctx, false);
 

@@ -20,10 +20,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SideDialog_Title_Updates_When_Cascaded_Dialog_Title_Changes()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
-            var cut = ctx.RenderComponent<RadzenDialog>();
+            var cut = ctx.Render<RadzenDialog>();
             var service = ctx.Services.GetRequiredService<DialogService>();
 
             cut.InvokeAsync(() => service.OpenSide("Initial", typeof(Capture), new Dictionary<string, object>(), new SideDialogOptions()));
@@ -37,10 +37,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SideDialog_Refreshes_When_Cascaded_Dialog_Options_Change()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
-            var cut = ctx.RenderComponent<RadzenDialog>();
+            var cut = ctx.Render<RadzenDialog>();
             var service = ctx.Services.GetRequiredService<DialogService>();
 
             cut.InvokeAsync(() => service.OpenSide("Initial", typeof(Capture), new Dictionary<string, object>(), new SideDialogOptions { ShowClose = true }));
@@ -54,10 +54,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void SideDialog_TitleContent_ReRenders_On_Service_Refresh()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
-            var cut = ctx.RenderComponent<RadzenDialog>();
+            var cut = ctx.Render<RadzenDialog>();
             var service = ctx.Services.GetRequiredService<DialogService>();
             var counter = 0;
 

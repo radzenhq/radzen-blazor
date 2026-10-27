@@ -23,7 +23,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void YearView_StartMonthJanuary_IncludesLastDaysOfYear_WhenYearStartsOnFirstDayOfWeek()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createResizable", _ => true)
@@ -38,7 +38,7 @@ namespace Radzen.Blazor.Tests
                 new() { Start = new DateTime(2024, 12, 31), End = new DateTime(2025, 1, 1), Text = "Year end" }
             };
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Culture, culture);
                 p.Add(x => x.Date, new DateTime(2024, 6, 1));
@@ -61,7 +61,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void YearView_LoadData_ReceivesCorrectDates_WhenStartMonthChanges()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createResizable", _ => true)
@@ -78,7 +78,7 @@ namespace Radzen.Blazor.Tests
                 builder.CloseComponent();
             };
 
-            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            var cut = ctx.Render<RadzenScheduler<Appointment>>(p =>
             {
                 p.Add(x => x.Data, appointments);
                 p.Add(x => x.Date, new DateTime(2024, 8, 1));
@@ -98,7 +98,7 @@ namespace Radzen.Blazor.Tests
             loadDataCalls.Clear();
 
             startMonth = Month.July;
-            cut.SetParametersAndRender(p =>
+            cut.Render(p =>
             {
                 p.Add(x => x.Data, appointments);
                 p.Add(x => x.Date, new DateTime(2024, 8, 1));

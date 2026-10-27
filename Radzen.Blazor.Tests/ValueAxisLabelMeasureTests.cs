@@ -65,7 +65,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
             var data = Weather();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 850px; height: 300px")
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.AllowPan, true)
@@ -83,7 +83,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new[] { "-20", "0", "20", "40", "60", "80" }, Labels(chart, LeftValueAxis));
 
-            chart.FindComponent<RadzenLegend>().SetParametersAndRender(p => p.Add(x => x.Visible, true));
+            chart.FindComponent<RadzenLegend>().Render(p => p.Add(x => x.Visible, true));
 
             Assert.Equal(new[] { "-50", "0", "50", "100" }, Labels(chart, LeftValueAxis));
             AssertTheMarginFitsTheDrawnLabels(chart);
@@ -95,7 +95,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
             var data = Weather();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 850px; height: 300px")
                 .Add(x => x.AllowZoom, true)
                 .Add(x => x.AllowPan, true)
@@ -115,7 +115,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new[] { "-20", "0", "20", "40", "60", "80" }, Labels(chart, RightValueAxis));
 
-            chart.FindComponent<RadzenLegend>().SetParametersAndRender(p => p.Add(x => x.Visible, true));
+            chart.FindComponent<RadzenLegend>().Render(p => p.Add(x => x.Visible, true));
 
             var labels = Labels(chart, RightValueAxis);
             Assert.Equal(new[] { "-50", "0", "50", "100" }, labels);
@@ -132,7 +132,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
             var data = new[] { 62.0, 71, 95, 84 }.Select((value, index) => new DataItem { Category = (2020 + index).ToString(CultureInfo.InvariantCulture), Value = value }).ToArray();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 875px; height: 400px")
                 .AddChildContent<RadzenColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -169,7 +169,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = CreateChartContext();
             var data = new[] { 30.0, 45, 25 }.Select((value, index) => new DataItem { Category = ((char)('A' + index)).ToString(), Value = value }).ToArray();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .Add(x => x.Style, "width: 875px; height: 300px")
                 .AddChildContent<RadzenFullStackedColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

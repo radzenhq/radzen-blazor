@@ -204,7 +204,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// <inheritdoc />
     public override void VisitLink(Link link)
     {
-        if (link.Destination?.StartsWith('#') == true)
+        if (link.Destination?.StartsWith('#', StringComparison.Ordinal) == true)
         {
             builder.OpenComponent<RadzenAnchor>(0);
             builder.AddAttribute(0, "href", link.Destination);

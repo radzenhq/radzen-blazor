@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Renders_TextParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.Text, "Hello World");
             });
@@ -20,8 +20,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Renders_ChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.AddChildContent("Custom Content");
             });
@@ -32,8 +32,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TextParameter_TakesPrecedence_OverChildContent()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.Text, "Text Wins");
                 parameters.AddChildContent("Child Loses");
@@ -46,8 +46,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_DefaultStyle_IsBody1()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>();
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>();
 
             Assert.Contains("rz-text-body1", component.Markup);
             Assert.Contains("<p", component.Markup);
@@ -56,8 +56,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_H1_RendersH1Tag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H1);
                 parameters.Add(p => p.Text, "Heading");
@@ -70,8 +70,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_H2_RendersH2Tag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H2);
             });
@@ -83,8 +83,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_H3_RendersH3Tag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H3);
             });
@@ -96,8 +96,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_DisplayH1_RendersH1Tag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.DisplayH1);
             });
@@ -109,8 +109,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Subtitle1_RendersH6Tag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.Subtitle1);
             });
@@ -122,8 +122,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Body2_RendersPTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.Body2);
             });
@@ -135,8 +135,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Caption_RendersSpanTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.Caption);
             });
@@ -148,8 +148,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Overline_RendersSpanTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.Overline);
             });
@@ -161,8 +161,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_ButtonStyle_RendersSpanTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.Button);
             });
@@ -174,8 +174,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TagName_OverridesAutoTag()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H1);
                 parameters.Add(p => p.TagName, TagName.Div);
@@ -189,8 +189,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TagName_Pre()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TagName, TagName.Pre);
                 parameters.Add(p => p.Text, "code here");
@@ -202,8 +202,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TagName_A()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TagName, TagName.A);
             });
@@ -214,8 +214,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TagName_Button()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TagName, TagName.Button);
             });
@@ -226,8 +226,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TextAlign_Center()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextAlign, TextAlign.Center);
             });
@@ -238,8 +238,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TextAlign_Right()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextAlign, TextAlign.Right);
             });
@@ -250,8 +250,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TextAlign_Justify()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextAlign, TextAlign.Justify);
             });
@@ -262,8 +262,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_TextAlign_Left_DoesNotAddAlignClass()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextAlign, TextAlign.Left);
             });
@@ -274,8 +274,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_NotVisible_DoesNotRender()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.Visible, false);
                 parameters.Add(p => p.Text, "Hidden");
@@ -287,8 +287,8 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            using var ctx = new BunitContext();
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.Style, "color:red");
             });
@@ -299,10 +299,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Renders_Anchor()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H2);
                 parameters.Add(p => p.Text, "Section Title");
@@ -316,10 +316,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Anchor_Renders_DefaultScreenReaderText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H2);
                 parameters.Add(p => p.Text, "Section Title");
@@ -332,10 +332,10 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Text_Anchor_Renders_CustomScreenReaderText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            var component = ctx.Render<RadzenText>(parameters =>
             {
                 parameters.Add(p => p.TextStyle, TextStyle.H2);
                 parameters.Add(p => p.Text, "Section Title");

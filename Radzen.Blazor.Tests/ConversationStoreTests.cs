@@ -1,3 +1,5 @@
+#nullable enable
+
 using Bunit;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -164,7 +166,7 @@ namespace Radzen.Blazor.Tests
         {
             var store = new RecordingStore();
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.Services.AddSingleton<IChatClient>(new EchoChatClient());
             ctx.Services.AddAIChatService();
             ctx.Services.AddConversationStore<RecordingStore>(ServiceLifetime.Singleton);
@@ -180,7 +182,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(1, store.Saves);
             Assert.Contains("Echo: Hello", store.Json["session-1"]);
 
-            using var ctx2 = new TestContext();
+            using var ctx2 = new BunitContext();
             ctx2.Services.AddSingleton<IChatClient>(new EchoChatClient());
             ctx2.Services.AddAIChatService();
             ctx2.Services.AddSingleton<IConversationStore>(store);
@@ -225,13 +227,13 @@ namespace Radzen.Blazor.Tests
             var store = new RecordingStore();
             await store.SaveAsync(CreateRichSession());
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddSingleton<IChatClient>(new EchoChatClient());
             ctx.Services.AddAIChatService();
             ctx.Services.AddSingleton<IConversationStore>(store);
 
-            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.SessionId, "s1").Add(p => p.UserId, "alice").Add(p => p.ShowUsage, true));
+            var component = ctx.Render<RadzenAIChat>(parameters => parameters.Add(p => p.SessionId, "s1").Add(p => p.UserId, "alice").Add(p => p.ShowUsage, true));
 
             component.WaitForAssertion(() => Assert.Equal(2, component.Instance.GetMessages().Count));
             Assert.Contains("Sunny", component.Markup);

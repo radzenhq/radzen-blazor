@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>Radzen.Blazor.TrimTest</RootNamespace>
     <Nullable>enable</Nullable>
 
@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.*-*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.*-*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.*-*" PrivateAssets="all" />
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
     <!-- Models live in a separate <IsTrimmable> assembly so the trimmer strips members that are only
          set via initializers and read by Radzen via reflection - the real reflection-over-T scenario. -->

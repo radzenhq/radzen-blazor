@@ -157,7 +157,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<TSeries>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ColumnWithMinAndMax_KeepsBoth()
         {
-            Assert.Equal("0|4343.33333333333|8686.66666666666|13030", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
+            Assert.Equal("0|4343.333333333333|8686.666666666666|13030", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
         }
 
         [Fact]

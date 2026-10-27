@@ -149,12 +149,12 @@ public class LocalizerTests
     [Fact]
     public void DataGrid_Uses_DefaultUICulture_Cascade_For_Localized_Strings()
     {
-        using var ctx = new TestContext();
+        using var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
         ctx.Services.AddRadzenComponents();
 
-        var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+        var component = ctx.Render<CascadingValue<CultureInfo>>(parameters => parameters
             .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
             .Add(p => p.Value, new CultureInfo("de"))
             .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid
@@ -184,12 +184,12 @@ public class LocalizerTests
     [Fact]
     public void DataGrid_Pager_Uses_DefaultUICulture_Cascade_For_Localized_Strings()
     {
-        using var ctx = new TestContext();
+        using var ctx = new BunitContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
         ctx.Services.AddRadzenComponents();
 
-        var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+        var component = ctx.Render<CascadingValue<CultureInfo>>(parameters => parameters
             .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
             .Add(p => p.Value, new CultureInfo("de"))
             .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid
@@ -275,12 +275,12 @@ public class LocalizerTests
         {
             Localizer.AppAssembly = typeof(LocalizerTests).Assembly;
 
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
             ctx.Services.AddRadzenComponents();
 
-            var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+            var component = ctx.Render<CascadingValue<CultureInfo>>(parameters => parameters
                 .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
                 .Add(p => p.Value, new CultureInfo("en-GB"))
                 .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid

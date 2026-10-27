@@ -17,9 +17,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_WithClassName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>();
+            var component = ctx.Render<RadzenPickList<Item>>();
 
             Assert.Contains(@"rz-picklist", component.Markup);
         }
@@ -27,9 +27,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_SourceAndTargetLists()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>();
+            var component = ctx.Render<RadzenPickList<Item>>();
 
             Assert.Contains("rz-picklist-source-wrapper", component.Markup);
             Assert.Contains("rz-picklist-target-wrapper", component.Markup);
@@ -38,9 +38,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_TransferButtons()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>();
+            var component = ctx.Render<RadzenPickList<Item>>();
 
             Assert.Contains("rz-picklist-buttons", component.Markup);
         }
@@ -48,9 +48,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_Orientation_Horizontal()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Horizontal);
             });
@@ -61,9 +61,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_Orientation_Vertical()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Vertical);
             });
@@ -74,14 +74,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_AllowFiltering()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Item>
             {
                 new Item { Id = 1, Name = "Item 1" }
             };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.AllowFiltering, true);
                 parameters.Add(p => p.Source, data);
@@ -94,7 +94,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_SourceData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Item>
             {
@@ -102,7 +102,7 @@ namespace Radzen.Blazor.Tests
                 new Item { Id = 2, Name = "Source Item 2" }
             };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -115,9 +115,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_ShowHeader()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.ShowHeader, true);
                 parameters.Add(p => p.SourceHeader, builder => builder.AddContent(0, "Available Items"));
@@ -131,11 +131,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_AllowMoveAll_Buttons()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Item> { new Item { Id = 1, Name = "Item" } };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.AllowMoveAll, true);
                 parameters.Add(p => p.Source, data);
@@ -149,9 +149,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -162,7 +162,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_GetSelectedSources_Respects_ValueProperty_Single()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new List<Item>
@@ -171,7 +171,7 @@ namespace Radzen.Blazor.Tests
                 new Item { Id = 2, Name = "B" }
             };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_GetSelectedSources_Respects_ValueProperty_Multiple()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var data = new List<Item>
@@ -201,7 +201,7 @@ namespace Radzen.Blazor.Tests
                 new Item { Id = 3, Name = "C" }
             };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, data);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -220,9 +220,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_DefaultEmptyText_WhenNoData()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>();
+            var component = ctx.Render<RadzenPickList<Item>>();
 
             Assert.Contains("rz-listbox-empty-message", component.Markup);
             Assert.Contains("No records to display.", component.Markup);
@@ -231,9 +231,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_CustomEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.EmptyText, "No items");
             });
@@ -244,9 +244,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_SourceEmptyText_OverridesEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.EmptyText, "No items");
                 parameters.Add(p => p.SourceEmptyText, "No source items");
@@ -258,9 +258,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_TargetEmptyText_OverridesEmptyText()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.EmptyText, "No items");
                 parameters.Add(p => p.TargetEmptyText, "No target items");
@@ -272,9 +272,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_EmptyTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.EmptyTemplate, builder => builder.AddContent(0, "Custom empty"));
             });
@@ -285,9 +285,9 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_SourceEmptyTemplate_OverridesEmptyTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.EmptyTemplate, builder => builder.AddContent(0, "Shared empty"));
                 parameters.Add(p => p.SourceEmptyTemplate, builder => builder.AddContent(0, "Source custom empty"));
@@ -299,7 +299,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_SourceTemplate_OverridesTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             List<Item> data = [new() { Id = 1, Name = "Item" }];
 
@@ -309,7 +309,7 @@ namespace Radzen.Blazor.Tests
             RenderFragment<Item> sourceTemplateFragment = _ =>
                 builder => builder.AddContent(0, "source template");
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters => parameters
+            var component = ctx.Render<RadzenPickList<Item>>(parameters => parameters
                 .Add(p => p.Template, templateFragment)
                 .Add(p => p.SourceTemplate, sourceTemplateFragment)
                 .Add(p => p.Source, data));
@@ -320,7 +320,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Renders_TargetTemplate_OverridesTemplate()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             List<Item> data = [new() { Id = 1, Name = "Item" }];
 
@@ -330,7 +330,7 @@ namespace Radzen.Blazor.Tests
             RenderFragment<Item> targetTemplateFragment = _ =>
                 builder => builder.AddContent(0, "target template");
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters => parameters
+            var component = ctx.Render<RadzenPickList<Item>>(parameters => parameters
                     .Add(p => p.Template, templateFragment)
                     .Add(p => p.TargetTemplate, targetTemplateFragment)
                     .Add(p => p.Target, data));
@@ -341,7 +341,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Move_Fires_OnMoveAllSourceToTarget()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var source = new List<Item>
@@ -352,7 +352,7 @@ namespace Radzen.Blazor.Tests
 
             PickListMoveEventArgs<Item> captured = null;
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, source);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -369,7 +369,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Move_Fires_OnSelectedSourceToTarget()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var source = new List<Item>
@@ -381,7 +381,7 @@ namespace Radzen.Blazor.Tests
 
             PickListMoveEventArgs<Item> captured = null;
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, source);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -404,7 +404,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Move_Fires_OnMoveAllTargetToSource()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var target = new List<Item>
@@ -415,7 +415,7 @@ namespace Radzen.Blazor.Tests
 
             PickListMoveEventArgs<Item> captured = null;
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Target, target);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -432,7 +432,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Move_Fires_OnSelectedTargetToSource()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var target = new List<Item>
@@ -444,7 +444,7 @@ namespace Radzen.Blazor.Tests
 
             PickListMoveEventArgs<Item> captured = null;
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Target, target);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -467,7 +467,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_Move_Fires_AfterSourceAndTargetChanged()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var source = new List<Item>
@@ -477,7 +477,7 @@ namespace Radzen.Blazor.Tests
 
             var order = new List<string>();
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, source);
                 parameters.Add(p => p.TextProperty, "Name");
@@ -499,14 +499,14 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void PickList_DoesNotRender_EmptyText_WhenDataExists()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Item>
             {
                 new Item { Id = 1, Name = "Item 1" }
             };
 
-            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            var component = ctx.Render<RadzenPickList<Item>>(parameters =>
             {
                 parameters.Add(p => p.Source, data);
                 parameters.Add(p => p.TextProperty, "Name");

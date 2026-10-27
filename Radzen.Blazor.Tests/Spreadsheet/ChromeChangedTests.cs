@@ -155,7 +155,7 @@ public class ChromeChangedTests
 /// re-renders: adding list validation at the cell's position must surface the menu chevron
 /// without any position change, and removing it must hide the chevron again.
 /// </summary>
-public class ChromeChangedRenderTests : TestContext
+public class ChromeChangedRenderTests : BunitContext
 {
     private const string ChevronClass = "rz-spreadsheet-cell-chevron";
 
@@ -165,7 +165,7 @@ public class ChromeChangedRenderTests : TestContext
         var sheet = new Worksheet(20, 20);
         var cell = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
 
-        var cut = RenderComponent<CellView>(parameters => parameters
+        var cut = Render<CellView>(parameters => parameters
             .Add(c => c.Worksheet, sheet)
             .Add(c => c.Row, 0)
             .Add(c => c.Column, 0));

@@ -31,12 +31,12 @@ namespace Radzen.Blazor.Tests
             public int NoAttribute { get; set; }
         }
 
-        static IRenderedComponent<RadzenDataGrid<DisplayNameModel>> Render(TestContext ctx, string property)
+        static IRenderedComponent<RadzenDataGrid<DisplayNameModel>> Render(BunitContext ctx, string property)
         {
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            return ctx.RenderComponent<RadzenDataGrid<DisplayNameModel>>(parameterBuilder =>
+            return ctx.Render<RadzenDataGrid<DisplayNameModel>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<DisplayNameModel>>(p => p.Data, new[] { new DisplayNameModel() });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_UseDisplayName_ResolvesLocalizedNameFromResourceType()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = Render(ctx, nameof(DisplayNameModel.LocalizedName));
 
@@ -67,7 +67,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_UseDisplayName_UsesPlainName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = Render(ctx, nameof(DisplayNameModel.PlainName));
 
@@ -77,7 +77,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_UseDisplayName_PrefersShortNameOverName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = Render(ctx, nameof(DisplayNameModel.ShortNameAndName));
 
@@ -87,7 +87,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_UseDisplayName_UsesShortNameWithoutName()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = Render(ctx, nameof(DisplayNameModel.ShortNameOnly));
 
@@ -97,7 +97,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void DataGrid_UseDisplayName_LeavesTitleEmptyWithoutDisplayAttribute()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
 
             var component = Render(ctx, nameof(DisplayNameModel.NoAttribute));
 

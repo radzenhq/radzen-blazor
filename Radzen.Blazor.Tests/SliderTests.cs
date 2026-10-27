@@ -12,11 +12,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_CssClass()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             Assert.Contains(@$"rz-slider", component.Markup);
             Assert.Contains(@$"rz-slider-horizontal", component.Markup);
@@ -27,16 +27,16 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_ValueParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             decimal max = 100;
             var value = 4;
 
-            component.SetParametersAndRender(parameters => parameters.Add<int>(p => p.Value, value));
+            component.Render(parameters => parameters.Add<int>(p => p.Value, value));
 
             Assert.Contains(@$"style=""width: {Math.Round((value / max * 100)).ToInvariantString()}%;""", component.Markup);
             Assert.Contains(@$"style=""inset-inline-start: {Math.Round((value / max * 100)).ToInvariantString()}%;""", component.Markup);
@@ -45,13 +45,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_ValueParameterWithRange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<IEnumerable<int>>>(parameterBuilder => parameterBuilder.Add<bool>(p => p.Range, true));
+            var component = ctx.Render<RadzenSlider<IEnumerable<int>>>(parameterBuilder => parameterBuilder.Add<bool>(p => p.Range, true));
 
-            component.SetParametersAndRender(parameters => {
+            component.Render(parameters => {
                 parameters.Add<IEnumerable<int>>(p => p.Value, new int[] { 4, 30 });
             });
 
@@ -63,15 +63,15 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_StyleParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             var value = "width:20px";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+            component.Render(parameters => parameters.Add(p => p.Style, value));
 
             Assert.Contains(@$"style=""{value}""", component.Markup);
         }
@@ -79,13 +79,13 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_UnmatchedParameter()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.Render(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
@@ -93,11 +93,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_Orientation_Vertical()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Vertical);
             });
@@ -108,11 +108,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_Disabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -123,11 +123,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_SliderHandle()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             Assert.Contains("rz-slider-handle", component.Markup);
         }
@@ -135,11 +135,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_SliderRange()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             Assert.Contains("rz-slider-range", component.Markup);
         }
@@ -147,11 +147,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_TabIndex()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>();
+            var component = ctx.Render<RadzenSlider<int>>();
 
             Assert.Contains("tabindex=\"0\"", component.Markup);
         }
@@ -159,11 +159,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_SliderRole_And_AriaValues()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Min, 0);
                 parameters.Add(p => p.Max, 100);
@@ -183,11 +183,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_AriaOrientation_Vertical()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Orientation, Orientation.Vertical);
             });
@@ -200,11 +200,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_AriaDisabled()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Disabled, true);
             });
@@ -217,11 +217,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_CustomHandleLabel()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.HandleLabel, "Volume");
             });
@@ -234,11 +234,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Renders_SliderRole_Range_BothHandles()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<IEnumerable<int>>>(parameters =>
+            var component = ctx.Render<RadzenSlider<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Range, true);
                 parameters.Add(p => p.Min, 0);
@@ -270,11 +270,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Home_Sets_Value_To_Min()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Min, 0);
                 parameters.Add(p => p.Max, 100);
@@ -289,11 +289,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_End_Sets_Value_To_Max()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Min, 0);
                 parameters.Add(p => p.Max, 100);
@@ -308,11 +308,11 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Slider_Arrow_Steps_Value()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            var component = ctx.Render<RadzenSlider<int>>(parameters =>
             {
                 parameters.Add(p => p.Min, 0);
                 parameters.Add(p => p.Max, 100);

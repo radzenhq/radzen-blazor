@@ -43,9 +43,9 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx, string series, IEnumerable<DataItem> data)
+        static IRenderedComponent<RadzenChart> RenderChart(BunitContext ctx, string series, IEnumerable<DataItem> data)
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 p.Add(x => x.ColorScheme, ColorScheme.Palette)
                     .Add(x => x.Animate, true)

@@ -77,9 +77,9 @@ namespace Radzen.Blazor.Tests
 
         // --- Chart-level: vertical-category (column) routes placement to CategoryScale ---
 
-        static async Task<RadzenChart> RenderColumn(TestContext ctx, TickPlacement placement)
+        static async Task<RadzenChart> RenderColumn(BunitContext ctx, TickPlacement placement)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis.Add(x => x.TickPlacement, placement))
                 .AddChildContent<RadzenColumnSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -117,9 +117,9 @@ namespace Radzen.Blazor.Tests
 
         // --- Chart-level: bar routes placement to ValueScale (axes swapped) ---
 
-        static async Task<RadzenChart> RenderBar(TestContext ctx, TickPlacement placement)
+        static async Task<RadzenChart> RenderBar(BunitContext ctx, TickPlacement placement)
         {
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis.Add(x => x.TickPlacement, placement))
                 .AddChildContent<RadzenBarSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -151,7 +151,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = CreateChartContext();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis.Add(x => x.TickPlacement, placement))
                 .AddChildContent<RadzenBarSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
@@ -180,7 +180,7 @@ namespace Radzen.Blazor.Tests
                 new DataItem { Category = "B", Value = 18, Target = 22, Max = 40 },
             };
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenCategoryAxis>(axis => axis.Add(x => x.TickPlacement, TickPlacement.On))
                 .AddChildContent<RadzenBulletSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))

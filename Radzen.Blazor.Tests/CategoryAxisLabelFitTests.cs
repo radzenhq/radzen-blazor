@@ -38,9 +38,9 @@ namespace Radzen.Blazor.Tests
             return Categories(Enumerable.Range(1, count).Select(LongName).ToArray());
         }
 
-        private static IRenderedComponent<RadzenChart> Render(TestContext ctx, string style, params Action<ComponentParameterCollectionBuilder<RadzenChart>>[] content)
+        private static IRenderedComponent<RadzenChart> Render(BunitContext ctx, string style, params Action<ComponentParameterCollectionBuilder<RadzenChart>>[] content)
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 if (style != null)
                 {
@@ -519,7 +519,7 @@ namespace Radzen.Blazor.Tests
             var months = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
             var data = months.Select((month, index) => new DataItem { Category = month, Value = 234000 + index * 10000 }).ToArray();
 
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
+            var chart = ctx.Render<RadzenChart>(p => p
                 .AddChildContent<RadzenAreaSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
@@ -673,9 +673,9 @@ namespace Radzen.Blazor.Tests
 
         private static readonly string[] CashFlowCategories = { "Revenue", "Services", "COGS", "Gross Profit", "Salaries", "Marketing", "R&D", "Net Income" };
 
-        private static IRenderedComponent<RadzenChart> RenderBarsWithAxisTitle(TestContext ctx, double width, string seriesTitle, bool legend)
+        private static IRenderedComponent<RadzenChart> RenderBarsWithAxisTitle(BunitContext ctx, double width, string seriesTitle, bool legend)
         {
-            return ctx.RenderComponent<RadzenChart>(p =>
+            return ctx.Render<RadzenChart>(p =>
             {
                 p.Add(x => x.Style, FormattableString.Invariant($"width: {width}px; height: 300px"));
                 p.AddChildContent<RadzenBarSeries<DataItem>>(s => s
@@ -789,7 +789,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void LabelsAreNotFittedBeforeTheChartKnowsItsSize()
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var createChart = ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true);
             ctx.Services.AddScoped<TooltipService>();
@@ -834,7 +834,7 @@ namespace Radzen.Blazor.Tests
         [InlineData("bar")]
         public void LabelsAreFittedWhenTheSizeArrivesAfterTheFirstRender(string type)
         {
-            using var ctx = new TestContext();
+            using var ctx = new BunitContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var createChart = ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true);
             ctx.Services.AddScoped<TooltipService>();
