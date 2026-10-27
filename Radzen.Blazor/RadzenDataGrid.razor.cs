@@ -2625,10 +2625,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (!string.IsNullOrEmpty(KeyProperty) && keyPropertyGetter == null)
-            {
-                keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
-            }
+            EnsureKeyPropertyGetter();
 
             Reset(!IsOData() && !LoadData.HasDelegate && !AllowColumnPicking && !AllowColumnReorder && !AllowColumnResize);
 
@@ -2879,6 +2876,15 @@ namespace Radzen.Blazor
         public string? KeyProperty { get; set; }
 
         internal Func<TItem, object>? keyPropertyGetter;
+
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        void EnsureKeyPropertyGetter()
+        {
+            if (!string.IsNullOrEmpty(KeyProperty) && keyPropertyGetter == null)
+            {
+                keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
+            }
+        }
         /// <summary>
         /// Compares two items for equality. When <see cref="KeyProperty"/> is set the comparison uses the key value
         /// (null-safe — both-null keys are equal, one-null is not), otherwise falls back to <see cref="object.Equals(object)"/>.
@@ -3160,10 +3166,18 @@ namespace Radzen.Blazor
 
                     case nameof(Value):
                         valueChanged = HasChanged(parameter.Value, Value); break;
+                    case nameof(KeyProperty):
+                        if (HasChanged(parameter.Value, KeyProperty))
+                        {
+                            keyPropertyGetter = null;
+                        }
+                        break;
                 }
             }
 
             await base.SetParametersAsync(parameters);
+
+            EnsureKeyPropertyGetter();
 
             if (groupsChanged || hideGroupedColumnChanged)
             {
