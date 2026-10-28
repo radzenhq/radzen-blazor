@@ -13,7 +13,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>12.1.7</Version>
+    <Version>12.1.8</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is the most sophisticated free and open-source (MIT, including commercial use) UI component library for Blazor, featuring 155+ native components including DataGrid, Scheduler, Gantt, PivotDataGrid, an Excel-like Spreadsheet with formulas and XLSX import/export, and 30+ chart types drawn in C# as SVG, the most complete AI toolkit for Blazor - AIChat with tool calling, approvals and attachments, AIPrompt, InlineAIPrompt and SmartPasteButton on Microsoft.Extensions.AI, working with any OpenAI-compatible provider - and free Material, Standard, Default, Humanistic and Software themes in light and dark.</Description>
