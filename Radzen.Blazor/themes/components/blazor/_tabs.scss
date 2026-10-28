@@ -29,6 +29,10 @@ $tabs-icon-margin-inline: -0.25rem 0.25rem !default;
 $tabs-transition: var(--rz-transition-all) !default;
 $tabs-more-min-width: 10rem !default;
 $tabs-more-max-height: 20rem !default;
+$tabs-close-font-size: var(--rz-icon-size) !default;
+$tabs-close-margin-inline: 0.5rem -0.5rem !default;
+$tabs-close-border-radius: 50% !default;
+$tabs-close-hover-background-color: var(--rz-base-300) !default;
 
 .rz-tabview {
   box-sizing: border-box;
@@ -286,6 +290,20 @@ $tabs-more-max-height: 20rem !default;
 .rz-tabview-icon {
   font-size: var(--rz-tabs-icon-font-size);
   margin-inline: var(--rz-tabs-icon-margin-inline);
+}
+
+.rz-tabview-close {
+  font-size: var(--rz-tabs-close-font-size);
+  margin-inline: var(--rz-tabs-close-margin-inline);
+  border-radius: var(--rz-tabs-close-border-radius);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: var(--rz-tabs-transition);
+
+  &:hover {
+    opacity: 1;
+    background-color: var(--rz-tabs-close-hover-background-color);
+  }
 }
 
 .rz-tabview-nav li[draggable="true"] {

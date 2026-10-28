@@ -18,7 +18,7 @@
             aria-label="@AriaLabel"
             aria-labelledby="@AriaLabelledBy"
             aria-activedescendant="@GetActiveDescendantId()"
-            tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:stopPropagation="stopKeydownPropagation">
+            tabindex=0 @onkeydown="@(args => OnKeyPress(args))">
             @Tabs
         </ul>
         @if (Overflow == TabsOverflow.Scroll)

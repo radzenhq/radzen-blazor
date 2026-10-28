@@ -1375,6 +1375,10 @@
   --rz-tabs-transition: #{$tabs-transition};
   --rz-tabs-more-min-width: #{$tabs-more-min-width};
   --rz-tabs-more-max-height: #{$tabs-more-max-height};
+  --rz-tabs-close-font-size: #{$tabs-close-font-size};
+  --rz-tabs-close-margin-inline: #{$tabs-close-margin-inline};
+  --rz-tabs-close-border-radius: #{$tabs-close-border-radius};
+  --rz-tabs-close-hover-background-color: #{$tabs-close-hover-background-color};
 
   /* Textarea */
   --rz-text-area-padding-block: #{$text-area-padding-block};

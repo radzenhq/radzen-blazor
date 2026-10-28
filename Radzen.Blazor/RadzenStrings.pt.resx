@@ -1783,6 +1783,9 @@
   <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
     <value>Rolar abas para frente</value>
   </data>
+  <data name="Tabs_CloseTitle" xml:space="preserve">
+    <value>Fechar aba</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Alternar popup</value>

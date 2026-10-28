@@ -1,0 +1,35 @@
+<RadzenTabs @bind-SelectedIndex=@selectedIndex Close=@OnClose>
+    <Tabs>
+        @foreach (var item in items)
+        {
+            <RadzenTabsItem @key=@item Text="@item" Closable="@(item != "Customers")">
+                @item
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-pt-4 rz-pb-8">
+    <RadzenButton Click="AddItem" Text="Add tab" />
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    int selectedIndex = 0;
+
+    List<string> items = new List<string> { "Customers", "Orders", "Order Details", "Products" };
+    int i = 0;
+
+    void AddItem()
+    {
+        items.Add($"TabItem{++i}");
+    }
+
+    void OnClose(TabsCloseEventArgs args)
+    {
+        console.Log($"Closed tab \"{args.Tab.Text}\" at index {args.Index}.");
+        items.Remove(args.Tab.Text);
+    }
+}

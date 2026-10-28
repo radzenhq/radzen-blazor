@@ -1783,6 +1783,9 @@
   <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
     <value>Scroll tabs forward</value>
   </data>
+  <data name="Tabs_CloseTitle" xml:space="preserve">
+    <value>Close tab</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Toggle popup</value>

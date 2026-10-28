@@ -1773,6 +1773,9 @@
   <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
     <value>Desplazar pestañas hacia adelante</value>
   </data>
+  <data name="Tabs_CloseTitle" xml:space="preserve">
+    <value>Cerrar pestaña</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Alternar ventana emergente</value>

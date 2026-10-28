@@ -604,6 +604,7 @@ namespace Radzen.Blazor {
         public static string Tabs_MoreAriaLabel { get { return ResourceManager.GetString("Tabs_MoreAriaLabel", resourceCulture); } }
         public static string Tabs_ScrollBackwardAriaLabel { get { return ResourceManager.GetString("Tabs_ScrollBackwardAriaLabel", resourceCulture); } }
         public static string Tabs_ScrollForwardAriaLabel { get { return ResourceManager.GetString("Tabs_ScrollForwardAriaLabel", resourceCulture); } }
+        public static string Tabs_CloseTitle { get { return ResourceManager.GetString("Tabs_CloseTitle", resourceCulture); } }
         public static string TimeSpanPicker_TogglePopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_TogglePopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_PopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_PopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_ClearAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_ClearAriaLabel", resourceCulture); } }

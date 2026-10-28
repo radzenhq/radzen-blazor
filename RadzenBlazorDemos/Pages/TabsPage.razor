@@ -71,6 +71,17 @@
 </RadzenExample>
 
 
+<RadzenText Anchor="tabs#closable-tabs" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Closable tabs
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Closable</code> to <code>true</code> on a <code>RadzenTabsItem</code> to render a close icon in it. Clicking the icon or pressing <code>Delete</code> while the tab has keyboard focus raises the <code>Close</code> event
+    of <code>RadzenTabs</code> with the tab and its index. Remove the tab from your collection in that event; the component then selects the neighbouring tab.
+</RadzenText>
+<RadzenExample ComponentName="Tabs" Example="TabsClose">
+    <TabsClose />
+</RadzenExample>
+
 <RadzenText Anchor="tabs#reorder" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Reorder tabs
 </RadzenText>
@@ -100,6 +111,7 @@
         new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous Tab in a vertical tab list, wrapping from the first Tab to the last and skipping disabled Tabs." },
         new KeyboardShortcut { Key = "Home", Action = "Focus the first Tab." },
         new KeyboardShortcut { Key = "End", Action = "Focus the last Tab." },
-        new KeyboardShortcut { Key = "Space or Enter on a focused Tab", Action = "Select the Tab." }
+        new KeyboardShortcut { Key = "Space or Enter on a focused Tab", Action = "Select the Tab." },
+        new KeyboardShortcut { Key = "Delete on a focused closable Tab", Action = "Close the Tab." }
     };
 }

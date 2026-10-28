@@ -1773,6 +1773,9 @@
   <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
     <value>Faire défiler les onglets vers l'avant</value>
   </data>
+  <data name="Tabs_CloseTitle" xml:space="preserve">
+    <value>Fermer l'onglet</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Basculer la fenêtre contextuelle</value>

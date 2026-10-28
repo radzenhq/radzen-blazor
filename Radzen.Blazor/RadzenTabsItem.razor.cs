@@ -76,6 +76,14 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the user can close this tab. A closable tab renders a close icon and is closed with the Delete key while it has keyboard focus.
+        /// Closing raises <see cref="RadzenTabs.Close"/>; the tab itself has to be removed by the application in that callback.
+        /// </summary>
+        /// <value><c>true</c> if the tab can be closed; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Closable { get; set; }
+
+        /// <summary>
         /// Gets the class list.
         /// </summary>
         /// <value>The class list.</value>
@@ -144,6 +152,14 @@ namespace Radzen.Blazor
             if (!Disabled && Tabs != null)
             {
                 await SelectTab(this);
+            }
+        }
+
+        async Task OnCloseClick()
+        {
+            if (Tabs != null)
+            {
+                await Tabs.CloseTab(this);
             }
         }
 

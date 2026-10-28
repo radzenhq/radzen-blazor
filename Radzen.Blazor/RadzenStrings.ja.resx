@@ -1773,6 +1773,9 @@
   <data name="Tabs_ScrollForwardAriaLabel" xml:space="preserve">
     <value>タブを末尾方向にスクロール</value>
   </data>
+  <data name="Tabs_CloseTitle" xml:space="preserve">
+    <value>タブを閉じる</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>ポップアップの切り替え</value>

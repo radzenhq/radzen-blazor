@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     /// Provides a container for RadzenTabsItem components, each representing one tab and its associated content panel.
     /// Supports tab positioning at Top, Bottom, Left, Right, TopRight, or BottomRight, server-side rendering (default) or client-side rendering for improved interactivity,
     /// programmatic selection via SelectedIndex with two-way binding, Change event when tabs are switched, dynamic tab addition/removal using AddTab() and RemoveItem(),
-    /// keyboard navigation (Arrow keys, Home, End, Space, Enter) for accessibility, and disabled tabs to prevent selection.
+    /// keyboard navigation (Arrow keys, Home, End, Space, Enter) for accessibility, closable tabs (<see cref="RadzenTabsItem.Closable"/>, the <see cref="Close"/> event and the Delete key) and disabled tabs to prevent selection.
     /// Use Server render mode for standard Blazor rendering, or Client mode for faster tab switching with JavaScript.
     /// </summary>
     /// <example>
@@ -128,6 +128,38 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<TabsReorderEventArgs> Reorder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the user closes a tab whose <see cref="RadzenTabsItem.Closable"/> is <c>true</c>, either by clicking its close icon or by pressing Delete while the tab has keyboard focus.
+        /// The tab is not removed by the component: remove it from the collection that renders the tabs in this callback.
+        /// When the selected tab is removed the following tab is selected (or the preceding one when the removed tab was last) and <see cref="SelectedIndexChanged"/> is raised.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTabs Close=@OnClose&gt;
+        ///     &lt;Tabs&gt;
+        ///         @foreach (var file in files)
+        ///         {
+        ///             &lt;RadzenTabsItem @key=@file Text=@file Closable="true"&gt;...&lt;/RadzenTabsItem&gt;
+        ///         }
+        ///     &lt;/Tabs&gt;
+        /// &lt;/RadzenTabs&gt;
+        /// @code {
+        ///     void OnClose(TabsCloseEventArgs args) => files.Remove(args.Tab.Text);
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<TabsCloseEventArgs> Close { get; set; }
+
+        string? closeTitle;
+
+        /// <summary>
+        /// Gets or sets the tooltip of the close icon rendered in a tab whose <see cref="RadzenTabsItem.Closable"/> is <c>true</c>.
+        /// </summary>
+        /// <value>The tooltip of the close icon. Default is the localized "Close tab".</value>
+        [Parameter]
+        public string CloseTitle { get => closeTitle ?? Localize(nameof(RadzenStrings.Tabs_CloseTitle)); set => closeTitle = value; }
 
         /// <summary>
         /// Gets or sets the render fragment containing RadzenTabsItem components that define the tabs.
@@ -274,12 +306,83 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenTabsItem item)
         {
-            if (tabs.Remove(item))
+            var index = tabs.IndexOf(item);
+
+            if (index < 0)
             {
-                if (!disposed)
+                return;
+            }
+
+            var navigableIndex = NavigableTabs().IndexOf(item);
+
+            tabs.RemoveAt(index);
+
+            if (disposed || !Visible)
+            {
+                return;
+            }
+
+            var selectedIndexBefore = selectedIndex;
+
+            if (index < selectedIndex)
+            {
+                selectedIndex--;
+            }
+            else if (index == selectedIndex)
+            {
+                var replacement = tabs.Skip(index).FirstOrDefault(t => t.Visible && !t.Disabled) ?? tabs.Take(index).LastOrDefault(t => t.Visible && !t.Disabled);
+
+                selectedIndex = replacement != null ? IndexOf(replacement) : -1;
+            }
+
+            if (navigableIndex >= 0)
+            {
+                if (navigableIndex < focusedIndex)
                 {
-                    try { InvokeAsync(StateHasChanged); } catch { }
+                    focusedIndex--;
                 }
+                else if (navigableIndex == focusedIndex)
+                {
+                    focusedIndex = Math.Min(focusedIndex, NavigableTabs().Count - 1);
+                }
+            }
+
+            try
+            {
+                if (selectedIndex != selectedIndexBefore)
+                {
+                    InvokeAsync(async () =>
+                    {
+                        await SelectedIndexChanged.InvokeAsync(selectedIndex);
+                        StateHasChanged();
+                    });
+                }
+                else
+                {
+                    InvokeAsync(StateHasChanged);
+                }
+            }
+            catch { }
+        }
+
+        internal async Task CloseTab(RadzenTabsItem tab)
+        {
+            if (!tab.Closable || tab.Disabled)
+            {
+                return;
+            }
+
+            await Close.InvokeAsync(new TabsCloseEventArgs { Index = IndexOf(tab), Tab = tab });
+
+            try
+            {
+                await tablistElement.FocusAsync(preventScroll: true);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (JSException)
+            {
             }
         }
 
@@ -420,13 +523,13 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
                 selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
+
+                SetFocusedIndex();
             }
 
             overflowChanged |= parameters.DidParameterChange(nameof(Overflow), Overflow);
             positionChanged |= parameters.DidParameterChange(nameof(TabPosition), TabPosition);
             visibleChanged |= parameters.DidParameterChange(nameof(Visible), Visible);
-
-            SetFocusedIndex();
 
             await base.SetParametersAsync(parameters);
 
@@ -836,8 +939,6 @@ namespace Radzen.Blazor
         internal bool IsVertical => TabPosition == TabPosition.Left || TabPosition == TabPosition.Right;
 
         internal int focusedIndex = -1;
-        bool preventKeyPress = true;
-        bool stopKeydownPropagation;
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
@@ -855,9 +956,6 @@ namespace Radzen.Blazor
 
             if (key == previousKey || key == nextKey)
             {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
                 var direction = key == previousKey ? -1 : 1;
                 var count = navigableTabs.Count;
 
@@ -872,9 +970,6 @@ namespace Radzen.Blazor
             }
             else if (key == "Home" || key == "End")
             {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
                 var count = navigableTabs.Count;
                 var direction = key == "Home" ? 1 : -1;
 
@@ -889,22 +984,18 @@ namespace Radzen.Blazor
             }
             else if (key == "Space" || key == "Enter")
             {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
                 if (focusedIndex >= 0 && focusedIndex < navigableTabs.Count)
                 {
                     await navigableTabs[focusedIndex].OnClick();
                 }
             }
+            else if (key == "Delete" && navigableTabs.ElementAtOrDefault(focusedIndex) is { Closable: true, Disabled: false } closable)
+            {
+                await CloseTab(closable);
+            }
             else
             {
-                if (!preventKeyPress && !stopKeydownPropagation)
-                {
-                    suppressNextRender = true;
-                }
-                preventKeyPress = false;
-                stopKeydownPropagation = false;
+                suppressNextRender = true;
             }
         }
         internal bool IsFocused(RadzenTabsItem item)
