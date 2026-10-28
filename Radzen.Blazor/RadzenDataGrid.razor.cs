@@ -2652,10 +2652,10 @@ namespace Radzen.Blazor
         {
             _groupedPagedView = null;
             _view = null;
-            _value = new List<TItem>();
 
             if (resetRowState)
             {
+                _value = new List<TItem>();
                 selectedItems.Clear();
                 expandedItems.Clear();
                 collapsedGroupItems.Clear();
@@ -3088,9 +3088,17 @@ namespace Radzen.Blazor
             }
 
             IReadOnlyDictionary<string, object> attributes;
+            Dictionary<string, object>? dict = null;
+
+            if (args.HasAttributes && args.Attributes.TryGetValue("class", out var rowClass))
+            {
+                dict = new Dictionary<string, object>(args.Attributes);
+                dict["class"] = string.Concat(RowStyle(item, index), " ", rowClass);
+            }
+
             if (RowClickActive)
             {
-                var dict = args.HasAttributes ? new Dictionary<string, object>(args.Attributes) : new Dictionary<string, object>();
+                dict ??= args.HasAttributes ? new Dictionary<string, object>(args.Attributes) : new Dictionary<string, object>();
                 // A chainable consumer onclick runs after the built-in row click; anything else (e.g. a string
                 // HTML handler) is kept as-is rather than wrapped and dropped.
                 dict["onclick"] = dict.TryGetValue("onclick", out var existing) && existing != null
@@ -3100,9 +3108,9 @@ namespace Radzen.Blazor
             }
             else
             {
-                attributes = args.HasAttributes
+                attributes = dict ?? (args.HasAttributes
                     ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes)
-                    : EmptyAttributes;
+                    : EmptyAttributes);
             }
 
             return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, attributes);
