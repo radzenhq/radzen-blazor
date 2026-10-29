@@ -2,23 +2,33 @@ $layout-background-color: var(--rz-body-background-color) !default;
 
 /* Radzen Blazor Layout reset styles */
 
-:root:has(.rz-layout) {
+$rz-layout-paths: ('> .rz-layout', '> * > .rz-layout', '> * > * > .rz-layout', '> * > * > * > .rz-layout') !default;
+
+$rz-layout-root-selectors: ();
+$rz-layout-body-selectors: ();
+
+@each $path in $rz-layout-paths {
+  $rz-layout-root-selectors: append($rz-layout-root-selectors, unquote(':root:has(> body #{$path})'), comma);
+  $rz-layout-body-selectors: append($rz-layout-body-selectors, unquote(':root body:has(#{$path})'), comma);
+}
+
+#{$rz-layout-root-selectors} {
   box-sizing: border-box;
   scroll-behavior: smooth;
   font-size: var(--rz-root-font-size);
-  
-  body {
-    margin: 0;
-    color: var(--rz-text-color);
-    background-color: var(--rz-body-background-color);
-    font-family: var(--rz-text-font-family);
-    font-size: var(--rz-body-font-size);
-    line-height: var(--rz-body-line-height);
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+}
+
+#{$rz-layout-body-selectors} {
+  margin: 0;
+  color: var(--rz-text-color);
+  background-color: var(--rz-body-background-color);
+  font-family: var(--rz-text-font-family);
+  font-size: var(--rz-body-font-size);
+  line-height: var(--rz-body-line-height);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* RadzenLayout styles */
