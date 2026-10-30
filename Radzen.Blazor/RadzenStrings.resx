@@ -1078,6 +1078,12 @@
   <data name="DataGrid_CollapseAllTitle" xml:space="preserve">
     <value>Collapse all</value>
   </data>
+  <data name="DataGrid_ExpandAllGroupsTitle" xml:space="preserve">
+    <value>Expand all groups</value>
+  </data>
+  <data name="DataGrid_CollapseAllGroupsTitle" xml:space="preserve">
+    <value>Collapse all groups</value>
+  </data>
   <!-- DatePicker -->
   <data name="DatePicker_CalendarWeekTitle" xml:space="preserve">
     <value>#</value>

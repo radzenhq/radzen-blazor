@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -3536,6 +3536,56 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if want to show left column with group visibility toggle, otherwise <c>false</c>.</value>
         [Parameter]
         public bool ShowGroupExpandColumn { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether all groups can be expanded or collapsed at once from the header of the group expand column.
+        /// The button is rendered only when the DataGrid is grouped and <see cref="ShowGroupExpandColumn"/> is <c>true</c>.
+        /// </summary>
+        /// <value><c>true</c> to render the expand all groups button in the header; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowGroupExpandAll { get; set; }
+
+        private string? expandAllGroupsTitle;
+
+        /// <summary>
+        /// Gets or sets the title attribute of the expand all groups button.
+        /// </summary>
+        /// <value>The title attribute value of the expand all groups button.</value>
+        [Parameter]
+        public string ExpandAllGroupsTitle { get => expandAllGroupsTitle ?? Localize(nameof(RadzenStrings.DataGrid_ExpandAllGroupsTitle)); set => expandAllGroupsTitle = value; }
+
+        private string? collapseAllGroupsTitle;
+
+        /// <summary>
+        /// Gets or sets the title attribute of the collapse all groups button.
+        /// </summary>
+        /// <value>The title attribute value of the collapse all groups button.</value>
+        [Parameter]
+        public string CollapseAllGroupsTitle { get => collapseAllGroupsTitle ?? Localize(nameof(RadzenStrings.DataGrid_CollapseAllGroupsTitle)); set => collapseAllGroupsTitle = value; }
+
+        internal bool AreAllGroupsExpanded => allGroupsExpanded == true || allGroupsExpanded == null && collapsedGroupItems.Count == 0;
+
+        /// <summary>
+        /// Expands all groups when any group is collapsed; collapses all groups when every group is expanded.
+        /// Updates <see cref="AllGroupsExpanded"/> and raises <see cref="AllGroupsExpandedChanged"/>.
+        /// </summary>
+        public async Task ToggleAllGroupsExpand()
+        {
+            allGroupsExpanded = !AreAllGroupsExpanded;
+
+            if (allGroupsExpanded == true)
+            {
+                collapsedGroupItems.Clear();
+            }
+
+            await AllGroupsExpandedChanged.InvokeAsync(allGroupsExpanded);
+            await ChangeState();
+        }
+
+        private string GroupTitleAttribute()
+        {
+            return AreAllGroupsExpanded ? CollapseAllGroupsTitle : ExpandAllGroupsTitle;
+        }
 
         private string? expandAllTitle;
 

@@ -390,6 +390,8 @@ namespace Radzen.Blazor {
         public static string DataGrid_GroupPanelText { get { return ResourceManager.GetString("DataGrid_GroupPanelText", resourceCulture); } }
         public static string DataGrid_ExpandAllTitle { get { return ResourceManager.GetString("DataGrid_ExpandAllTitle", resourceCulture); } }
         public static string DataGrid_CollapseAllTitle { get { return ResourceManager.GetString("DataGrid_CollapseAllTitle", resourceCulture); } }
+        public static string DataGrid_ExpandAllGroupsTitle { get { return ResourceManager.GetString("DataGrid_ExpandAllGroupsTitle", resourceCulture); } }
+        public static string DataGrid_CollapseAllGroupsTitle { get { return ResourceManager.GetString("DataGrid_CollapseAllGroupsTitle", resourceCulture); } }
         public static string DatePicker_CalendarWeekTitle { get { return ResourceManager.GetString("DatePicker_CalendarWeekTitle", resourceCulture); } }
         public static string DatePicker_ToggleAriaLabel { get { return ResourceManager.GetString("DatePicker_ToggleAriaLabel", resourceCulture); } }
         public static string DatePicker_PopupAriaLabel { get { return ResourceManager.GetString("DatePicker_PopupAriaLabel", resourceCulture); } }

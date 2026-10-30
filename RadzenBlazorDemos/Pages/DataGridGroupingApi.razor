@@ -12,6 +12,10 @@
                 <RadzenLabel Text="Show group expand column" Component="showGroupExpandColumn" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox TValue="bool" @bind-Value="@showGroupExpandAll" Name="showGroupExpandAll" />
+                <RadzenLabel Text="Show expand all groups button in header" Component="showGroupExpandAll" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
                 <RadzenCheckBox TriState="true" TValue="bool?" @bind-Value="@allGroupsExpanded" Name="allGroupsExpanded" Change="@ToggleGroups" />
                 <RadzenLabel Text="All groups expanded by default" Component="allGroupsExpanded" />
             </RadzenStack>
@@ -23,7 +27,7 @@
     <RadzenDataGrid @ref=grid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
             Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender"  TItem="Employee"
             HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
-            @bind-AllGroupsExpanded="@allGroupsExpanded" ShowGroupExpandColumn=@showGroupExpandColumn>
+            @bind-AllGroupsExpanded="@allGroupsExpanded" ShowGroupExpandColumn=@showGroupExpandColumn ShowGroupExpandAll=@showGroupExpandAll>
         <Columns>
             <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
@@ -52,6 +56,7 @@
 
 @code {
     bool showGroupExpandColumn = true;
+    bool showGroupExpandAll = true;
     bool? allGroupsExpanded;
     RadzenDataGrid<Employee> grid;
 

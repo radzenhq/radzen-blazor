@@ -292,6 +292,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       }
     }
 
+    &.rz-col-icon .rz-column-title {
+      justify-content: center;
+      padding-inline: 0;
+    }
+
     .rz-column-title-content {
       display: inline-block;
       white-space: nowrap;

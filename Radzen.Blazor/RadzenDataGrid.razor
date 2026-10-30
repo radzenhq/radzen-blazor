@@ -1,4 +1,4 @@
-@using Radzen
+﻿@using Radzen
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
@@ -151,10 +151,24 @@
                             {
                                 @if (ShowGroupExpandColumn)
                                 {
-                                    @foreach (var g in Groups)
+                                    @for (var g = 0; g < Groups.Count; g++)
                                     {
                                         <th role="columnheader" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                            <span class="rz-column-title"><span style="visibility:hidden">GEC</span></span>
+                                            <span class="rz-column-title">
+                                                @if (ShowGroupExpandAll && g == 0)
+                                                {
+                                                    <button type="button" tabindex="-1" title=@GroupTitleAttribute() aria-label="@GroupTitleAttribute()"
+                                                            aria-expanded="@(AreAllGroupsExpanded ? "true" : "false")"
+                                                            class="rz-button rz-button-sm rz-button-icon-only rz-variant-text rz-base rz-shade-default rz-group-expand-all"
+                                                            @onclick="_ => this.ToggleAllGroupsExpand()" @onclick:stopPropagation="true">
+                                                        <span class="@(AreAllGroupsExpanded ? "rzi-chevron-circle-down" : "rzi-chevron-circle-right")"></span>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span style="visibility:hidden">GEC</span>
+                                                }
+                                            </span>
                                         </th>
                                     }
                                 }
