@@ -1,5 +1,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -393,7 +396,119 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("--rz-steps-transition-duration: 300ms", component.Markup);
         }
+    
+
+        [Fact]
+        public async Task Steps_AsyncCanChange_WithChangeHandler_DoesNotReenterCanChange()
+        {
+            using var ctx = new TestContext();
+            var host = ctx.RenderComponent<StepsBindHost>();
+
+            await host.InvokeAsync(() => host.FindAll("button[role=tab]")[1].Click());
+
+            Assert.Equal(1, host.Instance.CanChangeCount);
+            Assert.Equal(0, host.Instance.Index);
+
+            await host.InvokeAsync(() => host.Instance.Pending[0].SetResult());
+
+            host.WaitForAssertion(() =>
+            {
+                Assert.Equal(1, host.Instance.Index);
+                Assert.Equal(1, host.Instance.ChangeCount);
+                Assert.Equal(1, host.Instance.CanChangeCount);
+                Assert.Equal("true", host.FindAll("button[role=tab]")[1].GetAttribute("aria-selected"));
+            });
+        }
+
+        [Fact]
+        public async Task Steps_Change_IsRaisedAfterBoundSelectedIndexIsUpdated()
+        {
+            using var ctx = new TestContext();
+            var host = ctx.RenderComponent<StepsBindHost>(parameters => parameters.Add(p => p.AsyncCanChangeCalls, 0));
+
+            await host.InvokeAsync(() => host.FindAll("button[role=tab]")[2].Click());
+
+            Assert.Equal(2, host.Instance.Index);
+            Assert.Equal(1, host.Instance.ChangeCount);
+            Assert.Equal(2, host.Instance.IndexWhenChangeRaised);
+        }
+
+        [Fact]
+        public async Task Steps_ProgrammaticSelectedIndex_WithAsyncCanChange_DoesNotReenterAndSelectsStep()
+        {
+            using var ctx = new TestContext();
+            var host = ctx.RenderComponent<StepsBindHost>();
+
+            host.Instance.Index = 2;
+            await host.InvokeAsync(host.Instance.Refresh);
+
+            Assert.Equal(0, host.Instance.CanChangeCount);
+            Assert.Equal(0, host.Instance.ChangeCount);
+            Assert.Equal("true", host.FindAll("button[role=tab]")[2].GetAttribute("aria-selected"));
+            Assert.Contains("Three", host.Find("[role=tabpanel]:not([hidden])").TextContent);
+        }
+
+        [Fact]
+        public async Task Steps_ProgrammaticSelectedIndex_DoesNotRaiseCanChange()
+        {
+            using var ctx = new TestContext();
+            var host = ctx.RenderComponent<StepsBindHost>(parameters => parameters.Add(p => p.AsyncCanChangeCalls, 0));
+
+            host.Instance.Index = 1;
+            await host.InvokeAsync(host.Instance.Refresh);
+
+            Assert.Equal(0, host.Instance.CanChangeCount);
+            Assert.Equal("true", host.FindAll("button[role=tab]")[1].GetAttribute("aria-selected"));
+        }
+
+        class StepsBindHost : ComponentBase
+        {
+            [Parameter]
+            public int AsyncCanChangeCalls { get; set; } = 10;
+
+            public int Index { get; set; }
+            public int CanChangeCount { get; private set; }
+            public int ChangeCount { get; private set; }
+            public int IndexWhenChangeRaised { get; private set; } = -1;
+            public List<TaskCompletionSource> Pending { get; } = new();
+
+            public void Refresh() => StateHasChanged();
+
+            Task OnCanChange(StepsCanChangeEventArgs args)
+            {
+                CanChangeCount++;
+
+                if (CanChangeCount > AsyncCanChangeCalls)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var tcs = new TaskCompletionSource();
+                Pending.Add(tcs);
+                return tcs.Task;
+            }
+
+            protected override void BuildRenderTree(RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenSteps>(0);
+                builder.AddAttribute(1, nameof(RadzenSteps.SelectedIndex), Index);
+                builder.AddAttribute(2, nameof(RadzenSteps.SelectedIndexChanged), EventCallback.Factory.Create<int>(this, value => Index = value));
+                builder.AddAttribute(3, nameof(RadzenSteps.Change), EventCallback.Factory.Create<int>(this, _ => { ChangeCount++; IndexWhenChangeRaised = Index; }));
+                builder.AddAttribute(4, nameof(RadzenSteps.CanChange), EventCallback.Factory.Create<StepsCanChangeEventArgs>(this, OnCanChange));
+                builder.AddAttribute(5, nameof(RadzenSteps.ShowStepsButtons), false);
+                builder.AddAttribute(6, nameof(RadzenSteps.Steps), (RenderFragment)(steps =>
+                {
+                    var seq = 0;
+                    foreach (var text in new[] { "One", "Two", "Three" })
+                    {
+                        steps.OpenComponent<RadzenStepsItem>(seq++);
+                        steps.AddAttribute(seq++, "Text", text);
+                        steps.AddAttribute(seq++, "ChildContent", (RenderFragment)(b => b.AddContent(0, text)));
+                        steps.CloseComponent();
+                    }
+                }));
+                builder.CloseComponent();
+            }
+        }
     }
 }
-
-

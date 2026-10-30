@@ -497,8 +497,8 @@ namespace Radzen.Blazor
 
                 if (raiseChange)
                 {
-                    await Change.InvokeAsync(SelectedIndex);
-                    await SelectedIndexChanged.InvokeAsync(SelectedIndex);
+                    await SelectedIndexChanged.InvokeAsync(newIndex);
+                    await Change.InvokeAsync(newIndex);
                     StateHasChanged();
                 }
             }
@@ -538,18 +538,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            var selectedIndexChanged = parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex);
-            if (selectedIndexChanged)
+            if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
-                if (SelectedIndex >= 0 && SelectedIndex < steps.Count)
-                {
-                    var stepToSelect = steps[SelectedIndex];
-
-                    if (stepToSelect != null)
-                    {
-                        await SelectStep(stepToSelect);
-                    }
-                }
+                transitionKey++;
+                focusedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
             }
 
             await base.SetParametersAsync(parameters);

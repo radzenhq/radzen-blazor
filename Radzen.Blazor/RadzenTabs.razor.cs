@@ -428,9 +428,9 @@ namespace Radzen.Blazor
             {
                 if (raiseChange)
                 {
-                    await Change.InvokeAsync(selectedIndex);
+                    await SelectedIndexChanged.InvokeAsync(newIndex);
 
-                    await SelectedIndexChanged.InvokeAsync(selectedIndex);
+                    await Change.InvokeAsync(newIndex);
 
                     try
                     {
@@ -650,8 +650,8 @@ namespace Radzen.Blazor
                 shouldRender = false;
                 try
                 {
-                    await Change.InvokeAsync(selectedIndex);
-                    await SelectedIndexChanged.InvokeAsync(selectedIndex);
+                    await SelectedIndexChanged.InvokeAsync(index);
+                    await Change.InvokeAsync(index);
                 }
                 finally
                 {

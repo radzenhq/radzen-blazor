@@ -1,5 +1,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Xunit;
@@ -617,6 +620,67 @@ namespace Radzen.Blazor.Tests
             var selected = component.Find("li.rz-tabview-selected");
             Assert.Contains("First", selected.TextContent);
         }
+    
+
+        [Fact]
+        public async Task Tabs_AsyncCanChange_WithChangeHandler_SelectsTabAfterHandlerCompletes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var host = ctx.RenderComponent<TabsBindHost>();
+
+            await host.InvokeAsync(() => host.FindAll("button[role=tab]")[1].Click());
+
+            Assert.Equal(1, host.Instance.CanChangeCount);
+            Assert.Equal(0, host.Instance.Index);
+
+            await host.InvokeAsync(() => host.Instance.Pending[0].SetResult());
+
+            host.WaitForAssertion(() =>
+            {
+                Assert.Equal(1, host.Instance.Index);
+                Assert.Equal(1, host.Instance.ChangeCount);
+                Assert.Equal(1, host.Instance.IndexWhenChangeRaised);
+                Assert.Equal("true", host.FindAll("button[role=tab]")[1].GetAttribute("aria-selected"));
+            });
+        }
+
+        class TabsBindHost : ComponentBase
+        {
+            public int Index { get; set; }
+            public int CanChangeCount { get; private set; }
+            public int ChangeCount { get; private set; }
+            public int IndexWhenChangeRaised { get; private set; } = -1;
+            public List<TaskCompletionSource> Pending { get; } = new();
+
+            Task OnCanChange(TabsCanChangeEventArgs args)
+            {
+                CanChangeCount++;
+                var tcs = new TaskCompletionSource();
+                Pending.Add(tcs);
+                return tcs.Task;
+            }
+
+            protected override void BuildRenderTree(RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenTabs>(0);
+                builder.AddAttribute(1, nameof(RadzenTabs.SelectedIndex), Index);
+                builder.AddAttribute(2, nameof(RadzenTabs.SelectedIndexChanged), EventCallback.Factory.Create<int>(this, value => Index = value));
+                builder.AddAttribute(3, nameof(RadzenTabs.Change), EventCallback.Factory.Create<int>(this, _ => { ChangeCount++; IndexWhenChangeRaised = Index; }));
+                builder.AddAttribute(4, nameof(RadzenTabs.CanChange), EventCallback.Factory.Create<TabsCanChangeEventArgs>(this, OnCanChange));
+                builder.AddAttribute(5, nameof(RadzenTabs.Tabs), (RenderFragment)(tabs =>
+                {
+                    var seq = 0;
+                    foreach (var text in new[] { "One", "Two", "Three" })
+                    {
+                        tabs.OpenComponent<RadzenTabsItem>(seq++);
+                        tabs.AddAttribute(seq++, "Text", text);
+                        tabs.AddAttribute(seq++, "ChildContent", (RenderFragment)(b => b.AddContent(0, text)));
+                        tabs.CloseComponent();
+                    }
+                }));
+                builder.CloseComponent();
+            }
+        }
     }
 }
-
