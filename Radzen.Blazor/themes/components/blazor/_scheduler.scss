@@ -593,6 +593,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       height: auto;
     }
 
+    .rz-view-header {
+      overflow-y: visible;
+    }
+
     .rz-month-view .rz-view-content {
       height: 0;
     }
@@ -712,7 +716,7 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   }
 
   .rz-slot-hour-header + .rz-slot-header {
-    border-inline-start: none;
+    border-inline-start-color: transparent;
   }
 
   .rz-resource-all-day-label {
