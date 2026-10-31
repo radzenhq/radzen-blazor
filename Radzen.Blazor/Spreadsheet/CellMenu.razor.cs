@@ -74,6 +74,7 @@ public partial class CellMenu : ComponentBase
     public EventCallback CustomFilter { get; set; }
 
     private readonly HashSet<object?> selectedFilterValues = [];
+    private HashSet<object?> initialFilterValues = [];
     private List<(string Text, object? Value)>? cachedAvailableValues;
     private bool? cachedShowBlank;
 
@@ -103,29 +104,20 @@ public partial class CellMenu : ComponentBase
     {
         selectedFilterValues.Clear();
 
-        var visitor = new InListCriterionVisitor(Column);
+        var columnFilters = Worksheet.Filters.Where(filter => FilterTargetsOnlyColumn(filter, Column)).ToList();
 
-        foreach (var filter in Worksheet.Filters)
-        {
-            filter.Criterion.Accept(visitor);
-        }
-
-        if (visitor.Criteria.Count != 0)
+        if (columnFilters.Count != 0)
         {
             var range = GetActiveFilterRange();
 
-            if (range == RangeRef.Invalid)
+            if (range != RangeRef.Invalid)
             {
-                return;
-            }
-
-            for (var row = range.Start.Row + 1; row <= range.End.Row; row++)
-            {
-                var value = Worksheet.Cells[row, Column].Value;
-
-                if (visitor.Criteria.Any(criterion => criterion.Matches(value)))
+                for (var row = range.Start.Row + 1; row <= range.End.Row; row++)
                 {
-                    selectedFilterValues.Add(value);
+                    if (columnFilters.All(filter => filter.Criterion.Matches(Worksheet, row)))
+                    {
+                        selectedFilterValues.Add(Worksheet.Cells[row, Column].Value);
+                    }
                 }
             }
         }
@@ -143,20 +135,8 @@ public partial class CellMenu : ComponentBase
                 selectedFilterValues.Add(null);
             }
         }
-    }
 
-    private class InListCriterionVisitor(int column) : FilterCriterionVisitorBase
-    {
-        private readonly int targetColumn = column;
-        public List<InListCriterion> Criteria { get; } = [];
-
-        public override void Visit(InListCriterion criterion)
-        {
-            if (criterion.Column == targetColumn)
-            {
-                Criteria.Add(criterion);
-            }
-        }
+        initialFilterValues = [.. selectedFilterValues];
     }
 
     private sealed class FilterColumnVisitor : FilterCriterionVisitorBase
@@ -352,6 +332,12 @@ public partial class CellMenu : ComponentBase
 
     private async Task OnApplyFilterAsync()
     {
+        if (selectedFilterValues.SetEquals(initialFilterValues))
+        {
+            await Cancel.InvokeAsync();
+            return;
+        }
+
         var availableValues = LoadAvailableValues();
         var showBlank = ShouldShowBlankOption();
         var totalItems = availableValues.Count + (showBlank ? 1 : 0);

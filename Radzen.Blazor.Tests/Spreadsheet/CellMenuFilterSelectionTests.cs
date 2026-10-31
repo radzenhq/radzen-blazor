@@ -37,11 +37,16 @@ public class CellMenuFilterSelectionTests
             new InListCriterion { Column = 0, Values = values },
             new RangeRef(new CellRef(0, 0), new CellRef(sheet.RowCount - 1, 0))));
 
-    private static IRenderedComponent<CellMenu> Render(TestContext ctx, Worksheet sheet, System.Action<SheetFilter?>? apply = null) =>
+    private static void AddColumnFilter(Worksheet sheet, FilterCriterion criterion) =>
+        sheet.AddFilter(new SheetFilter(criterion, new RangeRef(new CellRef(0, 0), new CellRef(sheet.RowCount - 1, 0))));
+
+    private static IRenderedComponent<CellMenu> Render(TestContext ctx, Worksheet sheet, System.Action<SheetFilter?>? apply = null, System.Action? cancel = null, System.Action? clear = null) =>
         ctx.RenderComponent<CellMenu>(p => p
             .Add(x => x.Worksheet, sheet)
             .Add(x => x.Row, 0)
             .Add(x => x.Column, 0)
+            .Add(x => x.Cancel, EventCallback.Factory.Create(new object(), () => cancel?.Invoke()))
+            .Add(x => x.Clear, EventCallback.Factory.Create(new object(), () => clear?.Invoke()))
             .Add(x => x.Apply, EventCallback.Factory.Create<SheetFilter?>(new object(), filter => apply?.Invoke(filter))));
 
     private static Dictionary<string, bool> ValueStates(IRenderedComponent<CellMenu> menu)
@@ -53,6 +58,13 @@ public class CellMenuFilterSelectionTests
 
     private static bool? SelectAllState(IRenderedComponent<CellMenu> menu) =>
         menu.FindComponent<RadzenCheckBox<bool?>>().Instance.Value;
+
+    private static void Toggle(IRenderedComponent<CellMenu> menu, string text)
+    {
+        var name = menu.FindComponents<RadzenLabel>().Single(label => label.Instance.Text == text).Instance.Component;
+
+        menu.FindComponents<RadzenCheckBox<bool>>().Single(box => box.Instance.Name == name).Find("input").Change(true);
+    }
 
     private static void ClickOk(IRenderedComponent<CellMenu> menu) =>
         menu.FindAll("button").Single(button => button.TextContent.Contains("OK")).Click();
@@ -129,16 +141,18 @@ public class CellMenuFilterSelectionTests
     }
 
     [Fact]
-    public void Ok_KeepsTheFilterWhenNothingChanged()
+    public void Ok_LeavesTheFilterAloneWhenNothingChanged()
     {
         using var ctx = CreateContext();
         var sheet = CreateSheet("Laptops", "Cables", "Mice");
         Filter(sheet, "Cables");
-        SheetFilter? applied = null;
+        var applied = false;
+        var cancelled = false;
 
-        ClickOk(Render(ctx, sheet, filter => applied = filter));
+        ClickOk(Render(ctx, sheet, _ => applied = true, () => cancelled = true));
 
-        Assert.Equal(["Cables"], Assert.IsType<InListCriterion>(applied!.Criterion).Values);
+        Assert.False(applied);
+        Assert.True(cancelled);
     }
 
     [Fact]
@@ -150,7 +164,7 @@ public class CellMenuFilterSelectionTests
         SheetFilter? applied = null;
         var menu = Render(ctx, sheet, filter => applied = filter);
 
-        menu.FindComponents<RadzenCheckBox<bool>>().First().Find("input").Change(false);
+        Toggle(menu, "1");
         ClickOk(menu);
 
         Assert.Equal([2d], Assert.IsType<InListCriterion>(applied!.Criterion).Values);
@@ -160,18 +174,127 @@ public class CellMenuFilterSelectionTests
     public void Ok_KeepsValuesHiddenByAnotherColumnFilter()
     {
         using var ctx = CreateContext();
-        var sheet = CreateSheet("EMEA", "AMER", "APAC");
+        var sheet = CreateSheet("EMEA", "AMER", "APAC", "LATAM");
         sheet.Cells[1, 1].Value = "Open";
         sheet.Cells[2, 1].Value = "Closed";
         sheet.Cells[3, 1].Value = "Open";
-        var range = new RangeRef(new CellRef(0, 1), new CellRef(3, 1));
+        sheet.Cells[4, 1].Value = "Open";
+        var range = new RangeRef(new CellRef(0, 1), new CellRef(4, 1));
         Filter(sheet, "EMEA", "AMER");
         sheet.AddFilter(new SheetFilter(new InListCriterion { Column = 1, Values = ["Open"] }, range));
         SheetFilter? applied = null;
+        var menu = Render(ctx, sheet, filter => applied = filter);
 
-        ClickOk(Render(ctx, sheet, filter => applied = filter));
+        Toggle(menu, "APAC");
+        ClickOk(menu);
 
-        Assert.Equal(["EMEA", "AMER"], Assert.IsType<InListCriterion>(applied!.Criterion).Values);
+        Assert.Equal(["EMEA", "AMER", "APAC"], Assert.IsType<InListCriterion>(applied!.Criterion).Values);
+    }
+
+    [Fact]
+    public void Reopen_ChecksTheValuesACustomFilterKeeps()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet(50d, 150d, 250d);
+        AddColumnFilter(sheet, new GreaterThanCriterion { Column = 0, Value = 100d });
+
+        var menu = Render(ctx, sheet);
+
+        Assert.Equal(new Dictionary<string, bool> { ["50"] = false, ["150"] = true, ["250"] = true }, ValueStates(menu));
+        Assert.Null(SelectAllState(menu));
+    }
+
+    [Fact]
+    public void Reopen_ChecksTheValuesACombinedCustomFilterKeeps()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet("Laptops", "Cables", "Mice");
+        AddColumnFilter(sheet, new OrCriterion
+        {
+            Criteria = [new StartsWithCriterion { Column = 0, Value = "La" }, new EndsWithCriterion { Column = 0, Value = "ce" }]
+        });
+
+        Assert.Equal(new Dictionary<string, bool> { ["Cables"] = false, ["Laptops"] = true, ["Mice"] = true }, ValueStates(Render(ctx, sheet)));
+    }
+
+    [Fact]
+    public void Reopen_ChecksTheValuesATopFilterKeeps()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet(1d, 2d, 3d, 4d);
+        AddColumnFilter(sheet, new TopFilterCriterion { Column = 0, Count = 2 });
+
+        Assert.Equal(new Dictionary<string, bool> { ["1"] = false, ["2"] = false, ["3"] = true, ["4"] = true }, ValueStates(Render(ctx, sheet)));
+    }
+
+    [Fact]
+    public void Reopen_ChecksTheValuesADynamicFilterKeeps()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet(1d, 2d, 9d);
+        AddColumnFilter(sheet, new DynamicFilterCriterion { Column = 0, Type = DynamicFilterType.AboveAverage });
+
+        Assert.Equal(new Dictionary<string, bool> { ["1"] = false, ["2"] = false, ["9"] = true }, ValueStates(Render(ctx, sheet)));
+    }
+
+    [Fact]
+    public void Reopen_ChecksBlankForABlanksFilter()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet("Cables", null);
+        AddColumnFilter(sheet, new IsNullCriterion { Column = 0 });
+
+        var states = ValueStates(Render(ctx, sheet));
+
+        Assert.False(states["Cables"]);
+        Assert.True(states.Single(state => state.Key.Contains("Blank")).Value);
+    }
+
+    [Fact]
+    public void Reopen_IgnoresAFilterOnAnotherColumn()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet("EMEA", "AMER");
+        sheet.Cells[1, 1].Value = 1d;
+        sheet.Cells[2, 1].Value = 5d;
+        sheet.AddFilter(new SheetFilter(new GreaterThanCriterion { Column = 1, Value = 2d }, new RangeRef(new CellRef(0, 1), new CellRef(2, 1))));
+
+        var menu = Render(ctx, sheet);
+
+        Assert.Equal(new Dictionary<string, bool> { ["AMER"] = true }, ValueStates(menu));
+        Assert.True(SelectAllState(menu));
+    }
+
+    [Fact]
+    public void Ok_LeavesACustomFilterAloneWhenNothingChanged()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet(50d, 150d, 250d);
+        var criterion = new GreaterThanCriterion { Column = 0, Value = 100d };
+        AddColumnFilter(sheet, criterion);
+        var applied = false;
+        var cleared = false;
+
+        ClickOk(Render(ctx, sheet, _ => applied = true, clear: () => cleared = true));
+
+        Assert.False(applied);
+        Assert.False(cleared);
+        Assert.Same(criterion, Assert.Single(sheet.Filters).Criterion);
+    }
+
+    [Fact]
+    public void Ok_TurnsACustomFilterIntoAValueListWhenTheUserChangesIt()
+    {
+        using var ctx = CreateContext();
+        var sheet = CreateSheet(50d, 150d, 250d);
+        AddColumnFilter(sheet, new GreaterThanCriterion { Column = 0, Value = 100d });
+        SheetFilter? applied = null;
+        var menu = Render(ctx, sheet, filter => applied = filter);
+
+        Toggle(menu, "250");
+        ClickOk(menu);
+
+        Assert.Equal([150d], Assert.IsType<InListCriterion>(applied!.Criterion).Values);
     }
 
     [Fact]
