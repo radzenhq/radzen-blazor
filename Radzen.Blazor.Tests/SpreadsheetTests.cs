@@ -1077,6 +1077,462 @@ public class SpreadsheetTests
         Assert.Equal(2, reported[^1]); // the new third sheet becomes active and is reported back
     }
     
+    private static TestContext CreateContextMenuContext(out List<ContextMenuOptions> menus)
+    {
+        var ctx = CreateContext();
+        var opened = new List<ContextMenuOptions>();
+        ctx.Services.GetRequiredService<ContextMenuService>().OnOpen += (_, options) => opened.Add(options);
+        menus = opened;
+        return ctx;
+    }
+
+    private static CellEventArgs ContextMenuArgs(int row = 0, int column = 0) => new()
+    {
+        Row = row,
+        Column = column,
+        Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs()
+    };
+
+    private static Task OpenCellContextMenu(IRenderedComponent<RadzenSpreadsheet> c, string cell)
+    {
+        var address = CellRef.Parse(cell);
+        return c.InvokeAsync(() => c.Instance.OnCellContextMenuAsync(ContextMenuArgs(address.Row, address.Column)));
+    }
+
+    private static Task OpenRowContextMenu(IRenderedComponent<RadzenSpreadsheet> c, int row) =>
+        c.InvokeAsync(() => c.Instance.OnRowContextMenuAsync(ContextMenuArgs(row: row)));
+
+    private static Task OpenColumnContextMenu(IRenderedComponent<RadzenSpreadsheet> c, int column) =>
+        c.InvokeAsync(() => c.Instance.OnColumnContextMenuAsync(ContextMenuArgs(column: column)));
+
+    private static Task ClickContextMenuItem(IRenderedComponent<RadzenSpreadsheet> c, List<ContextMenuOptions> menus, string value) =>
+        c.InvokeAsync(() => menus[^1].Click!(new MenuItemEventArgs { Value = value }));
+
+    private static IEnumerable<object?> ContextMenuValues(List<ContextMenuOptions> menus) =>
+        menus[^1].Items!.Select(item => item.Value);
+
+    [Fact]
+    public async Task CellContextMenu_InsideSelection_KeepsSelection()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A5")));
+
+        await OpenCellContextMenu(c, "A3");
+
+        Assert.Equal(RangeRef.Parse("A2:A5"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_OutsideSelection_SelectsClickedCell()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A5")));
+
+        await OpenCellContextMenu(c, "C3");
+
+        Assert.Equal(CellRef.Parse("C3"), sheet.Selection.Cell);
+        Assert.Equal(RangeRef.Parse("C3:C3"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_InsideRowSelection_KeepsSelection()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A3:J6")));
+
+        await OpenRowContextMenu(c, 3);
+
+        Assert.Equal(RangeRef.Parse("A3:J6"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_OutsideRowSelection_SelectsClickedRow()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A3:J6")));
+
+        await OpenRowContextMenu(c, 7);
+
+        Assert.Equal(RangeRef.Parse("A8:J8"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_InsideCellSelection_SelectsClickedRow()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A5")));
+
+        await OpenRowContextMenu(c, 2);
+
+        Assert.Equal(RangeRef.Parse("A3:J3"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_InsideColumnSelection_KeepsSelection()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("B1:D10")));
+
+        await OpenColumnContextMenu(c, 2);
+
+        Assert.Equal(RangeRef.Parse("B1:D10"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_OutsideColumnSelection_SelectsClickedColumn()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("B1:D10")));
+
+        await OpenColumnContextMenu(c, 5);
+
+        Assert.Equal(RangeRef.Parse("F1:F10"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_Delete_RemovesEverySelectedRow()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        for (var row = 0; row < 6; row++)
+        {
+            sheet.Cells[row, 0].Value = $"row{row}";
+        }
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:J4")));
+
+        await OpenRowContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "delete-row");
+
+        Assert.Equal("row0", sheet.Cells[0, 0].Value);
+        Assert.Equal("row4", sheet.Cells[1, 0].Value);
+        Assert.Equal("row5", sheet.Cells[2, 0].Value);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_DeleteUndo_RestoresEverySelectedRow()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        for (var row = 0; row < 6; row++)
+        {
+            sheet.Cells[row, 0].Value = $"row{row}";
+        }
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:J4")));
+
+        await OpenRowContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "delete-row");
+        await c.InvokeAsync(c.Instance.Undo);
+
+        Assert.Equal(new object[] { "row0", "row1", "row2", "row3", "row4", "row5" }, Enumerable.Range(0, 6).Select(row => sheet.Cells[row, 0].Value));
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_Delete_RemovesEverySelectedColumn()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        for (var column = 0; column < 6; column++)
+        {
+            sheet.Cells[0, column].Value = $"column{column}";
+        }
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("B1:D10")));
+
+        await OpenColumnContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "delete-column");
+
+        Assert.Equal("column0", sheet.Cells[0, 0].Value);
+        Assert.Equal("column4", sheet.Cells[0, 1].Value);
+        Assert.Equal("column5", sheet.Cells[0, 2].Value);
+    }
+
+    [Fact]
+    public async Task RowContextMenu_Hide_HidesEverySelectedRow()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:J4")));
+
+        await OpenRowContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "hide-row");
+
+        Assert.Equal(new[] { false, true, true, true, false }, Enumerable.Range(0, 5).Select(sheet.Rows.IsHidden));
+    }
+
+    [Theory]
+    [InlineData("hide-row")]
+    [InlineData("unhide-row")]
+    public async Task RowContextMenu_HideAndUnhide_RaiseOneRowsChange(string action)
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Rows.Hide(1);
+        sheet.Rows.Hide(2);
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A1:J5")));
+        await OpenRowContextMenu(c, 0);
+        var changes = 0;
+        sheet.Rows.Changed += () => changes++;
+
+        await ClickContextMenuItem(c, menus, action);
+
+        Assert.Equal(1, changes);
+    }
+
+    [Theory]
+    [InlineData("hide-column")]
+    [InlineData("unhide-column")]
+    public async Task ColumnContextMenu_HideAndUnhide_RaiseOneColumnsChange(string action)
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Columns.Hide(1);
+        sheet.Columns.Hide(2);
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A1:E10")));
+        await OpenColumnContextMenu(c, 0);
+        var changes = 0;
+        sheet.Columns.Changed += () => changes++;
+
+        await ClickContextMenuItem(c, menus, action);
+
+        Assert.Equal(1, changes);
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_Hide_HidesEverySelectedColumn()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("B1:D10")));
+
+        await OpenColumnContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "hide-column");
+
+        Assert.Equal(new[] { false, true, true, true, false }, Enumerable.Range(0, 5).Select(sheet.Columns.IsHidden));
+    }
+
+    [Fact]
+    public async Task RowContextMenu_Unhide_RestoresHiddenRowInsideSelection()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Rows.Hide(3);
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A3:J5")));
+
+        await OpenRowContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "unhide-row");
+
+        Assert.False(sheet.Rows.IsHidden(3));
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_Unhide_RestoresHiddenColumnInsideSelection()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Columns.Hide(3);
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("C1:E10")));
+
+        await OpenColumnContextMenu(c, 2);
+        await ClickContextMenuItem(c, menus, "unhide-column");
+
+        Assert.False(sheet.Columns.IsHidden(3));
+    }
+
+    [Fact]
+    public async Task RowContextMenu_EveryRowSelected_OffersNoDeleteOrHide()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A1:J10")));
+
+        await OpenRowContextMenu(c, 2);
+
+        Assert.DoesNotContain("delete-row", ContextMenuValues(menus));
+        Assert.DoesNotContain("hide-row", ContextMenuValues(menus));
+        Assert.Contains("unhide-row", ContextMenuValues(menus));
+    }
+
+    [Fact]
+    public async Task ColumnContextMenu_EveryColumnSelected_OffersNoDeleteOrHide()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A1:J10")));
+
+        await OpenColumnContextMenu(c, 2);
+
+        Assert.DoesNotContain("delete-column", ContextMenuValues(menus));
+        Assert.DoesNotContain("hide-column", ContextMenuValues(menus));
+        Assert.Contains("unhide-column", ContextMenuValues(menus));
+    }
+
+    [Fact]
+    public async Task CellContextMenu_Sort_OnlyReordersSelection()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A1"].Value = "zulu";
+        sheet.Cells["A2"].Value = "charlie";
+        sheet.Cells["A3"].Value = "alpha";
+        sheet.Cells["A4"].Value = "bravo";
+        sheet.Cells["A5"].Value = "aardvark";
+        sheet.Cells["B2"].Value = "keeps row";
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A4")));
+
+        await OpenCellContextMenu(c, "A3");
+        await ClickContextMenuItem(c, menus, "sort-ascending");
+
+        Assert.Equal("zulu", sheet.Cells["A1"].Value);
+        Assert.Equal("alpha", sheet.Cells["A2"].Value);
+        Assert.Equal("bravo", sheet.Cells["A3"].Value);
+        Assert.Equal("charlie", sheet.Cells["A4"].Value);
+        Assert.Equal("aardvark", sheet.Cells["A5"].Value);
+        Assert.Equal("keeps row", sheet.Cells["B2"].Value);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_SortUndo_RestoresSelection()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A2"].Value = "bravo";
+        sheet.Cells["A3"].Value = "alpha";
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A3")));
+
+        await OpenCellContextMenu(c, "A2");
+        await ClickContextMenuItem(c, menus, "sort-ascending");
+        await c.InvokeAsync(c.Instance.Undo);
+
+        Assert.Equal("bravo", sheet.Cells["A2"].Value);
+        Assert.Equal("alpha", sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_SortDescending_KeysOnClickedColumnOfSelection()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["B2"].Value = "first";
+        sheet.Cells["C2"].Value = 1d;
+        sheet.Cells["B3"].Value = "second";
+        sheet.Cells["C3"].Value = 2d;
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("B2:C3")));
+
+        await OpenCellContextMenu(c, "C2");
+        await ClickContextMenuItem(c, menus, "sort-descending");
+
+        Assert.Equal("second", sheet.Cells["B2"].Value);
+        Assert.Equal(2d, sheet.Cells["C2"].Value);
+        Assert.Equal("first", sheet.Cells["B3"].Value);
+        Assert.Equal(1d, sheet.Cells["C3"].Value);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_Sort_SingleCellSelection_SortsWholeSheet()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A1"].Value = "bravo";
+        sheet.Cells["A2"].Value = "alpha";
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await OpenCellContextMenu(c, "A1");
+        await ClickContextMenuItem(c, menus, "sort-ascending");
+
+        Assert.Equal("alpha", sheet.Cells["A1"].Value);
+        Assert.Equal("bravo", sheet.Cells["A2"].Value);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_Sort_MergedCellSelection_SortsWholeSheet()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["C1"].Value = "bravo";
+        sheet.Cells["C2"].Value = "alpha";
+        sheet.MergedCells.Add(RangeRef.Parse("C1:D1"));
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await OpenCellContextMenu(c, "C1");
+        await ClickContextMenuItem(c, menus, "sort-ascending");
+
+        Assert.Equal("alpha", sheet.Cells["C1"].Value);
+        Assert.Equal("bravo", sheet.Cells["C2"].Value);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_Sort_InsideAutoFilter_SortsFilterRange()
+    {
+        using var ctx = CreateContextMenuContext(out var menus);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells["A1"].Value = "header";
+        sheet.Cells["A2"].Value = "charlie";
+        sheet.Cells["A3"].Value = "bravo";
+        sheet.Cells["A4"].Value = "alpha";
+        sheet.AutoFilter.Range = RangeRef.Parse("A1:A4");
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A3")));
+
+        await OpenCellContextMenu(c, "A2");
+        await ClickContextMenuItem(c, menus, "sort-ascending");
+
+        Assert.Equal("header", sheet.Cells["A1"].Value);
+        Assert.Equal("alpha", sheet.Cells["A2"].Value);
+        Assert.Equal("bravo", sheet.Cells["A3"].Value);
+        Assert.Equal("charlie", sheet.Cells["A4"].Value);
+    }
+
     // ── Auto fit column width ───────────────────────────────────────────
 
     // SetupModule intercepts the InvokeAsync<IJSObjectReference> that creates the Spreadsheet JS
