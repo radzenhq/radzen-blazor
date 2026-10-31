@@ -39,37 +39,15 @@ public class DeleteColumnsCommand : DeleteRangeCommandBase
     protected override bool IsInsideRange(CellRef address) => address.Column >= startIndex && address.Column <= endIndex;
 
     /// <inheritdoc/>
-    protected override bool ReferencesRange(Cell cell)
-    {
-        ArgumentNullException.ThrowIfNull(cell);
-
-        var tree = cell.FormulaSyntaxTree;
-        if (tree is null)
-        {
-            return false;
-        }
-
-        for (var col = startIndex; col <= endIndex; col++)
-        {
-            var c = col;
-            if (tree.Find(node =>
-                    node is CellSyntaxNode { Token.Type: FormulaTokenType.CellIdentifier } cellNode && cellNode.Token.Address.Column == c
-                    || node is RangeSyntaxNode range && range.Kind != RangeKind.Rows && range.Start.Token.Address.Column <= c && range.End.Token.Address.Column >= c).Count > 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
     protected override void DeleteRange()
     {
-        for (var c = endIndex; c >= startIndex; c--)
+        sheet.Batch(() =>
         {
-            sheet.DeleteColumn(c);
-        }
+            for (var c = endIndex; c >= startIndex; c--)
+            {
+                sheet.DeleteColumn(c);
+            }
+        });
     }
 
     /// <inheritdoc/>

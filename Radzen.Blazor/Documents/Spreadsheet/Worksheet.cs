@@ -19,8 +19,6 @@ enum FormulaAdjustment
 /// </summary>
 public partial class Worksheet
 {
-    private readonly HashSet<int> invalidReferenceRows = [];
-    private readonly HashSet<int> invalidReferenceColumns = [];
 
     private int updateDepth;
 
@@ -47,9 +45,7 @@ public partial class Worksheet
         private set => Columns.Count = value;
     }
 
-    internal bool IsDeletedRow(int rowIndex) => invalidReferenceRows.Contains(rowIndex);
 
-    internal bool IsDeletedColumn(int columnIndex) => invalidReferenceColumns.Contains(columnIndex);
     /// <summary>
     /// Gets the collection of cells in the sheet.
     /// </summary>
@@ -340,30 +336,12 @@ public partial class Worksheet
 
         Validation.Shift(MapRange);
 
-        int MapIndex(int value) => count > 0
-            ? (value >= index ? value + count : value)
-            : (value > index ? value + count : value);
-
-        CellRef Adjust(FormulaToken token, bool isRangeEnd)
-        {
-            var address = token.Address;
-            var value = isRow ? address.Row : address.Column;
-            var moved = count < 0 && isRangeEnd && value == index ? value + count : MapIndex(value);
-
-            if (moved < 0 || moved == value)
-            {
-                return address;
-            }
-
-            return isRow
-                ? new CellRef(moved, address.Column) { Worksheet = address.Worksheet }
-                : new CellRef(address.Row, moved) { Worksheet = address.Worksheet };
-        }
+        var shift = new AxisShift(index, count, isRow);
 
         foreach (var rule in Validation.Ranges.SelectMany(Validation.GetValidators).OfType<DataValidationRule>().Distinct())
         {
-            rule.Formula1 = Workbook.AdjustReference(rule.Formula1, this, this, Adjust);
-            rule.Formula2 = Workbook.AdjustReference(rule.Formula2, this, this, Adjust);
+            rule.Formula1 = Workbook.AdjustReference(rule.Formula1, this, this, shift);
+            rule.Formula2 = Workbook.AdjustReference(rule.Formula2, this, this, shift);
         }
 
         void ShiftAnchor(CellAnchor? anchor)
@@ -375,11 +353,11 @@ public partial class Worksheet
 
             if (isRow)
             {
-                anchor.Row = Math.Max(0, MapIndex(anchor.Row));
+                anchor.Row = Math.Max(0, shift.Map(anchor.Row));
             }
             else
             {
-                anchor.Column = Math.Max(0, MapIndex(anchor.Column));
+                anchor.Column = Math.Max(0, shift.Map(anchor.Column));
             }
         }
 
@@ -406,9 +384,9 @@ public partial class Worksheet
 
             foreach (var series in sheet.Charts.SelectMany(chart => chart.Series))
             {
-                var categories = Workbook.AdjustReference(series.Categories, sheet, this, Adjust);
-                var values = Workbook.AdjustReference(series.Values, sheet, this, Adjust);
-                var name = Workbook.AdjustReference(series.Name, sheet, this, Adjust);
+                var categories = Workbook.AdjustReference(series.Categories, sheet, this, shift);
+                var values = Workbook.AdjustReference(series.Values, sheet, this, shift);
+                var name = Workbook.AdjustReference(series.Name, sheet, this, shift);
 
                 seriesChanged |= !ReferenceEquals(categories, series.Categories) || !ReferenceEquals(values, series.Values) || !ReferenceEquals(name, series.Name);
 
@@ -427,7 +405,11 @@ public partial class Worksheet
         {
             ChartsChanged?.Invoke();
         }
+
+        Workbook.AdjustFormulas(this, shift);
     }
+
+    internal void OnChartsChanged() => ChartsChanged?.Invoke();
 
     private void ShiftFilters(int index, int count, bool isRow)
     {
@@ -900,10 +882,6 @@ public partial class Worksheet
 
         ShiftStructures(columnIndex, -1, isRow: false);
 
-        invalidReferenceColumns.Add(columnIndex);
-
-        Workbook.InvalidateFormulasReferencing(this, RangeKind.Columns, columnIndex);
-
         ColumnCount--;
 
         // A different cell now occupies the selection if it sat at or after the deleted
@@ -941,10 +919,6 @@ public partial class Worksheet
         MergedCells.ShiftRowsUp(rowIndex);
 
         ShiftStructures(rowIndex, -1, isRow: true);
-
-        invalidReferenceRows.Add(rowIndex);
-
-        Workbook.InvalidateFormulasReferencing(this, RangeKind.Rows, rowIndex);
 
         RowCount--;
 
@@ -1092,13 +1066,6 @@ public partial class Worksheet
 
         ShiftStructures(rowIndex, count, isRow: true);
 
-        Workbook.AdjustFormulas(this, (cellToken) =>
-        {
-            var a = cellToken.Address;
-            var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
-            return new CellRef(newRow, a.Column) { Worksheet = a.Worksheet };
-        });
-
         // Increase the row count last so the axis change event fires after every shift
         // is in place. Doing it first would re-render the grid (and the selection overlay)
         // against intermediate geometry with nothing re-rendering afterwards.
@@ -1145,13 +1112,6 @@ public partial class Worksheet
         MergedCells.ShiftColumnsRight(columnIndex, count);
 
         ShiftStructures(columnIndex, count, isRow: false);
-
-        Workbook.AdjustFormulas(this, (cellToken) =>
-        {
-            var a = cellToken.Address;
-            var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
-            return new CellRef(a.Row, newCol) { Worksheet = a.Worksheet };
-        });
 
         // Increase the column count last so the axis change event fires after every shift
         // is in place. Doing it first would re-render the grid (and the selection overlay)

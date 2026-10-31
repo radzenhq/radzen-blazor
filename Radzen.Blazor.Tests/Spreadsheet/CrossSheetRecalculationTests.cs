@@ -218,7 +218,7 @@ public class CrossSheetRecalculationTests
 
         sheet2.DeleteRow(0);
 
-        Assert.Equal("=#REF!+A1", sheet1.Cells["B1"].Formula);
+        Assert.Equal("=Sheet2!#REF!+A1", sheet1.Cells["B1"].Formula);
         Assert.Equal(CellError.Ref, sheet1.Cells["B1"].Value);
     }
 
@@ -300,7 +300,7 @@ public class CrossSheetRecalculationTests
         sheet1.DeleteRow(4);
         sheet1.EndUpdate();
 
-        Assert.Equal("=#REF!", sheet2.Cells["B1"].Formula);
+        Assert.Equal("=Sheet1!#REF!", sheet2.Cells["B1"].Formula);
         Assert.Equal(CellError.Ref, sheet2.Cells["B1"].Value);
     }
 

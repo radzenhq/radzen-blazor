@@ -264,7 +264,7 @@ public class SparseShiftTests
 
         sheet.DeleteRow(0);
 
-        Assert.Equal("=#REF!+A3", sheet.Cells[0, 1].Formula);
+        Assert.Equal("=#REF!+A2", sheet.Cells[0, 1].Formula);
         Assert.Equal(CellError.Ref, sheet.Cells[0, 1].Value);
     }
 
@@ -320,7 +320,7 @@ public class SparseShiftTests
 
         sheet.DeleteColumn(0);
 
-        Assert.Equal("=#REF!+C1", sheet.Cells[1, 0].Formula);
+        Assert.Equal("=#REF!+B1", sheet.Cells[1, 0].Formula);
         Assert.Equal(CellError.Ref, sheet.Cells[1, 0].Value);
     }
 

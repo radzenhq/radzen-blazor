@@ -207,10 +207,11 @@ public class StructureShiftTests
 
         Assert.Equal("Sheet1!$A$1:$A$5", chart.Series[0].Categories);
         Assert.Equal("Sheet1!$B$1:$B$5", chart.Series[0].Values);
+        Assert.Equal("Sheet1!#REF!", chart.Series[0].Name);
 
         ws.InsertColumn(1);
 
-        Assert.Equal("Sheet1!$C$1", chart.Series[0].Name);
+        Assert.Equal("Sheet1!#REF!", chart.Series[0].Name);
         Assert.Equal("Sheet1!$A$1:$A$5", chart.Series[0].Categories);
         Assert.Equal("Sheet1!$C$1:$C$5", chart.Series[0].Values);
     }

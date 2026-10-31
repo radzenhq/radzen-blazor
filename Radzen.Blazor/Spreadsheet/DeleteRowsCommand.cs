@@ -39,37 +39,15 @@ public class DeleteRowsCommand : DeleteRangeCommandBase
     protected override bool IsInsideRange(CellRef address) => address.Row >= startIndex && address.Row <= endIndex;
 
     /// <inheritdoc/>
-    protected override bool ReferencesRange(Cell cell)
-    {
-        ArgumentNullException.ThrowIfNull(cell);
-
-        var tree = cell.FormulaSyntaxTree;
-        if (tree is null)
-        {
-            return false;
-        }
-
-        for (var row = startIndex; row <= endIndex; row++)
-        {
-            var r = row;
-            if (tree.Find(node =>
-                    node is CellSyntaxNode { Token.Type: FormulaTokenType.CellIdentifier } c && c.Token.Address.Row == r
-                    || node is RangeSyntaxNode range && range.Kind != RangeKind.Columns && range.Start.Token.Address.Row <= r && range.End.Token.Address.Row >= r).Count > 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
     protected override void DeleteRange()
     {
-        for (var r = endIndex; r >= startIndex; r--)
+        sheet.Batch(() =>
         {
-            sheet.DeleteRow(r);
-        }
+            for (var r = endIndex; r >= startIndex; r--)
+            {
+                sheet.DeleteRow(r);
+            }
+        });
     }
 
     /// <inheritdoc/>

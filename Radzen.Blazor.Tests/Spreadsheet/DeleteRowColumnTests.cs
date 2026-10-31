@@ -40,7 +40,7 @@ public class DeleteRowColumnTests
     }
 
     [Fact]
-    public void DeleteColumn_DoesNotAdjustFormulas_RefsBecomeError()
+    public void DeleteColumn_ShiftsFormulas_DeletedRefsBecomeError()
     {
         var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 1;   // A1
@@ -55,11 +55,11 @@ public class DeleteRowColumnTests
         sheet.DeleteColumn(0);
 
         Assert.Equal(CellError.Ref, sheet.Cells[1, 0].Value);
-        Assert.Equal("=#REF!+C1", sheet.Cells[1, 0].Formula);
+        Assert.Equal("=#REF!+B1", sheet.Cells[1, 0].Formula);
     }
 
     [Fact]
-    public void DeleteRow_DoesNotAdjustFormulas_RefsBecomeError()
+    public void DeleteRow_ShiftsFormulas_DeletedRefsBecomeError()
     {
         var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 1;   // A1
@@ -74,7 +74,7 @@ public class DeleteRowColumnTests
         sheet.DeleteRow(0);
 
         Assert.Equal(CellError.Ref, sheet.Cells[0, 1].Value);
-        Assert.Equal("=#REF!+A3", sheet.Cells[0, 1].Formula);
+        Assert.Equal("=#REF!+A2", sheet.Cells[0, 1].Formula);
     }
 
 }

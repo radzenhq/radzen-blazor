@@ -7,17 +7,22 @@ namespace Radzen.Documents.Spreadsheet;
 
 internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
 {
+    private const string RefError = "#REF!";
+
     private readonly Func<FormulaToken, CellRef> adjust;
+    private readonly Func<FormulaToken, FormulaToken, RangeKind, (CellRef Start, CellRef End)?> adjustRange;
     private readonly StringBuilder builder = new();
 
-    private FormulaRewriter(Func<FormulaToken, CellRef> adjust)
+    private FormulaRewriter(Func<FormulaToken, CellRef> adjust, Func<FormulaToken, FormulaToken, RangeKind, (CellRef Start, CellRef End)?>? adjustRange)
     {
         this.adjust = adjust;
+        this.adjustRange = adjustRange ?? ((start, end, _) => (adjust(start), adjust(end)));
     }
 
-    public static string Rewrite(string original, FormulaSyntaxTree tree, Func<FormulaToken, CellRef> adjust)
+    public static string Rewrite(string original, FormulaSyntaxTree tree, Func<FormulaToken, CellRef> adjust,
+        Func<FormulaToken, FormulaToken, RangeKind, (CellRef Start, CellRef End)?>? adjustRange = null)
     {
-        var rewriter = new FormulaRewriter(adjust);
+        var rewriter = new FormulaRewriter(adjust, adjustRange);
         rewriter.builder.Append('=');
         tree.Root.Accept(rewriter);
         return rewriter.builder.ToString();
@@ -109,6 +114,12 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
 
         AppendWorksheetPrefix(adjusted.Worksheet);
 
+        if (adjusted == CellRef.Invalid)
+        {
+            builder.Append(RefError);
+            return;
+        }
+
         if (token.Address.IsColumnAbsolute)
         {
             builder.Append('$');
@@ -141,8 +152,14 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
         var startToken = rangeSyntaxNode.Start.Token;
         var endToken = rangeSyntaxNode.End.Token;
 
-        var startAdjusted = adjust(startToken);
-        var endAdjusted = adjust(endToken);
+        if (adjustRange(startToken, endToken, rangeSyntaxNode.Kind) is not { } adjusted)
+        {
+            AppendWorksheetPrefix(startToken.Address.Worksheet);
+            builder.Append(RefError);
+            return;
+        }
+
+        var (startAdjusted, endAdjusted) = adjusted;
 
         if (rangeSyntaxNode.Kind != RangeKind.Cells)
         {
@@ -194,7 +211,7 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
 
         if (start < 0 || end < 0 || start >= max || end >= max)
         {
-            builder.Append("#REF!");
+            builder.Append(RefError);
             return;
         }
 
