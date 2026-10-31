@@ -1911,7 +1911,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         await AcceptAsync();
 
-        Worksheet.Selection.Select(new CellRef(args.Row, args.Column));
+        if (!Worksheet.Selection.Range.Contains(args.Row, args.Column))
+        {
+            Worksheet.Selection.Select(new CellRef(args.Row, args.Column));
+        }
 
         var row = args.Row;
         var column = args.Column;

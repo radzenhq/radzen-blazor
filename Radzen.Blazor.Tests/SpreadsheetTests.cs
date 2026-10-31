@@ -1077,6 +1077,48 @@ public class SpreadsheetTests
         Assert.Equal(2, reported[^1]); // the new third sheet becomes active and is reported back
     }
     
+    // ── Cell context menu ───────────────────────────────────────────────
+
+    private static Task OpenCellContextMenu(IRenderedComponent<RadzenSpreadsheet> c, string cell)
+    {
+        var address = CellRef.Parse(cell);
+        return c.InvokeAsync(() => c.Instance.OnCellContextMenuAsync(new CellEventArgs
+        {
+            Row = address.Row,
+            Column = address.Column,
+            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs()
+        }));
+    }
+
+    [Fact]
+    public async Task CellContextMenu_InsideSelection_KeepsSelection()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A5")));
+
+        await OpenCellContextMenu(c, "A3");
+
+        Assert.Equal(RangeRef.Parse("A2:A5"), sheet.Selection.Range);
+    }
+
+    [Fact]
+    public async Task CellContextMenu_OutsideSelection_SelectsClickedCell()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        await c.InvokeAsync(() => sheet.Selection.Select(RangeRef.Parse("A2:A5")));
+
+        await OpenCellContextMenu(c, "C3");
+
+        Assert.Equal(CellRef.Parse("C3"), sheet.Selection.Cell);
+        Assert.Equal(RangeRef.Parse("C3:C3"), sheet.Selection.Range);
+    }
+
     // ── Auto fit column width ───────────────────────────────────────────
 
     // SetupModule intercepts the InvokeAsync<IJSObjectReference> that creates the Spreadsheet JS
