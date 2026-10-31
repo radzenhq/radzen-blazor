@@ -110,16 +110,20 @@ public partial class CellMenu : ComponentBase
             filter.Criterion.Accept(visitor);
         }
 
-        if (visitor.FoundValues.Count != 0)
+        if (visitor.Criteria.Count != 0)
         {
-            foreach (var value in visitor.FoundValues)
+            var range = GetActiveFilterRange();
+
+            if (range == RangeRef.Invalid)
             {
-                if (value is string str)
-                {
-                    CellData.TryConvertFromString(str, out var parsedValue, out _);
-                    selectedFilterValues.Add(parsedValue);
-                }
-                else
+                return;
+            }
+
+            for (var row = range.Start.Row + 1; row <= range.End.Row; row++)
+            {
+                var value = Worksheet.Cells[row, Column].Value;
+
+                if (visitor.Criteria.Any(criterion => criterion.Matches(value)))
                 {
                     selectedFilterValues.Add(value);
                 }
@@ -144,16 +148,13 @@ public partial class CellMenu : ComponentBase
     private class InListCriterionVisitor(int column) : FilterCriterionVisitorBase
     {
         private readonly int targetColumn = column;
-        public HashSet<object?> FoundValues { get; } = [];
+        public List<InListCriterion> Criteria { get; } = [];
 
         public override void Visit(InListCriterion criterion)
         {
             if (criterion.Column == targetColumn)
             {
-                foreach (var value in criterion.Values)
-                {
-                    FoundValues.Add(value);
-                }
+                Criteria.Add(criterion);
             }
         }
     }
