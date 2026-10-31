@@ -856,7 +856,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Worksheet != null)
         {
-            await ExecuteAsync(BuildSortCommand(cellMenuRow, cellMenuColumn, order));
+            await ExecuteAsync(BuildSortCommand(cellMenuRow, cellMenuColumn, order, GetWholeSheetRange()));
         }
 
         if (cellMenuPopup != null)
@@ -865,7 +865,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private SortCommand BuildSortCommand(int row, int column, SortOrder order)
+    private RangeRef GetWholeSheetRange() =>
+        new(new CellRef(0, 0), new CellRef(Worksheet!.RowCount - 1, Worksheet.ColumnCount - 1));
+
+    private SortCommand BuildSortCommand(int row, int column, SortOrder order, RangeRef fallbackRange)
     {
         foreach (var table in Worksheet!.Tables)
         {
@@ -880,7 +883,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return new SortCommand(Worksheet, afRange, order, column, skipHeaderRow: true);
         }
 
-        return new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), order, column);
+        return new SortCommand(Worksheet, fallbackRange, order, column);
     }
 
     private async Task OnCellMenuClearAsync()
@@ -1988,9 +1991,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         await AcceptAsync();
 
-        Worksheet.Selection.Select(new RowRef(args.Row));
+        if (!Worksheet.Selection.IsSelected(new RowRef(args.Row)))
+        {
+            Worksheet.Selection.Select(new RowRef(args.Row));
+        }
 
         var row = args.Row;
+        var range = Worksheet.Selection.Range;
+        var isEveryRowSelected = range.Rows >= Worksheet.RowCount;
         var menuItems = new List<ContextMenuItem>();
 
         var canCutPaste = IsFeatureAllowed(SpreadsheetFeature.Clipboard) && IsFeatureAllowed(SpreadsheetFeature.Editing);
@@ -2010,15 +2018,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove)), Value = "insert-row-before", Icon = "north" });
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowBelow)), Value = "insert-row-after", Icon = "south" });
-            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" });
+            if (!isEveryRowSelected)
+            {
+                menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" });
+            }
         }
         if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
         {
-            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" });
+            if (!isEveryRowSelected)
+            {
+                menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" });
+            }
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideRow)), Value = "unhide-row", Icon = "visibility" });
         }
 
-        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnRowContextMenuItemClick(menuArgs, row));
+        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnRowContextMenuItemClick(menuArgs, row, range));
     }
 
     /// <summary>
@@ -2036,9 +2050,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         await AcceptAsync();
 
-        Worksheet.Selection.Select(new ColumnRef(args.Column));
+        if (!Worksheet.Selection.IsSelected(new ColumnRef(args.Column)))
+        {
+            Worksheet.Selection.Select(new ColumnRef(args.Column));
+        }
 
         var column = args.Column;
+        var range = Worksheet.Selection.Range;
+        var isEveryColumnSelected = range.Columns >= Worksheet.ColumnCount;
         var menuItems = new List<ContextMenuItem>();
 
         var canCutPaste = IsFeatureAllowed(SpreadsheetFeature.Clipboard) && IsFeatureAllowed(SpreadsheetFeature.Editing);
@@ -2058,15 +2077,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnBefore)), Value = "insert-column-before", Icon = "west" });
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)), Value = "insert-column-after", Icon = "east" });
-            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" });
+            if (!isEveryColumnSelected)
+            {
+                menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" });
+            }
         }
         if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
         {
-            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" });
+            if (!isEveryColumnSelected)
+            {
+                menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" });
+            }
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideColumn)), Value = "unhide-column", Icon = "visibility" });
         }
 
-        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnColumnContextMenuItemClick(menuArgs, column));
+        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnColumnContextMenuItemClick(menuArgs, column, range));
     }
 
     private bool HandleCommonContextMenuAction(string? action)
@@ -2106,10 +2131,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     await ExecuteAsync(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
                     break;
                 case "sort-ascending":
-                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Ascending));
+                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Ascending, GetContextMenuSortRange(row, column)));
                     break;
                 case "sort-descending":
-                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Descending));
+                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Descending, GetContextMenuSortRange(row, column)));
                     break;
                 case "convert-table-to-range":
                 case "delete-table":
@@ -2125,7 +2150,39 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private async Task OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
+    private RangeRef GetContextMenuSortRange(int row, int column)
+    {
+        var selection = Worksheet!.Selection.Range;
+        var isSingleCell = selection.Collapsed || selection == Worksheet.MergedCells.GetMergedRange(new CellRef(row, column));
+
+        return isSingleCell || !selection.Contains(row, column) ? GetWholeSheetRange() : selection;
+    }
+
+    private static void HideRange(Axis axis, int start, int end)
+    {
+        axis.BeginUpdate();
+
+        for (var index = start; index <= end; index++)
+        {
+            axis.Hide(index);
+        }
+
+        axis.EndUpdate();
+    }
+
+    private static void ShowRange(Axis axis, int start, int end)
+    {
+        axis.BeginUpdate();
+
+        for (var index = start; index <= end; index++)
+        {
+            axis.Show(index);
+        }
+
+        axis.EndUpdate();
+    }
+
+    private async Task OnRowContextMenuItemClick(MenuItemEventArgs args, int row, RangeRef range)
     {
         if (Worksheet is null)
         {
@@ -2147,25 +2204,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     await ExecuteAsync(new InsertRowCommand(Worksheet, row + 1));
                     break;
                 case "delete-row":
-                    await ExecuteAsync(new DeleteRowsCommand(Worksheet, row, row));
+                    await ExecuteAsync(new DeleteRowsCommand(Worksheet, range.Start.Row, range.End.Row));
                     break;
                 case "hide-row":
                     if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
                     {
-                        Worksheet.Rows.Hide(row);
+                        HideRange(Worksheet.Rows, range.Start.Row, range.End.Row);
                     }
                     break;
                 case "unhide-row":
                     if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
                     {
-                        Worksheet.Rows.Show(row);
+                        ShowRange(Worksheet.Rows, range.Start.Row, range.End.Row);
                     }
                     break;
             }
         }
     }
 
-    private async Task OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
+    private async Task OnColumnContextMenuItemClick(MenuItemEventArgs args, int column, RangeRef range)
     {
         if (Worksheet is null)
         {
@@ -2187,18 +2244,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     await ExecuteAsync(new InsertColumnCommand(Worksheet, column + 1));
                     break;
                 case "delete-column":
-                    await ExecuteAsync(new DeleteColumnsCommand(Worksheet, column, column));
+                    await ExecuteAsync(new DeleteColumnsCommand(Worksheet, range.Start.Column, range.End.Column));
                     break;
                 case "hide-column":
                     if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
                     {
-                        Worksheet.Columns.Hide(column);
+                        HideRange(Worksheet.Columns, range.Start.Column, range.End.Column);
                     }
                     break;
                 case "unhide-column":
                     if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
                     {
-                        Worksheet.Columns.Show(column);
+                        ShowRange(Worksheet.Columns, range.Start.Column, range.End.Column);
                     }
                     break;
             }
