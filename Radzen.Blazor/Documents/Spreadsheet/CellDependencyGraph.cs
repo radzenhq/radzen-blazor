@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -49,6 +50,9 @@ internal class CellDependencyGraph
     public IEnumerable<Cell> GetTopologicallySortedDependencies() => GetTopologicallySortedDependencies(dependencies.Keys);
 
     public IEnumerable<Cell> FormulaCells => dependencies.Keys;
+
+    public IEnumerable<Cell> GetRangeDependents(HashSet<Worksheet> sheets) =>
+        ranges.Values.Where(range => sheets.Contains(range.Area.Worksheet)).SelectMany(range => range.Dependents);
 
     public List<Cell> GetTopologicallySortedDependencies(IEnumerable<Cell> cells)
     {

@@ -437,6 +437,7 @@ public class Workbook
             }
         }
 
+        roots.AddRange(Graph.GetRangeDependents(updatedSheets));
         roots.AddRange(changedDuringUpdate);
         roots.AddRange(Graph.VolatileCells);
 
