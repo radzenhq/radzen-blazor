@@ -322,6 +322,11 @@ public class Workbook
             return text;
         }
 
+        if (tree.Errors.Count > 0)
+        {
+            return text;
+        }
+
         var rangeEnds = new HashSet<FormulaToken>();
 
         foreach (var node in tree.Find(node => node is RangeSyntaxNode))
@@ -451,7 +456,7 @@ public class Workbook
     {
         foreach (var cell in GetFormulaCells())
         {
-            if (string.IsNullOrEmpty(cell.Formula) || !References(cell, target))
+            if (string.IsNullOrEmpty(cell.Formula) || cell.FormulaSyntaxTree!.Errors.Count > 0 || !References(cell, target))
             {
                 continue;
             }
