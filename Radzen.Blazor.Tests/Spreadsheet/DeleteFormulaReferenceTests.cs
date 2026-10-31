@@ -121,6 +121,48 @@ public class DeleteFormulaReferenceTests
         Assert.Equal(CellError.Ref, sheet.Cells["F3"].Value);
     }
 
+    [Fact]
+    public void DeleteRows_MovesHiddenRowsAndRowSizesPastTheDeletion()
+    {
+        var sheet = new Worksheet(10, 3);
+        sheet.Rows.Hide(2);
+        sheet.Rows.Hide(7);
+        sheet.Rows[8] = 50;
+        sheet.Rows[1] = 40;
+
+        DeleteRows(sheet, 1, 3);
+
+        Assert.Equal(7, sheet.RowCount);
+        Assert.False(sheet.Rows.IsHidden(1));
+        Assert.True(sheet.Rows.IsHidden(4));
+        Assert.Equal(50, sheet.Rows[5]);
+    }
+
+    [Fact]
+    public void DeleteColumns_MovesHiddenColumnsPastTheDeletion()
+    {
+        var sheet = new Worksheet(3, 10);
+        sheet.Columns.Hide(2);
+        sheet.Columns.Hide(7);
+
+        Assert.True(new SheetView(sheet).Commands.Execute(new DeleteColumnsCommand(sheet, 1, 3)));
+
+        Assert.Equal(7, sheet.ColumnCount);
+        Assert.False(sheet.Columns.IsHidden(1));
+        Assert.True(sheet.Columns.IsHidden(4));
+    }
+
+    [Fact]
+    public void DeleteRows_ShrinksMergedCellsAcrossTheDeletion()
+    {
+        var sheet = new Worksheet(10, 3);
+        sheet.MergedCells.Add(RangeRef.Parse("A2:A6"));
+
+        DeleteRows(sheet, 2, 3);
+
+        Assert.Equal(RangeRef.Parse("A2:A4"), sheet.MergedCells.GetMergedRange(new CellRef(1, 0)));
+    }
+
     [Theory]
     [InlineData("=Sheet1!A5", "=Sheet1!A4")]
     [InlineData("=Sheet1!A2", "=Sheet1!#REF!")]

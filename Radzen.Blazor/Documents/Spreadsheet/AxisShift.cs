@@ -10,6 +10,10 @@ internal readonly record struct AxisShift(int Index, int Count, bool IsRow)
 
     private bool IsDelete => Count < 0;
 
+    private int DeletedEnd => Index - Count - 1;
+
+    private bool IsDeleted(int position) => IsDelete && position >= Index && position <= DeletedEnd;
+
     private int Position(CellRef address) => IsRow ? address.Row : address.Column;
 
     private CellRef Move(CellRef address, int position) => IsRow
@@ -17,7 +21,7 @@ internal readonly record struct AxisShift(int Index, int Count, bool IsRow)
         : new CellRef(address.Row, position) { Worksheet = address.Worksheet };
 
     public int Map(int position) => IsDelete
-        ? (position > Index ? position + Count : position)
+        ? (position > DeletedEnd ? position + Count : Math.Min(position, Index))
         : (position >= Index ? position + Count : position);
 
     public CellRef AdjustCell(FormulaToken token)
@@ -25,7 +29,7 @@ internal readonly record struct AxisShift(int Index, int Count, bool IsRow)
         var address = token.Address;
         var position = Position(address);
 
-        if (IsDelete && position == Index)
+        if (IsDeleted(position))
         {
             return CellRef.Invalid with { Worksheet = address.Worksheet };
         }
@@ -45,13 +49,13 @@ internal readonly record struct AxisShift(int Index, int Count, bool IsRow)
         var low = Math.Min(startPosition, endPosition);
         var high = Math.Max(startPosition, endPosition);
 
-        if (IsDelete && low == Index && high == Index)
+        if (IsDeleted(low) && IsDeleted(high))
         {
             return null;
         }
 
         var movedLow = Map(low);
-        var movedHigh = IsDelete && high == Index ? high + Count : Map(high);
+        var movedHigh = IsDeleted(high) ? Index - 1 : Map(high);
 
         return startPosition <= endPosition
             ? (Move(start.Address, movedLow), Move(end.Address, movedHigh))

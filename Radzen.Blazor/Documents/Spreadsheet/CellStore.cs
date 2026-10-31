@@ -139,11 +139,11 @@ public class CellStore(Worksheet sheet)
         }
     }
 
-    internal void ShiftRowsUp(int deletedRow) =>
+    internal void ShiftRowsUp(int deletedRow, int count = 1) =>
         DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
             k.row < deletedRow ? k :
-            k.row == deletedRow ? null :
-            (k.row - 1, k.column),
+            k.row < deletedRow + count ? null :
+            (k.row - count, k.column),
             UpdateCellAddress);
 
     internal void ShiftRowsDown(int fromRow, int count) =>
@@ -151,11 +151,11 @@ public class CellStore(Worksheet sheet)
             k.row < fromRow ? k : (k.row + count, k.column),
             UpdateCellAddress);
 
-    internal void ShiftColumnsLeft(int deletedColumn) =>
+    internal void ShiftColumnsLeft(int deletedColumn, int count = 1) =>
         DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
             k.column < deletedColumn ? k :
-            k.column == deletedColumn ? null :
-            (k.row, k.column - 1),
+            k.column < deletedColumn + count ? null :
+            (k.row, k.column - count),
             UpdateCellAddress);
 
     internal void ShiftColumnsRight(int fromColumn, int count) =>

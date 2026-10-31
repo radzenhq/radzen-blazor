@@ -405,8 +405,6 @@ public partial class Worksheet
         {
             ChartsChanged?.Invoke();
         }
-
-        Workbook.AdjustFormulas(this, shift);
     }
 
     internal void OnChartsChanged() => ChartsChanged?.Invoke();
@@ -866,28 +864,33 @@ public partial class Worksheet
             throw new ArgumentOutOfRangeException(nameof(columnIndex));
         }
 
-        Batch(() => DeleteColumnCore(columnIndex));
+        DeleteColumns(columnIndex, columnIndex);
     }
 
-    private void DeleteColumnCore(int columnIndex)
+    internal void DeleteColumns(int startIndex, int endIndex) => Batch(() => DeleteColumnsCore(startIndex, endIndex));
+
+    private void DeleteColumnsCore(int startIndex, int endIndex)
     {
-        RemoveFormulaCells(cell => cell.Address.Column == columnIndex);
+        var count = endIndex - startIndex + 1;
 
-        // Sparse shift - O(populated cells) instead of O(rows x columns)
-        Cells.ShiftColumnsLeft(columnIndex);
+        RemoveFormulaCells(cell => cell.Address.Column >= startIndex && cell.Address.Column <= endIndex);
 
-        Columns.ShiftUp(columnIndex);
+        Cells.ShiftColumnsLeft(startIndex, count);
 
-        MergedCells.ShiftColumnsLeft(columnIndex);
+        Columns.ShiftUp(startIndex, count);
 
-        ShiftStructures(columnIndex, -1, isRow: false);
+        for (var column = endIndex; column >= startIndex; column--)
+        {
+            MergedCells.ShiftColumnsLeft(column);
 
-        ColumnCount--;
+            ShiftStructures(column, -1, isRow: false);
+        }
 
-        // A different cell now occupies the selection if it sat at or after the deleted
-        // column - notify so the formula bar re-reads. Skip when the delete left the
-        // selection past the new bounds (re-reading there would be out of range).
-        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= columnIndex && Selection.Cell.Column < ColumnCount)
+        Workbook.AdjustFormulas(this, new AxisShift(startIndex, -count, IsRow: false));
+
+        ColumnCount -= count;
+
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= startIndex && Selection.Cell.Column < ColumnCount)
         {
             Selection.NotifyContentChanged();
         }
@@ -904,28 +907,33 @@ public partial class Worksheet
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
         }
 
-        Batch(() => DeleteRowCore(rowIndex));
+        DeleteRows(rowIndex, rowIndex);
     }
 
-    private void DeleteRowCore(int rowIndex)
+    internal void DeleteRows(int startIndex, int endIndex) => Batch(() => DeleteRowsCore(startIndex, endIndex));
+
+    private void DeleteRowsCore(int startIndex, int endIndex)
     {
-        RemoveFormulaCells(cell => cell.Address.Row == rowIndex);
+        var count = endIndex - startIndex + 1;
 
-        // Sparse shift - O(populated cells) instead of O(rows x columns)
-        Cells.ShiftRowsUp(rowIndex);
+        RemoveFormulaCells(cell => cell.Address.Row >= startIndex && cell.Address.Row <= endIndex);
 
-        Rows.ShiftUp(rowIndex);
+        Cells.ShiftRowsUp(startIndex, count);
 
-        MergedCells.ShiftRowsUp(rowIndex);
+        Rows.ShiftUp(startIndex, count);
 
-        ShiftStructures(rowIndex, -1, isRow: true);
+        for (var row = endIndex; row >= startIndex; row--)
+        {
+            MergedCells.ShiftRowsUp(row);
 
-        RowCount--;
+            ShiftStructures(row, -1, isRow: true);
+        }
 
-        // A different cell now occupies the selection if it sat at or after the deleted
-        // row - notify so the formula bar re-reads. Skip when the delete left the
-        // selection past the new bounds (re-reading there would be out of range).
-        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= rowIndex && Selection.Cell.Row < RowCount)
+        Workbook.AdjustFormulas(this, new AxisShift(startIndex, -count, IsRow: true));
+
+        RowCount -= count;
+
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= startIndex && Selection.Cell.Row < RowCount)
         {
             Selection.NotifyContentChanged();
         }
@@ -1066,6 +1074,8 @@ public partial class Worksheet
 
         ShiftStructures(rowIndex, count, isRow: true);
 
+        Workbook.AdjustFormulas(this, new AxisShift(rowIndex, count, IsRow: true));
+
         // Increase the row count last so the axis change event fires after every shift
         // is in place. Doing it first would re-render the grid (and the selection overlay)
         // against intermediate geometry with nothing re-rendering afterwards.
@@ -1112,6 +1122,8 @@ public partial class Worksheet
         MergedCells.ShiftColumnsRight(columnIndex, count);
 
         ShiftStructures(columnIndex, count, isRow: false);
+
+        Workbook.AdjustFormulas(this, new AxisShift(columnIndex, count, IsRow: false));
 
         // Increase the column count last so the axis change event fires after every shift
         // is in place. Doing it first would re-render the grid (and the selection overlay)

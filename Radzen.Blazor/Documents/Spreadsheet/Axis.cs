@@ -202,9 +202,9 @@ public class Axis(double size, int count)
         }
     }
 
-    internal void ShiftUp(int deletedIndex)
+    internal void ShiftUp(int deletedIndex, int count = 1)
     {
-        int? Remap(int k) => k < deletedIndex ? k : k == deletedIndex ? null : k - 1;
+        int? Remap(int k) => k < deletedIndex ? k : k < deletedIndex + count ? null : k - count;
 
         DictionaryShift.Remap(data, Remap);
         DictionaryShift.Remap(hidden, Remap);

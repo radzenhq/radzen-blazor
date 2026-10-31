@@ -41,13 +41,7 @@ public class DeleteColumnsCommand : DeleteRangeCommandBase
     /// <inheritdoc/>
     protected override void DeleteRange()
     {
-        sheet.Batch(() =>
-        {
-            for (var c = endIndex; c >= startIndex; c--)
-            {
-                sheet.DeleteColumn(c);
-            }
-        });
+        sheet.DeleteColumns(startIndex, endIndex);
     }
 
     /// <inheritdoc/>
