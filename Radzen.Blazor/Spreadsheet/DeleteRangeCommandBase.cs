@@ -46,6 +46,7 @@ public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
 
     private readonly List<(Table Table, TableState State)> tableStates = [];
     private readonly Dictionary<Cell, string> formulas = [];
+    private List<(IDictionary<string, string> Names, string Name, string RefersTo)> definedNames = [];
     private readonly List<(DataValidationRule Rule, string? Formula1, string? Formula2)> validationFormulas = [];
     private readonly List<(ChartSeries Series, string? Categories, string? Values, string? Name)> seriesReferences = [];
 
@@ -106,6 +107,7 @@ public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
         formulas.Clear();
         validationFormulas.Clear();
         seriesReferences.Clear();
+        definedNames = sheet.Workbook.CaptureDefinedNames();
 
         foreach (var worksheet in sheet.Workbook.Sheets)
         {
@@ -135,6 +137,8 @@ public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
 
     private void RestoreReferences()
     {
+        sheet.Workbook.RestoreDefinedNames(definedNames);
+
         foreach (var (cell, formula) in formulas)
         {
             cell.Formula = formula;

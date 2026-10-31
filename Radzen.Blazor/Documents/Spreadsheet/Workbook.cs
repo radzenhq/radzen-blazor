@@ -261,6 +261,57 @@ public class Workbook
         pendingSheetNames.Clear();
     }
 
+    private void QueueFormulasUsingDefinedNames()
+    {
+        foreach (var cell in GetFormulaCells())
+        {
+            if (cell.FormulaSyntaxTree!.Find(node => node is NameSyntaxNode).Count > 0)
+            {
+                pendingFormulaCells.Add(cell);
+            }
+        }
+    }
+
+    private IEnumerable<(IDictionary<string, string> Names, Worksheet? Owner)> DefinedNameScopes =>
+        sheets.Select(sheet => ((IDictionary<string, string>)sheet.DefinedNames, (Worksheet?)sheet)).Prepend((DefinedNames, null));
+
+    private void AdjustDefinedNames(Worksheet target, AxisShift shift)
+    {
+        var changed = false;
+
+        foreach (var (names, owner) in DefinedNameScopes)
+        {
+            foreach (var (name, refersTo) in names.ToList())
+            {
+                var adjusted = AdjustReference(refersTo, owner, target, shift)!;
+
+                if (!string.Equals(adjusted, refersTo, StringComparison.Ordinal))
+                {
+                    names[name] = adjusted;
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed)
+        {
+            QueueFormulasUsingDefinedNames();
+        }
+    }
+
+    internal List<(IDictionary<string, string> Names, string Name, string RefersTo)> CaptureDefinedNames() =>
+        [.. DefinedNameScopes.SelectMany(scope => scope.Names.Select(name => (scope.Names, name.Key, name.Value)))];
+
+    internal void RestoreDefinedNames(IEnumerable<(IDictionary<string, string> Names, string Name, string RefersTo)> definedNames)
+    {
+        foreach (var (names, name, refersTo) in definedNames)
+        {
+            names[name] = refersTo;
+        }
+
+        QueueFormulasUsingDefinedNames();
+    }
+
     private List<Cell> GetFormulaCells() => [.. sheets.SelectMany(GetFormulaCells)];
 
     private static IEnumerable<Cell> GetFormulaCells(Worksheet sheet) =>
@@ -302,7 +353,7 @@ public class Workbook
         }
     }
 
-    internal static string? AdjustReference(string? text, Worksheet owner, Worksheet target, AxisShift shift)
+    internal static string? AdjustReference(string? text, Worksheet? owner, Worksheet target, AxisShift shift)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -444,6 +495,8 @@ public class Workbook
 
     internal void AdjustFormulas(Worksheet target, AxisShift shift)
     {
+        AdjustDefinedNames(target, shift);
+
         foreach (var cell in GetFormulaCells())
         {
             if (string.IsNullOrEmpty(cell.Formula) || cell.FormulaSyntaxTree!.Errors.Count > 0 || !References(cell, target))
@@ -460,14 +513,14 @@ public class Workbook
         }
     }
 
-    private static string ShiftReferences(string formula, FormulaSyntaxTree tree, Worksheet owner, Worksheet target, AxisShift shift)
+    private static string ShiftReferences(string formula, FormulaSyntaxTree tree, Worksheet? owner, Worksheet target, AxisShift shift)
     {
         return FormulaRewriter.Rewrite(formula, tree,
             token => IsReferenceTo(target, owner, token.Address) ? shift.AdjustCell(token) : token.Address,
             (start, end, kind) => IsReferenceTo(target, owner, start.Address) ? shift.AdjustRange(start, end, kind) : (start.Address, end.Address));
     }
 
-    private static bool IsReferenceTo(Worksheet target, Worksheet owner, CellRef address)
+    private static bool IsReferenceTo(Worksheet target, Worksheet? owner, CellRef address)
     {
         return string.IsNullOrEmpty(address.Worksheet)
             ? owner == target
