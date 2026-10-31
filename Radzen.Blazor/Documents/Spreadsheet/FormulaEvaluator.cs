@@ -218,8 +218,10 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
                 case BinaryOperator.Divide:
                     res = l / r;
                     break;
+                case BinaryOperator.Power:
+                    return PowerFunction.Calculate(l, r);
             }
-            return CellData.FromNumber(res);
+            return double.IsInfinity(res) ? CellData.FromError(CellError.Num) : CellData.FromNumber(res);
         }
 
         return CellData.FromError(CellError.Value);
@@ -267,7 +269,9 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell, Recalculation? recalcu
             return CellData.FromError(CellError.Value);
         }
 
-        return CellData.FromNumber(-operand.GetValueOrDefault<double>());
+        var number = operand.GetValueOrDefault<double>();
+
+        return CellData.FromNumber(op == UnaryOperator.Percent ? number / 100d : -number);
     }
 
     private static RangeList Broadcast(IReadOnlyList<object?> operands, Func<CellData[], CellData> apply)

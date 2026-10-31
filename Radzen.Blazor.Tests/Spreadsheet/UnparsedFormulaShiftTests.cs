@@ -6,10 +6,8 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 public class UnparsedFormulaShiftTests
 {
     [Theory]
-    [InlineData("=2^3")]
     [InlineData("=\"a\"\"b\"")]
     [InlineData("=A1:B2 C1:D2")]
-    [InlineData("=10%")]
     [InlineData("={1,2}")]
     [InlineData("=Table1[Col]")]
     [InlineData("=A1#")]
@@ -29,11 +27,11 @@ public class UnparsedFormulaShiftTests
     public void InsertRow_KeepsValidationFormulaTheParserCannotParse()
     {
         var sheet = new Worksheet(10, 10);
-        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=2^3" };
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1#" };
         sheet.Validation.Add(RangeRef.Parse("A5:A6"), rule);
 
         sheet.InsertRow(0);
 
-        Assert.Equal("=2^3", rule.Formula1);
+        Assert.Equal("=A1#", rule.Formula1);
     }
 }

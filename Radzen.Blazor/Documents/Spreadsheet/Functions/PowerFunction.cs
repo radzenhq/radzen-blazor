@@ -26,18 +26,35 @@ class PowerFunction : FormulaFunction
             return powerError!;
         }
 
-        var result = Math.Pow(number, power);
+        return Calculate(number, power);
+    }
 
-        if (double.IsNaN(result))
+    internal static CellData Calculate(double number, double power)
+    {
+        if (number == 0d && power == 0d)
         {
             return CellData.FromError(CellError.Num);
         }
 
-        if (double.IsInfinity(result))
+        if (number == 0d && power < 0d)
         {
             return CellData.FromError(CellError.Div0);
         }
 
-        return CellData.FromNumber(result);
+        var result = number < 0d && IsOddRoot(power) ? -Math.Pow(-number, power) : Math.Pow(number, power);
+
+        return double.IsNaN(result) || double.IsInfinity(result)
+            ? CellData.FromError(CellError.Num)
+            : CellData.FromNumber(result);
+    }
+
+    private static bool IsOddRoot(double power)
+    {
+        const double Tolerance = 1e-14;
+
+        var root = 1d / power;
+        var nearest = Math.Round(root);
+
+        return Math.Abs(root - nearest) < Tolerance && nearest % 2d != 0d;
     }
 }

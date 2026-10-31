@@ -36,6 +36,8 @@ internal enum FormulaTokenType
     Minus,
     Star,
     Slash,
+    Caret,
+    Percent,
     Ampersand,
     EqualsGreaterThan,
     Comma,
@@ -458,6 +460,12 @@ internal class FormulaLexer(string expression, bool strict = true)
             case '/':
                 Advance(1);
                 return new FormulaToken(FormulaTokenType.Slash, "/");
+            case '^':
+                Advance(1);
+                return new FormulaToken(FormulaTokenType.Caret, "^");
+            case '%':
+                Advance(1);
+                return new FormulaToken(FormulaTokenType.Percent, "%");
             case '&':
                 Advance(1);
                 return new FormulaToken(FormulaTokenType.Ampersand, "&");

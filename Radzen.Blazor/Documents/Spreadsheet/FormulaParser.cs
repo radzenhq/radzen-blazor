@@ -139,6 +139,7 @@ internal enum BinaryOperator
     Minus,
     Multiply,
     Divide,
+    Power,
     Concat,
     Equals,
     NotEquals,
@@ -152,6 +153,7 @@ internal enum UnaryOperator
 {
     Negate,
     Plus,
+    Percent,
 }
 
 static class FormulaTokenTypeExtensions
@@ -164,6 +166,7 @@ static class FormulaTokenTypeExtensions
             FormulaTokenType.Minus => BinaryOperator.Minus,
             FormulaTokenType.Star => BinaryOperator.Multiply,
             FormulaTokenType.Slash => BinaryOperator.Divide,
+            FormulaTokenType.Caret => BinaryOperator.Power,
             FormulaTokenType.Ampersand => BinaryOperator.Concat,
             FormulaTokenType.Equals => BinaryOperator.Equals,
             FormulaTokenType.EqualsGreaterThan => BinaryOperator.GreaterThanOrEqual,
@@ -424,35 +427,70 @@ internal class FormulaParser
 
     private FormulaSyntaxNode ParseTerm()
     {
-        var left = ParseFactor();
+        var left = ParsePower();
 
         while (Peek().Type is FormulaTokenType.Star or FormulaTokenType.Slash)
         {
             var token = Peek();
             Advance(1);
-            left = new BinaryExpressionSyntaxNode(token, left, ParseFactor(), token.Type.ToBinaryOperator());
+            left = new BinaryExpressionSyntaxNode(token, left, ParsePower(), token.Type.ToBinaryOperator());
         }
 
         return left;
     }
 
-    private FormulaSyntaxNode ParseFactor()
+    private FormulaSyntaxNode ParsePower()
+    {
+        var left = ParseUnary();
+
+        while (Peek().Type is FormulaTokenType.Caret)
+        {
+            var token = Peek();
+            Advance(1);
+            left = new BinaryExpressionSyntaxNode(token, left, ParseUnary(), token.Type.ToBinaryOperator());
+        }
+
+        return left;
+    }
+
+    private FormulaSyntaxNode ParseUnary()
     {
         var token = Peek();
 
         if (token.Type == FormulaTokenType.Minus)
         {
             Advance(1);
-            var operand = ParseFactor();
+            var operand = ParseUnary();
             return new UnaryExpressionSyntaxNode(token, operand, UnaryOperator.Negate);
         }
 
         if (token.Type == FormulaTokenType.Plus)
         {
             Advance(1);
-            var operand = ParseFactor();
+            var operand = ParseUnary();
             return new UnaryExpressionSyntaxNode(token, operand, UnaryOperator.Plus);
         }
+
+        return ParsePercent();
+    }
+
+    private FormulaSyntaxNode ParsePercent()
+    {
+        var node = ParseFactor();
+
+        while (Peek().Type is FormulaTokenType.Percent)
+        {
+            var token = Peek();
+            Advance(1);
+            node = new UnaryExpressionSyntaxNode(token, node, UnaryOperator.Percent);
+        }
+
+        return node;
+    }
+
+    private FormulaSyntaxNode ParseFactor()
+    {
+        var token = Peek();
 
         if (token.Type == FormulaTokenType.OpenParen)
         {

@@ -64,6 +64,13 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
 
     public override void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
     {
+        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Percent)
+        {
+            AppendOperand(unaryExpressionSyntaxNode.Operand, Precedence(unaryExpressionSyntaxNode), wrapEqual: false);
+            builder.Append('%');
+            return;
+        }
+
         builder.Append(unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate ? '-' : '+');
         AppendOperand(unaryExpressionSyntaxNode.Operand, Precedence(unaryExpressionSyntaxNode), wrapEqual: false);
     }
@@ -98,12 +105,14 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
     {
         return node switch
         {
+            BinaryExpressionSyntaxNode { Operator: BinaryOperator.Power } => 5,
             BinaryExpressionSyntaxNode { Operator: BinaryOperator.Multiply or BinaryOperator.Divide } => 4,
             BinaryExpressionSyntaxNode { Operator: BinaryOperator.Plus or BinaryOperator.Minus } => 3,
             BinaryExpressionSyntaxNode { Operator: BinaryOperator.Concat } => 2,
             BinaryExpressionSyntaxNode => 1,
-            UnaryExpressionSyntaxNode => 5,
-            _ => 6
+            UnaryExpressionSyntaxNode { Operator: UnaryOperator.Percent } => 7,
+            UnaryExpressionSyntaxNode => 6,
+            _ => 8
         };
     }
 
@@ -265,6 +274,7 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
             FormulaTokenType.Minus => "-",
             FormulaTokenType.Star => "*",
             FormulaTokenType.Slash => "/",
+            FormulaTokenType.Caret => "^",
             FormulaTokenType.Ampersand => "&",
             FormulaTokenType.Equals => "=",
             FormulaTokenType.GreaterThan => ">",

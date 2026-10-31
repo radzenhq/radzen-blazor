@@ -638,9 +638,10 @@ public class FormulaParserTests
     [Fact]
     public void FormulaParser_ShouldParse_Percent()
     {
-        var formula = "=$%";
-        var syntaxTree = FormulaParser.Parse(formula);
-        Assert.NotEmpty(syntaxTree.Errors);
+        var syntaxTree = FormulaParser.Parse("=A1%");
+
+        Assert.Empty(syntaxTree.Errors);
+        Assert.Equal(UnaryOperator.Percent, Assert.IsType<UnaryExpressionSyntaxNode>(syntaxTree.Root).Operator);
     }
 
     [Theory]
