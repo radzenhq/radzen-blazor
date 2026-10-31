@@ -384,8 +384,6 @@ li.rz-navigation-item.rz-state-disabled {
   padding-inline: var(--rz-menu-top-item-padding-inline);
   justify-content: end;
   align-items: center;
-  width: 100%;
-  height: 100%;
 }
 
 .rz-menu-toggle {
@@ -397,6 +395,7 @@ li.rz-navigation-item.rz-state-disabled {
   justify-content: center;
   padding: 0;
   color: var(--rz-menu-top-item-color);
+  cursor: pointer;
 
   &:hover {
     background-color: transparent;
@@ -424,6 +423,8 @@ li.rz-navigation-item.rz-state-disabled {
 @media (max-width: 768px) {
   .rz-menu:not(.rz-profile-menu) {
     &.rz-menu-closed {
+      justify-content: end;
+
       .rz-navigation-item {
         display: none;
       }
@@ -435,6 +436,10 @@ li.rz-navigation-item.rz-state-disabled {
 
     &.rz-menu-open {
       display: block;
+
+      > .rz-navigation-item {
+        flex-basis: 100%;
+      }
 
       .rz-navigation-item {
         background-color: inherit;

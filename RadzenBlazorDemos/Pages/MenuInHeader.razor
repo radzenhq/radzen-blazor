@@ -1,0 +1,24 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0 1rem" class="rz-mb-12 rz-px-4 rz-py-2 rz-border-radius-2 rz-border-base-300" Style="min-height: var(--rz-header-min-height); background-color: var(--rz-header-background-color); border: var(--rz-border-base-300);">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="min-width: 0;">
+        <RadzenIcon Icon="task_alt" IconStyle="IconStyle.Primary" Style="font-size: 2rem;" />
+        <RadzenText Text="Tickwell" TextStyle="TextStyle.Subtitle1" class="rz-mb-0" />
+    </RadzenStack>
+    <RadzenProfileMenu class="rz-ms-auto rz-order-sm-last" Style="flex-shrink: 0;">
+        <Template>
+            admin
+            <RadzenGravatar Email="admin@example.com" />
+        </Template>
+        <ChildContent>
+            <RadzenProfileMenuItem Text="Change password" Icon="key" />
+            <RadzenProfileMenuItem Text="Sign out" Icon="power_settings_new" />
+        </ChildContent>
+    </RadzenProfileMenu>
+    <RadzenMenu class="rz-display-contents rz-display-sm-flex" Style="flex: 1 1 auto; min-width: 0;">
+        <RadzenMenuItem Text="Tasks" Icon="checklist" />
+        <RadzenMenuItem Text="Projects" Icon="folder">
+            <RadzenMenuItem Text="Active projects" Icon="play_circle" />
+            <RadzenMenuItem Text="Archived projects" Icon="inventory_2" />
+        </RadzenMenuItem>
+        <RadzenMenuItem Text="Users" Icon="group" />
+    </RadzenMenu>
+</RadzenStack>
