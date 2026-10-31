@@ -371,7 +371,7 @@ public class Workbook
     {
         bool IsOldSheet(CellRef address) => string.Equals(address.Worksheet, oldName, StringComparison.OrdinalIgnoreCase);
 
-        if (tree.Errors.Count > 0 || tree.Find(node => node is CellSyntaxNode c && IsOldSheet(c.Token.Address)).Count == 0)
+        if (tree.Errors.Count > 0 || tree.Find(node => node is CellSyntaxNode or ErrorLiteralSyntaxNode && IsOldSheet(node.Token.Address)).Count == 0)
         {
             return null;
         }

@@ -42,7 +42,14 @@ internal class FormulaRewriter : FormulaSyntaxNodeVisitorBase
 
     public override void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
     {
-        builder.Append(errorLiteralSyntaxNode.Token.Value);
+        var token = errorLiteralSyntaxNode.Token;
+
+        if (!string.IsNullOrEmpty(token.Address.Worksheet))
+        {
+            AppendWorksheetPrefix(adjust(token).Worksheet);
+        }
+
+        builder.Append(token.Value);
     }
 
     public override void VisitName(NameSyntaxNode nameSyntaxNode)
