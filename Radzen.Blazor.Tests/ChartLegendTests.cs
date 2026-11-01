@@ -90,6 +90,32 @@ namespace Radzen.Blazor.Tests
             builder.CloseComponent();
         };
 
+        [Theory]
+        [InlineData(true, "false")]
+        [InlineData(false, "true")]
+        public void LegendItem_Renders_AriaDisabled(bool clickable, string expected)
+        {
+            using var ctx = new TestContext();
+
+            var item = ctx.RenderComponent<Radzen.Blazor.Rendering.LegendItem>(p => p
+                .Add(x => x.Text, "Series")
+                .Add(x => x.Clickable, clickable));
+
+            Assert.Equal(expected, item.Find(".rz-legend-item").GetAttribute("aria-disabled"));
+        }
+
+        [Fact]
+        public async Task Legend_Renders_AriaDisabledFalse_ForSeriesItems()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(c => c.ChildContent, DefaultLegendWithSeries()));
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var item = chart.Find(".rz-legend-item");
+            Assert.Equal("false", item.GetAttribute("aria-disabled"));
+        }
+
         [Fact]
         public async Task DefaultLegend_RendersOnRightInLtr_AndFlipsToLeftInRtl()
         {
