@@ -10,7 +10,7 @@
          tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked aria-hidden="true" @attributes="InputAttributes"
-                tabindex="-1" readonly="@ReadOnly">
+                tabindex="-1" inert readonly="@ReadOnly">
         </div>
         <div class=@BoxClass>
             <span class=@IconClass></span>

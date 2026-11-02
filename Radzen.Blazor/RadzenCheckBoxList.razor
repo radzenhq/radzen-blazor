@@ -35,7 +35,7 @@
                  aria-disabled="@(Disabled || item.Disabled ? "true" : "false")">
                 <div class="rz-chkbox">
                     <div class="rz-helper-hidden-accessible">
-                        <input type="checkbox" name="@Name" value="@item.Value" disabled="@(Disabled || item.Disabled)" readonly="@ReadOnly" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" aria-checked="@(IsSelected(item).ToString().ToLowerInvariant())">
+                        <input type="checkbox" name="@Name" value="@item.Value" disabled="@(Disabled || item.Disabled)" readonly="@ReadOnly" tabindex="-1" inert aria-hidden="true" aria-label="@(item.Text + " " + item.Value)" aria-checked="@(IsSelected(item).ToString().ToLowerInvariant())">
                     </div>
                     <div class=@ItemClass(item)>
                         <span class=@IconClass(item)></span>

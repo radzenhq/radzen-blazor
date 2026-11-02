@@ -7,6 +7,24 @@ namespace Radzen.Blazor.Tests
 {
     public class RadioButtonListTests
     {
+        [Fact]
+        public void RadioButtonList_HiddenInputs_AreInert()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(AddThreeItems);
+
+            var inputs = component.FindAll("[role=radio] input[type=radio]");
+            Assert.Equal(3, inputs.Count);
+            Assert.All(inputs, input =>
+            {
+                Assert.True(input.HasAttribute("inert"));
+                Assert.Equal("true", input.GetAttribute("aria-hidden"));
+                Assert.Equal("-1", input.GetAttribute("tabindex"));
+            });
+        }
+
         private static void AddThreeItems(ComponentParameterCollectionBuilder<RadzenRadioButtonList<int>> parameters)
         {
             parameters.Add(p => p.Items, builder =>

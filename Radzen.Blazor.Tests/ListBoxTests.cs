@@ -8,6 +8,23 @@ namespace Radzen.Blazor.Tests
 {
     public class ListBoxTests
     {
+        [Fact]
+        public void ListBox_SelectAllHiddenInput_IsInert()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<IEnumerable<string>>>(parameters => parameters
+                .Add(p => p.Data, new List<string> { "Option 1", "Option 2" })
+                .Add(p => p.Multiple, true)
+                .Add(p => p.AllowSelectAll, true));
+
+            var input = component.Find("[role=checkbox] input[type=checkbox]");
+            Assert.True(input.HasAttribute("inert"));
+            Assert.Equal("true", input.GetAttribute("aria-hidden"));
+            Assert.Equal("-1", input.GetAttribute("tabindex"));
+        }
+
         class Item
         {
             public int Id { get; set; }

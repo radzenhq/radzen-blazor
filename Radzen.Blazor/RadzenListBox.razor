@@ -28,7 +28,7 @@
                          aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
                          @onkeydown="OnSelectAllKeyDown">
                         <div class="rz-helper-hidden-accessible">
-                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
+                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" tabindex="-1" inert aria-hidden="true" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
                         <div class="@(IsAllSelected() ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
