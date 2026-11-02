@@ -1,0 +1,28 @@
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Url="api/upload/single" ChooseText="Choose a file or drag it here" Style="width: 100%"
+                  Complete=@OnComplete Error=@OnError>
+        <ChooseTemplate>
+            <RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-6">
+                <RadzenIcon Icon="cloud_upload" Style="font-size: 2.5rem; width: auto; height: auto;" />
+                <RadzenText Text="Choose a file or drag it here" Style="color: inherit;" class="rz-m-0" />
+                <RadzenText Text="The file uploads automatically after selection" TextStyle="TextStyle.Caption"
+                            Style="color: inherit;" class="rz-m-0" />
+            </RadzenStack>
+        </ChooseTemplate>
+    </RadzenUpload>
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log(args.Cancelled ? "Upload cancelled" : $"Upload complete: {args.RawResponse}");
+    }
+
+    void OnError(UploadErrorEventArgs args)
+    {
+        console.Log($"Upload error: {args.Message}");
+    }
+}

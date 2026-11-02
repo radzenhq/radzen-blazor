@@ -108,6 +108,21 @@ namespace Radzen.Blazor
         [Parameter]
         public string ChooseText { get => chooseText ?? Localize(nameof(RadzenStrings.Upload_ChooseText)); set => chooseText = value; }
 
+        /// <summary>
+        /// Gets or sets the content of the file selection area. Replaces the default icon and text.
+        /// Use non-interactive content. The entire area selects files and supports drag and drop.
+        /// <see cref="ChooseText"/> remains the accessible name of the selection area.
+        /// </summary>
+        [Parameter]
+        public RenderFragment? ChooseTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the selected file list is displayed. Defaults to <c>true</c>.
+        /// Hiding the list does not clear selected files or change upload behavior.
+        /// </summary>
+        [Parameter]
+        public bool ShowFileList { get; set; } = true;
+
         private string? deleteText;
 
         /// <summary>
@@ -221,6 +236,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The choose class list.</value>
         string ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button")
+                                           .Add("rz-fileupload-choose-template", ChooseTemplate != null)
                                            .AddDisabled(Disabled)
                                            .ToString();
 

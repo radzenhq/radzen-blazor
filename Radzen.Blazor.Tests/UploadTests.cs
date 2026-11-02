@@ -1,12 +1,138 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
     public class UploadTests
     {
+        [Theory]
+        [InlineData(null)]
+        [InlineData("api/upload")]
+        public void Upload_Renders_ChooseTemplate(string url)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, url)
+                .Add(p => p.Icon, "upload")
+                .Add(p => p.ChooseText, "Select attachments")
+                .Add(p => p.TabIndex, 3)
+                .Add(p => p.ChooseTemplate, "<span>Drop files here</span><span>Choose attachments</span>"));
+
+            var choose = component.Find(".rz-fileupload-choose");
+            Assert.Contains("rz-fileupload-choose-template", choose.ClassList);
+            Assert.Contains("Drop files here", choose.TextContent);
+            Assert.Equal("Select attachments", choose.GetAttribute("aria-label"));
+            Assert.Equal("button", choose.GetAttribute("role"));
+            Assert.Equal("3", choose.GetAttribute("tabindex"));
+            Assert.Empty(component.FindAll(".rz-button-text, .rzi"));
+            Assert.Single(component.FindAll("input[type=file]"));
+            Assert.Equal("left: 0;", component.Find("input[type=file]").GetAttribute("style"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+
+            Assert.Equal("true", choose.GetAttribute("aria-disabled"));
+            Assert.Equal("-1", choose.GetAttribute("tabindex"));
+            Assert.True(component.Find("input[type=file]").HasAttribute("disabled"));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("api/upload")]
+        public async Task Upload_PreservesSelection_WhenAppearanceChanges(string url)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var changes = 0;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, url)
+                .Add(p => p.Auto, false)
+                .Add(p => p.Change, _ => changes++));
+            var inputFile = url == null ? component.FindComponent<InputFile>().Instance : null;
+            var selected = new PreviewFileInfo { Name = "report.pdf", Size = 42 };
+
+            await component.InvokeAsync(() => component.Instance.OnChange(new[] { selected }));
+
+            Assert.True(component.Instance.ShowFileList);
+            Assert.Single(component.FindAll(".rz-fileupload-row"));
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.ShowFileList, false)
+                .Add(p => p.ChooseTemplate, "<span>Custom content</span>"));
+
+            Assert.Empty(component.FindAll(".rz-fileupload-content"));
+            Assert.True(component.Instance.HasValue);
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.ShowFileList, true)
+                .Add(p => p.ChooseTemplate, (RenderFragment)null));
+
+            Assert.Contains("report.pdf", component.Find(".rz-fileupload-row").TextContent);
+            Assert.DoesNotContain("rz-fileupload-choose-template", component.Find(".rz-fileupload-choose").ClassList);
+            Assert.Single(component.FindAll(".rz-button-text"));
+            Assert.Equal(1, changes);
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.createUpload"]);
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.uploads"]);
+            if (inputFile != null)
+            {
+                Assert.Same(inputFile, component.FindComponent<InputFile>().Instance);
+            }
+        }
+
+        [Fact]
+        public async Task Upload_HiddenFileList_SupportsRemoveAndClear()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            UploadChangeEventArgs change = null;
+            var changes = 0;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, "api/upload")
+                .Add(p => p.Auto, false)
+                .Add(p => p.ShowFileList, false)
+                .Add(p => p.Change, args => { change = args; changes++; }));
+
+            await component.InvokeAsync(() => component.Instance.OnChange(new[]
+            {
+                new PreviewFileInfo { Name = "first.txt", Size = 1 },
+                new PreviewFileInfo { Name = "second.txt", Size = 2 }
+            }));
+            Assert.Equal(2, change.Files.Count());
+
+            await component.InvokeAsync(() => component.Instance.RemoveFile("first.txt"));
+            Assert.Equal("second.txt", Assert.Single(change.Files).Name);
+            Assert.True(component.Instance.HasValue);
+
+            await component.InvokeAsync(() => component.Instance.Upload());
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.upload"]);
+
+            await component.InvokeAsync(() => component.Instance.ClearFiles());
+            Assert.Empty(change.Files);
+            Assert.False(component.Instance.HasValue);
+            Assert.Equal(3, changes);
+            Assert.Empty(component.FindAll(".rz-fileupload-content"));
+            Assert.Equal(2, ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"].Count);
+        }
+
+        [Fact]
+        public void Upload_ChooseTemplate_PreservesHeaders()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, "api/upload")
+                .Add(p => p.ChooseTemplate, "<span>Custom content</span>")
+                .AddChildContent<RadzenUploadHeader>(header => header
+                    .Add(p => p.Name, "X-Upload-Test")
+                    .Add(p => p.Value, "custom")));
+
+            Assert.Equal("custom", component.Instance.GetHeaders()["X-Upload-Test"]);
+        }
+
         [Fact]
         public void Upload_Renders_WithClassName()
         {

@@ -1,0 +1,41 @@
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload @ref="upload" Url="api/upload/multiple" Auto="false" Multiple="true" ShowFileList="false"
+                  Change=@OnChange Complete=@OnComplete Error=@OnError Style="width: 100%" />
+
+    <RadzenStack Gap="0.5rem" class="rz-mt-4">
+        @foreach (var file in files)
+        {
+            <RadzenStack @key="file" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenIcon Icon="attach_file" />
+                <RadzenText Text=@file.Name class="rz-m-0" Style="overflow-wrap: anywhere;" />
+                <RadzenText Text=@($"{file.Size:N0} bytes") TextStyle="TextStyle.Caption" class="rz-m-0" />
+                <RadzenButton Icon="close" Variant="Variant.Flat" Size="ButtonSize.Small" Shade="Shade.Darker"
+                              aria-label=@($"Remove {file.Name}") Click=@(() => upload.RemoveFile(file.Name)) />
+            </RadzenStack>
+        }
+    </RadzenStack>
+
+    <RadzenButton Text="Upload" Disabled=@(!files.Any()) Click=@(() => upload.Upload()) class="rz-mt-4" />
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    RadzenUpload upload;
+    EventConsole console;
+    IEnumerable<Radzen.FileInfo> files = Enumerable.Empty<Radzen.FileInfo>();
+
+    void OnChange(UploadChangeEventArgs args)
+    {
+        files = args.Files?.ToArray() ?? Array.Empty<Radzen.FileInfo>();
+    }
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log(args.Cancelled ? "Upload cancelled" : "Upload complete");
+    }
+
+    void OnError(UploadErrorEventArgs args)
+    {
+        console.Log($"Upload error: {args.Message}");
+    }
+}

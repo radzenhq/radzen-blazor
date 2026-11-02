@@ -8098,16 +8098,24 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   function onKeydown(e) {
     if (e.keyCode === 32 || e.keyCode === 13) {
       e.preventDefault();
-      var child = choose.firstElementChild;
-      if (child) child.click();
+      if (fileInput && !fileInput.disabled) fileInput.click();
     }
   }
   function onStopKeydown(e) { e.stopPropagation(); }
+  function onDisabledDrop(e) {
+    if (fileInput && fileInput.disabled && choose.classList.contains('rz-fileupload-choose-template')) {
+      e.preventDefault();
+    }
+  }
   function onChange(e) {
     Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
   }
   function onImgError() { this.style.display = 'none'; }
-  if (choose) choose.addEventListener('keydown', onKeydown);
+  if (choose) {
+    choose.addEventListener('keydown', onKeydown);
+    choose.addEventListener('dragover', onDisabledDrop);
+    choose.addEventListener('drop', onDisabledDrop);
+  }
   if (fileInput) {
     fileInput.addEventListener('keydown', onStopKeydown);
     if (url) fileInput.addEventListener('change', onChange);
@@ -8116,7 +8124,11 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
     img.addEventListener('error', onImgError);
   });
   return { dispose: function() {
-    if (choose) choose.removeEventListener('keydown', onKeydown);
+    if (choose) {
+      choose.removeEventListener('keydown', onKeydown);
+      choose.removeEventListener('dragover', onDisabledDrop);
+      choose.removeEventListener('drop', onDisabledDrop);
+    }
     if (fileInput) {
       fileInput.removeEventListener('keydown', onStopKeydown);
       if (url) fileInput.removeEventListener('change', onChange);

@@ -81,6 +81,29 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadDragDrop)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadDragDrop />
 </RadzenExample>
+<RadzenText Anchor="upload#choose-template" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom file selection area
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>ChooseTemplate</code> to replace the default icon and text with custom content.
+    The whole area supports file selection and drag and drop, and retains the current theme's styling.
+    Set <code>ChooseText</code> to provide an accessible name. Use non-interactive content rather than nested buttons, links or inputs.
+    Instructions in the template are descriptive and do not add file validation.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadChooseTemplate)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
+    <UploadChooseTemplate />
+</RadzenExample>
+<RadzenText Anchor="upload#custom-file-list" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom file list
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>ShowFileList="false"</code> to hide the built-in list without clearing selected files.
+    In manual upload mode, handle <code>Change</code> to display the selection and use <code>RemoveFile</code> to remove files by name.
+    Select files with distinct names to try this example, then click Upload to send the remaining files to the server.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadCustomFileList)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
+    <UploadCustomFileList />
+</RadzenExample>
 <RadzenText Anchor="upload#custom-headers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Send custom HTTP headers
 </RadzenText>
