@@ -2,6 +2,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,6 +10,78 @@ namespace Radzen.Blazor.Tests
 {
     public class StepsTests
     {
+        [Theory]
+        [InlineData("Home", 1, 0)]
+        [InlineData("End", 1, 2)]
+        [InlineData("Home", 2, 0)]
+        [InlineData("End", 0, 2)]
+        public async Task Steps_HomeAndEnd_MoveFocusToFirstAndLastStep(string key, int focused, int expected)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add(p => p.SelectedIndex, focused);
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "Step 1");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(2);
+                    builder.AddAttribute(3, "Text", "Step 2");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(4);
+                    builder.AddAttribute(5, "Text", "Step 3");
+                    builder.CloseComponent();
+                });
+            });
+
+            var tabs = component.FindAll("button[role=tab]");
+            var prefix = component.Find(".rz-steps").Id;
+            await tabs[focused].KeyDownAsync(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = key, Code = key });
+
+            var focus = ctx.JSInterop.VerifyInvoke("Radzen.focusElement");
+            Assert.Equal(prefix + expected + "s", focus.Arguments[0]);
+            Assert.Equal("0", component.FindAll("button[role=tab]")[expected].GetAttribute("tabindex"));
+        }
+
+        [Fact]
+        public async Task Steps_HomeAndEnd_SkipHiddenSteps()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add(p => p.SelectedIndex, 1);
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "Step 1");
+                    builder.AddAttribute(2, "Visible", false);
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(3);
+                    builder.AddAttribute(4, "Text", "Step 2");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(5);
+                    builder.AddAttribute(6, "Text", "Step 3");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(7);
+                    builder.AddAttribute(8, "Text", "Step 4");
+                    builder.AddAttribute(9, "Visible", false);
+                    builder.CloseComponent();
+                });
+            });
+
+            var tabs = component.FindAll("button[role=tab]");
+            var prefix = component.Find(".rz-steps").Id;
+            await tabs[0].KeyDownAsync(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "End", Code = "End" });
+            Assert.Equal(prefix + "2s", ctx.JSInterop.VerifyInvoke("Radzen.focusElement").Arguments[0]);
+
+            await component.FindAll("button[role=tab]")[1].KeyDownAsync(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Home", Code = "Home" });
+            var ids = ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.focusElement").Select(i => (string)i.Arguments[0]).ToList();
+            Assert.Equal(new[] { prefix + "2s", prefix + "1s" }, ids);
+        }
+
         [Fact]
         public void Steps_Renders_WithClassName()
         {

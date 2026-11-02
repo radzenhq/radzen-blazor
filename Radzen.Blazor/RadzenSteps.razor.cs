@@ -601,11 +601,11 @@ namespace Radzen.Blazor
 
             if (key == "Home")
             {
-                target = NextFocusableTab(-1, 1);
+                target = NextFocusableTab(0, 1);
             }
             else if (key == "End")
             {
-                target = NextFocusableTab(steps.Count, -1);
+                target = NextFocusableTab(steps.Count - 1, -1);
             }
             else
             {
