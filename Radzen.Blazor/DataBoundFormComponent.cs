@@ -523,10 +523,7 @@ namespace Radzen
                 return;
             }
 
-            linkedLabelName = Name;
-            linkedLabelVisible = Visible;
-
-            if (!ShouldLinkLabel || !IsJSRuntimeAvailable || JSRuntime == null)
+            if (LabelToLink() == null || !IsJSRuntimeAvailable || JSRuntime == null)
             {
                 return;
             }
@@ -538,6 +535,19 @@ namespace Radzen
             catch (JSDisconnectedException)
             {
             }
+        }
+
+        /// <summary>
+        /// Returns the name whose label the client should link to the component, or <c>null</c> when no label should be linked, and records the link as done
+        /// so that a later <see cref="LinkLabelAsync"/> talks to the client only when <see cref="Name"/> or <see cref="RadzenComponent.Visible"/> change again.
+        /// Components that already create client-side state after render pass the result to that call instead of making a separate one.
+        /// </summary>
+        protected string? LabelToLink()
+        {
+            linkedLabelName = Name;
+            linkedLabelVisible = Visible;
+
+            return ShouldLinkLabel ? Name : null;
         }
 
         /// <summary>

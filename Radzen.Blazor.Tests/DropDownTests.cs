@@ -1842,9 +1842,10 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Name, "colour")
                 .Add(p => p.Data, new[] { "Red", "Green" }));
 
-            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.linkLabel");
+            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.createDropDown");
 
             Assert.Equal("colour", invocation.Arguments[1]);
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
         }
 
         [Fact]
@@ -1855,6 +1856,7 @@ namespace Radzen.Blazor.Tests
             ctx.RenderComponent<RadzenDropDown<string>>(parameters => parameters
                 .Add(p => p.Data, new[] { "Red", "Green" }));
 
+            Assert.Null(ctx.JSInterop.VerifyInvoke("Radzen.createDropDown").Arguments[1]);
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
         }
 
@@ -1868,6 +1870,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Data, new[] { "Red", "Green" })
                 .AddUnmatched("aria-label", "Colour"));
 
+            Assert.Null(ctx.JSInterop.VerifyInvoke("Radzen.createDropDown").Arguments[1]);
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
         }
 
@@ -1882,6 +1885,7 @@ namespace Radzen.Blazor.Tests
                     .Add(p => p.Name, "colour")
                     .Add(p => p.Data, new[] { "Red", "Green" })));
 
+            Assert.Null(ctx.JSInterop.VerifyInvoke("Radzen.createDropDown").Arguments[1]);
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
             Assert.Equal(component.Find("label").Id, component.Find("[role=combobox]").GetAttribute("aria-labelledby"));
         }
@@ -1897,9 +1901,26 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Name, "second"));
 
-            var names = ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.linkLabel").Select(i => (string)i.Arguments[1]).ToList();
+            Assert.Equal("first", ctx.JSInterop.VerifyInvoke("Radzen.createDropDown").Arguments[1]);
+            Assert.Equal("second", ctx.JSInterop.VerifyInvoke("Radzen.linkLabel").Arguments[1]);
+        }
 
-            Assert.Equal(new[] { "first", "second" }, names);
+        [Fact]
+        public void DropDown_ShownAgain_LinksLabelThroughCreate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenDropDown<string>>(parameters => parameters
+                .Add(p => p.Name, "colour")
+                .Add(p => p.Data, new[] { "Red", "Green" }));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            var names = ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createDropDown").Select(i => (string)i.Arguments[1]).ToList();
+
+            Assert.Equal(new[] { "colour", "colour" }, names);
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
         }
     }
 }

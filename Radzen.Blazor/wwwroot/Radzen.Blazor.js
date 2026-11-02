@@ -7957,8 +7957,9 @@ Radzen.createDataGrid = function(el) {
     el.removeEventListener('mousedown', onMousedown);
   }};
 };
-Radzen.createDropDown = function(el) {
+Radzen.createDropDown = function(el, labelName) {
   if (!el) return { dispose: function() {} };
+  if (labelName) Radzen.linkLabel(el, labelName);
   function onMousedown() { Radzen.activeElement = null; }
   function onFilterClick(e) {
     var input = e.target.closest('.rz-multiselect-filter-container input');
