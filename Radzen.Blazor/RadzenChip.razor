@@ -27,7 +27,7 @@
         }
     </span>
 
-    @if (Close.HasDelegate && ChipList != null)
+    @if (Close.HasDelegate)
     {
         <span class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-lighter rz-button-icon-only rz-chip-remove"
               title="@RemoveChipTitle"
@@ -36,20 +36,6 @@
               @onclick:stopPropagation>
             <span class="rz-button-box"><i class="notranslate rz-button-icon-left rzi">close</i></span>
         </span>
-    }
-    else if (Close.HasDelegate)
-    {
-        <RadzenButton Icon="close"
-                      Variant="Variant.Text"
-                      Shade="Shade.Lighter"
-                      Size="ButtonSize.ExtraSmall"
-                      Click="@OnCloseClick"
-                      ButtonStyle="ButtonStyle.Base"
-                      title="@RemoveChipTitle"
-                      aria-label="@RemoveChipTitle"
-                      Disabled="@Disabled"
-                      TabIndex="@TabIndexValue"
-                      @onclick:stopPropagation />
     }
 </span>
 }

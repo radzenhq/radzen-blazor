@@ -31,7 +31,9 @@
             </RadzenSelectBar>
         </RadzenStack>
     </RadzenStack>
-    <RadzenChipList @bind-Value="@selectedPriority"
+    <RadzenLabel Text="Priority" Component="priority" />
+    <RadzenChipList Name="priority"
+                    @bind-Value="@selectedPriority"
                     TValue="string"
                     Data="@priorities"
                     TextProperty="Name"

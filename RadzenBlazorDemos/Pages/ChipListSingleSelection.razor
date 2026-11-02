@@ -1,5 +1,7 @@
 <RadzenStack class="rz-p-12" Gap="0.5rem">
-    <RadzenChipList @bind-Value="@selectedCategory"
+    <RadzenLabel Text="Category" Component="category" />
+    <RadzenChipList Name="category"
+                    @bind-Value="@selectedCategory"
                     TValue="string"
                     Data="@categories"
                     TextProperty="Name"

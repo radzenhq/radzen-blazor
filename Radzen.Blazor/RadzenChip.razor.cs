@@ -84,7 +84,8 @@ namespace Radzen.Blazor
         private string? removeChipTitle;
 
         /// <summary>
-        /// Gets or sets the title used by the close button for accessibility.
+        /// Gets or sets the tooltip of the remove affordance.
+        /// The affordance is a mouse-only control; keyboard users remove the focused chip with Delete or Backspace.
         /// </summary>
         [Parameter]
         public string RemoveChipTitle { get => removeChipTitle ?? Localize(nameof(RadzenStrings.Chip_RemoveChipTitle)); set => removeChipTitle = value; }
@@ -96,7 +97,8 @@ namespace Radzen.Blazor
         public EventCallback<MouseEventArgs> Click { get; set; }
 
         /// <summary>
-        /// Gets or sets the callback invoked when the remove button is clicked.
+        /// Gets or sets the callback invoked when the chip is removed with the remove affordance or with Delete or Backspace.
+        /// Setting it renders the remove affordance.
         /// </summary>
         [Parameter]
         public EventCallback<MouseEventArgs> Close { get; set; }
@@ -123,8 +125,8 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the chip list that renders the chip. <see cref="RadzenChipList{TValue}"/> supplies it as a cascading value.
-        /// Inside a chip list the chip is the content of a listbox option, so it renders no role and no tab stop, the option carries
-        /// the selection and the keyboard behaviour, and the remove affordance is a mouse-only control because Delete and Backspace remove the focused chip.
+        /// Inside a chip list the chip is the content of a listbox option, so it renders no role and no tab stop and the option carries
+        /// the selection and the keyboard behaviour.
         /// </summary>
         [CascadingParameter]
         public IRadzenChipList? ChipList { get; set; }
