@@ -183,6 +183,8 @@ public partial class RadzenFabMenu : RadzenComponent
         return $"{baseClasses} {directionClass}";
     }
 
+    private bool focusFirstItemOnOpen;
+
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -190,12 +192,22 @@ public partial class RadzenFabMenu : RadzenComponent
 
         if (JSRuntime != null)
         {
+            if (firstRender)
+            {
+                JSRuntime.InvokeVoid("Radzen.createFabMenu", Element, Reference);
+            }
+
             if (isOpen)
             {
-                JSRuntime.InvokeVoid("Radzen.registerFabMenu", Element, Reference);
+                var focusFirstItem = focusFirstItemOnOpen;
+                focusFirstItemOnOpen = false;
+
+                JSRuntime.InvokeVoid("Radzen.registerFabMenu", Element, Reference, focusFirstItem);
             }
             else
             {
+                focusFirstItemOnOpen = false;
+
                 JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
             }
         }
@@ -216,6 +228,8 @@ public partial class RadzenFabMenu : RadzenComponent
 
     private async Task OnFabClick(MouseEventArgs args)
     {
+        focusFirstItemOnOpen = !isOpen && args.Detail == 0;
+
         await ToggleAsync();
     }
 
@@ -233,6 +247,25 @@ public partial class RadzenFabMenu : RadzenComponent
         isOpen = !isOpen;
         await IsOpenChanged.InvokeAsync(isOpen);
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Opens the menu. Pass <c>true</c> to move focus to the first item once the items render, which is what a keyboard user expects when
+    /// opening the menu with the arrow keys; the client calls it that way.
+    /// </summary>
+    /// <param name="focusFirstItem">Whether to focus the first menu item after the menu opens.</param>
+    [JSInvokable]
+    public async Task OpenAsync(bool focusFirstItem = false)
+    {
+        if (!isOpen)
+        {
+            isOpen = true;
+            focusFirstItemOnOpen = focusFirstItem;
+
+            await IsOpenChanged.InvokeAsync(isOpen);
+
+            StateHasChanged();
+        }
     }
 
     /// <summary>
@@ -256,9 +289,9 @@ public partial class RadzenFabMenu : RadzenComponent
     {
         try
         {
-            if (IsOpen && JSRuntime != null)
+            if (JSRuntime != null)
             {
-                JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyFabMenu", Element);
             }
         }
         catch { }

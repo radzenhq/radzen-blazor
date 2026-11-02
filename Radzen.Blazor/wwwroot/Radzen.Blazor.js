@@ -7808,7 +7808,74 @@ window.Radzen = {
     }
 };
 
-Radzen.registerFabMenu = function(element, dotnet){
+Radzen.fabMenuItems = function(element) {
+  return Array.prototype.slice.call(element.querySelectorAll('.rz-fabmenu-items button:not([disabled])'));
+};
+Radzen.fabMenuToggle = function(element) {
+  return element.querySelector(':scope > button');
+};
+Radzen.createFabMenu = function(element, dotnet) {
+  if (!element || typeof element.addEventListener !== 'function') return;
+  Radzen.destroyFabMenu(element);
+  var invoke = function(method, arg) {
+    try { suppressDisposed(arg === undefined ? dotnet.invokeMethodAsync(method) : dotnet.invokeMethodAsync(method, arg)); } catch { }
+  };
+  var onKeyDown = function(e) {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    var key = e.key;
+    var open = !!element.querySelector('.rz-fabmenu-items');
+    if (!open) {
+      if ((key === 'ArrowDown' || key === 'ArrowUp') && e.target === Radzen.fabMenuToggle(element)) {
+        e.preventDefault();
+        invoke('OpenAsync', true);
+      }
+      return;
+    }
+    if (key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      invoke('CloseAsync');
+      var toggle = Radzen.fabMenuToggle(element);
+      if (toggle) toggle.focus({ preventScroll: true });
+      return;
+    }
+    if (key === 'Tab') {
+      invoke('CloseAsync');
+      return;
+    }
+    var items = Radzen.fabMenuItems(element);
+    if (!items.length) return;
+    var index = items.indexOf(document.activeElement);
+    var next = -1;
+    if (key === 'ArrowDown' || key === 'ArrowRight') next = index < 0 ? 0 : (index + 1) % items.length;
+    else if (key === 'ArrowUp' || key === 'ArrowLeft') next = index < 0 ? items.length - 1 : (index - 1 + items.length) % items.length;
+    else if (key === 'Home') next = 0;
+    else if (key === 'End') next = items.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    items[next].focus();
+  };
+  var onFocusIn = function(e) {
+    if (e.target && e.target.closest && e.target.closest('.rz-fabmenu-items')) {
+      element.__rzFabMenuHadFocus = true;
+    }
+  };
+  element.addEventListener('keydown', onKeyDown);
+  element.addEventListener('focusin', onFocusIn);
+  element.__rzFabMenu = { keydown: onKeyDown, focusin: onFocusIn };
+};
+Radzen.destroyFabMenu = function(element) {
+  if (!element) return;
+  Radzen.unregisterFabMenu(element);
+  var handlers = element.__rzFabMenu;
+  if (handlers) {
+    element.removeEventListener('keydown', handlers.keydown);
+    element.removeEventListener('focusin', handlers.focusin);
+    delete element.__rzFabMenu;
+  }
+  delete element.__rzFabMenuHadFocus;
+};
+Radzen.registerFabMenu = function(element, dotnet, focusFirstItem){
   if(!element) return;
   if(element.__rzOutsideClickHandler){
     document.removeEventListener('click', element.__rzOutsideClickHandler);
@@ -7821,6 +7888,13 @@ Radzen.registerFabMenu = function(element, dotnet){
   };
   element.__rzOutsideClickHandler = handler;
   document.addEventListener('click', handler);
+  if (focusFirstItem) {
+    var first = Radzen.fabMenuItems(element)[0];
+    if (first) {
+      element.__rzFabMenuHadFocus = true;
+      first.focus();
+    }
+  }
 };
 Radzen.unregisterFabMenu = function(element){
   if(!element) return;
@@ -7828,6 +7902,14 @@ Radzen.unregisterFabMenu = function(element){
   if(handler){
     document.removeEventListener('click', handler);
     delete element.__rzOutsideClickHandler;
+  }
+  if (element.__rzFabMenuHadFocus) {
+    delete element.__rzFabMenuHadFocus;
+    var active = document.activeElement;
+    if (!active || active === document.body || element.contains(active)) {
+      var toggle = Radzen.fabMenuToggle(element);
+      if (toggle) toggle.focus({ preventScroll: true });
+    }
   }
 };
 Radzen.chatIsNearBottom = function(container, threshold) {

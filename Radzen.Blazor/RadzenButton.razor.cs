@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The tab index. Default value is 0.</value>
         [Parameter]
-        public int TabIndex { get; set; } = 0;
+        public virtual int TabIndex { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the text label displayed on the button.
