@@ -121,30 +121,29 @@ namespace Radzen.Blazor
             await Close.InvokeAsync(args);
         }
 
-        internal bool preventKeyDown;
+        /// <summary>
+        /// Gets or sets the chip list that renders the chip. <see cref="RadzenChipList{TValue}"/> supplies it as a cascading value.
+        /// Inside a chip list the chip is the content of a listbox option, so it renders no role and no tab stop, the option carries
+        /// the selection and the keyboard behaviour, and the remove affordance is a mouse-only control because Delete and Backspace remove the focused chip.
+        /// </summary>
+        [CascadingParameter]
+        public IRadzenChipList? ChipList { get; set; }
 
         internal async Task OnKeyDown(KeyboardEventArgs args)
         {
             if (Disabled)
             {
-                preventKeyDown = false;
                 return;
             }
 
             var key = args.Code ?? args.Key;
             if (key == "Enter" || key == "Space")
             {
-                preventKeyDown = true;
                 await Click.InvokeAsync();
             }
             else if ((key == "Delete" || key == "Backspace") && Close.HasDelegate)
             {
-                preventKeyDown = true;
                 await Close.InvokeAsync();
-            }
-            else
-            {
-                preventKeyDown = false;
             }
         }
 

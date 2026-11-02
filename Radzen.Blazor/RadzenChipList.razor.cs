@@ -120,7 +120,6 @@ namespace Radzen.Blazor
 
         int focusedIndex = -1;
         bool focused;
-        bool preventKeyPress = true;
 
         bool IsFocused(RadzenChipItem item)
         {
@@ -140,6 +139,14 @@ namespace Radzen.Blazor
             }
 
             return GetItemId(focusedIndex);
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            await LinkLabelAsync(Element);
         }
 
         void OnFocus()
@@ -298,34 +305,26 @@ namespace Radzen.Blazor
             if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
                 (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))
             {
-                preventKeyPress = true;
                 var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
                 focusedIndex = focusedIndex < 0 ? 0 : Math.Clamp(focusedIndex + direction, 0, count - 1);
                 await InvokeAsync(StateHasChanged);
             }
             else if (key == "Home" || key == "End")
             {
-                preventKeyPress = true;
                 focusedIndex = key == "Home" ? 0 : count - 1;
                 await InvokeAsync(StateHasChanged);
             }
             else if (key == "Space" || key == "Enter")
             {
-                preventKeyPress = true;
                 var item = focusedIndex >= 0 && focusedIndex < count ? allItems[focusedIndex] : allItems[0];
                 await SelectItem(item);
             }
             else if ((key == "Delete" || key == "Backspace") && AllowDelete)
             {
-                preventKeyPress = true;
                 if (focusedIndex >= 0 && focusedIndex < count)
                 {
                     await RemoveItemAsync(allItems[focusedIndex]);
                 }
-            }
-            else
-            {
-                preventKeyPress = false;
             }
         }
 

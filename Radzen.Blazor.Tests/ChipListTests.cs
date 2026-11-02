@@ -129,5 +129,128 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-state-focused", options[1].ClassList);
             Assert.Equal(secondId, component.Find("[role=listbox]").GetAttribute("aria-activedescendant"));
         }
+    
+
+        [Fact]
+        public void ChipList_Keydown_DoesNotRenderPreventDefault()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenChipList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Orientation, Orientation.Horizontal);
+                parameters.Add(p => p.Data, new List<string> { "Option 1", "Option 2", "Option 3" });
+            });
+
+            var listbox = component.Find("[role=listbox]");
+            Assert.DoesNotContain(listbox.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            listbox.Focus();
+            component.Find("[role=listbox]").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            listbox = component.Find("[role=listbox]");
+            Assert.Contains("rz-state-focused", component.FindAll("[role=option]")[1].ClassList);
+            Assert.DoesNotContain(listbox.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+        }
+    
+
+        [Fact]
+        public void ChipList_Options_HaveNoFocusableContent()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenChipList<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowDelete, true);
+                parameters.Add(p => p.Data, new List<string> { "Option 1", "Option 2" });
+            });
+
+            var options = component.FindAll("[role=option]");
+
+            Assert.Equal(2, options.Count);
+            Assert.All(options, option =>
+            {
+                Assert.False(option.HasAttribute("tabindex"));
+                Assert.Empty(option.QuerySelectorAll("[tabindex], [role=button], button"));
+                Assert.NotNull(option.QuerySelector(".rz-chip-remove[aria-hidden=true]"));
+            });
+        }
+
+        [Fact]
+        public void ChipList_RemoveAffordanceClick_RaisesChipRemoved_WithoutSelecting()
+        {
+            using var ctx = new TestContext();
+            object? removed = null;
+            var changed = false;
+
+            var component = ctx.RenderComponent<RadzenChipList<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowDelete, true);
+                parameters.Add(p => p.Data, new List<string> { "Option 1", "Option 2" });
+                parameters.Add(p => p.ChipRemoved, value => removed = value);
+                parameters.Add(p => p.ValueChanged, value => changed = true);
+            });
+
+            component.FindAll(".rz-chip-remove")[1].Click();
+
+            Assert.Equal("Option 2", removed);
+            Assert.False(changed);
+        }
+
+        [Fact]
+        public void ChipList_ClickOnOption_SetsActiveDescendant()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenChipList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Option 1", "Option 2" });
+            });
+
+            component.Find("[role=listbox]").Focus();
+            component.FindAll("[role=option]")[1].Click();
+
+            var options = component.FindAll("[role=option]");
+
+            Assert.Equal("true", options[1].GetAttribute("aria-selected"));
+            Assert.Contains("rz-state-focused", options[1].ClassList);
+            Assert.Equal(options[1].Id, component.Find("[role=listbox]").GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void ChipList_InsideFormField_IsLabelledByTheField()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenFormField>(parameters => parameters
+                .Add(p => p.Text, "Category")
+                .AddChildContent<RadzenChipList<string>>(list => list.Add(p => p.Data, new List<string> { "Option 1" })));
+
+            var label = component.Find("label");
+
+            Assert.False(string.IsNullOrEmpty(label.Id));
+            Assert.Equal(label.Id, component.Find("[role=listbox]").GetAttribute("aria-labelledby"));
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
+        }
+
+        [Fact]
+        public void ChipList_WithName_LinksLabelOnClient()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            ctx.RenderComponent<RadzenChipList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "category");
+                parameters.Add(p => p.Data, new List<string> { "Option 1" });
+            });
+
+            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.linkLabel");
+
+            Assert.Equal("category", invocation.Arguments[1]);
+        }
     }
 }

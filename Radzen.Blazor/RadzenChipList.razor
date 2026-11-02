@@ -15,14 +15,16 @@
 }
 @if (Visible)
 {
+    <CascadingValue Value="this" IsFixed="true">
     <div @ref="@Element" style="@($"{Style};{WrapStyle}")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="listbox"
          aria-multiselectable="@(Multiple ? "true" : "false")"
          aria-activedescendant="@GetActiveDescendantId()"
+         aria-labelledby="@FormFieldLabelledBy"
          aria-disabled="@(Disabled ? "true" : "false")"
          tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onfocus="OnFocus" @onblur="OnBlur"
-         @onkeydown="OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+         @onkeydown="OnKeyPress" @onkeydown:stopPropagation>
         @for (var i = 0; i < allItems.Count; i++)
         {
             var item = allItems[i];
@@ -30,7 +32,6 @@
             var hasTemplate = item.Template != null || Template != null;
             <div id="@GetItemId(i)" class="@ClassList.Create("rz-chip-list-item").Add("rz-state-focused", IsFocused(item) && focused).ToString()"
                  role="option"
-                 tabindex="-1"
                  aria-selected="@(selected ? "true" : "false")"
                  aria-disabled="@(Disabled || item.Disabled ? "true" : "false")"
                  @onclick="@(args => SelectItem(item))">
@@ -74,4 +75,5 @@
             </div>
         }
     </div>
+    </CascadingValue>
 }

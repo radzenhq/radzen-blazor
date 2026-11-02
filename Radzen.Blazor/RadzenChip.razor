@@ -6,12 +6,11 @@
       @attributes="Attributes"
       class="@GetCssClass()"
       id="@GetId()"
-      role="button"
-      tabindex="@TabIndexValue"
-      aria-disabled="@(Disabled ? "true" : "false")"
+      role="@(ChipList != null ? null : "button")"
+      tabindex="@(ChipList != null ? null : (int?)TabIndexValue)"
+      aria-disabled="@(ChipList != null ? null : Disabled ? "true" : "false")"
       @onclick="@OnClick"
-      @onkeydown="@OnKeyDown"
-      @onkeydown:preventDefault="@preventKeyDown">
+      @onkeydown="@OnKeyDown">
     @if (!string.IsNullOrEmpty(Icon))
     {
         <i class="notranslate rzi rz-chip-icon" aria-hidden="true">@Icon</i>
@@ -28,7 +27,17 @@
         }
     </span>
 
-    @if (Close.HasDelegate)
+    @if (Close.HasDelegate && ChipList != null)
+    {
+        <span class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-lighter rz-button-icon-only rz-chip-remove"
+              title="@RemoveChipTitle"
+              aria-hidden="true"
+              @onclick="@OnCloseClick"
+              @onclick:stopPropagation>
+            <span class="rz-button-box"><i class="notranslate rz-button-icon-left rzi">close</i></span>
+        </span>
+    }
+    else if (Close.HasDelegate)
     {
         <RadzenButton Icon="close"
                       Variant="Variant.Text"
