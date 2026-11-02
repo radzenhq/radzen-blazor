@@ -101,6 +101,7 @@ namespace Radzen.Blazor.Tests
         public void CheckBoxList_Renders_AllowSelectAll()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<string> { "Option 1", "Option 2" };
 
             var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>

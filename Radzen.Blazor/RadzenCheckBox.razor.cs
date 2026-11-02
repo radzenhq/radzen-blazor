@@ -44,6 +44,17 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabel { get; set; }
 
+        /// <inheritdoc />
+        protected override bool ShouldLinkLabel => base.ShouldLinkLabel && string.IsNullOrEmpty(AriaLabel);
+
+        /// <inheritdoc />
+        protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            await LinkLabelAsync(Element);
+        }
+
         /// <summary>
         /// Gets or sets whether the checkbox supports three states: checked (true), unchecked (false), and indeterminate (null).
         /// When enabled, clicking cycles through all three states. Use with nullable boolean (<c>bool?</c>) values.

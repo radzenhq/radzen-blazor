@@ -1,6 +1,7 @@
 using Bunit;
 using Bunit.JSInterop;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -76,6 +77,7 @@ namespace Radzen.Blazor.Tests
         public void CheckBox_Renders_NameParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
 
@@ -237,6 +239,57 @@ namespace Radzen.Blazor.Tests
             component.Find("div.rz-chkbox-box").Click();
 
             Assert.DoesNotContain(@$"rz-state-active", component.Markup);
+        }
+    
+
+        [Fact]
+        public void CheckBox_WithName_LinksLabelOnClient()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters.Add(p => p.Name, "pcheck"));
+
+            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.linkLabel");
+
+            Assert.Equal("pcheck", invocation.Arguments[1]);
+        }
+
+        [Fact]
+        public void CheckBox_WithAriaLabel_DoesNotLinkLabelOnClient()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters
+                .Add(p => p.Name, "pcheck")
+                .Add(p => p.AriaLabel, "Plain check"));
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
+        }
+
+        [Fact]
+        public void CheckBox_InsideFormField_IsLabelledByTheFieldAndDoesNotLinkOnClient()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenFormField>(parameters => parameters
+                .Add(p => p.Text, "Plain check")
+                .AddChildContent<RadzenCheckBox<bool>>(cb => cb.Add(p => p.Name, "pcheck")));
+
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
+            Assert.Equal(component.Find("label").Id, component.Find("[role=checkbox]").GetAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void CheckBox_LinksLabelAgain_WhenShownAgain()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters.Add(p => p.Name, "pcheck"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.linkLabel"));
         }
     }
 }

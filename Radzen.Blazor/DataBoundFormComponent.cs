@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor;
@@ -497,6 +498,47 @@ namespace Radzen
         /// or <c>null</c> when the component is not the one the form field label points to or the consumer supplied <c>aria-label</c> or <c>aria-labelledby</c> via <see cref="RadzenComponent.Attributes"/>.
         /// </summary>
         protected string? FormFieldLabelledBy => Attributes != null && (Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")) ? null : FormFieldContext?.GetLabelId(this);
+
+        private string? linkedLabelName;
+        private bool linkedLabelVisible;
+
+        /// <summary>
+        /// Gets a value indicating whether a label whose <c>for</c> attribute targets <see cref="Name"/> should name the component on the client:
+        /// the component has a name, is visible, is not named by a <see cref="RadzenFormField"/> and the consumer did not supply <c>aria-label</c> or <c>aria-labelledby</c>.
+        /// Components with an aria label parameter of their own override it to require that the parameter is not set.
+        /// </summary>
+        protected virtual bool ShouldLinkLabel => !string.IsNullOrEmpty(Name) && Visible && FormFieldContext?.GetLabelId(this) == null
+            && (Attributes == null || !(Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")));
+
+        /// <summary>
+        /// Asks the client to point <c>aria-labelledby</c> of <paramref name="element"/> at the label whose <c>for</c> attribute targets <see cref="Name"/>.
+        /// Call it from <c>OnAfterRenderAsync</c>; it talks to the client only when <see cref="Name"/> or <see cref="RadzenComponent.Visible"/> changed since the last call.
+        /// Use it for components whose focusable element is not labelable, so a <see cref="RadzenLabel"/> or a plain label associated through the name names it anyway.
+        /// </summary>
+        /// <param name="element">The element that carries the accessible name.</param>
+        protected async Task LinkLabelAsync(ElementReference element)
+        {
+            if (Name == linkedLabelName && Visible == linkedLabelVisible)
+            {
+                return;
+            }
+
+            linkedLabelName = Name;
+            linkedLabelVisible = Visible;
+
+            if (!ShouldLinkLabel || !IsJSRuntimeAvailable || JSRuntime == null)
+            {
+                return;
+            }
+
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.linkLabel", element, Name);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
 
         /// <summary>
         /// Handles the ContextMenu event.

@@ -20,7 +20,7 @@
         @if (AllowSelectAll)
         {
             <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
-                <RadzenCheckBox ReadOnly="@ReadOnly" Disabled="@Disabled" Name="SelectAll" TValue="bool?" Value="@IsAllSelected()" Change="@SelectAll"
+                <RadzenCheckBox ReadOnly="@ReadOnly" Disabled="@Disabled" Name="SelectAll" AriaLabel="@SelectAllText" TValue="bool?" Value="@IsAllSelected()" Change="@SelectAll"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectAllText ?? "" }})" />
                 <button type="button" @onclick="@(() => SelectAll(!IsAllSelected() ?? true))" class="rz-chkbox-label" disabled="@(Disabled || ReadOnly)">@SelectAllText</button>
             </div>
