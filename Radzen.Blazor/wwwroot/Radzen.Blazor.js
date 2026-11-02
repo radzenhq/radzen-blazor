@@ -8103,7 +8103,7 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   }
   function onStopKeydown(e) { e.stopPropagation(); }
   function onDisabledDrop(e) {
-    if (fileInput && fileInput.disabled && choose.classList.contains('rz-fileupload-choose-template')) {
+    if (fileInput && fileInput.disabled) {
       e.preventDefault();
     }
   }

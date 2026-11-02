@@ -442,7 +442,7 @@ namespace Radzen.Blazor
         /// <param name="ignoreCase">Specify true is file name casing should be ignored (default: false)</param>
         public async System.Threading.Tasks.Task RemoveFile(string fileName, bool ignoreCase = false)
         {
-            var comparisonMethod = ignoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            var comparisonMethod = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             var fileInfo = files.FirstOrDefault(f => string.Equals(f.Name, fileName, comparisonMethod));
             if (fileInfo != null)
             {

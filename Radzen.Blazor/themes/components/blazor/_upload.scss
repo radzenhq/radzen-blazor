@@ -51,6 +51,12 @@ $upload-button-background-color: var(--rz-primary) !default;
     }
   }
 
+  &.rz-fileupload-choose-template {
+    input[type='file'] {
+      left: 0;
+    }
+  }
+
   &:not(.rz-state-disabled) {
     background-color: var(--rz-upload-choose-background-color);
     color: var(--rz-upload-choose-color);

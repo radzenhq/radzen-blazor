@@ -69,12 +69,12 @@
                 @if(!string.IsNullOrEmpty(Url))
                 {
                     <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled"
-                        tabindex="-1" style="@(ChooseTemplate != null ? "left: 0;" : null)" />
+                        tabindex="-1" />
                 }
                 else
                 {
                     <Microsoft.AspNetCore.Components.Forms.InputFile id="@(Name ?? GetId())" @attributes="InputAttributes" multiple="@Multiple" accept="@Accept" disabled="@Disabled"
-                        tabindex="-1" style="@(ChooseTemplate != null ? "left: 0;" : null)" OnChange="@OnInputChange" />
+                        tabindex="-1" OnChange="@OnInputChange" />
                 }
             </text>
             };

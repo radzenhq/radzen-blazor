@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
@@ -31,7 +32,7 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("3", choose.GetAttribute("tabindex"));
             Assert.Empty(component.FindAll(".rz-button-text, .rzi"));
             Assert.Single(component.FindAll("input[type=file]"));
-            Assert.Equal("left: 0;", component.Find("input[type=file]").GetAttribute("style"));
+            Assert.False(component.Find("input[type=file]").HasAttribute("style"));
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
 
@@ -116,6 +117,54 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(3, changes);
             Assert.Empty(component.FindAll(".rz-fileupload-content"));
             Assert.Equal(2, ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"].Count);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("api/upload")]
+        public void Upload_ChooseTemplate_KeepsInputAttributesStyle(string url)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, url)
+                .Add(p => p.ChooseTemplate, "<span>Custom content</span>")
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["style"] = "color: red;", ["data-test"] = "1" }));
+
+            var input = component.Find("input[type=file]");
+            Assert.Equal("color: red;", input.GetAttribute("style"));
+            Assert.Equal("1", input.GetAttribute("data-test"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ChooseTemplate, (RenderFragment)null));
+
+            Assert.Equal("color: red;", component.Find("input[type=file]").GetAttribute("style"));
+        }
+
+        [Fact]
+        public async Task Upload_RemoveFile_RespectsIgnoreCase()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            UploadChangeEventArgs change = null;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
+                .Add(p => p.Url, "api/upload")
+                .Add(p => p.Auto, false)
+                .Add(p => p.Change, args => change = args));
+
+            await component.InvokeAsync(() => component.Instance.OnChange(new[]
+            {
+                new PreviewFileInfo { Name = "Report.pdf", Size = 1 },
+                new PreviewFileInfo { Name = "report.pdf", Size = 2 }
+            }));
+
+            await component.InvokeAsync(() => component.Instance.RemoveFile("REPORT.PDF"));
+            Assert.Equal(2, change.Files.Count());
+
+            await component.InvokeAsync(() => component.Instance.RemoveFile("report.pdf"));
+            Assert.Equal("Report.pdf", Assert.Single(change.Files).Name);
+
+            await component.InvokeAsync(() => component.Instance.RemoveFile("REPORT.PDF", ignoreCase: true));
+            Assert.Empty(change.Files);
         }
 
         [Fact]
