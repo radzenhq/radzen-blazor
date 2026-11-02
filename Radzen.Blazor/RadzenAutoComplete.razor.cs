@@ -72,6 +72,14 @@ namespace Radzen.Blazor
         public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
+        /// Gets the id of the input element: <see cref="DataBoundFormComponent{T}.Name"/> when set, otherwise an id derived from the component id.
+        /// </summary>
+        protected string InputId => Name ?? $"{GetId()}-input";
+
+        /// <inheritdoc />
+        protected override string? LabelTargetId => InputId;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAutoComplete"/> is multiline.
         /// </summary>
         /// <value><c>true</c> if multiline; otherwise, <c>false</c>.</value>

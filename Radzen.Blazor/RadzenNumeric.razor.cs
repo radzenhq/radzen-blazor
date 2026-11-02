@@ -945,9 +945,17 @@ namespace Radzen.Blazor
                     return null;
                 }
 
-                return !string.IsNullOrEmpty(AriaLabel) ? AriaLabel : Name;
+                return !string.IsNullOrEmpty(AriaLabel) ? AriaLabel : FormFieldContext != null ? null : Name;
             }
         }
+
+        /// <summary>
+        /// Gets the id of the input element: <see cref="FormComponent{T}.Name"/> when set, otherwise an id derived from the component id.
+        /// </summary>
+        protected string InputId => Name ?? $"{GetId()}-input";
+
+        /// <inheritdoc />
+        protected override string? LabelTargetId => InputId;
 
         private string? upAriaLabel;
 

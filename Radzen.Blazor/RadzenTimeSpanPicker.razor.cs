@@ -394,7 +394,21 @@ namespace Radzen.Blazor
         /// <summary>
         /// Specifies the <see cref="RadzenFormField"/> context of this component.
         /// </summary>
+        [CascadingParameter]
         public IFormFieldContext? FormFieldContext { get; set; }
+
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            FormFieldContext?.SetLabelTarget(this, Visible ? InputId : null);
+        }
+
+        /// <summary>
+        /// Gets the id of the input element: <see cref="Name"/> when set, otherwise an id derived from the component id.
+        /// </summary>
+        protected string InputId => Name ?? $"{GetId()}-input";
         #endregion
 
 
@@ -567,6 +581,8 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
+
+            FormFieldContext?.SetLabelTarget(this, null);
 
             if (EditContext != null)
             {

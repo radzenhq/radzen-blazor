@@ -21,7 +21,7 @@
     }
     else
     {
-        <input @ref="@input" type="text" name="@Name" id="@Name" value="@FormattedValue"
+        <input @ref="@input" type="text" name="@Name" id="@InputId" value="@FormattedValue"
                    disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off" class="@GetInputClass()"
                    placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
                    @onchange="@(args => { var value = args.Value?.ToString(); if (value != null) _ = SetValueFromInput(value); })"

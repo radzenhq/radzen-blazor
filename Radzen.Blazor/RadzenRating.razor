@@ -3,7 +3,7 @@
 @inherits FormComponent<int>
 @if (Visible)
 {
-    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" role="radiogroup" aria-label="@AriaLabel" aria-readonly="@(ReadOnly ? "true" : null)">
+    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" role="radiogroup" aria-label="@AriaLabel" aria-labelledby="@(ariaLabel == null ? FormFieldLabelledBy : null)" aria-readonly="@(ReadOnly ? "true" : null)">
         @if (!ReadOnly)
         {
             <button type="button" id="@(GetId() + "cl")" aria-label="@ClearAriaLabel" @onclick="@(args => SetValue(0))" class="rz-rating-cancel"

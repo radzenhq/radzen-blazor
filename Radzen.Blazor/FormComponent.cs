@@ -285,6 +285,8 @@ namespace Radzen
                 FormFieldContext?.DisabledChanged(Disabled);
             }
 
+            FormFieldContext?.SetLabelTarget(this, Visible ? LabelTargetId : null);
+
             return result;
         }
 
@@ -311,6 +313,8 @@ namespace Radzen
             }
 
             Form?.RemoveComponent(this);
+
+            FormFieldContext?.SetLabelTarget(this, null);
 
             GC.SuppressFinalize(this);
         }
@@ -380,6 +384,18 @@ namespace Radzen
 
         /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
         protected string? CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+
+        /// <summary>
+        /// Gets the id of the element a <see cref="RadzenFormField"/> label points to with its <c>for</c> attribute.
+        /// Defaults to the component id; components that render their input inside a wrapper element return the input id instead.
+        /// </summary>
+        protected virtual string? LabelTargetId => GetId();
+
+        /// <summary>
+        /// Gets the id of the enclosing <see cref="RadzenFormField"/> label for use as <c>aria-labelledby</c> on elements that cannot be the target of a label,
+        /// or <c>null</c> when the component is not the one the form field label points to or the consumer supplied <c>aria-label</c> or <c>aria-labelledby</c> via <see cref="RadzenComponent.Attributes"/>.
+        /// </summary>
+        protected string? FormFieldLabelledBy => Attributes != null && (Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")) ? null : FormFieldContext?.GetLabelId(this);
 
         /// <inheritdoc/>
         public virtual async ValueTask FocusAsync()

@@ -4,7 +4,7 @@
 @if (Visible)
 {
 <span @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" style="@Style" @onclick="@Toggle">
-    <input type="checkbox" role="switch" name="@Name" id="@Name" checked="@Value"
+    <input type="checkbox" role="switch" name="@Name" id="@InputId" checked="@Value"
            value="@ValueAsString" tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")"
            disabled="@(Disabled || ReadOnly)" aria-checked="@(Value.ToString().ToLowerInvariant())"
            @onclick="@Toggle" @onclick:stopPropagation @onkeydown="@OnKeyPress"

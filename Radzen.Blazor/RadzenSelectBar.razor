@@ -15,7 +15,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="@(Multiple ? "toolbar" : "radiogroup")" aria-orientation="@(Orientation == Orientation.Vertical ? "vertical" : "horizontal")"
-         aria-label="@AriaLabel" aria-labelledby="@AriaLabelledBy" aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId"
+         aria-label="@AriaLabel" aria-labelledby="@(AriaLabelledBy ?? (string.IsNullOrEmpty(AriaLabel) ? FormFieldLabelledBy : null))" aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId"
          @onfocus=@this.AsNonRenderingEventHandler(OnFocus) @onblur=@this.AsNonRenderingEventHandler(OnBlur)
          tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
         @foreach (var item in NavigableItems)

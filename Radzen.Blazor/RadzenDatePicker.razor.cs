@@ -2343,6 +2343,11 @@ namespace Radzen.Blazor
         protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
 
         /// <summary>
+        /// Gets the id of the input element: <see cref="Name"/> when set, otherwise an id derived from the component id.
+        /// </summary>
+        protected string InputId => Name ?? $"{GetId()}-input";
+
+        /// <summary>
         /// Closes this instance popup.
         /// </summary>
         public void Close()
@@ -2691,6 +2696,8 @@ namespace Radzen.Blazor
                 FormFieldContext?.DisabledChanged(Disabled);
             }
 
+            FormFieldContext?.SetLabelTarget(this, Visible ? InputId : null);
+
             if (shouldClose && !firstRender && IsJSRuntimeAvailable && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
@@ -2763,6 +2770,8 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
+
+            FormFieldContext?.SetLabelTarget(this, null);
 
             if (EditContext != null)
             {

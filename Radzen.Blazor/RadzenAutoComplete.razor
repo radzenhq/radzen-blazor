@@ -15,7 +15,7 @@
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                 aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" aria-activedescendant="@ActiveDescendantId" autocomplete="off" role="combobox"
                 class=@InputClass
-                id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
+                id="@InputId" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         else
         {
@@ -23,7 +23,7 @@
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                 aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" aria-activedescendant="@ActiveDescendantId" autocomplete="off" role="combobox"
                 class=@InputClass
-                type="@InputType" id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
+                type="@InputType" id="@InputId" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         <div id="@PopupID" class="@PopupCssClass" style="@PopupStyle">
             <ul id="@ListId" @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">

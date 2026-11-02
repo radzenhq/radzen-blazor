@@ -202,6 +202,8 @@ namespace Radzen.Blazor
                 FormFieldContext?.DisabledChanged(Disabled);
             }
 
+            FormFieldContext?.SetLabelTarget(this, Visible ? GetId() : null);
+
             return result;
         }
 
@@ -221,6 +223,8 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
+
+            FormFieldContext?.SetLabelTarget(this, null);
 
             if (EditContext != null)
             {

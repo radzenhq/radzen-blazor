@@ -4,7 +4,7 @@
 @inherits FormComponent<string>
 @if (Visible)
 {
-    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" role="group" aria-label="@AriaLabel">
+    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" role="group" aria-label="@AriaLabel" aria-labelledby="@(ariaLabel == null ? FormFieldLabelledBy : null)">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" type="hidden" name="@Name">
         </div>

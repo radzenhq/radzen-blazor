@@ -55,6 +55,14 @@ namespace Radzen.Blazor
         [Parameter]
         public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
+        /// <summary>
+        /// Gets the id of the input element: <see cref="FormComponent{T}.Name"/> when set, otherwise an id derived from the component id.
+        /// </summary>
+        protected string InputId => Name ?? $"{GetId()}-input";
+
+        /// <inheritdoc />
+        protected override string? LabelTargetId => InputId;
+
         private string ValueAsString => Value.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
         /// <summary>

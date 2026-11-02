@@ -139,7 +139,7 @@ namespace Radzen.Blazor
                     return Convert.ToString(ariaLabel, Culture);
                 }
 
-                if (Attributes != null && Attributes.ContainsKey("aria-labelledby"))
+                if (ListboxAriaLabelledBy != null)
                 {
                     return null;
                 }
@@ -149,10 +149,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the consumer supplied aria-labelledby attribute value applied to the listbox, or null when not supplied.
+        /// Gets the aria-labelledby attribute value applied to the listbox: the consumer supplied one, otherwise the enclosing <see cref="RadzenFormField"/> label, or null.
         /// </summary>
         /// <returns>The labelling element identifier or null.</returns>
-        internal string? ListboxAriaLabelledBy => Attributes != null && Attributes.TryGetValue("aria-labelledby", out var ariaLabelledBy) ? Convert.ToString(ariaLabelledBy, Culture) : null;
+        internal string? ListboxAriaLabelledBy => Attributes != null && Attributes.TryGetValue("aria-labelledby", out var ariaLabelledBy) ? Convert.ToString(ariaLabelledBy, Culture) : FormFieldLabelledBy;
 
         /// <summary>
         /// Handles the key down event.

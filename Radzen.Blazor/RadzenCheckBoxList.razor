@@ -15,7 +15,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         role="group" aria-label="@Name" aria-activedescendant="@GetActiveDescendantId()" aria-disabled="@(Disabled ? "true" : "false")" @onfocus=@OnFocus @onblur=@OnBlur
+         role="group" aria-label="@(FormFieldLabelledBy != null ? null : Name)" aria-labelledby="@FormFieldLabelledBy" aria-activedescendant="@GetActiveDescendantId()" aria-disabled="@(Disabled ? "true" : "false")" @onfocus=@OnFocus @onblur=@OnBlur
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:stopPropagation="stopKeydownPropagation">
         @if (AllowSelectAll)
         {

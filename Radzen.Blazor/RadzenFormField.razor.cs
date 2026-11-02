@@ -19,6 +19,20 @@ namespace Radzen.Blazor
         /// Gets or sets a value indicating whether the label is floating or fixed on top.
         /// </summary>
         bool AllowFloatingLabel { get; set; }
+        /// <summary>
+        /// Gets the id of the form field label when <paramref name="owner"/> registered the label target, otherwise <c>null</c>.
+        /// Components whose focusable element cannot be the target of the label <c>for</c> attribute render it as <c>aria-labelledby</c> so the label still names them.
+        /// </summary>
+        /// <param name="owner">The component asking for the label id.</param>
+        string? GetLabelId(object owner) => null;
+        /// <summary>
+        /// Registers the id of the element the form field label points to with its <c>for</c> attribute.
+        /// The form field uses it unless <see cref="RadzenFormField.Component"/> is set. The first component to register owns the target
+        /// until it passes <c>null</c>, so components nested inside another form component do not take the label over.
+        /// </summary>
+        /// <param name="owner">The component registering the target.</param>
+        /// <param name="id">The id of the element the label points to or <c>null</c> to release the target.</param>
+        void SetLabelTarget(object owner, string? id) { }
     }
 
     /// <summary>
@@ -34,6 +48,42 @@ namespace Radzen.Blazor
         /// Gets or sets a value indicating whether the label is floating or fixed on top.
         /// </summary>
         public bool AllowFloatingLabel { get; set; }
+        /// <summary>
+        /// Gets or sets the id of the form field label.
+        /// </summary>
+        public string? LabelId { get; set; }
+        /// <summary>
+        /// Gets the id of the element the form field label points to, registered by the wrapped component.
+        /// </summary>
+        public string? LabelTarget { get; private set; }
+        /// <summary>
+        /// Notifies the form field that the label target has changed.
+        /// </summary>
+        public Action<string?>? LabelTargetChanged { get; set; }
+
+        private object? labelTargetOwner;
+
+        /// <inheritdoc />
+        public string? GetLabelId(object owner) => labelTargetOwner == owner ? LabelId : null;
+
+        /// <inheritdoc />
+        public void SetLabelTarget(object owner, string? id)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+
+            if (labelTargetOwner != null && labelTargetOwner != owner)
+            {
+                return;
+            }
+
+            labelTargetOwner = id != null ? owner : null;
+
+            if (LabelTarget != id)
+            {
+                LabelTarget = id;
+                LabelTargetChanged?.Invoke(id);
+            }
+        }
     }
 
     /// <summary>
@@ -210,7 +260,8 @@ namespace Radzen.Blazor
         public bool FocusOnClick { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the form field. Used to associate the label with a component.
+        /// Gets or sets the id of the element the label is associated with, rendered as the label <c>for</c> attribute.
+        /// Optional: when not set the label points to the input component placed in <see cref="ChildContent"/>.
         /// </summary>
         [Parameter]
         public string? Component { get; set; }
@@ -224,20 +275,27 @@ namespace Radzen.Blazor
 
         private bool disabled;
 
-        private readonly IFormFieldContext context;
+        private string? labelTarget;
 
+        private readonly FormFieldContext context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RadzenFormField"/> class.
         /// </summary>
         public RadzenFormField()
         {
-            context = new FormFieldContext { DisabledChanged = DisabledChanged, AllowFloatingLabel = AllowFloatingLabel };
+            context = new FormFieldContext { DisabledChanged = DisabledChanged, AllowFloatingLabel = AllowFloatingLabel, LabelTargetChanged = LabelTargetChanged };
         }
 
         private void DisabledChanged(bool value)
         {
             disabled = value;
+            StateHasChanged();
+        }
+
+        private void LabelTargetChanged(string? value)
+        {
+            labelTarget = value;
             StateHasChanged();
         }
 
@@ -247,7 +305,12 @@ namespace Radzen.Blazor
             base.OnParametersSet();
 
             context.AllowFloatingLabel = AllowFloatingLabel;
+            context.LabelId = LabelId;
         }
+
+        string LabelId => $"{GetId()}-label";
+
+        string? LabelFor => !string.IsNullOrEmpty(Component) ? Component : labelTarget;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass() => ClassList.Create("rz-form-field")

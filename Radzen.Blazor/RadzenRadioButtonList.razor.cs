@@ -379,7 +379,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabelledBy { get; set; }
 
-        string? GroupAriaLabel => (Attributes != null && Attributes.ContainsKey("aria-label")) || !string.IsNullOrEmpty(AriaLabelledBy)
+        string? GroupAriaLabel => (Attributes != null && Attributes.ContainsKey("aria-label")) || !string.IsNullOrEmpty(AriaLabelledBy ?? FormFieldLabelledBy)
             ? null
             : Name;
 

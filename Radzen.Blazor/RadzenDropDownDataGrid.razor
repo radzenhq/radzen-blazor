@@ -8,7 +8,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" aria-label="@SelectedAriaLabel" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
+    <div @ref="@Element" aria-label="@SelectedAriaLabel" aria-labelledby="@FormFieldLabelledBy" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
          role="combobox" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@GridDataID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())" aria-activedescendant="@ActiveDescendantId"
          style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown">
