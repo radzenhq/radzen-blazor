@@ -420,6 +420,8 @@ namespace Radzen.Blazor
 
             this.firstRender = firstRender;
 
+            await LinkLabelAsync(Element, firstRender || visibleChanged);
+
             if (firstRender || visibleChanged || disabledChanged)
             {
                 visibleChanged = false;

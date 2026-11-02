@@ -8841,6 +8841,17 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
 Radzen.scrollElementTo = (scrollable, left, top) => {
   scrollable.scrollTo({ top: top, left: Radzen.isRTL(scrollable) ? -left : left });
 };
+Radzen.linkLabel = function (el, name) {
+  if (!el || !name || typeof el.setAttribute !== 'function') return;
+  var escaped = window.CSS && CSS.escape ? CSS.escape(name) : name.replace(/"/g, '\\"');
+  var label = document.querySelector('label[for="' + escaped + '"]');
+  if (!label || el.contains(label)) return;
+  if (!label.id) {
+    label.id = name + '-label';
+  }
+  el.setAttribute('aria-labelledby', label.id);
+};
+
 Radzen.createFormField = function(el) {
   if (!el || typeof el.addEventListener !== 'function') return { dispose: function() {} };
   function onFocusIn() { el.classList.add('rz-state-focused'); }

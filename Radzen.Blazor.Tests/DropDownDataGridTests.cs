@@ -781,5 +781,20 @@ namespace Radzen.Blazor.Tests
             Assert.NotEmpty(buttons);
             Assert.All(buttons, b => Assert.Equal(component.Instance.RemoveChipTitle, b.GetAttribute("aria-label")));
         }
+    
+
+        [Fact]
+        public void DropDownDataGrid_WithName_LinksLabelOnClient()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters => parameters
+                .Add(p => p.Name, "colour")
+                .Add(p => p.Data, new[] { "Red", "Green" }));
+
+            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.linkLabel");
+
+            Assert.Equal("colour", invocation.Arguments[1]);
+        }
     }
 }

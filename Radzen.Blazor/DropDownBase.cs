@@ -1248,6 +1248,44 @@ namespace Radzen
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        private string? linkedLabelName;
+
+        /// <summary>
+        /// Gets a value indicating whether a label whose <c>for</c> attribute targets <see cref="DataBoundFormComponent{T}.Name"/> should name the component on the client:
+        /// the component has a name, is visible, is not named by a <see cref="RadzenFormField"/> and the consumer did not supply <c>aria-label</c> or <c>aria-labelledby</c>.
+        /// </summary>
+        protected bool ShouldLinkLabel => !string.IsNullOrEmpty(Name) && Visible && FormFieldContext?.GetLabelId(this) == null
+            && (Attributes == null || !(Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")));
+
+        /// <summary>
+        /// Asks the client to point <c>aria-labelledby</c> of <paramref name="element"/> at the label whose <c>for</c> attribute targets <see cref="DataBoundFormComponent{T}.Name"/>.
+        /// The focusable element of the component is not labelable, so a <see cref="RadzenLabel"/> or a plain label associated through the name would otherwise not name it.
+        /// </summary>
+        /// <param name="element">The element that carries the accessible name.</param>
+        /// <param name="force">Whether to link even if the name did not change, for example after the element was recreated.</param>
+        protected async Task LinkLabelAsync(ElementReference element, bool force)
+        {
+            if (!force && Name == linkedLabelName)
+            {
+                return;
+            }
+
+            linkedLabelName = Name;
+
+            if (!ShouldLinkLabel || !IsJSRuntimeAvailable || JSRuntime == null)
+            {
+                return;
+            }
+
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.linkLabel", element, Name);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
         /// <inheritdoc />
         protected override void OnInitialized()
         {

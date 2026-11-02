@@ -664,6 +664,8 @@ namespace Radzen.Blazor
             }
 
             await base.OnAfterRenderAsync(firstRender);
+
+            await LinkLabelAsync(Element, firstRender);
         }
 
         async Task FocusItem()
