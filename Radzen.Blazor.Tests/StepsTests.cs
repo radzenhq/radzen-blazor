@@ -99,6 +99,31 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Steps_Renders_AriaDisabled_OnlyForDisabledStep()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add(p => p.ShowStepsButtons, false);
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "One");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(2);
+                    builder.AddAttribute(3, "Text", "Two");
+                    builder.AddAttribute(4, "Disabled", true);
+                    builder.CloseComponent();
+                });
+            });
+
+            var tabs = component.FindAll("[role=tab]");
+            Assert.Equal(2, tabs.Count);
+            Assert.False(tabs[0].HasAttribute("aria-disabled"));
+            Assert.Equal("true", tabs[1].GetAttribute("aria-disabled"));
+        }
+
+        [Fact]
         public void Steps_PrevButton_DisabledWhenPrevStepIsDisabled()
         {
             using var ctx = new TestContext();
