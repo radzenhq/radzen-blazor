@@ -17,16 +17,18 @@
 {
     <div @ref="@Element" style="@($"{Style};{WrapStyle}")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="listbox"
-         aria-multiselectable="@Multiple"
+         aria-multiselectable="@(Multiple ? "true" : "false")"
+         aria-activedescendant="@GetActiveDescendantId()"
          aria-disabled="@(Disabled ? "true" : "false")"
          tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onfocus="OnFocus" @onblur="OnBlur"
          @onkeydown="OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
-        @foreach (var item in allItems)
+        @for (var i = 0; i < allItems.Count; i++)
         {
+            var item = allItems[i];
             var selected = IsSelected(item);
             var hasTemplate = item.Template != null || Template != null;
-            <div class="@ClassList.Create("rz-chip-list-item").Add("rz-state-focused", IsFocused(item) && focused).ToString()"
+            <div id="@GetItemId(i)" class="@ClassList.Create("rz-chip-list-item").Add("rz-state-focused", IsFocused(item) && focused).ToString()"
                  role="option"
                  tabindex="-1"
                  aria-selected="@(selected ? "true" : "false")"

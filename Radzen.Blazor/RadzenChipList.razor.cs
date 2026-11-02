@@ -127,6 +127,21 @@ namespace Radzen.Blazor
             return allItems.IndexOf(item) == focusedIndex;
         }
 
+        string GetItemId(int index)
+        {
+            return $"{GetId()}-{index}";
+        }
+
+        string? GetActiveDescendantId()
+        {
+            if (!focused || focusedIndex < 0 || focusedIndex >= allItems.Count)
+            {
+                return null;
+            }
+
+            return GetItemId(focusedIndex);
+        }
+
         void OnFocus()
         {
             focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
