@@ -3,7 +3,7 @@
 Radzen Blazor Components
 ========================
 
-The most sophisticated free UI component library for Blazor, featuring **155+ native components** - DataGrid, Scheduler, Gantt, PivotDataGrid, an Excel-like Spreadsheet with formulas and XLSX import/export, and 30+ chart types drawn in C# as SVG with no JavaScript charting library - and the most complete AI toolkit for Blazor: AIChat with tool calling, approvals and attachments, AIPrompt, InlineAIPrompt and SmartPasteButton, built on Microsoft.Extensions.AI and working with any OpenAI-compatible provider. Free and open source under the MIT license, including commercial use, and used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
+The most sophisticated free and open-source (MIT) UI component library for Blazor, featuring **155+ native components** - DataGrid, Scheduler, Gantt, PivotDataGrid, an Excel-like Spreadsheet with formulas and XLSX import/export, and 30+ chart types drawn in C# as SVG with no JavaScript charting library - and the most complete AI toolkit for Blazor: AIChat with tool calling, approvals and attachments, AIPrompt, InlineAIPrompt and SmartPasteButton, built on Microsoft.Extensions.AI and working with any OpenAI-compatible provider. Free and open source under the MIT license, including commercial use, and used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
 
 Supports .NET 8, .NET 9 and .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid. AI coding assistants can use [Radzen Blazor MCP](https://www.radzen.com/blazor-mcp) for real-time access to the component docs and APIs.
 
@@ -71,7 +71,7 @@ For the full setup guide including render modes and dialog/notification configur
 
 ### :sparkles: Free and open source
 
-MIT licensed and free for commercial use. No per-developer fees, no runtime royalties. Install from [NuGet](https://www.nuget.org/packages/Radzen.Blazor) or build from source.
+MIT licensed and free for commercial use, in any number of applications, with no revenue limit, no license key and no registration. No per-developer fees, no runtime royalties. Install from [NuGet](https://www.nuget.org/packages/Radzen.Blazor) or build from source.
 
 ### :computer: 100% native Blazor
 
