@@ -247,6 +247,7 @@ namespace Radzen
 
             options.Title = title;
             currentSideDialogOptions = options;
+            options.Localizer = Localizer;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
             return sideDialogResultTask.Task;
         }
@@ -277,6 +278,7 @@ namespace Radzen
 
             options.Title = title;
             currentSideDialogOptions = options;
+            options.Localizer = Localizer;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
 
             return sideDialogResultTask.Task;
@@ -302,6 +304,7 @@ namespace Radzen
 
             options.Title = title;
             currentSideDialogOptions = options;
+            options.Localizer = Localizer;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
         }
 
@@ -329,6 +332,7 @@ namespace Radzen
 
             options.Title = title;
             currentSideDialogOptions = options;
+            options.Localizer = Localizer;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
         }
 
@@ -1174,6 +1178,8 @@ namespace Radzen
             }
         }
 
+        internal Localizer? Localizer { get; set; }
+
         private string? resizeBarTitle;
         internal string? ResizeBarTitleValue => resizeBarTitle;
 
@@ -1182,7 +1188,7 @@ namespace Radzen
         /// </summary>
         public string ResizeBarTitle
         {
-            get => resizeBarTitle ?? Localizer.Default.Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarTitle), System.Globalization.CultureInfo.CurrentUICulture);
+            get => resizeBarTitle ?? (Localizer ?? Radzen.Localizer.Default).Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarTitle), System.Globalization.CultureInfo.CurrentUICulture);
             set
             {
                 if (value == resizeBarTitle)
@@ -1203,7 +1209,7 @@ namespace Radzen
         /// </summary>
         public string ResizeBarAriaLabel
         {
-            get => resizeBarAriaLabel ?? Localizer.Default.Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarAriaLabel), System.Globalization.CultureInfo.CurrentUICulture);
+            get => resizeBarAriaLabel ?? (Localizer ?? Radzen.Localizer.Default).Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarAriaLabel), System.Globalization.CultureInfo.CurrentUICulture);
             set
             {
                 if (value == resizeBarAriaLabel)
