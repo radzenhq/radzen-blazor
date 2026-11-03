@@ -1,9 +1,9 @@
 ﻿@using System.ComponentModel.DataAnnotations
     
-<RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
+<RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px" EnumTranslationFunc="@TranslateEnum">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.ID)" Title="ID" />
-        <RadzenDataGridColumn Property="@nameof(Employee.Gender)" Title="Gender" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Gender)" Title="Gender (EnumTranslationFunc)" />
         <RadzenDataGridColumn Property="@nameof(Employee.Status)" Title="Nullable Status" />
         <RadzenDataGridColumn Property="@nameof(Employee.Color)" Title="Favorite Color (Display Attribute in Filter)" />
     </Columns>
@@ -49,6 +49,14 @@
         Inactive,
         Active,
     }
+
+    string TranslateEnum(Enum value) => value switch
+    {
+        GenderType.Ms => "Ms.",
+        GenderType.Mr => "Mr.",
+        GenderType.Unknown => "Not specified",
+        _ => null
+    };
 
     protected override void OnInitialized()
     {

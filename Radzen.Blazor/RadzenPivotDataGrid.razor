@@ -457,7 +457,7 @@
                         else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(currentFilterField)))
                         {
                             <RadzenDropDown Disabled="@(!CanSetFilterValue(currentFilterField))" AllowClear="false" AllowFiltering="false" TValue="@object"
-                                            Value="@currentFilterField.GetFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumFilterTranslationFunc)"
+                                            Value="@currentFilterField.GetFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumTranslationFunc, EnumFilterTranslationFunc)"
                                             Change="@(args => SetFilterValue(currentFilterField, args))"
                                             InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + FilterValueAriaLabel + currentFilterField.GetFilterValue() }})" />
                         }
@@ -491,7 +491,7 @@
                         else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(currentFilterField)))
                         {
                             <RadzenDropDown Disabled="@(!CanSetFilterValue(currentFilterField, false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + SecondFilterValueAriaLabel }})"
-                                            Value="@currentFilterField.GetSecondFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumFilterTranslationFunc)"
+                                            Value="@currentFilterField.GetSecondFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumTranslationFunc, EnumFilterTranslationFunc)"
                                             Change="@(args => SetFilterValue(currentFilterField, args, false))" />
                         }
                         else if (PropertyAccess.IsNumeric(GetFilterPropertyType(currentFilterField)))

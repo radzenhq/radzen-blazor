@@ -820,7 +820,7 @@ namespace Radzen.Blazor
                 var enumValue = value as Enum;
                 if (enumValue != null)
                 {
-                    value = EnumExtensions.GetDisplayDescription(enumValue, Grid.EnumFilterTranslationFunc);
+                    value = EnumExtensions.GetDisplayDescription(enumValue, Grid.EnumTranslationFunc, Grid.EnumFilterTranslationFunc);
                 }
             }
 

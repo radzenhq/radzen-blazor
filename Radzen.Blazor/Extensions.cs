@@ -56,15 +56,47 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets the display text for an enum value. <paramref name="valueTranslationFunction"/> receives the enum value itself and takes precedence;
+        /// when it is <c>null</c> or returns <c>null</c> the text resolves as in <see cref="GetDisplayDescription(Enum, Func{string, string})"/>
+        /// and <paramref name="textTranslationFunction"/> receives that text.
+        /// </summary>
+        public static string GetDisplayDescription(this Enum enumValue, Func<Enum, string?>? valueTranslationFunction, Func<string, string>? textTranslationFunction)
+        {
+            ArgumentNullException.ThrowIfNull(enumValue);
+
+            if (valueTranslationFunction != null)
+            {
+                var translated = valueTranslationFunction(enumValue);
+
+                if (translated != null)
+                {
+                    return translated;
+                }
+            }
+
+            return GetDisplayDescription(enumValue, textTranslationFunction);
+        }
+
+        /// <summary>
         /// Converts Enum to IEnumerable of Value/Text.
         /// </summary>
         [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.EnumTypePreserved)]
         public static IEnumerable<object> EnumAsKeyValuePair([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType, Func<string, string>? translationFunction = null)
         {
+            return EnumAsKeyValuePair(enumType, null, translationFunction);
+        }
+
+        /// <summary>
+        /// Converts Enum to IEnumerable of Value/Text. The text of every member resolves through
+        /// <see cref="GetDisplayDescription(Enum, Func{Enum, string}, Func{string, string})"/>.
+        /// </summary>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.EnumTypePreserved)]
+        public static IEnumerable<object> EnumAsKeyValuePair([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType, Func<Enum, string?>? valueTranslationFunction, Func<string, string>? textTranslationFunction)
+        {
             ArgumentNullException.ThrowIfNull(enumType);
 
             Type underlyingType = Enum.GetUnderlyingType(enumType);
-            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new DropDownItem<object> { Value = Convert.ChangeType(val, underlyingType, CultureInfo.InvariantCulture), Text = val.GetDisplayDescription(translationFunction) });
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new DropDownItem<object> { Value = Convert.ChangeType(val, underlyingType, CultureInfo.InvariantCulture), Text = val.GetDisplayDescription(valueTranslationFunction, textTranslationFunction) });
         }
 
         /// <summary>

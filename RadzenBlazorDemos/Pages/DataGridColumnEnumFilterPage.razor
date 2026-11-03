@@ -6,6 +6,11 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Filter Blazor DataGrid columns by enum values - the grid lists the enum members as filter options so users pick from a friendly list.
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    The text of an enum value comes from its <code>Display</code> or <code>Description</code> attribute, or from the member name. Set <code>EnumTranslationFunc</code> to translate
+    the enum value itself in the cells, the filter options and the exported data - it can tell apart members of different enums that share a name and return <code>null</code> to keep the default text.
+    <code>EnumFilterTranslationFunc</code> translates the resolved text instead.
+</RadzenText>
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridColumnEnumFilter">
     <DataGridColumnEnumFilter />

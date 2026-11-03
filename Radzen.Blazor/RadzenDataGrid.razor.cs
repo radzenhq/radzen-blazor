@@ -500,11 +500,22 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; }
 
         /// <summary>
-        /// Allows to define a custom function for enums DisplayAttribute Description property value translation in datagrid
-        /// Enum filters.
+        /// Gets or sets a function that translates the display text of enum values shown in the cells, the exported values, the enum filter options
+        /// and the check-box list filter. It receives the <see cref="System.ComponentModel.DataAnnotations.DisplayAttribute"/> description or name,
+        /// the <see cref="System.ComponentModel.DescriptionAttribute"/> description or the member name of the enum value.
+        /// Use <see cref="EnumTranslationFunc"/> when the translation needs the enum value or its type.
         /// </summary>
         [Parameter]
         public Func<string, string>? EnumFilterTranslationFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets a function that translates enum values shown in the cells, the exported values, the enum filter options
+        /// and the check-box list filter. It receives the enum value itself, so it can tell apart members of different enums that share a name
+        /// and can call a typed localization service. It takes precedence over <see cref="EnumFilterTranslationFunc"/>;
+        /// return <c>null</c> to fall back to the display text and <see cref="EnumFilterTranslationFunc"/> for that value.
+        /// </summary>
+        [Parameter]
+        public Func<Enum, string?>? EnumTranslationFunc { get; set; }
 
         /// <summary>
         /// The grouped and paged View

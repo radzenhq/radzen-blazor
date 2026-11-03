@@ -474,10 +474,20 @@ namespace Radzen.Blazor
         public string CustomText { get => customText ?? Localize(nameof(RadzenStrings.PivotDataGrid_CustomText)); set => customText = value; }
 
         /// <summary>
-        /// Gets or sets the enum filter translation function.
+        /// Gets or sets a function that translates the display text of the enum filter options. It receives the
+        /// <see cref="System.ComponentModel.DataAnnotations.DisplayAttribute"/> description or name, the
+        /// <see cref="System.ComponentModel.DescriptionAttribute"/> description or the member name of the enum value as a string.
+        /// Use <see cref="EnumTranslationFunc"/> when the translation needs the enum value or its type.
         /// </summary>
         [Parameter]
         public Func<object, string>? EnumFilterTranslationFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets a function that translates the enum filter options. It receives the enum value itself and takes precedence over
+        /// <see cref="EnumFilterTranslationFunc"/>; return <c>null</c> to fall back to the display text and <see cref="EnumFilterTranslationFunc"/> for that value.
+        /// </summary>
+        [Parameter]
+        public Func<Enum, string?>? EnumTranslationFunc { get; set; }
 
         /// <summary>
         /// Gets or sets whether to allow filter date input.
