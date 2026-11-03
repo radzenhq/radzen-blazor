@@ -36,7 +36,7 @@ internal static class FormulaFormat
 
         var trimmed = text.Trim();
 
-        if (trimmed.StartsWith('='))
+        if (trimmed.StartsWith('=', StringComparison.Ordinal))
         {
             trimmed = trimmed[1..].Trim();
         }

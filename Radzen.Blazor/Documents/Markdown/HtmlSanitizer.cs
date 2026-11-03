@@ -1,5 +1,6 @@
 
 using System;
+using Radzen;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -93,7 +94,7 @@ class HtmlSanitizer
             return string.Empty;
         }
 
-        if ((value.StartsWith('\'') && value.EndsWith('\'')) || (value.StartsWith('"') && value.EndsWith('"')))
+        if ((value.StartsWith('\'', StringComparison.Ordinal) && value.EndsWith('\'', StringComparison.Ordinal)) || (value.StartsWith('"', StringComparison.Ordinal) && value.EndsWith('"', StringComparison.Ordinal)))
         {
             value = value[1..^1];
         }

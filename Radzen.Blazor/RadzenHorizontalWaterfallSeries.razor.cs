@@ -114,7 +114,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items == null || !Items.Any())
+            if (Items == null || Items.Count == 0)
             {
                 return scale;
             }

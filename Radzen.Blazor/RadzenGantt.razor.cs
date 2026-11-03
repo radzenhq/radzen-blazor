@@ -17,9 +17,7 @@ namespace Radzen.Blazor
     /// Displays tasks in a split view: hierarchical rows on the left and a timeline with task bars on the right.
     /// </summary>
     /// <typeparam name="TItem">Task item type.</typeparam>
-#if NET6_0_OR_GREATER
     [CascadingTypeParameter(nameof(TItem))]
-#endif
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]

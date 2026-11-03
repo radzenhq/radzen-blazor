@@ -2,11 +2,11 @@
   <PropertyGroup>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <NoWarn>BL9993;BL0007;BL0005</NoWarn>
+    <NoWarn>BL9993;BL0007;BL0005;BL0016</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net10.0;net11.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
@@ -37,12 +37,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net11.0'" Version="11.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net11.0'" Version="11.*-*" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.*" />
   </ItemGroup>
 
@@ -61,13 +61,13 @@
     <PackageReference Include="Radzen.MSBuild" Version="0.0.6" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
     <SassFile Include="$(MSBuildProjectDirectory)/themes/**/*.scss" />
     <Content Remove="wwwroot/Radzen.Blazor.min.js" />
     <Content Remove="wwwroot/css/**/*.css" />
   </ItemGroup>
 
-  <Target Name="CompileSass" BeforeTargets="MoveCss" Condition="'$(TargetFramework)' == 'net10.0'"
+  <Target Name="CompileSass" BeforeTargets="MoveCss" Condition="'$(TargetFramework)' == 'net11.0'"
           Inputs="@(SassFile)" Outputs="$(IntermediateOutputPath)sass.stamp">
     <!-- The target runs before the compiler creates the intermediate dir, so the Touch below fails on a clean build. -->
     <MakeDir Directories="$(IntermediateOutputPath)" />
@@ -75,7 +75,7 @@
     <Touch Files="$(IntermediateOutputPath)sass.stamp" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="MoveCss" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
+  <Target Name="MoveCss" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net11.0'">
     <ItemGroup>
         <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
@@ -85,7 +85,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="MinifyJs" AfterTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
+  <Target Name="MinifyJs" AfterTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net11.0'">
     <TerserMinify InputFile="wwwroot\Radzen.Blazor.js" OutputFile="wwwroot\Radzen.Blazor.min.js" />
     <ItemGroup>
         <Content Include="wwwroot/Radzen.Blazor.min.js" />

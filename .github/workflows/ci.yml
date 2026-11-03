@@ -20,7 +20,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: 11.0.x
     
     - name: Build
       run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj
@@ -35,7 +35,7 @@ jobs:
       run: |
         dotnet publish Radzen.Blazor.TrimRuntimeTest/Radzen.Blazor.TrimRuntimeTest.csproj \
           -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true
-        ./Radzen.Blazor.TrimRuntimeTest/bin/Release/net10.0/linux-x64/publish/Radzen.Blazor.TrimRuntimeTest
+        ./Radzen.Blazor.TrimRuntimeTest/bin/Release/net11.0/linux-x64/publish/Radzen.Blazor.TrimRuntimeTest
 
     # Note: Native AOT (IL3050) is deliberately not gated. Blazor does not run under Native AOT, and the
     # IL3050 surface is inherent to dynamic-data binding (it can never reach zero). See the comment in
@@ -50,13 +50,13 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: 11.0.x
     - name: Publish WASM app (trimmed)
       run: dotnet publish Radzen.Blazor.TrimTest/Radzen.Blazor.TrimTest.csproj -c Release
     - name: Serve published app
       run: |
         dotnet tool install -g dotnet-serve
-        dotnet serve -d Radzen.Blazor.TrimTest/bin/Release/net10.0/publish/wwwroot -p 5050 &
+        dotnet serve -d Radzen.Blazor.TrimTest/bin/Release/net11.0/publish/wwwroot -p 5050 &
         sleep 3
     - name: Run Playwright runtime gate
       working-directory: e2e
@@ -78,7 +78,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: 11.0.x
     - name: Publish demos host (WASM client trimmed, local Radzen)
       run: |
         dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \
@@ -128,7 +128,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: 11.0.x
     - name: Publish demos host (WASM client trimmed, local Radzen)
       run: |
         dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \

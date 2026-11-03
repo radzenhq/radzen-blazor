@@ -271,7 +271,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 // 100% stacked area always uses 0-100 range
                 scale.Input.MergeWidth(new ScaleRange { Start = 0, End = 100 });

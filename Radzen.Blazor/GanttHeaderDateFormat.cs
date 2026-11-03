@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -110,7 +111,7 @@ namespace Radzen.Blazor
                 }
                 else if (c == '\'' || c == '"')
                 {
-                    var end = pattern.IndexOf(c, i + 1);
+                    var end = pattern.IndexOf(c, i + 1, StringComparison.Ordinal);
 
                     if (end < 0)
                     {

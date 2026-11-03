@@ -287,7 +287,7 @@ namespace Radzen.Blazor
         private bool TryGetNumberFormat(string formatString, object? value, out string numberFormat)
         {
             numberFormat = string.Empty;
-            if (string.IsNullOrEmpty(formatString) || !formatString.StartsWith("{0:", StringComparison.Ordinal) || !formatString.EndsWith('}'))
+            if (string.IsNullOrEmpty(formatString) || !formatString.StartsWith("{0:", StringComparison.Ordinal) || !formatString.EndsWith('}', StringComparison.Ordinal))
             {
                 return false;
             }

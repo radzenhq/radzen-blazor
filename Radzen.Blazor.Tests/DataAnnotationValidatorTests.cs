@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -38,7 +39,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DataAnnotationValidator_Updates_Message_When_Transitioning_Between_Invalid_States()
+        public async Task DataAnnotationValidator_Updates_Message_When_Transitioning_Between_Invalid_States()
         {
             using var ctx = new TestContext();
             var model = new Model();
@@ -46,7 +47,7 @@ namespace Radzen.Blazor.Tests
             var form = RenderForm(ctx, model);
 
             // Trigger validation with empty value → [Required] fails.
-            form.InvokeAsync(() => form.Instance.EditContext.Validate());
+            await form.InvokeAsync(() => form.Instance.EditContext.ValidateAsync());
 
             Assert.Contains("Name is required.", form.Markup);
             Assert.DoesNotContain("Name must be between 4 and 15 characters.", form.Markup);
@@ -54,25 +55,25 @@ namespace Radzen.Blazor.Tests
             // Change value to a single character → [Required] passes, [StringLength] fails.
             // IsValid remains false, but Text should change and view should re-render.
             model.Name = "a";
-            form.InvokeAsync(() => form.Instance.EditContext.Validate());
+            await form.InvokeAsync(() => form.Instance.EditContext.ValidateAsync());
 
             Assert.Contains("Name must be between 4 and 15 characters.", form.Markup);
             Assert.DoesNotContain("Name is required.", form.Markup);
         }
 
         [Fact]
-        public void DataAnnotationValidator_Clears_Message_When_Value_Becomes_Valid()
+        public async Task DataAnnotationValidator_Clears_Message_When_Value_Becomes_Valid()
         {
             using var ctx = new TestContext();
             var model = new Model();
 
             var form = RenderForm(ctx, model);
 
-            form.InvokeAsync(() => form.Instance.EditContext.Validate());
+            await form.InvokeAsync(() => form.Instance.EditContext.ValidateAsync());
             Assert.Contains("Name is required.", form.Markup);
 
             model.Name = "valid name";
-            form.InvokeAsync(() => form.Instance.EditContext.Validate());
+            await form.InvokeAsync(() => form.Instance.EditContext.ValidateAsync());
 
             Assert.DoesNotContain("Name is required.", form.Markup);
             Assert.DoesNotContain("Name must be between 4 and 15 characters.", form.Markup);

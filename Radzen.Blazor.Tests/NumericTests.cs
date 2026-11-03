@@ -786,7 +786,7 @@ namespace Radzen.Blazor.Tests
             component.Find("input").Change("10.55");
 
             Assert.NotNull(newValue);
-            Assert.Equal(10.55f, (float)newValue, 2);
+            Assert.Equal(10.55f, (float)newValue, precision: 2);
         }
 
         [Fact]
@@ -811,7 +811,7 @@ namespace Radzen.Blazor.Tests
             component.Find("input").Change("10,55");
 
             Assert.NotNull(newValue);
-            Assert.Equal(10.55f, (float)newValue, 2);
+            Assert.Equal(10.55f, (float)newValue, precision: 2);
         }
 
         [Fact]

@@ -106,7 +106,7 @@ internal sealed class SourceMarker : NodeVisitorBase
     private string LastLine(Block block)
     {
         var slice = Slice(block.SourceStart, block.SourceEnd);
-        return slice[(slice.LastIndexOf('\n') + 1)..].TrimStart(' ', '\t', '>').TrimEnd();
+        return slice[(slice.LastIndexOf('\n', StringComparison.Ordinal) + 1)..].TrimStart(' ', '\t', '>').TrimEnd();
     }
 
     public override void VisitIndentedCodeBlock(IndentedCodeBlock codeBlock)
