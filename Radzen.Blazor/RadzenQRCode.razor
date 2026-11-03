@@ -1,6 +1,7 @@
 @using System.Globalization
 @inherits RadzenComponent
-@{
+@if (Visible)
+{
     // Build the QR matrix
     bool[,] modules = RadzenQREncoder.EncodeUtf8(Value, Ecc);
     int n = modules.GetLength(0);
@@ -26,7 +27,6 @@
     double cutoutY = centerY - cutoutH / 2.0;
     double imgX = centerX - boxModules / 2.0;
     double imgY = centerY - boxModules / 2.0;
-}
 
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 @vb @vb"
@@ -93,6 +93,7 @@
         }
     }
 </svg>
+}
 
 @code
 {

@@ -1955,4 +1955,32 @@ public class SpreadsheetTests
         public static Microsoft.AspNetCore.Components.EventCallback<T> Create<T>(System.Func<T, Task> handler)
             => new Microsoft.AspNetCore.Components.EventCallbackFactory().Create<T>(new object(), handler);
     }
+
+    [Fact]
+    public void Visible_Toggle_RecreatesTheJsObject()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx);
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+            .Add(x => x.Workbook, NewWorkbook())
+            .Add(x => x.Visible, false));
+
+        Assert.Equal(string.Empty, c.Markup.Trim());
+        Assert.Empty(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createSpreadsheet"));
+
+        c.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+
+        Assert.Contains("rz-spreadsheet", c.Markup);
+        Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createSpreadsheet"));
+
+        c.SetParametersAndRender(p => p.Add(x => x.Visible, false));
+
+        Assert.Equal(string.Empty, c.Markup.Trim());
+        Assert.Single(module.Invocations.Where(i => i.Identifier == "dispose"));
+
+        c.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+
+        Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSpreadsheet"));
+    }
 }

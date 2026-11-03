@@ -8,6 +8,8 @@
 @inject ContextMenuService ContextMenuService
 @inherits RadzenComponent
 
+@if (Visible)
+{
 <div @ref=@Element class=@GetCssClass() style=@Style tabindex="0" @attributes=@Attributes id=@GetId()
      role="application" aria-label=@(AriaLabel ?? Localize(nameof(RadzenStrings.Spreadsheet_A11yGridLabel)))
      aria-keyshortcuts="F6 Shift+F6" aria-describedby=@($"{GetId()}-a11y-instructions")>
@@ -222,3 +224,4 @@
     </CascadingValue>
     <RangePickerBar @ref=@rangePickerBar CancelTitle=@Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) />
 </div>
+}

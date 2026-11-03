@@ -367,6 +367,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         var didWorkbookChange = parameters.DidParameterChange(nameof(Workbook), Workbook);
         var didSheetIndexChange = parameters.DidParameterChange(nameof(SelectedSheetIndex), SelectedSheetIndex);
+        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         await base.SetParametersAsync(parameters);
 
@@ -2285,6 +2286,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     private IJSObjectReference? jsRef;
+    private bool visibleChanged;
     private DotNetObjectReference<RadzenSpreadsheet>? dotNetRef;
 
     /// <inheritdoc/>
@@ -2292,9 +2294,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ImageResizeEventArgs))]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && JSRuntime != null)
+        if (!Visible)
         {
-            dotNetRef = DotNetObjectReference.Create(this);
+            await DisposeJsAsync();
+            return;
+        }
+
+        if ((firstRender || visibleChanged) && JSRuntime != null)
+        {
+            visibleChanged = false;
+            dotNetRef ??= DotNetObjectReference.Create(this);
             // Serialize one map of key -> isGlobal; the JS gate needs nothing more than that.
             jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSpreadsheet", Element, dotNetRef,
                 shortcuts.ToDictionary(s => s.Key, s => s.Value.Global));
@@ -3516,6 +3525,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         activeCapture = null;
 
+        await DisposeJsAsync();
+
+        dotNetRef?.Dispose();
+    }
+
+    private async Task DisposeJsAsync()
+    {
         if (jsRef is not null)
         {
             try
@@ -3526,8 +3542,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             catch (JSDisconnectedException)
             {
             }
-        }
 
-        dotNetRef?.Dispose();
+            jsRef = null;
+        }
     }
 }

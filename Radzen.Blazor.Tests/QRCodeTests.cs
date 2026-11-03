@@ -245,5 +245,43 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(512, invocation.Arguments[2]);
             Assert.Equal(512, invocation.Arguments[3]);
         }
+
+        [Fact]
+        public void QRCode_Visible_False_Renders_Nothing()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.Visible, false);
+            });
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+
+            component.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+
+            Assert.Contains(@"viewBox=""0 0 29 29""", component.Markup);
+
+            component.SetParametersAndRender(p => p.Add(x => x.Visible, false));
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+        }
+
+        [Fact]
+        public async Task QRCode_Visible_False_ToSvg_Returns_Empty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Strict;
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.Visible, false);
+            });
+
+            Assert.Equal(string.Empty, await component.Instance.ToSvg());
+        }
     }
 }

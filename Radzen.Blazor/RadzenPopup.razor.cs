@@ -84,6 +84,11 @@ namespace Radzen.Blazor
         /// <param name="syncWidth">Whether to synchronize the width of the popup with the target element.</param>
         public async Task ToggleAsync(ElementReference target, bool disableSmartPosition = false, bool syncWidth = false)
         {
+            if (!Visible)
+            {
+                return;
+            }
+
             open = !open;
             this.target = target;
 
@@ -142,6 +147,19 @@ namespace Radzen.Blazor
         public async Task CloseAsync()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
+        }
+
+        /// <inheritdoc />
+        protected override void OnBecameInvisible()
+        {
+            base.OnBecameInvisible();
+
+            open = false;
+
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                JSRuntime.InvokeVoid("Radzen.destroyPopup", GetId());
+            }
         }
 
         /// <inheritdoc />

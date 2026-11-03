@@ -1,5 +1,7 @@
 @inherits RadzenComponent
 
+@if (Visible)
+{
 <div class="rz-fabmenu" @ref="Element" @onclick:stopPropagation style="@Style">
     <RadzenToggleButton Value="@isOpen"
                         ValueChanged="OnToggleChanged"
@@ -25,4 +27,5 @@
     {
         <RadzenStack onclick=@CloseAsync Orientation=@StackOrientation AlignItems=@StackAlignment Gap=@Gap class=@GetStackClasses() style=@ComputedItemsStyle ChildContent="@ChildContent" id=@($"{GetId()}-items") role="menu" aria-label="@AriaLabel" />
     }
-</div> 
+</div>
+}

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using Bunit;
 using Xunit;
@@ -85,6 +86,34 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-scheme-palette", component.Markup);
+        }
+
+        [Fact]
+        public void Treemap_Visible_Toggle_Recreates_Resizable()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = ctx.RenderComponent<RadzenTreemap>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+            Assert.Empty(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createResizable"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Contains("rz-treemap", component.Markup);
+            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createResizable"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.disposeElement"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createResizable"));
         }
     }
 }

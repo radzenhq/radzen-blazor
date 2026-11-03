@@ -109,5 +109,33 @@ namespace Radzen.Blazor.Tests
             var register = ctx.JSInterop.Invocations.Last(i => i.Identifier == "Radzen.registerFabMenu");
             Assert.Equal(true, register.Arguments[2]);
         }
+
+        [Fact]
+        public void FabMenu_Visible_Toggle_Recreates_Keyboard_Handlers()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenFabMenu>(parameters => parameters
+                .Add(p => p.Visible, false)
+                .Add(p => p.AriaLabel, "Actions"));
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+            Assert.Empty(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createFabMenu"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Contains("rz-fabmenu", component.Markup);
+            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.createFabMenu"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+            Assert.Single(ctx.JSInterop.Invocations.Where(i => i.Identifier == "Radzen.destroyFabMenu"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createFabMenu"));
+        }
     }
 }

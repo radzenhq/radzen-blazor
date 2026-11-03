@@ -204,7 +204,7 @@ namespace Radzen.Blazor
         /// </returns>
         public async Task<string> ToSvg()
         {
-            if (JSRuntime != null)
+            if (Visible && JSRuntime != null)
             {
                 return await JSRuntime.InvokeAsync<string>("Radzen.outerHTML", Element);
             }

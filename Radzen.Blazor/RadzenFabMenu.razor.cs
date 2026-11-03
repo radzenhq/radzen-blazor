@@ -184,16 +184,19 @@ public partial class RadzenFabMenu : RadzenComponent
     }
 
     private bool focusFirstItemOnOpen;
+    private bool visibleChanged;
 
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (JSRuntime != null)
+        if (JSRuntime != null && Visible)
         {
-            if (firstRender)
+            if (firstRender || visibleChanged)
             {
+                visibleChanged = false;
+
                 JSRuntime.InvokeVoid("Radzen.createFabMenu", Element, Reference);
             }
 
@@ -217,6 +220,7 @@ public partial class RadzenFabMenu : RadzenComponent
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var isOpenChanged = parameters.DidParameterChange(nameof(IsOpen), IsOpen);
+        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         await base.SetParametersAsync(parameters);
 
@@ -281,6 +285,17 @@ public partial class RadzenFabMenu : RadzenComponent
             await IsOpenChanged.InvokeAsync(isOpen);
 
             StateHasChanged();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnBecameInvisible()
+    {
+        base.OnBecameInvisible();
+
+        if (IsJSRuntimeAvailable && JSRuntime != null)
+        {
+            JSRuntime.InvokeVoid("Radzen.destroyFabMenu", Element);
         }
     }
 

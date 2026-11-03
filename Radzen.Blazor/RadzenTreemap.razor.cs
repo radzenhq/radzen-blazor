@@ -77,6 +77,15 @@ namespace Radzen.Blazor
         private double? Width { get; set; }
         private double? Height { get; set; }
         private DotNetObjectReference<RadzenTreemap>? reference;
+        private bool visibleChanged;
+
+        /// <inheritdoc />
+        public override async System.Threading.Tasks.Task SetParametersAsync(ParameterView parameters)
+        {
+            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            await base.SetParametersAsync(parameters);
+        }
 
         /// <summary>
         /// Resizes the treemap.
@@ -94,10 +103,11 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
+            if ((firstRender || visibleChanged) && Visible && JSRuntime != null)
             {
-                reference = DotNetObjectReference.Create(this);
-                var rect = await JSRuntime!.InvokeAsync<Rect>("Radzen.createResizable", Element, reference);
+                visibleChanged = false;
+                reference ??= DotNetObjectReference.Create(this);
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, reference);
                 Width = rect.Width;
                 Height = rect.Height;
                 StateHasChanged();
@@ -313,6 +323,17 @@ namespace Radzen.Blazor
                 builder.AddContent(6, content);
                 builder.CloseElement();
             };
+        }
+
+        /// <inheritdoc />
+        protected override void OnBecameInvisible()
+        {
+            base.OnBecameInvisible();
+
+            if (IsJSRuntimeAvailable)
+            {
+                JSRuntime!.InvokeVoid("Radzen.disposeElement", Element);
+            }
         }
 
         /// <inheritdoc />

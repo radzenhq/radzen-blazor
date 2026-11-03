@@ -1,3 +1,4 @@
+using System.Linq;
 using Bunit;
 using Xunit;
 
@@ -220,6 +221,30 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdown>();
 
             Assert.Contains("rz-markdown", component.Markup);
+        }
+
+        [Fact]
+        public void Markdown_Visible_False_Renders_Nothing()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenMarkdown>(parameters =>
+            {
+                parameters.Add(p => p.Text, "Hello World");
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Contains("rz-markdown", component.Markup);
+            Assert.Contains("Hello World", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+
+            Assert.Equal(string.Empty, component.Markup.Trim());
         }
     }
 }

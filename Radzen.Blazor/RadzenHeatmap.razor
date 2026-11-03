@@ -1,6 +1,8 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenComponent
 
+@if (Visible)
+{
 <div @ref="@Element" style="@Style" @attributes="@Attributes" class="@GetCssClass()">
 @if (Width.HasValue && Height.HasValue && Data != null)
 {
@@ -57,3 +59,4 @@
     }
 }
 </div>
+}
