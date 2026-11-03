@@ -90,7 +90,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Resizes the treemap.
         /// </summary>
-        [JSInvokable("RadzenTreemap.Resize")]
+        [JSInvokable]
         public void Resize(double width, double height)
         {
             Width = width;

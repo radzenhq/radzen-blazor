@@ -90,7 +90,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Resizes the heatmap.
         /// </summary>
-        [JSInvokable("RadzenHeatmap.Resize")]
+        [JSInvokable]
         public void Resize(double width, double height)
         {
             Width = width;

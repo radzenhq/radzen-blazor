@@ -117,5 +117,16 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createResizable"));
         }
+
+        [Fact]
+        public void Heatmap_Resize_Is_Invokable_Under_The_Name_createResizable_Calls()
+        {
+            var attribute = typeof(RadzenHeatmap).GetMethod(nameof(RadzenHeatmap.Resize))!
+                .GetCustomAttributes(typeof(Microsoft.JSInterop.JSInvokableAttribute), false)
+                .Cast<Microsoft.JSInterop.JSInvokableAttribute>()
+                .Single();
+
+            Assert.Equal("Resize", attribute.Identifier ?? "Resize");
+        }
     }
 }
