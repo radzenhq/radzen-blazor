@@ -1,4 +1,4 @@
-using AngleSharp.Dom;
+﻿using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -1921,6 +1921,103 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(new[] { "colour", "colour" }, names);
             Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.linkLabel");
+        }
+
+        private static Microsoft.AspNetCore.Components.Web.KeyboardEventArgs Backspace => new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Backspace", Code = "Backspace" };
+
+        [Fact]
+        public void DropDown_Backspace_ClearsValue_WhenAllowClear()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            component.Find("div[role='combobox']").KeyDown(Backspace);
+
+            Assert.Equal(0, value);
+            Assert.Empty(component.FindAll(".rz-dropdown-clear-icon"));
+        }
+
+        [Fact]
+        public void DropDown_Backspace_DoesNotClearValue_WhenAllowClearIsFalse()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            component.Find("div[role='combobox']").KeyDown(Backspace);
+
+            Assert.Equal(1, value);
+        }
+
+        class FilterKeyPressDropDown<T> : RadzenDropDown<T>
+        {
+            public Task FilterKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args) => OnFilterKeyPress(args);
+        }
+
+        [Fact]
+        public async Task DropDown_Backspace_InFilterInput_DoesNotClearValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var value = 1;
+            var component = ctx.RenderComponent<FilterKeyPressDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            await component.InvokeAsync(() => component.Instance.FilterKeyPress(Backspace));
+
+            Assert.Equal(1, value);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_Backspace_ClearsAllSelectedItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = new List<int> { 1, 2 };
+            var component = MultipleDropDown(ctx, v => value = v, parameters =>
+            {
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Value, value);
+            });
+
+            Assert.Equal(2, component.FindAll(".rz-state-highlight").Count);
+
+            component.Find("div[role='combobox']").KeyDown(Backspace);
+
+            Assert.True(value == null || !value.Any());
+            Assert.Empty(component.FindAll(".rz-state-highlight"));
         }
     }
 }

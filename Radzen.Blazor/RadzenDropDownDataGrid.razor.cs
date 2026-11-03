@@ -1185,7 +1185,7 @@ namespace Radzen.Blazor
                     await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey, PopupID);
                 }
             }
-            else if (key == "Delete" && AllowClear)
+            else if ((key == "Delete" || key == "Backspace" && !isFilter) && AllowClear)
             {
                 preventKeydown = true;
 

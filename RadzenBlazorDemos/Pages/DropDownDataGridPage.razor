@@ -168,7 +168,7 @@
         new KeyboardShortcut { Key = "RightArrow", Action = "Goes to the next DropDownDataGrid page (only when the grid is not virtualized)." },
         new KeyboardShortcut { Key = "Enter on a closed popup", Action = "Open the DropDownDataGrid popup." },
         new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused DropDownDataGrid item and close the popup." },
-        new KeyboardShortcut { Key = "Delete", Action = "Clear the current selection (when AllowClear is set). In multiple selection mode all selected items are cleared." },
+        new KeyboardShortcut { Key = "Delete or Backspace", Action = "Clear the current selection (when AllowClear is set). Backspace clears only when the drop-down itself is focused, not the filter input. In multiple selection mode all selected items are cleared." },
         new KeyboardShortcut { Key = "Ctrl + A", Action = "Multiple selection: select all items when AllowSelectAll is enabled. If all items are already selected, the selection is cleared." },
         new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup (focus returns to the DropDownDataGrid)." }
     };

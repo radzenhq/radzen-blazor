@@ -1,4 +1,4 @@
-using Bunit;
+﻿using Bunit;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
@@ -795,6 +795,66 @@ namespace Radzen.Blazor.Tests
             var invocation = ctx.JSInterop.VerifyInvoke("Radzen.linkLabel");
 
             Assert.Equal("colour", invocation.Arguments[1]);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Backspace_ClearsValue_WhenAllowClear()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" },
+                new Customer { Id = 2, CompanyName = "Tech Inc" }
+            };
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            component.Find("div.rz-dropdown").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Backspace", Code = "Backspace" });
+
+            Assert.Equal(0, value);
+        }
+
+        class FilterKeyPressDropDownDataGrid<T> : RadzenDropDownDataGrid<T>
+        {
+            public System.Threading.Tasks.Task FilterKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args) => OnFilterKeyPress(args);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DropDownDataGrid_Backspace_InFilterInput_DoesNotClearValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" },
+                new Customer { Id = 2, CompanyName = "Tech Inc" }
+            };
+
+            var value = 1;
+            var component = ctx.RenderComponent<FilterKeyPressDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            await component.InvokeAsync(() => component.Instance.FilterKeyPress(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Backspace", Code = "Backspace" }));
+
+            Assert.Equal(1, value);
         }
     }
 }

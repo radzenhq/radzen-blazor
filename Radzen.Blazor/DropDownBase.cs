@@ -959,7 +959,7 @@ namespace Radzen
 
                 await ClosePopup(key);
             }
-            else if (key == "Delete" && AllowClear)
+            else if ((key == "Delete" || key == "Backspace" && !isFilter) && AllowClear)
             {
                 preventKeydown = true;
 
