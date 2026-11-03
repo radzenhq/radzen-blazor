@@ -246,7 +246,7 @@ public class Cell
     /// </summary>
     public void SetValue(string? value)
     {
-        if (value is not null && value.StartsWith('\''))
+        if (value is not null && value.StartsWith('\'', StringComparison.Ordinal))
         {
             SetText(value[1..]);
         }
@@ -254,7 +254,7 @@ public class Cell
         {
             SetText(value, quotePrefix: false);
         }
-        else if (value?.StartsWith('=') == true && value != "=")
+        else if (value?.StartsWith('=', StringComparison.Ordinal) == true && value != "=")
         {
             Formula = FormulaLocalizer.ToInvariant(value, Culture);
         }

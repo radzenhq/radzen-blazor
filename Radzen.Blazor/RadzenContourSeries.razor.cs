@@ -285,7 +285,7 @@ namespace Radzen.Blazor
 
         internal void RenderBands(RenderTreeBuilder builder, ref int sequence, ScaleBase categoryScale, ScaleBase valueScale)
         {
-            if (ColorRange == null || ColorRange.Count == 0 || !Items.Any())
+            if (ColorRange == null || ColorRange.Count == 0 || Items.Count == 0)
             {
                 return;
             }
@@ -350,7 +350,7 @@ namespace Radzen.Blazor
 
         internal void RenderIsoLines(RenderTreeBuilder builder, ref int sequence, ScaleBase categoryScale, ScaleBase valueScale)
         {
-            if (!ShowLines || !Items.Any())
+            if (!ShowLines || Items.Count == 0)
             {
                 return;
             }
@@ -463,7 +463,7 @@ namespace Radzen.Blazor
         public override bool Contains(double x, double y, double tolerance)
         {
             var chart = Chart;
-            if (chart == null || !Items.Any())
+            if (chart == null || Items.Count == 0)
             {
                 return false;
             }
@@ -483,7 +483,7 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = Chart;
-            if (chart == null || !Items.Any())
+            if (chart == null || Items.Count == 0)
             {
                 return (default!, new Point());
             }

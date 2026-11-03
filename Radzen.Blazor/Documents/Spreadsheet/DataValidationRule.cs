@@ -144,7 +144,7 @@ public class DataValidationRule : ICellValidator
             return [];
         }
 
-        if (Formula1.StartsWith('='))
+        if (Formula1.StartsWith('=', StringComparison.Ordinal))
         {
             return sheet is not null ? ResolveListFromRange(sheet) : [];
         }
@@ -299,7 +299,7 @@ public class DataValidationRule : ICellValidator
 
         try
         {
-            var formula = Formula1.StartsWith('=') ? Formula1 : "=" + Formula1;
+            var formula = Formula1.StartsWith('=', StringComparison.Ordinal) ? Formula1 : "=" + Formula1;
 
             var rowDelta = cell.Address.Row - rangeStart.Row;
             var colDelta = cell.Address.Column - rangeStart.Column;

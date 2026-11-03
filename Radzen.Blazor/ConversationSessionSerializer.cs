@@ -29,7 +29,7 @@ public static class ConversationSessionSerializer
     {
         ArgumentNullException.ThrowIfNull(session);
 
-        return JsonSerializer.Serialize(session, Options.GetTypeInfo(typeof(ConversationSession)));
+        return JsonSerializer.Serialize(session, Options.GetJsonTypeInfo<ConversationSession>());
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public static class ConversationSessionSerializer
     {
         ArgumentNullException.ThrowIfNull(json);
 
-        return (ConversationSession?)JsonSerializer.Deserialize(json, Options.GetTypeInfo(typeof(ConversationSession)));
+        return JsonSerializer.Deserialize(json, Options.GetJsonTypeInfo<ConversationSession>());
     }
 }
 

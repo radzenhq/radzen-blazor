@@ -44,7 +44,7 @@ public class HtmlVisitor : NodeVisitorBase
         return new MarkdownHtml(visitor.html.ToString(), visitor.segments);
     }
 
-    internal static int CodeLength(Leaf code) => code.Value.EndsWith('\n') ? code.Value.Length - 1 : code.Value.Length;
+    internal static int CodeLength(Leaf code) => code.Value.EndsWith('\n', StringComparison.Ordinal) ? code.Value.Length - 1 : code.Value.Length;
 
     private void AppendPlaceholder()
     {

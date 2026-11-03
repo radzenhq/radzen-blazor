@@ -190,7 +190,7 @@ namespace Radzen.Blazor
                     var shiftToken = section.ShiftRows != null && rowIndex < section.ShiftRows.Count && keyIndex < section.ShiftRows[rowIndex].Length
                         ? section.ShiftRows[rowIndex][keyIndex] : null;
 
-                    if (shiftToken == token || (shiftToken != null && shiftToken.StartsWith('{')))
+                    if (shiftToken == token || (shiftToken != null && shiftToken.StartsWith('{', StringComparison.Ordinal)))
                     {
                         shiftToken = null;
                     }

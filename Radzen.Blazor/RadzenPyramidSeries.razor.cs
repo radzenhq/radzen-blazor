@@ -151,7 +151,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override double MeasureLegend()
         {
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 return Items.Select(item => TextMeasurer.TextWidth(TooltipTitle(item))).Max() + MarkerSize;
             }
@@ -205,7 +205,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            if (!Items.Any())
+            if (Items.Count == 0)
             {
                 return false;
             }
@@ -299,7 +299,7 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
-            if (Data == null || !Items.Any())
+            if (Data == null || Items.Count == 0)
             {
                 return list;
             }

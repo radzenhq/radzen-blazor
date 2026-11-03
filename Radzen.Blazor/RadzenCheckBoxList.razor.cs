@@ -186,8 +186,6 @@ namespace Radzen.Blazor
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
-
-            StateHasChanged();
         }
 
         bool? IsAllSelected()

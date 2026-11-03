@@ -459,7 +459,7 @@ namespace Radzen.Blazor.Tests
         {
             public List<Microsoft.Extensions.AI.ChatMessage> Taken { get; } = new();
 
-            public Task<bool> TryQueueMessageAsync(Microsoft.Extensions.AI.ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
+            public override Task<bool> TryQueueMessageAsync(Microsoft.Extensions.AI.ChatMessage message, string? sessionId, CancellationToken cancellationToken = default)
             {
                 Taken.Add(message);
                 return Task.FromResult(true);

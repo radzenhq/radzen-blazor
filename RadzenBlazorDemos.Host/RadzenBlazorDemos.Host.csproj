@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ErrorOnDuplicatePublishOutputFiles>False</ErrorOnDuplicatePublishOutputFiles>
     <UserSecretsId>d4f5f92a-c1c5-47b2-bb94-becc7f09133c</UserSecretsId>
     <Nullable>disable</Nullable>
@@ -10,8 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\RadzenBlazorDemos\RadzenBlazorDemos.csproj" />
     <ProjectReference Include="..\Radzen.Blazor.Api\Radzen.Blazor.Api.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.*-*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="11.*-*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.*-*" />
     <PackageReference Include="AWSSDK.S3" Version="3.*" />
   </ItemGroup>

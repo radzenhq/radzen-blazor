@@ -178,7 +178,11 @@ namespace Radzen.Blazor
         {
             if (EditContext != null)
             {
+#if NET11_0_OR_GREATER
+                bool valid = await EditContext.ValidateAsync();
+#else
                 bool valid = EditContext.Validate();
+#endif
 
                 if (valid)
                 {

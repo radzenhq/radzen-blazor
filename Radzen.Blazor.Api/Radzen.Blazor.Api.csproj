@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -25,12 +25,12 @@
 
   <!-- Release reflects over the published package (what the site ships); Debug (or RadzenLocalProject) over the source build. -->
   <PropertyGroup Condition="'$(UseRadzenPackage)' == 'true'">
-    <RadzenBlazorDll>$(PkgRadzen_Blazor)/lib/net10.0/Radzen.Blazor.dll</RadzenBlazorDll>
-    <RadzenBlazorXml>$(PkgRadzen_Blazor)/lib/net10.0/Radzen.Blazor.xml</RadzenBlazorXml>
+    <RadzenBlazorDll>$(PkgRadzen_Blazor)/lib/net11.0/Radzen.Blazor.dll</RadzenBlazorDll>
+    <RadzenBlazorXml>$(PkgRadzen_Blazor)/lib/net11.0/Radzen.Blazor.xml</RadzenBlazorXml>
   </PropertyGroup>
   <PropertyGroup Condition="'$(UseRadzenPackage)' != 'true'">
-    <RadzenBlazorDll>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.dll</RadzenBlazorDll>
-    <RadzenBlazorXml>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.xml</RadzenBlazorXml>
+    <RadzenBlazorDll>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net11.0\Radzen.Blazor.dll</RadzenBlazorDll>
+    <RadzenBlazorXml>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net11.0\Radzen.Blazor.xml</RadzenBlazorXml>
   </PropertyGroup>
 
   <!-- Usage: dotnet build -p:GenerateApiPages=true -->
