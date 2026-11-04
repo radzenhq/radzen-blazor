@@ -738,9 +738,13 @@ namespace Radzen.Blazor
         Func<TItem, string>? textGetter;
         Func<TItem, bool>? allDayGetter;
 
+        private bool visibleChanged;
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
             var needsReload = false;
 
             if (parameters.DidParameterChange(nameof(Date), Date))
@@ -842,15 +846,28 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender && JSRuntime != null)
+            if ((firstRender || visibleChanged) && Visible && JSRuntime != null)
             {
+                visibleChanged = false;
+
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, Reference);
 
-                if (!heightIsSet)
+                if (!heightIsSet || !firstRender)
                 {
                     heightIsSet = true;
                     Resize(rect.Width, rect.Height);
                 }
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnBecameInvisible()
+        {
+            base.OnBecameInvisible();
+
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                JSRuntime.InvokeVoid("Radzen.disposeElement", Element);
             }
         }
 
