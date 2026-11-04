@@ -191,5 +191,33 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-state-active", buttons[2].ClassList);
             Assert.Equal(1, buttons.Count(b => b.ClassList.Contains("rz-state-active")));
         }
+
+        [Fact]
+        public void Gantt_YearZoom_TimelineWidthsUseInvariantCulture()
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            try
+            {
+                using var ctx = CreateContext();
+
+                var gantt = RenderGantt(ctx, GanttZoomLevel.Year, CultureInfo.InvariantCulture);
+
+                var widthPattern = new System.Text.RegularExpressions.Regex(@"^width:\s*\d+(\.\d+)?px;");
+
+                var styles = gantt.FindAll(".rz-gantt-timeline-content, .rz-gantt-table, .rz-gantt-table-header-cell, .rz-gantt-row-container, .rz-gantt-row-grid, .rz-gantt-row-grid-col, .rz-gantt-links")
+                    .Select(e => e.GetAttribute("style"))
+                    .ToList();
+
+                Assert.NotEmpty(styles);
+                Assert.All(styles, style => Assert.Matches(widthPattern, style));
+                Assert.Contains(styles, style => style.Contains('.'));
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
+        }
     }
 }
