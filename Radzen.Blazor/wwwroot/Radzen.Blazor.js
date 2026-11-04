@@ -2432,10 +2432,11 @@ window.Radzen = {
     }
     Radzen.uploadComponents[id] = uploadComponent;
   },
-  uploadChange: function (fileInput) {
+  uploadChange: function (fileInput, selectedFiles) {
+    var selection = selectedFiles || Array.from(fileInput.files);
     var files = [];
-    for (var i = 0; i < fileInput.files.length; i++) {
-      var file = fileInput.files[i];
+    for (var i = 0; i < selection.length; i++) {
+      var file = selection[i];
       files.push({
         Name: file.name,
         Size: file.size,
@@ -2457,7 +2458,7 @@ window.Radzen = {
         }
       }
 
-      uploadComponent.files = Array.from(fileInput.files);
+      uploadComponent.files = selection;
       uploadComponent.localFiles = files;
       try { suppressDisposed(uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files)); } catch { }
     }
@@ -2495,10 +2496,12 @@ window.Radzen = {
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
   },
-  upload: function (fileInput, url, multiple, clear, parameterName, method = 'POST', stream = false) {
+  upload: function (fileInput, url, multiple, clear, parameterName, method = 'POST', stream = false, selectedFiles) {
     var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (!uploadComponent) { return; }
-    if (!uploadComponent.files || clear) {
+    if (selectedFiles) {
+        uploadComponent.files = selectedFiles;
+    } else if (!uploadComponent.files || clear) {
         uploadComponent.files = Array.from(fileInput.files);
     }
     
@@ -8174,7 +8177,23 @@ Radzen.createMenu = function(el, clickToOpen) {
     });
   }};
 };
-Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream) {
+Radzen.validateUploadFiles = function(files, maxFileSize, allowedExtensions) {
+  var accepted = [], rejected = [];
+  files.forEach(function(file) {
+    var reason = maxFileSize != null && file.size > maxFileSize ? 0 :
+      allowedExtensions.length && !allowedExtensions.some(function(extension) {
+        return file.name.toLowerCase().endsWith(extension);
+      }) ? 1 : null;
+    if (reason == null) {
+      accepted.push(file);
+    } else {
+      rejected.push({ File: { Name: file.name, Size: file.size, ContentType: file.type,
+        LastModified: new Date(file.lastModified).toISOString() }, Reason: reason });
+    }
+  });
+  return { accepted: accepted, rejected: rejected };
+};
+Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream, maxFileSize = null, allowedExtensions = []) {
   if (!el) return { dispose: function() {} };
   var choose = el.querySelector('.rz-fileupload-choose');
   var fileInput = el.querySelector('input[type=file]');
@@ -8191,7 +8210,30 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
     }
   }
   function onChange(e) {
-    Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
+    if (maxFileSize == null && !allowedExtensions.length) {
+      Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
+      return;
+    }
+    if (fileInput.disabled || !fileInput.files.length) return;
+    var extensions = allowedExtensions.slice();
+    var limit = maxFileSize;
+    var result = Radzen.validateUploadFiles(Array.from(fileInput.files), limit, extensions);
+    if (result.accepted.length) {
+      if (auto) {
+        Radzen.upload(fileInput, url, multiple, true, parameterName, method, stream, result.accepted);
+      } else {
+        Radzen.uploadChange(fileInput, result.accepted);
+      }
+    }
+    fileInput.value = '';
+    if (result.rejected.length) {
+      var component = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
+      if (component) {
+        try { suppressDisposed(component.invokeMethodAsync('RadzenUpload.OnRejected', {
+          Files: result.rejected, MaxFileSize: limit, AllowedExtensions: extensions
+        })); } catch { }
+      }
+    }
   }
   function onImgError() { this.style.display = 'none'; }
   if (choose) {
@@ -8206,7 +8248,10 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
     img.addEventListener('error', onImgError);
   });
-  return { dispose: function() {
+  return { updateValidation: function(size, extensions) {
+    maxFileSize = size;
+    allowedExtensions = extensions || [];
+  }, dispose: function() {
     if (choose) {
       choose.removeEventListener('keydown', onKeydown);
       choose.removeEventListener('dragover', onDisabledDrop);
