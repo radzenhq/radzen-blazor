@@ -993,25 +993,28 @@ namespace Radzen.Blazor
         private string GetStackedStyleForFrozen()
         {
             var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen() && c.FrozenPosition == FrozenPosition).ToList();
+            var index = visibleFrozenColumns.IndexOf(this);
+
             if (FrozenPosition == FrozenColumnPosition.Left)
             {
-                var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) > i);
-
-                return GetStackedStyleForFrozen(stackColumns, "inset-inline-start");
+                return GetStackedStyleForFrozen(visibleFrozenColumns.Take(index), "inset-inline-start", "left", index);
             }
             else
             {
-                var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) < i);
-
-                return GetStackedStyleForFrozen(stackColumns, "inset-inline-end");
+                return GetStackedStyleForFrozen(visibleFrozenColumns.Skip(index + 1), "inset-inline-end", "right", index);
             }
         }
 
-        private static string GetStackedStyleForFrozen(IEnumerable<RadzenDataGridColumn<TItem>> stackColumns, string position)
+        private static string GetStackedStyleForFrozen(IEnumerable<RadzenDataGridColumn<TItem>> stackColumns, string position, string side, int index)
+        {
+            return $"{position}:var(--rz-grid-frozen-{side}-{index},{GetStackedOffsetForFrozen(stackColumns)})";
+        }
+
+        private static string GetStackedOffsetForFrozen(IEnumerable<RadzenDataGridColumn<TItem>> stackColumns)
         {
             if (!stackColumns.Any())
             {
-                return $"{position}:0";
+                return "0";
             }
 
             var widths = new List<string>();
@@ -1037,10 +1040,10 @@ namespace Radzen.Blazor
 
             if (widths.Count == 1)
             {
-                return $"{position}:{widths.First()}";
+                return widths[0];
             }
 
-            return $"{position}:calc({string.Join(" + ", widths)})";
+            return $"calc({string.Join(" + ", widths)})";
         }
 
         internal bool IsFrozen()

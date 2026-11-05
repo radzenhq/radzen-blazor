@@ -7159,36 +7159,25 @@ window.Radzen = {
       // grid's rather than one nested inside it.
       var table = gridElement.querySelector('.rz-grid-table');
       if (!table) return;
-      // Get frozen cell positions from the header row first, then apply to all rows
       var headerRow = table.querySelector(':scope > thead > tr');
       if (!headerRow) return;
       var leftHeaderCells = Radzen.frozenCellsOf(headerRow, 'left');
       var rightHeaderCells = Radzen.frozenCellsOf(headerRow, 'right');
-      // Calculate offsets from header widths
-      var leftOffsets = [];
       var offset = 0;
       for (var i = 0; i < leftHeaderCells.length; i++) {
-          leftOffsets.push(offset);
+          table.style.setProperty('--rz-grid-frozen-left-' + i, offset + 'px');
           offset += leftHeaderCells[i].getBoundingClientRect().width;
       }
-      var rightOffsets = [];
+      for (var i = leftHeaderCells.length; table.style.getPropertyValue('--rz-grid-frozen-left-' + i) !== ''; i++) {
+          table.style.removeProperty('--rz-grid-frozen-left-' + i);
+      }
       offset = 0;
       for (var i = rightHeaderCells.length - 1; i >= 0; i--) {
-          rightOffsets[i] = offset;
+          table.style.setProperty('--rz-grid-frozen-right-' + i, offset + 'px');
           offset += rightHeaderCells[i].getBoundingClientRect().width;
       }
-      // Apply offsets to this grid's own rows
-      var rows = table.querySelectorAll(':scope > thead > tr, :scope > tbody > tr, :scope > tfoot > tr');
-      for (var r = 0; r < rows.length; r++) {
-          var row = rows[r];
-          var leftCells = Radzen.frozenCellsOf(row, 'left');
-          for (var i = 0; i < leftCells.length && i < leftOffsets.length; i++) {
-              leftCells[i].style.setProperty('inset-inline-start', leftOffsets[i] + 'px');
-          }
-          var rightCells = Radzen.frozenCellsOf(row, 'right');
-          for (var i = 0; i < rightCells.length && i < rightOffsets.length; i++) {
-              rightCells[i].style.setProperty('inset-inline-end', rightOffsets[i] + 'px');
-          }
+      for (var i = rightHeaderCells.length; table.style.getPropertyValue('--rz-grid-frozen-right-' + i) !== ''; i++) {
+          table.style.removeProperty('--rz-grid-frozen-right-' + i);
       }
   },
   startColumnResize: function(id, grid, columnIndex, clientX) {
@@ -8037,9 +8026,26 @@ Radzen.createDataGrid = function(el) {
   }
   el.addEventListener('click', onClick);
   el.addEventListener('mousedown', onMousedown);
+  var table = el.querySelector('.rz-grid-table');
+  var frozenObserver = null;
+  if (table && typeof ResizeObserver !== 'undefined') {
+    frozenObserver = new ResizeObserver(function () {
+      Radzen.updateFrozenColumnPositions(el);
+      var headerRow = table.querySelector(':scope > thead > tr');
+      if (!headerRow) return;
+      var cells = Radzen.frozenCellsOf(headerRow, 'left').concat(Radzen.frozenCellsOf(headerRow, 'right'));
+      for (var i = 0; i < cells.length; i++) {
+        frozenObserver.observe(cells[i]);
+      }
+    });
+    frozenObserver.observe(table);
+  }
   return { dispose: function() {
     el.removeEventListener('click', onClick);
     el.removeEventListener('mousedown', onMousedown);
+    if (frozenObserver) {
+      frozenObserver.disconnect();
+    }
   }};
 };
 Radzen.createDropDown = function(el, labelName) {
