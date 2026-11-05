@@ -11,12 +11,12 @@
 
 <div class="rz-gantt-timeline-view">
     <div class="rz-gantt-timeline-scroll">
-      <div class="rz-gantt-timeline-content" style="@($"width:{TimelineWidthPx}px;")">
+      <div class="rz-gantt-timeline-content" style="@($"width:{TimelineWidthPx.ToInvariantString()}px;")">
         @{
             var appointmentsByRow = BuildAppointmentsByRow();
             var links = BuildLinks();
         }
-        <table class="rz-gantt-table" style="@($"width: {TimelineWidthPx}px; min-width: 100%;")">
+        <table class="rz-gantt-table" style="@($"width: {TimelineWidthPx.ToInvariantString()}px; min-width: 100%;")">
             <thead>
                 @{
                     var groups = BuildHeaderGroups();
@@ -38,7 +38,7 @@
                     @foreach (var column in Columns)
                     {
                         var headerNonWorking = ShowWeekends && NonWorkingDays != null && NonWorkingDays.Contains(column.Start.DayOfWeek);
-                        <th class="@($"rz-gantt-table-header-cell{(headerNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx}px;")">
+                        <th class="@($"rz-gantt-table-header-cell{(headerNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx.ToInvariantString()}px;")">
                             @column.Label
                         </th>
                     }
@@ -51,12 +51,12 @@
                     var effectiveRowHeight = GetEffectiveRowHeight(row);
                     <tr class="rz-gantt-table-row">
                         <td class="rz-gantt-table-cell" colspan="@Columns.Count" style="@($"height:{effectiveRowHeight}px;")">
-                            <div class="rz-gantt-row-container" style="@($"width:{TimelineWidthPx}px;font-size:{RowHeightPx}px;")">
-                                <div class="rz-gantt-row-grid" style="@($"width:{TimelineWidthPx}px;")">
+                            <div class="rz-gantt-row-container" style="@($"width:{TimelineWidthPx.ToInvariantString()}px;font-size:{RowHeightPx}px;")">
+                                <div class="rz-gantt-row-grid" style="@($"width:{TimelineWidthPx.ToInvariantString()}px;")">
                                     @foreach (var column in Columns)
                                     {
                                         var isNonWorking = ShowWeekends && NonWorkingDays != null && NonWorkingDays.Contains(column.Start.DayOfWeek);
-                                        <div class="@($"rz-gantt-row-grid-col{(isNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx}px;")"></div>
+                                        <div class="@($"rz-gantt-row-grid-col{(isNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx.ToInvariantString()}px;")"></div>
                                     }
                                 </div>
                                 @if (rowAppointments != null)
@@ -112,7 +112,7 @@
                 }
             </tbody>
         </table>
-        <svg class="rz-gantt-links" style="@($"width:{TimelineWidthPx}px;height:{GetTotalHeight()}px;")">
+        <svg class="rz-gantt-links" style="@($"width:{TimelineWidthPx.ToInvariantString()}px;height:{GetTotalHeight().ToInvariantString()}px;")">
             <defs>
                 <marker id="rz-gantt-link-arrow-end" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                     <path d="M0,0 L6,3 L0,6 Z" class="rz-gantt-link-arrow" />
