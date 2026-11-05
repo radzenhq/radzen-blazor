@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
@@ -20,6 +20,8 @@ namespace Radzen.Blazor.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.MaxFileSize, -1)));
             Assert.Throws<ArgumentException>(() => ctx.RenderComponent<RadzenUpload>(p => p
                 .Add(x => x.Url, "api/upload").Add(x => x.AllowedExtensions, new[] { "image/*" })));
+            Assert.Throws<ArgumentException>(() => ctx.RenderComponent<RadzenUpload>(p => p
+                .Add(x => x.Url, "api/upload").Add(x => x.AllowedExtensions, new[] { "." })));
         }
 
         [Fact]
@@ -29,18 +31,19 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
             module.SetupVoid("updateValidation", _ => true).SetVoidResult();
-            var extensions = new List<string> { " .PDF ", ".pdf" };
+            var extensions = new List<string> { " .PDF ", "pdf" };
             var component = ctx.RenderComponent<RadzenUpload>(p => p
                 .Add(x => x.Url, "api/upload").Add(x => x.MaxFileSize, 10)
                 .Add(x => x.AllowedExtensions, extensions));
             var creation = ctx.JSInterop.Invocations["Radzen.createUpload"].Single();
             Assert.Equal(10L, creation.Arguments[7]);
             Assert.Equal(new[] { ".pdf" }, (string[])creation.Arguments[8]);
+            Assert.DoesNotContain(module.Invocations, invocation => invocation.Identifier == "updateValidation");
             extensions.Add(".txt");
             component.SetParametersAndRender(p => p.Add(x => x.AllowedExtensions, extensions));
             Assert.Single(ctx.JSInterop.Invocations["Radzen.createUpload"]);
             Assert.Single(ctx.JSInterop.Invocations["Radzen.uploads"]);
-            Assert.Equal(new[] { ".pdf", ".txt" }, (string[])module.Invocations["updateValidation"].Last().Arguments[1]);
+            Assert.Equal(new[] { ".pdf", ".txt" }, (string[])module.Invocations["updateValidation"].Single().Arguments[1]);
         }
 
         [Fact]

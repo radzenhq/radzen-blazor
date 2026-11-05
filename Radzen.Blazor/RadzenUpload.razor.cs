@@ -197,7 +197,7 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets allowed filename suffixes, such as ".pdf" or ".tar.gz". Requires <see cref="Url"/>.
-        /// Null or an empty collection allows all extensions. Comparison is case-insensitive.
+        /// Null or an empty collection allows all extensions. Comparison is case-insensitive and a missing leading dot is added.
         /// Applies to new selections only and does not validate MIME types or file contents.
         /// </summary>
         [Parameter]
@@ -223,15 +223,14 @@ namespace Radzen.Blazor
                 throw new ArgumentOutOfRangeException(nameof(MaxFileSize), "The maximum file size cannot be negative.");
             }
 
-            var extensions = AllowedExtensions?.Select(extension => extension?.Trim()).ToArray();
+            var extensions = AllowedExtensions?.Select(extension => extension?.Trim().TrimStart('.')).ToArray();
             if (extensions != null && extensions.Any(extension => string.IsNullOrEmpty(extension) ||
-                extension[0] != '.' || extension.Length == 1 ||
                 extension.Any(c => c is '/' or '\\' or '*' or ',' or ';' || char.IsWhiteSpace(c))))
             {
-                throw new ArgumentException("Extensions must begin with a dot and cannot contain MIME types, wildcards or separators.", nameof(AllowedExtensions));
+                throw new ArgumentException("Extensions cannot be empty or contain MIME types, wildcards or separators.", nameof(AllowedExtensions));
             }
 
-            var normalized = extensions?.Select(extension => extension!.ToLowerInvariant()).Distinct().ToArray() ?? Array.Empty<string>();
+            var normalized = extensions?.Select(extension => "." + extension!.ToLowerInvariant()).Distinct().ToArray() ?? Array.Empty<string>();
             validationChanged |= validationMaxFileSize != MaxFileSize || !allowedExtensions.SequenceEqual(normalized);
             validationMaxFileSize = MaxFileSize;
             allowedExtensions = normalized;
@@ -407,6 +406,8 @@ namespace Radzen.Blazor
                     {
                         return;
                     }
+
+                    validationChanged = false;
 
                     var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createUpload", Element,
