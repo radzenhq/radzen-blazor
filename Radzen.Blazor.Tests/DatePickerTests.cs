@@ -1966,6 +1966,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_OtherMonthDays_MarkOnlyTheCell()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, new DateTime(2025, 1, 15));
+                parameters.Add(p => p.Inline, true);
+            });
+
+            var otherMonthCells = component.FindAll("td.rz-calendar-other-month:not(.rz-calendar-week-number)");
+            Assert.NotEmpty(otherMonthCells);
+            Assert.All(otherMonthCells, cell =>
+            {
+                var day = cell.QuerySelector("span.rz-state-default");
+                Assert.NotNull(day);
+                Assert.DoesNotContain("rz-calendar-other-month", day.ClassList);
+            });
+            Assert.Empty(component.FindAll(".rz-calendar-other-month .rz-calendar-other-month"));
+
+            var currentMonthCells = component.FindAll("td[role='gridcell']:not(.rz-calendar-other-month)");
+            Assert.Equal(31, currentMonthCells.Count);
+            Assert.All(currentMonthCells, cell => Assert.DoesNotContain("rz-calendar-other-month", cell.QuerySelector("span")!.ClassList));
+        }
+
+        [Fact]
         public void DatePicker_NonGregorianCalendar_DayClick_SetsCorrectValue()
         {
             using var ctx = new TestContext();
@@ -1986,7 +2014,7 @@ namespace Radzen.Blazor.Tests
 
             // Click on day "10"
             var dayCells = component.FindAll("td[role='button'] span.rz-state-default");
-            var day10 = dayCells.FirstOrDefault(c => c.TextContent.Trim() == "10" && !c.ClassList.Contains("rz-calendar-other-month"));
+            var day10 = dayCells.FirstOrDefault(c => c.TextContent.Trim() == "10" && !c.ParentElement!.ClassList.Contains("rz-calendar-other-month"));
 
             if (day10 != null)
             {

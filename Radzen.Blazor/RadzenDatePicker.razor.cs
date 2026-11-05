@@ -2856,7 +2856,7 @@ namespace Radzen.Blazor
         {
             var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
-                               .Add("rz-calendar-other-month", GetCalendarMonth(viewMonth) != GetCalendarMonth(date))
+                               .Add("rz-calendar-other-month", forCell && GetCalendarMonth(viewMonth) != GetCalendarMonth(date))
                                .Add("rz-state-active", !forCell && (IsRange ? IsRangeEndpoint(date) : Multiple ? IsSelectedDate(date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
                                .Add("rz-calendar-range", !forCell && IsDateInRange(date))
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
