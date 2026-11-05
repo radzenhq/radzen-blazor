@@ -219,5 +219,20 @@ namespace Radzen.Blazor.Tests
                 CultureInfo.CurrentCulture = previous;
             }
         }
+
+        [Fact]
+        public void Gantt_YearZoom_ColgroupMatchesColumnWidths()
+        {
+            using var ctx = CreateContext();
+
+            var gantt = RenderGantt(ctx, GanttZoomLevel.Year, CultureInfo.InvariantCulture);
+
+            var cols = gantt.FindAll(".rz-gantt-table colgroup col").Select(c => c.GetAttribute("style")).ToList();
+            var headers = gantt.FindAll(".rz-gantt-table thead tr:last-child th").Select(h => h.GetAttribute("style")).ToList();
+
+            Assert.NotEmpty(cols);
+            Assert.Equal(headers, cols);
+            Assert.Contains(cols, style => style.Contains('.'));
+        }
     }
 }

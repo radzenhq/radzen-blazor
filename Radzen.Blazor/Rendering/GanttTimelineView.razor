@@ -17,6 +17,12 @@
             var links = BuildLinks();
         }
         <table class="rz-gantt-table" style="@($"width: {TimelineWidthPx.ToInvariantString()}px; min-width: 100%;")">
+            <colgroup>
+                @foreach (var column in Columns)
+                {
+                    <col style="@($"width:{column.WidthPx.ToInvariantString()}px;")" />
+                }
+            </colgroup>
             <thead>
                 @{
                     var groups = BuildHeaderGroups();
