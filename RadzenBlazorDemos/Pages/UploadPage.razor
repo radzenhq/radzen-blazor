@@ -54,6 +54,20 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadImage)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadImage />
 </RadzenExample>
+<RadzenText Anchor="upload#validation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Client-side selection limits
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    With <code>Url</code> set, use <code>MaxFileSize</code> (bytes) and <code>AllowedExtensions</code>
+    to check files before accepting them or starting an automatic upload. Handle <code>Rejected</code> to display your own messages.
+    This example accepts PDF and PNG files up to 1 MiB. Allowed files are accepted even if other files in the same selection are rejected.
+    If all files are rejected, the previous selection is preserved.
+    These optional limits apply to new selections only; changing them does not revalidate files already selected.
+    <code>Accept</code> remains a dialog hint. Extensions do not validate file contents or MIME types: always validate on the server too.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadValidation)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
+    <UploadValidation />
+</RadzenExample>
 <RadzenText Anchor="upload#parameters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Use parameters
 </RadzenText>

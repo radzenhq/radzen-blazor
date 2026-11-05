@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
@@ -10,6 +11,60 @@ namespace Radzen.Blazor.Tests
 {
     public class UploadTests
     {
+        [Fact]
+        public void Upload_RejectsInvalidLimits()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            Assert.Throws<InvalidOperationException>(() => ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.MaxFileSize, 1)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.MaxFileSize, -1)));
+            Assert.Throws<ArgumentException>(() => ctx.RenderComponent<RadzenUpload>(p => p
+                .Add(x => x.Url, "api/upload").Add(x => x.AllowedExtensions, new[] { "image/*" })));
+        }
+
+        [Fact]
+        public void Upload_UpdatesLimits_WithoutRecreatingHandler()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
+            module.SetupVoid("updateValidation", _ => true).SetVoidResult();
+            var extensions = new List<string> { " .PDF ", ".pdf" };
+            var component = ctx.RenderComponent<RadzenUpload>(p => p
+                .Add(x => x.Url, "api/upload").Add(x => x.MaxFileSize, 10)
+                .Add(x => x.AllowedExtensions, extensions));
+            var creation = ctx.JSInterop.Invocations["Radzen.createUpload"].Single();
+            Assert.Equal(10L, creation.Arguments[7]);
+            Assert.Equal(new[] { ".pdf" }, (string[])creation.Arguments[8]);
+            extensions.Add(".txt");
+            component.SetParametersAndRender(p => p.Add(x => x.AllowedExtensions, extensions));
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.createUpload"]);
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.uploads"]);
+            Assert.Equal(new[] { ".pdf", ".txt" }, (string[])module.Invocations["updateValidation"].Last().Arguments[1]);
+        }
+
+        [Fact]
+        public async Task Upload_ReportsRejection_WithoutChangingSelection()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            UploadRejectedEventArgs rejected = null;
+            var changes = 0;
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload")
+                .Add(x => x.Change, _ => changes++)
+                .Add(x => x.Rejected, args => rejected = args));
+            await component.InvokeAsync(() => component.Instance.OnChange(new[] { new PreviewFileInfo { Name = "keep.pdf", Size = 1 } }));
+            var args = new UploadRejectedEventArgs { MaxFileSize = 10, Files = new[] {
+                new UploadRejectedFile { File = new FileInfo { Name = "large.pdf", Size = 11 }, Reason = UploadRejectionReason.FileTooLarge }
+            }};
+            await component.InvokeAsync(() => component.Instance.OnRejected(args));
+            Assert.Same(args, rejected);
+            Assert.Equal(1, changes);
+            Assert.True(component.Instance.HasValue);
+            Assert.Contains("keep.pdf", component.Markup);
+            Assert.DoesNotContain("large.pdf", component.Markup);
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("api/upload")]

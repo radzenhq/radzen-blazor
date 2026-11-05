@@ -188,6 +188,60 @@ namespace Radzen.Blazor
         public string? Accept { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum size in bytes for newly selected files. Requires <see cref="Url"/>.
+        /// Null means no size limit. Files whose size equals the limit are allowed.
+        /// This client-side check does not replace server-side validation.
+        /// </summary>
+        [Parameter]
+        public long? MaxFileSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets allowed filename suffixes, such as ".pdf" or ".tar.gz". Requires <see cref="Url"/>.
+        /// Null or an empty collection allows all extensions. Comparison is case-insensitive.
+        /// Applies to new selections only and does not validate MIME types or file contents.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<string>? AllowedExtensions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback reporting files rejected by the client-side selection limits.
+        /// This notification does not delay or cancel upload of accepted files.
+        /// </summary>
+        [Parameter]
+        public EventCallback<UploadRejectedEventArgs> Rejected { get; set; }
+
+        string[] allowedExtensions = Array.Empty<string>();
+        long? validationMaxFileSize;
+        bool validationChanged;
+
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            if (MaxFileSize < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(MaxFileSize), "The maximum file size cannot be negative.");
+            }
+
+            var extensions = AllowedExtensions?.Select(extension => extension?.Trim()).ToArray();
+            if (extensions != null && extensions.Any(extension => string.IsNullOrEmpty(extension) ||
+                extension[0] != '.' || extension.Length == 1 ||
+                extension.Any(c => c is '/' or '\\' or '*' or ',' or ';' || char.IsWhiteSpace(c))))
+            {
+                throw new ArgumentException("Extensions must begin with a dot and cannot contain MIME types, wildcards or separators.", nameof(AllowedExtensions));
+            }
+
+            var normalized = extensions?.Select(extension => extension!.ToLowerInvariant()).Distinct().ToArray() ?? Array.Empty<string>();
+            validationChanged |= validationMaxFileSize != MaxFileSize || !allowedExtensions.SequenceEqual(normalized);
+            validationMaxFileSize = MaxFileSize;
+            allowedExtensions = normalized;
+            if ((MaxFileSize.HasValue || allowedExtensions.Length > 0) && string.IsNullOrEmpty(Url))
+            {
+                throw new InvalidOperationException("RadzenUpload file selection limits require Url to be set.");
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is multiple.
         /// </summary>
         /// <value><c>true</c> if multiple; otherwise, <c>false</c>.</value>
@@ -321,6 +375,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(FileInfo))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(PreviewFileInfo))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UploadRejectedEventArgs))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UploadRejectedFile))]
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -355,7 +411,7 @@ namespace Radzen.Blazor
                     var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createUpload", Element,
                         !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
-                        ParameterName, Method, Stream);
+                        ParameterName, Method, Stream, MaxFileSize, allowedExtensions);
 
                     if (version == _jsRefVersion)
                     {
@@ -368,7 +424,20 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
+            var handler = _jsRef;
+            if (Visible && handler != null && validationChanged)
+            {
+                validationChanged = false;
+                await handler.InvokeVoidAsync("updateValidation", MaxFileSize, allowedExtensions);
+            }
         }
+
+        /// <summary>
+        /// Reports files rejected by client-side selection limits.
+        /// </summary>
+        [JSInvokable("RadzenUpload.OnRejected")]
+        public Task OnRejected(UploadRejectedEventArgs args) => Rejected.InvokeAsync(args);
 
         /// <summary>
         /// Gets the headers.

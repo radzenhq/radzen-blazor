@@ -1,0 +1,28 @@
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload @ref="upload" Url="api/upload/multiple" Multiple="true" Auto="false"
+                  Accept=".pdf,.png" MaxFileSize="1048576" AllowedExtensions="@extensions"
+                  Rejected=@OnRejected Complete=@OnComplete Style="width: 100%" />
+    <RadzenButton Text="Upload" Click=@(() => upload.Upload()) class="rz-mt-4" />
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    RadzenUpload upload;
+    EventConsole console;
+    string[] extensions = { ".pdf", ".png" };
+
+    void OnRejected(UploadRejectedEventArgs args)
+    {
+        foreach (var rejected in args.Files)
+        {
+            console.Log(rejected.Reason == UploadRejectionReason.FileTooLarge
+                ? $"{rejected.File.Name} exceeds the {args.MaxFileSize:N0} byte limit ({rejected.File.Size:N0} bytes)."
+                : $"{rejected.File.Name} must have one of these extensions: {string.Join(", ", args.AllowedExtensions)}.");
+        }
+    }
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log(args.Cancelled ? "Upload cancelled" : "Upload complete");
+    }
+}
