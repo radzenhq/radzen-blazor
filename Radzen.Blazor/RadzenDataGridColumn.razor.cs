@@ -1969,6 +1969,10 @@ namespace Radzen.Blazor
                     return Grid?.IsNotNullText;
                 case FilterOperator.IsNotEmpty:
                     return Grid?.IsNotEmptyText;
+                case FilterOperator.In:
+                    return Grid?.InText;
+                case FilterOperator.NotIn:
+                    return Grid?.NotInText;
                 default:
                     return $"{filterOperator}";
             }
