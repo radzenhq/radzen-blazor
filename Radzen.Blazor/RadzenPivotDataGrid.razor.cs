@@ -2229,6 +2229,10 @@ namespace Radzen.Blazor
                     return IsNotNullText;
                 case FilterOperator.IsNotEmpty:
                     return IsNotEmptyText;
+                case FilterOperator.In:
+                    return InText;
+                case FilterOperator.NotIn:
+                    return NotInText;
                 default:
                     return $"{filterOperator}";
             }

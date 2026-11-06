@@ -2192,5 +2192,25 @@ namespace Radzen.Blazor.Tests
                 configure?.Invoke(parameters);
             });
         }
+
+        [Theory]
+        [InlineData(FilterOperator.In, "custom in")]
+        [InlineData(FilterOperator.NotIn, "custom not in")]
+        public void PivotDataGrid_GetFilterOperatorText_UsesInAndNotInText(FilterOperator op, string expected)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
+            {
+                parameters.Add(p => p.Data, SampleData);
+                parameters.Add(p => p.InText, "custom in");
+                parameters.Add(p => p.NotInText, "custom not in");
+                parameters.Add(p => p.AllowFieldsPicking, false);
+            });
+
+            Assert.Equal(expected, component.Instance.GetFilterOperatorText(op));
+        }
     }
 }
