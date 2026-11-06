@@ -673,6 +673,12 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     .rz-current-filter {
       margin-inline-start: 0.5rem;
     }
+
+    // The clear button of a text filter sits over the end of the input (position: absolute, 10px from the end),
+    // so the input reserves room for it and a long value does not run under the button.
+    > .rz-textbox:has(+ .rz-cell-filter-clear) {
+      padding-inline-end: calc(10px + var(--rz-grid-filter-icon-width) + 0.5rem);
+    }
   }
 }
 
