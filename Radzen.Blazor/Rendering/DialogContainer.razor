@@ -109,8 +109,8 @@
             Dialog.Options.Drag(new System.Drawing.Point(Convert.ToInt32(l), Convert.ToInt32(t)));
         }
 
-        top = $"top: {t}px;";
-        left = $"left: {l}px;";
+        top = $"top: {t.ToInvariantString()}px;";
+        left = $"left: {l.ToInvariantString()}px;";
 
         shouldRender = true;
     }
@@ -130,8 +130,8 @@
         {
             Dialog?.Options?.Resize?.Invoke(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
 
-            width = $"width: {w}px;";
-            height = $"height: {h}px;";
+            width = $"width: {w.ToInvariantString()}px;";
+            height = $"height: {h.ToInvariantString()}px;";
         }
 
         shouldRender = true;

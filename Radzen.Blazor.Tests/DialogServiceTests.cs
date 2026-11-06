@@ -1,8 +1,10 @@
 ﻿using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -554,6 +556,50 @@ namespace Radzen.Blazor.Tests
 				{
 					Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closeDialog"));
 				});
+			}
+		}
+
+		public class DragResizeTests
+		{
+			[Fact(DisplayName = "Dragged and resized dialog style uses the invariant culture")]
+			public void DragAndResize_Style_UsesInvariantCulture()
+			{
+				var previous = CultureInfo.CurrentCulture;
+				CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+				try
+				{
+					using var ctx = new TestContext();
+					ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+					ctx.Services.AddScoped<DialogService>();
+
+					var cut = ctx.RenderComponent<RadzenDialog>();
+					var dialogService = ctx.Services.GetRequiredService<DialogService>();
+
+					cut.InvokeAsync(() => dialogService.Open("Test", typeof(RadzenButton),
+						new Dictionary<string, object>(), new DialogOptions { Draggable = true, Resizable = true }));
+
+					cut.WaitForState(() => cut.FindComponents<DialogContainer>().Count == 1);
+					var container = cut.FindComponent<DialogContainer>();
+
+					container.InvokeAsync(() =>
+					{
+						container.Instance.OnDrag(120.5, 80.25);
+						container.Instance.OnResize(640.5, 480.75);
+					});
+					container.Render();
+
+					var style = container.Find(".rz-dialog").GetAttribute("style");
+
+					Assert.Contains("width: 640.5px;", style);
+					Assert.Contains("height: 480.75px;", style);
+					Assert.Contains("top: 120.5px;", style);
+					Assert.Contains("left: 80.25px;", style);
+				}
+				finally
+				{
+					CultureInfo.CurrentCulture = previous;
+				}
 			}
 		}
 	}
