@@ -73,7 +73,8 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task OnDrop(DragEventArgs args)
+        // The drop event bubbles to the parent RadzenDropZone, which invokes Drop. Calling it from here too would raise it twice.
+        void OnDrop(DragEventArgs args)
         {
             if (Container?.Payload == null)
             {
@@ -83,10 +84,6 @@ namespace Radzen.Blazor
             if (Container?.Payload != null)
             {
                 Container.Payload.ToItem = Item;
-            }
-            if (Zone != null)
-            {
-                await Zone.OnDropInternal();
             }
         }
 
