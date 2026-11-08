@@ -1,4 +1,5 @@
 using Bunit;
+using System.Globalization;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -296,6 +297,33 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-progressbar-info", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBarCircular_Renders_AriaValues_WithInvariantCulture()
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            try
+            {
+                using var ctx = new TestContext();
+
+                var component = ctx.RenderComponent<RadzenProgressBarCircular>(parameters =>
+                {
+                    parameters.Add(p => p.Value, 4.5);
+                    parameters.Add(p => p.Min, 0.5);
+                    parameters.Add(p => p.Max, 10.5);
+                });
+
+                Assert.Contains(@"aria-valuenow=""4.5""", component.Markup);
+                Assert.Contains(@"aria-valuemin=""0.5""", component.Markup);
+                Assert.Contains(@"aria-valuemax=""10.5""", component.Markup);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
         }
     }
 }
