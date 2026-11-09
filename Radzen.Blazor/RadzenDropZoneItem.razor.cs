@@ -73,7 +73,6 @@ namespace Radzen.Blazor
             }
         }
 
-        // The drop event bubbles to the parent RadzenDropZone, which invokes Drop. Calling it from here too would raise it twice.
         void OnDrop(DragEventArgs args)
         {
             if (Container?.Payload == null)
