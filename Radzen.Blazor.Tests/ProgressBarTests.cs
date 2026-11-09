@@ -1,6 +1,7 @@
 using Bunit;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Globalization;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -21,7 +22,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"<div class=""rz-progressbar-label"">", component.Markup);
             Assert.Contains(@$"{value}%", component.Markup);
-            Assert.Contains(@$"aria-valuenow=""{value}""", component.Markup);
+            Assert.Contains(@$"aria-valuenow=""{value.ToInvariantString()}""", component.Markup);
             Assert.Contains(@$"aria-valuemin=""0""", component.Markup);
         }
 
@@ -329,6 +330,33 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains(@"--rz-progressbar-buffer-value: 50%;", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBar_Renders_AriaValues_WithInvariantCulture()
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            try
+            {
+                using var ctx = new TestContext();
+
+                var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+                {
+                    parameters.Add(p => p.Value, 4.5);
+                    parameters.Add(p => p.Min, 0.5);
+                    parameters.Add(p => p.Max, 10.5);
+                });
+
+                Assert.Contains(@"aria-valuenow=""4.5""", component.Markup);
+                Assert.Contains(@"aria-valuemin=""0.5""", component.Markup);
+                Assert.Contains(@"aria-valuemax=""10.5""", component.Markup);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
         }
     }
 }
