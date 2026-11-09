@@ -1073,5 +1073,51 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(50, component.Instance.Value);
         }
+    
+
+        [Fact]
+        public void Numeric_Keeps_AriaLabel_From_InputAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["aria-label"] = "Hops" }));
+
+            var input = component.Find("input[role=spinbutton]");
+
+            Assert.Equal("Hops", input.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Numeric_InputAttributes_AriaLabel_Wins_Over_AriaLabel_Parameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters
+                .Add(p => p.AriaLabel, "Ignored")
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["aria-label"] = "Hops" }));
+
+            var input = component.Find("input[role=spinbutton]");
+
+            Assert.Equal("Hops", input.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Numeric_Keeps_AriaLabelledBy_From_InputAttributes_Without_AriaLabel()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters
+                .Add(p => p.Name, "hops")
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["aria-labelledby"] = "hops-label" }));
+
+            var input = component.Find("input[role=spinbutton]");
+
+            Assert.Equal("hops-label", input.GetAttribute("aria-labelledby"));
+            Assert.False(input.HasAttribute("aria-label"));
+        }
     }
 }
