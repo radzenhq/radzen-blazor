@@ -1,0 +1,31 @@
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select files as many times as needed, then click Upload</RadzenText>
+    <RadzenUpload @ref="upload" Auto="false" Multiple="true" AppendFiles="true" Url="api/upload/multiple"
+                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                  Change=@OnChange Complete=@OnComplete Style="width: 100%" />
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" class="rz-mt-4">
+        <RadzenButton Text="Upload" Click=@(() => upload.Upload()) Disabled="@(!upload?.HasValue ?? true)" />
+        <RadzenButton Text="Clear" ButtonStyle="ButtonStyle.Light" Click=@(() => upload.ClearFiles()) Disabled="@(!upload?.HasValue ?? true)" />
+    </RadzenStack>
+</RadzenCard>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenUpload upload;
+    EventConsole console;
+
+    void OnChange(UploadChangeEventArgs args)
+    {
+        var files = args.Files.ToList();
+
+        console.Log(files.Count == 0
+            ? "Selection cleared"
+            : $"{files.Count} file(s) selected: {string.Join(", ", files.Select(f => f.Name))}");
+    }
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log(args.Cancelled ? "Upload cancelled" : "Upload complete");
+    }
+}

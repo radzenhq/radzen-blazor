@@ -45,6 +45,18 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadFromCode)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadFromCode />
 </RadzenExample>
+<RadzenText Anchor="upload#append-files" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Add files over several selections
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    By default every new selection replaces the previously selected files. Set <code>AppendFiles</code> to <code>true</code> to keep the earlier files and add the new ones to the list,
+    so users can pick files one at a time before triggering the upload. Files are not deduplicated: selecting the same file again adds another entry, and each entry can be removed on its own.
+    <code>AppendFiles</code> applies when <code>Url</code> is set, <code>Multiple</code> is <code>true</code>, <code>Auto</code> is <code>false</code> and <code>Stream</code> is <code>false</code>.
+    Uploading does not clear the selection; call <code>ClearFiles()</code> to start over.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadAppendFiles)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
+    <UploadAppendFiles />
+</RadzenExample>
 <RadzenText Anchor="upload#filter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     File filter
 </RadzenText>

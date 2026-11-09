@@ -3074,6 +3074,7 @@ namespace RadzenBlazorDemos
                         new () { Text = "Upload files to server", Anchor = "#url" }, 
                         new () { Text = "Upload multiple files", Anchor = "#multiple" }, 
                         new () { Text = "Trigger from code", Anchor = "#from-code" }, 
+                        new () { Text = "Add files over selections", Anchor = "#append-files" }, 
                         new () { Text = "File filter", Anchor = "#filter" }, 
                         new () { Text = "Use parameters", Anchor = "#parameters" }, 
                         new () { Text = "Show upload progress", Anchor = "#progress" }, 
