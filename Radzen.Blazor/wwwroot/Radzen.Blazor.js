@@ -2426,18 +2426,30 @@ window.Radzen = {
           Radzen.uploadChange(e.target);
       }
   },
-  uploads: function (uploadComponent, id) {
+  uploads: function (uploadComponent, id, queue = false) {
     if (!Radzen.uploadComponents) {
       Radzen.uploadComponents = {};
     }
-    Radzen.uploadComponents[id] = uploadComponent;
+    if (queue) {
+      var state = Radzen.uploadComponents[id];
+      if (!state || !state.queue) {
+        state = { queue: true, files: [], localFiles: [], version: 0, requests: new Set(),
+          invokeMethodAsync: function(...args) { return this.reference.invokeMethodAsync(...args); } };
+      }
+      state.reference = uploadComponent;
+      Radzen.uploadComponents[id] = state;
+    } else {
+      Radzen.uploadComponents[id] = uploadComponent;
+    }
   },
-  uploadChange: function (fileInput, selectedFiles) {
+  uploadChange: function (fileInput, selectedFiles, append = false) {
     var selection = selectedFiles || Array.from(fileInput.files);
+    if (!selection.length) return;
     var files = [];
     for (var i = 0; i < selection.length; i++) {
       var file = selection[i];
       files.push({
+        Id: 'upload-' + (Radzen.uploadFileId = (Radzen.uploadFileId || 0) + 1),
         Name: file.name,
         Size: file.size,
         ContentType: file.type,
@@ -2448,7 +2460,7 @@ window.Radzen = {
     var uploadComponent =
       Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (uploadComponent) {
-      if (uploadComponent.localFiles) {
+      if (!append && uploadComponent.localFiles) {
         // Clear any previously created preview URL(s)
         for (var i = 0; i < uploadComponent.localFiles.length; i++) {
           var file = uploadComponent.localFiles[i];
@@ -2458,9 +2470,11 @@ window.Radzen = {
         }
       }
 
-      uploadComponent.files = selection;
-      uploadComponent.localFiles = files;
-      try { suppressDisposed(uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files)); } catch { }
+      uploadComponent.files = append ? uploadComponent.files.concat(selection) : selection;
+      uploadComponent.localFiles = append ? uploadComponent.localFiles.concat(files) : files;
+      try { suppressDisposed(uploadComponent.queue
+        ? uploadComponent.invokeMethodAsync('RadzenUpload.OnQueueChange', uploadComponent.localFiles, ++uploadComponent.version)
+        : uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files)); } catch { }
     }
 
     for (var i = 0; i < fileInput.files.length; i++) {
@@ -2470,13 +2484,15 @@ window.Radzen = {
       }
     }
   },
-  removeFileFromUpload: function (ref, name, id) {
-    var uploadComponent = (Radzen.uploadComponents && Radzen.uploadComponents[ref]) ?? Radzen.uploadComponents[id];
+  removeFileFromUpload: function (ref, name, id, fileId) {
+    var uploadComponent = Radzen.uploadComponents && (Radzen.uploadComponents[id] || Radzen.uploadComponents[ref]);
     if (!uploadComponent) return;
     if (!uploadComponent.files) return;
-    var file = uploadComponent.files.find(function (f) { return f.name == name; })
+    var index = fileId ? uploadComponent.localFiles.findIndex(f => f.Id === fileId) :
+      uploadComponent.files.findIndex(f => f.name === name);
+    var file = uploadComponent.files[index];
     if (!file) { return; }
-    var localFile = uploadComponent.localFiles.find(function (f) { return f.Name == name; });
+    var localFile = uploadComponent.localFiles[index];
     if (localFile) {
       URL.revokeObjectURL(localFile.Url);
       var localIndex = uploadComponent.localFiles.indexOf(localFile);
@@ -2484,14 +2500,35 @@ window.Radzen = {
         uploadComponent.localFiles.splice(localIndex, 1);
       }
     }
-    var index = uploadComponent.files.indexOf(file)
     if (index != -1) {
         uploadComponent.files.splice(index, 1);
     }
-    var fileInput = document.getElementById(id).querySelector('input[type="file"]');
+    var element = document.getElementById(id);
+    var fileInput = element && (element.matches('input[type="file"]') ? element : element.querySelector('input[type="file"]'));
     if (fileInput && uploadComponent.files.length == 0) {
         fileInput.value = '';
     }
+    return { Files: uploadComponent.localFiles, Version: ++uploadComponent.version };
+  },
+  clearUpload: function(id) {
+    var component = Radzen.uploadComponents && Radzen.uploadComponents[id];
+    if (!component) return null;
+    component.localFiles.forEach(f => { if (f.Url) URL.revokeObjectURL(f.Url); });
+    component.files = [];
+    component.localFiles = [];
+    var element = document.getElementById(id);
+    var input = element && (element.matches('input[type="file"]') ? element : element.querySelector('input[type="file"]'));
+    if (input) input.value = '';
+    return { Files: [], Version: ++component.version };
+  },
+  destroyUpload: function(id) {
+    var component = Radzen.uploadComponents && Radzen.uploadComponents[id];
+    if (!component || !component.queue) return;
+    delete Radzen.uploadComponents[id];
+    component.requests.forEach(xhr => xhr.abort());
+    component.localFiles.forEach(f => { if (f.Url) URL.revokeObjectURL(f.Url); });
+    component.files = [];
+    component.localFiles = [];
   },
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
@@ -2504,6 +2541,12 @@ window.Radzen = {
     } else if (!uploadComponent.files || clear) {
         uploadComponent.files = Array.from(fileInput.files);
     }
+    if (uploadComponent.queue && (selectedFiles || clear)) {
+      uploadComponent.localFiles.forEach(f => { if (f.Url) URL.revokeObjectURL(f.Url); });
+      uploadComponent.localFiles = uploadComponent.files.map(f => ({
+        Id: 'upload-' + (Radzen.uploadFileId = (Radzen.uploadFileId || 0) + 1), Name: f.name, Size: f.size
+      }));
+    }
     
 	function asFormData() {
 		var data = new FormData();
@@ -2511,7 +2554,7 @@ window.Radzen = {
 		for (var i = 0; i < uploadComponent.files.length; i++) {
 			var file = uploadComponent.files[i];
 			data.append(parameterName || (multiple ? 'files' : 'file'), file, file.name);
-			files.push({Name: file.name, Size: file.size});
+			files.push({Id: uploadComponent.localFiles?.[i]?.Id, Name: file.name, Size: file.size});
 		}
 		return {data, files}
 	}
@@ -2519,7 +2562,7 @@ window.Radzen = {
 	function asStream() {
 		if (uploadComponent.files.length > 0) {
 			var file = uploadComponent.files[0];
-			return {data: file, files: [{Name: file.name, Size: file.size}]};
+			return {data: file, files: [{Id: uploadComponent.localFiles?.[0]?.Id, Name: file.name, Size: file.size}]};
 		}
 		return {data: null, files: []}
 	}
@@ -2528,12 +2571,15 @@ window.Radzen = {
 	var {data, files} = stream ? asStream() : asFormData();
 	
     var xhr = new XMLHttpRequest();
+    var requestOwner = uploadComponent;
+    if (requestOwner.requests) requestOwner.requests.add(xhr);
+    xhr.onloadend = function() { if (requestOwner.requests) requestOwner.requests.delete(xhr); };
     xhr.withCredentials = true;
     xhr.upload.onprogress = function (e) {
       if (e.lengthComputable) {
         var uploadComponent =
           Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
-        if (uploadComponent) {
+        if (uploadComponent && (!requestOwner.queue || uploadComponent === requestOwner)) {
           var progress = parseInt((e.loaded / e.total) * 100);
           try { uploadComponent.invokeMethodAsync(
             'RadzenUpload.OnProgress',
@@ -2556,7 +2602,7 @@ window.Radzen = {
         var status = xhr.status;
         var uploadComponent =
           Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
-        if (uploadComponent) {
+        if (uploadComponent && (!requestOwner.queue || uploadComponent === requestOwner)) {
           if (status === 0 || (status >= 200 && status < 400)) {
             try { uploadComponent.invokeMethodAsync(
               'RadzenUpload.OnComplete',
@@ -2573,6 +2619,7 @@ window.Radzen = {
       }
     };
     try { uploadComponent.invokeMethodAsync('GetHeaders').then(function (headers) {
+      if (requestOwner.queue && Radzen.uploadComponents?.[fileInput.id] !== requestOwner) return;
       xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
@@ -8199,7 +8246,7 @@ Radzen.validateUploadFiles = function(files, maxFileSize, allowedExtensions) {
   });
   return { accepted: accepted, rejected: rejected };
 };
-Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream, maxFileSize = null, allowedExtensions = []) {
+Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream, maxFileSize = null, allowedExtensions = [], appendFiles = false) {
   if (!el) return { dispose: function() {} };
   var choose = el.querySelector('.rz-fileupload-choose');
   var fileInput = el.querySelector('input[type=file]');
@@ -8216,7 +8263,8 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
     }
   }
   function onChange(e) {
-    if (maxFileSize == null && !allowedExtensions.length) {
+    var append = appendFiles && multiple && !auto && !stream;
+    if (maxFileSize == null && !allowedExtensions.length && !append) {
       Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
       return;
     }
@@ -8228,7 +8276,7 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
       if (auto) {
         Radzen.upload(fileInput, url, multiple, true, parameterName, method, stream, result.accepted);
       } else {
-        Radzen.uploadChange(fileInput, result.accepted);
+        Radzen.uploadChange(fileInput, result.accepted, append);
       }
     }
     fileInput.value = '';
@@ -8254,7 +8302,7 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
     img.addEventListener('error', onImgError);
   });
-  return { updateValidation: function(size, extensions) {
+  return { updateAppendFiles: function(value) { appendFiles = value; }, updateValidation: function(size, extensions) {
     maxFileSize = size;
     allowedExtensions = extensions || [];
   }, dispose: function() {

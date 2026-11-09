@@ -51,17 +51,39 @@ namespace Radzen.Blazor
     {
         IJSObjectReference? _jsRef;
         int _jsRefVersion;
+        long queueVersion;
+        bool appendFilesChanged;
+
+        internal sealed class UploadQueueState
+        {
+            public UploadQueueState() { }
+            public List<PreviewFileInfo> Files { get; set; } = new();
+            public long Version { get; set; }
+        }
 
         /// <inheritdoc />
         public override void Dispose()
         {
+            if (disposed)
+            {
+                return;
+            }
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                JSRuntime.InvokeVoid("Radzen.destroyUpload", Name ?? GetId());
+            }
             base.Dispose();
+            DisposeHandler();
+            GC.SuppressFinalize(this);
+        }
+
+        void DisposeHandler()
+        {
             _jsRefVersion++;
             var jsRef = _jsRef;
             _jsRef = null;
             jsRef?.InvokeVoid("dispose");
             jsRef?.DisposeFireAndForget();
-            GC.SuppressFinalize(this);
         }
 
         private string? imageAlternateText;
@@ -248,6 +270,14 @@ namespace Radzen.Blazor
         public bool Multiple { get; set; }
 
         /// <summary>
+        /// Gets or sets whether new selections are appended instead of replacing selected files.
+        /// Applies only with Url, Multiple=true, Auto=false and Stream=false. Otherwise ignored.
+        /// Repeated selections are separate entries. Uploading does not clear the selection.
+        /// </summary>
+        [Parameter]
+        public bool AppendFiles { get; set; }
+
+        /// <summary>
         /// Gets or sets the icon.
         /// </summary>
         /// <value>The icon.</value>
@@ -348,6 +378,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            appendFilesChanged |= parameters.DidParameterChange(nameof(AppendFiles), AppendFiles);
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             if (parameters.DidParameterChange(nameof(Url), Url) ||
@@ -366,7 +397,7 @@ namespace Radzen.Blazor
             {
                 if (Visible == false)
                 {
-                    Dispose();
+                    DisposeHandler();
                 }
             }
         }
@@ -376,6 +407,7 @@ namespace Radzen.Blazor
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(PreviewFileInfo))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UploadRejectedEventArgs))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UploadRejectedFile))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UploadQueueState))]
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -388,7 +420,7 @@ namespace Radzen.Blazor
 
                 if (Visible && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
+                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId(), true);
 
                     _jsParamsChanged = false;
 
@@ -408,11 +440,12 @@ namespace Radzen.Blazor
                     }
 
                     validationChanged = false;
+                    appendFilesChanged = false;
 
                     var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createUpload", Element,
                         !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
-                        ParameterName, Method, Stream, MaxFileSize, allowedExtensions);
+                        ParameterName, Method, Stream, MaxFileSize, allowedExtensions, AppendFiles);
 
                     if (version == _jsRefVersion)
                     {
@@ -427,6 +460,11 @@ namespace Radzen.Blazor
             }
 
             var handler = _jsRef;
+            if (Visible && handler != null && appendFilesChanged)
+            {
+                appendFilesChanged = false;
+                await handler.InvokeVoidAsync("updateAppendFiles", AppendFiles);
+            }
             if (Visible && handler != null && validationChanged)
             {
                 validationChanged = false;
@@ -497,6 +535,23 @@ namespace Radzen.Blazor
         /// </summary>
         public async System.Threading.Tasks.Task ClearFiles()
         {
+            if (!string.IsNullOrEmpty(Url))
+            {
+                var state = IsJSRuntimeAvailable && JSRuntime != null
+                    ? await JSRuntime.InvokeAsync<UploadQueueState>("Radzen.clearUpload", Name ?? GetId())
+                    : null;
+                if (state != null)
+                {
+                    await ApplyQueueState(state, true);
+                }
+                else
+                {
+                    files.Clear();
+                    await Change.InvokeAsync(CreateUploadChangeEventArgs(files.ToArray()));
+                    await InvokeAsync(StateHasChanged);
+                }
+                return;
+            }
             while(files.Count > 0)
             {
                 await OnRemove(files[0], false);
@@ -520,6 +575,17 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>Removes the selected file with the specified identifier. Unknown identifiers are ignored.</summary>
+        /// <param name="fileId">The identifier supplied in Change event arguments.</param>
+        public async Task RemoveFileById(string fileId)
+        {
+            var file = string.IsNullOrEmpty(fileId) ? null : files.FirstOrDefault(f => f.Id == fileId);
+            if (file != null)
+            {
+                await OnRemove(file);
+            }
+        }
+
         /// <summary>
         /// Called on file remove.
         /// </summary>
@@ -528,6 +594,13 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file, bool fireChangeEvent = true)
         {
             ArgumentNullException.ThrowIfNull(file);
+            if (!string.IsNullOrEmpty(Url) && JSRuntime != null && file.Id != null)
+            {
+                var state = await JSRuntime.InvokeAsync<UploadQueueState>("Radzen.removeFileFromUpload",
+                    Reference, file.Name, Name ?? GetId(), file.Id);
+                await ApplyQueueState(state, fireChangeEvent);
+                return;
+            }
             files.Remove(file);
 
             if (JSRuntime != null)
@@ -559,6 +632,26 @@ namespace Radzen.Blazor
 
             await Change.InvokeAsync(CreateUploadChangeEventArgs(files ?? Enumerable.Empty<FileInfo>()));
 
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>Receives an ordered snapshot of the browser upload selection.</summary>
+        [JSInvokable("RadzenUpload.OnQueueChange")]
+        public Task OnQueueChange(IEnumerable<PreviewFileInfo> files, long version)
+            => ApplyQueueState(new UploadQueueState { Files = files.ToList(), Version = version }, true);
+
+        async Task ApplyQueueState(UploadQueueState? state, bool fireChangeEvent)
+        {
+            if (disposed || state == null || state.Version <= queueVersion)
+            {
+                return;
+            }
+            queueVersion = state.Version;
+            files = state.Files;
+            if (fireChangeEvent)
+            {
+                await Change.InvokeAsync(CreateUploadChangeEventArgs(files.ToArray()));
+            }
             await InvokeAsync(StateHasChanged);
         }
 
@@ -646,7 +739,12 @@ namespace Radzen.Blazor
                 files = new FileInfo[] { new FileInfo(args.File) };
             }
 
-            this.files = files.Where(f => f.Source != null).Select(f => new PreviewFileInfo(f.Source!) { Name = f.Name, Size = f.Size }).ToList();
+            files = files.ToArray();
+            foreach (var file in files)
+            {
+                file.Id = Guid.NewGuid().ToString();
+            }
+            this.files = files.Where(f => f.Source != null).Select(f => new PreviewFileInfo(f.Source!) { Id = f.Id, Name = f.Name, Size = f.Size }).ToList();
 
             await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
 

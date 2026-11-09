@@ -10,6 +10,12 @@ namespace Radzen;
 public class FileInfo : IBrowserFile
 {
     /// <summary>
+    /// Gets or sets the identifier of this selection. Stable until the file leaves the upload selection.
+    /// This identifier is not sent to the upload endpoint.
+    /// </summary>
+    public string? Id { get; set; }
+
+    /// <summary>
     /// Creates FileInfo.
     /// </summary>
     public FileInfo()

@@ -11,6 +11,24 @@ namespace Radzen.Blazor.Tests
 {
     public class UploadTests
     {
+        class UploadBeforeRender : RadzenUpload
+        {
+            protected override Task OnInitializedAsync() => ClearFiles();
+        }
+
+        [Fact]
+        public void Upload_ClearsBeforeFirstRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var changes = 0;
+            var component = ctx.RenderComponent<UploadBeforeRender>(p => p.Add(x => x.Url, "api/upload")
+                .Add(x => x.Change, args => { Assert.Empty(args.Files); changes++; }));
+            Assert.Equal(1, changes);
+            Assert.False(component.Instance.HasValue);
+            Assert.Empty(ctx.JSInterop.Invocations["Radzen.clearUpload"]);
+        }
+
         [Fact]
         public void Upload_RejectsInvalidLimits()
         {
@@ -147,6 +165,8 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<RadzenUpload.UploadQueueState>("Radzen.clearUpload", _ => true)
+                .SetResult(new RadzenUpload.UploadQueueState { Version = 1 });
             UploadChangeEventArgs change = null;
             var changes = 0;
             var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters
@@ -174,7 +194,113 @@ namespace Radzen.Blazor.Tests
             Assert.False(component.Instance.HasValue);
             Assert.Equal(3, changes);
             Assert.Empty(component.FindAll(".rz-fileupload-content"));
-            Assert.Equal(2, ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"].Count);
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"]);
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.clearUpload"]);
+        }
+
+        [Fact]
+        public async Task Upload_RemovesFileById()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var first = new PreviewFileInfo { Id = "first", Name = "report.pdf", Size = 1 };
+            var second = new PreviewFileInfo { Id = "second", Name = "report.pdf", Size = 2 };
+            var changes = 0;
+            UploadChangeEventArgs change = null;
+            ctx.JSInterop.Setup<RadzenUpload.UploadQueueState>("Radzen.removeFileFromUpload", _ => true)
+                .SetResult(new RadzenUpload.UploadQueueState { Version = 2, Files = new() { first } });
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload")
+                .Add(x => x.Change, args => { change = args; changes++; }));
+            await component.InvokeAsync(() => component.Instance.OnQueueChange(new[] { first, second }, 1));
+            await component.InvokeAsync(() => component.Instance.RemoveFileById("second"));
+            Assert.Equal("first", Assert.Single(change.Files).Id);
+            Assert.Equal("second", ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"].Single().Arguments[3]);
+            await component.InvokeAsync(() => component.Instance.OnQueueChange(new[] { first, second }, 1));
+            await component.InvokeAsync(() => component.Instance.RemoveFileById("missing"));
+            Assert.Equal(2, changes);
+            Assert.Single(component.FindAll(".rz-fileupload-row"));
+        }
+
+        [Fact]
+        public void Upload_UpdatesAppendFiles()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
+            module.SetupVoid("updateAppendFiles", _ => true).SetVoidResult();
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload"));
+            Assert.False(component.Instance.AppendFiles);
+            component.SetParametersAndRender(p => p.Add(x => x.AppendFiles, true));
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.createUpload"]);
+            Assert.Equal(true, module.Invocations["updateAppendFiles"].Single().Arguments[0]);
+        }
+
+        [Fact]
+        public async Task Upload_ClearsQueue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<RadzenUpload.UploadQueueState>("Radzen.clearUpload", _ => true)
+                .SetResult(new RadzenUpload.UploadQueueState { Version = 2 });
+            UploadChangeEventArgs change = null;
+            var changes = 0;
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload")
+                .Add(x => x.ShowFileList, false).Add(x => x.Change, args => { change = args; changes++; }));
+            await component.InvokeAsync(() => component.Instance.OnQueueChange(new[] {
+                new PreviewFileInfo { Id = "first", Name = "report.pdf" }
+            }, 1));
+            await component.InvokeAsync(() => component.Instance.ClearFiles());
+            Assert.Empty(change.Files);
+            Assert.False(component.Instance.HasValue);
+            Assert.Equal(2, changes);
+        }
+
+        [Fact]
+        public async Task Upload_PreservesQueue_WhenHidden()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload"));
+            await component.InvokeAsync(() => component.Instance.OnQueueChange(new[] {
+                new PreviewFileInfo { Id = "first", Name = "report.pdf" }
+            }, 1));
+            component.SetParametersAndRender(p => p.Add(x => x.Visible, false));
+            Assert.Empty(ctx.JSInterop.Invocations["Radzen.destroyUpload"]);
+            component.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+            Assert.Contains("report.pdf", component.Markup);
+            Assert.Equal(2, ctx.JSInterop.Invocations["Radzen.uploads"].Count);
+            ctx.DisposeComponents();
+            Assert.Single(ctx.JSInterop.Invocations["Radzen.destroyUpload"]);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Upload_ClearsWithoutBrowserQueue(bool hasFiles)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            UploadChangeEventArgs change = null;
+            var changes = 0;
+            var component = ctx.RenderComponent<RadzenUpload>(p => p.Add(x => x.Url, "api/upload")
+                .Add(x => x.Visible, false).Add(x => x.Change, args => { change = args; changes++; }));
+            if (hasFiles)
+            {
+                await component.InvokeAsync(() => component.Instance.OnChange(new[] {
+                    new PreviewFileInfo { Id = "first", Name = "report.pdf" }
+                }));
+            }
+            var before = changes;
+            await component.InvokeAsync(() => component.Instance.ClearFiles());
+            Assert.False(component.Instance.HasValue);
+            Assert.Empty(change.Files);
+            Assert.Equal(before + 1, changes);
+            Assert.Empty(ctx.JSInterop.Invocations["Radzen.removeFileFromUpload"]);
+            component.SetParametersAndRender(p => p.Add(x => x.Visible, true));
+            await component.InvokeAsync(() => component.Instance.OnQueueChange(new[] {
+                new PreviewFileInfo { Id = "new", Name = "new.pdf" }
+            }, 1));
+            Assert.Equal("new", Assert.Single(change.Files).Id);
         }
 
         [Theory]
