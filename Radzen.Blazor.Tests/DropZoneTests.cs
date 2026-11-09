@@ -1,5 +1,6 @@
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -211,6 +212,61 @@ namespace Radzen.Blazor.Tests
 
             component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragleave", DragArgs());
             Assert.DoesNotContain("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+        }
+
+        static IRenderedComponent<RadzenDropZoneContainer<string>> RenderZoneWithItems(TestContext ctx, List<RadzenDropZoneItemEventArgs<string>> drops)
+        {
+            return ctx.RenderComponent<RadzenDropZoneContainer<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new[] { "Item1", "Item2" });
+                parameters.Add(p => p.ItemSelector, (item, zone) => true);
+                parameters.Add(p => p.Drop, args => drops.Add(args));
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenDropZone<string>>(0);
+                    builder.CloseComponent();
+                });
+            });
+        }
+
+        [Fact]
+        public void DropZone_InvokesDropOnce_WhenDroppingOnAnItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var drops = new List<RadzenDropZoneItemEventArgs<string>>();
+            var component = RenderZoneWithItems(ctx, drops);
+
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragstart", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondragenter", DragArgs());
+            component.FindAll(".rz-dropzone-item")[1].TriggerEvent("ondragenter", DragArgs());
+            component.FindAll(".rz-dropzone-item")[1].TriggerEvent("ondragover", DragArgs());
+            Assert.Contains("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+
+            component.FindAll(".rz-dropzone-item")[1].TriggerEvent("ondrop", DragArgs());
+
+            var drop = Assert.Single(drops);
+            Assert.Equal("Item1", drop.Item);
+            Assert.Equal("Item2", drop.ToItem);
+            Assert.DoesNotContain("rz-can-drop", component.Find(".rz-dropzone").ClassList);
+        }
+
+        [Fact]
+        public void DropZone_InvokesDropOnce_WhenDroppingOnTheZone()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var drops = new List<RadzenDropZoneItemEventArgs<string>>();
+            var component = RenderZoneWithItems(ctx, drops);
+
+            component.FindAll(".rz-dropzone-item")[0].TriggerEvent("ondragstart", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondragenter", DragArgs());
+            component.Find(".rz-dropzone").TriggerEvent("ondrop", DragArgs());
+
+            var drop = Assert.Single(drops);
+            Assert.Equal("Item1", drop.Item);
         }
     }
 }
