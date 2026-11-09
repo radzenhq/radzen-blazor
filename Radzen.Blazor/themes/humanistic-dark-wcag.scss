@@ -88,4 +88,7 @@
   --rz-toc-horizontal-link-selected-color: #73bce2;
   --rz-toc-link-selected-indicator-color: #73bce2;
   --rz-toc-link-hover-color: #58abd8;
+  --rz-input-border: var(--rz-border-width) solid var(--rz-base-500);
+  --rz-input-border-block-end: var(--rz-input-border);
+  --rz-input-hover-border: var(--rz-border-width) solid var(--rz-base-400);
 }

@@ -82,4 +82,7 @@
   --rz-on-danger-lighter: #b2242e;
   --rz-on-danger-dark: #ffffff;
   --rz-on-danger-darker: #ffffff;
+  --rz-input-border: var(--rz-border-width) solid var(--rz-base-500);
+  --rz-input-border-block-end: var(--rz-input-border);
+  --rz-input-hover-border: var(--rz-border-width) solid var(--rz-base-700);
 }

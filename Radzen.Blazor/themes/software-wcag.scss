@@ -84,4 +84,7 @@
   --rz-on-danger-darker: #ffffff;
   --rz-link-color: #297aae;
   --rz-link-hover-color: #005185;
+  --rz-input-border: var(--rz-border-width) solid var(--rz-base-500);
+  --rz-input-border-block-end: var(--rz-input-border);
+  --rz-input-hover-border: var(--rz-border-width) solid var(--rz-base-700);
 }
