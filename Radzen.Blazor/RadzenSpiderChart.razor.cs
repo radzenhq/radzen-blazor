@@ -677,7 +677,6 @@ namespace Radzen.Blazor
             if (!IsLegendHover)
             {
                 HoveredSeries = null;
-                StateHasChanged();
             }
         }
 
@@ -767,7 +766,6 @@ namespace Radzen.Blazor
         {
             HoveredSeries = null;
             IsLegendHover = false;
-            StateHasChanged();
         }
 
 

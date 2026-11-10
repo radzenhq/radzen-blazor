@@ -63,7 +63,7 @@ namespace Radzen.Blazor
 
             if (vertical)
             {
-                if (chart.Series.Any())
+                if (chart.Series.Count > 0)
                 {
                     length = chart.Series.Select(series => series.MeasureLegend()).Max();
                     size = length + 8 + 2 * chart.Series.Select(series => series.MarkerSize).Max();

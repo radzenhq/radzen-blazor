@@ -486,7 +486,11 @@ namespace Radzen.Blazor
 
             if (EditContext != null)
             {
+#if NET11_0_OR_GREATER
+                valid = await EditContext.ValidateAsync();
+#else
                 valid = EditContext.Validate();
+#endif
             }
 
             if (valid || newIndex < SelectedIndex)

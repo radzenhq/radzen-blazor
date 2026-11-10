@@ -272,12 +272,10 @@ public partial class RadzenMarkdown : RadzenComponent
                     builder.AddComponentReferenceCapture(frame.Sequence, frame.ComponentReferenceCaptureAction);
                     startIndex ++;
                     break;
-#if NET8_0_OR_GREATER
                 case RenderTreeFrameType.ComponentRenderMode:
                     builder.AddComponentRenderMode(frame.ComponentRenderMode);
                     startIndex ++;
                     break;
-#endif
                 case RenderTreeFrameType.Text:
                     builder.AddContent(frame.Sequence, frame.TextContent);
                     startIndex ++;

@@ -9,7 +9,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class CellStoreSetValuesTests
 {
-    private static IReadOnlyList<IReadOnlyList<object?>?> Block(params object?[][] rows) => rows;
+    private static IReadOnlyList<IReadOnlyList<object?>?> Block(params object?[]?[] rows) => rows;
 
     [Fact]
     public void FillsTheBlockFromTheGivenOrigin()

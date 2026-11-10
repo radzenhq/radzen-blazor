@@ -28,7 +28,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '11.0.x'
 
       # Kept out of the sources so forks, clones and local runs of the demos never report to
       # our analytics - only the image this workflow builds carries the snippet.

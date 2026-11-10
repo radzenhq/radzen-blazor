@@ -54,7 +54,7 @@ The Radzen Blazor components are distributed via the <a href="">Radzen.Blazor</a
 <h3 id="theme"><a href="#theme">Set the theme</a></h3>
 <div class="tabs">
   <input class="tabs-radio" name="tabs" checked type="radio" id="theme-net8">
-  <label class="tabs-label" for="theme-net8">.NET 8</label>
+  <label class="tabs-label" for="theme-net8">.NET 9, .NET 10 &amp; .NET 11</label>
   <div class="tabs-content">
     <p>Open the <code>App.razor</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:</p>
 <pre>
@@ -122,7 +122,7 @@ The Radzen Blazor components are distributed via the <a href="">Radzen.Blazor</a
 <h3 id="javascript"><a href="#javascript">Include Radzen.Blazor.js</a></h3>
 <div class="tabs">
   <input class="tabs-radio" name="tabs" checked type="radio" id="js-net8">
-  <label class="tabs-label" for="js-net8">.NET 8</label>
+  <label class="tabs-label" for="js-net8">.NET 9, .NET 10 &amp; .NET 11</label>
   <div class="tabs-content">
     <p>Open the <code>App.razor</code> file of your application. Add this code after the last <code>&lt;script&gt;</code>:</p>
 <pre>
@@ -184,7 +184,7 @@ To use RadzenDialog, RadzenContextMenu, RadzenTooltip, RadzenChartTooltip and Ra
   <li>Open <code>MainLayout.razor</code> and add this code
   <div class="tabs">
     <input class="tabs-radio" name="tabs" checked type="radio" id="layout-net8">
-    <label class="tabs-label" for="tlayout-net8">.NET 8</label>
+    <label class="tabs-label" for="tlayout-net8">.NET 9, .NET 10 &amp; .NET 11</label>
     <div class="tabs-content">
 <pre>
 <code>

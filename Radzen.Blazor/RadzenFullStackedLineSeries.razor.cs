@@ -214,7 +214,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 scale.Input.MergeWidth(new ScaleRange { Start = 0, End = 100 });
             }

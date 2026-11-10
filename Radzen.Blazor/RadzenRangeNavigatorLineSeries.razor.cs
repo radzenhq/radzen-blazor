@@ -134,7 +134,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items == null || !Items.Any())
+            if (Items == null || Items.Count == 0)
             {
                 return scale;
             }
@@ -191,7 +191,7 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(scale);
 
-            if (Items != null && Items.Any())
+            if (Items != null && Items.Count > 0)
             {
                 scale.Input.MergeWidth(ScaleRange.From(Items, Value));
             }
@@ -204,7 +204,7 @@ namespace Radzen.Blazor
         {
             return builder =>
             {
-                if (Items == null || !Items.Any())
+                if (Items == null || Items.Count == 0)
                 {
                     return;
                 }
@@ -288,7 +288,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public IEnumerable<Point> GetDataPoints(ScaleBase categoryScale)
         {
-            if (Items == null || !Items.Any())
+            if (Items == null || Items.Count == 0)
             {
                 return Enumerable.Empty<Point>();
             }

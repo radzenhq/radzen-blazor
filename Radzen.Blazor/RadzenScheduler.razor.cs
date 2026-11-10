@@ -625,7 +625,6 @@ namespace Radzen.Blazor
                 // Start the picker over and render it before the popup is shown, so the popup is measured with its content.
                 // Doing this when the popup closes would change the picker while it is still fading out.
                 titlePickerKey++;
-                StateHasChanged();
                 await Task.Yield();
             }
 

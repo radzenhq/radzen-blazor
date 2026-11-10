@@ -84,21 +84,11 @@ class TextFunction : FormulaFunction
     private static bool ContainsDateTimeTokens(string format)
     {
         var f = format.ToUpperInvariant();
-#if NET8_0_OR_GREATER
         return f.Contains('Y', StringComparison.Ordinal) ||
                f.Contains('D', StringComparison.Ordinal) ||
                f.Contains('H', StringComparison.Ordinal) ||
                f.Contains('S', StringComparison.Ordinal) ||
                f.Contains("AM/PM", StringComparison.Ordinal);
-#else
-#pragma warning disable CA1847
-        return f.Contains("Y", StringComparison.Ordinal) ||
-               f.Contains("D", StringComparison.Ordinal) ||
-               f.Contains("H", StringComparison.Ordinal) ||
-               f.Contains("S", StringComparison.Ordinal) ||
-               f.Contains("AM/PM", StringComparison.Ordinal);
-#pragma warning restore CA1847
-#endif
     }
 
     private static DateTime GetDateTimeFromValue(CellData valueArg)

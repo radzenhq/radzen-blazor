@@ -105,7 +105,7 @@ namespace Radzen.Blazor
                 wrap = "flex-wrap:wrap-reverse;";
             }
 
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : ";") : "")}{wrap}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';', StringComparison.Ordinal) ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : ";") : "")}{wrap}";
         }
 
         /// <inheritdoc />

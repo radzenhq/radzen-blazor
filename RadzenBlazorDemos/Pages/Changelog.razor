@@ -6,6 +6,27 @@
 </HeadContent>
 
 <div class="changelog">
+<RadzenText Anchor="changelog#v13" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v13 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v13
+</RadzenText>
+<RadzenText Anchor="changelog#v13-breaking" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Breaking changes
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> .NET 8 support has been removed. The library now targets .NET 9, .NET 10, and .NET 11.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v13-net11" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    .NET 11
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> .NET 11 support. On .NET 11 RadzenTemplateForm, RadzenSteps and <code>RadzenDataGrid.UpdateRow</code> await <code>EditContext.ValidateAsync</code>, so asynchronous validators run before submit, step change and row update.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> RadzenDataGrid has a new <code>IsValidAsync</code> method that validates the edited rows and awaits their asynchronous validators. The <code>IsValid</code> property runs synchronous validators only.</li>
+</ul>
+
 <RadzenText Anchor="changelog#v12" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v12 Changelog
 </RadzenText>

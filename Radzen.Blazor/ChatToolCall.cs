@@ -213,11 +213,11 @@ public class ChatToolCall
             case T typed:
                 return typed;
             case JsonElement element:
-                return (T?)JsonSerializer.Deserialize(element, options.GetTypeInfo(typeof(T)));
+                return JsonSerializer.Deserialize(element, options.GetJsonTypeInfo<T>());
             case string text when typeof(T) != typeof(string):
-                return (T?)JsonSerializer.Deserialize(text, options.GetTypeInfo(typeof(T)));
+                return JsonSerializer.Deserialize(text, options.GetJsonTypeInfo<T>());
             default:
-                return (T?)JsonSerializer.Deserialize(JsonSerializer.SerializeToElement(Result, options.GetTypeInfo(Result.GetType())), options.GetTypeInfo(typeof(T)));
+                return JsonSerializer.Deserialize(JsonSerializer.SerializeToElement(Result, options.GetTypeInfo(Result.GetType())), options.GetJsonTypeInfo<T>());
         }
     }
 

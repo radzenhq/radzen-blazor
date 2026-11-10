@@ -113,6 +113,7 @@ namespace Radzen.Blazor.Tests
             var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(0, 0, "typed", "insertText", 1));
             Assert.Equal("typed", value);
             Assert.Equal("typed", component.Instance.Value);
+            Assert.NotNull(update);
             Assert.Equal(1, update.Version);
             Assert.Null(update.Html);
             Assert.Equal((5, 5), (update.SelectionStart, update.SelectionEnd));
@@ -138,6 +139,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenMarkdownEditor>(p => p.Add(x => x.Value, "old"));
             var update = await component.InvokeAsync(() => component.Instance.OnEditAsync(3, 3, " *x*", "insertText", 1));
             Assert.Equal("old \\*x\\*", component.Instance.Value);
+            Assert.NotNull(update);
             Assert.Equal("<p>old *x*</p>", update.Html);
             Assert.Equal((7, 7), (update.SelectionStart, update.SelectionEnd));
         }

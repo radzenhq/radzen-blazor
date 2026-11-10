@@ -191,7 +191,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public async Task ColumnWithMinAndMax_KeepsBoth()
         {
-            Assert.Equal("0|4343.33333333333|8686.66666666666|13030", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
+            Assert.Equal("0|4343.333333333333|8686.666666666666|13030", await ValueAxisLabelsAsync<RadzenColumnSeries<DataItem>>(Revenue, a => a.Add(x => x.Min, 0).Add(x => x.Max, 13030)));
         }
 
         [Fact]

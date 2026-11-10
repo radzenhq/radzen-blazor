@@ -233,7 +233,7 @@ namespace Radzen.Blazor
             var getter = PropertyAccess.Getter<TItem, double>(RadiusProperty);
             var items = PositiveItems;
 
-            if (!items.Any())
+            if (items.Count == 0)
             {
                 return maxRadius;
             }
@@ -313,7 +313,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override double MeasureLegend()
         {
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 return Items.Select(item => TextMeasurer.TextWidth(TooltipTitle(item))).Max() + MarkerSize;
             }
@@ -401,7 +401,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            if (Items.Any())
+            if (Items.Count > 0)
             {
                 var distance = Math.Sqrt(Math.Pow(CenterX - x, 2) + Math.Pow(CenterY - y, 2));
 

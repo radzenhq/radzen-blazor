@@ -146,7 +146,7 @@ class InlineParser
 
             content = BlockParser.NewLineRegex.Replace(content, $"{Space}");
 
-            if (content.StartsWith(Space) && content.EndsWith(Space) && !string.IsNullOrWhiteSpace(content))
+            if (content.StartsWith(Space, StringComparison.Ordinal) && content.EndsWith(Space, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(content))
             {
                 content = content[1..^1];
             }
