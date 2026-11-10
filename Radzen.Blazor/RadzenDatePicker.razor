@@ -202,7 +202,7 @@
                                                                     aria-label="@GetDayAriaLabel(date, dateArgs)"
                                                                     aria-selected="@(IsDateSelected(date) ? "true" : "false")"
                                                                     aria-disabled="@(dateArgs.Disabled ? "true" : null)"
-                                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
+                                                                    @onclick="@(async () => { if (!Disabled && !ReadOnly && !dateArgs.Disabled) { await SetDay(date); } })"
                                                                     @onmouseover="@(IsRange && !cellDisabled ? EventCallback.Factory.Create<MouseEventArgs>(this, () => OnDayMouseOver(date)) : default(EventCallback<MouseEventArgs>))"
                                                                     @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))"
                                                                     @onkeydown:preventDefault="preventKeyPress"

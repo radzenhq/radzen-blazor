@@ -1341,7 +1341,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if ((key == "Enter" || key == "Space") && !Disabled && !dateArgs.Disabled)
+            if ((key == "Enter" || key == "Space") && !Disabled && !ReadOnly && !dateArgs.Disabled)
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
