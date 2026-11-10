@@ -101,4 +101,4 @@ For dedicated support and additional productivity tools, the [Radzen Blazor Pro 
 
 ## Run demos locally
 
-Use **Radzen.Server.sln** to open and run demos as Blazor server application or **Radzen.WebAssembly.sln** to open and run demos as Blazor WebAssembly application. The demos require the .NET 10 SDK and should preferably be opened in VS2026.
+Use **Radzen.Server.sln** to open and run demos as Blazor server application or **Radzen.WebAssembly.sln** to open and run demos as Blazor WebAssembly application. The demos require the .NET 11 SDK and should preferably be opened in VS2026.

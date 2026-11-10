@@ -103,6 +103,10 @@ namespace Radzen.Blazor
         /// Use this property to check validation state before saving edited rows.
         /// </summary>
         /// <value><c>true</c> if all edit form validators are valid; otherwise, <c>false</c>. Returns <c>true</c> if no rows are being edited.</value>
+        /// <remarks>
+        /// Runs synchronous validators only. On .NET 11 and later it throws <see cref="InvalidOperationException"/> when a validator of an edited row
+        /// registers asynchronous work. Use <see cref="IsValidAsync"/> in that case.
+        /// </remarks>
         public bool IsValid
         {
             get
@@ -120,6 +124,33 @@ namespace Radzen.Blazor
                 });
 #pragma warning restore CS0618
             }
+        }
+
+        /// <summary>
+        /// Validates all rows that are being edited and awaits their asynchronous validators.
+        /// Use this method instead of <see cref="IsValid"/> when the edited rows use asynchronous validation.
+        /// </summary>
+        /// <returns><c>true</c> if all edit form validators are valid; otherwise, <c>false</c>. Returns <c>true</c> if no rows are being edited.</returns>
+        public async Task<bool> IsValidAsync()
+        {
+            foreach (var editContext in editContexts.Values.ToList())
+            {
+#if NET11_0_OR_GREATER
+                if (!await editContext.ValidateAsync())
+                {
+                    return false;
+                }
+#else
+                editContext.Validate();
+#endif
+
+                if (editContext.GetValidationMessages().Any())
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
