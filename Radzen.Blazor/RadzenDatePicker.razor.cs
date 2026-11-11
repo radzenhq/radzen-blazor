@@ -797,7 +797,7 @@ namespace Radzen.Blazor
 
         async Task ToggleAmPm()
         {
-            if (Disabled)
+            if (Disabled || ReadOnly)
             {
                 return;
             }
@@ -881,6 +881,11 @@ namespace Radzen.Blazor
 
         async Task UpdateValueFromTime(DateTime newValue)
         {
+            if (ReadOnly)
+            {
+                return;
+            }
+
             newValue = ClampToMinMax(newValue);
 
             if (ShowTimeOkButton && !Immediate)
@@ -984,6 +989,12 @@ namespace Radzen.Blazor
 
         async Task OnOkClick(bool shouldClose = true, bool fromOkButton = false)
         {
+            if (ReadOnly)
+            {
+                await ClosePopup();
+                return;
+            }
+
             // Prevent single-value change path in Multiple mode
             if (Multiple)
             {
