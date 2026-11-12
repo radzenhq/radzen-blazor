@@ -15,6 +15,28 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDownDataGrid_Ignores_Row_Click_After_Disabling()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var value = "Apple";
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters => parameters
+                .Add(p => p.Data, new[] { new DisabledPopupChoice("Apple"), new DisabledPopupChoice("Orange") })
+                .Add(p => p.TextProperty, nameof(DisabledPopupChoice.Name))
+                .Add(p => p.ValueProperty, nameof(DisabledPopupChoice.Name))
+                .Add(p => p.Value, value)
+                .Add(p => p.ValueChanged, (string selected) => { value = selected; }));
+
+            component.Find("[role=combobox]").Click();
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.FindAll("tbody tr").Single(row => row.TextContent.Trim() == "Orange").Click();
+
+            Assert.Equal("Apple", value);
+        }
+
+        public record DisabledPopupChoice(string Name);
+
+        [Fact]
         public void DropDownDataGrid_Renders_WithClassName()
         {
             using var ctx = new TestContext();
