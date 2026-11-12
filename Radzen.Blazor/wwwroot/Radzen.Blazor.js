@@ -4852,6 +4852,22 @@ window.Radzen = {
       canvas.toBlob(resolve, 'image/png');
     });
   },
+  getImageFileSize: async function (input) {
+    var file = input && input.files && input.files[0];
+    if (!file) return null;
+
+    var url = URL.createObjectURL(file);
+    try {
+      var img = new Image();
+      img.src = url;
+      await img.decode();
+      return [img.naturalWidth, img.naturalHeight];
+    } catch (e) {
+      return null;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  },
   downloadSvgAsPng: async function (svg, fileName, width, height) {
     var blob = await this.svgToPng(svg, width, height);
     if (blob) {

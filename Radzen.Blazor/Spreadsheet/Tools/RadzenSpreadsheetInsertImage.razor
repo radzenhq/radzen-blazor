@@ -1,17 +1,24 @@
 @namespace Radzen.Blazor
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inherits RadzenSpreadsheetToolBase
+@inject IJSRuntime JSRuntime
 
 <RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertImage))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button"
     Disabled=@IsDisabled Size="ButtonSize.Small"
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertImage)) ?? "Insert Image")>
-    <InputFile OnChange=@OnFileSelectedAsync accept="image/*" disabled=@IsDisabled />
+    <InputFile @ref=inputFile OnChange=@OnFileSelectedAsync accept="image/*" disabled=@IsDisabled />
     <i class="notranslate rzi" aria-hidden="true">image</i>
 </RadzenButton>
 
 @code {
+    private const double DefaultWidth = 210;
+    private const double DefaultHeight = 158;
+
+    private InputFile? inputFile;
+
     protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Images;
 
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
@@ -31,15 +38,17 @@
         using var ms = new System.IO.MemoryStream();
         await stream.CopyToAsync(ms);
 
+        var (width, height) = await GetImageSizeAsync();
+
         var address = Worksheet.Selection.Cell;
         var image = new SheetImage
         {
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = address.Row, Column = address.Column },
-            Width = 2000000,
-            Height = 1500000,
+            Width = width,
+            Height = height,
             Data = ms.ToArray(),
-            ContentType = file.ContentType ?? "image/png",
+            ContentType = string.IsNullOrEmpty(file.ContentType) ? "image/png" : file.ContentType,
             Name = file.Name
         };
 
@@ -48,5 +57,19 @@
             var command = new InsertImageCommand(Worksheet, image);
             await Spreadsheet.ExecuteAsync(command);
         }
+    }
+
+    private async Task<(double Width, double Height)> GetImageSizeAsync()
+    {
+        if (inputFile?.Element is ElementReference element)
+        {
+            var size = await JSRuntime.InvokeAsync<double[]?>("Radzen.getImageFileSize", element);
+            if (size is [> 0 and var width, > 0 and var height])
+            {
+                return (width, height);
+            }
+        }
+
+        return (DefaultWidth, DefaultHeight);
     }
 }
