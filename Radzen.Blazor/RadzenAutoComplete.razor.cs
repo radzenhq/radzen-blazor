@@ -298,7 +298,10 @@ namespace Radzen.Blazor
         {
             await ClosePopup();
 
-            await SelectItem(item);
+            if (!Disabled)
+            {
+                await SelectItem(item);
+            }
         }
 
         /// <summary>
