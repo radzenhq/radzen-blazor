@@ -42,7 +42,7 @@ class InlineParser
     private const char Exclamation = '!';
     internal const char Colon = ':';
 
-    private BlockParser.HtmlTerminators htmlTerminators;
+    private BlockParser.HtmlTerminators? htmlTerminators;
     private readonly List<Inline> inlines = [];
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
@@ -419,7 +419,7 @@ class InlineParser
     private List<Inline> ParseInlines(string text, Dictionary<string, LinkReference> references)
     {
         var index = 0;
-        htmlTerminators = new BlockParser.HtmlTerminators(text);
+        htmlTerminators = null;
 
         while (index < text.Length)
         {
@@ -613,7 +613,9 @@ class InlineParser
             return false;
         }
 
-        var match = htmlTerminators.Match(index);
+        htmlTerminators ??= new BlockParser.HtmlTerminators(text);
+
+        var match = htmlTerminators.Value.Match(index);
 
         if (match.Success)
         {
@@ -621,7 +623,7 @@ class InlineParser
 
             var value = text[index..(index + match.Length)];
 
-            inlines.Add(new HtmlInline { Value = value, SourceStart = index, SourceEnd = index + match.Length });
+            inlines.Add(new HtmlInline { Value = value, Tag = match, SourceStart = index, SourceEnd = index + match.Length });
 
             newIndex = index + match.Length;
 

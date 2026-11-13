@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace Radzen.Documents.Markdown;
 
@@ -11,6 +12,8 @@ public class HtmlInline : Inline
     /// Gets or sets the HTML element value.
     /// </summary>
     public string? Value { get; set; }
+
+    internal Match? Tag { get; init; }
 
 
     /// <inheritdoc />

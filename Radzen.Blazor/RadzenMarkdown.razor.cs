@@ -106,6 +106,8 @@ public partial class RadzenMarkdown : RadzenComponent
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
+    private Uri? baseUri;
+
     /// <inheritdoc />
     protected override string GetComponentCssClass()
     {
@@ -142,7 +144,7 @@ public partial class RadzenMarkdown : RadzenComponent
             AllowHtml = AllowHtml,
             AllowedHtmlAttributes = AllowedHtmlAttributes,
             AllowedHtmlTags = AllowedHtmlTags,
-            BaseUri = new Uri(NavigationManager.BaseUri),
+            BaseUri = baseUri ??= new Uri(NavigationManager.BaseUri),
         };
 
         var visitor = new BlazorMarkdownRenderer(options, builder, outlet);

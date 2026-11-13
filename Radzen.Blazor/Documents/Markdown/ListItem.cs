@@ -94,7 +94,7 @@ public class ListItem : BlockContainer
 
     internal static BlockStart Start(BlockParser parser, Block container)
     {
-        if ((!parser.Indented || container is List) && TryParseListMarker(parser, container, out var data))
+        if ((!parser.Indented || container is List) && !BlockParser.IsNestingLimitReached(container) && TryParseListMarker(parser, container, out var data))
         {
             parser.CloseUnmatchedBlocks();
 

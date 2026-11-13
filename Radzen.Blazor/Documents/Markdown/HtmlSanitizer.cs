@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,14 +59,15 @@ class HtmlSanitizer
         "action", "background", "cite", "data", "dynsrc", "formaction", "href", "longdesc", "lowsrc", "ping", "poster", "src", "xlink:href"
     };
 
-    private static readonly char[] SchemeTerminators = [':', '/', '?', '#'];
+    private static readonly string C0ControlOrSpace = new([.. Enumerable.Range(0, 33).Select(code => (char)code)]);
 
     public string Sanitize(string html)
     {
         ArgumentNullException.ThrowIfNull(html);
 
         var output = new StringBuilder();
-        var openElements = new List<string>();
+        var writer = new StringHtmlElementWriter(this, output);
+        var scope = writer.EnterScope();
         var textStart = 0;
         var index = 0;
         var terminators = new BlockParser.HtmlTerminators(html);
@@ -93,53 +95,22 @@ class HtmlSanitizer
 
             index += match.Length;
 
-            var openTag = match.Groups["openTag"];
-            var closeTag = match.Groups["closeTag"];
+            var openTag = match.Groups["openTag"].Value.ToLowerInvariant();
 
-            if (openTag.Success)
+            if (openTag is "script" or "style" && !allowedTags.Contains(openTag))
             {
-                var tagName = openTag.Value.ToLowerInvariant();
-
-                if (allowedTags.Contains(tagName))
-                {
-                    output.Append('<').Append(tagName);
-
-                    foreach (var attribute in GetAllowedAttributes(tagName, match))
-                    {
-                        output.Append(' ').Append(attribute.Key).Append("=\"").Append(WebUtility.HtmlEncode(attribute.Value)).Append('"');
-                    }
-
-                    output.Append('>');
-
-                    if (match.Groups["selfClosing"].Success && !IsVoidElement(tagName))
-                    {
-                        output.Append("</").Append(tagName).Append('>');
-                    }
-                    else if (!IsVoidElement(tagName))
-                    {
-                        openElements.Add(tagName);
-                    }
-                }
-                else if (tagName is "script" or "style")
-                {
-                    index = SkipRawText(html, index, tagName);
-                }
+                index = SkipRawText(html, index, openTag);
             }
-            else if (closeTag.Success)
+            else
             {
-                var position = openElements.LastIndexOf(closeTag.Value.ToLowerInvariant());
-
-                if (position >= 0)
-                {
-                    CloseElements(output, openElements, position);
-                }
+                writer.Write(match);
             }
 
             textStart = index;
         }
 
         AppendText(output, html, textStart, html.Length);
-        CloseElements(output, openElements, 0);
+        writer.ExitScope(scope);
 
         return output.ToString();
     }
@@ -150,16 +121,6 @@ class HtmlSanitizer
         {
             output.Append(WebUtility.HtmlEncode(WebUtility.HtmlDecode(html[start..end])));
         }
-    }
-
-    private static void CloseElements(StringBuilder output, List<string> openElements, int index)
-    {
-        for (var i = openElements.Count - 1; i >= index; i--)
-        {
-            output.Append("</").Append(openElements[i]).Append('>');
-        }
-
-        openElements.RemoveRange(index, openElements.Count - index);
     }
 
     private static int SkipRawText(string html, int index, string tagName)
@@ -199,13 +160,13 @@ class HtmlSanitizer
 
         var names = tag.Groups["attributeName"].Captures;
         var values = tag.Groups["attributeValue"].Captures;
-        var emitted = new HashSet<string>(StringComparer.Ordinal);
+        var emitted = names.Count > 1 ? new HashSet<string>(StringComparer.Ordinal) : null;
 
         for (var index = 0; index < names.Count; index++)
         {
             var name = names[index].Value.ToLowerInvariant();
 
-            if (!allowedAttributes.Contains(name) || !emitted.Add(name))
+            if (!allowedAttributes.Contains(name) || emitted?.Add(name) == false)
             {
                 continue;
             }
@@ -224,53 +185,108 @@ class HtmlSanitizer
     public static bool IsSafeMarkdownUrl(string? destination, bool image)
     {
         // https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references
-        return IsSafeUrl(destination, image) && IsSafeUrl(WebUtility.HtmlDecode(destination), image);
+        return IsSafeUrl(destination, image) &&
+               (destination?.Contains('&', StringComparison.Ordinal) != true || IsSafeUrl(WebUtility.HtmlDecode(destination), image));
     }
 
     public static bool IsSafeUrl(string? url, bool allowDataImage)
     {
-        if (string.IsNullOrEmpty(url))
-        {
-            return true;
-        }
-
         // https://url.spec.whatwg.org/#concept-basic-url-parser
-        var start = 0;
-        var end = url.Length;
+        var value = url.AsSpan().Trim(C0ControlOrSpace);
+        Span<char> scheme = stackalloc char[6];
+        var schemeLength = 0;
 
-        while (start < end && url[start] <= ' ')
+        for (var index = 0; index < value.Length; index++)
         {
-            start++;
+            var ch = value[index];
+
+            if (ch is '\t' or '\n' or '\r')
+            {
+                continue;
+            }
+
+            // RFC 3986 section 4.2
+            if (ch is '/' or '?' or '#')
+            {
+                return true;
+            }
+
+            if (ch == ':')
+            {
+                if (schemeLength > scheme.Length)
+                {
+                    return false;
+                }
+
+                var name = scheme[..schemeLength];
+
+                if (name.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("https", StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("mailto", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                return allowDataImage &&
+                       name.Equals("data", StringComparison.OrdinalIgnoreCase) &&
+                       StartsWithIgnoringTabAndNewline(value[(index + 1)..], "image/");
+            }
+
+            if (schemeLength < scheme.Length)
+            {
+                scheme[schemeLength] = ch;
+            }
+
+            schemeLength++;
         }
 
-        while (end > start && url[end - 1] <= ' ')
+        return true;
+    }
+
+    private static bool StartsWithIgnoringTabAndNewline(ReadOnlySpan<char> value, string prefix)
+    {
+        var matched = 0;
+
+        for (var index = 0; index < value.Length && matched < prefix.Length; index++)
         {
-            end--;
+            var ch = value[index];
+
+            if (ch is '\t' or '\n' or '\r')
+            {
+                continue;
+            }
+
+            if (char.ToLowerInvariant(ch) != prefix[matched])
+            {
+                return false;
+            }
+
+            matched++;
         }
 
-        var normalized = url[start..end].Replace("\t", string.Empty, StringComparison.Ordinal)
-            .Replace("\n", string.Empty, StringComparison.Ordinal)
-            .Replace("\r", string.Empty, StringComparison.Ordinal);
+        return matched == prefix.Length;
+    }
 
-        // RFC 3986 section 4.2
-        var terminator = normalized.IndexOfAny(SchemeTerminators);
-
-        if (terminator < 0 || normalized[terminator] != ':')
+    private sealed class StringHtmlElementWriter(HtmlSanitizer sanitizer, StringBuilder output) : HtmlElementWriter(sanitizer)
+    {
+        protected override void OpenElement(string tagName, IEnumerable<KeyValuePair<string, string>> attributes)
         {
-            return true;
+            output.Append('<').Append(tagName);
+
+            foreach (var attribute in attributes)
+            {
+                output.Append(' ').Append(attribute.Key).Append("=\"").Append(WebUtility.HtmlEncode(attribute.Value)).Append('"');
+            }
+
+            output.Append('>');
         }
 
-        var scheme = normalized[..terminator];
-
-        if (scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
-            scheme.Equals("https", StringComparison.OrdinalIgnoreCase) ||
-            scheme.Equals("mailto", StringComparison.OrdinalIgnoreCase))
+        protected override void CloseElement(string tagName, bool isVoid)
         {
-            return true;
+            if (!isVoid)
+            {
+                output.Append("</").Append(tagName).Append('>');
+            }
         }
-
-        return allowDataImage &&
-               scheme.Equals("data", StringComparison.OrdinalIgnoreCase) &&
-               normalized.AsSpan(terminator + 1).StartsWith("image/", StringComparison.OrdinalIgnoreCase);
     }
 }

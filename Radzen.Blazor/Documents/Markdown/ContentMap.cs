@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Markdown;
 
@@ -89,28 +91,32 @@ internal sealed class ContentMap
 
     public int ToSource(int contentOffset)
     {
-        for (var i = 0; i < segments.Count; i++)
+        var index = FirstSegment(new EndsAfter(contentOffset));
+
+        if (index == segments.Count && index > 0 && contentOffset == segments[^1].ContentEnd)
         {
-            var segment = segments[i];
+            index--;
+        }
+
+        if (index < segments.Count)
+        {
+            var segment = segments[index];
 
             if (contentOffset < segment.ContentStart)
             {
                 return segment.SourceStart;
             }
 
-            if (contentOffset < segment.ContentEnd || (contentOffset == segment.ContentEnd && i == segments.Count - 1))
+            var contentLength = segment.ContentEnd - segment.ContentStart;
+            var sourceLength = segment.SourceEnd - segment.SourceStart;
+            var delta = contentOffset - segment.ContentStart;
+
+            if (contentLength == sourceLength)
             {
-                var contentLength = segment.ContentEnd - segment.ContentStart;
-                var sourceLength = segment.SourceEnd - segment.SourceStart;
-                var delta = contentOffset - segment.ContentStart;
-
-                if (contentLength == sourceLength)
-                {
-                    return segment.SourceStart + delta;
-                }
-
-                return delta == 0 ? segment.SourceStart : delta >= contentLength ? segment.SourceEnd : segment.SourceStart;
+                return segment.SourceStart + delta;
             }
+
+            return delta == 0 ? segment.SourceStart : delta >= contentLength ? segment.SourceEnd : segment.SourceStart;
         }
 
         return segments.Count > 0 ? segments[^1].SourceEnd : 0;
@@ -118,18 +124,28 @@ internal sealed class ContentMap
 
     public int ToSourceEnd(int contentOffset)
     {
-        for (var i = 0; i < segments.Count; i++)
-        {
-            var segment = segments[i];
+        var index = FirstSegment(new EndsAtOrAfter(contentOffset));
 
-            if (contentOffset <= segment.ContentEnd && (contentOffset > segment.ContentStart || i == 0 || contentOffset == segment.ContentStart && segment.ContentStart == segment.ContentEnd))
-            {
-                return contentOffset >= segment.ContentEnd ? segment.SourceEnd : ToSource(contentOffset);
-            }
+        if (index < segments.Count)
+        {
+            return contentOffset >= segments[index].ContentEnd ? segments[index].SourceEnd : ToSource(contentOffset);
         }
 
         return segments.Count > 0 ? segments[^1].SourceEnd : 0;
     }
 
+    private int FirstSegment<TComparable>(TComparable comparable) where TComparable : IComparable<ContentSegment>
+    {
+        return ~CollectionsMarshal.AsSpan(segments).BinarySearch(comparable);
+    }
 
+    private readonly struct EndsAfter(int contentOffset) : IComparable<ContentSegment>
+    {
+        public int CompareTo(ContentSegment other) => other.ContentEnd > contentOffset ? -1 : 1;
+    }
+
+    private readonly struct EndsAtOrAfter(int contentOffset) : IComparable<ContentSegment>
+    {
+        public int CompareTo(ContentSegment other) => other.ContentEnd >= contentOffset ? -1 : 1;
+    }
 }

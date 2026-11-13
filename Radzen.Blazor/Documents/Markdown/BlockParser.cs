@@ -47,6 +47,23 @@ class BlockParser
         }
     }
 
+    private const int MaxNesting = 100;
+
+    internal static bool IsNestingLimitReached(Block container)
+    {
+        var depth = 0;
+
+        for (var block = container; block is not null and not Document; block = block.Parent)
+        {
+            if (++depth >= MaxNesting)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private BlockParser()
     {
         Tip = document;

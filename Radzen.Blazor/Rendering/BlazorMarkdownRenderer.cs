@@ -21,26 +21,13 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     public const string Outlet = "<!--rz-outlet-{0}-->";
 
     private static readonly Regex OutletRegex = new(@"<!--rz-outlet-([0-9]{1,9})-->");
-    private readonly HtmlSanitizer sanitizer = new(options.AllowedHtmlTags, options.AllowedHtmlAttributes);
-    private List<string> openElements = [];
+    private readonly RenderTreeHtmlElementWriter html = new(options.Sanitizer, builder);
 
     private void VisitContainer(IEnumerable<INode> children)
     {
-        var parent = openElements;
-        openElements = [];
+        var scope = html.EnterScope();
         VisitChildren(children);
-        CloseOpenElements(0);
-        openElements = parent;
-    }
-
-    private void CloseOpenElements(int index)
-    {
-        for (var i = openElements.Count - 1; i >= index; i--)
-        {
-            builder.CloseElement();
-        }
-
-        openElements.RemoveRange(index, openElements.Count - index);
+        html.ExitScope(scope);
     }
 
     /// <inheritdoc />
@@ -341,57 +328,11 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         }
         else if (options.AllowHtml)
         {
-            var html = sanitizer.Sanitize(htmlBlock.Value);
-            builder.AddMarkupContent(0, html);
+            builder.AddMarkupContent(0, options.Sanitizer.Sanitize(htmlBlock.Value));
         }
         else
         {
             builder.AddContent(0, htmlBlock.Value);
-        }
-    }
-
-    private void RenderHtml(Match match)
-    {
-        var openTag = match.Groups["openTag"];
-
-        if (openTag.Success)
-        {
-            var tagName = openTag.Value.ToLowerInvariant();
-
-            if (!sanitizer.IsAllowedTag(tagName))
-            {
-                return;
-            }
-
-            builder.OpenElement(0, tagName);
-
-            foreach (var attribute in sanitizer.GetAllowedAttributes(tagName, match))
-            {
-                builder.AddAttribute(1, attribute.Key, attribute.Value);
-            }
-
-            if (match.Groups["selfClosing"].Success || HtmlSanitizer.IsVoidElement(tagName))
-            {
-                builder.CloseElement();
-            }
-            else
-            {
-                openElements.Add(tagName);
-            }
-
-            return;
-        }
-
-        var closeTag = match.Groups["closeTag"];
-
-        if (closeTag.Success)
-        {
-            var index = openElements.LastIndexOf(closeTag.Value.ToLowerInvariant());
-
-            if (index >= 0)
-            {
-                CloseOpenElements(index);
-            }
         }
     }
 
@@ -437,15 +378,33 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
             return;
         }
 
-        var tag = BlockParser.HtmlRegex.Match(htmlInline.Value);
+        var tag = htmlInline.Tag ?? BlockParser.HtmlRegex.Match(htmlInline.Value);
 
         if (tag.Success && tag.Length == htmlInline.Value.Length)
         {
-            RenderHtml(tag);
+            html.Write(tag);
         }
         else
         {
             builder.AddContent(0, htmlInline.Value);
+        }
+    }
+
+    private sealed class RenderTreeHtmlElementWriter(HtmlSanitizer sanitizer, RenderTreeBuilder builder) : HtmlElementWriter(sanitizer)
+    {
+        protected override void OpenElement(string tagName, IEnumerable<KeyValuePair<string, string>> attributes)
+        {
+            builder.OpenElement(0, tagName);
+
+            foreach (var attribute in attributes)
+            {
+                builder.AddAttribute(1, attribute.Key, attribute.Value);
+            }
+        }
+
+        protected override void CloseElement(string tagName, bool isVoid)
+        {
+            builder.CloseElement();
         }
     }
 }

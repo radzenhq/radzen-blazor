@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace Radzen.Documents.Markdown;
+
+#nullable enable
 
 /// <summary>
 /// Base class for markdown leaf block nodes.
@@ -10,7 +13,27 @@ public abstract class Leaf : Block, IBlockInlineContainer
     /// <summary>
     /// Gets or sets the value of the leaf node.
     /// </summary>
-    public string Value { get; set; } = string.Empty;
+    public string Value
+    {
+        get
+        {
+            if (pendingValue != null)
+            {
+                value = pendingValue.ToString();
+                pendingValue = null;
+            }
+
+            return value;
+        }
+        set
+        {
+            pendingValue = null;
+            this.value = value;
+        }
+    }
+
+    private string value = string.Empty;
+    private StringBuilder? pendingValue;
 
     private readonly List<Inline> children = [];
 
@@ -42,18 +65,23 @@ public abstract class Leaf : Block, IBlockInlineContainer
 
             var charsToTab = 4 - (blockParser.Column % 4);
 
-            Value += new string(' ', charsToTab);
+            AppendValue().Append(' ', charsToTab);
 
             Content.Append(charsToTab, blockParser.SourceOffset - 1, 1);
         }
 
         var text = blockParser.CurrentLine[blockParser.Offset..];
 
-        Value += text + "\n";
+        AppendValue().Append(text).Append('\n');
 
         Content.Append(text.Length, blockParser.SourceOffset, text.Length);
 
         Content.Append(1, blockParser.LineEnd, blockParser.NextLineStart - blockParser.LineEnd);
+    }
+
+    private StringBuilder AppendValue()
+    {
+        return pendingValue ??= new StringBuilder(value);
     }
 
     internal void SetContent(string value, int sourceStart)
