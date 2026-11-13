@@ -44,7 +44,7 @@ public class BlockQuote : BlockContainer
 
     internal static BlockStart Start(BlockParser parser, Block block)
     {
-        if (!parser.Indented && parser.PeekNonSpace() == '>' && !BlockParser.IsNestingLimitReached(block)) 
+        if (!parser.Indented && parser.PeekNonSpace() == '>' && !NestingLimit.IsReached(block)) 
         {
             parser.AdvanceNextNonSpace();
             parser.AdvanceOffset(1, false);

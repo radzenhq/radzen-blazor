@@ -30,7 +30,7 @@ internal class BlazorMarkdownRendererOptions
     /// </summary>
     public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
 
-    public required Uri BaseUri { get; init; }
+    public required Func<Uri> GetBaseUri { get; init; }
 
     public HtmlSanitizer Sanitizer => sanitizer ??= new HtmlSanitizer(AllowedHtmlTags, AllowedHtmlAttributes);
 

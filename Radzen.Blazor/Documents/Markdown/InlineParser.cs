@@ -888,7 +888,11 @@ class InlineParser
         container.SourceStart = opener.Node?.SourceStart ?? opener.Position;
         container.SourceEnd = position + 1;
 
-        ReplaceOpener(openerIndex, container);
+        if (!ReplaceOpener(openerIndex, container))
+        {
+            delimiters.Remove(opener);
+            return false;
+        }
 
         newIndex = position + 1;
 
@@ -954,7 +958,7 @@ class InlineParser
         return true;
     }
 
-    private void ReplaceOpener(int openerIndex, InlineContainer parent)
+    private bool ReplaceOpener(int openerIndex, InlineContainer parent)
     {
         var startIndex = delimiters[openerIndex].Node != null ? inlines.FindIndex(node => node.Equals(delimiters[openerIndex].Node)) : -1;
 
@@ -964,6 +968,11 @@ class InlineParser
 
         var children = inlines.GetRange(startIndex + 1, endIndex - 1);
 
+        if (NestingLimit.IsReached(MaxDepth(children)))
+        {
+            return false;
+        }
+
         inlines.RemoveRange(startIndex, endIndex);
 
         foreach (var child in children)
@@ -972,8 +981,24 @@ class InlineParser
         }
 
         inlines.Insert(startIndex, parent);
+
+        return true;
     }
 
+    private static int MaxDepth(List<Inline> nodes)
+    {
+        var depth = 0;
+
+        foreach (var node in nodes)
+        {
+            if (node is InlineContainer container && container.Depth > depth)
+            {
+                depth = container.Depth;
+            }
+        }
+
+        return depth;
+    }
 
     private bool TryParseLinkFromReference(string text, int index, Dictionary<string, LinkReference> references, out int newIndex)
     {
@@ -1009,7 +1034,7 @@ class InlineParser
             }
         }
 
-        if (!references.TryGetValue(id.ToString().ToLowerInvariant(), out var reference))
+        if (!references.TryGetValue(id.ToString().ToLowerInvariant(), out var reference) || NestingLimit.IsReached(MaxDepth(children)))
         {
             return false;
         }
@@ -1075,6 +1100,12 @@ class InlineParser
                             continue;
                         }
                         charsToConsume = 2;
+                    }
+
+                    if (NestingLimit.IsReached(MaxDepth(innerInlines)))
+                    {
+                        delimiters.RemoveAt(closerIndex);
+                        continue;
                     }
 
                     InlineContainer parent = closer.Char == Tilde

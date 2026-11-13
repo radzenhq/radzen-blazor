@@ -21,11 +21,23 @@ public abstract class InlineContainer : Inline
     public void Add(Inline node)
     {
         children.Add(node);
+
+        if (node is InlineContainer container && container.Depth >= Depth)
+        {
+            Depth = container.Depth + 1;
+        }
     }
+
+    internal int Depth { get; private set; } = 1;
 
     internal void ReplaceInlines(IEnumerable<Inline> inlines)
     {
         children.Clear();
-        children.AddRange(inlines);
+        Depth = 1;
+
+        foreach (var inline in inlines)
+        {
+            Add(inline);
+        }
     }
 }

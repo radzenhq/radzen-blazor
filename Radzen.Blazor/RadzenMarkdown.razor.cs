@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Radzen.Blazor;
 
@@ -104,7 +105,7 @@ public partial class RadzenMarkdown : RadzenComponent
     public int AutoLinkHeadingDepth { get; set; }
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
+    private IServiceProvider ServiceProvider { get; set; } = default!;
 
     private Uri? baseUri;
 
@@ -144,12 +145,17 @@ public partial class RadzenMarkdown : RadzenComponent
             AllowHtml = AllowHtml,
             AllowedHtmlAttributes = AllowedHtmlAttributes,
             AllowedHtmlTags = AllowedHtmlTags,
-            BaseUri = baseUri ??= new Uri(NavigationManager.BaseUri),
+            GetBaseUri = GetBaseUri,
         };
 
         var visitor = new BlazorMarkdownRenderer(options, builder, outlet);
 
         document.Accept(visitor);
+    }
+
+    private Uri GetBaseUri()
+    {
+        return baseUri ??= new Uri(ServiceProvider.GetRequiredService<NavigationManager>().BaseUri);
     }
 
     private static void Empty(RenderTreeBuilder builder, int marker) 

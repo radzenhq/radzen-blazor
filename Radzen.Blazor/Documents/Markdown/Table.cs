@@ -41,6 +41,7 @@ public class Table : Leaf
 
         var dataLines = Value.Split('\n');
         var lineStart = 0;
+        var paddedCells = 0;
 
         foreach (var line in dataLines)
         {
@@ -59,9 +60,16 @@ public class Table : Leaf
                     row.Add(cells[cellIndex].Value, alignment, cells[cellIndex].Content);
                 }
 
-                for (int missingCellIndex = 0; missingCellIndex < header.Cells.Count - cells.Count; missingCellIndex++)
+                var missingCells = Math.Max(0, header.Cells.Count - cells.Count);
+
+                if (paddedCells + missingCells <= MaxPaddedCells)
                 {
-                    row.Add("", headerCells[cells.Count + missingCellIndex].Alignment);
+                    paddedCells += missingCells;
+
+                    for (int missingCellIndex = 0; missingCellIndex < missingCells; missingCellIndex++)
+                    {
+                        row.Add("", headerCells[cells.Count + missingCellIndex].Alignment);
+                    }
                 }
 
                 rows.Add(row);
@@ -69,6 +77,8 @@ public class Table : Leaf
             lineStart += line.Length + 1;
         }
     }
+
+    private const int MaxPaddedCells = 10_000;
 
     private readonly record struct CellText(string Value, ContentMap Content);
 

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Radzen.Documents.Markdown;
 
 #nullable enable
 abstract class HtmlElementWriter(HtmlSanitizer sanitizer)
 {
-    private const int MaxOpenElements = 100;
     private readonly List<string> openElements = [];
     private int scopeStart;
 
@@ -35,7 +35,7 @@ abstract class HtmlElementWriter(HtmlSanitizer sanitizer)
             var isVoid = HtmlSanitizer.IsVoidElement(tagName);
             var closesImmediately = isVoid || tag.Groups["selfClosing"].Success;
 
-            if (!sanitizer.IsAllowedTag(tagName) || (!closesImmediately && openElements.Count >= MaxOpenElements))
+            if (!sanitizer.IsAllowedTag(tagName) || (!closesImmediately && NestingLimit.IsReached(openElements.Count)))
             {
                 return;
             }

@@ -223,7 +223,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         else
         {
             if (!string.IsNullOrEmpty(link.Destination)
-                && (!HtmlSanitizer.IsSafeMarkdownUrl(link.Destination, false) || !Uri.TryCreate(options.BaseUri, link.Destination, out _)))
+                && (!HtmlSanitizer.IsSafeMarkdownUrl(link.Destination, false) || !Uri.TryCreate(options.GetBaseUri(), link.Destination, out _)))
             {
                 VisitContainer(link.Children);
                 return;
@@ -319,14 +319,12 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// <inheritdoc />
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
-        var match = OutletRegex.Match(htmlBlock.Value);
-
-        if (match.Success)
+        if (TryRenderOutlet(htmlBlock.Value))
         {
-            var markerId = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-            outlet(builder, markerId);
+            return;
         }
-        else if (options.AllowHtml)
+
+        if (options.AllowHtml)
         {
             builder.AddMarkupContent(0, options.Sanitizer.Sanitize(htmlBlock.Value));
         }
@@ -355,6 +353,18 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         builder.AddContent(0, "\n");
     }
 
+    private bool TryRenderOutlet(string value)
+    {
+        var match = OutletRegex.Match(value);
+
+        if (match.Success)
+        {
+            outlet(builder, int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture));
+        }
+
+        return match.Success;
+    }
+
     /// <inheritdoc />
     public override void VisitHtmlInline(HtmlInline htmlInline)
     {
@@ -363,12 +373,8 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
             return;
         }
 
-        var match = OutletRegex.Match(htmlInline.Value);
-
-        if (match.Success)
+        if (TryRenderOutlet(htmlInline.Value))
         {
-            var markerId = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-            outlet(builder, markerId);
             return;
         }
 

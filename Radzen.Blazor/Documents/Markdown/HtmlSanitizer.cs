@@ -95,9 +95,9 @@ class HtmlSanitizer
 
             index += match.Length;
 
-            var openTag = match.Groups["openTag"].Value.ToLowerInvariant();
+            var openTag = match.Groups["openTag"].Value;
 
-            if (openTag is "script" or "style" && !allowedTags.Contains(openTag))
+            if ((openTag.Equals("script", StringComparison.OrdinalIgnoreCase) || openTag.Equals("style", StringComparison.OrdinalIgnoreCase)) && !allowedTags.Contains(openTag))
             {
                 index = SkipRawText(html, index, openTag);
             }
@@ -125,7 +125,9 @@ class HtmlSanitizer
 
     private static int SkipRawText(string html, int index, string tagName)
     {
-        while ((index = html.IndexOf("</" + tagName, index, StringComparison.OrdinalIgnoreCase)) >= 0)
+        var closeTag = "</" + tagName;
+
+        while ((index = html.IndexOf(closeTag, index, StringComparison.OrdinalIgnoreCase)) >= 0)
         {
             var match = BlockParser.HtmlRegex.Match(html, index);
 
