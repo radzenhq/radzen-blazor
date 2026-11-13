@@ -29,6 +29,9 @@ public class HtmlSanitizerTests
     [InlineData("<div><img/src=x onerror=alert(1)></div>", "<div>&lt;img/src=x onerror=alert(1)&gt;</div>")]
     [InlineData("<div>1 < 2 > 0</div>", "<div>1 &lt; 2 &gt; 0</div>")]
     [InlineData("<div>&quot;x&#39;</div>", "<div>&quot;x&#39;</div>")]
+    [InlineData("<div><!-- <b>y</b></div>", "<div>&lt;!-- <b>y</b></div>")]
+    [InlineData("<div><? <b>y</b></div>", "<div>&lt;? <b>y</b></div>")]
+    [InlineData("<div><![CDATA[ <b>y</b></div>", "<div>&lt;![CDATA[ <b>y</b></div>")]
     public void Encodes_Text(string html, string expected)
     {
         Assert.Equal(expected, Sanitize(html));

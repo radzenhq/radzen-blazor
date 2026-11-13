@@ -103,6 +103,9 @@ public partial class RadzenMarkdown : RadzenComponent
     [Parameter]
     public int AutoLinkHeadingDepth { get; set; }
 
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     /// <inheritdoc />
     protected override string GetComponentCssClass()
     {
@@ -139,6 +142,7 @@ public partial class RadzenMarkdown : RadzenComponent
             AllowHtml = AllowHtml,
             AllowedHtmlAttributes = AllowedHtmlAttributes,
             AllowedHtmlTags = AllowedHtmlTags,
+            BaseUri = new Uri(NavigationManager.BaseUri),
         };
 
         var visitor = new BlazorMarkdownRenderer(options, builder, outlet);

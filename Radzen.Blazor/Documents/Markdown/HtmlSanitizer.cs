@@ -68,6 +68,7 @@ class HtmlSanitizer
         var openElements = new List<string>();
         var textStart = 0;
         var index = 0;
+        var terminators = new BlockParser.HtmlTerminators(html);
 
         while (index < html.Length)
         {
@@ -80,7 +81,7 @@ class HtmlSanitizer
 
             index += offset;
 
-            var match = BlockParser.HtmlRegex.Match(html, index);
+            var match = terminators.Match(index);
 
             if (!match.Success)
             {

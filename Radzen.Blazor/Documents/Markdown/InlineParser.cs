@@ -42,6 +42,7 @@ class InlineParser
     private const char Exclamation = '!';
     internal const char Colon = ':';
 
+    private BlockParser.HtmlTerminators htmlTerminators;
     private readonly List<Inline> inlines = [];
     private readonly List<Delimiter> delimiters = [];
     private readonly StringBuilder buffer = new();
@@ -418,6 +419,7 @@ class InlineParser
     private List<Inline> ParseInlines(string text, Dictionary<string, LinkReference> references)
     {
         var index = 0;
+        htmlTerminators = new BlockParser.HtmlTerminators(text);
 
         while (index < text.Length)
         {
@@ -606,7 +608,12 @@ class InlineParser
     {
         newIndex = index;
 
-        var match = BlockParser.HtmlRegex.Match(text[index..]);
+        if (text[index] is not OpenAngleBracket)
+        {
+            return false;
+        }
+
+        var match = htmlTerminators.Match(index);
 
         if (match.Success)
         {

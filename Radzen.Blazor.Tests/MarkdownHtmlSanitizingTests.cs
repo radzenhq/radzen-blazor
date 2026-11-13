@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Linq;
 using Bunit;
+using Radzen.Documents.Markdown;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -283,6 +285,96 @@ namespace Radzen.Blazor.Tests
             Assert.Empty(component.FindAll("b"));
             Assert.Empty(component.FindAll("i"));
             Assert.Contains("&lt;b&gt;x&lt;/b&gt;", component.Markup);
+        }
+
+        [Theory]
+        [InlineData("[c](//)")]
+        [InlineData("[c](https:x)")]
+        [InlineData("[c](//x:99999)")]
+        [InlineData("[c](//[::1)")]
+        [InlineData("[c](///)")]
+        [InlineData("[c](//%)")]
+        [InlineData("[c](//x:y@[z])")]
+        [InlineData("[c](https://)")]
+        [InlineData("[c](javascript:alert(1))")]
+        public void Unresolvable_Or_Unsafe_Link_Renders_Text(string markdown)
+        {
+            using var ctx = new TestContext();
+
+            var component = Render(ctx, markdown);
+
+            Assert.Empty(component.FindAll("a"));
+            Assert.Equal("c", component.Find("p").TextContent);
+        }
+
+        [Theory]
+        [InlineData("[c](/docs)", "/docs")]
+        [InlineData("[c](https://radzen.com/a?b=1)", "https://radzen.com/a?b=1")]
+        [InlineData("[c](mailto:a@example.com)", "mailto:a@example.com")]
+        public void Resolvable_Link_Renders_Anchor(string markdown, string expected)
+        {
+            using var ctx = new TestContext();
+
+            var component = Render(ctx, markdown);
+
+            Assert.Equal(expected, component.Find("a").GetAttribute("href"));
+        }
+
+        [Theory]
+        [InlineData("a <!--rz-outlet-99999999999999999999--> b")]
+        [InlineData("<!--rz-outlet-99999999999999999999-->")]
+        [InlineData("a <!--rz-outlet-\u0663--> b")]
+        [InlineData("<!--rz-outlet-\u0663-->")]
+        public void Malformed_Outlet_Markers_Render_Without_Throwing(string markdown)
+        {
+            using var ctx = new TestContext();
+
+            var component = Render(ctx, markdown);
+
+            Assert.Contains("rz-markdown", component.Markup);
+        }
+
+        [Fact]
+        public void Tag_After_Unterminated_Comment_Is_Still_Html()
+        {
+            using var ctx = new TestContext();
+
+            var component = Render(ctx, "x <!-- <b>y</b>\n\n<div>\n<!-- <b>z</b>\n</div>");
+
+            Assert.Equal("y", component.Find("p b").TextContent);
+            Assert.Equal("z", component.Find("div:not(.rz-markdown) b").TextContent);
+        }
+
+        [Theory]
+        [InlineData("<!--")]
+        [InlineData("<?")]
+        [InlineData("<![CDATA[")]
+        [InlineData("<!A")]
+        [InlineData("<a ")]
+        [InlineData("<a b=\"")]
+        public void Unterminated_Html_Parses_And_Renders_In_Linear_Time(string opener)
+        {
+            var repeated = string.Concat(Enumerable.Repeat(opener, 65536 / opener.Length));
+
+            var stopwatch = Stopwatch.StartNew();
+            MarkdownParser.Parse("x " + repeated);
+            Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"inline took {stopwatch.ElapsedMilliseconds} ms");
+
+            using var ctx = new TestContext();
+            stopwatch.Restart();
+            Render(ctx, "<div>\n" + repeated);
+            Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"block took {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [Fact]
+        public void Open_Tag_With_Unicode_Spaces_Parses_In_Linear_Time()
+        {
+            var markdown = "x <a b=" + new string('\u00A0', 2000) + "c";
+
+            var stopwatch = Stopwatch.StartNew();
+            MarkdownParser.Parse(markdown);
+
+            Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"took {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 }

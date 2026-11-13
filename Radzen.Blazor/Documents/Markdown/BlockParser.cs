@@ -9,23 +9,43 @@ namespace Radzen.Documents.Markdown;
 
 class BlockParser
 {
+    private static readonly string whitespace = @"[ \t\n\v\f\r]";
     private static readonly string tagName = @"[A-Za-z][A-Za-z0-9-]*";
     private static readonly string attributeName = @"[a-zA-Z_:][a-zA-Z0-9:._-]*";
     private static readonly string unquotedValue = @"(?<attributeValue>[^""'=<>`\x00-\x20]+)";
     private static readonly string singleQuotedValue = @"'(?<attributeValue>[^']*)'";
     private static readonly string doubleQuotedValue = @"""(?<attributeValue>[^""]*)""";
     private static readonly string attributeValue = @$"(?:{unquotedValue}|{singleQuotedValue}|{doubleQuotedValue})";
-    private static readonly string attributeValueSpec = @$"(?:\s*=\s*{attributeValue}|(?<attributeValue>))";
-    private static readonly string attribute = @$"(?:\s+(?<attributeName>{attributeName}){attributeValueSpec})";
+    private static readonly string attributeValueSpec = @$"(?:{whitespace}*={whitespace}*{attributeValue}|(?<attributeValue>))";
+    private static readonly string attribute = @$"(?:{whitespace}+(?<attributeName>{attributeName}){attributeValueSpec})";
 
-    private static readonly string OpenTag = @$"<(?<openTag>{tagName}){attribute}*\s*(?<selfClosing>/)?>";
-    private static readonly string CloseTag = @$"</(?<closeTag>{tagName})\s*[>]";
+    private static readonly string OpenTag = @$"<(?<openTag>{tagName}){attribute}*{whitespace}*(?<selfClosing>/)?>";
+    private static readonly string CloseTag = @$"</(?<closeTag>{tagName}){whitespace}*[>]";
     private static readonly string htmlComment = @"<!-->|<!--->|<!--[\s\S]*?-->";
     private static readonly string processingInstruction = @"<\?[ \s\S]*?\?>";
-    private static readonly string declaration = @$"<![A-Za-z]+[^>]*>";
+    private static readonly string declaration = @$"<![A-Za-z][^>]*>";
     private static readonly string cdata = @"<!\[CDATA\[[\s\S]*?\]\]>";
 
     public static readonly Regex HtmlRegex = new(@$"\G(?:{OpenTag}|{CloseTag}|{htmlComment}|{processingInstruction}|{declaration}|{cdata})");
+
+    internal readonly struct HtmlTerminators(string text)
+    {
+        private readonly int tag = text.AsSpan().LastIndexOf('>');
+        private readonly int comment = text.LastIndexOf("-->", StringComparison.Ordinal);
+        private readonly int processingInstruction = text.LastIndexOf("?>", StringComparison.Ordinal);
+        private readonly int cdata = text.LastIndexOf("]]>", StringComparison.Ordinal);
+
+        public Match Match(int index)
+        {
+            var rest = text.AsSpan(index);
+            var terminated = rest.StartsWith("<!--") ? comment >= index + 2
+                : rest.StartsWith("<?") ? processingInstruction >= index + 2
+                : rest.StartsWith("<![CDATA[") ? cdata >= index + 9
+                : rest.StartsWith("<") && tag > index;
+
+            return terminated ? HtmlRegex.Match(text, index) : System.Text.RegularExpressions.Match.Empty;
+        }
+    }
 
     private BlockParser()
     {
@@ -420,7 +440,7 @@ class BlockParser
         new (@"^<![A-Za-z]"),
         new (@"^<!\[CDATA\["),
         new (@"^<[/]?(?:address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[123456]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|section|search|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)(?:\s|[/]?[>]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        new (@$"^(?:{OpenTag}|{CloseTag})\s*$", RegexOptions.IgnoreCase)
+        new (@$"^(?:{OpenTag}|{CloseTag}){whitespace}*$", RegexOptions.IgnoreCase)
     ];
 
     private static readonly Regex[] HtmlBlockCloseRegex = [

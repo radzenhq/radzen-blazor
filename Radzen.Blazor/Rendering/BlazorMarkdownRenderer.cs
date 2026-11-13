@@ -20,7 +20,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// </summary>
     public const string Outlet = "<!--rz-outlet-{0}-->";
 
-    private static readonly Regex OutletRegex = new(@"<!--rz-outlet-(\d+)-->");
+    private static readonly Regex OutletRegex = new(@"<!--rz-outlet-([0-9]{1,9})-->");
     private readonly HtmlSanitizer sanitizer = new(options.AllowedHtmlTags, options.AllowedHtmlAttributes);
     private List<string> openElements = [];
 
@@ -235,14 +235,16 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         }
         else
         {
+            if (!string.IsNullOrEmpty(link.Destination)
+                && (!HtmlSanitizer.IsSafeMarkdownUrl(link.Destination, false) || !Uri.TryCreate(options.BaseUri, link.Destination, out _)))
+            {
+                VisitContainer(link.Children);
+                return;
+            }
+
             builder.OpenComponent<RadzenLink>(0);
 
-            // NavLink (used by RadzenLink) calls NavigationManager.ToAbsoluteUri(href), which throws
-            // UriFormatException for destinations like "https://" (empty host). Skip those instead
-            // of letting the exception take down the component tree.
-            if (!string.IsNullOrEmpty(link.Destination)
-                && HtmlSanitizer.IsSafeMarkdownUrl(link.Destination, false)
-                && Uri.TryCreate(link.Destination, UriKind.RelativeOrAbsolute, out _))
+            if (!string.IsNullOrEmpty(link.Destination))
             {
                 builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
             }
@@ -424,7 +426,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
 
         if (match.Success)
         {
-            var markerId = Convert.ToInt32(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            var markerId = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
             outlet(builder, markerId);
             return;
         }
