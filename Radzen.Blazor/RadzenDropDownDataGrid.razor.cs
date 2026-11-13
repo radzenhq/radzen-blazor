@@ -1395,6 +1395,11 @@ namespace Radzen.Blazor
 
         async Task OnRowSelect(object item)
         {
+            if (Disabled)
+            {
+                return;
+            }
+
             await CloseAndFocus();
 
             if (AllowRowSelectOnRowClick)
