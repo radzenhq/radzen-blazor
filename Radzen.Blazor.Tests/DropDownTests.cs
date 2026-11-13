@@ -13,6 +13,24 @@ namespace Radzen.Blazor.Tests
     public class DropDownTests
     {
         [Fact]
+        public void DropDown_Ignores_Option_Click_After_Disabling()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var value = "Apple";
+            var component = ctx.RenderComponent<RadzenDropDown<string>>(parameters => parameters
+                .Add(p => p.Data, new[] { "Apple", "Orange" })
+                .Add(p => p.Value, value)
+                .Add(p => p.ValueChanged, (string selected) => { value = selected; }));
+
+            component.Find("[role=combobox]").Click();
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+            component.FindAll(".rz-dropdown-item").Single(item => item.TextContent.Trim() == "Orange").Click();
+
+            Assert.Equal("Apple", value);
+        }
+
+        [Fact]
         public void DropDown_SelectAllHiddenInput_IsInert()
         {
             using var ctx = new TestContext();

@@ -518,7 +518,7 @@ namespace Radzen.Blazor
         /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
         protected override async Task OnSelectItem(object? item, bool isFromKey = false)
         {
-            if (!ReadOnly && JSRuntime != null)
+            if (!Disabled && !ReadOnly && JSRuntime != null)
             {
                 if (!Multiple && !isFromKey)
                 {
