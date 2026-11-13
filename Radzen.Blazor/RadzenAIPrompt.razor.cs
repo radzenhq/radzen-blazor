@@ -51,6 +51,14 @@ namespace Radzen.Blazor
         public string? Output { get; set; }
 
         /// <summary>
+        /// Gets or sets whether HTML tags in the output are rendered.
+        /// When <c>true</c> (default), allow-listed HTML tags and attributes are rendered and everything else is removed, as in <see cref="RadzenMarkdown.AllowHtml"/>.
+        /// When <c>false</c>, HTML in the output is displayed as literal text. Set to <c>false</c> when the model reads untrusted content.
+        /// </summary>
+        [Parameter]
+        public bool AllowHtml { get; set; } = true;
+
+        /// <summary>
         /// Event callback that is invoked when the output changes, including while it streams.
         /// </summary>
         [Parameter]

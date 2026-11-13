@@ -30,7 +30,7 @@
                 <div class="rz-aiprompt-output-content">
                     @if (IsGenerating)
                     {
-                        <RadzenMarkdown Text="@Output" /><RadzenIcon Icon="more_horiz" class="rz-aiprompt-streaming-icon" />
+                        <RadzenMarkdown Text="@Output" AllowHtml="@AllowHtml" /><RadzenIcon Icon="more_horiz" class="rz-aiprompt-streaming-icon" />
                     }
                     else if (OutputTemplate != null)
                     {
@@ -38,7 +38,7 @@
                     }
                     else
                     {
-                        <RadzenMarkdown Text="@Output" />
+                        <RadzenMarkdown Text="@Output" AllowHtml="@AllowHtml" />
                     }
                 </div>
                 <div class="rz-aiprompt-toolbar">
