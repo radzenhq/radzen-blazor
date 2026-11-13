@@ -317,7 +317,7 @@
                         else
                         {
                         <div class="rz-chat-message-text">
-                            <RadzenMarkdown Text=@segment.Text />
+                            <RadzenMarkdown Text=@segment.Text AllowHtml=@AllowHtml />
                             @if (message.IsStreaming && segment == segments[segments.Count - 1])
                             {
                                 <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />

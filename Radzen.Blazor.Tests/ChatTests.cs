@@ -109,6 +109,42 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("Hi there!", component.Markup);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void RadzenChat_AllowHtml_ControlsHtmlInMessages(bool allowHtml)
+        {
+            var messages = new List<ChatMessage>
+            {
+                new ChatMessage { Content = "<b>x</b>", UserId = "user2", Timestamp = DateTime.Now }
+            };
+
+            var users = new List<ChatUser>
+            {
+                new ChatUser { Id = "user1", Name = "John" },
+                new ChatUser { Id = "user2", Name = "Jane" }
+            };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, messages)
+                .Add(p => p.AllowHtml, allowHtml)
+            );
+
+            if (allowHtml)
+            {
+                Assert.Equal("x", component.Find(".rz-chat-message-text b").TextContent);
+            }
+            else
+            {
+                Assert.Empty(component.FindAll(".rz-chat-message-text b"));
+                Assert.Contains("&lt;b&gt;x&lt;/b&gt;", component.Markup);
+            }
+        }
+
         [Fact]
         public void RadzenChat_ShouldShowUsersInHeader()
         {

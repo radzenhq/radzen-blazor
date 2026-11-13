@@ -363,7 +363,7 @@ public class HtmlVisitor : NodeVisitorBase
     {
         ArgumentNullException.ThrowIfNull(link);
 
-        var destination = HtmlSanitizer.IsDangerousUrl(link.Destination ?? string.Empty) ? string.Empty : link.Destination;
+        var destination = !HtmlSanitizer.IsSafeMarkdownUrl(link.Destination, false) ? string.Empty : link.Destination;
 
         html.Append("<a href=\"").Append(Escape(destination)).Append("\">");
         base.VisitLink(link);
@@ -379,7 +379,7 @@ public class HtmlVisitor : NodeVisitorBase
         var alt = new StringBuilder();
         AppendPlainText(alt, image.Children);
 
-        var destination = HtmlSanitizer.IsDangerousUrl(image.Destination ?? string.Empty) ? string.Empty : image.Destination;
+        var destination = !HtmlSanitizer.IsSafeMarkdownUrl(image.Destination, true) ? string.Empty : image.Destination;
 
         BeforeAtom();
         html.Append("<img src=\"").Append(Escape(destination)).Append("\" alt=\"").Append(Escape(alt.ToString())).Append("\">");

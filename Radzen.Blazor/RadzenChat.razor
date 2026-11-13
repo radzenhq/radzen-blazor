@@ -127,7 +127,7 @@
                                 }
                                 else
                                 {
-                                    <RadzenMarkdown Text=@message.Content />
+                                    <RadzenMarkdown Text=@message.Content AllowHtml=@AllowHtml />
                                 }
                                 @if (message.IsStreaming)
                                 {

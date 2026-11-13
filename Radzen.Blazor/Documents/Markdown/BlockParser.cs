@@ -11,21 +11,21 @@ class BlockParser
 {
     private static readonly string tagName = @"[A-Za-z][A-Za-z0-9-]*";
     private static readonly string attributeName = @"[a-zA-Z_:][a-zA-Z0-9:._-]*";
-    private static readonly string unquotedValue = @"[^""'=<>`\x00-\x20]+";
-    private static readonly string singleQuotedValue = @"'[^']*'";
-    private static readonly string doubleQuotedValue = @"""[^""]*""";
+    private static readonly string unquotedValue = @"(?<attributeValue>[^""'=<>`\x00-\x20]+)";
+    private static readonly string singleQuotedValue = @"'(?<attributeValue>[^']*)'";
+    private static readonly string doubleQuotedValue = @"""(?<attributeValue>[^""]*)""";
     private static readonly string attributeValue = @$"(?:{unquotedValue}|{singleQuotedValue}|{doubleQuotedValue})";
-    private static readonly string attributeValueSpec = @$"(?:\s*=\s*{attributeValue})";
-    private static readonly string attribute = @$"(?:\s+{attributeName}{attributeValueSpec}?)";
+    private static readonly string attributeValueSpec = @$"(?:\s*=\s*{attributeValue}|(?<attributeValue>))";
+    private static readonly string attribute = @$"(?:\s+(?<attributeName>{attributeName}){attributeValueSpec})";
 
-    private static readonly string OpenTag = @$"<{tagName}{attribute}*\s*/?>";
-    private static readonly string CloseTag = @$"</{tagName}\s*[>]";
+    private static readonly string OpenTag = @$"<(?<openTag>{tagName}){attribute}*\s*(?<selfClosing>/)?>";
+    private static readonly string CloseTag = @$"</(?<closeTag>{tagName})\s*[>]";
     private static readonly string htmlComment = @"<!-->|<!--->|<!--[\s\S]*?-->";
     private static readonly string processingInstruction = @"<\?[ \s\S]*?\?>";
     private static readonly string declaration = @$"<![A-Za-z]+[^>]*>";
     private static readonly string cdata = @"<!\[CDATA\[[\s\S]*?\]\]>";
 
-    public static readonly Regex HtmlRegex = new(@$"^(?:{OpenTag}|{CloseTag}|{htmlComment}|{processingInstruction}|{declaration}|{cdata})");
+    public static readonly Regex HtmlRegex = new(@$"\G(?:{OpenTag}|{CloseTag}|{htmlComment}|{processingInstruction}|{declaration}|{cdata})");
 
     private BlockParser()
     {

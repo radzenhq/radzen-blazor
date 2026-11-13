@@ -122,6 +122,29 @@ namespace Radzen.Blazor.Tests
             Assert.False(message.IsStreaming);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void RadzenAIChat_AllowHtml_ControlsHtmlInMessages(bool allowHtml)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            RegisterChatService(ctx);
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.AllowHtml, allowHtml));
+
+            component.InvokeAsync(() => component.Instance.AddMessage("<b>x</b>", false));
+
+            if (allowHtml)
+            {
+                Assert.Equal("x", component.Find(".rz-chat-message-text b").TextContent);
+            }
+            else
+            {
+                Assert.Empty(component.FindAll(".rz-chat-message-text b"));
+                Assert.Contains("&lt;b&gt;x&lt;/b&gt;", component.Markup);
+            }
+        }
+
         [Fact]
         public void RadzenAIChat_AddMessage_ShouldAddMessageToList()
         {

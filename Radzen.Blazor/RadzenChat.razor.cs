@@ -338,6 +338,14 @@ namespace Radzen.Blazor
         public int MaxVisibleUsers { get; set; } = 5;
 
         /// <summary>
+        /// Gets or sets whether HTML tags in message text are rendered.
+        /// When <c>true</c> (default), allow-listed HTML tags and attributes are rendered and everything else is removed, as in <see cref="RadzenMarkdown.AllowHtml"/>.
+        /// When <c>false</c>, HTML in message text is displayed as literal text. Set to <c>false</c> when messages come from untrusted users or from a model that reads untrusted content.
+        /// </summary>
+        [Parameter]
+        public bool AllowHtml { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets whether to show the clear chat button.
         /// </summary>
         [Parameter]
