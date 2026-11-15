@@ -2810,8 +2810,20 @@ window.Radzen = {
         }
     }
   },
-  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
+  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY, tooltipId) {
     Radzen.closeTooltip(id);
+
+    var popupInstance = instance;
+    if (instance && tooltipId != null) {
+        popupInstance = {
+            invokeMethodAsync: function (method, position) {
+                if (position == null) {
+                    return instance.invokeMethodAsync.apply(instance, arguments);
+                }
+                return instance.invokeMethodAsync('RadzenTooltip.UpdatePosition', position, tooltipId);
+            }
+        };
+    }
 
     if (clientX != null && clientY != null) {
         position = null;
@@ -2827,9 +2839,9 @@ window.Radzen = {
     }
 
     if (delay) {
-        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
+        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, clientX, clientY, popupInstance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     } else {
-        Radzen.openPopup(target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
+        Radzen.openPopup(target, id, false, position, clientX, clientY, popupInstance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     }
 
     if (duration) {

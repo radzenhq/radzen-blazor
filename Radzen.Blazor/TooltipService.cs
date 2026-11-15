@@ -374,6 +374,8 @@ namespace Radzen
         /// </summary>
         /// <value>The element.</value>
         public ElementReference Element { get; set; }
+
+        internal int Id { get; set; }
     }
 
     internal class ChartTooltipOptions

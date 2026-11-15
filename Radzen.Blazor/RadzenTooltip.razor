@@ -32,10 +32,12 @@
 
     List<Tooltip> tooltips = new List<Tooltip>();
 
+    int lastTooltipId;
+
     public async Task Open(ElementReference element, Type type, TooltipOptions options)
     {
         tooltips.Clear();
-        tooltips.Add(new Tooltip() { Type = type, Options = options, Element = element });
+        tooltips.Add(new Tooltip() { Type = type, Options = options, Element = element, Id = ++lastTooltipId });
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
@@ -63,7 +65,8 @@
                 Reference,
                 "RadzenTooltip.CloseTooltip",
                 tooltip.Options.ClientX,
-                tooltip.Options.ClientY);
+                tooltip.Options.ClientY,
+                tooltip.Id);
         }
     }
 
@@ -104,6 +107,24 @@ private DotNetObjectReference<RadzenTooltip>? reference;
             {
                  tooltip.Options.Position = (TooltipPosition)Enum.Parse(typeof(TooltipPosition), position, true);
             }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Updates the position of the tooltip that was moved to a different side in order to fit in the viewport.
+    /// </summary>
+    /// <param name="position">The side the tooltip was displayed on.</param>
+    /// <param name="tooltipId">The identifier of the tooltip that was repositioned.</param>
+    [JSInvokable("RadzenTooltip.UpdatePosition")]
+    public Task UpdatePosition(string position, int tooltipId)
+    {
+        var tooltip = tooltips.LastOrDefault();
+
+        if (tooltip != null && tooltip.Id == tooltipId && Enum.TryParse<TooltipPosition>(position, true, out var tooltipPosition))
+        {
+            tooltip.Options.Position = tooltipPosition;
         }
 
         return Task.CompletedTask;

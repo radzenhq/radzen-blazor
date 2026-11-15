@@ -76,5 +76,59 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(TooltipPosition.Bottom, sharedOptions.Position);
             Assert.Contains("rz-top-tooltip-content", tooltip.Markup);
         }
+
+        static int LastOpenedTooltipId(TestContext ctx)
+        {
+            var invocation = ctx.JSInterop.Invocations["Radzen.openTooltip"][^1];
+
+            return (int)invocation.Arguments[^1];
+        }
+
+        [Fact]
+        public async Task UpdatePosition_IsIgnored_WhenAnotherTooltipWasOpenedMeanwhile()
+        {
+            using var ctx = CreateContext();
+            var tooltip = ctx.RenderComponent<RadzenTooltip>();
+            var service = ctx.Services.GetRequiredService<TooltipService>();
+
+            var options = new TooltipOptions { Position = TooltipPosition.Top, Duration = 0 };
+
+            await tooltip.InvokeAsync(() => service.Open(default, "first", options));
+
+            var firstId = LastOpenedTooltipId(ctx);
+
+            await tooltip.InvokeAsync(() => service.Close());
+            await tooltip.InvokeAsync(() => service.Open(default, "second", options));
+
+            var secondId = LastOpenedTooltipId(ctx);
+
+            Assert.NotEqual(firstId, secondId);
+
+            await tooltip.InvokeAsync(() => tooltip.Instance.UpdatePosition("left", firstId));
+
+            tooltip.Render();
+
+            Assert.Contains("second", tooltip.Markup);
+            Assert.Contains("rz-top-tooltip-content", tooltip.Markup);
+            Assert.DoesNotContain("rz-left-tooltip-content", tooltip.Markup);
+            Assert.Equal("top", ctx.JSInterop.Invocations["Radzen.openTooltip"][^1].Arguments[4]);
+        }
+
+        [Fact]
+        public async Task UpdatePosition_IsApplied_ToTheTooltipItWasReportedFor()
+        {
+            using var ctx = CreateContext();
+            var tooltip = ctx.RenderComponent<RadzenTooltip>();
+            var service = ctx.Services.GetRequiredService<TooltipService>();
+
+            await tooltip.InvokeAsync(() => service.Open(default, "text", new TooltipOptions { Position = TooltipPosition.Top, Duration = 0 }));
+
+            await tooltip.InvokeAsync(() => tooltip.Instance.UpdatePosition("left", LastOpenedTooltipId(ctx)));
+
+            tooltip.Render();
+
+            Assert.Contains("rz-left-tooltip-content", tooltip.Markup);
+            Assert.DoesNotContain("rz-top-tooltip-content", tooltip.Markup);
+        }
     }
 }
