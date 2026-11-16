@@ -1569,8 +1569,9 @@ namespace Radzen.Blazor
 
             if ((FilterPropertyType == typeof(Guid) || FilterPropertyType == typeof(Guid?)) && value != null && value is string)
             {
-                var v = Guid.Parse($"{value}");
-                value = FilterPropertyType == typeof(Guid) ? v : (Guid?)v;
+                // The value comes from a free text box, so text that is not a valid Guid (a fragment, a typo, an
+                // empty string) is expected input. Treat it as no filter value instead of throwing.
+                value = Guid.TryParse($"{value}", out var v) ? (FilterPropertyType == typeof(Guid) ? v : (Guid?)v) : null;
             }
 
             if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType))))
