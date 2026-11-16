@@ -86,9 +86,11 @@ namespace Radzen
 
                 var themeCookie = cookies?.Split("; ").Select(x =>
                 {
-                    var parts = x.Split("=");
+                    // document.cookie is an empty string when no script-visible cookie exists, and a cookie set
+                    // without a name has no '=' at all, so a missing value must not be indexed.
+                    var parts = x.Split('=', 2);
 
-                    return (Key: parts[0], Value: parts[1]);
+                    return (Key: parts[0], Value: parts.Length > 1 ? parts[1] : null);
                 })
                 .FirstOrDefault(x => x.Key == options.Name);
 
