@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.36" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.36" />
-    <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="*" />
+    <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="0.0.1" />
   </ItemGroup>
   <ItemGroup>
     <!-- Workaround for .NET 10 antiforgery token issue - https://github.com/dotnet/aspnetcore/issues/64693 -->
