@@ -2733,7 +2733,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Default Tools",
                             Path = "html-editor",
-                            Title = "Blazor HTML Editor Component | Free Radzen Blazor",
+                            Title = "Blazor HTML Editor (Rich Text / WYSIWYG) | Free Radzen Blazor",
                             Description = "The Blazor HTML Editor is a rich text (WYSIWYG) editor with a full toolbar of formatting tools, image and link support, and HTML output.",
                             Related = new [] { "html-editor-custom-tools", "textarea" },
                             Faq = new []
