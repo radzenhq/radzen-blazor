@@ -1178,7 +1178,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Chart Gallery",
                     Path = "charts",
-                    Title = "Blazor Charts - 30+ Chart Types | Free Radzen Blazor",
+                    Title = "Blazor Charts & Graphs - 30+ Chart Types | Free Radzen Blazor",
                     Description = "Browse 40+ free Blazor data-visualization components, including 30+ chart types plus gauges, sparklines, treemap and Sankey. Drawn in C# as SVG, with no JavaScript charting library.",
                     Icon = "\ue3b6",
                     Faq = new []
@@ -2351,6 +2351,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "GoogleMap",
+                    Title = "Blazor Google Maps Component | Free Radzen Blazor",
                     Path = "googlemap",
                     Description = "Demonstration and configuration of Radzen Blazor Google Map component.",
                     Icon = "\ue55b"
@@ -2550,7 +2551,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "Loading indicator", Anchor = "#loading" }, new () { Text = "DropDown Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Single selection",
                             Path = "dropdown",
-                            Title = "Blazor DropDown / Select Component | Free Radzen Blazor",
+                            Title = "Blazor DropDown List / Select Component | Free Radzen Blazor",
                             Description = "Free Blazor DropDown (select) component with data binding, filtering, multiple selection, grouping, templates, and virtualization for large lists. Bind to any IEnumerable or IQueryable.",
                             Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "combobox", "multiselect" },
                             Related = new [] { "dropdown-multiple", "dropdown-filtering", "dropdown-grouping", "dropdown-virtualization", "dropdown-tree", "dropdown-datagrid" },
@@ -3744,7 +3745,7 @@ namespace RadzenBlazorDemos
                         {
                             Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Inline definition",
-                            Title = "Blazor Tree Component | Free Radzen Blazor",
+                            Title = "Blazor TreeView Component | Free Radzen Blazor",
                             Description = "Demonstration and configuration of the Blazor RadzenTree component.",
                             Path = "tree",
                             Tags = new [] { "tree", "treeview", "nodes", "inline" },
@@ -4113,7 +4114,7 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Define can-drop and no-drop styles", Anchor = "#can-drop-no-drop-styles" }, new () { Text = "Define a Footer Template per Drop Zone", Anchor = "#footer-template" } ],
                     Name = "DropZone",
-                    Title = "Blazor DropZone - Drag & Drop | Free Radzen Blazor",
+                    Title = "Blazor Drag and Drop Component (DropZone) | Free Radzen Blazor",
                     Description = "The Blazor DropZone lets users drag and drop items between zones - for kanban boards and reordering.",
                     Path = "dropzone",
                     Related = new [] { "tile-layout", "splitter" },
