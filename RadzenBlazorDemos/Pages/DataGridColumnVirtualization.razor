@@ -1,0 +1,98 @@
+@using System.Globalization
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mb-4">
+    <RadzenSwitch @bind-Value="@virtualize" Name="virtualize" />
+    <RadzenLabel Text="Column virtualization" Component="virtualize" />
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-ms-4">
+        @products.Count.ToString("N0") products × @months.Count months of revenue
+    </RadzenText>
+</RadzenStack>
+
+<RadzenDataGrid Data="@products" TItem="ProductRevenue" AllowColumnVirtualization="@virtualize" AllowVirtualization="true" Style="height:500px"
+                AllowSorting="true" AllowColumnResize="true" AllowFiltering="true" FilterMode="FilterMode.Advanced"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(ProductRevenue.Product)" Title="Product" Frozen="true" Width="220px" />
+        <RadzenDataGridColumn Property="@nameof(ProductRevenue.Category)" Title="Category" Frozen="true" Width="140px" />
+        @for (var i = 0; i < months.Count; i++)
+        {
+            var index = i;
+            <RadzenDataGridColumn @key="index" Property="@($"Revenue[{index}]")" Title="@months[index].ToString("MMM yyyy", culture)" Width="120px"
+                                  TextAlign="TextAlign.Right" Filterable="false">
+                <Template Context="product">
+                    @product.Revenue[index].ToString("C0", culture)
+                </Template>
+            </RadzenDataGridColumn>
+        }
+        <RadzenDataGridColumn Property="@nameof(ProductRevenue.Total)" Title="Total" Frozen="true" FrozenPosition="FrozenColumnPosition.Right"
+                              Width="150px" TextAlign="TextAlign.Right" Filterable="false">
+            <Template Context="product">
+                <strong>@product.Total.ToString("C0", culture)</strong>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    static readonly CultureInfo culture = CultureInfo.GetCultureInfo("en-US");
+
+    static readonly Dictionary<string, string[]> catalog = new()
+    {
+        ["Beverages"] = new[] { "Dark Roast Coffee", "Green Tea", "Sparkling Water", "Orange Juice", "Ginger Ale", "Cold Brew" },
+        ["Bakery"] = new[] { "Sourdough Loaf", "Butter Croissant", "Rye Bread", "Cinnamon Roll", "Bagel", "Brioche Bun" },
+        ["Dairy"] = new[] { "Greek Yogurt", "Aged Cheddar", "Whole Milk", "Salted Butter", "Mozzarella", "Sour Cream" },
+        ["Produce"] = new[] { "Honeycrisp Apples", "Baby Spinach", "Roma Tomatoes", "Avocados", "Blueberries", "Sweet Corn" },
+        ["Pantry"] = new[] { "Olive Oil", "Basmati Rice", "Penne Pasta", "Black Beans", "Maple Syrup", "Sea Salt" },
+        ["Snacks"] = new[] { "Kettle Chips", "Trail Mix", "Dark Chocolate", "Granola Bars", "Salted Almonds", "Popcorn" },
+        ["Frozen"] = new[] { "Vanilla Ice Cream", "Garden Peas", "Margherita Pizza", "Berry Blend", "Fish Fillets", "Waffles" },
+        ["Household"] = new[] { "Paper Towels", "Dish Soap", "Laundry Detergent", "Trash Bags", "Sponges", "Glass Cleaner" }
+    };
+
+    static readonly string[] brands = { "Alpine", "Harbor", "Juniper", "Meadow", "Northwind", "Orchard", "Prairie", "Redwood", "Summit", "Tidewater", "Willow" };
+
+    bool virtualize = true;
+
+    IList<DateTime> months = new List<DateTime>();
+    IList<ProductRevenue> products = new List<ProductRevenue>();
+
+    public class ProductRevenue
+    {
+        public string Product { get; set; }
+        public string Category { get; set; }
+        public decimal[] Revenue { get; set; }
+        public decimal Total { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        months = Enumerable.Range(0, 20 * 12).Select(i => new DateTime(2007, 1, 1).AddMonths(i)).ToList();
+
+        var random = new Random(7);
+        var categories = catalog.Keys.ToList();
+
+        products = (from brand in brands
+                    from category in categories
+                    from name in catalog[category]
+                    select CreateProduct($"{brand} {name}", category, categories.IndexOf(category), random))
+            .OrderBy(p => p.Product)
+            .ToList();
+    }
+
+    ProductRevenue CreateProduct(string name, string category, int season, Random random)
+    {
+        var baseline = 4000 + random.NextDouble() * 36000;
+        var growth = 0.01 + random.NextDouble() * 0.07;
+        var swing = 0.05 + random.NextDouble() * 0.25;
+
+        var revenue = months.Select((month, index) =>
+        {
+            var trend = Math.Pow(1 + growth, index / 12d);
+            var seasonal = 1 + swing * Math.Sin((month.Month + season * 1.5) / 12d * 2 * Math.PI);
+            var noise = 0.92 + random.NextDouble() * 0.16;
+
+            return Math.Round((decimal)(baseline * trend * seasonal * noise / 12));
+        }).ToArray();
+
+        return new ProductRevenue { Product = name, Category = category, Revenue = revenue, Total = revenue.Sum() };
+    }
+}

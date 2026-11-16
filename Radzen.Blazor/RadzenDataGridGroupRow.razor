@@ -123,7 +123,7 @@
             var columnsOfGrid = Columns
                   .Where(c => c.GetVisible())
                   .ToList();
-            return columnsOfGrid.Sum(c => CountVisibleLeafColumns<TItem>(c));
+            return columnsOfGrid.Sum(c => CountVisibleLeafColumns<TItem>(c)) + (Grid?.ColumnSpacerCount ?? 0);
         }
     }
 

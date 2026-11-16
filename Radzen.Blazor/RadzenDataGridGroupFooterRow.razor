@@ -19,8 +19,10 @@
         }
         @foreach (var column in Columns)
         {
+            @Grid.ColumnSpacerBefore(column, "td", i)
             <RadzenDataGridGroupFooterCell Group="@Group" RowIndex="@i" Grid="@Grid" Column="@column" CssClass="@($"{column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column)} {Grid.getCompositeCellCSSClass(column)}".Trim())" />
         }
+        @Grid.ColumnSpacerAfter("td", i)
     </tr>
 }
 @code {

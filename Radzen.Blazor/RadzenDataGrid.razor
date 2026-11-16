@@ -11,6 +11,8 @@
 @if (Visible)
 {
     var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
+    var renderColumns = UpdateColumnWindow(visibleColumns);
+    var bodyColSpan = renderColumns.Sum(c => c.GetColSpan()) + ColumnSpacerCount;
 
     <div @ref=@Element style="@Style" @attributes="WrapperAttributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.ContextMenu.HasDelegate">
@@ -116,12 +118,32 @@
             role="@(LoadChildData.HasDelegate ? "treegrid" : "grid")"
             aria-label="@GridAriaLabel" aria-labelledby="@GridAriaLabelledBy"
             aria-multiselectable="@(SelectionMode == DataGridSelectionMode.Multiple ? "true" : null)"
-            aria-rowcount="@GridAriaRowCount()"
+            aria-rowcount="@GridAriaRowCount()" aria-colcount="@GridAriaColCount()"
             aria-activedescendant="@GetActiveDescendantId()"
             @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="stopKeydownPropagation"
             @onblur=@OnBlur>
             <table role="presentation" class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
-                @if(allColumns.All(c => c.Parent == null))
+                @if (columnWindow != null)
+                {
+                <colgroup>
+                    @if (ShowGroupExpandColumn)
+                    {
+                        @foreach (var g in Groups)
+                        {
+                            <col>
+                        }
+                    }
+                    @if (Template != null && ShowExpandColumn)
+                    {
+                        <col>
+                    }
+                    @foreach (var definition in GetVirtualColumnDefinitions())
+                    {
+                        <col id="@definition.Id" style="@definition.Style">
+                    }
+                </colgroup>
+                }
+                else if(allColumns.All(c => c.Parent == null))
                 {
                 <colgroup>
                     @if (ShowGroupExpandColumn)
@@ -193,11 +215,13 @@
                                     </th>
                                 }
                             }
-                            @for (var j = 0; j < visibleColumns.Count; j++)
+                            @for (var j = 0; j < renderColumns.Count; j++)
                             {
-                                var column = visibleColumns[j];
+                                var column = renderColumns[j];
 
-                                var cellAttr = HeaderCellAttributes(column);
+                                @ColumnSpacerBefore(column, "th", i)
+
+                                var cellAttr = AddVirtualColumnAttributes(HeaderCellAttributes(column), column);
 
                                 object? colspan;
                                 cellAttr.TryGetValue("colspan", out colspan);
@@ -207,11 +231,12 @@
                                     j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
                                 }
 
-                                var columnIndex = visibleColumns.IndexOf(column);
+                                var columnIndex = GetVisibleColumnIndex(visibleColumns, column);
                                 var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
                                 <RadzenDataGridHeaderCell @key=column RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
+                            @ColumnSpacerAfter("th", i)
                         </tr>
                     }
                     }
@@ -233,9 +258,10 @@
                                     <span class="rz-column-title"></span>
                                 </th>
                             }
-                            @foreach (var column in visibleColumns)
+                            @foreach (var column in renderColumns)
                             {
                                 var filterMode = column.FilterMode ?? FilterMode;
+                                @ColumnSpacerBefore(column, "th")
                                 <th @key=column role="columnheader" colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
                                     @if (allColumns.All(c => c.Parent == null) && AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                     {
@@ -246,6 +272,7 @@
                                     }
                                 </th>
                             }
+                            @ColumnSpacerAfter("th")
                         </tr>
                     }
                 </thead>
@@ -256,12 +283,12 @@
                         {
                             if (columns.Count > 0)
                             {
-                                @DrawRows(visibleColumns)
+                                @DrawRows(renderColumns)
                             }
                             else
                             {
                                 <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation>
-                                    <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
+                                    <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(bodyColSpan + (Template != null && ShowExpandColumn ? 1 : 0))">
                                         @if (EmptyTemplate != null)
                                         {
                                             @EmptyTemplate
@@ -277,7 +304,7 @@
                         else
                         {
                             <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation>
-                                <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0) + Groups.Count)">
+                                <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(bodyColSpan + (Template != null && ShowExpandColumn ? 1 : 0) + Groups.Count)">
                                     @if (EmptyTemplate != null)
                                     {
                                         @EmptyTemplate
@@ -315,9 +342,10 @@
                                         </td>
                                     }
                                 }
-                                @for (var j = 0; j < visibleColumns.Count; j++)
+                                @for (var j = 0; j < renderColumns.Count; j++)
                                 {
-                                    var column = visibleColumns[j];
+                                    var column = renderColumns[j];
+                                    @ColumnSpacerBefore(column, "td", i)
                                     var cellAttr = FooterCellAttributes(column);
 
                                     object? colspan;
@@ -332,6 +360,7 @@
                                               CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column)} {getCompositeCellCSSClass(column)}".Trim())"
                                               Attributes="@(cellAttr)" />
                                 }
+                                @ColumnSpacerAfter("td", i)
                             </tr>
                         }
                     </tfoot>
@@ -616,7 +645,7 @@
         }
     }
 
-    internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
+    internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex, bool keyed = false)
     {
             // Keep class/style in the splat so SetAttribute preserves CellRender precedence. Allocate the
             // dictionary on first use; AddMultipleAttributes ignores null without enumerating it.
@@ -684,6 +713,11 @@
             if (CellContextMenu.HasDelegate)
             {
                 SetAttribute(cellAttributes ??= new(), "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
+            }
+
+            if (keyed && columnWindow != null && columnWindow.Indexes.TryGetValue(column, out var virtualColumnIndex))
+            {
+                AddVirtualColumnAttributes(cellAttributes ??= new(), virtualColumnIndex);
             }
 
             var hasTemplate = column.Template != null;
@@ -808,13 +842,27 @@
                         </span>
                     }</text>;
 
-                @RenderCellElement(cellAttributes, cellContent)
+                if (keyed)
+                {
+                    RenderCellElement(cellAttributes, cellContent, column)(__builder);
+                }
+                else
+                {
+                    @RenderCellElement(cellAttributes, cellContent)
+                }
             }
             else
             {
                 @foreach (var c in this.childColumns.Where(c => c.GetVisible() && c.Parent == column))
                 {
-                    @RenderCell(c, Item, this.CellAttributes(Item, c), rowArgs, RowIndex)
+                    if (keyed)
+                    {
+                        RenderCell(c, Item, this.CellAttributes(Item, c), rowArgs, RowIndex, true)(__builder);
+                    }
+                    else
+                    {
+                        @RenderCell(c, Item, this.CellAttributes(Item, c), rowArgs, RowIndex)
+                    }
                 }
             }
             </text>
@@ -822,9 +870,15 @@
     }
 
     // Keep one element frame so toggling context-menu modifiers preserves the cell subtree.
-    RenderFragment RenderCellElement(Dictionary<string, object>? cellAttributes, RenderFragment cellContent) => builder =>
+    RenderFragment RenderCellElement(Dictionary<string, object>? cellAttributes, RenderFragment cellContent, object? key = null) => builder =>
     {
         builder.OpenElement(0, "td");
+
+        if (key != null)
+        {
+            builder.SetKey(key);
+        }
+
         builder.AddAttribute(1, "role", "gridcell");
         builder.AddMultipleAttributes(2, cellAttributes);
 

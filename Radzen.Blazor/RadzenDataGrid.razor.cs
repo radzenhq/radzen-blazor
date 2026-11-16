@@ -728,10 +728,15 @@ namespace Radzen.Blazor
             {
                 if (JSRuntime != null)
                 {
-                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed());
+                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed(), columnWindow?.All.Count);
                     focusedIndex = result[0];
                     focusedCellIndex = result[1];
                     hasActiveRow = true;
+
+                    if (columnWindow != null && (key == "ArrowLeft" || key == "ArrowRight"))
+                    {
+                        await FocusVirtualCell(focusedIndex, focusedCellIndex);
+                    }
                 }
             }
             catch (Exception)
@@ -753,6 +758,8 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="FocusEventArgs"/> instance containing the event data.</param>
         protected virtual async Task OnBlur(FocusEventArgs args)
         {
+            focusedVirtualColumn = -1;
+
             if (JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID);
@@ -3343,9 +3350,12 @@ namespace Radzen.Blazor
 
             this.firstRender = firstRender;
 
-            if (firstRender || visibleChanged)
+            await ApplyPendingVirtualCellFocus();
+
+            if (firstRender || visibleChanged || columnVirtualizationAttached != IsColumnVirtualizationAllowed())
             {
                 visibleChanged = false;
+                columnVirtualizationAttached = IsColumnVirtualizationAllowed();
 
                 if (Visible && JSRuntime != null)
                 {
@@ -3365,7 +3375,7 @@ namespace Radzen.Blazor
                     }
 
                     var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                        "Radzen.createDataGrid", Element);
+                        "Radzen.createDataGrid", Element, columnVirtualizationAttached ? Reference : null);
 
                     if (version == _jsRefVersion)
                     {

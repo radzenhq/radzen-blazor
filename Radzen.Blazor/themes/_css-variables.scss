@@ -665,6 +665,7 @@
   --rz-grid-header-color: #{$grid-header-color};
   --rz-grid-header-cell-padding: #{$grid-header-cell-padding};
   --rz-grid-header-title-padding-inline: #{$grid-header-title-padding-inline};
+  --rz-grid-header-title-padding-inline-reverse: #{if(length($grid-header-title-padding-inline) > 1, nth($grid-header-title-padding-inline, 2) nth($grid-header-title-padding-inline, 1), $grid-header-title-padding-inline)};
   --rz-grid-header-sorted-background-color: #{$grid-header-sorted-background-color};
   --rz-grid-header-padding: #{$grid-header-padding};
   --rz-grid-foot-cell-color: #{$grid-foot-cell-color};

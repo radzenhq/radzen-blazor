@@ -297,6 +297,15 @@ namespace RadzenBlazorDemos
                             Description = "RadzenDataGrid supports virtualization with custom data-binding scenarios. Handle the LoadData event as usual.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
                         },
+                        new Example
+                        {
+                            Name = "Column virtualization",
+                            Path = "datagrid-column-virtualization",
+                            New = true,
+                            Title = "Column Virtualization in a Blazor DataGrid | Free Radzen Blazor",
+                            Description = "RadzenDataGrid renders only the columns that are scrolled into view when AllowColumnVirtualization is enabled.",
+                            Tags = new [] { "datagrid", "columns", "virtualization", "horizontal", "scroll", "performance" }
+                        },
                     }
                 },
                 new Example
