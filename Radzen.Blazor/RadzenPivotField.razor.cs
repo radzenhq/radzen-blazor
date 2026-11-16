@@ -387,14 +387,12 @@ namespace Radzen.Blazor
 
             if ((filterPropertyType == typeof(TimeOnly) || filterPropertyType == typeof(TimeOnly?)) && value is string stringValue)
             {
-                var v = TimeOnly.Parse(stringValue, CultureInfo.InvariantCulture);
-                value = filterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
+                value = TimeOnly.TryParse(stringValue, CultureInfo.InvariantCulture, out var v) ? (filterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v) : null!;
             }
 
             if ((filterPropertyType == typeof(Guid) || filterPropertyType == typeof(Guid?)) && value is string guidString)
             {
-                var v = Guid.Parse(guidString);
-                value = filterPropertyType == typeof(Guid) ? v : (Guid?)v;
+                value = Guid.TryParse(guidString, out var v) ? (filterPropertyType == typeof(Guid) ? v : (Guid?)v) : null!;
             }
 
             if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && (PropertyAccess.IsEnum(filterPropertyType) || PropertyAccess.IsNullableEnum(filterPropertyType)))

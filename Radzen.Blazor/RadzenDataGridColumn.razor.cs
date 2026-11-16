@@ -1198,6 +1198,18 @@ namespace Radzen.Blazor
         FilterOperator? filterOperator;
         object? secondFilterValue;
         bool secondFilterValueCleared;
+        string? unparsedFilterText;
+        string? unparsedSecondFilterText;
+
+        internal object? GetFilterInputValue()
+        {
+            return GetFilterValue() ?? unparsedFilterText;
+        }
+
+        internal object? GetSecondFilterInputValue()
+        {
+            return GetSecondFilterValue() ?? unparsedSecondFilterText;
+        }
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
         CollectionFilterMode? collectionFilterMode;
@@ -1561,17 +1573,46 @@ namespace Radzen.Blazor
                 value = v;
             }
 
-            if ((FilterPropertyType == typeof(TimeOnly) || FilterPropertyType == typeof(TimeOnly?)) && value != null && value is string)
+            string? unparsedText = null;
+
+            if ((FilterPropertyType == typeof(TimeOnly) || FilterPropertyType == typeof(TimeOnly?)) && value is string timeText)
             {
-                var v = TimeOnly.Parse($"{value}", CultureInfo.InvariantCulture);
-                value = FilterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
+                if (TimeOnly.TryParse(timeText, CultureInfo.InvariantCulture, out var v))
+                {
+                    value = FilterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
+                }
+                else
+                {
+                    unparsedText = timeText;
+                    value = null;
+                }
             }
 
-            if ((FilterPropertyType == typeof(Guid) || FilterPropertyType == typeof(Guid?)) && value != null && value is string)
+            if ((FilterPropertyType == typeof(Guid) || FilterPropertyType == typeof(Guid?)) && value is string guidText)
             {
-                // The value comes from a free text box, so text that is not a valid Guid (a fragment, a typo, an
-                // empty string) is expected input. Treat it as no filter value instead of throwing.
-                value = Guid.TryParse($"{value}", out var v) ? (FilterPropertyType == typeof(Guid) ? v : (Guid?)v) : null;
+                if (Guid.TryParse(guidText, out var v))
+                {
+                    value = FilterPropertyType == typeof(Guid) ? v : (Guid?)v;
+                }
+                else
+                {
+                    unparsedText = guidText;
+                    value = null;
+                }
+            }
+
+            if (string.IsNullOrEmpty(unparsedText))
+            {
+                unparsedText = null;
+            }
+
+            if (isFirst)
+            {
+                unparsedFilterText = unparsedText;
+            }
+            else
+            {
+                unparsedSecondFilterText = unparsedText;
             }
 
             if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType))))
@@ -1702,6 +1743,8 @@ namespace Radzen.Blazor
 
             filterValue = null;
             secondFilterValue = null;
+            unparsedFilterText = null;
+            unparsedSecondFilterText = null;
 
             filterValueCleared = FilterTemplate != null || FilterValueTemplate != null;
             secondFilterValueCleared = FilterTemplate != null || SecondFilterValueTemplate != null;
