@@ -197,40 +197,63 @@
 
             if (draggable)
             {
-                jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDraggable", element, dotnetRef, nameof(OnDragStartAsync));
+                var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDraggable", element, dotnetRef, nameof(OnDragStartAsync));
+
+                if (disposed)
+                {
+                    await DisposeJSReferenceAsync(created);
+                    return;
+                }
+
+                jsRef = created;
             }
 
             if (Resizable)
             {
-                jsResizeRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSchedulerResizable", element, dotnetRef, nameof(OnResizeAsync), MinutesPerSlot);
+                var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSchedulerResizable", element, dotnetRef, nameof(OnResizeAsync), MinutesPerSlot);
+
+                if (disposed)
+                {
+                    await DisposeJSReferenceAsync(created);
+                    return;
+                }
+
+                jsResizeRef = created;
             }
         }
     }
 
+    private bool disposed;
 
-    public async ValueTask DisposeAsync()
+    private static async ValueTask DisposeJSReferenceAsync(IJSObjectReference? reference)
     {
+        if (reference == null)
+        {
+            return;
+        }
+
         try
         {
-            if (jsRef != null)
-            {
-                await jsRef.InvokeVoidAsync("dispose");
-                await jsRef.DisposeAsync();
-            }
-
-            if (jsResizeRef != null)
-            {
-                await jsResizeRef.InvokeVoidAsync("dispose");
-                await jsResizeRef.DisposeAsync();
-            }
+            await reference.InvokeVoidAsync("dispose");
+            await reference.DisposeAsync();
         }
         catch (JSDisconnectedException)
         {
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+
+        try
+        {
+            await DisposeJSReferenceAsync(jsRef);
+            await DisposeJSReferenceAsync(jsResizeRef);
         }
         finally
         {
             dotnetRef?.Dispose();
         }
-
     }
 }
