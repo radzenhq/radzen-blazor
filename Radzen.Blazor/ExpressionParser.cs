@@ -4,7 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Linq;
 
 namespace Radzen;
@@ -57,6 +59,8 @@ public class ExpressionParser
     private int position;
     private readonly Func<string, Type?>? typeResolver;
     private readonly Stack<ParameterExpression> parameterStack = new();
+    private readonly HashSet<Type> registeredTypes = new();
+    private int anonymousTypeCount;
 
     private ExpressionParser(string expression, Func<string, Type?>? typeResolver = null)
     {
@@ -112,7 +116,169 @@ public class ExpressionParser
 
         parameterStack.Pop();
 
+        EnsureComplexity(body);
+
         return Expression.Lambda(body, parameter);
+    }
+
+    private const int MaxExpressionDepth = 300;
+    private const int OperandDepthCost = 3;
+    private const int MaxAnonymousTypes = 64;
+    private const int MaxAnonymousTypeMembers = 256;
+    private const int MaxTypeNameParts = 32;
+    private const long MaxExpressionSize = 100_000;
+
+    private void EnsureComplexity(Expression root)
+    {
+        var measured = new Dictionary<Expression, (long Size, int Depth)>(ReferenceEqualityComparer.Instance);
+        var pending = new Stack<(Expression Node, bool Expanded)>();
+
+        pending.Push((root, false));
+
+        while (pending.Count > 0)
+        {
+            var (node, expanded) = pending.Pop();
+
+            if (measured.ContainsKey(node))
+            {
+                continue;
+            }
+
+            if (!expanded)
+            {
+                pending.Push((node, true));
+
+                foreach (var child in GetChildren(node))
+                {
+                    if (!measured.ContainsKey(child))
+                    {
+                        pending.Push((child, false));
+                    }
+                }
+
+                continue;
+            }
+
+            long size = 1;
+            var depth = 0;
+
+            foreach (var child in GetChildren(node))
+            {
+                var (childSize, childDepth) = measured[child];
+
+                size += childSize;
+                depth = Math.Max(depth, childDepth);
+            }
+
+            depth += node.NodeType is ExpressionType.AndAlso or ExpressionType.OrElse ? 1 : OperandDepthCost;
+
+            if (depth > MaxExpressionDepth || size > MaxExpressionSize)
+            {
+                throw new InvalidOperationException("Expression is too complex.");
+            }
+
+            measured[node] = (size, depth);
+        }
+    }
+
+    private static MemberExpression PublicPropertyOrField(Expression expression, string name)
+    {
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy;
+
+        var property = expression.Type.GetProperty(name, flags);
+
+        if (property != null)
+        {
+            return Expression.Property(expression, property);
+        }
+
+        var field = expression.Type.GetField(name, flags);
+
+        if (field != null)
+        {
+            return Expression.Field(expression, field);
+        }
+
+        throw new ArgumentException($"'{Shorten(name)}' is not a member of type '{expression.Type}'", nameof(name));
+    }
+
+    private static IEnumerable<Expression> GetChildren(Expression node)
+    {
+        switch (node)
+        {
+            case BinaryExpression binary:
+                yield return binary.Left;
+                yield return binary.Right;
+                break;
+            case UnaryExpression unary:
+                yield return unary.Operand;
+                break;
+            case ConditionalExpression conditional:
+                yield return conditional.Test;
+                yield return conditional.IfTrue;
+                yield return conditional.IfFalse;
+                break;
+            case MethodCallExpression call:
+                if (call.Object != null)
+                {
+                    yield return call.Object;
+                }
+                foreach (var argument in call.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case MemberExpression member:
+                if (member.Expression != null)
+                {
+                    yield return member.Expression;
+                }
+                break;
+            case IndexExpression index:
+                if (index.Object != null)
+                {
+                    yield return index.Object;
+                }
+                foreach (var argument in index.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case NewArrayExpression array:
+                foreach (var element in array.Expressions)
+                {
+                    yield return element;
+                }
+                break;
+            case MemberInitExpression init:
+                foreach (var binding in init.Bindings)
+                {
+                    if (binding is MemberAssignment assignment)
+                    {
+                        yield return assignment.Expression;
+                    }
+                }
+                break;
+            case NewExpression creation:
+                foreach (var argument in creation.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case LambdaExpression lambda:
+                yield return lambda.Body;
+                break;
+            case InvocationExpression invocation:
+                yield return invocation.Expression;
+                foreach (var argument in invocation.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case TypeBinaryExpression typeBinary:
+                yield return typeBinary.Expression;
+                break;
+        }
     }
 
     private Expression ParseExpression(ParameterExpression parameter)
@@ -142,6 +308,8 @@ public class ExpressionParser
 
     private Expression ParseBinary(ParameterExpression parameter)
     {
+        EnsureStack();
+
         var left = ParseNullCoalescing(parameter);
         var token = Peek();
 
@@ -213,6 +381,8 @@ public class ExpressionParser
 
     private Expression ParseMemberAccess(Expression expression, ParameterExpression parameter)
     {
+        EnsureStack();
+
         var token = Peek();
         while (token.Type is TokenType.Dot or TokenType.QuestionDot or TokenType.OpenBracket)
         {
@@ -226,7 +396,9 @@ public class ExpressionParser
                 }
                 else
                 {
-                    expression = Expression.PropertyOrField(expression, token.Value);
+                    GuardReflectionType(expression.Type);
+                    expression = PublicPropertyOrField(expression, token.Value);
+                    GuardReflectionType(expression.Type);
                 }
             }
             else if (token.Type == TokenType.QuestionDot)
@@ -243,7 +415,9 @@ public class ExpressionParser
                 }
                 else
                 {
-                    var access = Expression.PropertyOrField(expression, token.Value);
+                    GuardReflectionType(expression.Type);
+                    var access = PublicPropertyOrField(expression, token.Value);
+                    GuardReflectionType(access.Type);
 
                     expression = Expression.Condition(check, Expression.Default(access.Type), access);
 
@@ -263,6 +437,8 @@ public class ExpressionParser
                 var index = ParseExpression(parameter);
                 Expect(TokenType.CloseBracket);
 
+                GuardReflectionType(expression.Type);
+
                 if (expression.Type.IsArray)
                 {
                     expression = Expression.ArrayIndex(expression, index);
@@ -273,6 +449,8 @@ public class ExpressionParser
 
                     expression = Expression.Property(expression, indexer, index);
                 }
+
+                GuardReflectionType(expression.Type);
             }
 
             token = Peek();
@@ -283,6 +461,13 @@ public class ExpressionParser
 
     private MethodCallExpression ParseInvocation(Expression expression, string methodName, ParameterExpression parameter)
     {
+        GuardReflectionType(expression.Type);
+
+        if (methodName == nameof(GetType) || methodName == nameof(Type.GetTypeCode))
+        {
+            throw new InvalidOperationException($"Invocation of '{methodName}' is not allowed.");
+        }
+
         Advance(1);
 
         var arguments = new List<Expression>();
@@ -301,8 +486,7 @@ public class ExpressionParser
 
                     Type? lambdaParameterType = null;
 
-                    var extensionMethod = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                        .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == 2);
+                    var extensionMethod = FindEnumerableMethod(methodName, 2);
 
                     if (extensionMethod != null)
                     {
@@ -340,11 +524,14 @@ public class ExpressionParser
 
         if (method != null)
         {
+            GuardReflectionType(method.ReturnType);
+
             return Expression.Call(expression, method, arguments);
         }
 
-        method = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                   .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Count + 1);
+        method = typeof(System.Collections.IEnumerable).IsAssignableFrom(expression.Type)
+            ? FindEnumerableMethod(methodName, arguments.Count + 1)
+            : null;
 
         if (method != null)
         {
@@ -364,10 +551,20 @@ public class ExpressionParser
 
             var argumentsWithInstance = new[] { expression }.Concat(arguments).ToArray();
 
+            GuardReflectionType(method.ReturnType);
+
             return Expression.Call(method, argumentsWithInstance.Select((a, index) => ConvertIfNeeded(a, parameters[index].ParameterType)));
         }
 
-        throw new InvalidOperationException($"No suitable method '{methodName}' found for type '{expression.Type}'");
+        throw new InvalidOperationException($"No suitable method '{Shorten(methodName)}' found for type '{expression.Type}'");
+    }
+
+    private static MethodInfo? FindEnumerableMethod(string methodName, int parameterCount)
+    {
+        return typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .FirstOrDefault(m => m.Name == methodName
+                && m.GetParameters().Length == parameterCount
+                && typeof(System.Collections.IEnumerable).IsAssignableFrom(m.GetParameters()[0].ParameterType));
     }
 
     private static Type? GetItemType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type enumerableOrArray)
@@ -375,7 +572,26 @@ public class ExpressionParser
         return enumerableOrArray.IsArray ? enumerableOrArray.GetElementType() : enumerableOrArray.GetGenericArguments()[0];
     }
 
+    private static void EnsureStack()
+    {
+        try
+        {
+            RuntimeHelpers.EnsureSufficientExecutionStack();
+        }
+        catch (InsufficientExecutionStackException)
+        {
+            throw new InvalidOperationException("Expression nesting is too deep.");
+        }
+    }
+
     private Expression? ParseTerm(ParameterExpression parameter)
+    {
+        EnsureStack();
+
+        return ParseTermCore(parameter);
+    }
+
+    private Expression? ParseTermCore(ParameterExpression parameter)
     {
         var token = Peek();
 
@@ -408,8 +624,10 @@ public class ExpressionParser
 
                 if (!TryParseTypeReference(out var defaultType))
                 {
-                    throw new InvalidOperationException($"Could not resolve type in default expression at position {position}");
+                    throw new InvalidOperationException($"Could not resolve type in default expression at position {position}. {RegistrationHint(null)}");
                 }
+
+                GuardReflectionType(defaultType);
 
                 Expect(TokenType.CloseParen);
 
@@ -442,7 +660,7 @@ public class ExpressionParser
                 return ParseInvocation(parameter, token.Value, parameter);
             }
 
-            throw new InvalidOperationException($"Unexpected identifier: {token.Value}");
+            throw new InvalidOperationException($"Unexpected identifier: {Shorten(token.Value)}. If this is a type name: {RegistrationHint(null)}");
         }
 
         if (token.Type == TokenType.ExclamationMark)
@@ -510,7 +728,7 @@ public class ExpressionParser
                                 if (Peek().Type == TokenType.Dot || Peek().Type == TokenType.QuestionDot)
                                 {
                                     // Handle nested property access
-                                    Expression expr = propertyName == parameter.Name ? (Expression)parameter : Expression.Property(parameter, propertyName);
+                                    Expression expr = propertyName == parameter.Name ? (Expression)parameter : PublicPropertyOrField(parameter, propertyName);
                                     propertyExpression = ParseMemberAccess(expr, parameter);
 
                                     // Get the last identifier token's value
@@ -557,6 +775,12 @@ public class ExpressionParser
 
                     var propertyTypes = properties.Select(p => p.Expression.Type).ToArray();
                     var propertyNames = properties.Select(p => p.Name).ToArray();
+
+                    if (++anonymousTypeCount > MaxAnonymousTypes || properties.Count > MaxAnonymousTypeMembers)
+                    {
+                        throw new InvalidOperationException("Expression is too complex.");
+                    }
+
                     var dynamicType = DynamicTypeFactory.CreateType(parameter.Type.Name, propertyNames, propertyTypes);
                     var bindings = properties.Select(p => Expression.Bind(dynamicType.GetProperty(p.Name)!, p.Expression));
                     return Expression.MemberInit(Expression.New(dynamicType), bindings);
@@ -568,6 +792,11 @@ public class ExpressionParser
                     if (TryParseQualifiedArrayType(out var parsedElementType))
                     {
                         elementType = parsedElementType;
+
+                        if (elementType != null)
+                        {
+                            GuardReflectionType(elementType);
+                        }
                     }
 
                     Expect(TokenType.OpenBracket);
@@ -661,7 +890,18 @@ public class ExpressionParser
         {
             var name = typeName.ToString();
 
-            var type = ResolveType(name) ?? throw new InvalidOperationException($"Could not resolve type: {typeName}");
+            var type = ResolveType(name);
+
+            if (type == null)
+            {
+                var startsWithParameter = parameterStack.Any(p => name == p.Name || name.StartsWith(p.Name + ".", StringComparison.Ordinal));
+
+                throw new InvalidOperationException(startsWithParameter
+                    ? $"Could not resolve type: {Shorten(name)}"
+                    : $"Could not resolve type: {Shorten(name)}. {RegistrationHint(name)}");
+            }
+
+            GuardReflectionType(type);
 
             if (nullable && type.IsValueType)
             {
@@ -690,6 +930,8 @@ public class ExpressionParser
 
     private Expression ParseStaticMemberAccess([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicMethods)] Type type, ParameterExpression parameter)
     {
+        GuardReflectionType(type);
+
         Expect(TokenType.Dot);
 
         var token = Expect(TokenType.Identifier);
@@ -707,7 +949,16 @@ public class ExpressionParser
                 throw new InvalidOperationException($"Member {token.Value} not found on type {type.Name}");
             }
 
-            return Expression.MakeMemberAccess(null, member);
+            if (!IsStaticMemberReadAllowed(type, member))
+            {
+                throw new InvalidOperationException($"Access to static member '{token.Value}' on type '{type.FullName}' is not allowed. {RegistrationHint(type.FullName)}");
+            }
+
+            var access = Expression.MakeMemberAccess(null, member);
+
+            GuardReflectionType(access.Type);
+
+            return access;
         }
 
         throw new InvalidOperationException($"Expected method invocation after {token.Value} at position {position}");
@@ -715,6 +966,16 @@ public class ExpressionParser
 
     private Expression ParseStaticInvocation([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type, string methodName, ParameterExpression parameter)
     {
+        if (!IsStaticInvocationAllowed(type))
+        {
+            throw new InvalidOperationException($"Static method invocation on type '{type.FullName}' is not allowed. {RegistrationHint(type.FullName)}");
+        }
+
+        if (type == typeof(string) && methodName is nameof(string.Intern) or nameof(string.IsInterned))
+        {
+            throw new InvalidOperationException($"Invocation of '{methodName}' is not allowed.");
+        }
+
         Advance(1);
 
         var arguments = new List<Expression>();
@@ -732,7 +993,9 @@ public class ExpressionParser
 
         Expect(TokenType.CloseParen);
 
-        var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {methodName} not found on type {type.Name}");
+        var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {Shorten(methodName)} not found on type {type.Name}");
+
+        GuardReflectionType(method.ReturnType);
 
         return Expression.Call(null, method, arguments);
     }
@@ -831,7 +1094,7 @@ public class ExpressionParser
             Advance(1);
         }
 
-        for (var i = parts.Count; i >= 1; i--)
+        for (var i = Math.Min(parts.Count, MaxTypeNameParts); i >= 1; i--)
         {
             var typeName = string.Join(".", parts.Take(i));
             var resolvedType = ResolveType(typeName);
@@ -902,7 +1165,7 @@ public class ExpressionParser
             return false;
         }
 
-        for (var i = parts.Count; i >= 1; i--)
+        for (var i = Math.Min(parts.Count, MaxTypeNameParts); i >= 1; i--)
         {
             var typeName = string.Join(".", parts.Take(i));
             var resolvedType = ResolveType(typeName);
@@ -922,26 +1185,245 @@ public class ExpressionParser
     }
 
     /// <summary>
-    /// Resolves a type name using well-known types, the optional type resolver, or by searching loaded assemblies.
-    /// This allows any type from loaded assemblies to be resolved without hardcoding.
+    /// Gets or sets the resolver for types that expression strings refer to by name, other than framework
+    /// value types and enums, which are always resolved. Types returned by the resolver can be used as cast
+    /// targets, in <c>default(T)</c> and typed arrays, and their static members and methods can be accessed.
     /// </summary>
+    /// <example>
+    /// Register the application types that filter, sort or select strings use:
+    /// <code>
+    /// ExpressionParser.TypeResolver = name => name switch
+    /// {
+    ///     "MyApp.Models.Money" => typeof(MyApp.Models.Money),
+    ///     "MyApp.Filters.Helpers" => typeof(MyApp.Filters.Helpers),
+    ///     _ => null
+    /// };
+    /// </code>
+    /// Resolve every loaded type by name. Use this only when all expression strings come from a trusted source:
+    /// <code>
+    /// ExpressionParser.TypeResolver = ExpressionParser.ResolveTypeFromAssemblies;
+    /// </code>
+    /// </example>
+    public static Func<string, Type?>? TypeResolver { get; set; }
+
     private Type? ResolveType(string typeName)
     {
-        return GetWellKnownType(typeName)
-            ?? typeResolver?.Invoke(typeName)
-            ?? ResolveTypeFromAssemblies(typeName);
+        var type = GetWellKnownType(typeName) ?? ResolveWellKnownFullName(typeName);
+
+        if (type != null)
+        {
+            return type;
+        }
+
+        type = typeResolver?.Invoke(typeName) ?? TypeResolver?.Invoke(typeName);
+
+        if (type != null)
+        {
+            registeredTypes.Add(type);
+
+            return type;
+        }
+
+        return ResolveEnumTypeFromAssemblies(typeName);
+    }
+
+    private static string Shorten(string value) => value.Length > 100 ? value[..100] + "..." : value;
+
+    private static string RegistrationHint(string? typeName)
+    {
+        var name = typeName == null ? "MyApp.MyType" : Shorten(typeName);
+
+        return "Types other than framework value types and enums must be registered before they can be used in an expression string, for example: "
+            + $"ExpressionParser.TypeResolver = name => name == \"{name}\" ? typeof({name}) : null;";
+    }
+
+    private static volatile Dictionary<string, Type>? typeNameCache;
+    private static int typeNameCacheVersion;
+    private static int typeNameCacheSubscribed;
+
+    [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
+    private static Type? ResolveEnumTypeFromAssemblies(string typeName)
+    {
+        var type = ResolveLoadedType(typeName);
+
+        return type != null && type.IsEnum ? type : null;
     }
 
     [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
-    private static Type? ResolveTypeFromAssemblies(string typeName)
+    private static Type? ResolveLoadedType(string typeName)
+    {
+        var cache = typeNameCache;
+
+        if (cache == null)
+        {
+            if (Interlocked.Exchange(ref typeNameCacheSubscribed, 1) == 0)
+            {
+                AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
+            }
+
+            var version = Volatile.Read(ref typeNameCacheVersion);
+
+            cache = BuildTypeNameCache(AppDomain.CurrentDomain.GetAssemblies());
+
+            if (version == Volatile.Read(ref typeNameCacheVersion))
+            {
+                typeNameCache = cache;
+
+                if (version != Volatile.Read(ref typeNameCacheVersion))
+                {
+                    typeNameCache = null;
+                }
+            }
+        }
+
+        return cache.TryGetValue(typeName, out var type) ? type : null;
+    }
+
+    private static void OnAssemblyLoad(object? sender, AssemblyLoadEventArgs args)
+    {
+        if (args.LoadedAssembly.IsDynamic || args.LoadedAssembly.IsCollectible)
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref typeNameCacheVersion);
+        typeNameCache = null;
+    }
+
+    [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
+    private static Dictionary<string, Type> BuildTypeNameCache(Assembly[] assemblies)
+    {
+        var map = new Dictionary<string, Type>(StringComparer.Ordinal);
+
+        foreach (var type in assemblies.Where(a => !a.IsCollectible && !a.IsDynamic).SelectMany(GetLoadableTypes))
+        {
+            if (!type.IsEnum)
+            {
+                continue;
+            }
+
+            var fullName = type.FullName;
+            if (fullName != null)
+            {
+                var key = fullName.Replace("+", ".", StringComparison.Ordinal);
+
+                if (!map.TryGetValue(key, out var existing) || (!existing.IsVisible && type.IsVisible))
+                {
+                    map[key] = type;
+                }
+            }
+        }
+
+        return map;
+    }
+
+    private static Type? ResolveWellKnownFullName(string typeName)
+    {
+        if (!typeName.StartsWith("System.", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var resolved = GetWellKnownType(typeName.Split('.')[^1]);
+
+        return resolved?.FullName == typeName ? resolved : null;
+    }
+
+    /// <summary>
+    /// Resolves a type by its full name by scanning the loaded assemblies. The parser does not use it by
+    /// default. Assign it to <see cref="TypeResolver"/> to resolve every loaded type by name; do this only
+    /// when all expression strings come from a trusted source.
+    /// </summary>
+    [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
+    public static Type? ResolveTypeFromAssemblies(string typeName)
     {
         return AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(a => a.GetTypes())
+            .SelectMany(GetLoadableTypes)
             .FirstOrDefault(t =>
             {
                 var fullName = t.FullName;
                 return fullName != null && fullName.Replace("+", ".", StringComparison.Ordinal) == typeName;
             });
+    }
+
+    [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(t => t != null)!;
+        }
+    }
+
+    private static readonly HashSet<Type> StaticInvocationAllowedTypes = new()
+    {
+        typeof(DateTime), typeof(DateOnly), typeof(TimeOnly), typeof(DateTimeOffset),
+        typeof(Guid), typeof(TimeSpan), typeof(DateTimeStyles), typeof(DateTimeKind),
+        typeof(double), typeof(float), typeof(int), typeof(long), typeof(short),
+        typeof(byte), typeof(sbyte), typeof(uint), typeof(ulong), typeof(ushort),
+        typeof(bool), typeof(char), typeof(decimal), typeof(string),
+        typeof(Math), typeof(Convert)
+    };
+
+    private bool IsStaticInvocationAllowed(Type type) => StaticInvocationAllowedTypes.Contains(type) || IsRegistered(type);
+
+    private bool IsRegistered(Type type)
+    {
+        if (registeredTypes.Contains(type))
+        {
+            return true;
+        }
+
+        var name = type.FullName?.Replace("+", ".", StringComparison.Ordinal);
+
+        if (name != null && (typeResolver?.Invoke(name) ?? TypeResolver?.Invoke(name)) == type)
+        {
+            registeredTypes.Add(type);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static Type Unwrap(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type) ?? type;
+        return underlying.IsArray ? (underlying.GetElementType() ?? underlying) : underlying;
+    }
+
+    private static bool IsReflectionType(Type type)
+    {
+        var t = Unwrap(type);
+        return typeof(MemberInfo).IsAssignableFrom(t)
+            || typeof(Assembly).IsAssignableFrom(t)
+            || typeof(Module).IsAssignableFrom(t)
+            || typeof(Delegate).IsAssignableFrom(t)
+            || t == typeof(AppDomain)
+            || t == typeof(Type)
+            || (t.Namespace != null && t.Namespace.StartsWith("System.Reflection", StringComparison.Ordinal));
+    }
+
+    private static void GuardReflectionType(Type type)
+    {
+        if (IsReflectionType(type))
+        {
+            throw new InvalidOperationException($"Access to reflection type '{Unwrap(type).FullName}' is not allowed.");
+        }
+    }
+
+    private bool IsStaticMemberReadAllowed(Type declaringType, MemberInfo member)
+    {
+        if (StaticInvocationAllowedTypes.Contains(declaringType) || declaringType == typeof(CultureInfo) || declaringType.IsEnum || IsRegistered(declaringType))
+        {
+            return true;
+        }
+
+        return member is FieldInfo { IsLiteral: true };
     }
 
     private static Type? GetWellKnownType(string typeName)
@@ -972,6 +1454,15 @@ public class ExpressionParser
             nameof(String) or "string" => typeof(string),
             nameof(Math) => typeof(Math),
             nameof(Convert) => typeof(Convert),
+            nameof(TimeSpan) => typeof(TimeSpan),
+            nameof(StringComparison) => typeof(StringComparison),
+            nameof(DayOfWeek) => typeof(DayOfWeek),
+            nameof(Object) or "object" => typeof(object),
+            nameof(Uri) => typeof(Uri),
+            nameof(Version) => typeof(Version),
+            nameof(Int128) => typeof(Int128),
+            nameof(UInt128) => typeof(UInt128),
+            nameof(Half) => typeof(Half),
             _ => null
         };
     }
