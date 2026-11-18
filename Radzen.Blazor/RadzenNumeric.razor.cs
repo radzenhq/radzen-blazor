@@ -123,7 +123,8 @@ namespace Radzen.Blazor
                     var maxArg = Max.HasValue ? (object)Max.Value.ToString(CultureInfo.InvariantCulture) : null;
                     var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createNumeric", Element, IsInteger(),
-                        Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable);
+                        Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable,
+                        Culture.NumberFormat.NumberGroupSeparator);
 
                     if (version == _jsRefVersion)
                     {

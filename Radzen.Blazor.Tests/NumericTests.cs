@@ -1119,5 +1119,24 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("hops-label", input.GetAttribute("aria-labelledby"));
             Assert.False(input.HasAttribute("aria-label"));
         }
+
+        [Fact]
+        public void Numeric_Passes_Culture_Separators_To_Js()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var culture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
+            ctx.RenderComponent<RadzenNumeric<decimal>>(parameters => parameters
+                .Add(p => p.Min, 0)
+                .Add(p => p.Max, 100)
+                .Add(p => p.Culture, culture));
+
+            var invocation = Assert.Single(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.createNumeric");
+
+            Assert.Equal(culture.NumberFormat.NumberDecimalSeparator, invocation.Arguments[2]);
+            Assert.Equal(culture.NumberFormat.NumberGroupSeparator, invocation.Arguments[6]);
+        }
     }
 }

@@ -2686,7 +2686,7 @@ window.Radzen = {
       : null;
     return uiCulture || 'en-US';
   },
-  numericOnPaste: function (e, min, max, locale = navigator.language) {
+  numericOnPaste: function (e, min, max, locale = navigator.language, decimalSeparator, groupSeparator) {
     if (!e.clipboardData) return;
 
     let value = e.clipboardData.getData("text");
@@ -2697,16 +2697,22 @@ window.Radzen = {
 
     value = String(value).trim();
 
-    const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
-
     let group = ",";
     let decimal = ".";
 
-    for (const p of parts) {
-        if (p.type === "group") group = p.value;
-        if (p.type === "decimal") decimal = p.value;
+    if (decimalSeparator) {
+        decimal = decimalSeparator;
+        group = groupSeparator || "";
+    } else {
+        const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
+
+        for (const p of parts) {
+            if (p.type === "group") group = p.value;
+            if (p.type === "decimal") decimal = p.value;
+        }
     }
 
+    group = group.replace(/[\u00A0\u202F]/g, " ");
     value = value.replace(/[\u00A0\u202F]/g, " ");
 
     if (group) {
@@ -8359,13 +8365,13 @@ Radzen.createMask = function(el, id, mask, pattern, charPattern) {
   el.addEventListener('input', onInput);
   return { dispose: function() { el.removeEventListener('input', onInput); }};
 };
-Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) {
+Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable, groupSeparator) {
   if (!el) return { dispose: function() {} };
   var input = el.querySelector('.rz-numeric-input');
   if (!input) return { dispose: function() {} };
   function onKeypress(e) { Radzen.numericKeyPress(e, isInteger, separator); }
   function onBlur(e) { Radzen.numericOnInput(e, min, max, isNullable); }
-  function onPaste(e) { Radzen.numericOnPaste(e, min, max); }
+  function onPaste(e) { Radzen.numericOnPaste(e, min, max, undefined, separator, groupSeparator); }
   input.addEventListener('keypress', onKeypress);
   if (min !== null || max !== null) {
     input.addEventListener('blur', onBlur);
