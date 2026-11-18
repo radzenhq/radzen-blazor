@@ -4637,6 +4637,17 @@ namespace Radzen.Blazor
             return false;
         }
 
+        List<GroupDescriptor> GetGroupsOfExistingColumns(IEnumerable<GroupDescriptor> groups)
+        {
+            var groupProperties = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection))
+                .Where(c => c.Groupable)
+                .Select(c => c.GetGroupProperty())
+                .Where(p => !string.IsNullOrEmpty(p))
+                .ToHashSet();
+
+            return groups.Where(g => g.Property != null && groupProperties.Contains(g.Property)).ToList();
+        }
+
         /// <summary>
         /// Load DataGrid settings saved from the GetSettings() method.
         /// This internal method handles the actual loading or updating of the DataGrid settings.
@@ -4750,9 +4761,10 @@ namespace Radzen.Blazor
                     }
                 }
 
-                if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
+                var settingsGroups = settings.Groups != null ? GetGroupsOfExistingColumns(settings.Groups) : null;
+
+                if (settingsGroups != null && !settingsGroups.SequenceEqual(Groups))
                 {
-                    var settingsGroups = settings.Groups.ToList();
                     suppressGroupsCollectionChanged = true;
 
                     try

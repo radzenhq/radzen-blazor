@@ -1421,9 +1421,19 @@ public class ExpressionParser
             throw new InvalidOperationException($"Access to reflection type '{Unwrap(node.Type).FullName}' is not allowed.");
         }
 
-        if (node.NodeType == ExpressionType.Invoke)
+        var supported = node switch
         {
-            throw new InvalidOperationException("Delegate invocation is not allowed.");
+            BinaryExpression or UnaryExpression or ConditionalExpression or MethodCallExpression or MemberExpression
+                or IndexExpression or NewArrayExpression or LambdaExpression or ConstantExpression or ParameterExpression
+                or DefaultExpression or TypeBinaryExpression => true,
+            NewExpression creation => creation.Type.Assembly.IsDynamic,
+            MemberInitExpression init => init.Bindings.All(binding => binding is MemberAssignment),
+            _ => false
+        };
+
+        if (!supported)
+        {
+            throw new InvalidOperationException($"Expression of kind '{node.NodeType}' is not allowed.");
         }
 
         var method = node switch
