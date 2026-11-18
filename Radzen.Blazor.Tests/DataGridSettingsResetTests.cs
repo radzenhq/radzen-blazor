@@ -76,5 +76,28 @@ namespace Radzen.Blazor.Tests
             // reset that rebuilds the list from allColumns without ordering it produces.
             Assert.Equal(new[] { "Name", "City", "Id" }, HeaderTitles(component));
         }
+
+        [Fact]
+        public async Task DataGrid_LoadSettings_KeepsOnlyGroupsOfExistingColumns()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = Render(ctx);
+            var grid = component.Instance;
+
+            await component.InvokeAsync(() => grid.Settings = new DataGridSettings
+            {
+                Groups = new[]
+                {
+                    new GroupDescriptor { Property = "City" },
+                    new GroupDescriptor { Property = "Unknown" }
+                }
+            });
+            await component.InvokeAsync(() => grid.ReloadSettings(true));
+
+            Assert.Equal(new[] { "City" }, grid.Groups.Select(g => g.Property).ToArray());
+        }
     }
 }
