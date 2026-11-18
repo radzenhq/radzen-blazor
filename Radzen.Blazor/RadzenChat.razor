@@ -171,8 +171,9 @@
         <div class="rz-chat-input">
             <div class="rz-chat-input-inner">
                 <textarea @ref="inputElement" 
-                          value="@CurrentInput"
-                          @oninput="OnInput" 
+                          @bind:get="CurrentInput"
+                          @bind:set="OnInput"
+                          @bind:event="oninput"
                           @onkeydown="OnKeyDown"
                           data-mention-segments="@MentionSegmentsAttribute"
                           class="rz-textarea rz-chat-textarea"

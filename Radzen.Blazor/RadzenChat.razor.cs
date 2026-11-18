@@ -668,10 +668,10 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task OnInput(ChangeEventArgs e)
+        private async Task OnInput(string value)
         {
             var previousInput = CurrentInput;
-            CurrentInput = e.Value?.ToString() ?? "";
+            CurrentInput = value ?? "";
             ReconcileMentionInputSegments(previousInput, CurrentInput);
             await NotifyCurrentUserTyping();
             await DetectMentionTrigger(CurrentInput);
