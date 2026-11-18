@@ -2770,6 +2770,11 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the value for the <c>aria-invalid</c> attribute. Returns <c>"true"</c> when the field has validation messages in the <see cref="EditContext" />, otherwise <c>null</c>.
+        /// </summary>
+        protected string? ValidationAriaInvalid => EditContext != null && FieldIdentifier.FieldName != null && EditContext.GetValidationMessages(FieldIdentifier).Any() ? "true" : null;
+
         private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();

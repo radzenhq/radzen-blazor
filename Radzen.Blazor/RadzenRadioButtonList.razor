@@ -14,7 +14,7 @@
 }
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+    <div @ref="@Element" style="@Style" aria-invalid="@ValidationAriaInvalid" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="radiogroup" aria-disabled="@(Disabled ? "true" : "false")" @onfocus=@OnFocus @onblur=@OnBlur
          aria-activedescendant="@ActiveDescendantId" aria-label="@GroupAriaLabel" aria-labelledby="@(AriaLabelledBy ?? FormFieldLabelledBy)"
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:stopPropagation="stopKeydownPropagation">

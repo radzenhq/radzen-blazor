@@ -5,7 +5,7 @@
 @inherits FormComponent<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault @onclick=@Toggle @onclick:preventDefault style="@Style"
+    <div @ref="@Element" aria-invalid="@ValidationAriaInvalid" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault @onclick=@Toggle @onclick:preventDefault style="@Style"
          role="checkbox" aria-checked="@CheckBoxAriaChecked" aria-label="@AriaLabel" aria-labelledby="@(string.IsNullOrEmpty(AriaLabel) ? FormFieldLabelledBy : null)" aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
          tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")" id="@GetId()">
         <div class="rz-helper-hidden-accessible">

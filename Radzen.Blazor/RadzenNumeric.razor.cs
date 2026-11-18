@@ -453,23 +453,32 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets the value exposed via the <c>aria-invalid</c> attribute of the spinbutton input.
-        /// Returns <c>"true"</c> when the current value is outside the configured <see cref="Min" />/<see cref="Max" /> range,
-        /// or <c>null</c> when the value is within range or <see cref="Min" />/<see cref="Max" /> are not set.
+        /// Returns <c>"true"</c> when the current value is outside the configured <see cref="Min" />/<see cref="Max" /> range
+        /// or the field has validation messages in the <see cref="FormComponent{T}.EditContext" />,
+        /// otherwise the <c>aria-invalid</c> value supplied through <see cref="InputAttributes" />, or <c>null</c> when there is none.
         /// </summary>
         protected string? AriaInvalid
         {
             get
             {
-                if (_value == null || (Min == null && Max == null))
+                if (_value != null && (Min != null || Max != null))
                 {
-                    return null;
+                    var current = ConvertToDecimal(_value);
+
+                    if (Min != null && current < Min.Value || Max != null && current > Max.Value)
+                    {
+                        return "true";
+                    }
                 }
 
-                var current = ConvertToDecimal(_value);
-
-                if (Min != null && current < Min.Value || Max != null && current > Max.Value)
+                if (ValidationAriaInvalid != null)
                 {
                     return "true";
+                }
+
+                if (InputAttributes != null && InputAttributes.TryGetValue("aria-invalid", out var inputAriaInvalid))
+                {
+                    return inputAriaInvalid?.ToString();
                 }
 
                 return null;

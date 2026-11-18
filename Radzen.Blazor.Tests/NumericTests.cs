@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Bunit;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -1087,6 +1088,75 @@ namespace Radzen.Blazor.Tests
             var input = component.Find("input[role=spinbutton]");
 
             Assert.Equal("Hops", input.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Numeric_Keeps_AriaInvalid_From_InputAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenNumeric<decimal>>(parameters => parameters
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["aria-invalid"] = "true" }));
+
+            var input = component.Find("input[role=spinbutton]");
+
+            Assert.Equal("true", input.GetAttribute("aria-invalid"));
+        }
+
+        [Fact]
+        public void Numeric_Out_Of_Range_AriaInvalid_Wins_Over_InputAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenNumeric<decimal>>(parameters => parameters
+                .Add(p => p.Value, 200m)
+                .Add(p => p.Max, 100m)
+                .Add(p => p.InputAttributes, new Dictionary<string, object> { ["aria-invalid"] = "false" }));
+
+            var input = component.Find("input[role=spinbutton]");
+
+            Assert.Equal("true", input.GetAttribute("aria-invalid"));
+        }
+
+        class AriaInvalidModel
+        {
+            public decimal Amount { get; set; }
+        }
+
+        [Fact]
+        public void Numeric_AriaInvalid_Follows_EditContext_Validation_State()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var model = new AriaInvalidModel();
+            var editContext = new EditContext(model);
+            var messages = new ValidationMessageStore(editContext);
+
+            var component = ctx.RenderComponent<RadzenNumeric<decimal>>(parameters => parameters
+                .AddCascadingValue(editContext)
+                .Add(p => p.Value, model.Amount)
+                .Add(p => p.ValueExpression, () => model.Amount));
+
+            Assert.False(component.Find("input[role=spinbutton]").HasAttribute("aria-invalid"));
+
+            component.InvokeAsync(() =>
+            {
+                messages.Add(editContext.Field(nameof(AriaInvalidModel.Amount)), "Amount is invalid");
+                editContext.NotifyValidationStateChanged();
+            });
+
+            Assert.Equal("true", component.Find("input[role=spinbutton]").GetAttribute("aria-invalid"));
+
+            component.InvokeAsync(() =>
+            {
+                messages.Clear();
+                editContext.NotifyValidationStateChanged();
+            });
+
+            Assert.False(component.Find("input[role=spinbutton]").HasAttribute("aria-invalid"));
         }
 
         [Fact]

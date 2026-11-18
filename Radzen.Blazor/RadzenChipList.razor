@@ -16,7 +16,7 @@
 @if (Visible)
 {
     <CascadingValue Value="this" IsFixed="true">
-    <div @ref="@Element" style="@($"{Style};{WrapStyle}")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+    <div @ref="@Element" style="@($"{Style};{WrapStyle}")" aria-invalid="@ValidationAriaInvalid" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="listbox"
          aria-multiselectable="@(Multiple ? "true" : "false")"
          aria-activedescendant="@GetActiveDescendantId()"

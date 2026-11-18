@@ -61,7 +61,7 @@
         else if (View != null)
         {
             <div class="rz-listbox-list-wrapper">
-                <ul @ref="list" id="@ListId" class="rz-listbox-list" role="listbox" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+                <ul @ref="list" id="@ListId" class="rz-listbox-list" aria-invalid="@ValidationAriaInvalid" role="listbox" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                     aria-label="@ListboxAriaLabel" aria-labelledby="@ListboxAriaLabelledBy" aria-multiselectable="@(Multiple ? "true" : "false")"
                     aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId">
                     @RenderItems()
