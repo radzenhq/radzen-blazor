@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -1643,25 +1644,41 @@ public class ExpressionParserTests
 
     public enum TicketStatus { Open, Closed }
 
+    public record Pair(string Left, string Right);
+
     public class Ticket
     {
         public string? City { get; set; }
         public TicketStatus Status { get; set; }
         public List<TicketStatus> Statuses { get; set; } = new();
+        public HashSet<string> Tags { get; set; } = new();
+        public Pair? Pair { get; set; }
         public Type? Kind { get; set; }
         public Func<string>? Factory { get; set; }
         public object? Payload { get; set; }
         internal string? Hidden { get; set; }
         private readonly string secret = "secret";
         public string Reveal() => secret;
+        public bool IsOpen() => Status == TicketStatus.Open;
+        public bool IsClosed() => Status == TicketStatus.Closed;
     }
 
     public static class Helpers
     {
         public const string Name = "radzen";
         public static readonly string Shared = "shared";
-        public static string Current => "current";
         public static string Normalize(string value) => value;
+    }
+
+    internal static class InternalHelpers
+    {
+        public const string Name = "internal";
+    }
+
+    public static class AllowedHelpers
+    {
+        public static readonly string Shared = "shared";
+        public static string Normalize(string value) => value.Trim();
     }
 
     public class Plain
@@ -1669,20 +1686,30 @@ public class ExpressionParserTests
         public string? Name { get; set; }
     }
 
-    private static readonly string PlainName = typeof(Plain).FullName!.Replace("+", ".", StringComparison.Ordinal);
-    private static readonly string HelpersName = typeof(Helpers).FullName!.Replace("+", ".", StringComparison.Ordinal);
-    private static readonly string TicketStatusName = typeof(TicketStatus).FullName!.Replace("+", ".", StringComparison.Ordinal);
+    public class Convertible
+    {
+        public static explicit operator Convertible(string value) => new();
+        public static implicit operator string(Convertible value) => string.Empty;
+        public static Convertible operator +(Convertible left, Convertible right) => left;
+    }
+
+    private static string NameOf(Type type) => type.FullName!.Replace("+", ".", StringComparison.Ordinal);
+
+    private static readonly string PlainName = NameOf(typeof(Plain));
+    private static readonly string HelpersName = NameOf(typeof(Helpers));
+    private static readonly string AllowedHelpersName = NameOf(typeof(AllowedHelpers));
+    private static readonly string ConvertibleName = NameOf(typeof(Convertible));
+    private static readonly string TicketStatusName = NameOf(typeof(TicketStatus));
 
     private static IQueryable<Ticket> Data() => new List<Ticket>
     {
-        new() { City = "Seattle", Status = TicketStatus.Open, Statuses = { TicketStatus.Open } },
+        new() { City = "Seattle", Status = TicketStatus.Open, Statuses = { TicketStatus.Open }, Tags = { "a" } },
         new() { City = "Redmond", Status = TicketStatus.Closed, Statuses = { TicketStatus.Closed } },
     }.AsQueryable();
 
     private static LambdaExpression Parse(string expression) => ExpressionParser.ParseLambda<Ticket>(expression);
 
-    private static LambdaExpression ParseWithResolver(string expression) =>
-        ExpressionParser.ParseLambda<Ticket>(expression, ExpressionParser.ResolveTypeFromAssemblies);
+    private static Func<Ticket, bool> Compile(string expression) => ExpressionParser.ParsePredicate<Ticket>(expression).Compile();
 
     private static IQueryable Project(string selector) => DynamicExtensions.Select(Data(), selector);
 
@@ -1695,112 +1722,66 @@ public class ExpressionParserTests
     }
 
     [Fact]
-    public void ApplicationType_IsNotResolvedByDefault()
+    public void ApplicationTypes_CanBeNamedInCastsDefaultsAndArrays()
     {
-        AssertRejected(() => Parse($"x => {HelpersName}.Normalize(x.City) == null"), "Unexpected identifier");
-        AssertRejected(() => Parse($"x => x.City == {HelpersName}.Name"), "Unexpected identifier");
-        AssertRejected(() => Parse($"x => (({PlainName})x.Payload).Name == \"a\""), "Could not resolve type");
-        AssertRejected(() => Parse($"x => default({PlainName}) == null"), "Could not resolve type");
-        AssertRejected(() => Parse("x => ((System.Text.StringBuilder)x.Payload) == null"), "Could not resolve type");
+        Assert.True(Compile($"x => (({PlainName})x.Payload).Name == \"a\"")(new Ticket { Payload = new Plain { Name = "a" } }));
+        Assert.True(Compile($"x => default({PlainName}) == null")(new Ticket()));
+        Assert.True(Compile($"x => new {PlainName}[] {{ }}.Length == 0")(new Ticket()));
     }
 
     [Fact]
-    public void UnresolvedType_ErrorExplainsHowToRegisterIt()
+    public void ApplicationConstant_IsReadable_OnlyOnPublicTypes()
     {
-        var exception = Assert.Throws<InvalidOperationException>(() => Parse($"x => (({PlainName})x.Payload).Name == \"a\""));
-
-        Assert.Contains("ExpressionParser.TypeResolver", exception.Message);
-        Assert.Contains(PlainName, exception.Message);
-    }
-
-    [Fact]
-    public void RegisteredType_CanBeUsedForCastsAndStaticMembers()
-    {
-        Func<string, Type?> resolver = name => name == HelpersName ? typeof(Helpers) : name == PlainName ? typeof(Plain) : null;
-
-        var cast = ExpressionParser.ParsePredicate<Ticket>($"x => (({PlainName})x.Payload).Name == \"a\"", resolver).Compile();
-        var call = ExpressionParser.ParsePredicate<Ticket>($"x => {HelpersName}.Normalize(x.City) == {HelpersName}.Shared", resolver).Compile();
-        var constant = ExpressionParser.ParsePredicate<Ticket>($"x => x.City == {HelpersName}.Name", resolver).Compile();
-
-        Assert.True(cast(new Ticket { Payload = new Plain { Name = "a" } }));
-        Assert.True(call(new Ticket { City = "shared" }));
-        Assert.True(constant(new Ticket { City = "radzen" }));
-    }
-
-    [Fact]
-    public void RegisteredTypes_DoNotMakeOtherTypesResolvable()
-    {
-        Func<string, Type?> resolver = name => name == PlainName ? typeof(Plain) : null;
-
-        AssertRejected(() => ExpressionParser.ParseLambda<Ticket>($"x => {HelpersName}.Normalize(x.City) == null", resolver), "Unexpected identifier");
-    }
-
-    [Fact]
-    public void TypeResolverSetting_AppliesToStringExtensions()
-    {
-        var previous = ExpressionParser.TypeResolver;
-
-        ExpressionParser.TypeResolver = name => name == HelpersName ? typeof(Helpers) : null;
-
-        try
-        {
-            Assert.Equal("Seattle", Data().Where($"x => {HelpersName}.Normalize(x.City) == \"Seattle\"").Single().City);
-        }
-        finally
-        {
-            ExpressionParser.TypeResolver = previous;
-        }
-    }
-
-    [Fact]
-    public void FrameworkType_OutsideStaticList_CanBeRegistered()
-    {
-        const string expression = "x => Uri.EscapeDataString(x.City) == \"a%20b\"";
-
-        AssertRejected(() => Parse(expression), "is not allowed");
-
-        var predicate = ExpressionParser.ParsePredicate<Ticket>(expression, name => name == "System.Uri" ? typeof(Uri) : null).Compile();
-
-        Assert.True(predicate(new Ticket { City = "a b" }));
-    }
-
-    [Fact]
-    public void ParenthesisedMember_ErrorHasNoRegistrationHint()
-    {
-        var exception = Assert.Throws<InvalidOperationException>(() => Parse("x => (x.City) == \"Seattle\""));
-
-        Assert.DoesNotContain("TypeResolver", exception.Message);
+        Assert.True(Compile($"x => x.City == {HelpersName}.Name")(new Ticket { City = "radzen" }));
+        Assert.Throws<InvalidOperationException>(() => Parse($"x => x.City == {NameOf(typeof(InternalHelpers))}.Name"));
     }
 
     [Theory]
+    [InlineData("Normalize(x.City) == null")]
+    [InlineData("Shared == x.City")]
+    public void ApplicationStaticMembers_AreNotAllowedByDefault(string member)
+    {
+        AssertRejected(() => Parse($"x => {HelpersName}.{member}"), "is not allowed");
+    }
+
+    [Fact]
+    public void AllowedType_StaticMembersWork()
+    {
+        ExpressionParser.AllowType(typeof(AllowedHelpers));
+
+        Assert.True(Compile($"x => {AllowedHelpersName}.Normalize(x.City) == {AllowedHelpersName}.Shared")(new Ticket { City = " shared " }));
+        Assert.Equal("Seattle", Data().Where($"x => {AllowedHelpersName}.Normalize(x.City) == \"Seattle\"").Single().City);
+    }
+
+    [Fact]
+    public void ModelMethods_NeedToBeAllowed()
+    {
+        AssertRejected(() => Parse("x => x.IsOpen()"), "ExpressionParser.AllowMethod");
+
+        ExpressionParser.AllowMethod(typeof(Ticket).GetMethod(nameof(Ticket.IsClosed))!);
+
+        Assert.True(Compile("x => x.IsClosed()")(new Ticket { Status = TicketStatus.Closed }));
+        AssertRejected(() => Parse("x => x.IsOpen()"), "is not allowed");
+    }
+
+    [Theory]
+    [InlineData("x => object.ReferenceEquals(x, x)")]
     [InlineData("x => string.Intern(x.City) == \"a\"")]
-    [InlineData("x => string.IsInterned(x.City) == \"a\"")]
     [InlineData("x => CultureInfo.GetCultureInfo(\"en-US\").Name == \"en-US\"")]
-    public void ProcessWideCaches_AreNotReachable(string expression)
+    [InlineData("x => System.Linq.Enumerable.Range(0, 5).Count() == 5")]
+    [InlineData("x => x.Tags.Add(\"b\")")]
+    [InlineData("x => ((System.Text.StringBuilder)x.Payload).Append(\"a\") != null")]
+    public void MembersOutsideTheAllowList_AreRejected(string expression)
     {
         AssertRejected(() => Parse(expression), "is not allowed");
     }
 
     [Fact]
-    public void CultureInfoStaticProperties_AreReadable()
+    public void CollectionReadsAndFrameworkProperties_Work()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => CultureInfo.InvariantCulture.Name == \"\"").Compile();
-
-        Assert.True(predicate(new Ticket()));
-    }
-
-    [Fact]
-    public void AnonymousTypeWithManyMembers_IsRejected()
-    {
-        var members = string.Join(", ", Enumerable.Range(0, 300).Select(i => $"P{i} = 1"));
-
-        AssertRejected(() => Parse($"x => new {{ {members} }}"), "too complex");
-    }
-
-    [Fact]
-    public void StaticMethod_OnObject_IsNotAllowed()
-    {
-        AssertRejected(() => Parse("x => object.ReferenceEquals(x, x)"), "is not allowed");
+        Assert.True(Compile("x => x.Tags.Contains(\"a\")")(new Ticket { Tags = { "a" } }));
+        Assert.True(Compile("x => ((System.Text.StringBuilder)x.Payload).Length == 2")(new Ticket { Payload = new StringBuilder("ab") }));
+        Assert.True(Compile("x => CultureInfo.InvariantCulture.Name == \"\"")(new Ticket()));
     }
 
     [Theory]
@@ -1808,50 +1789,42 @@ public class ExpressionParserTests
     [InlineData("x => x.GetType() == null")]
     [InlineData("x => ((object)x).GetType() == null")]
     [InlineData("x => x.City?.GetType() == null")]
-    [InlineData("x => x.City.GetTypeCode() == null")]
-    public void GetType_IsNotAllowed(string expression)
+    [InlineData("x => x.Kind.Name == null")]
+    [InlineData("x => x.Kind == null")]
+    [InlineData("x => x.Factory == null")]
+    [InlineData("x => ((System.Type)x.Payload) == null")]
+    [InlineData("x => default(System.Type) == null")]
+    public void ReflectionAndDelegates_AreNotAllowed(string expression)
     {
         AssertRejected(() => Parse(expression), "is not allowed");
     }
 
     [Theory]
-    [InlineData("x => x.Kind.Name == null")]
-    [InlineData("x => x.Kind == null")]
-    [InlineData("x => x.Factory == null")]
-    public void ReflectionTypedMember_IsNotAllowed(string expression)
+    [InlineData("x => (({0})x.City) == null")]
+    [InlineData("x => ({0})null == x.City")]
+    [InlineData("x => x.City == ({0})x.Payload")]
+    [InlineData("x => new [] {{ ({0})null, x.City }}.Length == 2")]
+    [InlineData("x => (({0})x.Payload + ({0})x.Payload) == null")]
+    public void ApplicationOperators_AreNotAllowedByDefault(string format)
     {
-        AssertRejected(() => Parse(expression), "is not allowed");
+        AssertRejected(() => Parse(string.Format(CultureInfo.InvariantCulture, format, ConvertibleName)), "is not allowed");
     }
 
     [Fact]
-    public void ReflectionTypes_AreNotAllowed_EvenWhenResolved()
+    public void EqualityOnApplicationTypesAndFrameworkOperators_Work()
     {
-        AssertRejected(() => Parse("x => ((System.Type)x.Payload) == null"), "Could not resolve type");
-        AssertRejected(() => ParseWithResolver("x => ((System.Type)x.Payload) == null"), "is not allowed");
-        AssertRejected(() => ParseWithResolver("x => x.City.GetType() == null"), "is not allowed");
-        AssertRejected(() => ParseWithResolver("x => default(System.Type) == null"), "is not allowed");
-    }
-
-    [Fact]
-    public void CastToFrameworkType_IsResolved()
-    {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => ((System.Uri)x.Payload).Host == \"radzen.com\"").Compile();
-
-        Assert.True(predicate(new Ticket { Payload = new Uri("https://radzen.com/") }));
-    }
-
-    [Fact]
-    public void FrameworkValueTypes_SupportOperators()
-    {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => (System.Version)x.Payload >= (System.Version)x.Payload").Compile();
-
-        Assert.True(predicate(new Ticket { Payload = new Version(1, 2) }));
+        Assert.True(Compile("x => x.Pair == null")(new Ticket()));
+        Assert.False(Compile("x => x.Pair == null")(new Ticket { Pair = new Pair("a", "b") }));
+        Assert.True(Compile("x => (System.Version)x.Payload >= (System.Version)x.Payload")(new Ticket { Payload = new Version(1, 2) }));
+        Assert.True(Compile("x => ((decimal)x.City.Length) == 7")(new Ticket { City = "Seattle" }));
+        Assert.True(Compile("x => (System.Numerics.BigInteger)x.Payload == (System.Numerics.BigInteger)x.Payload")(new Ticket { Payload = new System.Numerics.BigInteger(5) }));
+        Assert.True(Compile("x => x.City.Length.ToString().PadLeft(3, '0') == \"007\"")(new Ticket { City = "Seattle" }));
+        Assert.True(Compile("x => ((System.Uri)x.Payload).Host == \"radzen.com\"")(new Ticket { Payload = new Uri("https://radzen.com/") }));
     }
 
     [Theory]
     [InlineData("x => x.secret == null")]
     [InlineData("x => x.Hidden == null")]
-    [InlineData("x => x.City._stringLength == 7")]
     public void NonPublicMembers_AreNotAccessible(string expression)
     {
         Assert.Throws<ArgumentException>(() => Parse(expression));
@@ -1860,9 +1833,7 @@ public class ExpressionParserTests
     [Fact]
     public void PublicMembers_AreMatchedIgnoringCase()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => x.city == \"Seattle\"").Compile();
-
-        Assert.True(predicate(new Ticket { City = "Seattle" }));
+        Assert.True(Compile("x => x.city == \"Seattle\"")(new Ticket { City = "Seattle" }));
     }
 
     [Theory]
@@ -1871,6 +1842,25 @@ public class ExpressionParserTests
     public void EnumerableMethods_RequireSequenceSource(string expression)
     {
         AssertRejected(() => Parse(expression), "No suitable method");
+    }
+
+    [Theory]
+    [InlineData("a\\b")]
+    [InlineData("ends with \\")]
+    [InlineData("say \"hi\"")]
+    [InlineData("it's")]
+    [InlineData("\\\\server\\share")]
+    public void SerializedStringValue_RoundTrips(string value)
+    {
+        var parameter = Expression.Parameter(typeof(Ticket), "e");
+        var expression = Expression.Lambda<Func<Ticket, bool>>(
+            Expression.Equal(Expression.Property(parameter, nameof(Ticket.City)), Expression.Constant(value, typeof(string))), parameter);
+
+        var rows = new List<Ticket> { new() { City = value }, new() { City = "other" }, new() { City = null } }.AsQueryable();
+        var filtered = rows.Where(new ExpressionSerializer().Serialize(expression)).ToList();
+
+        Assert.Single(filtered);
+        Assert.Equal(value, filtered[0].City);
     }
 
     [Fact]
@@ -1882,17 +1872,17 @@ public class ExpressionParserTests
     }
 
     [Fact]
-    public void LongDottedName_IsRejected()
+    public void AnonymousTypeWithManyMembers_IsRejected()
     {
-        Assert.ThrowsAny<Exception>(() => Parse("x => a" + Repeat(".a", 20000)));
+        var members = string.Join(", ", Enumerable.Range(0, 300).Select(i => $"P{i} = 1"));
+
+        AssertRejected(() => Parse($"x => new {{ {members} }}"), "too complex");
     }
 
     [Fact]
-    public void CastThroughConversionOperator_ToFrameworkType_Works()
+    public void LongDottedName_IsRejected()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => ((decimal)x.City.Length) == 7").Compile();
-
-        Assert.True(predicate(new Ticket { City = "Seattle" }));
+        Assert.ThrowsAny<Exception>(() => Parse("x => a" + Repeat(".a", 20000)));
     }
 
     [Fact]
@@ -1925,7 +1915,7 @@ public class ExpressionParserTests
     [Fact]
     public void LogicalChain_WithManyOperands_IsParsed()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => x.City != \"0\"" + string.Concat(Enumerable.Range(1, 250).Select(i => $" && x.City != \"{i}\""))).Compile();
+        var predicate = Compile("x => x.City != \"0\"" + string.Concat(Enumerable.Range(1, 250).Select(i => $" && x.City != \"{i}\"")));
 
         Assert.True(predicate(new Ticket { City = "Seattle" }));
         Assert.False(predicate(new Ticket { City = "125" }));
@@ -1960,28 +1950,16 @@ public class ExpressionParserTests
     [Fact]
     public void FilterWithManyConditions_IsParsed()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => " + new string('(', 119) + "x.City != \"0\"" + string.Concat(Enumerable.Range(1, 119).Select(i => $" && x.City != \"{i}\")"))).Compile();
+        var predicate = Compile("x => " + new string('(', 119) + "x.City != \"0\"" + string.Concat(Enumerable.Range(1, 119).Select(i => $" && x.City != \"{i}\")")));
 
         Assert.True(predicate(new Ticket { City = "Seattle" }));
         Assert.False(predicate(new Ticket { City = "60" }));
     }
 
     [Fact]
-    public void SiblingNestedProjections_Work()
-    {
-        Assert.Equal(2, Project("x => new { A = new { P = x.City }, B = new { Q = x.Status } }").Cast<object>().Count());
-    }
-
-    [Fact]
-    public void ModeratelyNestedParentheses_AreParsed()
-    {
-        Assert.NotNull(Parse("x => " + new string('(', 150) + "1" + new string(')', 150)));
-    }
-
-    [Fact]
     public void NullConditionalChain_WithinLimit_Runs()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>("x => x.City" + Repeat("?.Trim()", 12) + " == \"Seattle\"").Compile();
+        var predicate = Compile("x => x.City" + Repeat("?.Trim()", 12) + " == \"Seattle\"");
 
         Assert.True(predicate(new Ticket { City = " Seattle " }));
         Assert.False(predicate(new Ticket { City = null }));
@@ -1990,7 +1968,7 @@ public class ExpressionParserTests
     [Fact]
     public void EnumArray_ReferencedByName_IsResolved()
     {
-        var predicate = ExpressionParser.ParsePredicate<Ticket>($"x => new {TicketStatusName}[] {{ 1 }}.Contains(x.Status)").Compile();
+        var predicate = Compile($"x => new {TicketStatusName}[] {{ 1 }}.Contains(x.Status)");
 
         Assert.False(predicate(new Ticket { Status = TicketStatus.Open }));
         Assert.True(predicate(new Ticket { Status = TicketStatus.Closed }));
@@ -2001,19 +1979,18 @@ public class ExpressionParserTests
     {
         Expression<Func<Ticket, bool>> expression = x => new[] { TicketStatus.Closed }.Intersect(x.Statuses).Any();
 
-        var serialized = new ExpressionSerializer().Serialize(expression);
-        var filtered = Data().Where(serialized).ToList();
+        var filtered = Data().Where(new ExpressionSerializer().Serialize(expression)).ToList();
 
         Assert.Single(filtered);
         Assert.Equal("Redmond", filtered[0].City);
     }
 
     [Fact]
-    public void NestedProjections_WithDifferentShapes_DoNotInterfere()
+    public void NestedProjections_Work()
     {
         Assert.Equal(2, Project("x => new { A = new { B = x.City } }").Cast<object>().Count());
         Assert.Equal(2, Project("x => new { A = new { C = x.Status } }").Cast<object>().Count());
-        Assert.Equal(2, Project("x => new { A = new { B = x.City } }").Cast<object>().Count());
+        Assert.Equal(2, Project("x => new { A = new { P = x.City }, B = new { Q = x.Status } }").Cast<object>().Count());
     }
 
     [Fact]
@@ -2026,17 +2003,13 @@ public class ExpressionParserTests
     }
 
     [Fact]
-    public void FrameworkStaticCalls_StillWork()
+    public void FrameworkMembers_StillWork()
     {
         Assert.Equal("Redmond", Data().OrderBy("x => Convert.ToString(x.City)").First().City);
         Assert.Equal(2, Data().Where("x => TimeSpan.FromHours(1).Hours == 1").Count());
         Assert.Equal(2, Data().Where("x => DateTime.Now.Year > 2000").Count());
-    }
-
-    [Fact]
-    public void InstanceStringMethods_StillWork()
-    {
         Assert.Equal("Seattle", Data().Where("x => x.City.ToUpper().StartsWith(\"SEA\")").Single().City);
         Assert.Equal("Seattle", Data().Where("x => x.City.Contains(\"SEA\", (System.StringComparison)5)").Single().City);
+        Assert.Equal("Seattle", Data().Where("x => x.Statuses.Any(s => s == 0) && x.City.Length > 3").Single().City);
     }
 }
