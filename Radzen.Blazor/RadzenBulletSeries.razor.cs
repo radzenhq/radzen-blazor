@@ -115,7 +115,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("TargetProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(TargetProperty);
+                return NumericGetter(TargetProperty);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("MaxProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(MaxProperty);
+                return NumericGetter(MaxProperty);
             }
         }
 
@@ -144,8 +144,12 @@ namespace Radzen.Blazor
                 var max = Max;
                 var value = Value;
 
-                var maxVal = Items.Max(item => Math.Max(max(item), value(item)));
-                scale.Input.MergeWidth(new ScaleRange { Start = 0, End = maxVal });
+                var values = Items.SelectMany(item => new[] { max(item), value(item) }).Where(v => !double.IsNaN(v)).ToList();
+
+                if (values.Count > 0)
+                {
+                    scale.Input.MergeWidth(new ScaleRange { Start = 0, End = values.Max() });
+                }
             }
 
             return scale;

@@ -12,6 +12,8 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenFullStackedAreaSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartFullStackedAreaSeries
     {
+        private protected override bool EmptyValueIsZero => true;
+
         /// <summary>
         /// Specifies the color of the line.
         /// </summary>

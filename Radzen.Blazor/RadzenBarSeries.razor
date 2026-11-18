@@ -52,8 +52,14 @@
                     continue;
                 }
 
-                var x = value(data);
                 var itemValue = Value(data);
+
+                if (IsEmpty(itemValue, y))
+                {
+                    continue;
+                }
+
+                var x = value(data);
                 var radius = barOptions?.Radius ?? 0;
                 var width = Math.Abs(x0 - x);
 

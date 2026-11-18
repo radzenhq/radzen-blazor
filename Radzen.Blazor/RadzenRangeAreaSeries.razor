@@ -30,6 +30,10 @@
             return new Point<TItem> { X = x, Y = y, Data = item };
         }).ToList();
 
+        Func<int, bool> isEmpty = i => IsEmpty(upperList[i].X, upperList[i].Y, lowerList[i].Y);
+        var upperSegments = Segments(upperList, isEmpty);
+        var lowerSegments = Segments(lowerList, isEmpty);
+
         var index = chart.Series.IndexOf(this);
         var className = $"rz-range-area-series rz-series-{index}";
         var gradientId = $"rzRangeAreaGradient{chart.UniqueID}{index}";
@@ -37,65 +41,75 @@
 
         return
         @<g class="@className">
-            @if (Items.Any())
+            @if (upperSegments.Count > 0)
             {
                 var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-                string area;
-                string upperLine;
-                string lowerLine;
+                var areas = new List<string>();
+                var upperLines = new List<string>();
+                var lowerLines = new List<string>();
 
-                if (Interpolation == Interpolation.Step)
+                for (var segmentIndex = 0; segmentIndex < upperSegments.Count; segmentIndex++)
                 {
-                    // Build the fill as independent rectangles per step interval.
-                    // A single polygon creates a fold at the last X where the connector
-                    // and return path cancel under SVG's nonzero winding rule.
-                    var areaPath = new System.Text.StringBuilder();
+                    var upper = upperSegments[segmentIndex];
+                    var lower = lowerSegments[segmentIndex];
 
-                    for (var i = 0; i < upperList.Count - 1; i++)
+                    if (Interpolation == Interpolation.Step)
                     {
-                        areaPath.Append($"M {upperList[i].X.ToInvariantString()} {upperList[i].Y.ToInvariantString()} ");
-                        areaPath.Append($"H {upperList[i + 1].X.ToInvariantString()} ");
-                        areaPath.Append($"V {lowerList[i].Y.ToInvariantString()} ");
-                        areaPath.Append($"H {upperList[i].X.ToInvariantString()} Z ");
+                        // Build the fill as independent rectangles per step interval.
+                        // A single polygon creates a fold at the last X where the connector
+                        // and return path cancel under SVG's nonzero winding rule.
+                        var areaPath = new System.Text.StringBuilder();
+
+                        for (var i = 0; i < upper.Count - 1; i++)
+                        {
+                            areaPath.Append($"M {upper[i].X.ToInvariantString()} {upper[i].Y.ToInvariantString()} ");
+                            areaPath.Append($"H {upper[i + 1].X.ToInvariantString()} ");
+                            areaPath.Append($"V {lower[i].Y.ToInvariantString()} ");
+                            areaPath.Append($"H {upper[i].X.ToInvariantString()} Z ");
+                        }
+
+                        areas.Add(areaPath.ToString());
+
+                        // Build stroke paths matching the fill: H-V for intermediate
+                        // transitions, H only for the last point (no vertical drop that
+                        // would extend past the fill at the right edge).
+                        var upperStroke = new System.Text.StringBuilder();
+                        var lowerStroke = new System.Text.StringBuilder();
+
+                        upperStroke.Append($"M {upper[0].X.ToInvariantString()} {upper[0].Y.ToInvariantString()}");
+                        lowerStroke.Append($"M {lower[0].X.ToInvariantString()} {lower[0].Y.ToInvariantString()}");
+
+                        for (var i = 1; i < upper.Count - 1; i++)
+                        {
+                            upperStroke.Append($" H {upper[i].X.ToInvariantString()} V {upper[i].Y.ToInvariantString()}");
+                            lowerStroke.Append($" H {lower[i].X.ToInvariantString()} V {lower[i].Y.ToInvariantString()}");
+                        }
+
+                        if (upper.Count > 1)
+                        {
+                            var last = upper.Count - 1;
+                            upperStroke.Append($" H {upper[last].X.ToInvariantString()}");
+                            lowerStroke.Append($" H {lower[last].X.ToInvariantString()}");
+                        }
+
+                        upperLines.Add(upperStroke.ToString());
+                        lowerLines.Add(lowerStroke.ToString());
                     }
-
-                    area = areaPath.ToString();
-
-                    // Build stroke paths matching the fill: H-V for intermediate
-                    // transitions, H only for the last point (no vertical drop that
-                    // would extend past the fill at the right edge).
-                    var upperStroke = new System.Text.StringBuilder();
-                    var lowerStroke = new System.Text.StringBuilder();
-
-                    upperStroke.Append($"M {upperList[0].X.ToInvariantString()} {upperList[0].Y.ToInvariantString()}");
-                    lowerStroke.Append($"M {lowerList[0].X.ToInvariantString()} {lowerList[0].Y.ToInvariantString()}");
-
-                    for (var i = 1; i < upperList.Count - 1; i++)
+                    else
                     {
-                        upperStroke.Append($" H {upperList[i].X.ToInvariantString()} V {upperList[i].Y.ToInvariantString()}");
-                        lowerStroke.Append($" H {lowerList[i].X.ToInvariantString()} V {lowerList[i].Y.ToInvariantString()}");
+                        var upperPath = pathGenerator.Path(upper);
+                        var lowerPathForward = pathGenerator.Path(lower);
+                        var lowerPathReversed = pathGenerator.Path(lower.AsEnumerable().Reverse());
+                        areas.Add($"M {upperPath} L {lowerPathReversed} Z");
+                        upperLines.Add($"M {upperPath}");
+                        lowerLines.Add($"M {lowerPathForward}");
                     }
-
-                    if (upperList.Count > 1)
-                    {
-                        var last = upperList.Count - 1;
-                        upperStroke.Append($" H {upperList[last].X.ToInvariantString()}");
-                        lowerStroke.Append($" H {lowerList[last].X.ToInvariantString()}");
-                    }
-
-                    upperLine = upperStroke.ToString();
-                    lowerLine = lowerStroke.ToString();
                 }
-                else
-                {
-                    var upperPath = pathGenerator.Path(upperList);
-                    var lowerPathForward = pathGenerator.Path(lowerList);
-                    var lowerPathReversed = pathGenerator.Path(lowerList.AsEnumerable().Reverse());
-                    area = $"M {upperPath} L {lowerPathReversed} Z";
-                    upperLine = $"M {upperPath}";
-                    lowerLine = $"M {lowerPathForward}";
-                }
+
+                var area = string.Join(" ", areas);
+                var upperLine = string.Join(" ", upperLines);
+                var lowerLine = string.Join(" ", lowerLines);
 
                 @if (FillMode == FillMode.Gradient)
                 {

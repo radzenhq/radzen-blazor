@@ -114,7 +114,12 @@ namespace Radzen.Blazor
                 var dx = px - x;
                 var dy = py - y;
                 return new { Item = item, Distance = Math.Sqrt(dx * dx + dy * dy), Point = new Point { X = px, Y = py } };
-            }).Aggregate((a, b) => a.Distance < b.Distance ? a : b);
+            }).Where(candidate => !double.IsNaN(candidate.Distance)).MinBy(candidate => candidate.Distance);
+
+            if (result == null)
+            {
+                return (default!, new Point());
+            }
 
             return (result.Item!, result.Point);
         }

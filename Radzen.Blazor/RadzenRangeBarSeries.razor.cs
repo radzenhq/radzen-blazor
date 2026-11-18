@@ -119,7 +119,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("MinProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(MinProperty);
+                return NumericGetter(MinProperty);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("MaxProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(MaxProperty);
+                return NumericGetter(MaxProperty);
             }
         }
 
@@ -143,13 +143,7 @@ namespace Radzen.Blazor
 
             if (Items != null && Items.Count > 0)
             {
-                var min = Min;
-                var max = Max;
-
-                var minValue = Items.Min(item => min(item));
-                var maxValue = Items.Max(item => max(item));
-
-                scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
+                MergeValues(scale, Min, Max);
             }
 
             IncludeZeroInValueScale(scale, false);

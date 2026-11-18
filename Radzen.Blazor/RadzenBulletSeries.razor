@@ -50,6 +50,11 @@
                 var valueVal = Value(data);
                 var targetVal = target(data);
 
+                if (IsEmpty(maxValue, cy))
+                {
+                    continue;
+                }
+
                 var index = Items.IndexOf(data);
 
                 // Qualitative range bands (background)
@@ -78,7 +83,10 @@
 
                 var fillRef = gradient ? grad.Url(fill, valueVal < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
 
-                <Path @key="@($"measure-{index}")" D="@measurePath" Fill="@fillRef" Stroke="@stroke" StrokeWidth="@StrokeWidth" Style="@style" />
+                @if (!IsEmpty(valueVal))
+                {
+                    <Path @key="@($"measure-{index}")" D="@measurePath" Fill="@fillRef" Stroke="@stroke" StrokeWidth="@StrokeWidth" Style="@style" />
+                }
 
                 // Target marker line
                 var targetX = chart.CategoryScale.Scale(targetVal, true);
@@ -86,7 +94,10 @@
                 var markerY = cy - markerHeight / 2;
                 var targetPath = $"M {targetX.ToInvariantString()} {markerY.ToInvariantString()} L {targetX.ToInvariantString()} {(markerY + markerHeight).ToInvariantString()}";
 
-                <Path @key="@($"target-{index}")" D="@targetPath" Fill="none" Stroke="@targetStroke" StrokeWidth="@TargetWidth" Style="@style" />
+                @if (!IsEmpty(targetVal))
+                {
+                    <Path @key="@($"target-{index}")" D="@targetPath" Fill="none" Stroke="@targetStroke" StrokeWidth="@TargetWidth" Style="@style" />
+                }
             }
             @if (gradient)
             {

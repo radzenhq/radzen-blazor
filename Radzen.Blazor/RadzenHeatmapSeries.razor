@@ -29,6 +29,12 @@
                 var cx = category(item);
                 var cy = value(item);
                 var intensity = Intensity(item);
+
+                if (IsEmpty(cx, cy, intensity))
+                {
+                    continue;
+                }
+
                 var fill = PickColor(Items.IndexOf(item), null, Fill, ColorRange, intensity) ?? "transparent";
                 var x = cx - halfWidthPx;
                 var y = cy - halfHeightPx;

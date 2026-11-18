@@ -145,8 +145,8 @@
             return Enumerable.Empty<double>();
         }
 
-        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
-        return Data.Select(item => valueGetter(item)).ToList();
+        var valueGetter = PropertyAccess.Getter<TItem, double?>(ValueProperty);
+        return Data.Select(item => valueGetter(item)).Where(value => value.HasValue).Select(value => value!.Value).ToList();
     }
 
     double IRadzenSpiderSeries.GetValue(string category)
@@ -157,10 +157,10 @@
         }
 
         var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
-        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
+        var valueGetter = PropertyAccess.Getter<TItem, double?>(ValueProperty);
 
         var item = Data.FirstOrDefault(d => categoryGetter(d) == category);
-        return item != null ? valueGetter(item) : 0;
+        return item != null ? valueGetter(item) ?? 0 : 0;
     }
 
     object? IRadzenSpiderSeries.GetData(string category)

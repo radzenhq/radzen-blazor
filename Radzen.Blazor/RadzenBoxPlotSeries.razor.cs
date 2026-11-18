@@ -127,7 +127,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("LowerWhiskerProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(LowerWhiskerProperty);
+                return NumericGetter(LowerWhiskerProperty);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("LowerQuartileProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(LowerQuartileProperty);
+                return NumericGetter(LowerQuartileProperty);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("MedianProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(MedianProperty);
+                return NumericGetter(MedianProperty);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("UpperQuartileProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(UpperQuartileProperty);
+                return NumericGetter(UpperQuartileProperty);
             }
         }
 
@@ -179,7 +179,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("UpperWhiskerProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(UpperWhiskerProperty);
+                return NumericGetter(UpperWhiskerProperty);
             }
         }
 
@@ -192,7 +192,7 @@ namespace Radzen.Blazor
                     return null;
                 }
 
-                return PropertyAccess.Getter<TItem, double>(MeanProperty);
+                return NumericGetter(MeanProperty);
             }
         }
 
@@ -203,13 +203,7 @@ namespace Radzen.Blazor
 
             if (Items != null && Items.Count > 0)
             {
-                var lw = LowerWhisker;
-                var uw = UpperWhisker;
-
-                var minValue = Items.Min(item => lw(item));
-                var maxValue = Items.Max(item => uw(item));
-
-                scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
+                MergeValues(scale, LowerWhisker, UpperWhisker);
             }
 
             IncludeZeroInValueScale(scale, false);

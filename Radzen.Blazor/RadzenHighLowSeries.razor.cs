@@ -93,7 +93,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("HighProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(HighProperty);
+                return NumericGetter(HighProperty);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Radzen.Blazor
                     throw new ArgumentException("LowProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(LowProperty);
+                return NumericGetter(LowProperty);
             }
         }
 
@@ -120,13 +120,7 @@ namespace Radzen.Blazor
 
             if (Items != null && Items.Count > 0)
             {
-                var high = High;
-                var low = Low;
-
-                var minValue = Items.Min(item => low(item));
-                var maxValue = Items.Max(item => high(item));
-
-                scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
+                MergeValues(scale, Low, High);
             }
 
             IncludeZeroInValueScale(scale, false);

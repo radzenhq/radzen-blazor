@@ -39,8 +39,14 @@
                     continue;
                 }
 
-                var y = value(data);
                 var itemValue = Value(data);
+
+                if (IsEmpty(itemValue, x))
+                {
+                    continue;
+                }
+
+                var y = value(data);
                 var radius = chart.ColumnOptions.Radius;
                 var height = Math.Abs(y0 - y);
 

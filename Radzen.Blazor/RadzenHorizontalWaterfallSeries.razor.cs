@@ -24,6 +24,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenHorizontalWaterfallSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartBarSeries
     {
+        private protected override bool EmptyValueIsZero => true;
+
         /// <summary>
         /// Gets or sets the fill color for positive value bars.
         /// When not set, the theme color scheme applies.

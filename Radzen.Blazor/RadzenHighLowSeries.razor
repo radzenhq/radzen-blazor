@@ -27,6 +27,11 @@
                 var highValue = high(data);
                 var lowValue = low(data);
 
+                if (IsEmpty(highValue, lowValue, cx))
+                {
+                    continue;
+                }
+
                 var highY = valueScale.Scale(highValue, true);
                 var lowY = valueScale.Scale(lowValue, true);
 

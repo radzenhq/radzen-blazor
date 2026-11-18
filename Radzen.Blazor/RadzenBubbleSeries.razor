@@ -15,9 +15,7 @@
     var className = $"rz-bubble-series rz-series-{index}";
     var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-    var sizeValues = Items.Select(item => Math.Abs(Size(item))).ToList();
-    var minValue = sizeValues.Any() ? sizeValues.Min() : 0;
-    var maxValue = sizeValues.Any() ? sizeValues.Max() : 1;
+    var (minValue, maxValue) = SizeRange();
 
     var bubbles = Items.Select(item =>
     {
@@ -25,7 +23,7 @@
       var y = value(item);
       var radius = GetBubbleRadius(item, minValue, maxValue);
       return new { X = x, Y = y, Radius = radius, Item = item };
-    }).OrderByDescending(b => b.Radius).ToList();
+    }).Where(b => !IsEmpty(b.X, b.Y, b.Radius)).OrderByDescending(b => b.Radius).ToList();
 
     var fill = Fill ?? Stroke;
 

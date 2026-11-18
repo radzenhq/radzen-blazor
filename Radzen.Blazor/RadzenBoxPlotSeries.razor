@@ -37,6 +37,11 @@
             {
                 var cx = category(data);
 
+                if (IsEmpty(lw(data), lq(data), med(data), uq(data)) || IsEmpty(uw(data), cx))
+                {
+                    continue;
+                }
+
                 var lwY = valueScale.Scale(lw(data), true);
                 var lqY = valueScale.Scale(lq(data), true);
                 var medY = valueScale.Scale(med(data), true);
@@ -75,7 +80,7 @@
                 <Path @key="@($"box-{index}")" D="@boxPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" Style="@style" />
                 <Path @key="@($"median-{index}")" D="@medianPath" Stroke="@medianStroke" StrokeWidth="@(StrokeWidth + 1)" Fill="none" Style="@style" />
 
-                @if (ShowMean && mean != null)
+                @if (ShowMean && mean != null && !IsEmpty(mean(data)))
                 {
                     var meanY = valueScale.Scale(mean(data), true);
                     var ms = 4.0;

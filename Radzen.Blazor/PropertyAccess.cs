@@ -270,6 +270,33 @@ public static class PropertyAccess
     }
 
     /// <summary>
+    /// Like <see cref="DateGetter{TItem}"/>, but a null nullable is returned as null instead of throwing.
+    /// </summary>
+    /// <typeparam name="TItem">The owner type.</typeparam>
+    /// <param name="propertyName">Name of the property to return.</param>
+    /// <returns>A function which returns the specified property as a nullable DateTime.</returns>
+    [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
+    internal static Func<TItem, DateTime?> NullableDateGetter<TItem>(string propertyName)
+    {
+        var type = GetPropertyType(typeof(TItem), propertyName);
+        var underlying = type == null ? null : Nullable.GetUnderlyingType(type) ?? type;
+
+        if (underlying == typeof(DateOnly))
+        {
+            var getter = Getter<TItem, DateOnly?>(propertyName);
+            return item => getter(item)?.ToDateTime(TimeOnly.MinValue);
+        }
+
+        if (underlying == typeof(DateTimeOffset))
+        {
+            var getter = Getter<TItem, DateTimeOffset?>(propertyName);
+            return item => getter(item)?.DateTime;
+        }
+
+        return Getter<TItem, DateTime?>(propertyName);
+    }
+
+    /// <summary>
     /// Converts a DateTime to DateOnly.
     /// </summary>
     /// <param name="source">The source DateTime.</param>

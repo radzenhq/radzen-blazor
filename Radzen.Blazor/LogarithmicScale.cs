@@ -47,6 +47,11 @@ namespace Radzen.Blazor
         /// </summary>
         public override double Scale(double value, bool padding = false)
         {
+            if (double.IsNaN(value))
+            {
+                return double.NaN;
+            }
+
             var outputSize = Output.End - Output.Start;
 
             if (padding)

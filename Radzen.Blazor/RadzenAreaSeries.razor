@@ -30,6 +30,7 @@
       data = ClipToPlotRange(data, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
     }
 
+    var segments = Segments(data);
     var ticks = chart.CategoryScale.Ticks(chart.CategoryAxis.TickDistance);
     var index = chart.Series.IndexOf(this);
     var className = $"rz-area-series rz-series-{index}";
@@ -38,10 +39,8 @@
 
     return
     @<g class="@className">
-      @if (data.Count > 0)
+      @if (segments.Count > 0)
       {
-        var x1 = data[0].X.ToInvariantString();
-        var x2 = data[data.Count - 1].X.ToInvariantString();
         var vs = chart.GetValueScale(ValueAxisName);
         var va = chart.GetValueAxis(ValueAxisName);
         var valueTicks = vs.Ticks(va.TickDistance);
@@ -49,40 +48,48 @@
         var y = vs.Scale(start).ToInvariantString();
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-        string area;
-        string line;
+        var areas = new List<string>();
+        var lines = new List<string>();
 
-        if (Interpolation == Interpolation.Step)
+        foreach (var dataList in segments)
         {
-            // For step interpolation, build path without the last vertical drop.
-            // The StepGenerator's last V command creates a fold at the right edge
-            // when the last value is higher than the previous, causing SVG's
-            // nonzero winding rule to leave the transition area unfilled.
-            var dataList = data;
-            var stepPath = new System.Text.StringBuilder();
+            var x1 = dataList[0].X.ToInvariantString();
+            var x2 = dataList[dataList.Count - 1].X.ToInvariantString();
 
-            stepPath.Append($"{dataList[0].X.ToInvariantString()} {dataList[0].Y.ToInvariantString()}");
-
-            for (var i = 1; i < dataList.Count - 1; i++)
+            if (Interpolation == Interpolation.Step)
             {
-                stepPath.Append($" H {dataList[i].X.ToInvariantString()} V {dataList[i].Y.ToInvariantString()}");
-            }
+                // For step interpolation, build path without the last vertical drop.
+                // The StepGenerator's last V command creates a fold at the right edge
+                // when the last value is higher than the previous, causing SVG's
+                // nonzero winding rule to leave the transition area unfilled.
+                var stepPath = new System.Text.StringBuilder();
 
-            if (dataList.Count > 1)
+                stepPath.Append($"{dataList[0].X.ToInvariantString()} {dataList[0].Y.ToInvariantString()}");
+
+                for (var i = 1; i < dataList.Count - 1; i++)
+                {
+                    stepPath.Append($" H {dataList[i].X.ToInvariantString()} V {dataList[i].Y.ToInvariantString()}");
+                }
+
+                if (dataList.Count > 1)
+                {
+                    stepPath.Append($" H {dataList[dataList.Count - 1].X.ToInvariantString()}");
+                }
+
+                var stepPathStr = stepPath.ToString();
+                areas.Add($"M {x1} {y} {stepPathStr} L {x2} {y}");
+                lines.Add($"M {stepPathStr}");
+            }
+            else
             {
-                stepPath.Append($" H {dataList[dataList.Count - 1].X.ToInvariantString()}");
+                var path = pathGenerator.Path(dataList);
+                areas.Add($"M {x1} {y} {path} L {x2} {y}");
+                lines.Add($"M {path}");
             }
+        }
 
-            var stepPathStr = stepPath.ToString();
-            area = $"M {x1} {y} {stepPathStr} L {x2} {y}";
-            line = $"M {stepPathStr}";
-        }
-        else
-        {
-            var path = pathGenerator.Path(data);
-            area = $"M {x1} {y} {path} L {x2} {y}";
-            line = $"M {path}";
-        }
+        var area = string.Join(" ", areas);
+        var line = string.Join(" ", lines);
 
         @if (FillMode == FillMode.Gradient)
         {

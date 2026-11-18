@@ -234,17 +234,21 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Chart_NullDateOnlyCategory_ThrowsLikeNullDateTime()
+        public void Chart_NullDateOnlyCategory_IsSkippedLikeNullDateTime()
         {
             using var ctx = CreateContext();
 
-            var dateTimeData = new[] { new NullableDateTimeItem { Date = new DateTime(2025, 1, 1), Value = 1 }, new NullableDateTimeItem { Date = null, Value = 2 } };
-            var dateOnlyData = new[] { new NullableDateOnlyItem { Date = new DateOnly(2025, 1, 1), Value = 1 }, new NullableDateOnlyItem { Date = null, Value = 2 } };
+            var dateTimeData = new[] { new NullableDateTimeItem { Date = new DateTime(2025, 1, 1), Value = 1 }, new NullableDateTimeItem { Date = null, Value = 2 }, new NullableDateTimeItem { Date = new DateTime(2025, 1, 3), Value = 3 } };
+            var dateOnlyData = new[] { new NullableDateOnlyItem { Date = new DateOnly(2025, 1, 1), Value = 1 }, new NullableDateOnlyItem { Date = null, Value = 2 }, new NullableDateOnlyItem { Date = new DateOnly(2025, 1, 3), Value = 3 } };
 
-            var expected = Assert.ThrowsAny<Exception>(() => RenderChart(ctx, dateTimeData));
-            var actual = Assert.ThrowsAny<Exception>(() => RenderChart(ctx, dateOnlyData));
+            var expected = RenderChart(ctx, dateTimeData);
+            var actual = RenderChart(ctx, dateOnlyData);
 
-            Assert.Equal(expected.GetType(), actual.GetType());
+            Assert.DoesNotContain("NaN", actual.Markup);
+            Assert.Equal(new DateTime(2025, 1, 1).Ticks, actual.Instance.CategoryScale.Input.Start);
+            Assert.Equal(new DateTime(2025, 1, 3).Ticks, actual.Instance.CategoryScale.Input.End);
+            Assert.Equal(expected.Instance.CategoryScale.Input.Start, actual.Instance.CategoryScale.Input.Start);
+            Assert.Equal(expected.Instance.CategoryScale.Input.End, actual.Instance.CategoryScale.Input.End);
         }
 
         static IRenderedComponent<RadzenRangeNavigator> RenderNavigator<TItem>(TestContext ctx, IEnumerable<TItem> data, Action<ComponentParameterCollectionBuilder<RadzenRangeNavigator>> configure = null)

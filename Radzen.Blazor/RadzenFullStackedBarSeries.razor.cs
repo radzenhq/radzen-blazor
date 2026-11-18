@@ -14,6 +14,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
     public partial class RadzenFullStackedBarSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartFullStackedBarSeries
     {
+        private protected override bool EmptyValueIsZero => true;
+
         /// <summary>
         /// Specifies the fill (background color) of the bar series.
         /// </summary>

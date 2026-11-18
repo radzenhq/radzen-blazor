@@ -33,6 +33,11 @@
                 var lowValue = low(data);
                 var closeValue = close(data);
 
+                if (IsEmpty(openValue, highValue, lowValue, closeValue) || IsEmpty(cx))
+                {
+                    continue;
+                }
+
                 var openY = valueScale.Scale(openValue, true);
                 var highY = valueScale.Scale(highValue, true);
                 var lowY = valueScale.Scale(lowValue, true);

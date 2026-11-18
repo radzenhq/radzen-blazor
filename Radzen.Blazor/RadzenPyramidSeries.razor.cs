@@ -15,6 +15,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
     public partial class RadzenPyramidSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
+        private protected override bool EmptyValueIsZero => true;
+
         /// <summary>
         /// Gets or sets a collection of fill colors applied to individual pyramid segments.
         /// </summary>

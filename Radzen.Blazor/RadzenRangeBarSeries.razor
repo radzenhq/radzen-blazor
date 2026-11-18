@@ -36,6 +36,12 @@
             @foreach (var data in Items)
             {
                 var cy = slot.Start(category(data));
+
+                if (IsEmpty(min(data), max(data), cy))
+                {
+                    continue;
+                }
+
                 var minX = categoryScale.Scale(min(data), true);
                 var maxX = categoryScale.Scale(max(data), true);
 

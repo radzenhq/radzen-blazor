@@ -103,7 +103,7 @@ namespace Radzen.Blazor
                     return _ => 0;
                 }
 
-                return PropertyAccess.Getter<TItem, double>(IntensityProperty);
+                return NumericGetter(IntensityProperty);
             }
         }
 
@@ -115,7 +115,7 @@ namespace Radzen.Blazor
         internal (double[] xs, double[] ys, double[,] grid) BuildGrid(ScaleBase categoryScale)
         {
             var categoryGetter = Category(categoryScale);
-            var pairs = Items.Select(item => (X: categoryGetter(item), Y: Value(item), V: Intensity(item))).ToList();
+            var pairs = Items.Select(item => (X: categoryGetter(item), Y: Value(item), V: Intensity(item))).Where(p => !IsEmpty(p.X, p.Y)).ToList();
 
             var xs = pairs.Select(p => p.X).Distinct().OrderBy(v => v).ToArray();
             var ys = pairs.Select(p => p.Y).Distinct().OrderBy(v => v).ToArray();
@@ -498,7 +498,12 @@ namespace Radzen.Blazor
                 var dx = px - x;
                 var dy = py - y;
                 return new { Item = item, Distance = Math.Sqrt(dx * dx + dy * dy), Point = new Point { X = px, Y = py } };
-            }).Aggregate((a, b) => a.Distance < b.Distance ? a : b);
+            }).Where(candidate => !IsEmpty(candidate.Distance, Intensity(candidate.Item))).MinBy(candidate => candidate.Distance);
+
+            if (result == null)
+            {
+                return (default!, new Point());
+            }
 
             return (result.Item!, result.Point);
         }

@@ -39,6 +39,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenPieSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
+        private protected override bool EmptyValueIsZero => true;
+
         /// <summary>
         /// Gets or sets the horizontal center position of the pie chart in pixels.
         /// If not set, the pie is automatically centered horizontally within the chart area.
@@ -230,7 +232,7 @@ namespace Radzen.Blazor
                 return maxRadius;
             }
 
-            var getter = PropertyAccess.Getter<TItem, double>(RadiusProperty);
+            var getter = NumericGetter(RadiusProperty, true);
             var items = PositiveItems;
 
             if (items.Count == 0)

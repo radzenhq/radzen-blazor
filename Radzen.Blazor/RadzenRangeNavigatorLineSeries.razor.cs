@@ -220,16 +220,37 @@ namespace Radzen.Blazor
                     Y = value(item)
                 }).ToList();
 
-                var x1 = category(Items.First()).ToInvariantString();
-                var x2 = category(Items.Last()).ToInvariantString();
+                var segments = new List<List<Point>>();
+                List<Point>? segment = null;
+
+                foreach (var point in data)
+                {
+                    if (double.IsNaN(point.X) || double.IsNaN(point.Y))
+                    {
+                        segment = null;
+                        continue;
+                    }
+
+                    if (segment == null)
+                    {
+                        segment = new List<Point>();
+                        segments.Add(segment);
+                    }
+
+                    segment.Add(point);
+                }
+
+                if (segments.Count == 0)
+                {
+                    return;
+                }
 
                 var valueTicks = valueScale.Ticks(0);
                 var baseline = Math.Max(0, valueTicks.Start);
                 var y = valueScale.Scale(baseline).ToInvariantString();
 
-                var path = pathGenerator.Path(data);
-                var area = $"M {x1} {y} {path} L {x2} {y}";
-                var line = $"M {path}";
+                var area = string.Join(" ", segments.Select(points => $"M {points[0].X.ToInvariantString()} {y} {pathGenerator.Path(points)} L {points[points.Count - 1].X.ToInvariantString()} {y}"));
+                var line = string.Join(" ", segments.Select(points => $"M {pathGenerator.Path(points)}"));
 
                 var fill = Fill ?? Stroke;
 
@@ -303,13 +324,14 @@ namespace Radzen.Blazor
         {
             if (IsNumeric(CategoryProperty))
             {
-                return PropertyAccess.Getter<TItem, double>(CategoryProperty!);
+                var numeric = PropertyAccess.Getter<TItem, double?>(CategoryProperty!);
+                return (item) => numeric(item) ?? double.NaN;
             }
 
             if (IsDate(CategoryProperty))
             {
-                var getter = PropertyAccess.DateGetter<TItem>(CategoryProperty!);
-                return (item) => getter(item).Ticks;
+                var getter = PropertyAccess.NullableDateGetter<TItem>(CategoryProperty!);
+                return (item) => getter(item)?.Ticks ?? double.NaN;
             }
 
             if (scale is OrdinalScale ordinal)
@@ -330,7 +352,8 @@ namespace Radzen.Blazor
                     throw new ArgumentException("ValueProperty should not be empty");
                 }
 
-                return PropertyAccess.Getter<TItem, double>(ValueProperty);
+                var getter = PropertyAccess.Getter<TItem, double?>(ValueProperty);
+                return (item) => getter(item) ?? double.NaN;
             }
         }
 
