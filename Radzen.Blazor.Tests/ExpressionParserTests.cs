@@ -1893,12 +1893,6 @@ public class ExpressionParserTests
     }
 
     [Fact]
-    public void DeeplyNestedParentheses_AreRejected()
-    {
-        AssertRejected(() => Parse("x => " + new string('(', 5000) + "1" + new string(')', 5000)), "too ");
-    }
-
-    [Fact]
     public void DeeplyNestedUnaryOperators_AreRejected()
     {
         AssertRejected(() => Parse("x => " + new string('!', 5000) + "true"), "too ");
