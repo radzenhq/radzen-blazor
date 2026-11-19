@@ -3734,6 +3734,32 @@ namespace Radzen.Blazor
             return false;
         }
 
+        List<GroupDescriptor> GetGroupsWithExistingProperties(IEnumerable<GroupDescriptor> groups)
+        {
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(TItem));
+
+            return groups.Where(g => IsExistingProperty(parameter, g.Property)).ToList();
+        }
+
+        static bool IsExistingProperty(System.Linq.Expressions.ParameterExpression parameter, string? property)
+        {
+            if (string.IsNullOrEmpty(property))
+            {
+                return false;
+            }
+
+            try
+            {
+                QueryableExtension.GetNestedPropertyExpression(parameter, property);
+
+                return true;
+            }
+            catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or System.Reflection.AmbiguousMatchException or IndexOutOfRangeException)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Load DataGrid settings saved from the GetSettings() method.
         /// This internal method handles the actual loading or updating of the DataGrid settings.
@@ -3841,14 +3867,16 @@ namespace Radzen.Blazor
                     }
                 }
 
-                if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
+                var settingsGroups = settings.Groups != null ? GetGroupsWithExistingProperties(settings.Groups) : null;
+
+                if (settingsGroups != null && !settingsGroups.SequenceEqual(Groups))
                 {
                     if (groups != null)
                     {
                         groups.CollectionChanged -= GroupsCollectionChanged;
                     }
                     Groups.Clear();
-                    settings.Groups.ToList().ForEach(Groups.Add);
+                    settingsGroups.ForEach(Groups.Add);
                     shouldUpdateState = true;
                     if (groups != null)
                     {
