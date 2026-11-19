@@ -263,8 +263,52 @@ namespace Radzen
             return source.Where(lambda);
         }
 
+        private const int MaxPropertyPathLength = 10;
+
+        internal static MemberExpression PublicPropertyOrField(Expression instance, string memberName)
+        {
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+            var t = instance.Type;
+            PropertyInfo prop;
+            FieldInfo field = null;
+
+            try
+            {
+                prop = t.GetProperty(memberName, flags | BindingFlags.IgnoreCase);
+                field = prop == null ? t.GetField(memberName, flags | BindingFlags.IgnoreCase) : null;
+            }
+            catch (AmbiguousMatchException)
+            {
+                prop = t.GetProperty(memberName, flags);
+                field = prop == null ? t.GetField(memberName, flags) : null;
+
+                if (prop == null && field == null)
+                {
+                    throw;
+                }
+            }
+
+            if (prop != null)
+            {
+                return Expression.Property(instance, prop);
+            }
+
+            if (field != null)
+            {
+                return Expression.Field(instance, field);
+            }
+
+            throw new ArgumentException($"'{memberName}' is not a member of type '{t}'", nameof(memberName));
+        }
+
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type type = null)
         {
+            if (property.Count(c => c == '.') >= MaxPropertyPathLength)
+            {
+                throw new InvalidOperationException("Property path is too long.");
+            }
+
             var parts = property.Split(new char[] { '.' }, 2);
             string currentPart = parts[0];
             Expression member;
@@ -288,7 +332,7 @@ namespace Radzen
                 var propertyName = currentPart.Substring(0, indexStart);
                 var indexString = currentPart.Substring(indexStart + 1, currentPart.Length - indexStart - 2);
 
-                member = Expression.PropertyOrField(expression, propertyName);
+                member = PublicPropertyOrField(expression, propertyName);
                 if (int.TryParse(indexString, out int index))
                 {
                     if (member.Type.IsArray)
@@ -320,7 +364,7 @@ namespace Radzen
             }
             else
             {
-                member = Expression.PropertyOrField(expression, currentPart);
+                member = PublicPropertyOrField(expression, currentPart);
             }
 
             if (expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)

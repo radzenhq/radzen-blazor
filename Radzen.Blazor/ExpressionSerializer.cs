@@ -188,8 +188,8 @@ public class ExpressionSerializer : ExpressionVisitor
         {
             string s when s == string.Empty => @"""""",
             null => "null",
-            string s => @$"""{s.Replace("\"", "\\\"")}""",
-            char c => $"'{c}'",
+            string s => @$"""{s.Replace("\\", "\\\\").Replace("\"", "\\\"")}""",
+            char c => c is '\\' or '\'' ? $"'\\{c}'" : $"'{c}'",
             bool b => b.ToString().ToLowerInvariant(),
             DateTime dt => FormatDateTime(dt),
             DateTimeOffset dto => $"DateTime.Parse(\"{dto.UtcDateTime:yyyy-MM-ddTHH:mm:ss.fffZ}\")",

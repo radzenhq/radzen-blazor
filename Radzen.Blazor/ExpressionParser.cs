@@ -1,9 +1,14 @@
+#nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Linq;
 
 namespace Radzen;
@@ -28,7 +33,7 @@ public class ExpressionParser
     /// </summary>
     public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type?>? typeResolver = null)
     {
-        var lambda = ParseLambda(expression, typeof(T), typeResolver);
+        var lambda = ParseLambda<T>(expression, typeResolver);
 
         return Expression.Lambda<Func<T, TResult>>(lambda.Body, lambda.Parameters[0]);
     }
@@ -52,9 +57,10 @@ public class ExpressionParser
     }
 
     private readonly List<Token> tokens;
-    private int position = 0;
+    private int position;
     private readonly Func<string, Type?>? typeResolver;
     private readonly Stack<ParameterExpression> parameterStack = new();
+    private int anonymousTypeCount;
 
     private ExpressionParser(string expression, Func<string, Type?>? typeResolver = null)
     {
@@ -110,7 +116,171 @@ public class ExpressionParser
 
         parameterStack.Pop();
 
+        EnsureComplexity(body);
+
         return Expression.Lambda(body, parameter);
+    }
+
+    private const int MaxExpressionDepth = 300;
+    private const int OperandDepthCost = 3;
+    private const int MaxAnonymousTypes = 64;
+    private const int MaxAnonymousTypeMembers = 256;
+    private const int MaxTypeNameParts = 32;
+    private const long MaxExpressionSize = 100_000;
+
+    private static void EnsureComplexity(Expression root)
+    {
+        var measured = new Dictionary<Expression, (long Size, int Depth)>(ReferenceEqualityComparer.Instance);
+        var pending = new Stack<(Expression Node, bool Expanded)>();
+
+        pending.Push((root, false));
+
+        while (pending.Count > 0)
+        {
+            var (node, expanded) = pending.Pop();
+
+            if (measured.ContainsKey(node))
+            {
+                continue;
+            }
+
+            if (!expanded)
+            {
+                EnsureAllowed(node);
+
+                pending.Push((node, true));
+
+                foreach (var child in GetChildren(node))
+                {
+                    if (!measured.ContainsKey(child))
+                    {
+                        pending.Push((child, false));
+                    }
+                }
+
+                continue;
+            }
+
+            long size = 1;
+            var depth = 0;
+
+            foreach (var child in GetChildren(node))
+            {
+                var (childSize, childDepth) = measured[child];
+
+                size += childSize;
+                depth = Math.Max(depth, childDepth);
+            }
+
+            depth += node.NodeType is ExpressionType.AndAlso or ExpressionType.OrElse ? 1 : OperandDepthCost;
+
+            if (depth > MaxExpressionDepth || size > MaxExpressionSize)
+            {
+                throw new InvalidOperationException("Expression is too complex.");
+            }
+
+            measured[node] = (size, depth);
+        }
+    }
+
+    private static MemberExpression PublicPropertyOrField(Expression expression, string name)
+    {
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy;
+
+        var property = expression.Type.GetProperty(name, flags);
+
+        if (property != null)
+        {
+            return Expression.Property(expression, property);
+        }
+
+        var field = expression.Type.GetField(name, flags);
+
+        if (field != null)
+        {
+            return Expression.Field(expression, field);
+        }
+
+        throw new ArgumentException($"'{Shorten(name)}' is not a member of type '{expression.Type}'", nameof(name));
+    }
+
+    private static IEnumerable<Expression> GetChildren(Expression node)
+    {
+        switch (node)
+        {
+            case BinaryExpression binary:
+                yield return binary.Left;
+                yield return binary.Right;
+                break;
+            case UnaryExpression unary:
+                yield return unary.Operand;
+                break;
+            case ConditionalExpression conditional:
+                yield return conditional.Test;
+                yield return conditional.IfTrue;
+                yield return conditional.IfFalse;
+                break;
+            case MethodCallExpression call:
+                if (call.Object != null)
+                {
+                    yield return call.Object;
+                }
+                foreach (var argument in call.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case MemberExpression member:
+                if (member.Expression != null)
+                {
+                    yield return member.Expression;
+                }
+                break;
+            case IndexExpression index:
+                if (index.Object != null)
+                {
+                    yield return index.Object;
+                }
+                foreach (var argument in index.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case NewArrayExpression array:
+                foreach (var element in array.Expressions)
+                {
+                    yield return element;
+                }
+                break;
+            case MemberInitExpression init:
+                foreach (var binding in init.Bindings)
+                {
+                    if (binding is MemberAssignment assignment)
+                    {
+                        yield return assignment.Expression;
+                    }
+                }
+                break;
+            case NewExpression creation:
+                foreach (var argument in creation.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case LambdaExpression lambda:
+                yield return lambda.Body;
+                break;
+            case InvocationExpression invocation:
+                yield return invocation.Expression;
+                foreach (var argument in invocation.Arguments)
+                {
+                    yield return argument;
+                }
+                break;
+            case TypeBinaryExpression typeBinary:
+                yield return typeBinary.Expression;
+                break;
+        }
     }
 
     private Expression ParseExpression(ParameterExpression parameter)
@@ -140,6 +310,8 @@ public class ExpressionParser
 
     private Expression ParseBinary(ParameterExpression parameter)
     {
+        EnsureStack();
+
         var left = ParseNullCoalescing(parameter);
         var token = Peek();
 
@@ -147,6 +319,7 @@ public class ExpressionParser
         {
             Advance(1);
             var right = ParseBinary(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            AlignBinaryOperandTypes(ref left, ref right);
             left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
         }
 
@@ -210,6 +383,8 @@ public class ExpressionParser
 
     private Expression ParseMemberAccess(Expression expression, ParameterExpression parameter)
     {
+        EnsureStack();
+
         var token = Peek();
         while (token.Type is TokenType.Dot or TokenType.QuestionDot or TokenType.OpenBracket)
         {
@@ -223,7 +398,7 @@ public class ExpressionParser
                 }
                 else
                 {
-                    expression = Expression.PropertyOrField(expression, token.Value);
+                    expression = PublicPropertyOrField(expression, token.Value);
                 }
             }
             else if (token.Type == TokenType.QuestionDot)
@@ -240,8 +415,7 @@ public class ExpressionParser
                 }
                 else
                 {
-                    var access = Expression.PropertyOrField(expression, token.Value);
-
+                    var access = PublicPropertyOrField(expression, token.Value);
                     expression = Expression.Condition(check, Expression.Default(access.Type), access);
 
                     var nextToken = Peek();
@@ -270,6 +444,7 @@ public class ExpressionParser
 
                     expression = Expression.Property(expression, indexer, index);
                 }
+
             }
 
             token = Peek();
@@ -298,8 +473,7 @@ public class ExpressionParser
 
                     Type? lambdaParameterType = null;
 
-                    var extensionMethod = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                        .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == 2);
+                    var extensionMethod = FindEnumerableMethod(methodName, 2);
 
                     if (extensionMethod != null)
                     {
@@ -340,8 +514,9 @@ public class ExpressionParser
             return Expression.Call(expression, method, arguments);
         }
 
-        method = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                   .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Count + 1);
+        method = typeof(System.Collections.IEnumerable).IsAssignableFrom(expression.Type)
+            ? FindEnumerableMethod(methodName, arguments.Count + 1)
+            : null;
 
         if (method != null)
         {
@@ -364,15 +539,54 @@ public class ExpressionParser
             return Expression.Call(method, argumentsWithInstance.Select((a, index) => ConvertIfNeeded(a, parameters[index].ParameterType)));
         }
 
-        throw new InvalidOperationException($"No suitable method '{methodName}' found for type '{expression.Type}'");
+        throw new InvalidOperationException($"No suitable method '{Shorten(methodName)}' found for type '{expression.Type}'");
+    }
+
+    private static MethodInfo? FindEnumerableMethod(string methodName, int parameterCount)
+    {
+        return typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .FirstOrDefault(m => m.Name == methodName
+                && m.GetParameters().Length == parameterCount
+                && typeof(System.Collections.IEnumerable).IsAssignableFrom(m.GetParameters()[0].ParameterType));
     }
 
     private static Type? GetItemType(Type enumerableOrArray)
     {
-        return enumerableOrArray.IsArray ? enumerableOrArray.GetElementType() : enumerableOrArray.GetGenericArguments()[0];
+        if (enumerableOrArray.IsArray)
+        {
+            return enumerableOrArray.GetElementType();
+        }
+
+        if (enumerableOrArray.IsGenericType)
+        {
+            return enumerableOrArray.GetGenericArguments()[0];
+        }
+
+        return enumerableOrArray.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))?
+            .GetGenericArguments()[0];
+    }
+
+    private static void EnsureStack()
+    {
+        try
+        {
+            RuntimeHelpers.EnsureSufficientExecutionStack();
+        }
+        catch (InsufficientExecutionStackException)
+        {
+            throw new InvalidOperationException("Expression nesting is too deep.");
+        }
     }
 
     private Expression? ParseTerm(ParameterExpression parameter)
+    {
+        EnsureStack();
+
+        return ParseTermCore(parameter);
+    }
+
+    private Expression? ParseTermCore(ParameterExpression parameter)
     {
         var token = Peek();
 
@@ -399,6 +613,20 @@ public class ExpressionParser
 
         if (token.Type == TokenType.Identifier)
         {
+            if (token.Value == "default" && Peek(1).Type == TokenType.OpenParen)
+            {
+                Advance(2);
+
+                if (!TryParseTypeReference(out var defaultType))
+                {
+                    throw new InvalidOperationException($"Could not resolve type in default expression at position {position}.");
+                }
+
+                Expect(TokenType.CloseParen);
+
+                return Expression.Default(defaultType);
+            }
+
             var matchingParameter = parameterStack.FirstOrDefault(p => p.Name == token.Value);
             if (matchingParameter != null)
             {
@@ -414,13 +642,18 @@ public class ExpressionParser
                 return ParseStaticMemberAccess(type, parameter);
             }
 
+            if (TryParseQualifiedType(out var qualifiedType))
+            {
+                return ParseStaticMemberAccess(qualifiedType, parameter);
+            }
+
             if (Peek(1).Type == TokenType.OpenParen)
             {
                 Advance(1);
                 return ParseInvocation(parameter, token.Value, parameter);
             }
 
-            throw new InvalidOperationException($"Unexpected identifier: {token.Value}");
+            throw new InvalidOperationException($"Unexpected identifier: {Shorten(token.Value)}");
         }
 
         if (token.Type == TokenType.ExclamationMark)
@@ -488,7 +721,7 @@ public class ExpressionParser
                                 if (Peek().Type == TokenType.Dot || Peek().Type == TokenType.QuestionDot)
                                 {
                                     // Handle nested property access
-                                    Expression expr = propertyName == parameter.Name ? (Expression)parameter : Expression.Property(parameter, propertyName);
+                                    Expression expr = propertyName == parameter.Name ? (Expression)parameter : PublicPropertyOrField(parameter, propertyName);
                                     propertyExpression = ParseMemberAccess(expr, parameter);
 
                                     // Get the last identifier token's value
@@ -535,6 +768,12 @@ public class ExpressionParser
 
                     var propertyTypes = properties.Select(p => p.Expression.Type).ToArray();
                     var propertyNames = properties.Select(p => p.Name).ToArray();
+
+                    if (++anonymousTypeCount > MaxAnonymousTypes || properties.Count > MaxAnonymousTypeMembers)
+                    {
+                        throw new InvalidOperationException("Expression is too complex.");
+                    }
+
                     var dynamicType = DynamicTypeFactory.CreateType(parameter.Type.Name, propertyNames, propertyTypes);
                     var bindings = properties.Select(p => Expression.Bind(dynamicType.GetProperty(p.Name)!, p.Expression));
                     return Expression.MemberInit(Expression.New(dynamicType), bindings);
@@ -542,19 +781,10 @@ public class ExpressionParser
                 else
                 {
                     Type? elementType = null;
-                    var nullable = false;
 
-                    if (token.Type == TokenType.Identifier)
+                    if (TryParseQualifiedArrayType(out var parsedElementType))
                     {
-                        var typeName = token.Value;
-                        elementType = GetWellKnownType(typeName);
-                        Advance(1);
-
-                        if (Peek().Type == TokenType.QuestionMark)
-                        {
-                            nullable = true;
-                            Advance(1);
-                        }
+                        elementType = parsedElementType;
                     }
 
                     Expect(TokenType.OpenBracket);
@@ -583,11 +813,6 @@ public class ExpressionParser
                     if (elementType == null)
                     {
                         elementType = elements.Count > 0 ? elements[0].Type : typeof(object);
-                    }
-
-                    if (nullable)
-                    {
-                        elementType = typeof(Nullable<>).MakeGenericType(elementType);
                     }
 
                     return Expression.NewArrayInit(elementType, elements.Select(e => ConvertIfNeeded(e, elementType)));
@@ -653,7 +878,7 @@ public class ExpressionParser
         {
             var name = typeName.ToString();
 
-            var type = GetWellKnownType(name) ?? typeResolver?.Invoke(name) ?? throw new InvalidOperationException($"Could not resolve type: {typeName}");
+            var type = ResolveType(name) ?? throw new InvalidOperationException($"Could not resolve type: {Shorten(name)}");
 
             if (nullable && type.IsValueType)
             {
@@ -696,7 +921,7 @@ public class ExpressionParser
 
             if (member == null)
             {
-                throw new InvalidOperationException($"Member {token.Value} not found on type {type.Name}");
+                throw new InvalidOperationException($"Member {Shorten(token.Value)} not found on type {type.Name}");
             }
 
             return Expression.MakeMemberAccess(null, member);
@@ -724,9 +949,516 @@ public class ExpressionParser
 
         Expect(TokenType.CloseParen);
 
-        var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {methodName} not found on type {type.Name}");
+        var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {Shorten(methodName)} not found on type {type.Name}");
 
         return Expression.Call(null, method, arguments);
+    }
+
+    /// <summary>
+    /// Tries to parse a type reference (e.g. bool, int, System.DateTime, System.DateTime?) and returns the resolved type.
+    /// Advances position past the type name. Does not backtrack — expects the full token sequence to be a type.
+    /// Used for contexts like default(T) where the entire content is a type name.
+    /// </summary>
+    private bool TryParseTypeReference(out Type type)
+    {
+        type = null!;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                position = startPosition;
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        var typeName = string.Join(".", parts);
+        var resolvedType = ResolveType(typeName);
+        if (resolvedType != null)
+        {
+            if (nullable && resolvedType.IsValueType)
+            {
+                resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+            }
+
+            type = resolvedType;
+            return true;
+        }
+
+        position = startPosition;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to parse a qualified type name (e.g. System.DateTime or System.DateTime?) and returns the resolved type.
+    /// Advances position past the type name. The next token will be . for member access or [ for array.
+    /// Uses backtracking to find the longest resolvable type prefix (e.g. System.DateTime in System.DateTime.SpecifyKind).
+    /// </summary>
+    private bool TryParseQualifiedType(out Type type)
+    {
+        type = null!;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        for (var i = Math.Min(parts.Count, MaxTypeNameParts); i >= 1; i--)
+        {
+            var typeName = string.Join(".", parts.Take(i));
+            var resolvedType = ResolveType(typeName);
+            if (resolvedType != null)
+            {
+                if (nullable && resolvedType.IsValueType)
+                {
+                    resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+                }
+
+                position = startPosition;
+                var tokensToConsume = (i * 2) - 1 + (nullable ? 1 : 0);
+                for (var t = 0; t < tokensToConsume; t++)
+                {
+                    Advance(1);
+                }
+
+                type = resolvedType;
+                return true;
+            }
+        }
+
+        position = startPosition;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to parse a qualified array element type (e.g. System.DateTime? or DateTime) before [].
+    /// Advances position past the type name to the [. Returns the element type for the array.
+    /// </summary>
+    private bool TryParseQualifiedArrayType(out Type? elementType)
+    {
+        elementType = null;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                position = startPosition;
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        if (Peek().Type != TokenType.OpenBracket)
+        {
+            position = startPosition;
+            return false;
+        }
+
+        for (var i = Math.Min(parts.Count, MaxTypeNameParts); i >= 1; i--)
+        {
+            var typeName = string.Join(".", parts.Take(i));
+            var resolvedType = ResolveType(typeName);
+            if (resolvedType != null)
+            {
+                if (nullable && resolvedType.IsValueType)
+                {
+                    resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+                }
+                elementType = resolvedType;
+                return true;
+            }
+        }
+
+        position = startPosition;
+        return false;
+    }
+
+    private Type? ResolveType(string typeName)
+    {
+        return GetWellKnownType(typeName)
+            ?? ResolveWellKnownFullName(typeName)
+            ?? typeResolver?.Invoke(typeName)
+            ?? ResolveLoadedType(typeName);
+    }
+
+    private static string Shorten(string value) => value.Length > 100 ? value[..100] + "..." : value;
+
+    private static volatile Dictionary<string, Type>? typeNameCache;
+    private static int typeNameCacheVersion;
+    private static int typeNameCacheSubscribed;
+
+    private static Type? ResolveLoadedType(string typeName)
+    {
+        var cache = typeNameCache;
+
+        if (cache == null)
+        {
+            if (Interlocked.Exchange(ref typeNameCacheSubscribed, 1) == 0)
+            {
+                AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
+            }
+
+            var version = Volatile.Read(ref typeNameCacheVersion);
+
+            cache = BuildTypeNameCache(AppDomain.CurrentDomain.GetAssemblies());
+
+            if (version == Volatile.Read(ref typeNameCacheVersion))
+            {
+                typeNameCache = cache;
+
+                if (version != Volatile.Read(ref typeNameCacheVersion))
+                {
+                    typeNameCache = null;
+                }
+            }
+        }
+
+        return cache.TryGetValue(typeName, out var type) ? type : null;
+    }
+
+    private static void OnAssemblyLoad(object? sender, AssemblyLoadEventArgs args)
+    {
+        if (args.LoadedAssembly.IsDynamic || args.LoadedAssembly.IsCollectible)
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref typeNameCacheVersion);
+        typeNameCache = null;
+    }
+
+    private static Dictionary<string, Type> BuildTypeNameCache(Assembly[] assemblies)
+    {
+        var map = new Dictionary<string, Type>(StringComparer.Ordinal);
+
+        foreach (var type in assemblies.Where(a => !a.IsCollectible && !a.IsDynamic).SelectMany(GetLoadableTypes))
+        {
+            if (type.IsGenericTypeDefinition || !(type.IsVisible || type.IsEnum))
+            {
+                continue;
+            }
+
+            var fullName = type.FullName;
+            if (fullName != null)
+            {
+                var key = fullName.Replace("+", ".", StringComparison.Ordinal);
+
+                if (!map.TryGetValue(key, out var existing) || (!existing.IsVisible && type.IsVisible))
+                {
+                    map[key] = type;
+                }
+            }
+        }
+
+        return map;
+    }
+
+    private static Type? ResolveWellKnownFullName(string typeName)
+    {
+        if (!typeName.StartsWith("System.", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var resolved = GetWellKnownType(typeName.Split('.')[^1]);
+
+        return resolved?.FullName == typeName ? resolved : null;
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(t => t != null)!;
+        }
+    }
+
+    private static readonly HashSet<Type> AllowedFrameworkTypes = new()
+    {
+        typeof(DateTime), typeof(DateOnly), typeof(TimeOnly), typeof(DateTimeOffset),
+        typeof(Guid), typeof(TimeSpan), typeof(DateTimeStyles), typeof(DateTimeKind),
+        typeof(double), typeof(float), typeof(int), typeof(long), typeof(short),
+        typeof(byte), typeof(sbyte), typeof(uint), typeof(ulong), typeof(ushort),
+        typeof(bool), typeof(char), typeof(decimal), typeof(string),
+        typeof(Math), typeof(Convert), typeof(Enum),
+        typeof(Uri), typeof(Version), typeof(Half),
+#if NET7_0_OR_GREATER
+        typeof(Int128), typeof(UInt128),
+#endif
+        typeof(System.Numerics.BigInteger), typeof(IntPtr), typeof(UIntPtr)
+    };
+
+    private static readonly HashSet<string> ComparisonOperatorNames = new(StringComparer.Ordinal)
+    {
+        "op_Equality", "op_Inequality", "op_GreaterThan", "op_LessThan", "op_GreaterThanOrEqual", "op_LessThanOrEqual"
+    };
+
+    private static readonly HashSet<string> DeniedStringMethodNames = new(StringComparer.Ordinal)
+    {
+        nameof(string.Intern), nameof(string.IsInterned), nameof(string.PadLeft), nameof(string.PadRight)
+    };
+
+    private static readonly HashSet<string> ObjectMethodNames = new(StringComparer.Ordinal)
+    {
+        nameof(ToString), nameof(Equals), nameof(GetHashCode), nameof(IComparable.CompareTo)
+    };
+
+    private static readonly HashSet<string> CollectionReadMethodNames = new(StringComparer.Ordinal)
+    {
+        "Contains", "ContainsKey", "ContainsValue", "IndexOf", "LastIndexOf", "GetValueOrDefault",
+        "IsSubsetOf", "IsSupersetOf", "IsProperSubsetOf", "IsProperSupersetOf", "Overlaps", "SetEquals",
+        "ToArray", "ToList", "AsReadOnly"
+    };
+
+    private static readonly ConcurrentDictionary<Type, bool> allowedTypes = new();
+    private static readonly ConcurrentDictionary<(Module Module, int Token), bool> allowedMethods = new();
+
+    /// <summary>
+    /// Allows expression strings to call the specified method. By default only methods of framework value
+    /// types, <see cref="Math"/>, <see cref="Convert"/> and LINQ operators can be called.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// ExpressionParser.AllowMethod(typeof(Order).GetMethod(nameof(Order.IsOverdue))!);
+    /// </code>
+    /// </example>
+    public static void AllowMethod(MethodInfo method)
+    {
+        ArgumentNullException.ThrowIfNull(method);
+
+        allowedMethods[(method.Module, method.MetadataToken)] = true;
+    }
+
+    /// <summary>
+    /// Allows expression strings to call the public methods and operators of the specified type and to read
+    /// its static properties and fields.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// ExpressionParser.AllowType(typeof(MyApp.Filters.Helpers));
+    /// </code>
+    /// </example>
+    public static void AllowType(Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+
+        allowedTypes[type] = true;
+    }
+
+    private static bool IsTypeAllowed(Type type)
+    {
+        return allowedTypes.ContainsKey(type) || (type.IsGenericType && allowedTypes.ContainsKey(type.GetGenericTypeDefinition()));
+    }
+
+    private static bool IsSequence(Type type) => typeof(System.Collections.IEnumerable).IsAssignableFrom(type);
+
+    private static bool IsMethodAllowed(MethodInfo method)
+    {
+        var declaringType = method.DeclaringType;
+
+        if (declaringType == null)
+        {
+            return false;
+        }
+
+        if (allowedMethods.ContainsKey((method.Module, method.MetadataToken)) || IsTypeAllowed(declaringType))
+        {
+            return true;
+        }
+
+        if (declaringType == typeof(Enumerable) || declaringType == typeof(Queryable))
+        {
+            var parameters = method.GetParameters();
+
+            return parameters.Length > 0 && IsSequence(parameters[0].ParameterType);
+        }
+
+        if (declaringType == typeof(string) && DeniedStringMethodNames.Contains(method.Name))
+        {
+            return false;
+        }
+
+        if (AllowedFrameworkTypes.Contains(declaringType) || declaringType.IsEnum)
+        {
+            return true;
+        }
+
+        if (declaringType.IsGenericType && declaringType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            return true;
+        }
+
+        if (method.IsStatic)
+        {
+            return method.IsSpecialName && ComparisonOperatorNames.Contains(method.Name);
+        }
+
+        return ObjectMethodNames.Contains(method.Name) || (CollectionReadMethodNames.Contains(method.Name) && IsSequence(declaringType));
+    }
+
+    private static bool IsStaticReadAllowed(MemberInfo member)
+    {
+        var declaringType = member.DeclaringType;
+
+        if (declaringType == null)
+        {
+            return false;
+        }
+
+        return AllowedFrameworkTypes.Contains(declaringType) || declaringType == typeof(CultureInfo) || declaringType.IsEnum
+            || (member is FieldInfo { IsLiteral: true } && declaringType.IsVisible) || IsTypeAllowed(declaringType);
+    }
+
+    private static Type Unwrap(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type) ?? type;
+
+        while (underlying.IsArray && underlying.GetElementType() is { } elementType)
+        {
+            underlying = elementType;
+        }
+
+        return underlying;
+    }
+
+    private static bool IsReflectionType(Type type)
+    {
+        var t = Unwrap(type);
+        return typeof(MemberInfo).IsAssignableFrom(t)
+            || typeof(Assembly).IsAssignableFrom(t)
+            || typeof(Module).IsAssignableFrom(t)
+            || typeof(Delegate).IsAssignableFrom(t)
+            || t == typeof(AppDomain)
+            || t == typeof(Type)
+            || (t.Namespace != null && t.Namespace.StartsWith("System.Reflection", StringComparison.Ordinal));
+    }
+
+    private static string DisplayName(Type? type)
+    {
+        if (type == null)
+        {
+            return string.Empty;
+        }
+
+        var name = (type.IsGenericType ? type.GetGenericTypeDefinition() : type).FullName ?? type.Name;
+
+        return name.Replace("+", ".", StringComparison.Ordinal);
+    }
+
+    private static void EnsureAllowed(Expression node)
+    {
+        if (node.NodeType != ExpressionType.Lambda && IsReflectionType(node.Type))
+        {
+            throw new InvalidOperationException($"Access to reflection type '{Unwrap(node.Type).FullName}' is not allowed.");
+        }
+
+        var supported = node switch
+        {
+            BinaryExpression or UnaryExpression or ConditionalExpression or MethodCallExpression or MemberExpression
+                or IndexExpression or NewArrayExpression or LambdaExpression or ConstantExpression or ParameterExpression
+                or DefaultExpression or TypeBinaryExpression => true,
+            NewExpression creation => creation.Type.Assembly.IsDynamic,
+            MemberInitExpression init => init.Bindings.All(binding => binding is MemberAssignment),
+            _ => false
+        };
+
+        if (!supported)
+        {
+            throw new InvalidOperationException($"Expression of kind '{node.NodeType}' is not allowed.");
+        }
+
+        var method = node switch
+        {
+            MethodCallExpression call => call.Method,
+            BinaryExpression binary => binary.Method,
+            UnaryExpression unary => unary.Method,
+            _ => null
+        };
+
+        if (method != null && !IsMethodAllowed(method))
+        {
+            var typeName = DisplayName(method.DeclaringType);
+
+            throw new InvalidOperationException($"Method '{method.Name}' of type '{typeName}' is not allowed in an expression string. "
+                + $"To allow it, call ExpressionParser.AllowMethod(typeof({typeName}).GetMethod(\"{method.Name}\")) or ExpressionParser.AllowType(typeof({typeName})) when the application starts.");
+        }
+
+        if (node is MemberExpression { Expression: null } member && !IsStaticReadAllowed(member.Member))
+        {
+            var typeName = DisplayName(member.Member.DeclaringType);
+
+            throw new InvalidOperationException($"Static member '{member.Member.Name}' of type '{typeName}' is not allowed in an expression string. "
+                + $"To allow it, call ExpressionParser.AllowType(typeof({typeName})) when the application starts.");
+        }
     }
 
     private static Type? GetWellKnownType(string typeName)
@@ -757,6 +1489,17 @@ public class ExpressionParser
             nameof(String) or "string" => typeof(string),
             nameof(Math) => typeof(Math),
             nameof(Convert) => typeof(Convert),
+            nameof(TimeSpan) => typeof(TimeSpan),
+            nameof(StringComparison) => typeof(StringComparison),
+            nameof(DayOfWeek) => typeof(DayOfWeek),
+            nameof(Object) or "object" => typeof(object),
+            nameof(Uri) => typeof(Uri),
+            nameof(Version) => typeof(Version),
+#if NET7_0_OR_GREATER
+            nameof(Int128) => typeof(Int128),
+            nameof(UInt128) => typeof(UInt128),
+#endif
+            nameof(Half) => typeof(Half),
             _ => null
         };
     }
@@ -802,6 +1545,7 @@ public class ExpressionParser
         {
             Advance(1);
             var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            AlignBinaryOperandTypes(ref left, ref right);
             left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
         }
 
@@ -915,5 +1659,25 @@ public class ExpressionParser
         }
 
         return expression;
+    }
+
+    private static void AlignBinaryOperandTypes(ref Expression left, ref Expression right)
+    {
+        if (left.Type == right.Type)
+        {
+            return;
+        }
+
+        var leftUnderlying = Nullable.GetUnderlyingType(left.Type);
+        var rightUnderlying = Nullable.GetUnderlyingType(right.Type);
+
+        if (leftUnderlying != null && rightUnderlying == null && leftUnderlying == right.Type)
+        {
+            right = Expression.Convert(right, left.Type);
+        }
+        else if (rightUnderlying != null && leftUnderlying == null && rightUnderlying == left.Type)
+        {
+            left = Expression.Convert(left, right.Type);
+        }
     }
 }

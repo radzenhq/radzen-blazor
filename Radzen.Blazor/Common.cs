@@ -3172,7 +3172,7 @@ namespace Radzen
                     {
                         try
                         {
-                            body = Expression.PropertyOrField(body, member);
+                            body = QueryableExtension.PublicPropertyOrField(body, member);
                         }
                         catch (AmbiguousMatchException)
                         {
