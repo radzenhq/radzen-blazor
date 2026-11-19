@@ -53,6 +53,7 @@ namespace Radzen.Blazor.Tests
         static readonly (string CssClass, string Hint, TooltipPosition Position)[] AIChatButtons =
         {
             ("rz-chat-header-clear", "Clear chat history", TooltipPosition.Bottom),
+            ("rz-chat-scroll-end", "Scroll to the latest message", TooltipPosition.Top),
             ("rz-chat-attachment-remove", "Remove attachment", TooltipPosition.Top),
             ("rz-chat-attach-btn", "Attach image", TooltipPosition.Top),
             ("rz-chat-send-btn", "Send message", TooltipPosition.Top),

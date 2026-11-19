@@ -2639,6 +2639,9 @@
   <data name="AIChat_RemoveAttachmentTitle" xml:space="preserve">
     <value>Remove attachment</value>
   </data>
+  <data name="AIChat_ScrollToEndTitle" xml:space="preserve">
+    <value>Scroll to the latest message</value>
+  </data>
   <data name="AIChat_UsageFormat" xml:space="preserve">
     <value>{0} tokens</value>
   </data>

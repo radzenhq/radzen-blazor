@@ -34,6 +34,7 @@ namespace Radzen.Blazor
         private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
+        private bool scrollToEnd = true;
         private CancellationTokenSource cts = new();
         private string? currentSessionId;
 
@@ -441,6 +442,21 @@ namespace Radzen.Blazor
 
         private ButtonTooltips Tooltips => buttonTooltips ??= new ButtonTooltips(ServiceProvider?.GetService<TooltipService>());
 
+        private void OnScrollToEndClick()
+        {
+            Tooltips.Close();
+            ScrollToEnd();
+        }
+
+        /// <summary>
+        /// Scrolls the messages to the latest one, wherever the reader has scrolled to.
+        /// </summary>
+        public void ScrollToEnd()
+        {
+            scrollToEnd = true;
+            InvokeAsync(StateHasChanged);
+        }
+
         private void OnRemoveAttachmentClick(ChatAttachment attachment)
         {
             Tooltips.Close();
@@ -648,6 +664,11 @@ namespace Radzen.Blazor
 
             Messages.Add(message);
 
+            if (message.IsUser)
+            {
+                scrollToEnd = true;
+            }
+
             while (Messages.Count > MaxMessages)
             {
                 Messages.RemoveAt(0);
@@ -688,6 +709,7 @@ namespace Radzen.Blazor
         public async Task LoadMessages(IEnumerable<ChatMessage> messages)
         {
             Messages.Clear();
+            scrollToEnd = true;
 
             if (messages != null)
             {
@@ -1248,8 +1270,12 @@ namespace Radzen.Blazor
         {
             if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
             {
-                // Scroll to bottom when new messages are added
-                await JSRuntime.InvokeVoidAsync("Radzen.chatScrollAfterRender", ".rz-chat-messages", 100);
+                // The script keeps the list at its end only while the reader is there, and shows the scroll to end button when
+                // content arrives while the reader is elsewhere. The first render after the initial one, a message of the user,
+                // a loaded conversation and that button move the list to the end wherever the reader is.
+                var toEnd = scrollToEnd;
+                scrollToEnd = false;
+                await JSRuntime.InvokeVoidAsync("Radzen.chatScrollAfterRender", messagesContainer, toEnd, 100);
             }
         }
 

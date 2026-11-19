@@ -225,6 +225,22 @@ $rz-chat-tool-call-color: var(--rz-text-color) !default;
     }
 }
 
+.rz-chat-messages > .rz-button.rz-chat-scroll-end {
+    display: none;
+    position: sticky;
+    bottom: 0.5rem;
+    z-index: 1;
+    flex: none;
+    align-self: center;
+    margin-block-start: calc(-1rem - var(--rz-button-size-sm, 1.5rem));
+    border-radius: 50%;
+    box-shadow: var(--rz-shadow-2);
+}
+
+.rz-chat-messages-behind > .rz-button.rz-chat-scroll-end {
+    display: inline-flex;
+}
+
 .rz-chat-new-messages {
     display: flex;
     align-items: center;

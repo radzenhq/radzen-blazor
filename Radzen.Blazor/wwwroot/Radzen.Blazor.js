@@ -8095,10 +8095,25 @@ Radzen.readClipboardText = async function() {
     return null;
   }
 };
-Radzen.chatScrollAfterRender = function(selector, delay) {
+Radzen.chatScrollAfterRender = function(container, toEnd, delay) {
+  if (typeof container === 'string') container = document.querySelector(container);
+  if (!container) return;
+  if (container.rzChatAtEnd === undefined) {
+    container.rzChatAtEnd = true;
+    container.addEventListener('scroll', function() {
+      container.rzChatAtEnd = Radzen.chatIsNearBottom(container, 50);
+      if (container.rzChatAtEnd) container.classList.remove('rz-chat-messages-behind');
+    }, { passive: true });
+  }
+  if (toEnd) container.rzChatAtEnd = true;
   setTimeout(function() {
-    var container = document.querySelector(selector);
-    if (container) container.scrollTop = container.scrollHeight;
+    if (container.rzChatAtEnd) {
+      container.classList.remove('rz-chat-messages-behind');
+      container.scrollTop = container.scrollHeight;
+    } else if (container.scrollHeight > container.rzChatHeight) {
+      container.classList.add('rz-chat-messages-behind');
+    }
+    container.rzChatHeight = container.scrollHeight;
   }, delay || 100);
 };
 Radzen.createAutoComplete = function(el, popupId, openOnFocus, minLength, instance, openCallback, closeCallback) {
