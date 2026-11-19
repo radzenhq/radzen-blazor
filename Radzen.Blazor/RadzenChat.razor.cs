@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -1301,8 +1302,22 @@ namespace Radzen.Blazor
             };
         }
 
+        [Inject]
+        private IServiceProvider? ServiceProvider { get; set; }
+
+        private ButtonTooltips? buttonTooltips;
+
+        private ButtonTooltips Tooltips => buttonTooltips ??= new ButtonTooltips(ServiceProvider?.GetService<TooltipService>());
+
+        private async Task OnSendClick()
+        {
+            Tooltips.Close();
+            await OnSendMessage();
+        }
+
         private async Task OnClearChat()
         {
+            Tooltips.Close();
             await ClearChat();
         }
 

@@ -85,6 +85,11 @@ namespace Radzen
         public event Action<ElementReference, Type, TooltipOptions>? OnOpen;
 
         /// <summary>
+        /// Gets a value indicating whether a component, normally <see cref="RadzenTooltip"/>, is subscribed to display the tooltips this service opens.
+        /// </summary>
+        internal bool HasHost => OnOpen != null;
+
+        /// <summary>
         /// Occurs when [on open chart tooltip].
         /// </summary>
         internal event Action<ElementReference, double, double, ChartTooltipOptions>? OnOpenChartTooltip;

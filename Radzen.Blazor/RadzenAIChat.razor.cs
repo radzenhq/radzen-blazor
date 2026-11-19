@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -433,8 +434,35 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
+        [Inject]
+        private IServiceProvider? ServiceProvider { get; set; }
+
+        private ButtonTooltips? buttonTooltips;
+
+        private ButtonTooltips Tooltips => buttonTooltips ??= new ButtonTooltips(ServiceProvider?.GetService<TooltipService>());
+
+        private void OnRemoveAttachmentClick(ChatAttachment attachment)
+        {
+            Tooltips.Close();
+            RemoveAttachment(attachment);
+        }
+
+        private void OnStopClick()
+        {
+            Tooltips.Close();
+            Stop();
+        }
+
+        private async Task OnSendClick()
+        {
+            Tooltips.Close();
+            await OnSendMessage();
+        }
+
         private async Task OnAttachClick()
         {
+            Tooltips.Close();
+
             if (JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.clickElement", attachInputId);
@@ -1211,6 +1239,7 @@ namespace Radzen.Blazor
 
         private async Task OnClearChat()
         {
+            Tooltips.Close();
             await ClearChat();
         }
 

@@ -25,7 +25,8 @@
                 @if (ShowClearButton)
                 {
                     <RadzenButton Icon="delete_history" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" 
-                                Click="@OnClearChat" Title="@Localize(nameof(RadzenStrings.AIChat_ClearChatTitle))" class="rz-chat-header-clear" />
+                                Click="@OnClearChat" class="rz-chat-header-clear" @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.AIChat_ClearChatTitle)))"
+                                MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.AIChat_ClearChatTitle)), TooltipPosition.Bottom)" MouseLeave="@Tooltips.Hide" />
                 }
                 </RadzenStack>
             </RadzenStack>
@@ -95,7 +96,9 @@
                                 <RadzenIcon Icon="attach_file" />
                             }
                             <span class="rz-chat-attachment-name" title="@attachment.Name">@attachment.Name</span>
-                            <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Title="@Localize(nameof(RadzenStrings.AIChat_RemoveAttachmentTitle))" Disabled="@(Disabled || IsLoading)" Click="@(() => RemoveAttachment(attachment))" class="rz-chat-attachment-remove" />
+                            <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Disabled="@(Disabled || IsLoading)" Click="@(() => OnRemoveAttachmentClick(attachment))" class="rz-chat-attachment-remove"
+                                          @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.AIChat_RemoveAttachmentTitle)))"
+                                          MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.AIChat_RemoveAttachmentTitle)), TooltipPosition.Top)" MouseLeave="@Tooltips.Hide" />
                         </span>
                     }
                 </div>
@@ -125,7 +128,9 @@
                                       Variant="Variant.Text"
                                       Disabled="@(IsLoading || Disabled || ReadOnly)"
                                       Click="@OnAttachClick"
-                                      Title="@Localize(nameof(RadzenStrings.AIChat_AttachTitle))"
+                                      @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.AIChat_AttachTitle)))"
+                                      MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.AIChat_AttachTitle)), TooltipPosition.Top)"
+                                      MouseLeave="@Tooltips.Hide"
                                       class="rz-chat-attach-btn" />
                     }
                     @if (IsLoading)
@@ -134,8 +139,10 @@
                                       Text="@StopButtonText"
                                       ButtonStyle="ButtonStyle.Danger"
                                       Variant="Variant.Text"
-                                      Click="@Stop"
-                                      Title="@Localize(nameof(RadzenStrings.AIChat_StopTitle))"
+                                      Click="@OnStopClick"
+                                      @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.AIChat_StopTitle)), string.IsNullOrEmpty(StopButtonText))"
+                                      MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.AIChat_StopTitle)), TooltipPosition.Top)"
+                                      MouseLeave="@Tooltips.Hide"
                                       class="rz-chat-stop-btn" />
                     }
                     @if (!IsLoading || QueueMessages)
@@ -145,8 +152,10 @@
                                       ButtonStyle="ButtonStyle.Primary"
                                       Variant="@(string.IsNullOrEmpty(SendButtonText) ? Variant.Text : Variant.Filled)"
                                       Disabled="@((string.IsNullOrWhiteSpace(CurrentInput) && pendingAttachments.Count == 0) || Disabled)"
-                                      Click="@OnSendMessage"
-                                      Title="@Localize(nameof(RadzenStrings.AIChat_SendTitle))"
+                                      Click="@OnSendClick"
+                                      @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.AIChat_SendTitle)), string.IsNullOrEmpty(SendButtonText))"
+                                      MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.AIChat_SendTitle)), TooltipPosition.Top)"
+                                      MouseLeave="@Tooltips.Hide"
                                       class="rz-chat-send-btn" />
                     }
                 </div>

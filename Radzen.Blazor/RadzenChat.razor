@@ -49,7 +49,8 @@
                 @if (ShowClearButton)
                 {
                     <RadzenButton Icon="delete_history" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" 
-                                Click="@OnClearChat" Title="@Localize(nameof(RadzenStrings.Chat_ClearChatTitle))" class="rz-chat-header-clear" />
+                                Click="@OnClearChat" class="rz-chat-header-clear" @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.Chat_ClearChatTitle)))"
+                                MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.Chat_ClearChatTitle)), TooltipPosition.Bottom)" MouseLeave="@Tooltips.Hide" />
                 }
                 </RadzenStack>
             </RadzenStack>
@@ -186,8 +187,10 @@
                                 ButtonStyle="ButtonStyle.Primary" 
                                 Variant="Variant.Text"
                                 Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
-                                Click="@OnSendMessage"
-                                Title="@Localize(nameof(RadzenStrings.Chat_SendTitle))"
+                                Click="@OnSendClick"
+                                @attributes="@Tooltips.Attributes(Localize(nameof(RadzenStrings.Chat_SendTitle)))"
+                                MouseEnter="@Tooltips.Show(Localize(nameof(RadzenStrings.Chat_SendTitle)), TooltipPosition.Top)"
+                                MouseLeave="@Tooltips.Hide"
                                 class="rz-chat-send-btn" />
             </div>
 
