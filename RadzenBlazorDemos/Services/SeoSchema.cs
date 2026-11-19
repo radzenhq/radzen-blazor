@@ -77,6 +77,23 @@ namespace RadzenBlazorDemos
                 return Serialize(hub);
             }
 
+            if (path == "templates")
+            {
+                var hub = new List<object>
+                {
+                    CollectionPage(example, url),
+                    ItemList(exampleService.GetTemplatePages()),
+                    Breadcrumb(new[] { ("Home", BaseUrl + "/"), ("App Templates", url) })
+                };
+
+                if (example.Faq != null && example.Faq.Any())
+                {
+                    hub.Add(FaqPage(example));
+                }
+
+                return Serialize(hub);
+            }
+
             if (InCluster(exampleService.GetChartPages().Concat(exampleService.GetChartConfigPages()), path))
             {
                 return ArticleGraph(example, url, exampleService, "Charts", "charts");

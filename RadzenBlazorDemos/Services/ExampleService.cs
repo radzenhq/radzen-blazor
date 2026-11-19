@@ -4375,6 +4375,21 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
+                    Name = "Overview",
+                    Path = "templates",
+                    Title = "Blazor App and Website Templates | Radzen",
+                    Description = "Ready-made Blazor app templates: a free dashboard sample and premium healthcare, real estate and auto repair website templates, each with a live preview.",
+                    Tags = new [] { "template", "templates", "website", "dashboard", "admin", "app", "application", "starter", "overview" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Are the Blazor templates free?", Answer = "The Issues Dashboard sample is free and open source. The healthcare, real estate and repair workshop website templates are premium and come with a Radzen Blazor subscription." },
+                        new FaqItem { Question = "What does a website template include?", Answer = "Each template is a complete multi-page Blazor website. The real estate template, for example, has a home page with top listings, a properties page with filtering, property details, agent pages and an about page." },
+                        new FaqItem { Question = "Can I see a template before I buy it?", Answer = "Yes. Every template has a live preview that opens in your browser." },
+                        new FaqItem { Question = "Which components do the templates use?", Answer = "They are built with Radzen Blazor Components, so you can change and extend them with the same 155+ components you use in the rest of your app." }
+                    }
+                },
+                new Example
+                {
                     Name = "Issues Dashboard",
                     Path = "/dashboard",
                     Title = "Sample Blazor Dashboard | Free Radzen Blazor",
@@ -5119,6 +5134,12 @@ namespace RadzenBlazorDemos
         }
 
         // Every leaf page under the "DataGrid" category (across its sub-groups). Article-eligible for schema.
+        public IEnumerable<Example> GetTemplatePages()
+        {
+            var templates = Examples.FirstOrDefault(c => c.Name == "App Templates");
+            return templates?.Children != null ? CollectLeaves(templates.Children).Where(e => e.Path?.TrimStart('/') != "templates").ToList() : Enumerable.Empty<Example>();
+        }
+
         public IEnumerable<Example> GetDataGridPages()
         {
             var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");

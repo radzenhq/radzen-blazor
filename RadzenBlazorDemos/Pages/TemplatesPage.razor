@@ -1,0 +1,76 @@
+@page "/templates"
+@inject ExampleService ExampleService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@ExampleService.TitleFor(example)</PageTitle>
+<HeadContent>
+    <meta name="description" content="@ExampleService.DescriptionFor(example)">
+    <meta name="author" content="Radzen">
+    <meta property="og:title" content="@ExampleService.TitleFor(example)" />
+    <meta property="og:description" content="@ExampleService.DescriptionFor(example)" />
+    <meta property="og:site_name" content="Radzen Blazor Components">
+    <meta property="og:image" content="https://blazor.radzen.com/images/radzen-og.png" />
+    <meta property="twitter:card" content="summary_large_image" />
+</HeadContent>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor App Templates
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1200px;">
+    Start your next Blazor app from a ready-made template built with Radzen Blazor Components. Explore the free dashboard sample, or pick a premium website template for healthcare, real estate or auto repair, included with a Radzen Blazor subscription. Every template has a live preview.
+</RadzenText>
+
+<RadzenRow Gap="1.5rem" RowGap="1.5rem" class="app-templates rz-pt-4">
+    @foreach (var template in templates)
+    {
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden rz-h-100">
+                <RadzenLink Path="@template.Path">
+                    <RadzenImage Path="@template.Image" AlternateText="@($"{template.Name} Blazor template")" class="rz-w-100 app-templates-thumb" />
+                </RadzenLink>
+                <RadzenStack Gap="0.75rem" class="rz-p-6">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-m-0">@template.Name</RadzenText>
+                        <RadzenBadge BadgeStyle="@(template.Pro ? BadgeStyle.Danger : BadgeStyle.Success)" Text="@(template.Pro ? "PRO" : "FREE")" />
+                    </RadzenStack>
+                    <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-m-0">@template.Description</RadzenText>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-pt-2">
+                        <RadzenLink Text="View template" class="rz-button rz-button-md rz-variant-flat rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="@template.Path" />
+                        @if (template.Preview != null)
+                        {
+                            <RadzenLink Text="Live Preview" Icon="open_in_new" class="rz-button rz-button-md rz-variant-text rz-base rz-shade-darker" Style="--rz-link-hover-text-decoration: none" Path="@template.Preview" target="_blank" />
+                        }
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+<style>
+    .app-templates-thumb {
+        display: block;
+        aspect-ratio: 8 / 3;
+        object-fit: cover;
+        object-position: top;
+    }
+</style>
+
+@code {
+    Example example;
+
+    protected override void OnInitialized()
+    {
+        example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+
+    record AppTemplate(string Name, string Description, string Path, string Image, string Preview, bool Pro);
+
+    AppTemplate[] templates = new[]
+    {
+        new AppTemplate("Issues Dashboard", "A dashboard with charts, a DataGrid and stat cards on one page, visualizing live GitHub issues. Free and open source.", "/dashboard", "images/blazor-template-dashboard.jpg", null, false),
+        new AppTemplate("Healthcare", "A modern, responsive healthcare website that showcases medical services, telehealth solutions and AI-driven innovations.", "/templates-healthcare", "images/blazor-template-healthcare.jpg", "https://healthcare.radzen.com", true),
+        new AppTemplate("Real Estate", "A real estate website that showcases listings, builds trust and converts leads, with a clean, responsive layout.", "/templates-realestate", "images/blazor-template-real-estate.jpg", "https://realestate.radzen.com", true),
+        new AppTemplate("Repair Workshop", "A modern, responsive auto repair shop website with easy booking and service details.", "/templates-repairshop", "images/blazor-template-repairshop.jpg", "https://repairshop.radzen.com", true)
+    };
+}
