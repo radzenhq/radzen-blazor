@@ -493,10 +493,17 @@ namespace Radzen
             return source.Where(lambda);
         }
 
+        private const int MaxPropertyPathLength = 10;
+
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type? type = null)
         {
             ArgumentNullException.ThrowIfNull(expression);
             if (string.IsNullOrWhiteSpace(property)) return Expression.Constant(null, typeof(object));
+
+            if (property.Count(c => c == '.') >= MaxPropertyPathLength)
+            {
+                throw new InvalidOperationException("Property path is too long.");
+            }
 
             var parts = property.Split(separator, 2);
             var currentPart = parts[0];
@@ -540,20 +547,38 @@ namespace Radzen
                     return Expression.Property(instance, declaring, memberName);
                 }
 
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+                PropertyInfo? prop;
+                FieldInfo? field = null;
+
                 try
                 {
-                    return Expression.PropertyOrField(instance, memberName);
+                    prop = t.GetProperty(memberName, flags | BindingFlags.IgnoreCase);
+                    field = prop == null ? t.GetField(memberName, flags | BindingFlags.IgnoreCase) : null;
                 }
                 catch (AmbiguousMatchException)
                 {
-                    var prop = t.GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                    if (prop != null) return Expression.Property(instance, prop);
+                    prop = t.GetProperty(memberName, flags);
+                    field = prop == null ? t.GetField(memberName, flags) : null;
 
-                    var field = t.GetField(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                    if (field != null) return Expression.Field(instance, field);
-
-                    throw;
+                    if (prop == null && field == null)
+                    {
+                        throw;
+                    }
                 }
+
+                if (prop != null)
+                {
+                    return Expression.Property(instance, prop);
+                }
+
+                if (field != null)
+                {
+                    return Expression.Field(instance, field);
+                }
+
+                throw new ArgumentException($"'{memberName}' is not a member of type '{t}'", nameof(memberName));
             }
 
             static Expression NullPropagate(Expression parent, Expression accessed)

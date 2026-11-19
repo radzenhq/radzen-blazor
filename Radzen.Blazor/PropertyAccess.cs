@@ -54,22 +54,38 @@ public static class PropertyAccess
                 return Expression.Property(instance, declaringType, memberName);
             }
 
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+            PropertyInfo? prop;
+            FieldInfo? field = null;
+
             try
             {
-                return Expression.PropertyOrField(instance, memberName);
+                prop = instance.Type.GetProperty(memberName, flags | BindingFlags.IgnoreCase);
+                field = prop == null ? instance.Type.GetField(memberName, flags | BindingFlags.IgnoreCase) : null;
             }
             catch (AmbiguousMatchException)
             {
-                var prop = instance.Type.GetProperty(memberName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (prop != null) return Expression.Property(instance, prop);
+                prop = instance.Type.GetProperty(memberName, flags);
+                field = prop == null ? instance.Type.GetField(memberName, flags) : null;
 
-                var field = instance.Type.GetField(memberName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (field != null) return Expression.Field(instance, field);
-
-                throw;
+                if (prop == null && field == null)
+                {
+                    throw;
+                }
             }
+
+            if (prop != null)
+            {
+                return Expression.Property(instance, prop);
+            }
+
+            if (field != null)
+            {
+                return Expression.Field(instance, field);
+            }
+
+            throw new ArgumentException($"'{memberName}' is not a member of type '{instance.Type}'", nameof(memberName));
         }
 
         Expression AccessWithNullPropagation(Expression instance, string memberName)

@@ -9,14 +9,6 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static readonly Func<string, Type?> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(a => a.GetTypes())
-            .FirstOrDefault(t =>
-            {
-                var fullName = t.FullName;
-                return fullName != null && fullName.Replace("+", ".", StringComparison.Ordinal) == type;
-            });
-
         /// <summary>
         /// Filters using the specified filter descriptors.
         /// </summary>
@@ -49,7 +41,7 @@ namespace System.Linq.Dynamic.Core
                     .Replace(" = ", " == ", StringComparison.Ordinal);
 
                 return !string.IsNullOrEmpty(predicate) ?
-                    source.Where(ExpressionParser.ParsePredicate<T>(predicate, typeLocator)) : source;
+                    source.Where(ExpressionParser.ParsePredicate<T>(predicate)) : source;
             }
             catch (Exception ex)
             {

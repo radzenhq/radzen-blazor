@@ -2545,6 +2545,44 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(result, r => r.Id == 1);
             Assert.Contains(result, r => r.Id == 3);
         }
+
+        class PathNode
+        {
+            public string Name { get; set; }
+            public PathNode Parent { get; set; }
+            internal string Hidden { get; set; }
+        }
+
+        [Fact]
+        public void OrderBy_PropertyPath_FindsOnlyPublicMembers()
+        {
+            var nodes = new[] { new PathNode { Name = "a", Hidden = "b" } }.AsQueryable();
+
+            Assert.Single(QueryableExtension.OrderBy((System.Linq.IQueryable)nodes, "name").Cast<PathNode>());
+            Assert.Throws<ArgumentException>(() => QueryableExtension.OrderBy((System.Linq.IQueryable)nodes, "Hidden"));
+            Assert.Throws<ArgumentException>(() => PropertyAccess.Getter<PathNode, string>("Hidden"));
+        }
+
+        [Fact]
+        public void OrderBy_PropertyPath_WithinLimit_Works()
+        {
+            var node = new PathNode { Name = "a" };
+            node.Parent = node;
+
+            var ordered = QueryableExtension.OrderBy((System.Linq.IQueryable)new[] { node }.AsQueryable(), "Parent.Parent.Parent.Name");
+
+            Assert.Single(ordered.Cast<PathNode>());
+        }
+
+        [Fact]
+        public void OrderBy_PropertyPath_ThatIsTooLong_IsRejected()
+        {
+            var node = new PathNode { Name = "a" };
+            node.Parent = node;
+            var path = string.Concat(Enumerable.Repeat("Parent.", 12)) + "Name";
+
+            Assert.Throws<InvalidOperationException>(() => QueryableExtension.OrderBy((System.Linq.IQueryable)new[] { node }.AsQueryable(), path));
+        }
     }
 }
 
