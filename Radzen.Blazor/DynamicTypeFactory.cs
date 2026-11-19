@@ -1,9 +1,19 @@
 using System;
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
+using Radzen;
 
 static class DynamicTypeFactory
 {
+    private static readonly ConcurrentDictionary<string, Lazy<Type>> typeCache = new();
+
+    private const int MaxCachedTypes = 1024;
+
+    private static int typeCounter;
+
     public static Type CreateType(string typeName, string[] propertyNames, Type[] propertyTypes)
     {
         if (propertyNames.Length != propertyTypes.Length)
@@ -11,11 +21,44 @@ static class DynamicTypeFactory
             throw new ArgumentException("Property names and types count mismatch.");
         }
 
-        var assemblyName = new AssemblyName("DynamicTypesAssembly");
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        var key = BuildCacheKey(typeName, propertyNames, propertyTypes);
+
+        if (typeCache.TryGetValue(key, out var cached))
+        {
+            return cached.Value;
+        }
+
+        if (typeCache.Count >= MaxCachedTypes)
+        {
+            return EmitType(typeName, propertyNames, propertyTypes, collectible: true);
+        }
+
+        return typeCache.GetOrAdd(key, _ => new Lazy<Type>(() => EmitType(typeName, propertyNames, propertyTypes, collectible: false))).Value;
+    }
+
+    private static string BuildCacheKey(string typeName, string[] propertyNames, Type[] propertyTypes)
+    {
+        var parts = new string[1 + propertyNames.Length + propertyTypes.Length];
+        parts[0] = typeName;
+        Array.Copy(propertyNames, 0, parts, 1, propertyNames.Length);
+        for (var i = 0; i < propertyTypes.Length; i++)
+        {
+            parts[1 + propertyNames.Length + i] = propertyTypes[i].AssemblyQualifiedName ?? propertyTypes[i].FullName ?? propertyTypes[i].Name;
+        }
+
+        return string.Join("\u0001", parts);
+    }
+
+    private static Type EmitType(string typeName, string[] propertyNames, Type[] propertyTypes, bool collectible)
+    {
+        var suffix = "_" + Interlocked.Increment(ref typeCounter).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var assemblyName = new AssemblyName("DynamicTypesAssembly" + suffix);
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, collectible ? AssemblyBuilderAccess.RunAndCollect : AssemblyBuilderAccess.Run);
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicTypesModule");
 
-        var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Sealed);
+        var uniqueName = typeName + suffix;
+
+        var typeBuilder = moduleBuilder.DefineType(uniqueName, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Sealed);
 
         for (int i = 0; i < propertyNames.Length; i++)
         {
