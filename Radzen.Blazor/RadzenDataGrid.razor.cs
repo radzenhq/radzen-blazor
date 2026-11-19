@@ -4589,15 +4589,31 @@ namespace Radzen.Blazor
             return false;
         }
 
-        List<GroupDescriptor> GetGroupsOfExistingColumns(IEnumerable<GroupDescriptor> groups)
+        List<GroupDescriptor> GetGroupsWithExistingProperties(IEnumerable<GroupDescriptor> groups)
         {
-            var groupProperties = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection))
-                .Where(c => c.Groupable)
-                .Select(c => c.GetGroupProperty())
-                .Where(p => !string.IsNullOrEmpty(p))
-                .ToHashSet();
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(TItem));
 
-            return groups.Where(g => g.Property != null && groupProperties.Contains(g.Property)).ToList();
+            return groups.Where(g => IsExistingProperty(parameter, g.Property)).ToList();
+        }
+
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        static bool IsExistingProperty(System.Linq.Expressions.ParameterExpression parameter, string? property)
+        {
+            if (string.IsNullOrEmpty(property))
+            {
+                return false;
+            }
+
+            try
+            {
+                QueryableExtension.GetNestedPropertyExpression(parameter, property);
+
+                return true;
+            }
+            catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or System.Reflection.AmbiguousMatchException or IndexOutOfRangeException)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -4713,7 +4729,7 @@ namespace Radzen.Blazor
                     }
                 }
 
-                var settingsGroups = settings.Groups != null ? GetGroupsOfExistingColumns(settings.Groups) : null;
+                var settingsGroups = settings.Groups != null ? GetGroupsWithExistingProperties(settings.Groups) : null;
 
                 if (settingsGroups != null && !settingsGroups.SequenceEqual(Groups))
                 {
