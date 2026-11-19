@@ -1264,7 +1264,7 @@ public class ExpressionParser
 
     private static readonly HashSet<string> DeniedStringMethodNames = new(StringComparer.Ordinal)
     {
-        nameof(string.Intern), nameof(string.IsInterned)
+        nameof(string.Intern), nameof(string.IsInterned), nameof(string.PadLeft), nameof(string.PadRight)
     };
 
     private static readonly HashSet<string> ObjectMethodNames = new(StringComparer.Ordinal)
