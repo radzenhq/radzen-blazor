@@ -4352,18 +4352,22 @@ window.Radzen = {
             el = el.parentElement;
           }
 
+          var bounds = { left: 0, right: document.documentElement.clientWidth };
+          if (scrollParent) {
+            var scrollParentLeft = scrollParent.getBoundingClientRect().left + scrollParent.clientLeft;
+            bounds = { left: scrollParentLeft, right: scrollParentLeft + scrollParent.clientWidth };
+          }
+
           if (children.hasAttribute('data-flyout')) {
             children.removeAttribute('data-flyout-flip');
             var childRect = children.getBoundingClientRect();
             var itemRect = item.getBoundingClientRect();
             if (isRtl) {
-              var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
-              if (round(itemRect.left - childRect.width) < round(leftBoundary)) {
+              if (round(itemRect.left - childRect.width) < round(bounds.left)) {
                 children.setAttribute('data-flyout-flip', '');
               }
             } else {
-              var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
-              if (round(itemRect.right + childRect.width) > round(rightBoundary)) {
+              if (round(itemRect.right + childRect.width) > round(bounds.right)) {
                 children.setAttribute('data-flyout-flip', '');
               }
             }
@@ -4372,14 +4376,12 @@ window.Radzen = {
           // Shift dropdown left/right if it overflows the scroll parent or viewport
           children.style.insetInlineStart = children.style.insetInlineStart || '';
           var childRect = children.getBoundingClientRect();
-          var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
-          var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
-          if (!isRtl && round(childRect.right) > round(rightBoundary)) {
+          if (!isRtl && round(childRect.right) > round(bounds.right)) {
             var offset = parseFloat(children.style.insetInlineStart) || 0;
-            children.style.insetInlineStart = (offset + rightBoundary - childRect.right) + 'px';
-          } else if (isRtl && round(childRect.left) < round(leftBoundary)) {
+            children.style.insetInlineStart = (offset + bounds.right - childRect.right) + 'px';
+          } else if (isRtl && round(childRect.left) < round(bounds.left)) {
             var offset = parseFloat(children.style.insetInlineStart) || 0;
-            children.style.insetInlineStart = (offset + leftBoundary - childRect.left) + 'px';
+            children.style.insetInlineStart = (offset + childRect.left - bounds.left) + 'px';
           }
         } else {
           children.onanimationend = function () {
