@@ -2289,7 +2289,7 @@ window.Radzen = {
         scroller.scrollLeft += rect.right - right;
     }
   },
-  focusTableRow: function (gridId, key, rowIndex, cellIndex, isVirtual, columnCount) {
+  focusTableRow: function (gridId, key, rowIndex, cellIndex, isVirtual, columnCount, virtualRowIndex) {
     var grid = document.getElementById(gridId);
     if (!grid) return;
 
@@ -2310,6 +2310,20 @@ window.Radzen = {
     };
 
     var rows = (cellIndex != null && thead && thead.rows && thead.rows.length ? [...thead.rows] : []).concat(tbody && tbody.rows && tbody.rows.length ? [...tbody.rows] : []);
+    var dataStartIndex = rows.length - (tbody && tbody.rows ? tbody.rows.length : 0);
+    var virtualRowIndexOf = function (row) {
+        var value = row && row.parentNode === tbody ? parseInt(row.getAttribute('aria-rowindex')) : NaN;
+        return isNaN(value) ? -1 : value;
+    };
+
+    if (isVirtual && virtualRowIndex != null) {
+        for (var r = dataStartIndex; r < rows.length; r++) {
+            if (virtualRowIndexOf(rows[r]) == virtualRowIndex) {
+                rowIndex = r;
+                break;
+            }
+        }
+    }
 
     if (isVirtual && (key == 'ArrowUp' || key == 'ArrowDown' || key == 'PageUp' || key == 'PageDown' || key == 'Home' || key == 'End')) {
         if (rowIndex == 0 && (key == 'End' || key == 'PageDown')) {
@@ -2384,14 +2398,39 @@ window.Radzen = {
 
     if (isVirtual && (key == 'ArrowDown' || key == 'ArrowUp')) {
         var minIndex = cellIndex != null ? 0 : 1;
+        var scroller = table.parentNode;
+        var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+        var currentIndex = rowIndex || 0;
         if (key == 'ArrowDown' && table.nextSelectedIndex >= rows.length - 1) {
-            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
-            table.parentNode.scrollTop += rh;
             table.nextSelectedIndex = rows.length - 1;
+            if (currentIndex >= rows.length - 1) {
+                scroller.scrollTop += rh;
+            }
+        } else if (key == 'ArrowUp' && table.nextSelectedIndex < dataStartIndex && currentIndex >= dataStartIndex && scroller.scrollTop > 0) {
+            scroller.scrollTop -= rh;
+            table.nextSelectedIndex = currentIndex;
         } else if (key == 'ArrowUp' && table.nextSelectedIndex <= minIndex) {
-            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
-            table.parentNode.scrollTop -= rh;
+            scroller.scrollTop -= rh;
             table.nextSelectedIndex = minIndex;
+        }
+
+        var nextRow = rows[table.nextSelectedIndex];
+        if (nextRow && nextRow.parentNode === tbody) {
+            var scrollerRect = scroller.getBoundingClientRect();
+            var visibleTop = scrollerRect.top + scroller.clientTop;
+            var visibleBottom = visibleTop + scroller.clientHeight;
+            if (thead) {
+                visibleTop = Math.max(visibleTop, Math.min(thead.getBoundingClientRect().bottom, visibleBottom));
+            }
+            if (table.tFoot) {
+                visibleBottom = Math.min(visibleBottom, Math.max(table.tFoot.getBoundingClientRect().top, visibleTop));
+            }
+            var nextRect = nextRow.getBoundingClientRect();
+            if (nextRect.top < visibleTop) {
+                scroller.scrollTop -= visibleTop - nextRect.top;
+            } else if (nextRect.bottom > visibleBottom) {
+                scroller.scrollTop += nextRect.bottom - visibleBottom;
+            }
         }
     }
 
@@ -2410,9 +2449,78 @@ window.Radzen = {
         }
     };
 
+    if (isVirtual && tbody && (key == 'PageUp' || key == 'PageDown' || key == 'Home' || key == 'End')) {
+        var focusToken = table.focusToken = (table.focusToken || 0) + 1;
+        var pageScroller = table.parentNode;
+        var headerRowCount = cellIndex != null && thead && thead.rows ? thead.rows.length : 0;
+
+        return new Promise(function (resolve) {
+            var attempts = 0;
+            var settle = function () {
+                if (focusToken !== table.focusToken || !tbody.isConnected) {
+                    resolve([table.nextSelectedIndex, table.nextSelectedCellIndex, -1]);
+                    return;
+                }
+
+                var dataRows = [...tbody.rows];
+                var scrollerRect = pageScroller.getBoundingClientRect();
+                var visibleTop = scrollerRect.top + pageScroller.clientTop;
+                var visibleBottom = visibleTop + pageScroller.clientHeight;
+                if (thead) {
+                    visibleTop = Math.max(visibleTop, Math.min(thead.getBoundingClientRect().bottom, visibleBottom));
+                }
+                if (table.tFoot) {
+                    visibleBottom = Math.min(visibleBottom, Math.max(table.tFoot.getBoundingClientRect().top, visibleTop));
+                }
+
+                var visibleRows = dataRows.filter(function (dataRow) {
+                    var rect = dataRow.getBoundingClientRect();
+                    return rect.top >= visibleTop - 1 && rect.bottom <= visibleBottom + 1;
+                });
+
+                var covered = false;
+                if (dataRows.length) {
+                    var bodyRect = tbody.getBoundingClientRect();
+                    var firstRect = dataRows[0].getBoundingClientRect();
+                    var lastRect = dataRows[dataRows.length - 1].getBoundingClientRect();
+                    covered = (firstRect.top <= visibleTop + 1 || bodyRect.top >= firstRect.top - 1) &&
+                        (lastRect.bottom >= visibleBottom - 1 || bodyRect.bottom <= lastRect.bottom + 1);
+                }
+
+                var timedOut = attempts++ >= 60;
+                if (!(covered && visibleRows.length) && !timedOut) {
+                    setTimeout(settle, 30);
+                    return;
+                }
+
+                var target = key == 'Home' ? dataRows[0] :
+                    key == 'End' ? dataRows[dataRows.length - 1] :
+                    key == 'PageUp' ? visibleRows[0] : visibleRows[visibleRows.length - 1];
+
+                if (!target || (timedOut && visibleRows.indexOf(target) == -1)) {
+                    resolve([table.nextSelectedIndex, table.nextSelectedCellIndex, -1]);
+                    return;
+                }
+
+                var focusedElements = table.querySelectorAll('.rz-state-focused');
+                for (var f = 0; f < focusedElements.length; f++) {
+                    focusedElements[f].classList.remove('rz-state-focused');
+                }
+
+                target.classList.add('rz-state-focused');
+                setActiveDescendant(target);
+
+                table.nextSelectedIndex = headerRowCount + dataRows.indexOf(target);
+                resolve([table.nextSelectedIndex, table.nextSelectedCellIndex, virtualRowIndexOf(target)]);
+            };
+
+            settle();
+        });
+    }
+
     if (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'FocusCell' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         if (!rows[table.nextSelectedIndex]) {
-            return [table.nextSelectedIndex, table.nextSelectedCellIndex];
+            return [table.nextSelectedIndex, table.nextSelectedCellIndex, -1];
         }
 
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
@@ -2463,7 +2571,7 @@ window.Radzen = {
         }
     }
 
-    return [table.nextSelectedIndex, table.nextSelectedCellIndex];
+    return [table.nextSelectedIndex, table.nextSelectedCellIndex, virtualRowIndexOf(rows[table.nextSelectedIndex])];
   },
   uploadInputChange: function (e, url, auto, multiple, clear, parameterName, method = 'POST', stream = false) {
       if (auto) {

@@ -694,6 +694,23 @@ namespace Radzen.Blazor
 
         int focusedIndex = -1;
         int focusedCellIndex;
+        int focusedVirtualRowIndex = -1;
+
+        TItem? GetFocusedItem()
+        {
+            if (IsVirtualizationAllowed() && focusedVirtualRowIndex > 0)
+            {
+                return virtualDataItems.ElementAtOrDefault(focusedVirtualRowIndex - HeaderRowCount() - 1 - virtualItemsStartIndex);
+            }
+
+            var pagedViewIndex = focusedIndex - 1;
+            if (FilterRowActive)
+            {
+                pagedViewIndex = pagedViewIndex - 1;
+            }
+
+            return PagedView.ElementAtOrDefault(pagedViewIndex);
+        }
 
         internal Func<bool>? HasActiveDescendant { get; set; }
 
@@ -728,9 +745,10 @@ namespace Radzen.Blazor
             {
                 if (JSRuntime != null)
                 {
-                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed(), columnWindow?.All.Count);
+                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed(), columnWindow?.All.Count, focusedVirtualRowIndex > 0 ? focusedVirtualRowIndex : null);
                     focusedIndex = result[0];
                     focusedCellIndex = result[1];
+                    focusedVirtualRowIndex = result.Length > 2 ? result[2] : -1;
                     hasActiveRow = true;
 
                     if (columnWindow != null && (key == "ArrowLeft" || key == "ArrowRight"))
@@ -793,12 +811,7 @@ namespace Radzen.Blazor
                 }
                 else if ((Template != null || LoadChildData.HasDelegate) && (key == "ArrowLeft" || key == "ArrowRight"))
                 {
-                    var pagedViewIndex = focusedIndex - 1;
-                    if (FilterRowActive)
-                    {
-                        pagedViewIndex = pagedViewIndex - 1;
-                    }
-                    var item = PagedView.ElementAtOrDefault(pagedViewIndex);
+                    var item = GetFocusedItem();
                     if (item != null)
                     {
                         if (key == "ArrowLeft")
@@ -838,12 +851,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    var pagedViewIndex = focusedIndex - 1;
-                    if (FilterRowActive)
-                    {
-                        pagedViewIndex = pagedViewIndex - 1;
-                    }
-                    var itemToSelect = PagedView.ElementAtOrDefault(pagedViewIndex);
+                    var itemToSelect = GetFocusedItem();
                     if (itemToSelect != null)
                     {
                         if (SelectionMode == DataGridSelectionMode.Multiple && !args.ShiftKey)
@@ -3763,6 +3771,12 @@ namespace Radzen.Blazor
             if (focusedIndexResult != null)
             {
                 focusedIndex = focusedIndexResult.Index + 1;
+            }
+
+            if (IsVirtualizationAllowed() && Groups.Count == 0)
+            {
+                var virtualIndex = virtualDataItems.FindIndex(x => ItemEquals(x, item));
+                focusedVirtualRowIndex = virtualIndex >= 0 ? virtualItemsStartIndex + virtualIndex + HeaderRowCount() + 1 : -1;
             }
 
             if (SelectionMode == DataGridSelectionMode.Single && item != null && ContainsItemKey(selectedItems, item))
