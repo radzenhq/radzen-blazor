@@ -71,6 +71,9 @@
     public string FormatString { get; set; } = string.Empty;
 
     [Parameter]
+    public System.Globalization.CultureInfo? Culture { get; set; }
+
+    [Parameter]
     public Func<double, string> Formatter { get; set; } = value => value.ToInvariantString();
 
     [Parameter]
@@ -142,7 +145,7 @@
                 {
                     if (!string.IsNullOrEmpty(FormatString))
                     {
-                        tick.Value = string.Format(FormatString, value);
+                        tick.Value = string.Format(Culture ?? System.Globalization.CultureInfo.CurrentCulture, FormatString, value);
                     }
                     else
                     {

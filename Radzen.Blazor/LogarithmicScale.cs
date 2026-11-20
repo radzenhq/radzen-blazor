@@ -22,7 +22,9 @@ namespace Radzen.Blazor
             return value;
         }
 
-        public override string FormatTick(string format, object value)
+        public override string FormatTick(string format, object value) => FormatTick(format, value, CultureInfo.CurrentCulture);
+
+        public override string FormatTick(string format, object value, CultureInfo culture)
         {
             if (value == null)
             {
@@ -36,10 +38,10 @@ namespace Radzen.Blazor
 
             if (String.IsNullOrEmpty(format))
             {
-                return value.ToString() ?? String.Empty;
+                return Convert.ToString(value, culture) ?? String.Empty;
             }
 
-            return string.Format(CultureInfo.CurrentCulture, format, value);
+            return string.Format(culture, format, value);
         }
 
         /// <summary>

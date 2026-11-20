@@ -236,11 +236,11 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(AxisFormatString))
                 {
-                    label = CategoryScale.FormatTick(AxisFormatString, tickValue);
+                    label = CategoryScale.FormatTick(AxisFormatString, tickValue, Culture);
                 }
                 else
                 {
-                    label = CategoryScale.FormatTick("", tickValue);
+                    label = CategoryScale.FormatTick("", tickValue, Culture);
                 }
 
                 ticks.Add(new AxisTick { Position = Math.Clamp(fraction, 0, 1), Label = label });

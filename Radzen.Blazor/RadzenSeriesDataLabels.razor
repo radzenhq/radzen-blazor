@@ -161,7 +161,7 @@
 
         if (!string.IsNullOrEmpty(FormatString) && label.Value != null)
         {
-            return string.Format(CultureInfo.CurrentCulture, FormatString, label.Value);
+            return string.Format(Chart?.Culture ?? CultureInfo.CurrentCulture, FormatString, label.Value);
         }
 
         return label.Text;

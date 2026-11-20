@@ -206,19 +206,19 @@ namespace Radzen.Blazor
             return new DateTime(Convert.ToInt64(value));
         }
 
-        public override string FormatTick(string format, object value)
+        public override string FormatTick(string format, object value, CultureInfo culture)
         {
             if (string.IsNullOrEmpty(format))
             {
                 return value switch
                 {
-                    DateOnly date => date.ToShortDateString(),
-                    DateTime date => date.ToShortDateString(),
-                    _ => value.ToString() ?? string.Empty
+                    DateOnly date => date.ToString("d", culture),
+                    DateTime date => date.ToString("d", culture),
+                    _ => Convert.ToString(value, culture) ?? string.Empty
                 };
             }
 
-            return base.FormatTick(format, value);
+            return base.FormatTick(format, value, culture);
         }
 
         public override void Fit(int distance)

@@ -200,7 +200,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                return scale.FormatTick(FormatString ?? string.Empty, value);
+                return scale.FormatTick(FormatString ?? string.Empty, value, Chart?.Culture ?? CultureInfo.CurrentCulture);
             }
         }
 

@@ -24,7 +24,7 @@
                         }
                         else if (!string.IsNullOrEmpty(value.FormatString))
                         {
-                            @string.Format(value.FormatString, value.Value)
+                            @string.Format(Culture, value.FormatString, value.Value)
                         }
                         else
                         {

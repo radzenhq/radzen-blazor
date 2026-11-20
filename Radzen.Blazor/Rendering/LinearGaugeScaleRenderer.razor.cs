@@ -101,6 +101,12 @@ namespace Radzen.Blazor.Rendering
         public string? FormatString { get; set; }
 
         /// <summary>
+        /// Gets or sets the culture used to format major tick labels.
+        /// </summary>
+        [Parameter]
+        public CultureInfo? Culture { get; set; }
+
+        /// <summary>
         /// Gets or sets the formatter used for major tick labels.
         /// </summary>
         [Parameter]
@@ -234,7 +240,7 @@ namespace Radzen.Blazor.Rendering
                 string? text = null;
                 if (ShowTickLabels)
                 {
-                    text = !string.IsNullOrEmpty(FormatString) ? string.Format(CultureInfo.CurrentCulture, FormatString, value) : Formatter(value);
+                    text = !string.IsNullOrEmpty(FormatString) ? string.Format(Culture ?? CultureInfo.CurrentCulture, FormatString, value) : Formatter(value);
                 }
 
                 Ticks.Add(CreateTick(ratio, TickLength, text));

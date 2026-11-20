@@ -24,7 +24,7 @@
                         }
                         else if (!string.IsNullOrEmpty(pointer.FormatString))
                         {
-                            @string.Format(pointer.FormatString, pointer.Value)
+                            @string.Format(Culture, pointer.FormatString, pointer.Value)
                         }
                         else
                         {

@@ -228,6 +228,17 @@ namespace Radzen.Blazor
         public abstract string FormatTick(string format, object value);
 
         /// <summary>
+        /// Formats the tick value with the specified culture.
+        /// </summary>
+        /// <param name="format">The format.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="culture">The culture used to format the value.</param>
+        /// <returns>System.String.</returns>
+#pragma warning disable CA1304
+        public virtual string FormatTick(string format, object value, CultureInfo culture) => FormatTick(format, value);
+#pragma warning restore CA1304
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ScaleBase"/> is round. Gets <c>true</c> when either end of the scale is rounded to a tick
         /// and sets whether both ends are. <see cref="Resize(object, object)" /> stops rounding only the end it sets.
         /// </summary>
