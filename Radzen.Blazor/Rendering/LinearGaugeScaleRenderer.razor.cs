@@ -234,7 +234,7 @@ namespace Radzen.Blazor.Rendering
                 string? text = null;
                 if (ShowTickLabels)
                 {
-                    text = !string.IsNullOrEmpty(FormatString) ? string.Format(CultureInfo.InvariantCulture, FormatString, value) : Formatter(value);
+                    text = !string.IsNullOrEmpty(FormatString) ? string.Format(CultureInfo.CurrentCulture, FormatString, value) : Formatter(value);
                 }
 
                 Ticks.Add(CreateTick(ratio, TickLength, text));

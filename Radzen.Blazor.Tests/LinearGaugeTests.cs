@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bunit;
 using Radzen.Blazor.Rendering;
 using Xunit;
@@ -142,6 +143,33 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(">0.0<", component.Markup);
             Assert.Contains(">50.0<", component.Markup);
             Assert.Contains(">100.0<", component.Markup);
+        }
+
+        [Fact]
+        public void LinearGauge_FormatString_UsesCurrentCulture()
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            try
+            {
+                using var ctx = new TestContext();
+                ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+                var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+                    parameters.Add(p => p.Style, "width:300px;height:150px")
+                        .AddChildContent<RadzenLinearGaugeScale>(scale =>
+                            scale.Add(p => p.FormatString, "{0:N1}")
+                                .Add(p => p.Min, 0)
+                                .Add(p => p.Max, 100)
+                                .Add(p => p.Step, 50)));
+
+                Assert.Contains(">50,0<", component.Markup);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
         }
 
         [Fact]

@@ -30,7 +30,7 @@ namespace Radzen.Blazor
                 return value.ToString() ?? String.Empty;
             }
 
-            return string.Format(CultureInfo.InvariantCulture, format, value);
+            return string.Format(CultureInfo.CurrentCulture, format, value);
         }
 
         public override double Scale(double value, bool padding)

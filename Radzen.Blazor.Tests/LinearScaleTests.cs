@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -52,6 +53,41 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(0, start);
             Assert.Equal(100, end);
             Assert.Equal(20, step);
+        }
+
+        [Theory]
+        [InlineData("en-US", "$300,000.00")]
+        [InlineData("de-DE", "300.000,00 €")]
+        public void FormatTick_UsesCurrentCulture(string culture, string expected)
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo(culture);
+
+            try
+            {
+                Assert.Equal(expected, new LinearScale().FormatTick("{0:C}", 300000d));
+                Assert.Equal(expected, new LogarithmicScale().FormatTick("{0:C}", 300000d));
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
+        }
+
+        [Fact]
+        public void FormatTick_DateScale_UsesCurrentCulture()
+        {
+            var previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            try
+            {
+                Assert.Equal("März", new DateScale().FormatTick("{0:MMMM}", new DateTime(2026, 3, 5)));
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previous;
+            }
         }
     }
 }
