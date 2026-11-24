@@ -7,6 +7,23 @@
     The Radzen Blazor DataGrid displays tabular data with sorting, filtering, paging, grouping, and editing built in. Bind it to IQueryable and Entity Framework, an OData service, a DataTable, or dynamic data, and it pages, sorts, and filters on the server.
 </RadzenText>
 
+<RadzenText Anchor="datagrid#whats-included" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4 rz-pb-2">
+    What's included
+</RadzenText>
+<ul class="datagrid-included rz-mb-8">
+    @foreach (var item in included)
+    {
+        <li>
+            @item.Text:
+            @for (var i = 0; i < item.Links.Length; i++)
+            {
+                var link = item.Links[i];
+                @(i > 0 ? ", " : " ")<RadzenLink Path="@link.Path" Text="@link.Text" />
+            }
+        </li>
+    }
+</ul>
+
 <RadzenExample ComponentName="DataGrid" Example="DataGridIQueryable">
     <DataGridIQueryable />
 </RadzenExample>
@@ -29,6 +46,19 @@
 </RadzenRow>
 
 <style>
+    .datagrid-included {
+        max-width: 1200px;
+        margin-block-start: 0;
+        padding-inline-start: 1.25rem;
+        columns: 2 24rem;
+        column-gap: 2rem;
+        line-height: 1.75;
+    }
+
+    .datagrid-included .rz-link {
+        --rz-link-text-decoration: underline;
+    }
+
     .datagrid-features .rz-link {
         --rz-link-text-decoration: none;
         --rz-link-hover-text-decoration: none;
@@ -56,6 +86,21 @@
 <KeyboardNavigationDataGrid Data="@data" />
 
 @code {
+    (string Text, (string Text, string Path)[] Links)[] included = new[]
+    {
+        ("Data binding", new[] { ("IQueryable and EF Core", "/datagrid-iqueryable"), ("OData", "/datagrid-odata"), ("LoadData", "/datagrid-loaddata") }),
+        ("Virtualization", new[] { ("rows", "/datagrid-virtualization"), ("columns", "/datagrid-column-virtualization") }),
+        ("Columns", new[] { ("frozen columns", "/datagrid-frozen-columns"), ("column picker", "/datagrid-column-picker") }),
+        ("Export in the browser", new[] { ("Excel and CSV", "/datagrid-export") }),
+        ("Grouping and aggregates", new[] { ("grouping", "/datagrid-grouping-api"), ("footer totals", "/datagrid-footer-totals") }),
+        ("Editing", new[] { ("inline", "/datagrid-inline-edit"), ("in-cell", "/datagrid-incell-edit") }),
+        ("Filtering", new[] { ("Excel-like filtering", "/datagrid-checkboxlist-filter"), ("advanced filter", "/datagrid-advanced-filter") }),
+        ("Hierarchy", new[] { ("master/detail and hierarchy", "/master-detail-hierarchy") }),
+        ("Grid state", new[] { ("save and restore settings", "/datagrid-save-settings") }),
+        ("AI", new[] { ("AI assistant", "/datagrid-ai-assistant") }),
+        ("Accessibility", new[] { ("keyboard navigation", "/datagrid-keyboard-navigation") }),
+    };
+
     (string Title, string Description, string Path)[] features = new[]
     {
         ("Data binding", "IQueryable & Entity Framework, OData, DataTable, dynamic data, or custom via LoadData", "/datagrid-iqueryable"),
@@ -72,31 +117,5 @@
         ("State persistence", "Save and restore column, sort, filter, and paging settings", "/datagrid-save-settings"),
     };
 
-    List<KeyboardShortcut> data = new List<KeyboardShortcut>
-    {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid." },
-        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next DataGrid item." },
-        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous DataGrid item." },
-        new KeyboardShortcut { Key = "Home", Action = "Focus first DataGrid item on the current page." },
-        new KeyboardShortcut { Key = "End", Action = "Focus last DataGrid item on the current page." },
-        new KeyboardShortcut { Key = "PageDown", Action = "Move focus down by a page of DataGrid items." },
-        new KeyboardShortcut { Key = "PageUp", Action = "Move focus up by a page of DataGrid items." },
-        new KeyboardShortcut { Key = "Enter or Space", Action = "Select the focused DataGrid item." },
-        new KeyboardShortcut { Key = "Shift + Enter or Space", Action = "Select/deselect multiple DataGrid items." },
-        new KeyboardShortcut { Key = "LeftArrow when header row is focused", Action = "Focus previous DataGrid header cell." },
-        new KeyboardShortcut { Key = "RightArrow when header row is focused", Action = "Focus next DataGrid header cell." },
-        new KeyboardShortcut { Key = "LeftArrow when data row is focused", Action = "Collapse item." },
-        new KeyboardShortcut { Key = "RightArrow when data row is focused", Action = "Expand items." },
-        new KeyboardShortcut { Key = "Enter on focused header cell", Action = "Sort DataGrid by focused header cell column." },
-        new KeyboardShortcut { Key = "Alt + DownArrow on focused header cell", Action = "Open DataGrid column filter popup." },
-        new KeyboardShortcut { Key = "Tab in an opened DataGrid column filter popup", Action = "Navigate forward across available filter options." },
-        new KeyboardShortcut { Key = "Shift + Tab in an opened DataGrid column filter popup", Action = "Navigate backward across available filter options." },
-        new KeyboardShortcut { Key = "Esc in an opened DataGrid column filter popup", Action = "Close the DataGrid column filter popup." },
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid pager." },
-        new KeyboardShortcut { Key = "LeftArrow on focused pager", Action = "Focus previous DataGrid pager button." },
-        new KeyboardShortcut { Key = "RightArrow on focused pager", Action = "Focus next DataGrid pager button." },
-        new KeyboardShortcut { Key = "Home on focused pager", Action = "Focus first DataGrid pager button." },
-        new KeyboardShortcut { Key = "End on focused pager", Action = "Focus last DataGrid pager button." },
-        new KeyboardShortcut { Key = "Enter or Space on focused pager", Action = "Activate the focused DataGrid pager button." }
-    };
+    List<KeyboardShortcut> data = DataGridKeyboardNavigationPage.Shortcuts;
 }

@@ -785,6 +785,33 @@
     Financial
 </RadzenText>
 <RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
+    @* Stock Chart *@
+    <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
+        <RadzenLink Path="/stock-chart">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-overflow-hidden">
+                <div class="chart-gallery-thumb">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stock chart thumbnail">
+                        <path d="M20 40L34 46L48 38L62 52L76 56L90 50L104 70L118 78L132 72L146 76L160 68L180 70V112H20V40Z" fill="var(--rz-series-1)" fill-opacity="0.2"/>
+                        <path d="M20 40L34 46L48 38L62 52L76 56L90 50L104 70L118 78L132 72L146 76L160 68L180 70" stroke="var(--rz-series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                        <line x1="20" y1="62" x2="180" y2="62" stroke="var(--rz-text-tertiary-color)" stroke-width="1" stroke-dasharray="2 3"/>
+                        <rect x="22" y="100" width="6" height="12" fill="var(--rz-danger)"/>
+                        <rect x="36" y="104" width="6" height="8" fill="var(--rz-success)"/>
+                        <rect x="50" y="98" width="6" height="14" fill="var(--rz-danger)"/>
+                        <rect x="64" y="105" width="6" height="7" fill="var(--rz-danger)"/>
+                        <rect x="78" y="102" width="6" height="10" fill="var(--rz-success)"/>
+                        <rect x="92" y="92" width="6" height="20" fill="var(--rz-danger)"/>
+                        <rect x="106" y="96" width="6" height="16" fill="var(--rz-danger)"/>
+                        <rect x="120" y="103" width="6" height="9" fill="var(--rz-success)"/>
+                        <rect x="134" y="106" width="6" height="6" fill="var(--rz-danger)"/>
+                        <rect x="148" y="101" width="6" height="11" fill="var(--rz-success)"/>
+                        <rect x="162" y="105" width="6" height="7" fill="var(--rz-danger)"/>
+                    </svg>
+                </div>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-py-3 rz-px-4 rz-mb-0">Stock</RadzenText>
+            </RadzenCard>
+        </RadzenLink>
+    </RadzenColumn>
+
     @* Candlestick Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/candlestick-chart">
@@ -1704,7 +1731,7 @@
     Keyboard Navigation
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Chart component.
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Chart component. The chart plot area is a tab stop named after its series (set <code>AriaLabel</code> to give it your own name), and every data point you move to is announced to screen readers. Set <code>AllowKeyboardNavigation</code> to <code>false</code> to turn this off.
 </RadzenText>
 
 <KeyboardNavigationDataGrid Data="@shortcuts" />
@@ -1713,8 +1740,16 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate forward across Chart legend items." },
-        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate backward across Chart legend items." },
-        new KeyboardShortcut { Key = "Enter or Space", Action = "Show/hide the focused Chart legend item series." }
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate forward across Chart legend items and to the Chart plot area." },
+        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate backward across the Chart plot area and legend items." },
+        new KeyboardShortcut { Key = "Enter or Space on a legend item", Action = "Show/hide the focused Chart legend item series." },
+        new KeyboardShortcut { Key = "RightArrow when the plot area is focused", Action = "Focus the next data point of the series and show its tooltip. After the last point of a series, move to the first point of the next series." },
+        new KeyboardShortcut { Key = "LeftArrow when the plot area is focused", Action = "Focus the previous data point of the series and show its tooltip. Before the first point of a series, move to the last point of the previous series." },
+        new KeyboardShortcut { Key = "DownArrow when the plot area is focused", Action = "Move to the next series at the same category." },
+        new KeyboardShortcut { Key = "UpArrow when the plot area is focused", Action = "Move to the previous series at the same category." },
+        new KeyboardShortcut { Key = "Home when the plot area is focused", Action = "Focus the first data point of the series." },
+        new KeyboardShortcut { Key = "End when the plot area is focused", Action = "Focus the last data point of the series." },
+        new KeyboardShortcut { Key = "Enter or Space on a data point", Action = "Click the focused data point (raises SeriesClick)." },
+        new KeyboardShortcut { Key = "Esc", Action = "Hide the tooltip and clear the focused data point." }
     };
 }

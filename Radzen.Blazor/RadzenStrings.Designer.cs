@@ -448,6 +448,8 @@ namespace Radzen.Blazor {
         public static string Gantt_IsNotEmptyText { get { return ResourceManager.GetString("Gantt_IsNotEmptyText", resourceCulture); } }
         public static string Gantt_UnassignedText { get { return ResourceManager.GetString("Gantt_UnassignedText", resourceCulture); } }
         public static string Gantt_HistogramLabel { get { return ResourceManager.GetString("Gantt_HistogramLabel", resourceCulture); } }
+        public static string Chart_AriaLabel { get { return ResourceManager.GetString("Chart_AriaLabel", resourceCulture); } }
+        public static string Chart_KeyboardNavigationHint { get { return ResourceManager.GetString("Chart_KeyboardNavigationHint", resourceCulture); } }
         public static string Gantt_DayViewText { get { return ResourceManager.GetString("Gantt_DayViewText", resourceCulture); } }
         public static string Gantt_WeekViewText { get { return ResourceManager.GetString("Gantt_WeekViewText", resourceCulture); } }
         public static string Gantt_MonthViewText { get { return ResourceManager.GetString("Gantt_MonthViewText", resourceCulture); } }

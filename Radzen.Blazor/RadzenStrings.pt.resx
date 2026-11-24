@@ -2663,4 +2663,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>Tema escuro</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>Gráfico</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>Use as teclas de seta para se mover entre os pontos de dados e as séries.</value>
+  </data>
 </root>

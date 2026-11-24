@@ -2569,4 +2569,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>Tema scuro</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>Grafico</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>Usa i tasti freccia per spostarti tra i punti dati e le serie.</value>
+  </data>
 </root>

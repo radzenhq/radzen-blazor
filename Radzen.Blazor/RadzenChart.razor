@@ -13,7 +13,7 @@
 {
     <CascadingValue Value="@this">
         <Legend />
-        <svg style="width: 100%; height: 100%; overflow: visible;@(IsRTL ? " direction: ltr;" : "")">
+        <svg class="rz-chart-plot" role="@(AllowKeyboardNavigation ? "application" : "img")" aria-label="@GetAriaLabel()" aria-describedby="@(AllowKeyboardNavigation ? KeyboardHintId : null)" tabindex="@(AllowKeyboardNavigation ? "0" : null)" style="width: 100%; height: 100%; overflow: visible;@(IsRTL ? " direction: ltr;" : "")">
             <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
                 <ClipPath />
                 @if(ShouldRenderAxes())
@@ -46,6 +46,10 @@
                 <HoverOverlay Chart="@this" />
             </g>
         </svg>
+        @if (AllowKeyboardNavigation)
+        {
+            <span id="@KeyboardHintId" hidden>@KeyboardNavigationHint</span>
+        }
         <TooltipOverlay Chart="@this" />
         @if ((AllowZoom || AllowPan) && ShowScrollbar && (ZoomStart > 0 || ZoomEnd < 1))
         {

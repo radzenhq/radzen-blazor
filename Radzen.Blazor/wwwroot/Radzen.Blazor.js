@@ -4432,6 +4432,10 @@ window.Radzen = {
     delete ref.mouseMoveHandler;
     ref.removeEventListener('click', ref.clickHandler);
     delete ref.clickHandler;
+    ref.removeEventListener('keydown', ref.keyDownHandler);
+    delete ref.keyDownHandler;
+    ref.removeEventListener('focusout', ref.focusOutHandler);
+    delete ref.focusOutHandler;
     ref.removeEventListener('wheel', ref.wheelHandler);
     delete ref.wheelHandler;
     if (ref.legendEnterHandler) {
@@ -5165,10 +5169,24 @@ window.Radzen = {
       queueWheel(x, delta);
     };
 
+    var chartKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter', ' ', 'Escape'];
+    ref.keyDownHandler = function (e) {
+      if (!e.target.classList || !e.target.classList.contains('rz-chart-plot')) return;
+      if (e.altKey || e.ctrlKey || e.metaKey || chartKeys.indexOf(e.key) === -1) return;
+      if (e.key !== 'Escape') e.preventDefault();
+      try { suppressDisposed(instance.invokeMethodAsync('KeyDown', e.key)); } catch { }
+    };
+    ref.focusOutHandler = function (e) {
+      if (!e.target.classList || !e.target.classList.contains('rz-chart-plot')) return;
+      try { suppressDisposed(instance.invokeMethodAsync('KeyDown', 'Blur')); } catch { }
+    };
+
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
     ref.addEventListener('mouseleave', ref.mouseLeaveHandler);
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
     ref.addEventListener('click', ref.clickHandler);
+    ref.addEventListener('keydown', ref.keyDownHandler);
+    ref.addEventListener('focusout', ref.focusOutHandler);
     ref.addEventListener('wheel', ref.wheelHandler, { passive: false });
 
     // Legend hover → series highlight (only when AllowSeriesHover is enabled)

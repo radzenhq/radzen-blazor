@@ -17,7 +17,7 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     public abstract class CartesianSeries<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IChartNavigableSeries, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
@@ -925,6 +925,22 @@ namespace Radzen.Blazor
                     builder.CloseComponent();
                 }
             };
+        }
+
+        int IChartNavigableSeries.ItemCount => Items.Count;
+
+        object? IChartNavigableSeries.ItemAt(int index) => index >= 0 && index < Items.Count ? Items[index] : null;
+
+        string IChartNavigableSeries.DescribeItem(object data)
+        {
+            if (data is not TItem item)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[] { TooltipLabel(item), TooltipTitle(item), TooltipValue(item) };
+
+            return string.Join(", ", parts.Where(part => !string.IsNullOrWhiteSpace(part)).Distinct());
         }
 
         /// <inheritdoc />

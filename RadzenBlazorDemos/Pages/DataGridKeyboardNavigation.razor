@@ -1,0 +1,45 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-0">
+        Selected: @(selectedCustomers?.Any() == true ? string.Join(", ", selectedCustomers.Select(c => c.CompanyName)) : "none")
+    </RadzenText>
+</RadzenCard>
+
+<RadzenDataGrid Data="@customers" TItem="Customer" AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="5" ExpandMode="DataGridExpandMode.Single"
+                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value="@selectedCustomers">
+    <Template Context="customer">
+        <RadzenDataGrid Data="@customer.Orders" AllowSorting="true" AllowPaging="true" PageSize="5">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Order.OrderID)" Title="Order ID" Width="120px" />
+                <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+                <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" Width="160px" />
+            </Columns>
+        </RadzenDataGrid>
+    </Template>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Customer.CustomerID)" Title="Customer ID" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(Customer.CompanyName)" Title="Company" />
+        <RadzenDataGridColumn Property="@nameof(Customer.ContactName)" Title="Contact" />
+        <RadzenDataGridColumn Property="@nameof(Customer.City)" Title="City" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Customer.Country)" Title="Country" Width="160px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Customer> customers;
+    IList<Customer> selectedCustomers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers.Include(c => c.Orders).ToList();
+    }
+}

@@ -17,6 +17,7 @@ namespace Radzen.Blazor
             ValueAxis = new RadzenValueAxis { Visible = false };
             Legend = new RadzenLegend { Visible = false };
             TooltipTolerance = 5;
+            AllowKeyboardNavigation = false;
         }
 
         internal override bool IncludesZeroForBaselineSeries => false;

@@ -1272,6 +1272,224 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the accessible name of the chart. When not set, the name is built from the titles of the visible series.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Specifies whether the chart plot area can be focused and its data points navigated with the keyboard. Set to <c>true</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AllowKeyboardNavigation { get; set; } = true;
+
+        private string? keyboardNavigationHint;
+
+        /// <summary>
+        /// Gets or sets the description that tells assistive technology users how to navigate the data points with the keyboard.
+        /// </summary>
+        [Parameter]
+        public string KeyboardNavigationHint { get => keyboardNavigationHint ?? Localize(nameof(RadzenStrings.Chart_KeyboardNavigationHint)); set => keyboardNavigationHint = value; }
+
+        IChartSeries? keyboardSeries;
+        int keyboardIndex = -1;
+
+        internal string? KeyboardAnnouncement { get; private set; }
+
+        internal string KeyboardHintId => $"{GetId()}-keyboard-hint";
+
+        internal string GetAriaLabel()
+        {
+            if (!string.IsNullOrEmpty(AriaLabel))
+            {
+                return AriaLabel;
+            }
+
+            var name = Localize(nameof(RadzenStrings.Chart_AriaLabel));
+            var titles = Series.Where(series => series.Visible && series.ShowInLegend).Select(series => series.GetTitle()).ToList();
+
+            return titles.Count > 0 ? $"{name}: {string.Join(", ", titles)}" : name;
+        }
+
+        bool IsInsidePlot(Point point)
+        {
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return true;
+            }
+
+            var plotWidth = Width.Value - MarginLeft - MarginRight;
+            var plotHeight = Height.Value - MarginTop - MarginBottom;
+
+            return point.X >= -1 && point.X <= plotWidth + 1 && point.Y >= -1 && point.Y <= plotHeight + 1;
+        }
+
+        int FindKeyboardIndex(IChartSeries series, int start, int step)
+        {
+            var navigable = (IChartNavigableSeries)series;
+
+            for (var index = start; index >= 0 && index < navigable.ItemCount; index += step)
+            {
+                var data = navigable.ItemAt(index);
+
+                if (data != null && IsInsidePlot(series.GetTooltipPosition(data)))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Invoked via interop when the user presses a key while the chart plot area is focused, or when it loses focus.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        [JSInvokable]
+        public async Task KeyDown(string key)
+        {
+            if (!AllowKeyboardNavigation)
+            {
+                return;
+            }
+
+            if (key == "Blur" || key == "Escape")
+            {
+                if (keyboardSeries != null)
+                {
+                    keyboardSeries = null;
+                    keyboardIndex = -1;
+                    KeyboardAnnouncement = null;
+                    await MouseMove(-1, -1);
+                    TooltipOverlay?.Refresh();
+                }
+
+                return;
+            }
+
+            var navigable = Series.OrderBy(series => series.RenderingOrder)
+                .Where(series => series.Visible && series is IChartNavigableSeries items && items.ItemCount > 0)
+                .ToList();
+
+            if (navigable.Count == 0)
+            {
+                return;
+            }
+
+            var seriesIndex = keyboardSeries != null ? navigable.IndexOf(keyboardSeries) : -1;
+
+            if (key == "Enter" || key == " ")
+            {
+                if (seriesIndex >= 0)
+                {
+                    var item = ((IChartNavigableSeries)navigable[seriesIndex]).ItemAt(keyboardIndex);
+
+                    if (item != null)
+                    {
+                        await navigable[seriesIndex].InvokeClick(SeriesClick, item);
+                    }
+                }
+
+                return;
+            }
+
+            if (IsRTL && key == "ArrowLeft")
+            {
+                key = "ArrowRight";
+            }
+            else if (IsRTL && key == "ArrowRight")
+            {
+                key = "ArrowLeft";
+            }
+
+            int next;
+
+            if (seriesIndex < 0)
+            {
+                seriesIndex = 0;
+                var count = ((IChartNavigableSeries)navigable[0]).ItemCount;
+                next = key == "End" ? FindKeyboardIndex(navigable[0], count - 1, -1) : FindKeyboardIndex(navigable[0], 0, 1);
+            }
+            else
+            {
+                var count = ((IChartNavigableSeries)navigable[seriesIndex]).ItemCount;
+
+                switch (key)
+                {
+                    case "ArrowRight":
+                        next = FindKeyboardIndex(navigable[seriesIndex], keyboardIndex + 1, 1);
+                        while (next < 0 && seriesIndex < navigable.Count - 1)
+                        {
+                            seriesIndex++;
+                            next = FindKeyboardIndex(navigable[seriesIndex], 0, 1);
+                        }
+                        break;
+                    case "ArrowLeft":
+                        next = FindKeyboardIndex(navigable[seriesIndex], keyboardIndex - 1, -1);
+                        while (next < 0 && seriesIndex > 0)
+                        {
+                            seriesIndex--;
+                            next = FindKeyboardIndex(navigable[seriesIndex], ((IChartNavigableSeries)navigable[seriesIndex]).ItemCount - 1, -1);
+                        }
+                        break;
+                    case "Home":
+                        next = FindKeyboardIndex(navigable[seriesIndex], 0, 1);
+                        break;
+                    case "End":
+                        next = FindKeyboardIndex(navigable[seriesIndex], count - 1, -1);
+                        break;
+                    case "ArrowDown":
+                    case "ArrowUp":
+                        seriesIndex = (seriesIndex + (key == "ArrowDown" ? 1 : navigable.Count - 1)) % navigable.Count;
+                        var other = (IChartNavigableSeries)navigable[seriesIndex];
+                        var start = Math.Min(keyboardIndex, other.ItemCount - 1);
+                        next = FindKeyboardIndex(navigable[seriesIndex], start, 1);
+                        if (next < 0)
+                        {
+                            next = FindKeyboardIndex(navigable[seriesIndex], start, -1);
+                        }
+                        break;
+                    default:
+                        return;
+                }
+            }
+
+            if (next < 0)
+            {
+                return;
+            }
+
+            var target = navigable[seriesIndex];
+            var data = ((IChartNavigableSeries)target).ItemAt(next);
+
+            if (data == null)
+            {
+                return;
+            }
+
+            keyboardSeries = target;
+            keyboardIndex = next;
+
+            var snap = target.GetTooltipPosition(data);
+            mouseX = snap.X + MarginLeft;
+            mouseY = snap.Y + MarginTop;
+            MouseInside = true;
+            SnapPlotX = snap.X;
+            SnapPlotY = snap.Y;
+            HoveredSeries = target;
+            SharedPointsAtSnap = null;
+            KeyboardAnnouncement = ((IChartNavigableSeries)target).DescribeItem(data);
+
+            if (Tooltip.Visible)
+            {
+                await ShowTooltip(target, data);
+            }
+
+            HoverOverlay?.Refresh();
+            TooltipOverlay?.Refresh();
+        }
+
+        /// <summary>
         /// The minimum pixel distance from a data point to the mouse cursor required for the SeriesClick event to fire. Set to 25 by default.
         /// </summary>
         [Parameter]

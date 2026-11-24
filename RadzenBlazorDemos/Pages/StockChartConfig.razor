@@ -1,0 +1,273 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" Gap="1rem">
+    <RadzenStack Gap="0.25rem">
+        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-m-0">ACME Corp</RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" Wrap="FlexWrap.Wrap">
+            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.P" class="rz-m-0">@FormatPrice(price)</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="@($"color: {trendColor};")">
+                <RadzenIcon Icon="@(change >= 0 ? "arrow_upward" : "arrow_downward")" />
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-m-0" Style="color: inherit;">
+                    @changePercent.ToString("+0.00;-0.00", CultureInfo.InvariantCulture)% (@change.ToString("+0.00;-0.00", CultureInfo.InvariantCulture)) @periods[range]
+                </RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+        <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.P" class="rz-m-0">
+            Closed: @lastSession.ToString("MMM d, h:mm tt", CultureInfo.InvariantCulture) &middot; USD &middot; After hours @FormatPrice(afterHoursPrice) (@afterHoursChange.ToString("+0.00;-0.00", CultureInfo.InvariantCulture))
+        </RadzenText>
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenSelectBar @bind-Value="@chartType" TValue="string" Size="ButtonSize.Small" aria-label="Chart type">
+            <Items>
+                <RadzenSelectBarItem Value="@("Area")" Text="Area" />
+                <RadzenSelectBarItem Value="@("Line")" Text="Line" />
+                <RadzenSelectBarItem Value="@("Candlestick")" Text="Candlestick" />
+            </Items>
+        </RadzenSelectBar>
+        <RadzenSelectBar Value="@range" Change="@SelectRange" TValue="string" Size="ButtonSize.Small" aria-label="Period">
+            <Items>
+                @foreach (var period in periods.Keys)
+                {
+                    <RadzenSelectBarItem Value="@period" Text="@period" />
+                }
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+
+    <RadzenChart Style="height: 420px;">
+        <RadzenChartTooltipOptions Shared="true" />
+        <RadzenColumnSeries Data="@bars" CategoryProperty="Index" ValueProperty="Volume" Title="Volume" ValueAxisName="volume" Fill="#9E9E9E" Fills="@volumeFills" StrokeWidth="0" />
+        @if (chartType == "Candlestick")
+        {
+            <RadzenCandlestickSeries Data="@bars" CategoryProperty="Index" Title="Price"
+                OpenProperty="Open" HighProperty="High" LowProperty="Low" CloseProperty="Close" BullFill="@upColor" BearFill="@downColor">
+                <RadzenSeriesReferenceLine Visible="@(range == "1D")" Value="@baseline" Title="Prev. close" Stroke="var(--rz-text-tertiary-color)" LineType="LineType.Dotted" />
+            </RadzenCandlestickSeries>
+        }
+        else if (chartType == "Line")
+        {
+            <RadzenLineSeries Data="@bars" CategoryProperty="Index" ValueProperty="Close" Title="Price" Stroke="@trendColor" StrokeWidth="2">
+                <RadzenMarkers Visible="false" />
+                <RadzenSeriesReferenceLine Visible="@(range == "1D")" Value="@baseline" Title="Prev. close" Stroke="var(--rz-text-tertiary-color)" LineType="LineType.Dotted" />
+            </RadzenLineSeries>
+        }
+        else
+        {
+            <RadzenAreaSeries Data="@bars" CategoryProperty="Index" ValueProperty="Close" Title="Price" FillMode="FillMode.Gradient" Stroke="@trendColor" Fill="@trendColor" StrokeWidth="2">
+                <RadzenMarkers Visible="false" />
+                <RadzenSeriesReferenceLine Visible="@(range == "1D")" Value="@baseline" Title="Prev. close" Stroke="var(--rz-text-tertiary-color)" LineType="LineType.Dotted" />
+            </RadzenAreaSeries>
+        }
+        <RadzenCategoryAxis Formatter="@FormatDate" Min="-0.5" Max="@(bars.Count - 0.5)" Step="@dateStep">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Formatter="@FormatPrice" Min="@priceMin" Max="@priceMax" Step="@priceStep">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+        </RadzenValueAxis>
+        <RadzenValueAxis Name="volume" Visible="false" Formatter="@FormatVolume" Min="0" Max="@volumeMax" />
+        <RadzenLegend Visible="false" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    record Bar(DateTime Date, double Open, double High, double Low, double Close, double Volume)
+    {
+        public int Index { get; init; }
+    }
+
+    const string upColor = "#26A69A";
+    const string downColor = "#EF5350";
+
+    readonly Dictionary<string, string> periods = new()
+    {
+        ["1D"] = "today",
+        ["5D"] = "past 5 days",
+        ["1M"] = "past month",
+        ["6M"] = "past 6 months",
+        ["YTD"] = "year to date",
+        ["1Y"] = "past year",
+        ["5Y"] = "past 5 years",
+        ["MAX"] = "all time"
+    };
+
+    readonly List<Bar> daily = new();
+    readonly List<List<Bar>> sessions = new();
+    readonly List<Bar> afterHours = new();
+
+    List<Bar> bars = new();
+    List<string> volumeFills = new();
+
+    string chartType = "Area";
+    string range = "1D";
+    string dateFormat = "h:mm tt";
+    int dateStep = 1;
+
+    DateTime lastSession;
+    double price;
+    double afterHoursPrice;
+    double afterHoursChange;
+    double baseline;
+    double change;
+    double changePercent;
+    double priceMin;
+    double priceMax;
+    double priceStep;
+    double volumeMax;
+
+    string trendColor => change >= 0 ? upColor : downColor;
+
+    protected override void OnInitialized()
+    {
+        var random = new Random(11);
+        var days = new List<DateTime>();
+
+        for (var day = new DateTime(2025, 11, 21); days.Count < 2520; day = day.AddDays(-1))
+        {
+            if (day.DayOfWeek != DayOfWeek.Saturday && day.DayOfWeek != DayOfWeek.Sunday)
+            {
+                days.Add(day);
+            }
+        }
+
+        days.Reverse();
+
+        var current = 12.0;
+
+        for (var i = 0; i < days.Count; i++)
+        {
+            if (i < days.Count - 5)
+            {
+                daily.Add(NextBar(random, days[i], ref current, 0.021, 0.0011, 32_000_000));
+                continue;
+            }
+
+            var open = days[i].AddHours(9.5);
+            var session = new List<Bar>();
+
+            for (var slot = 0; slot < 78; slot++)
+            {
+                session.Add(NextBar(random, open.AddMinutes(slot * 5), ref current, 0.0024, 0, 410_000));
+            }
+
+            sessions.Add(session);
+            daily.Add(Merge(session));
+        }
+
+        lastSession = days[^1].AddHours(16);
+        price = current;
+
+        for (var slot = 0; slot < 48; slot++)
+        {
+            afterHours.Add(NextBar(random, lastSession.AddMinutes(slot * 5), ref current, 0.0006, 0, 24_000));
+        }
+
+        afterHoursPrice = current;
+        afterHoursChange = afterHoursPrice - price;
+
+        SelectRange(range);
+    }
+
+    void SelectRange(string value)
+    {
+        range = value;
+
+        var source = value switch
+        {
+            "1D" => sessions[^1].Concat(afterHours),
+            "5D" => sessions.SelectMany(session => session.Chunk(6).Select(Merge)),
+            "1M" => daily.TakeLast(22),
+            "6M" => daily.TakeLast(126),
+            "YTD" => daily.Where(bar => bar.Date.Year == lastSession.Year),
+            "1Y" => daily.TakeLast(252),
+            "5Y" => daily.TakeLast(1260).Chunk(5).Select(Merge),
+            _ => daily.GroupBy(bar => (bar.Date.Year, bar.Date.Month)).Select(Merge)
+        };
+
+        bars = source.Select((bar, index) => bar with { Index = index }).ToList();
+        volumeFills = bars.Select(bar => (bar.Close >= bar.Open ? upColor : downColor) + "99").ToList();
+
+        dateFormat = value switch
+        {
+            "1D" => "h:mm tt",
+            "5D" => "ddd h:mm tt",
+            "1M" or "6M" or "YTD" => "MMM d",
+            _ => "MMM yyyy"
+        };
+
+        dateStep = value switch
+        {
+            "1D" => 18,
+            "5D" => 13,
+            _ => Math.Max(1, (int)Math.Ceiling(bars.Count / 6.0))
+        };
+
+        baseline = value == "1D" ? daily[^2].Close : bars[0].Close;
+        change = price - baseline;
+        changePercent = change / baseline * 100;
+
+        var low = Math.Min(bars.Min(bar => bar.Low), baseline);
+        var high = Math.Max(bars.Max(bar => bar.High), baseline);
+        var span = high - low;
+
+        priceStep = NiceStep(span / 4);
+        priceMin = Math.Max(0, Math.Floor((low - span * 0.3) / priceStep) * priceStep);
+        priceMax = Math.Ceiling(high / priceStep) * priceStep;
+        volumeMax = bars.Max(bar => bar.Volume) * 5;
+    }
+
+    static Bar NextBar(Random random, DateTime date, ref double current, double volatility, double drift, double volume)
+    {
+        var move = drift + volatility * (random.NextDouble() + random.NextDouble() + random.NextDouble() - 1.5) * 2;
+        var open = current;
+        var close = Math.Round(open * (1 + move), 2);
+        var high = Math.Round(Math.Max(open, close) * (1 + volatility * 0.6 * random.NextDouble()), 2);
+        var low = Math.Round(Math.Min(open, close) * (1 - volatility * 0.6 * random.NextDouble()), 2);
+
+        current = close;
+
+        return new Bar(date, open, high, low, close, Math.Round(volume * (0.5 + random.NextDouble() + Math.Abs(move) / volatility)));
+    }
+
+    static Bar Merge(IEnumerable<Bar> source)
+    {
+        var items = source.ToList();
+
+        return new Bar(items[0].Date, items[0].Open, items.Max(bar => bar.High), items.Min(bar => bar.Low), items[^1].Close, items.Sum(bar => bar.Volume));
+    }
+
+    static double NiceStep(double value)
+    {
+        var magnitude = Math.Pow(10, Math.Floor(Math.Log10(value)));
+        var fraction = value / magnitude;
+
+        return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * magnitude;
+    }
+
+    string FormatDate(object value)
+    {
+        var position = Math.Ceiling(Convert.ToDouble(value, CultureInfo.InvariantCulture));
+
+        if (position < 0 || position >= bars.Count)
+        {
+            return "";
+        }
+
+        return bars[(int)position].Date.ToString(dateFormat, CultureInfo.InvariantCulture);
+    }
+
+    string FormatPrice(object value)
+    {
+        return Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString("C2", CultureInfo.GetCultureInfo("en-US"));
+    }
+
+    string FormatVolume(object value)
+    {
+        var volume = Convert.ToDouble(value, CultureInfo.InvariantCulture);
+
+        return volume >= 1e9 ? (volume / 1e9).ToString("0.##", CultureInfo.InvariantCulture) + "B"
+            : volume >= 1e6 ? (volume / 1e6).ToString("0.##", CultureInfo.InvariantCulture) + "M"
+            : volume >= 1e3 ? (volume / 1e3).ToString("0.#", CultureInfo.InvariantCulture) + "K"
+            : volume.ToString("0", CultureInfo.InvariantCulture);
+    }
+}
