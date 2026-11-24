@@ -7,6 +7,15 @@ using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
+    internal interface IChartNavigableSeries
+    {
+        int ItemCount { get; }
+
+        object? ItemAt(int index);
+
+        string DescribeItem(object data);
+    }
+
     /// <summary>
     /// Specifies the common API that <see cref="RadzenChart" /> series must implement.
     /// </summary>

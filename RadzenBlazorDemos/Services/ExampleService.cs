@@ -1109,6 +1109,23 @@ namespace RadzenBlazorDemos
 
                 new Example
                 {
+                    Name = "Keyboard Navigation",
+                    Path = "datagrid-keyboard-navigation",
+                    New = true,
+                    Related = new [] { "datagrid", "datagrid-multiple-selection", "master-detail-hierarchy" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can the Blazor DataGrid be used with the keyboard only?", Answer = "Yes. Tab moves focus to the grid, the arrow keys move between rows and header cells, Enter sorts a focused header cell, Alt + DownArrow opens its filter, Enter or Space selects the focused row, and the pager is reachable with Tab." },
+                        new FaqItem { Question = "How do I expand a DataGrid row from the keyboard?", Answer = "Focus the row and press RightArrow to expand it or LeftArrow to collapse it." }
+                    },
+                    Title = "Keyboard Navigation in a Blazor DataGrid | Free Radzen Blazor",
+                    Description = "Navigate the Radzen Blazor DataGrid with the keyboard: move between rows and header cells, sort, filter, select, expand and page without a mouse.",
+                    Icon = "\ue312",
+                    Tags = new [] { "keyboard", "navigation", "accessibility", "a11y", "shortcuts", "datagrid", "table" }
+                },
+
+                new Example
+                {
                     Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
                     Related = new [] { "datagrid-column-template", "datagrid-conditional-columns-render", "datagrid-grid-lines" },
@@ -1949,6 +1966,21 @@ namespace RadzenBlazorDemos
                     Name = "Financial Charts",
                     Icon = "\uef92",
                     Children = new [] {
+                        new Example
+                        {
+                            Name = "Stock Chart",
+                            Path = "stock-chart",
+                            Description = "Build a Blazor stock chart with a price area, volume bars, a previous close line, and period buttons from one day to several years. Free and open source.",
+                            Tags = new [] { "chart", "graph", "stock", "financial", "price", "volume", "ticker", "intraday", "area", "candlestick" },
+                            New = true,
+                            Related = new [] { "candlestick-chart", "ohlc-chart", "area-chart", "range-navigator" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show volume under the price?", Answer = "Add a column series bound to the volume and point it at a second, hidden value axis whose maximum is a few times the largest volume, so the bars stay in the bottom part of the chart." },
+                                new FaqItem { Question = "How do I skip nights and weekends on the axis?", Answer = "Bind the category to the position of each point instead of its date and format the axis labels from the date at that position. The points are then evenly spaced with no gaps for the hours the market is closed." },
+                                new FaqItem { Question = "How do I draw the previous close?", Answer = "Add a reference line to the price series and set its value to the previous close." }
+                            }
+                        },
                         new Example
                         {
                             Name = "Candlestick Chart",

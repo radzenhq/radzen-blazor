@@ -2666,4 +2666,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>Dark theme</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>Chart</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>Use the arrow keys to move between data points and series.</value>
+  </data>
 </root>

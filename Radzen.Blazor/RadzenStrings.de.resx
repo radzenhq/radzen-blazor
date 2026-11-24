@@ -2569,4 +2569,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>Dunkles Design</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>Diagramm</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>Verwenden Sie die Pfeiltasten, um zwischen Datenpunkten und Reihen zu wechseln.</value>
+  </data>
 </root>

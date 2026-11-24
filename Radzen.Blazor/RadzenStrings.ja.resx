@@ -2569,4 +2569,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>ダークテーマ</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>チャート</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>矢印キーでデータ ポイントと系列の間を移動します。</value>
+  </data>
 </root>

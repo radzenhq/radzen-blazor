@@ -2569,4 +2569,10 @@
   <data name="AppearanceToggle_AriaLabel" xml:space="preserve">
     <value>Thème sombre</value>
   </data>
+  <data name="Chart_AriaLabel" xml:space="preserve">
+    <value>Graphique</value>
+  </data>
+  <data name="Chart_KeyboardNavigationHint" xml:space="preserve">
+    <value>Utilisez les touches fléchées pour vous déplacer entre les points de données et les séries.</value>
+  </data>
 </root>
