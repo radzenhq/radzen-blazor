@@ -1418,9 +1418,19 @@ namespace Radzen.Blazor
                 {
                     case "ArrowRight":
                         next = FindKeyboardIndex(navigable[seriesIndex], keyboardIndex + 1, 1);
+                        while (next < 0 && seriesIndex < navigable.Count - 1)
+                        {
+                            seriesIndex++;
+                            next = FindKeyboardIndex(navigable[seriesIndex], 0, 1);
+                        }
                         break;
                     case "ArrowLeft":
                         next = FindKeyboardIndex(navigable[seriesIndex], keyboardIndex - 1, -1);
+                        while (next < 0 && seriesIndex > 0)
+                        {
+                            seriesIndex--;
+                            next = FindKeyboardIndex(navigable[seriesIndex], ((IChartNavigableSeries)navigable[seriesIndex]).ItemCount - 1, -1);
+                        }
                         break;
                     case "Home":
                         next = FindKeyboardIndex(navigable[seriesIndex], 0, 1);

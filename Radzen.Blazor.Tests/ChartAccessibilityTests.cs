@@ -70,7 +70,40 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public async Task Arrow_Keys_Announce_Data_Points()
+        public async Task Left_And_Right_Move_Along_A_Series_And_Continue_Into_The_Adjacent_One()
+        {
+            using var ctx = CreateChartContext();
+            var chart = RenderChart(ctx);
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowRight"));
+            Assert.Equal("Revenue, A, 10", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowRight"));
+            Assert.Equal("Revenue, B, 20", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowRight"));
+            Assert.Equal("Revenue, C, 15", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowRight"));
+            Assert.Equal("Cost, A, 20", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowLeft"));
+            Assert.Equal("Revenue, C, 15", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowLeft"));
+            Assert.Equal("Revenue, B, 20", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowLeft"));
+            Assert.Equal("Revenue, A, 10", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowLeft"));
+            Assert.Equal("Revenue, A, 10", chart.Find(".rz-chart-announcement").TextContent);
+        }
+
+        [Fact]
+        public async Task Up_And_Down_Switch_Series_At_The_Same_Point()
         {
             using var ctx = CreateChartContext();
             var chart = RenderChart(ctx);
@@ -85,6 +118,30 @@ namespace Radzen.Blazor.Tests
 
             await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowDown"));
             Assert.Equal("Cost, B, 30", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowDown"));
+            Assert.Equal("Revenue, B, 20", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowUp"));
+            Assert.Equal("Cost, B, 30", chart.Find(".rz-chart-announcement").TextContent);
+        }
+
+        [Fact]
+        public async Task Home_And_End_Stay_In_The_Current_Series()
+        {
+            using var ctx = CreateChartContext();
+            var chart = RenderChart(ctx);
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("End"));
+            Assert.Equal("Revenue, C, 15", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("Home"));
+            Assert.Equal("Revenue, A, 10", chart.Find(".rz-chart-announcement").TextContent);
+
+            await chart.InvokeAsync(() => chart.Instance.KeyDown("ArrowDown"));
+            Assert.Equal("Cost, A, 20", chart.Find(".rz-chart-announcement").TextContent);
 
             await chart.InvokeAsync(() => chart.Instance.KeyDown("End"));
             Assert.Equal("Cost, C, 25", chart.Find(".rz-chart-announcement").TextContent);
