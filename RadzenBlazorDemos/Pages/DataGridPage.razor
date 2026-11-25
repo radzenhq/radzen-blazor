@@ -10,7 +10,7 @@
 <RadzenText Anchor="datagrid#whats-included" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4 rz-pb-2">
     What's included
 </RadzenText>
-<ul class="datagrid-included rz-mb-8">
+<ul class="datagrid-included rz-mb-4">
     @foreach (var item in included)
     {
         <li>
@@ -23,6 +23,9 @@
         </li>
     }
 </ul>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="datagrid-included-more rz-mb-8">
+    See <RadzenLink Path="https://www.radzen.com/blog/radzendatagrid-vs-muddatagrid-vs-quickgrid" Text="how our DataGrid compares to other open-source data grids" />.
+</RadzenText>
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridIQueryable">
     <DataGridIQueryable />
@@ -55,7 +58,8 @@
         line-height: 1.75;
     }
 
-    .datagrid-included .rz-link {
+    .datagrid-included .rz-link,
+    .datagrid-included-more .rz-link {
         --rz-link-text-decoration: underline;
     }
 
