@@ -18,7 +18,10 @@
         <RadzenLineSeries Data="@data" CategoryProperty="Date" ValueProperty="Expenses" Title="Expenses" Smooth="true" Stroke="#EF5350">
             <RadzenMarkers Visible="false" />
         </RadzenLineSeries>
-        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}" />
+        <RadzenChartTooltipOptions Shared="true" />
+        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
         <RadzenValueAxis Formatter="@FormatAsUSD">
             <RadzenGridLines Visible="true" />
         </RadzenValueAxis>

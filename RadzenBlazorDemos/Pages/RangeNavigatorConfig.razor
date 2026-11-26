@@ -17,7 +17,10 @@
         <RadzenLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="SMA20" Title="SMA 20" Stroke="#FF9800" StrokeWidth="1.5">
             <RadzenMarkers Visible="false" />
         </RadzenLineSeries>
-        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}" />
+        <RadzenChartTooltipOptions Shared="true" />
+        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
         <RadzenValueAxis Formatter="@FormatAsUSD">
             <RadzenGridLines Visible="true" />
             <RadzenAxisTitle Text="Price (USD)" />
