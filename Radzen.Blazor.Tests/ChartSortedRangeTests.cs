@@ -234,5 +234,78 @@ namespace Radzen.Blazor.Tests
             Assert.False(series.Contains(points.Min(p => p.X) - 10, points[0].Y, 3));
             Assert.False(series.Contains(points.Max(p => p.X) + 10, points[^1].Y, 3));
         }
+
+        static async Task<(double X, double Y)[]> RenderedPoints(TestContext ctx, IList<Sample> data, string category)
+        {
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenLineSeries<Sample>>(s => s
+                    .Add(x => x.CategoryProperty, category)
+                    .Add(x => x.ValueProperty, nameof(Sample.Y))
+                    .Add(x => x.Data, data)
+                    .AddChildContent<RadzenMarkers>(m => m.Add(x => x.Visible, false))));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(700, 300));
+
+            return LinePoints(chart);
+        }
+
+        [Theory]
+        [InlineData(nameof(Sample.X))]
+        [InlineData(nameof(Sample.Time))]
+        public async Task LineSeries_DataInAnyOrder_RendersThePointsInCategoryOrder(string category)
+        {
+            using var ctx = CreateChartContext();
+
+            var ordered = Wave(300);
+            var shuffled = ordered.OrderBy(s => (s.X * 7919) % 300).ToList();
+            var reversed = ordered.Reverse().ToList();
+
+            var expected = await RenderedPoints(ctx, ordered.ToList(), category);
+
+            Assert.Equal(expected.OrderBy(p => p.X), expected);
+            Assert.Equal(expected, await RenderedPoints(ctx, shuffled, category));
+            Assert.Equal(expected, await RenderedPoints(ctx, reversed, category));
+        }
+
+        [Fact]
+        public async Task LineSeries_OrderedData_KeepsItemsWithTheSameCategoryInTheirOriginalOrder()
+        {
+            using var ctx = CreateChartContext();
+
+            var data = Wave(300).Select((s, i) => new Sample { X = i / 3, Time = s.Time, Y = i }).ToList();
+            var points = await RenderedPoints(ctx, data, nameof(Sample.X));
+
+            Assert.Equal(points.OrderByDescending(p => p.Y).Select(p => p.Y), points.Select(p => p.Y));
+        }
+
+        [Fact]
+        public async Task LineSeries_OrderedData_PicksUpItemsAddedToTheSameList()
+        {
+            using var ctx = CreateChartContext();
+
+            var data = Wave(50).ToList();
+
+            Microsoft.AspNetCore.Components.RenderFragment content = builder =>
+            {
+                builder.OpenComponent<RadzenLineSeries<Sample>>(0);
+                builder.AddAttribute(1, nameof(RadzenLineSeries<Sample>.CategoryProperty), nameof(Sample.X));
+                builder.AddAttribute(2, nameof(RadzenLineSeries<Sample>.ValueProperty), nameof(Sample.Y));
+                builder.AddAttribute(3, nameof(RadzenLineSeries<Sample>.Data), data);
+                builder.CloseComponent();
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p.Add(x => x.ChildContent, content));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(700, 300));
+
+            Assert.Equal(50, LinePoints(chart).Length);
+
+            data.Add(new Sample { X = 50, Time = new DateTime(2025, 1, 1), Y = 5 });
+            data.Add(new Sample { X = 51, Time = new DateTime(2025, 1, 2), Y = 6 });
+
+            chart.SetParametersAndRender(p => p.Add(x => x.ChildContent, content));
+
+            Assert.Equal(52, LinePoints(chart).Length);
+        }
     }
 }

@@ -17,11 +17,17 @@
 
     var animate = chart.AnimateDataUpdates;
 
-    var data = CreatePoints(categoryScale, category, value, Interpolation == Interpolation.Spline ? 2 : 1, !animate);
+    var neighbors = Interpolation == Interpolation.Spline ? 2 : 1;
+    var sample = !animate && Sampling == Sampling.MinMax;
 
-    if (!animate && Sampling == Sampling.MinMax)
+    if (!sample || !TryCreateSampledPoints(categoryScale, valueScale, Value, neighbors, out var data))
     {
-      data = SampleMinMax(data);
+      data = CreatePoints(categoryScale, category, value, neighbors, !animate);
+
+      if (sample)
+      {
+        data = SampleMinMax(data);
+      }
     }
 
     var segments = Segments(data);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -367,6 +368,116 @@ namespace Radzen.Blazor.Tests
             var after = ValueRange(chart);
 
             Assert.True(after.Min > before.Max);
+        }
+
+        static (double X, double Y)[] SampleEveryPoint((double X, double Y)[] points, double width, int neighbors)
+        {
+            var keep = new bool[points.Length];
+
+            for (var i = 0; i < points.Length; i++)
+            {
+                if (points[i].X >= 0 && points[i].X <= width)
+                {
+                    keep[i] = true;
+                }
+
+                if (i > 0 && Math.Max(points[i - 1].X, points[i].X) >= 0 && Math.Min(points[i - 1].X, points[i].X) <= width)
+                {
+                    keep[i - 1] = true;
+                    keep[i] = true;
+                }
+            }
+
+            var firstKept = Array.IndexOf(keep, true);
+            var lastKept = Array.LastIndexOf(keep, true);
+
+            if (firstKept < 0)
+            {
+                return Array.Empty<(double, double)>();
+            }
+
+            var visible = points.Skip(Math.Max(0, firstKept - neighbors)).Take(Math.Min(points.Length - 1, lastKept + neighbors) - Math.Max(0, firstKept - neighbors) + 1).ToArray();
+            var result = new List<(double X, double Y)>();
+            var start = 0;
+
+            while (start < visible.Length)
+            {
+                var end = start;
+
+                while (end + 1 < visible.Length && Math.Floor(visible[end + 1].X * 2) == Math.Floor(visible[start].X * 2))
+                {
+                    end++;
+                }
+
+                var min = start;
+                var max = start;
+
+                for (var i = start + 1; i <= end; i++)
+                {
+                    if (visible[i].Y < visible[min].Y) min = i;
+                    if (visible[i].Y > visible[max].Y) max = i;
+                }
+
+                foreach (var index in new[] { start, Math.Min(min, max), Math.Max(min, max), end }.Distinct())
+                {
+                    result.Add(visible[index]);
+                }
+
+                start = end + 1;
+            }
+
+            return result.ToArray();
+        }
+
+        [Theory]
+        [InlineData(20000, 0.0, 1.0, false, 1)]
+        [InlineData(20000, 0.0, 0.1, false, 1)]
+        [InlineData(20000, 0.37, 0.52, false, 1)]
+        [InlineData(20000, 0.9, 1.0, false, 1)]
+        [InlineData(20000, 0.37, 0.52, true, 1)]
+        [InlineData(20000, 0.0, 1.0, true, 1)]
+        [InlineData(20000, 0.5, 0.5004, false, 1)]
+        [InlineData(20000, 0.25, 0.75, false, 3)]
+        [InlineData(100, 0.0, 1.0, false, 1)]
+        [InlineData(17, 0.0, 1.0, false, 1)]
+        [InlineData(4097, 0.1, 0.9, false, 1)]
+        public async Task LineSeries_MinMaxSampling_RendersTheSamePointsAsSamplingEveryPoint(int count, double viewStart, double viewEnd, bool inverted, int repeat)
+        {
+            using var ctx = CreateChartContext();
+
+            var data = Wave(count);
+
+            foreach (var item in data)
+            {
+                item.X = Math.Floor(item.X / repeat);
+                item.Y = repeat > 1 ? Math.Round(item.Y!.Value / 10) : item.Y;
+            }
+
+            var sampledChart = await RenderZoomable(ctx, data, Sampling.MinMax, viewStart, viewEnd, inverted);
+            var all = ctx.RenderComponent<RadzenChart>(p => p
+                .Add(x => x.AllowZoom, true)
+                .Add(x => x.AnimateDataUpdates, true)
+                .Add(x => x.ViewStart, viewStart)
+                .Add(x => x.ViewEnd, viewEnd)
+                .AddChildContent<RadzenCategoryAxis>(a => a.Add(x => x.Inverted, inverted))
+                .AddChildContent<RadzenLineSeries<Sample>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(Sample.X))
+                    .Add(x => x.ValueProperty, nameof(Sample.Y))
+                    .Add(x => x.Data, data)));
+
+            await all.InvokeAsync(() => all.Instance.Resize(Width, 300));
+
+            var width = sampledChart.Instance.CategoryScale.OutputSize;
+            var expected = SampleEveryPoint(LinePoints(all), width, 1);
+            var actual = LinePoints(sampledChart);
+
+            Assert.Equal(expected.Length, actual.Length);
+
+            for (var i = 0; i < expected.Length; i++)
+            {
+                Assert.Equal(expected[i].X, actual[i].X, 6);
+                Assert.Equal(expected[i].Y, actual[i].Y, 6);
+            }
         }
     }
 }

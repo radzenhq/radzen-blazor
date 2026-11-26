@@ -21,11 +21,18 @@
     var chart = RequireChart();
     var animate = chart.AnimateDataUpdates;
 
-    var data = CreatePoints(categoryScale, category, item => valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item), Interpolation == Interpolation.Spline ? 2 : 1, !animate);
+    var neighbors = Interpolation == Interpolation.Spline ? 2 : 1;
+    var sample = !animate && Sampling == Sampling.MinMax;
+    var rawValue = Value;
 
-    if (!animate && Sampling == Sampling.MinMax)
+    if (!sample || !TryCreateSampledPoints(categoryScale, valueScale, item => valueNullable && rawValueGetter!(item) == null ? double.NaN : rawValue(item), neighbors, out var data))
     {
-      data = SampleMinMax(data);
+      data = CreatePoints(categoryScale, category, item => valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item), neighbors, !animate);
+
+      if (sample)
+      {
+        data = SampleMinMax(data);
+      }
     }
 
     var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
