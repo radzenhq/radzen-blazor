@@ -90,6 +90,9 @@ Used by developers at Microsoft, NASA, Porsche, Dell, Siemens, Nokia, DHL, HSBC,
 ### :speech_balloon: Community Support
 Visit the [Radzen Community forum](https://forum.radzen.com/) — 400+ active weekly users with an average response time of 2 hours.
 
+### :star: Leave a review
+Using Radzen Blazor Components? Tell other developers what you think: [radzen.com/review](https://www.radzen.com/review)
+
 ### :dart: Radzen Blazor Pro
 
 For dedicated support and additional productivity tools, the [Radzen Blazor Pro subscription](https://www.radzen.com/pricing) includes:
