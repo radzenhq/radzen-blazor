@@ -1,0 +1,165 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">Use the mouse wheel or pinch to zoom in/out and drag the scrollbar to pan.</RadzenText>
+            <RadzenButton Text="Reset Zoom" Click="@ResetZoom" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenText TextStyle="TextStyle.Body2" Style="margin: 0;">@status</RadzenText>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" MaxZoom="@(ReadingStore.Count * 2.0)" ViewChange="@OnViewChange" Animate="false">
+        <RadzenLineSeries Data="@data" CategoryProperty="Time" ValueProperty="Value" Title="Sensor reading" StrokeWidth="1">
+            <ChildContent>
+                <RadzenMarkers Visible="false" />
+            </ChildContent>
+            <TooltipTemplate Context="reading">
+                <div>@reading.Time.ToString("d MMM yyyy HH:mm")</div>
+                <div>Sensor reading: <strong>@reading.Value.ToString("N2")</strong></div>
+            </TooltipTemplate>
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Min="@ReadingStore.Start" Max="@ReadingStore.End" Formatter="@FormatTime">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+        <RadzenLegend Visible="false" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class Reading
+    {
+        public DateTime Time { get; set; }
+        public double Value { get; set; }
+    }
+
+    static class ReadingStore
+    {
+        public const int Count = 5_000_000;
+
+        public static readonly DateTime Start = new DateTime(2016, 1, 1);
+        public static readonly DateTime End = Start.AddMinutes(Count - 1);
+
+        static readonly Lazy<float[]> values = new(() =>
+        {
+            var random = new Random(42);
+            var result = new float[Count];
+            var value = 50.0;
+
+            for (var i = 0; i < Count; i++)
+            {
+                value += random.NextDouble() - 0.5;
+                result[i] = (float)value;
+            }
+
+            return result;
+        });
+
+        public static List<Reading> Query(DateTime from, DateTime to, int points)
+        {
+            var all = values.Value;
+            var first = Math.Clamp((int)Math.Floor((from - Start).TotalMinutes), 0, Count - 1);
+            var last = Math.Clamp((int)Math.Ceiling((to - Start).TotalMinutes), first, Count - 1);
+            var total = last - first + 1;
+            var result = new List<Reading>(Math.Min(total, points * 2));
+
+            if (total <= points * 2)
+            {
+                for (var i = first; i <= last; i++)
+                {
+                    result.Add(At(all, i));
+                }
+
+                return result;
+            }
+
+            var size = (double)total / points;
+
+            for (var bucket = 0; bucket < points; bucket++)
+            {
+                var from1 = first + (int)(bucket * size);
+                var to1 = Math.Min(last, first + (int)((bucket + 1) * size) - 1);
+                var min = from1;
+                var max = from1;
+
+                for (var i = from1 + 1; i <= to1; i++)
+                {
+                    if (all[i] < all[min]) min = i;
+                    if (all[i] > all[max]) max = i;
+                }
+
+                result.Add(At(all, Math.Min(min, max)));
+
+                if (min != max)
+                {
+                    result.Add(At(all, Math.Max(min, max)));
+                }
+            }
+
+            return result;
+        }
+
+        static Reading At(float[] all, int index) => new Reading { Time = Start.AddMinutes(index), Value = Math.Round(all[index], 2) };
+    }
+
+    const int Points = 1000;
+
+    RadzenChart chart;
+    List<Reading> data;
+    string status;
+    TimeSpan visible = ReadingStore.End - ReadingStore.Start;
+
+    string FormatTime(object value)
+    {
+        var time = Convert.ToDateTime(value);
+
+        if (visible.TotalDays > 120)
+        {
+            return time.ToString("MMM yyyy");
+        }
+
+        if (visible.TotalDays > 3)
+        {
+            return time.ToString("d MMM yyyy");
+        }
+
+        if (visible.TotalHours > 6)
+        {
+            return time.ToString("d MMM HH:mm");
+        }
+
+        return time.ToString("HH:mm");
+    }
+
+    protected override void OnInitialized()
+    {
+        Load(0, 1);
+    }
+
+    void OnViewChange(ChartViewChangeEventArgs args)
+    {
+        Load(args.ViewStart, args.ViewEnd);
+    }
+
+    async Task ResetZoom()
+    {
+        await chart.ResetZoom();
+
+        Load(0, 1);
+    }
+
+    void Load(double viewStart, double viewEnd)
+    {
+        var range = ReadingStore.End - ReadingStore.Start;
+        var margin = (viewEnd - viewStart) / 2;
+
+        visible = range * (viewEnd - viewStart);
+        var from = ReadingStore.Start + range * Math.Max(0, viewStart - margin);
+        var to = ReadingStore.Start + range * Math.Min(1, viewEnd + margin);
+
+        data = ReadingStore.Query(from, to, Points * 2);
+
+        status = $"Loaded {data.Count:N0} of {ReadingStore.Count:N0} points";
+    }
+}
