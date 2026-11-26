@@ -5162,7 +5162,8 @@ window.Radzen = {
       var delta = e.deltaY > 0 ? 1 : -1;
       var range = parseFloat(ref.dataset.zoomEnd) - parseFloat(ref.dataset.zoomStart);
       if (isNaN(range)) range = 1;
-      if (delta < 0 ? range <= 0.01 + 1e-6 : range >= 1 - 1e-6) return;
+      var minRange = parseFloat(ref.dataset.zoomMinRange) || 0.01;
+      if (delta < 0 ? range <= minRange * (1 + 1e-4) : range >= 1 - 1e-6) return;
       e.preventDefault();
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;

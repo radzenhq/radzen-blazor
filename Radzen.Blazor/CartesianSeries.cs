@@ -17,7 +17,7 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     public abstract class CartesianSeries<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IChartNavigableSeries, IDisposable
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IChartNavigableSeries, IChartSeriesDataCache, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
@@ -238,6 +238,318 @@ namespace Radzen.Blazor
             var high = Math.Max(position, position + size) + strokeWidth;
 
             return !double.IsNaN(low) && !double.IsNaN(high) && high >= start && low <= end;
+        }
+
+        /// <summary>
+        /// Creates the points a line or area needs in order to draw the part of it that falls inside the pixel range of
+        /// <paramref name="categoryScale"/>. When the items are in ascending category order only the items around the visible range are read;
+        /// otherwise every item is read. The result is the same as passing the points of every item to <see cref="ClipToPlotRange"/>.
+        /// </summary>
+        /// <param name="categoryScale">The category scale whose <see cref="ScaleBase.Output"/> is the visible pixel range.</param>
+        /// <param name="x">Returns the horizontal pixel of an item.</param>
+        /// <param name="y">Returns the vertical pixel of an item.</param>
+        /// <param name="neighbors">How many extra points to keep beyond the last point whose segment is visible.</param>
+        /// <param name="clip">Whether to leave out the points outside the visible range.</param>
+        private protected IList<Point<TItem>> CreatePoints(ScaleBase categoryScale, Func<TItem, double> x, Func<TItem, double> y, int neighbors, bool clip)
+        {
+            var first = 0;
+            var last = Items.Count - 1;
+
+            if (clip && TryGetPlotRange(categoryScale, out var start, out var end) && TryGetSortedRange(categoryScale, x, start, end, neighbors, out var visibleFirst, out var visibleLast))
+            {
+                first = visibleFirst;
+                last = visibleLast;
+            }
+
+            IList<Point<TItem>> points = new List<Point<TItem>>(Math.Max(0, last - first + 1));
+
+            for (var i = first; i <= last; i++)
+            {
+                var item = Items[i];
+
+                points.Add(new Point<TItem> { X = x(item), Y = y(item), Data = item });
+            }
+
+            return clip ? ClipToPlotRange(points, categoryScale, neighbors) : points;
+        }
+
+        /// <summary>
+        /// Specifies whether the series may remember facts about its data between renders - the category and value ranges and
+        /// whether the items are in ascending category order - instead of reading every item again.
+        /// The cache is dropped when <see cref="Data"/>, its number of items or the bound properties change and when <see cref="RadzenChart.Reload"/> is called.
+        /// </summary>
+        private protected virtual bool CachesData => false;
+
+        sealed class DataCache
+        {
+            public IList<TItem>? Items;
+            public int Count;
+            public string? CategoryProperty;
+            public string? ValueProperty;
+            public bool? Sorted;
+            public (double Start, double End)? CategoryRange;
+            public (double Start, double End)? ValueRange;
+        }
+
+        DataCache? dataCache;
+
+        DataCache? GetDataCache()
+        {
+            if (!CachesData)
+            {
+                dataCache = null;
+
+                return null;
+            }
+
+            var cache = dataCache;
+
+            if (cache == null || !ReferenceEquals(cache.Items, Items) || cache.Count != Items.Count || cache.CategoryProperty != CategoryProperty || cache.ValueProperty != ValueProperty)
+            {
+                cache = dataCache = new DataCache { Items = Items, Count = Items.Count, CategoryProperty = CategoryProperty, ValueProperty = ValueProperty };
+            }
+
+            return cache;
+        }
+
+        void IChartSeriesDataCache.Invalidate()
+        {
+            dataCache = null;
+        }
+
+        ScaleRange CategoryRange(ScaleBase scale)
+        {
+            var cache = IsNumeric(CategoryProperty) || IsDate(CategoryProperty) ? GetDataCache() : null;
+
+            if (cache == null)
+            {
+                return ScaleRange.From(Items, Category(scale));
+            }
+
+            if (cache.CategoryRange == null)
+            {
+                var range = ScaleRange.From(Items, Category(scale));
+
+                cache.CategoryRange = (range.Start, range.End);
+            }
+
+            return new ScaleRange { Start = cache.CategoryRange.Value.Start, End = cache.CategoryRange.Value.End };
+        }
+
+        bool IsSortedByCategory(ScaleBase categoryScale)
+        {
+            var cache = GetDataCache();
+
+            if (cache?.Sorted != null)
+            {
+                return cache.Sorted.Value;
+            }
+
+            var sorted = true;
+            var category = Category(categoryScale);
+            var previous = category(Items[0]);
+
+            if (double.IsNaN(previous))
+            {
+                sorted = false;
+            }
+
+            for (var i = 1; sorted && i < Items.Count; i++)
+            {
+                var current = category(Items[i]);
+
+                if (!(current >= previous))
+                {
+                    sorted = false;
+                }
+
+                previous = current;
+            }
+
+            if (cache != null)
+            {
+                cache.Sorted = sorted;
+            }
+
+            return sorted;
+        }
+
+        /// <summary>
+        /// Finds the items whose horizontal pixel falls between <paramref name="start"/> and <paramref name="end"/>, plus one item and
+        /// <paramref name="neighbors"/> more on each side. Returns <c>false</c> when the items are not in ascending category order,
+        /// in which case every item has to be read.
+        /// </summary>
+        private protected bool TryGetSortedRange(ScaleBase categoryScale, Func<TItem, double> x, double start, double end, int neighbors, out int first, out int last)
+        {
+            var count = Items.Count;
+
+            first = 0;
+            last = count - 1;
+
+            if (count < 2 || !(IsNumeric(CategoryProperty) || IsDate(CategoryProperty)))
+            {
+                return false;
+            }
+
+            if (!IsSortedByCategory(categoryScale))
+            {
+                return false;
+            }
+
+            var firstX = x(Items[0]);
+            var lastX = x(Items[count - 1]);
+
+            if (double.IsNaN(firstX) || double.IsNaN(lastX))
+            {
+                return false;
+            }
+
+            var direction = lastX >= firstX ? 1 : -1;
+            var low = direction > 0 ? start : -end;
+            var high = direction > 0 ? end : -start;
+
+            var from = 0;
+            var to = count;
+
+            while (from < to)
+            {
+                var middle = from + (to - from) / 2;
+
+                if (direction * x(Items[middle]) >= low)
+                {
+                    to = middle;
+                }
+                else
+                {
+                    from = middle + 1;
+                }
+            }
+
+            var firstInside = from;
+
+            from = -1;
+            to = count - 1;
+
+            while (from < to)
+            {
+                var middle = from + (to - from + 1) / 2;
+
+                if (direction * x(Items[middle]) <= high)
+                {
+                    from = middle;
+                }
+                else
+                {
+                    to = middle - 1;
+                }
+            }
+
+            var lastInside = from;
+
+            first = Math.Clamp(Math.Min(firstInside, lastInside) - 1 - neighbors, 0, count - 1);
+            last = Math.Clamp(Math.Max(firstInside, lastInside) + 1 + neighbors, 0, count - 1);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reduces consecutive points that fall on the same half of a horizontal pixel to the first, the lowest, the highest and the last of them,
+        /// in their original order. Half pixels are used because the series knows neither where its pixels fall on the screen nor the
+        /// pixel density of the screen. Points without a value are kept so gaps in the series are preserved.
+        /// Returns the original list when no point can be dropped.
+        /// </summary>
+        /// <param name="points">The points in series order, in plot-relative pixels.</param>
+        private protected static IList<Point<TItem>> SampleMinMax(IList<Point<TItem>> points)
+        {
+            ArgumentNullException.ThrowIfNull(points);
+
+            var count = points.Count;
+
+            if (count <= 4)
+            {
+                return points;
+            }
+
+            var result = new List<Point<TItem>>(Math.Min(count, 4096));
+            Span<int> picked = stackalloc int[4];
+            var hasBucket = false;
+            var bucket = 0d;
+            var first = 0;
+            var last = 0;
+            var min = 0;
+            var max = 0;
+
+            for (var i = 0; i < count; i++)
+            {
+                var point = points[i];
+
+                if (double.IsNaN(point.X) || double.IsNaN(point.Y))
+                {
+                    if (hasBucket)
+                    {
+                        AddBucket(points, result, picked, first, min, max, last);
+                        hasBucket = false;
+                    }
+
+                    result.Add(point);
+
+                    continue;
+                }
+
+                var pixel = Math.Floor(point.X * 2);
+
+                if (hasBucket && pixel == bucket)
+                {
+                    last = i;
+
+                    if (point.Y < points[min].Y)
+                    {
+                        min = i;
+                    }
+
+                    if (point.Y > points[max].Y)
+                    {
+                        max = i;
+                    }
+
+                    continue;
+                }
+
+                if (hasBucket)
+                {
+                    AddBucket(points, result, picked, first, min, max, last);
+                }
+
+                hasBucket = true;
+                bucket = pixel;
+                first = last = min = max = i;
+            }
+
+            if (hasBucket)
+            {
+                AddBucket(points, result, picked, first, min, max, last);
+            }
+
+            return result.Count == count ? points : result;
+        }
+
+        static void AddBucket(IList<Point<TItem>> points, List<Point<TItem>> result, Span<int> picked, int first, int min, int max, int last)
+        {
+            picked[0] = first;
+            picked[1] = Math.Min(min, max);
+            picked[2] = Math.Max(min, max);
+            picked[3] = last;
+
+            var previous = -1;
+
+            for (var i = 0; i < picked.Length; i++)
+            {
+                if (picked[i] != previous)
+                {
+                    previous = picked[i];
+                    result.Add(points[previous]);
+                }
+            }
         }
 
         /// <summary>
@@ -599,7 +911,7 @@ namespace Radzen.Blazor
 
             if (Items.Count > 0)
             {
-                scale.Input.MergeWidth(ScaleRange.From(Items, Category(scale)));
+                scale.Input.MergeWidth(CategoryRange(scale));
             }
 
             if (IsNumeric(CategoryProperty))
@@ -653,7 +965,26 @@ namespace Radzen.Blazor
 
             if (Items != null)
             {
-                MergeValues(scale, Value);
+                var cache = GetDataCache();
+
+                if (cache == null)
+                {
+                    MergeValues(scale, Value);
+                }
+                else
+                {
+                    if (cache.ValueRange == null)
+                    {
+                        var range = ScaleRange.From(Items, Value);
+
+                        cache.ValueRange = (range.Start, range.End);
+                    }
+
+                    if (cache.ValueRange.Value.Start <= cache.ValueRange.Value.End)
+                    {
+                        scale.Input.MergeWidth(new ScaleRange { Start = cache.ValueRange.Value.Start, End = cache.ValueRange.Value.End });
+                    }
+                }
             }
 
             IncludeZeroInValueScale(scale, false);
@@ -759,6 +1090,7 @@ namespace Radzen.Blazor
             if (categoryChanged || shouldRefresh)
             {
                 categoryPropertyCache = null;
+                dataCache = null;
             }
 
             if (Data != null && Data.Count() != Items.Count)
@@ -1305,9 +1637,28 @@ namespace Radzen.Blazor
             TItem closest = default!;
             var found = false;
             var closestDistance = double.MaxValue;
+            var firstIndex = 0;
+            var lastIndex = Items.Count - 1;
 
-            foreach (var item in Items)
+            if (CachesData)
             {
+                var probe = zoomed && plotWidth > 0 ? Math.Clamp(x, 0, plotWidth) : x;
+
+                if (TryGetSortedRange(chart.CategoryScale, TooltipX, probe, probe, 0, out var firstNear, out var lastNear))
+                {
+                    while (lastNear < Items.Count - 1 && TooltipX(Items[lastNear + 1]) == TooltipX(Items[lastNear]))
+                    {
+                        lastNear++;
+                    }
+
+                    firstIndex = firstNear;
+                    lastIndex = lastNear;
+                }
+            }
+
+            for (var index = firstIndex; index <= lastIndex; index++)
+            {
+                var item = Items[index];
                 var itemX = TooltipX(item);
 
                 if (zoomed && (itemX < 0 || itemX > plotWidth))
@@ -1322,6 +1673,30 @@ namespace Radzen.Blazor
                     closestDistance = distance;
                     closest = item;
                     found = true;
+                }
+            }
+
+            if (found && CachesData && TryGetSortedRange(chart.CategoryScale, TooltipX, x - 0.5, x + 0.5, 0, out var firstInColumn, out var lastInColumn))
+            {
+                var closestY = double.MaxValue;
+
+                for (var index = firstInColumn; index <= lastInColumn; index++)
+                {
+                    var item = Items[index];
+                    var itemX = TooltipX(item);
+
+                    if (Math.Abs(itemX - x) > 0.5 || (zoomed && (itemX < 0 || itemX > plotWidth)))
+                    {
+                        continue;
+                    }
+
+                    var distance = Math.Abs(TooltipY(item) - y);
+
+                    if (distance < closestY)
+                    {
+                        closestY = distance;
+                        closest = item;
+                    }
                 }
             }
 

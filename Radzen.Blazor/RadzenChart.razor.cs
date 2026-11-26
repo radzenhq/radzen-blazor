@@ -377,6 +377,16 @@ namespace Radzen.Blazor
         public EventCallback<double> ZoomChanged { get; set; }
 
         /// <summary>
+        /// Gets or sets the highest zoom level the mouse wheel can reach, as a percentage.
+        /// Raise it for series with many points so that zooming in can reach the individual points.
+        /// </summary>
+        /// <value>The maximum zoom level. Default is 10000 (the visible range is one hundredth of the full range).</value>
+        [Parameter]
+        public double MaxZoom { get; set; } = 10000;
+
+        internal double MinZoomRange => 100.0 / Math.Max(100, MaxZoom);
+
+        /// <summary>
         /// Gets or sets the callback invoked when the visible range changes due to zoom or pan.
         /// Provides the current zoom level and visible range fractions. A handler may re-anchor the range by assigning new values
         /// to the variables bound to <see cref="ViewStart" /> and <see cref="ViewEnd" />; the chart adopts the values it receives
@@ -1542,7 +1552,7 @@ namespace Radzen.Blazor
             var fraction = Math.Clamp((x - MarginLeft) / plotWidth, 0, 1);
             var zoomFactor = Math.Pow(delta < 0 ? 0.8 : 1.25, Math.Abs(delta));
             var range = ZoomEnd - ZoomStart;
-            var newRange = Math.Clamp(range * zoomFactor, 0.01, 1.0);
+            var newRange = Math.Clamp(range * zoomFactor, MinZoomRange, 1.0);
 
             var center = ZoomStart + fraction * range;
             var newStart = center - newRange * fraction;
@@ -2102,6 +2112,11 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Reload()
         {
+            foreach (var series in Series)
+            {
+                (series as IChartSeriesDataCache)?.Invalidate();
+            }
+
             await Refresh(true);
         }
 

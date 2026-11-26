@@ -21,17 +21,11 @@
     var chart = RequireChart();
     var animate = chart.AnimateDataUpdates;
 
-    IList<Point<TItem>> data = Items.Select(item =>
-    {
-      var x = category(item);
-      var y = valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item);
+    var data = CreatePoints(categoryScale, category, item => valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item), Interpolation == Interpolation.Spline ? 2 : 1, !animate);
 
-      return new Point<TItem> { X = x, Y = y, Data = item };
-    }).ToList();
-
-    if (!animate)
+    if (!animate && Sampling == Sampling.MinMax)
     {
-      data = ClipToPlotRange(data, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
+      data = SampleMinMax(data);
     }
 
     var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
