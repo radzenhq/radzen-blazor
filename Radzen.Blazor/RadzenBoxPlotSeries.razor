@@ -31,11 +31,17 @@
         var medianStroke = MedianStroke ?? stroke ?? "var(--rz-base-background-color)";
         var meanFill = MeanFill ?? "var(--rz-base-background-color)";
 
+        var cull = TryGetPlotRange(categoryScale, out var plotStart, out var plotEnd);
         return
         @<g class="@className">
             @foreach (var data in Items)
             {
                 var cx = category(data);
+
+                if (cull && !BandIntersects(cx - Math.Max(halfBox, halfCap), Math.Max(boxWidth, capWidth), StrokeWidth + 4, plotStart, plotEnd))
+                {
+                    continue;
+                }
 
                 if (IsEmpty(lw(data), lq(data), med(data), uq(data)) || IsEmpty(uw(data), cx))
                 {

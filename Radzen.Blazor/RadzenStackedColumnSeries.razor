@@ -23,11 +23,17 @@
         var groupStyle = $"--rz-zero-y: {valueScale.Scale(Math.Max(0, valueScale.Ticks(Chart?.ValueAxis?.TickDistance ?? 0).Start)).ToInvariantString()}px";
         var grad = new GradientFill(Chart?.UniqueID ?? "", Chart?.Series?.IndexOf(this) ?? -1);
         var gradient = FillMode == FillMode.Gradient;
+        var cull = TryGetPlotRange(categoryScale, out var plotStart, out var plotEnd);
         return
         @<g class="@className" style="@groupStyle">
             @foreach(var data in Items)
             {
                 var x = slot.Start(category(data));
+
+                if (cull && !BandIntersects(x, width, StrokeWidth, plotStart, plotEnd))
+                {
+                    continue;
+                }
                 var y = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var itemValue = Value(data);
                 var radius = Chart?.ColumnOptions?.Radius ?? 0;
