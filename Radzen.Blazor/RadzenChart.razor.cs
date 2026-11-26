@@ -1730,6 +1730,12 @@ namespace Radzen.Blazor
                 }
 
                 var (data, point) = series.DataAt(queryX, queryY);
+
+                if (data == null && series is IChartCategorySeries categorySeries)
+                {
+                    (data, point) = categorySeries.DataAtCategory(queryX)!;
+                }
+
                 if (data == null)
                 {
                     continue;

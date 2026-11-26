@@ -26,7 +26,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenCandlestickSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
+    public partial class RadzenCandlestickSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartCategorySeries
     {
         /// <summary>
         /// Gets or sets the name of the property of <typeparamref name="TItem"/> that provides the Open value.
@@ -312,6 +312,44 @@ namespace Radzen.Blazor
             }
 
             return (default!, new Point());
+        }
+
+        (object?, Point) IChartCategorySeries.DataAtCategory(double x)
+        {
+            var chart = Chart;
+
+            if (chart == null)
+            {
+                return (null, new Point());
+            }
+
+            var category = ComposeCategory(chart.CategoryScale);
+            var zoomed = chart.CategoryScale.IsZoomed;
+            var plotWidth = chart.CategoryScale.OutputSize;
+            var closest = default(TItem);
+            var closestDistance = double.MaxValue;
+            var found = false;
+
+            foreach (var data in Items)
+            {
+                var cx = category(data);
+
+                if (IsEmpty(High(data), Low(data), cx) || (zoomed && (cx < 0 || cx > plotWidth)))
+                {
+                    continue;
+                }
+
+                var distance = Math.Abs(cx - x);
+
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closest = data;
+                    found = true;
+                }
+            }
+
+            return found ? (closest, new Point { X = category(closest!), Y = TooltipY(closest!) }) : (null, new Point());
         }
 
     }
