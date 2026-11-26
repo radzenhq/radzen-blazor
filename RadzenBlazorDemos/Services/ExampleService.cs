@@ -2242,6 +2242,35 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Large Data",
+                            Path = "chart-large-data",
+                            Description = "Render a Blazor line chart with hundreds of thousands of points by sampling it down to the pixels on screen.",
+                            Tags = new [] { "chart", "large", "data", "big", "performance", "sampling", "points", "downsampling" },
+                            New = true,
+                            Related = new [] { "chart-load-on-demand", "zoom-pan-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How many points can a Blazor chart show?", Answer = "With Sampling set to MinMax a line or area series draws at most eight points per pixel no matter how many points it has, so the cost of drawing no longer grows with the data." },
+                                new FaqItem { Question = "Does sampling change how the chart looks?", Answer = "For series drawn with straight lines the shape stays the same: the lowest and the highest point of every half pixel are kept, so peaks are not lost." }
+                            }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Line", Anchor = "#line" }, new () { Text = "Candlestick", Anchor = "#candlestick" } ],
+                            Name = "Load on Demand",
+                            Path = "chart-load-on-demand",
+                            Description = "Browse millions of points in a Blazor chart by loading only the visible range as the reader zooms and pans.",
+                            Tags = new [] { "chart", "large", "data", "lazy", "loading", "demand", "virtual", "server", "zoom", "pan" },
+                            New = true,
+                            Related = new [] { "chart-large-data", "zoom-pan-chart", "range-navigator" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I load chart data on demand?", Answer = "When the data is too large to send to the chart at once, or lives in a database that can aggregate it faster than the browser can." },
+                                new FaqItem { Question = "How does the chart know the full range?", Answer = "Set Min and Max of the category axis to the full range. The chart then zooms and pans across it while the series holds only the visible part." }
+                            }
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" }, new () { Text = "Synchronized Charts", Anchor = "#synchronized-charts" } ],
                             Name = "Range Navigator",
                             Path = "range-navigator",

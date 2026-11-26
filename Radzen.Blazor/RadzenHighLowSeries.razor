@@ -18,11 +18,17 @@
         var high = High;
         var low = Low;
 
+        var cull = TryGetPlotRange(categoryScale, out var plotStart, out var plotEnd);
         return
         @<g class="@className">
             @foreach (var data in Items)
             {
                 var cx = category(data);
+
+                if (cull && !BandIntersects(cx, 0, StrokeWidth, plotStart, plotEnd))
+                {
+                    continue;
+                }
 
                 var highValue = high(data);
                 var lowValue = low(data);

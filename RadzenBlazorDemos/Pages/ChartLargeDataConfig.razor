@@ -1,0 +1,115 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Points" Component="points" />
+            <RadzenDropDown TValue="int" Name="points" Data="@sizes" Value="@size" Change="@(args => OnSizeChange((int)args))" Style="width: 10rem;">
+                <Template>@(((int)context).ToString("N0"))</Template>
+            </RadzenDropDown>
+            <RadzenSwitch @bind-Value="@sample" Name="sampling" />
+            <RadzenLabel Text="Sampling" Component="sampling" />
+            <RadzenButton Text="Reset Zoom" Click="@(() => chart.ResetZoom())" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenText TextStyle="TextStyle.Body2" Style="margin: 0;">Zoom: @zoom.ToString("N0")%</RadzenText>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" MaxZoom="@(size * 2.0)" @bind-Zoom="@zoom" Animate="false">
+        <RadzenLineSeries Data="@data" CategoryProperty="Time" ValueProperty="Value" Title="Sensor reading"
+                          Sampling="@(sample ? Sampling.MinMax : Sampling.None)" StrokeWidth="1">
+            <ChildContent>
+                <RadzenMarkers Visible="false" />
+            </ChildContent>
+            <TooltipTemplate Context="reading">
+                <div>@reading.Time.ToString("d MMM yyyy HH:mm")</div>
+                <div>Sensor reading: <strong>@reading.Value.ToString("N2")</strong></div>
+            </TooltipTemplate>
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Formatter="@FormatTime">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+        <RadzenLegend Visible="false" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class Reading
+    {
+        public DateTime Time { get; set; }
+        public double Value { get; set; }
+    }
+
+    static readonly int[] sizes = [10_000, 50_000, 100_000, 250_000];
+    static readonly Dictionary<int, Reading[]> cache = new();
+
+    RadzenChart chart;
+    Reading[] data;
+    int size = 100_000;
+    bool sample = true;
+    double zoom = 100;
+
+    TimeSpan visible => TimeSpan.FromMinutes(size * 100.0 / Math.Max(100, zoom));
+
+    string FormatTime(object value)
+    {
+        var time = Convert.ToDateTime(value);
+
+        if (visible.TotalDays > 120)
+        {
+            return time.ToString("MMM yyyy");
+        }
+
+        if (visible.TotalDays > 3)
+        {
+            return time.ToString("d MMM yyyy");
+        }
+
+        if (visible.TotalHours > 6)
+        {
+            return time.ToString("d MMM HH:mm");
+        }
+
+        return time.ToString("HH:mm");
+    }
+
+    protected override void OnInitialized()
+    {
+        data = Generate(size);
+    }
+
+    void OnSizeChange(int value)
+    {
+        size = value;
+        zoom = 100;
+        data = Generate(size);
+    }
+
+    static Reading[] Generate(int count)
+    {
+        lock (cache)
+        {
+            if (cache.TryGetValue(count, out var readings))
+            {
+                return readings;
+            }
+
+            var random = new Random(42);
+            var start = new DateTime(2024, 1, 1);
+            var value = 50.0;
+
+            readings = new Reading[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                value += random.NextDouble() - 0.5;
+
+                readings[i] = new Reading { Time = start.AddMinutes(i), Value = Math.Round(value, 2) };
+            }
+
+            cache[count] = readings;
+
+            return readings;
+        }
+    }
+}

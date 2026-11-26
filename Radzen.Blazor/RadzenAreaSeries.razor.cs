@@ -78,6 +78,19 @@ namespace Radzen.Blazor
         [Parameter]
         public Interpolation Interpolation { get; set; } = Interpolation.Line;
 
+        /// <summary>
+        /// Gets or sets how the series reduces the number of points it renders when several points share the same horizontal pixel.
+        /// Use <see cref="Sampling.MinMax"/> for series with many more points than the chart is wide. Tooltips and hit testing still use every point.
+        /// A sampled series reads its data once and remembers its range, so after changing the items of <see cref="CartesianSeries{TItem}.Data"/>
+        /// in place call <see cref="RadzenChart.Reload"/>; assigning a new collection is picked up automatically.
+        /// Points are not reduced when <see cref="RadzenChart.AnimateDataUpdates"/> is enabled.
+        /// </summary>
+        /// <value>The sampling method. Default is <see cref="Sampling.None"/>.</value>
+        [Parameter]
+        public Sampling Sampling { get; set; }
+
+        private protected override bool CachesData => Sampling != Sampling.None;
+
         /// <inheritdoc />
         public override string Color
         {
@@ -131,7 +144,23 @@ namespace Radzen.Blazor
             var category = ComposeCategory(chart.CategoryScale);
             var value = ComposeValue(vs);
 
-            var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
+            var firstItem = 0;
+            var lastItem = Items.Count - 1;
+
+            if (TryGetSortedRange(chart.CategoryScale, category, x, x, 0, out var firstNear, out var lastNear))
+            {
+                firstItem = firstNear;
+                lastItem = lastNear;
+            }
+
+            var points = new Point[Math.Max(0, lastItem - firstItem + 1)];
+
+            for (var i = 0; i < points.Length; i++)
+            {
+                var item = Items[firstItem + i];
+
+                points[i] = new Point { X = category(item), Y = value(item) };
+            }
 
             var valueTicks = vs.Ticks(va.TickDistance);
             var axisY = vs.Scale(Math.Max(0, valueTicks.Start));
@@ -160,6 +189,11 @@ namespace Radzen.Blazor
                     {
                         var start = points[i];
                         var end = points[i + 1];
+
+                        if (x < Math.Min(start.X, end.X) || x > Math.Max(start.X, end.X))
+                        {
+                            continue;
+                        }
 
                         var polygon = new[]
                         {

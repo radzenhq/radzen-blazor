@@ -17,17 +17,17 @@
 
     var animate = chart.AnimateDataUpdates;
 
-    IList<Point<TItem>> data = Items.Select(item =>
-    {
-      var x = category(item);
-      var y = value(item);
+    var neighbors = Interpolation == Interpolation.Spline ? 2 : 1;
+    var sample = !animate && Sampling == Sampling.MinMax;
 
-      return new Point<TItem> { X = x, Y = y, Data = item };
-    }).ToList();
-
-    if (!animate)
+    if (!sample || !TryCreateSampledPoints(categoryScale, valueScale, Value, neighbors, out var data))
     {
-      data = ClipToPlotRange(data, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
+      data = CreatePoints(categoryScale, category, value, neighbors, !animate);
+
+      if (sample)
+      {
+        data = SampleMinMax(data);
+      }
     }
 
     var segments = Segments(data);

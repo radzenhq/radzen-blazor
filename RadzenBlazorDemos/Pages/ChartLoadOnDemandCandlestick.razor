@@ -1,0 +1,136 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">Zoom in to go from monthly candles down to one minute.</RadzenText>
+            <RadzenButton Text="Reset Zoom" Click="@(() => chart.ResetZoom())" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenText TextStyle="TextStyle.Body2" Style="margin: 0;">@status</RadzenText>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" MaxZoom="@(PriceStore.Count * 2.0)" LoadData="@OnLoadData" Animate="false">
+        <RadzenCandlestickSeries Data="@candles" CategoryProperty="Time" OpenProperty="Open" HighProperty="High" LowProperty="Low" CloseProperty="Close"
+                                 Title="ACME Corp" BullFill="#26A69A" BearFill="#EF5350" Width="5" />
+        <RadzenCategoryAxis Min="@PriceStore.Start" Max="@PriceStore.End" Formatter="@FormatTime">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Formatter="@(value => ((double)value).ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US")))">
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+        <RadzenLegend Visible="false" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class Candle
+    {
+        public DateTime Time { get; set; }
+        public double Open { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Close { get; set; }
+    }
+
+    static class PriceStore
+    {
+        public const int Count = 2_000_000;
+
+        public static readonly DateTime Start = new DateTime(2022, 1, 1);
+        public static readonly DateTime End = Start.AddMinutes(Count - 1);
+
+        static readonly Lazy<float[]> prices = new(() =>
+        {
+            var random = new Random(7);
+            var result = new float[Count];
+            var price = 100.0;
+
+            for (var i = 0; i < Count; i++)
+            {
+                price *= 1 + (random.NextDouble() - 0.5) * 0.002;
+                result[i] = (float)price;
+            }
+
+            return result;
+        });
+
+        public static List<Candle> Query(DateTime from, DateTime to, int minutes)
+        {
+            var all = prices.Value;
+            var first = Math.Clamp((int)Math.Floor((from - Start).TotalMinutes), 0, Count - 1) / minutes * minutes;
+            var last = Math.Clamp((int)Math.Ceiling((to - Start).TotalMinutes), first, Count - 1);
+            var result = new List<Candle>((last - first) / minutes + 1);
+
+            for (var start = first; start <= last; start += minutes)
+            {
+                var end = Math.Min(Count, start + minutes);
+                var high = all[start];
+                var low = all[start];
+
+                for (var i = start + 1; i < end; i++)
+                {
+                    high = Math.Max(high, all[i]);
+                    low = Math.Min(low, all[i]);
+                }
+
+                result.Add(new Candle
+                {
+                    Time = Start.AddMinutes(start),
+                    Open = Math.Round(all[start], 2),
+                    High = Math.Round(high, 2),
+                    Low = Math.Round(low, 2),
+                    Close = Math.Round(all[end - 1], 2)
+                });
+            }
+
+            return result;
+        }
+    }
+
+    static readonly (int Minutes, string Name)[] intervals =
+    [
+        (1, "1 minute"), (5, "5 minutes"), (15, "15 minutes"), (30, "30 minutes"), (60, "1 hour"), (120, "2 hours"), (240, "4 hours"),
+        (720, "12 hours"), (1440, "1 day"), (4320, "3 days"), (10080, "1 week"), (20160, "2 weeks"), (43200, "30 days")
+    ];
+
+    const double CandleSpacing = 8;
+
+    RadzenChart chart;
+    List<Candle> candles = new();
+    string status;
+    TimeSpan visible = PriceStore.End - PriceStore.Start;
+
+    void OnLoadData(ChartLoadDataEventArgs args)
+    {
+        var from = (DateTime)args.Start;
+        var to = (DateTime)args.End;
+
+        visible = to - from;
+
+        var interval = intervals.FirstOrDefault(i => visible.TotalMinutes / i.Minutes <= args.Width / CandleSpacing, intervals[^1]);
+
+        candles = PriceStore.Query(from - visible / 2, to + visible / 2, interval.Minutes);
+
+        status = $"Each candle is {interval.Name}. Loaded {candles.Count:N0} candles from {PriceStore.Count:N0} prices.";
+    }
+
+    string FormatTime(object value)
+    {
+        var time = Convert.ToDateTime(value);
+
+        if (visible.TotalDays > 120)
+        {
+            return time.ToString("MMM yyyy");
+        }
+
+        if (visible.TotalDays > 3)
+        {
+            return time.ToString("d MMM yyyy");
+        }
+
+        if (visible.TotalHours > 6)
+        {
+            return time.ToString("d MMM HH:mm");
+        }
+
+        return time.ToString("HH:mm");
+    }
+}

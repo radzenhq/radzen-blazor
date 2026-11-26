@@ -1,0 +1,22 @@
+@page "/chart-large-data"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with Large Data
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    A line with hundreds of thousands of points has far more points than the chart has pixels. Set <code>Sampling</code> to <code>Sampling.MinMax</code> and the series keeps only the first, the lowest, the highest and the last point of every half pixel - at most eight points per pixel - so the line keeps its shape and its peaks while the chart stays fast.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="ChartLargeDataConfig">
+    <ChartLargeDataConfig />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    How it works
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Sampling only changes what is drawn. Tooltips and clicks still use every point, and zooming in brings back the detail: once the visible points are fewer than the pixels, all of them are drawn again.
+    Raise <code>MaxZoom</code> so the mouse wheel can zoom far enough to reach the individual points.
+    Sampling is available for line and area series and is skipped when <code>AnimateDataUpdates</code> is enabled.
+    A sampled series reads its data once and remembers its range. Assigning a new collection to <code>Data</code> is picked up automatically; after changing items in place call <code>Reload()</code> on the chart.
+</RadzenText>
