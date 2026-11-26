@@ -4,18 +4,29 @@
     Radzen Blazor Chart with Data Loaded on Demand
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    When the data is too large to load at once, give the chart only the part it is showing. This chart browses five million readings, yet it never holds more than a few thousand points: every zoom or pan asks the data source for the visible range at the resolution of the screen.
+    When the data is too large to load at once, give the chart only the part it is showing. Every zoom or pan asks the data source for the visible range at the resolution of the screen, so the chart never holds more than a few thousand points.
 </RadzenText>
 
+<RadzenText Anchor="chart-load-on-demand#line" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Line
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    This chart browses five million readings. Set <code>Min</code> and <code>Max</code> of the category axis to the full range of the data, so the chart knows how far it can zoom and pan even though it holds only a part of it.
+    Handle <code>LoadData</code>: the chart raises it once it knows its size and every time the visible range changes, with the <code>Start</code> and <code>End</code> of the range and the <code>Width</code> of the plot area in pixels. Load that range and assign it to the <code>Data</code> of the series.
+    The data source should return a number of points that depends on the width and not on the range, for example the lowest and highest value of each interval, so the amount of data stays the same at every zoom level.
+    In this demo the <code>ReadingStore</code> class stands in for a database or an API.
+</RadzenText>
 <RadzenExample ComponentName="Chart" Example="ChartLoadOnDemandConfig">
     <ChartLoadOnDemandConfig />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
-    How it works
+<RadzenText Anchor="chart-load-on-demand#candlestick" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Candlestick
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
-    Set <code>Min</code> and <code>Max</code> of the category axis to the full range of the data, so the chart knows how far it can zoom and pan even though it holds only a part of it.
-    Handle <code>LoadData</code>: the chart raises it once it knows its size and every time the visible range changes, with the <code>Start</code> and <code>End</code> of the range and the <code>Width</code> of the plot area in pixels. Load that range and assign it to the <code>Data</code> of the series. The data source should return a number of points that depends on the width and not on the range, for example the lowest and highest value of each interval, so the amount of data stays the same at every zoom level.
-    In this demo the <code>ReadingStore</code> class stands in for a database or an API.
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Series that cannot be sampled, such as candlesticks and columns, are aggregated by the data source in the same <code>LoadData</code> handler. This chart holds two million one-minute prices and picks the candle interval from the visible range and the <code>Width</code> of the plot area, from 30 days down to one minute.
+    Each candle is a real item of <code>Data</code> - the open of the first price, the close of the last, the highest and the lowest of the interval - so tooltips and click events work as usual.
 </RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartLoadOnDemandCandlestick">
+    <ChartLoadOnDemandCandlestick />
+</RadzenExample>

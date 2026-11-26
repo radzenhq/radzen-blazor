@@ -2244,8 +2244,8 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Large Data",
                             Path = "chart-large-data",
-                            Description = "Render a Blazor line chart with a million points by sampling it down to the pixels on screen.",
-                            Tags = new [] { "chart", "large", "data", "big", "performance", "sampling", "million", "points", "downsampling" },
+                            Description = "Render a Blazor line chart with hundreds of thousands of points by sampling it down to the pixels on screen.",
+                            Tags = new [] { "chart", "large", "data", "big", "performance", "sampling", "points", "downsampling" },
                             New = true,
                             Related = new [] { "chart-load-on-demand", "zoom-pan-chart", "line-chart" },
                             Faq = new []
@@ -2256,6 +2256,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Toc = [ new () { Text = "Line", Anchor = "#line" }, new () { Text = "Candlestick", Anchor = "#candlestick" } ],
                             Name = "Load on Demand",
                             Path = "chart-load-on-demand",
                             Description = "Browse millions of points in a Blazor chart by loading only the visible range as the reader zooms and pans.",
