@@ -2,12 +2,12 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">Use the mouse wheel or pinch to zoom in/out and drag the scrollbar to pan.</RadzenText>
-            <RadzenButton Text="Reset Zoom" Click="@ResetZoom" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="Reset Zoom" Click="@(() => chart.ResetZoom())" Variant="Variant.Outlined" Size="ButtonSize.Small" />
             <RadzenText TextStyle="TextStyle.Body2" Style="margin: 0;">@status</RadzenText>
         </RadzenStack>
     </RadzenCard>
 
-    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" MaxZoom="@(ReadingStore.Count * 2.0)" ViewChange="@OnViewChange" Animate="false">
+    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" MaxZoom="@(ReadingStore.Count * 2.0)" LoadData="@OnLoadData" Animate="false">
         <RadzenLineSeries Data="@data" CategoryProperty="Time" ValueProperty="Value" Title="Sensor reading" StrokeWidth="1">
             <ChildContent>
                 <RadzenMarkers Visible="false" />
@@ -103,10 +103,8 @@
         static Reading At(float[] all, int index) => new Reading { Time = Start.AddMinutes(index), Value = Math.Round(all[index], 2) };
     }
 
-    const int Points = 1000;
-
     RadzenChart chart;
-    List<Reading> data;
+    List<Reading> data = new();
     string status;
     TimeSpan visible = ReadingStore.End - ReadingStore.Start;
 
@@ -132,33 +130,14 @@
         return time.ToString("HH:mm");
     }
 
-    protected override void OnInitialized()
+    void OnLoadData(ChartLoadDataEventArgs args)
     {
-        Load(0, 1);
-    }
+        var from = (DateTime)args.Start;
+        var to = (DateTime)args.End;
 
-    void OnViewChange(ChartViewChangeEventArgs args)
-    {
-        Load(args.ViewStart, args.ViewEnd);
-    }
+        visible = to - from;
 
-    async Task ResetZoom()
-    {
-        await chart.ResetZoom();
-
-        Load(0, 1);
-    }
-
-    void Load(double viewStart, double viewEnd)
-    {
-        var range = ReadingStore.End - ReadingStore.Start;
-        var margin = (viewEnd - viewStart) / 2;
-
-        visible = range * (viewEnd - viewStart);
-        var from = ReadingStore.Start + range * Math.Max(0, viewStart - margin);
-        var to = ReadingStore.Start + range * Math.Min(1, viewEnd + margin);
-
-        data = ReadingStore.Query(from, to, Points * 2);
+        data = ReadingStore.Query(from - visible / 2, to + visible / 2, (int)args.Width * 2);
 
         status = $"Loaded {data.Count:N0} of {ReadingStore.Count:N0} points";
     }

@@ -396,6 +396,56 @@ namespace Radzen.Blazor
         public EventCallback<ChartViewChangeEventArgs> ViewChange { get; set; }
 
         /// <summary>
+        /// Gets or sets the callback invoked when the chart needs data for the range it shows: once the chart knows its size,
+        /// when the visible range changes due to zoom or pan, when the width of the plot area changes and when <see cref="Reload" /> is called.
+        /// Load the data for <see cref="ChartLoadDataEventArgs.Start" /> to <see cref="ChartLoadDataEventArgs.End" /> and assign it to the
+        /// <see cref="CartesianSeries{TItem}.Data" /> of the series. Set <see cref="AxisBase.Min" /> and <see cref="AxisBase.Max" /> of the
+        /// category axis to the full range so the chart can zoom and pan across it while the series hold only the visible part.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChartLoadDataEventArgs> LoadData { get; set; }
+
+        (double Start, double End, double Width, int Version)? loadedView;
+        int loadVersion;
+
+        async Task InvokeLoadData()
+        {
+            if (!LoadData.HasDelegate || !widthAndHeightAreSet || !Width.HasValue || !Height.HasValue)
+            {
+                return;
+            }
+
+            var width = CategoryScale.OutputSize;
+
+            if (double.IsNaN(width) || width <= 0)
+            {
+                return;
+            }
+
+            var view = (ZoomStart, ZoomEnd, Width.Value, loadVersion);
+
+            if (loadedView == view)
+            {
+                return;
+            }
+
+            loadedView = view;
+
+            var input = CategoryScale.Input;
+            var hasRange = double.IsFinite(input.Start) && double.IsFinite(input.End) && input.Start <= input.End &&
+                (CategoryAxis.Min != null || CategoryAxis.Max != null || Series.OfType<IChartNavigableSeries>().Any(series => series.ItemCount > 0));
+
+            await LoadData.InvokeAsync(new ChartLoadDataEventArgs
+            {
+                Start = hasRange ? CategoryScale.Value(input.Start) : null,
+                End = hasRange ? CategoryScale.Value(input.End) : null,
+                ViewStart = ZoomStart,
+                ViewEnd = ZoomEnd,
+                Width = width
+            });
+        }
+
+        /// <summary>
         /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
         /// Supports two-way binding with <c>@bind-ViewStart</c>.
         /// </summary>
@@ -1945,6 +1995,7 @@ namespace Radzen.Blazor
             }
 
             await ObserveLegend();
+            await InvokeLoadData();
         }
 
         private async Task ObserveLegend()
@@ -2112,6 +2163,8 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Reload()
         {
+            loadVersion++;
+
             foreach (var series in Series)
             {
                 (series as IChartSeriesDataCache)?.Invalidate();

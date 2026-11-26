@@ -16,6 +16,6 @@
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
     Set <code>Min</code> and <code>Max</code> of the category axis to the full range of the data, so the chart knows how far it can zoom and pan even though it holds only a part of it.
-    Handle <code>ViewChange</code>, convert <code>ViewStart</code> and <code>ViewEnd</code> to a range and load it. The data source should return a fixed number of points for any range, for example the lowest and highest value of each interval, so the amount of data stays the same at every zoom level.
+    Handle <code>LoadData</code>: the chart raises it once it knows its size and every time the visible range changes, with the <code>Start</code> and <code>End</code> of the range and the <code>Width</code> of the plot area in pixels. Load that range and assign it to the <code>Data</code> of the series. The data source should return a number of points that depends on the width and not on the range, for example the lowest and highest value of each interval, so the amount of data stays the same at every zoom level.
     In this demo the <code>ReadingStore</code> class stands in for a database or an API.
 </RadzenText>
