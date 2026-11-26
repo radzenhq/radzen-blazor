@@ -17,13 +17,18 @@
 
     var index = Chart?.Series.IndexOf(this);
 
-    var topPoints = GetTopPoints(category, value, valueScale);
+    IList<Point<TItem>> topPoints = GetTopPoints(category, value, valueScale).ToList();
+
+    if (Chart?.AnimateDataUpdates != true)
+    {
+      topPoints = ClipToPlotRange(topPoints, categoryScale, Interpolation == Interpolation.Spline ? 2 : 1);
+    }
 
     var className = $"rz-full-stacked-line-series {SeriesClass}";
 
     return
     @<g class="@className">
-      @if (Items.Any())
+      @if (topPoints.Count > 0)
       {
         var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
         var topPath = pathGenerator.Path(topPoints);

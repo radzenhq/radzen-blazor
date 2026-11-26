@@ -47,7 +47,11 @@ namespace Radzen.Blazor.Tests
                 .Add(x => x.MinProperty, nameof(DataItem.Min))
                 .Add(x => x.MaxProperty, nameof(DataItem.Max))
                 .Add(x => x.Data, Items)), ".rz-range-column-series > path", 1),
-            ["Candlestick"] =(p => p.AddChildContent<RadzenCandlestickSeries<DataItem>>(s => s
+            ["Waterfall"] = (p => p.AddChildContent<RadzenWaterfallSeries<DataItem>>(s => s
+                .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                .Add(x => x.Data, Items)), ".rz-waterfall-series > path", 1),
+            ["Candlestick"] = (p => p.AddChildContent<RadzenCandlestickSeries<DataItem>>(s => s
                 .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                 .Add(x => x.OpenProperty, nameof(DataItem.Open))
                 .Add(x => x.HighProperty, nameof(DataItem.High))
@@ -134,6 +138,67 @@ namespace Radzen.Blazor.Tests
             var second = await CountItems(ctx, name, 0.5, 1);
 
             Assert.InRange(first + second, Count, Count + 4);
+        }
+
+        static readonly Dictionary<string, (Action<ComponentParameterCollectionBuilder<RadzenChart>> Add, string Selector)> Lines = new()
+        {
+            ["StackedLine"] = (p => p.AddChildContent<RadzenStackedLineSeries<DataItem>>(s => s
+                .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                .Add(x => x.Data, Items)), ".rz-stacked-line-series path"),
+            ["FullStackedLine"] = (p => p.AddChildContent<RadzenFullStackedLineSeries<DataItem>>(s => s
+                .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                .Add(x => x.Data, Items)), ".rz-full-stacked-line-series path"),
+            ["StackedArea"] = (p => p.AddChildContent<RadzenStackedAreaSeries<DataItem>>(s => s
+                .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                .Add(x => x.Data, Items)), ".rz-area-series path"),
+            ["FullStackedArea"] = (p => p.AddChildContent<RadzenFullStackedAreaSeries<DataItem>>(s => s
+                .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                .Add(x => x.Data, Items)), ".rz-full-stacked-area-series path"),
+        };
+
+        public static IEnumerable<object[]> LineNames => Lines.Keys.Select(name => new object[] { name });
+
+        static async Task<int> CountLinePoints(TestContext ctx, string name, double viewStart, double viewEnd)
+        {
+            var (add, selector) = Lines[name];
+
+            var chart = ctx.RenderComponent<RadzenChart>(p =>
+            {
+                p.Add(x => x.AllowZoom, true);
+                p.Add(x => x.ViewStart, viewStart);
+                p.Add(x => x.ViewEnd, viewEnd);
+                add(p);
+            });
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(800, 300));
+
+            var line = chart.FindAll(selector).Last().GetAttribute("d")!;
+
+            return System.Text.RegularExpressions.Regex.Matches(line, "L ").Count + 1;
+        }
+
+        [Theory]
+        [MemberData(nameof(LineNames))]
+        public async Task StackedLines_FullView_RenderEveryPoint(string name)
+        {
+            using var ctx = CreateChartContext();
+
+            Assert.Equal(Count, await CountLinePoints(ctx, name, 0, 1));
+        }
+
+        [Theory]
+        [MemberData(nameof(LineNames))]
+        public async Task StackedLines_ZoomedToAQuarter_RenderOnlyThePointsAroundTheView(string name)
+        {
+            using var ctx = CreateChartContext();
+
+            var rendered = await CountLinePoints(ctx, name, 0.5, 0.75);
+
+            Assert.InRange(rendered, Count / 4, Count / 4 + 4);
         }
     }
 }
