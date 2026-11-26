@@ -13,7 +13,7 @@
         var category = ComposeCategory(categoryScale);
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
         var index = chart.Series.IndexOf(this);
-        var className = $"rz-highlow-series rz-series-{index}";
+        var className = $"rz-highlow-series {SeriesClass}";
 
         var high = High;
         var low = Low;

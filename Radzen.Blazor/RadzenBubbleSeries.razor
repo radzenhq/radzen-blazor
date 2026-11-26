@@ -12,7 +12,7 @@
 
     var chart = RequireChart();
     var index = chart.Series.IndexOf(this);
-    var className = $"rz-bubble-series rz-series-{index}";
+    var className = $"rz-bubble-series {SeriesClass}";
     var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
     var (minValue, maxValue) = SizeRange();

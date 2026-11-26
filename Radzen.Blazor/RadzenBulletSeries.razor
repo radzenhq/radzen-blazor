@@ -21,7 +21,7 @@
         var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
         var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
-        var className = $"rz-bullet-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-bullet-series {SeriesClass}";
 
         var barHeight = BarHeight;
         var halfHeight = barHeight / 2;
@@ -29,7 +29,7 @@
         var target = Target;
         var max = Max;
 
-        var fill = Fill ?? $"var(--rz-series-{chart.Series.IndexOf(this) + 1})";
+        var fill = Fill ?? ColorScheme.Pastel.SeriesColorVariable(chart.Series.IndexOf(this));
         var stroke = Stroke;
         var targetStroke = TargetStroke ?? "var(--rz-text-title-color)";
 

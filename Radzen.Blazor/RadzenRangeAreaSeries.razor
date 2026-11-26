@@ -35,7 +35,7 @@
         var lowerSegments = Segments(lowerList, isEmpty);
 
         var index = chart.Series.IndexOf(this);
-        var className = $"rz-range-area-series rz-series-{index}";
+        var className = $"rz-range-area-series {SeriesClass}";
         var gradientId = $"rzRangeAreaGradient{chart.UniqueID}{index}";
         var gradientColor = Fill ?? "var(--rz-series-color)";
 

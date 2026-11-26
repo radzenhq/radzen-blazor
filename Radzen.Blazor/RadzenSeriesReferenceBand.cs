@@ -169,7 +169,7 @@ namespace Radzen.Blazor
             return builder =>
             {
                 builder.OpenElement(0, "g");
-                builder.AddAttribute(1, "class", index >= 0 ? $"rz-series-{index}" : null);
+                builder.AddAttribute(1, "class", index >= 0 ? Chart.ColorScheme.SeriesClass(index) : null);
 
                 builder.OpenElement(2, "rect");
                 builder.SetKey($"{x.ToInvariantString()}-{y.ToInvariantString()}-{width.ToInvariantString()}-{height.ToInvariantString()}-{index}");

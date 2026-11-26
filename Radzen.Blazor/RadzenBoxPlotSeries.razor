@@ -12,7 +12,7 @@
         var chart = RequireChart();
         var category = ComposeCategory(categoryScale);
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
-        var className = $"rz-box-plot-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-box-plot-series {SeriesClass}";
 
         var boxWidth = BoxWidth;
         var halfBox = boxWidth / 2;

@@ -2390,7 +2390,7 @@ namespace Radzen.Blazor
 
                     builder.OpenElement(3, "g");
                     builder.SetKey(index);
-                    builder.AddAttribute(4, "class", $"rz-series-{index} rz-active-point");
+                    builder.AddAttribute(4, "class", $"{ColorScheme.SeriesClass(index)} rz-active-point");
                     builder.AddAttribute(5, "style", style);
 
                     builder.OpenElement(6, "circle");

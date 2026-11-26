@@ -22,7 +22,7 @@
         var slot = Slot;
         var height = slot.Size;
 
-        var className = $"rz-full-stacked-bar-series rz-series-{Chart?.Series.IndexOf(this)}";
+        var className = $"rz-full-stacked-bar-series {SeriesClass}";
 
         var groupStyle = $"--rz-zero-x: {(Chart?.CategoryScale?.Scale(Math.Max(0, ticks?.Start ?? 0)) ?? 0).ToInvariantString()}px";
         var grad = new GradientFill(Chart?.UniqueID ?? "", Chart?.Series?.IndexOf(this) ?? -1);

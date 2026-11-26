@@ -24,7 +24,7 @@
 
         var barOptions = chart.BarOptions;
         var height = slot.Size;
-        var className = $"rz-horizontal-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-horizontal-waterfall-series {SeriesClass}";
         var radius = barOptions?.Radius ?? 0;
 
         var wfItems = ComputeWaterfallItems();

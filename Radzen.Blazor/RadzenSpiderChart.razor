@@ -72,7 +72,7 @@
                                     var localValue = value;
 
                                     <path d="@columnPath"
-                                          class="rz-spider-chart-column rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                          class="rz-spider-chart-column @(ColorScheme.SeriesClass(series.Index)) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
                                           data-stroke-width="@series.StrokeWidth.ToInvariantString()"
                                           @onclick="@(args => InvokeSeriesClick(localSeries, localCategory, localValue, localSeries.GetData(localCategory)))"
                                           @onmouseenter="@(args => OnMarkerMouseEnter((MouseEventArgs)args, localSeries, localCategory, localValue))"
@@ -84,7 +84,7 @@
                                 var path = GetSeriesPath(series);
 
                                 <path d="@path"
-                                      class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                      class="rz-spider-chart-area @(ColorScheme.SeriesClass(series.Index)) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
                                       data-stroke-width="@series.StrokeWidth.ToInvariantString()"
                                       @onclick="@(args => InvokeSeriesClick(localSeries))"
                                       @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
@@ -110,7 +110,7 @@
                                         var (x, y) = GetPoint(index, value);
                                         
                                         <circle cx="@x.ToInvariantString()" cy="@y.ToInvariantString()" r="@series.MarkerSize.ToInvariantString()" 
-                                                class="rz-spider-chart-marker rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                                class="rz-spider-chart-marker @(ColorScheme.SeriesClass(series.Index)) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
                                                 pointer-events="none" />
                                     }
                                 }

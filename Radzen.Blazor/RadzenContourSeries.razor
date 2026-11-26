@@ -9,7 +9,7 @@
     {
         var chart = RequireChart();
         var index = chart.Series.IndexOf(this);
-        var className = $"rz-contour-series rz-series-{index}";
+        var className = $"rz-contour-series {SeriesClass}";
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
         return builder =>

@@ -338,7 +338,7 @@ namespace Radzen.Blazor
                 {
                     builder.OpenComponent<LegendItem>(0);
                     builder.AddAttribute(1, nameof(LegendItem.Text), TooltipTitle(data));
-                    builder.AddAttribute(2, nameof(LegendItem.Class), $"rz-series-item-{Items.IndexOf(data)}");
+                    builder.AddAttribute(2, nameof(LegendItem.Class), SeriesItemClass(Items.IndexOf(data)));
                     builder.AddAttribute(3, nameof(LegendItem.MarkerSize), MarkerSize);
                     builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
@@ -472,7 +472,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string TooltipClass(TItem item)
         {
-            return $"{base.TooltipClass(item)} rz-pie-tooltip rz-series-item-{Items.IndexOf(item)}";
+            return $"{base.TooltipClass(item)} rz-pie-tooltip {SeriesItemTooltipClass(Items.IndexOf(item))}";
         }
 
         /// <inheritdoc />

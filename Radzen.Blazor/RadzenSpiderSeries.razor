@@ -218,6 +218,7 @@
         builder.AddAttribute(5, nameof(LegendItem.Text), Title);
         builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
         builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
+        builder.AddAttribute(8, nameof(LegendItem.Class), (Chart?.ColorScheme ?? default).ColorClass(Index) ?? string.Empty);
         builder.CloseComponent();
     };
 

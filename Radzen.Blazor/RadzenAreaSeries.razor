@@ -33,7 +33,7 @@
     var segments = Segments(data);
     var ticks = chart.CategoryScale.Ticks(chart.CategoryAxis.TickDistance);
     var index = chart.Series.IndexOf(this);
-    var className = $"rz-area-series rz-series-{index}";
+    var className = $"rz-area-series {SeriesClass}";
     var gradientId = $"rzAreaGradient{chart.UniqueID}{index}";
     var gradientColor = Fill ?? "var(--rz-series-color)";
 

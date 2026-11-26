@@ -10,3 +10,12 @@
 <RadzenExample ComponentName="Chart" Example="StylingChartConfig" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
     <StylingChartConfig />
 </RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Color scheme length
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Every color scheme has a fixed number of colors: <code>Pastel</code> has 24, <code>Palette</code> and <code>Monochrome</code> have 8 and <code>Divergent</code> has 9.
+    When a chart has more series than the scheme has colors, the extra series use lighter and darker shades of the scheme colors. The same applies to the items of pie, donut, funnel and pyramid series.
+    To use your own colors set the <code>Fill</code> or <code>Stroke</code> property of a series, or the <code>Fills</code> property of a pie, donut, funnel or pyramid series.
+</RadzenText>
