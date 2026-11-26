@@ -21,7 +21,7 @@
 
         var slot = Slot;
         var width = slot.Size;
-        var className = $"rz-column-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-column-series {SeriesClass}";
 
         var groupStyle = $"--rz-zero-y: {y0.ToInvariantString()}px";
         var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));

@@ -974,8 +974,22 @@ namespace Radzen.Blazor
                 return "rz-series-tooltip";
             }
 
-            return $"rz-series-{chart.Series.IndexOf(this)}-tooltip";
+            return chart.ColorScheme.SeriesTooltipClass(chart.Series.IndexOf(this));
         }
+
+        internal string SeriesClass
+        {
+            get
+            {
+                var chart = Chart;
+
+                return chart == null ? "rz-series--1" : chart.ColorScheme.SeriesClass(chart.Series.IndexOf(this));
+            }
+        }
+
+        internal string SeriesItemClass(int index) => (Chart?.ColorScheme ?? default).SeriesItemClass(index);
+
+        internal string SeriesItemTooltipClass(int index) => (Chart?.ColorScheme ?? default).SeriesItemTooltipClass(index);
 
         /// <inheritdoc />
         public virtual RenderFragment RenderLegendItem()
@@ -1010,6 +1024,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
                 builder.AddAttribute(9, nameof(LegendItem.ShowLine), ShowLineInLegend);
                 builder.AddAttribute(10, nameof(LegendItem.ChildContent), RenderLegendItemContent(clickable, GetTitle(), Data, Color));
+                builder.AddAttribute(11, nameof(LegendItem.Class), chart.ColorScheme.ColorClass(index) ?? string.Empty);
                 builder.CloseComponent();
             };
         }

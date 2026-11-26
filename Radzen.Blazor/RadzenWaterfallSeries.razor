@@ -18,7 +18,7 @@
 
         var slot = Slot;
         var width = slot.Size;
-        var className = $"rz-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-waterfall-series {SeriesClass}";
         var radius = chart.ColumnOptions.Radius;
 
         var wfItems = ComputeWaterfallItems();

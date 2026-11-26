@@ -11,7 +11,7 @@
         var category = ComposeCategory(categoryScale);
         var value = ComposeValue(valueScale);
         var index = chart.Series.IndexOf(this);
-        var className = $"rz-heatmap-series rz-series-{index}";
+        var className = $"rz-heatmap-series {SeriesClass}";
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
         var cellWidth = EffectiveCellWidth(categoryScale);

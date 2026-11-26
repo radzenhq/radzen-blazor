@@ -82,7 +82,7 @@
                                 if (string.IsNullOrEmpty(nodeFill))
                                 {
                                     // Source node uses color scheme
-                                    linkClass = $"rz-sankey-link rz-series-item-{link.SourceNode.ColorIndex}";
+                                    linkClass = $"rz-sankey-link {ChartColorClasses.SankeyItemClass(link.SourceNode.ColorIndex)}";
                                     linkFill = null; // Let CSS handle it
                                 }
                                 else
@@ -133,7 +133,7 @@
                         {
                             var nodeFill = GetNodeFill(node);
                             var nodeClass = string.IsNullOrEmpty(nodeFill) 
-                                ? $"rz-sankey-node rz-series-item-{node.ColorIndex}" 
+                                ? $"rz-sankey-node {ChartColorClasses.SankeyItemClass(node.ColorIndex)}" 
                                 : "rz-sankey-node";
                             
                             <g class="@nodeClass">

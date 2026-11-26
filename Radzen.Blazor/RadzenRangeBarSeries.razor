@@ -22,7 +22,7 @@
 
         var barOptions = chart.BarOptions;
         var height = slot.Size;
-        var className = $"rz-range-bar-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-range-bar-series {SeriesClass}";
         var radius = barOptions?.Radius ?? 0;
 
         var min = Min;

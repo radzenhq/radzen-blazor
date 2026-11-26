@@ -403,6 +403,18 @@ $chart-color-schemes: (
         stroke: $color;
       }
 
+      .rz-series-color-#{$index - 1} {
+        --rz-series-color: color-mix(in oklch, #{$color}, var(--rz-series-shade-color, white) var(--rz-series-shade, 0%));
+        fill: var(--rz-series-color);
+        stroke: var(--rz-series-color);
+      }
+
+      .rz-series-color-#{$index - 1}-tooltip {
+        .rz-chart-tooltip-content {
+          border: 1px solid color-mix(in oklch, #{$color}, var(--rz-series-shade-color, white) var(--rz-series-shade, 0%));
+        }
+      }
+
       .rz-series-#{$index - 1}-tooltip {
         .rz-chart-tooltip-content {
           border: 1px solid $color;
@@ -420,6 +432,21 @@ $chart-color-schemes: (
       }
     }
   }
+}
+
+.rz-series-shade-1 {
+  --rz-series-shade: 40%;
+  --rz-series-shade-color: white;
+}
+
+.rz-series-shade-2 {
+  --rz-series-shade: 35%;
+  --rz-series-shade-color: black;
+}
+
+.rz-series-shade-3 {
+  --rz-series-shade: 70%;
+  --rz-series-shade-color: white;
 }
 
 .rz-marker {

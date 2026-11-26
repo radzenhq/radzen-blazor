@@ -178,7 +178,7 @@ namespace Radzen.Blazor
                     var index = i;
                     builder.OpenComponent<LegendItem>(0);
                     builder.AddAttribute(1, nameof(LegendItem.Text), TooltipTitle(data));
-                    builder.AddAttribute(2, nameof(LegendItem.Class), $"rz-series-item-{index}");
+                    builder.AddAttribute(2, nameof(LegendItem.Class), SeriesItemClass(index));
                     builder.AddAttribute(3, nameof(LegendItem.MarkerSize), MarkerSize);
                     builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(index, Fills));
@@ -254,7 +254,7 @@ namespace Radzen.Blazor
         protected override string TooltipClass(TItem item)
         {
             var sorted = GetSortedItems();
-            return $"{base.TooltipClass(item)} rz-pyramid-tooltip rz-series-item-{sorted.IndexOf(item)}";
+            return $"{base.TooltipClass(item)} rz-pyramid-tooltip {SeriesItemTooltipClass(sorted.IndexOf(item))}";
         }
 
         /// <inheritdoc />

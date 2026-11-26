@@ -21,7 +21,7 @@
     var topPoints = GetTopPoints(category, value, valueScale);
     var bottomPoints = GetBottomPoints(category, value, valueScale);
 
-    var className = $"rz-full-stacked-area-series rz-series-{index}";
+    var className = $"rz-full-stacked-area-series {SeriesClass}";
     var gradientId = $"rzAreaGradient{Chart?.UniqueID}{index}";
     var gradientColor = Fill ?? "var(--rz-series-color)";
 

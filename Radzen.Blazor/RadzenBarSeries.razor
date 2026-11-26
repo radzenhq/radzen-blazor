@@ -34,7 +34,7 @@
 
         var barOptions = chart.BarOptions;
         var height = slot.Size;
-        var className = $"rz-bar-series rz-series-{chart.Series.IndexOf(this)}";
+        var className = $"rz-bar-series {SeriesClass}";
 
         var groupStyle = $"--rz-zero-x: {x0.ToInvariantString()}px";
         var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));

@@ -88,7 +88,7 @@
         var style = Fill != null ? $"--rz-series-color: {Fill};" : null;
 
         return
-    @<g class="@($"rz-series-value-label rz-series-{index}")" style="@style" pointer-events="none">
+    @<g class="@($"rz-series-value-label {Chart.ColorScheme.SeriesClass(index)}")" style="@style" pointer-events="none">
         <rect x="@x.ToInvariantString()" y="@((y - boxHeight / 2).ToInvariantString())" width="@boxWidth.ToInvariantString()" height="@boxHeight.ToInvariantString()" rx="4" ry="4"></rect>
         <text x="@((x + boxWidth / 2).ToInvariantString())" y="@y.ToInvariantString()" text-anchor="middle">@text</text>
     </g>;

@@ -19,7 +19,7 @@
 
     var chart = RequireChart();
     var index = chart.Series.IndexOf(this);
-    var className = $"rz-scatter-series rz-series-{index}";
+    var className = $"rz-scatter-series {SeriesClass}";
 
     return
     @<g class="@className">
