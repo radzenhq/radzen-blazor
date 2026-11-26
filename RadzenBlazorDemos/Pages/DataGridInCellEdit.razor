@@ -198,13 +198,14 @@ ColumnWidth="200px" CellClick="@OnCellClick" @onfocusout="@OnFocusOut">
         {
             // The popups of editors such as RadzenDatePicker and RadzenDropDown are rendered outside of the DataGrid.
             // Wait while the user is working in such a popup - it has the focus, or it is open and nothing else is focused.
+            // The selectors check :focus and not :focus-within, which the browser can report wrong after the focused editor is removed.
             do
             {
                 await Task.Delay(200);
             }
-            while (IsEditing(column, order) && await Matches(":has(.rz-popup:focus-within), :has(.rz-popup.rz-open):not(:focus-within)"));
+            while (IsEditing(column, order) && await Matches(":has(.rz-popup:focus), :has(.rz-popup :focus), :has(.rz-popup.rz-open:not(.rz-tooltip)):not(:has(:focus))"));
 
-            if (await Matches(":has(#in-cell-edit-grid:focus-within)")) return;
+            if (await Matches(":has(#in-cell-edit-grid :focus)")) return;
         }
         catch
         {

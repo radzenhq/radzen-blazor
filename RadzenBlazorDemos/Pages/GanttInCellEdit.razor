@@ -167,9 +167,9 @@
             {
                 await Task.Delay(200);
             }
-            while (IsEditing(column, task) && await Matches(":has(.rz-popup:focus-within), :has(.rz-popup.rz-open):not(:focus-within)"));
+            while (IsEditing(column, task) && await Matches(":has(.rz-popup:focus), :has(.rz-popup :focus), :has(.rz-popup.rz-open:not(.rz-tooltip)):not(:has(:focus))"));
 
-            if (await Matches(":has(#in-cell-edit-gantt .rz-data-grid:focus-within)")) return;
+            if (await Matches(":has(#in-cell-edit-gantt .rz-data-grid :focus)")) return;
         }
         catch
         {
