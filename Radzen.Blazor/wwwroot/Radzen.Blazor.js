@@ -5197,10 +5197,10 @@ window.Radzen = {
       var g = legendItem.querySelector('g[class]');
       if (!g) return;
       var classes = g.className.baseVal || g.getAttribute('class') || '';
-      var match = classes.match(/rz-series-item-\d+|rz-series-\d+/);
+      var match = classes.match(/rz-series-item-\d+/) || classes.match(/rz-series-\d+/);
       if (!match) return;
       var selector = '.' + match[0];
-      var svg = ref.querySelector('svg');
+      var svg = ref.querySelector('svg.rz-chart-plot');
       if (!svg) return;
       var targets = svg.querySelectorAll(selector);
       targets.forEach(function (t) { t.classList.add('rz-state-hover'); });
@@ -5209,7 +5209,7 @@ window.Radzen = {
       if (!ref.classList.contains('rz-chart-series-hover')) return;
       var legendItem = e.target.closest('.rz-legend-item');
       if (!legendItem) return;
-      var svg = ref.querySelector('svg');
+      var svg = ref.querySelector('svg.rz-chart-plot');
       if (!svg) return;
       var hovered = svg.querySelectorAll('.rz-state-hover');
       hovered.forEach(function (t) { t.classList.remove('rz-state-hover'); });
