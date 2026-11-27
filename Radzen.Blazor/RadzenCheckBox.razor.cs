@@ -44,6 +44,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabel { get; set; }
 
+        string? GetAriaAttribute(string name) => Attributes != null && Attributes.TryGetValue(name, out var value) ? System.Convert.ToString(value, Culture) : null;
+
+        string? CheckBoxAriaLabel => !string.IsNullOrEmpty(AriaLabel) ? AriaLabel : GetAriaAttribute("aria-label");
+
+        string? CheckBoxAriaLabelledBy => !string.IsNullOrEmpty(AriaLabel) ? null : GetAriaAttribute("aria-labelledby") ?? FormFieldLabelledBy;
+
         /// <inheritdoc />
         protected override bool ShouldLinkLabel => base.ShouldLinkLabel && string.IsNullOrEmpty(AriaLabel);
 

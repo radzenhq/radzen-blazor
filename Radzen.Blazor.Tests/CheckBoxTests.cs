@@ -306,5 +306,56 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.linkLabel"));
         }
+
+        [Fact]
+        public void CheckBox_Renders_AriaLabelAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters.AddUnmatched("aria-label", "Send a copy"));
+
+            var checkBox = component.Find("[role=checkbox]");
+            Assert.Equal("Send a copy", checkBox.GetAttribute("aria-label"));
+            Assert.False(checkBox.HasAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void CheckBox_Renders_AriaLabelledByAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters.AddUnmatched("aria-labelledby", "my-label"));
+
+            var checkBox = component.Find("[role=checkbox]");
+            Assert.Equal("my-label", checkBox.GetAttribute("aria-labelledby"));
+            Assert.False(checkBox.HasAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void CheckBox_AriaLabelParameter_OverridesAriaAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>(parameters => parameters
+                .Add(p => p.AriaLabel, "Plain check")
+                .AddUnmatched("aria-label", "Send a copy")
+                .AddUnmatched("aria-labelledby", "my-label"));
+
+            var checkBox = component.Find("[role=checkbox]");
+            Assert.Equal("Plain check", checkBox.GetAttribute("aria-label"));
+            Assert.False(checkBox.HasAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void CheckBox_InsideFormField_KeepsAriaLabelledByAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenFormField>(parameters => parameters
+                .Add(p => p.Text, "Plain check")
+                .AddChildContent<RadzenCheckBox<bool>>(cb => cb.Add(p => p.Name, "pcheck").AddUnmatched("aria-labelledby", "my-label")));
+
+            Assert.Equal("my-label", component.Find("[role=checkbox]").GetAttribute("aria-labelledby"));
+        }
     }
 }

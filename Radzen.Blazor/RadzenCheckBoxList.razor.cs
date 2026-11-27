@@ -440,6 +440,14 @@ namespace Radzen.Blazor
             return allItems.IndexOf(item) == focusedIndex;
         }
 
+        string? GetAriaAttribute(string name) => Attributes != null && Attributes.TryGetValue(name, out var value) ? Convert.ToString(value, Culture) : null;
+
+        string? GroupAriaLabelledBy => GetAriaAttribute("aria-labelledby") ?? FormFieldLabelledBy;
+
+        string? GroupAriaLabel => Attributes != null && Attributes.ContainsKey("aria-label")
+            ? GetAriaAttribute("aria-label")
+            : !string.IsNullOrEmpty(GroupAriaLabelledBy) ? null : Name;
+
         string? GetActiveDescendantId()
         {
             if (!focused)

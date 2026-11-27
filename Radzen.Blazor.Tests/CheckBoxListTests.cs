@@ -222,6 +222,40 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void CheckBoxList_Renders_AriaLabelAttribute()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "Notifications");
+                parameters.AddUnmatched("aria-label", "Choose notifications");
+            });
+
+            var group = component.Find("div.rz-checkbox-list");
+
+            Assert.Equal("Choose notifications", group.GetAttribute("aria-label"));
+            Assert.False(group.HasAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void CheckBoxList_Renders_AriaLabelledByAttribute()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "Notifications");
+                parameters.AddUnmatched("aria-labelledby", "my-label");
+            });
+
+            var group = component.Find("div.rz-checkbox-list");
+
+            Assert.Equal("my-label", group.GetAttribute("aria-labelledby"));
+            Assert.False(group.HasAttribute("aria-label"));
+        }
+
+        [Fact]
         public void CheckBoxList_Renders_CheckboxRoleAndState()
         {
             using var ctx = new TestContext();

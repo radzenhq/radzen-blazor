@@ -97,6 +97,58 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void RadioButtonList_Renders_AriaLabelAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "Shipping options");
+                parameters.AddUnmatched("aria-label", "Choose shipping");
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            Assert.Equal("Choose shipping", group.GetAttribute("aria-label"));
+            Assert.False(group.HasAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void RadioButtonList_Renders_AriaLabelledByAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "Shipping options");
+                parameters.AddUnmatched("aria-labelledby", "my-label");
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            Assert.Equal("my-label", group.GetAttribute("aria-labelledby"));
+            Assert.False(group.HasAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void RadioButtonList_AriaLabelledByParameter_OverridesAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.AriaLabelledBy, "parameter-label");
+                parameters.AddUnmatched("aria-labelledby", "my-label");
+                AddThreeItems(parameters);
+            });
+
+            Assert.Equal("parameter-label", component.Find("[role=radiogroup]").GetAttribute("aria-labelledby"));
+        }
+
+        [Fact]
         public void RadioButtonList_Exposes_ActiveDescendantOnFocus()
         {
             using var ctx = new TestContext();

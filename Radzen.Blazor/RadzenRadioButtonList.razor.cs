@@ -379,9 +379,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabelledBy { get; set; }
 
-        string? GroupAriaLabel => (Attributes != null && Attributes.ContainsKey("aria-label")) || !string.IsNullOrEmpty(AriaLabelledBy ?? FormFieldLabelledBy)
-            ? null
-            : Name;
+        string? GetAriaAttribute(string name) => Attributes != null && Attributes.TryGetValue(name, out var value) ? Convert.ToString(value, Culture) : null;
+
+        string? GroupAriaLabelledBy => AriaLabelledBy ?? GetAriaAttribute("aria-labelledby") ?? FormFieldLabelledBy;
+
+        string? GroupAriaLabel => Attributes != null && Attributes.ContainsKey("aria-label")
+            ? GetAriaAttribute("aria-label")
+            : !string.IsNullOrEmpty(GroupAriaLabelledBy) ? null : Name;
 
         bool IsFocused(IRadzenRadioButtonListItem item)
         {
