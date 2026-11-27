@@ -238,17 +238,6 @@ $gantt-event-border-radius: var(--rz-border-radius) !default;
     min-height: 100%;
   }
 
-  .rz-gantt-timeline-header {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    display: flex;
-    align-items: stretch;
-    overflow: hidden;
-    background: var(--rz-base-200);
-    border-bottom: 1px solid var(--rz-border-color);
-  }
-
   .rz-gantt-bar {
     position: absolute;
     border-radius: var(--rz-gantt-event-border-radius);

@@ -4,7 +4,7 @@ $tile-border: var(--rz-card-border) !default;
 $tile-border-radius: var(--rz-card-border-radius) !default;
 $tile-shadow: var(--rz-card-shadow) !default;
 $tile-header-background-color: var(--rz-base) !default;
-$tile-overlay-border-color: var(--rz-border-color) !default;
+$tile-overlay-border-color: var(--rz-primary) !default;
 $tile-overlay-background-color: var(--rz-primary-lighter) !default;
 
 .rz-tile-layout {
